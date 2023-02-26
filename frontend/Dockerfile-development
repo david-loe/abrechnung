@@ -1,0 +1,15 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY frontend/package*.json ./
+
+RUN npm install
+
+COPY frontend/. .
+
+RUN chown -R node /app/node_modules
+
+USER node
+
+CMD [ "npm", "run", "serve" ]

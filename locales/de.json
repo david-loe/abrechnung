@@ -1,0 +1,71 @@
+{
+  "headlines": {
+    "title": "reisekostenabrechnung",
+    "emoji": "✈",
+    "settings": "Einstellungen",
+    "login": "Login",
+    "logout": "Logout",
+    "user": "Benutzer",
+    "account": "Konto",
+    "approve": "Genehmigen",
+    "examine": "Prüfen",
+    "home": "Start"
+  },
+  "labels": {
+    "email": "Email Addresse",
+    "username": "Benutzername",
+    "name": "Name",
+    "password": "Passwort",
+    "done": "Erledigt",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "signIn": "Anmelden",
+    "search": "Suchen",
+    "image": "Bild",
+    "typeToSearch": "Tippe um zu Suchen...",
+    "createdBy": "Erstellt von",
+    "by": "von",
+    "filter": "Filter",
+    "import": "Importieren"
+  },
+  "alerts": {
+    "loginFailed": "Anmeldung fehlgeschlagen!",
+    "wrongPassword": "Falsches Passwort",
+    "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
+    "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
+    "successSaving": "Gespeichert",
+    "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
+    "successDeleting": "Gelöscht",
+    "request": {
+      "unauthorized": "Nicht autorisiert!"
+    },
+    "db": {
+      "success": "Erfolgreich mit der Datenbank verbunden."
+    }
+  },
+  "login": {
+    "signIn": "Bitte Anmelden"
+  },
+  "settings": {
+  },
+  "weekdays": {
+    "0": "Sonntag",
+    "1": "Montag",
+    "2": "Dienstag",
+    "3": "Mittwoch",
+    "4": "Donnerstag",
+    "5": "Freitag",
+    "6": "Samstag"
+  },
+  "weekdaysShort": {
+    "0": "So",
+    "1": "Mo",
+    "2": "Di",
+    "3": "Mi",
+    "4": "Do",
+    "5": "Fr",
+    "6": "Sa"
+  }
+}

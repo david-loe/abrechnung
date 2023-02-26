@@ -1,0 +1,50 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-${NODE_ENV}
+    restart: always
+    depends_on:
+      - db  
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./locales:/app/locales:ro
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    env_file:
+      - .env
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - db_data:/data/db
+
+# Uses ningx in production mode see /frontend/Dockerfile-production
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./frontend/Dockerfile-${NODE_ENV}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./locales:/app/src/locales:ro
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - ${FRONTEND_PORT}:80
+    env_file:
+      - .env
+
+# Test LDAP only in development mode
+  ldap:
+    build:
+      context: ./ldap
+      dockerfile: Dockerfile-${NODE_ENV}
+    environment:
+      - DEBUG=false
+
+volumes:
+  db_data:
