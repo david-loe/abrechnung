@@ -257,7 +257,7 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
     if(country){
       var newData = true
       for(const countrylumpSums of country.lumpSums){
-        if(countrylumpSums.validFrom > validFrom){
+        if(countrylumpSums.validFrom >= validFrom){
           newData = false
           break
         }

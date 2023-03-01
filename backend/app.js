@@ -100,6 +100,9 @@ for(const access of accesses){
   app.use('/api/' + access, adminRoutes)
 }
 
+// require('./test')
+
+
 app.listen(port, () => {
   console.log(`Backend listening at ${url}`)
 })

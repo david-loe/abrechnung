@@ -15,9 +15,4 @@ const userSchema = new mongoose.Schema({
   }
 })
 
-userSchema.pre(/^find((?!Update).)*$/, function () {
-  this.populate({ path: 'settings' })
-  this.populate({ path: 'access' })
-})
-
 module.exports = mongoose.model('User', userSchema)

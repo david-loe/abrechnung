@@ -26,10 +26,4 @@ const countrySchema = new mongoose.Schema({
   currency: {type: mongoose.Schema.Types.ObjectId, ref: 'Currency'}
 })
 
-countrySchema.pre(/^find((?!Update).)*$/, function () {
-  this.populate({ path: 'name' })
-  this.populate({ path: 'lumpSums' })
-  this.populate({ path: 'lumpSums.spezials' })
-})
-
 module.exports = mongoose.model('Country', countrySchema)
