@@ -21,6 +21,11 @@
     "edit": "Edit",
     "save": "Save",
     "delete": "Delete",
+    "addX": "Add $t({X})",
+    "deleteX": "Delete $t({X})",
+    "saveX": "Save $t({X})",
+    "editX": "Edit $t({X})",
+    "applyForX": "{X} beantragen",
     "signIn": "Sign in",
     "search": "Search",
     "image": "Image",
@@ -28,7 +33,9 @@
     "createdBy": "Created by",
     "by": "by",
     "filter": "Filter",
-    "import": "Import"
+    "import": "Import",
+    "travel": "Travel",
+    "myTravels": "Meine Reisen"
   },
   "alerts": {
     "loginFailed": "Failed to login!",
@@ -67,5 +74,11 @@
     "4": "Thu",
     "5": "Fri",
     "6": "Sat"
+  },
+  "states":{
+    "appliedFor": "Applied for",
+    "approved": "Approved",
+    "underExamination": "Under examination",
+    "refunded": "Refunded"
   }
 }

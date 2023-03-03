@@ -64,20 +64,26 @@
       </div>
     </div>
     <div class="position-relative">
-      <div class="position-absolute top-0 end-0" style="height: 100%;">
-      <div class="position-sticky top-0 pt-2 pe-2" style="z-index: 1100;">
-        <div v-for="(alert, index) of alerts" :key="alert.id" :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'" role="alert" style="z-index: 1100; max-width: 250px">
-          <strong>
-            <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
-            <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
-            {{alert.title}}{{ alert.title && alert.message ? ': ' : ''}}
-          </strong>
-          {{alert.message}}
-          <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
-            <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress" aria-label="Danger example"></div>
+      <div class="position-absolute top-0 end-0" style="height: 100%">
+        <div class="position-sticky top-0 pt-2 pe-2" style="z-index: 1100">
+          <div
+            v-for="(alert, index) of alerts"
+            :key="alert.id"
+            :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'"
+            role="alert"
+            style="z-index: 1100; max-width: 250px"
+          >
+            <strong>
+              <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
+              <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
+              {{ alert.title }}{{ alert.title && alert.message ? ': ' : '' }}
+            </strong>
+            {{ alert.message }}
+            <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
+              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress" aria-label="Danger example"></div>
+            </div>
+            <button type="button" class="btn-close" @click="alerts.splice(index, 1)"></button>
           </div>
-          <button type="button" class="btn-close" @click="alerts.splice(index, 1)"></button>
-        </div>
         </div>
       </div>
       <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
@@ -104,25 +110,33 @@ export default {
       alerts: [],
       auth: false,
       user: {},
+      travels: [],
       loadState: 'UNLOADED',
       loadingPromise: null,
-      bp: {sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400}
+      bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
+      stateColors: {
+        appliedFor: { color: '#cae5ff', text: 'black' },
+        approved: { color: '#89bbfe', text: 'black' },
+        underExamination: { color: '#6f8ab7', text: 'white' },
+        refunded: { color: '#615d6c', text: 'white' },
+      },
     }
   },
   methods: {
     async load() {
-      if(this.loadState === 'UNLOADED'){
+      if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
         this.loadingPromise = new Promise(async (resolve) => { // eslint-disable-line no-async-promise-executor
           this.user = await this.getter('user')
-          if(Object.keys(this.user).length > 0){
+          if (Object.keys(this.user).length > 0) {
             this.auth = true
           }
+          this.travels = await this.getter('travel')
           this.loadState = 'LOADED'
           resolve()
         })
         await this.loadingPromise
-      }else if(this.loadState === 'LOADING'){
+      } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
       }
     },
@@ -135,9 +149,9 @@ export default {
           this.auth = false
           this.user = {}
           this.$router.push('/login')
-        } 
+        }
       } catch (error) {
-        this.addAlert({message: error.response.data.message, title: "ERROR", type: "danger"})
+        this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
         console.log(error.response.data)
       }
     },
@@ -155,14 +169,14 @@ export default {
           this.$router.push('login')
         } else {
           console.log(error.response.data)
-          this.addAlert({message: error.response.data.message, title: "ERROR", type: "danger"})
+          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
         }
       }
     },
-    getById(property, id){
-      if(property in this){
-        for(const element of this[property]){
-          if(element._id == id){
+    getById(property, id) {
+      if (property in this) {
+        for (const element of this[property]) {
+          if (element._id == id) {
             return element
           }
         }
@@ -170,16 +184,36 @@ export default {
       }
       return false
     },
-    addAlert(alert){
-      alert = Object.assign(alert, {id: Math.random()})
+    addAlert(alert) {
+      alert = Object.assign(alert, { id: Math.random() })
       this.alerts.push(alert)
-      setTimeout(()=>{
-        const index = this.alerts.findIndex((al) => {return al.id === alert.id})
-        if(index !== -1){
+      setTimeout(() => {
+        const index = this.alerts.findIndex((al) => {
+          return al.id === alert.id
+        })
+        if (index !== -1) {
           this.alerts.splice(index, 1)
         }
       }, 5000)
-    }
+    },
+    dateTimeToHTMLInputString(date){
+      const dateObject = new Date(date)
+      const year = dateObject.getFullYear()
+      const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
+      const day = dateObject.getDate().toString().padStart(2, '0')
+      const hour = dateObject.getHours().toString().padStart(2, '0')
+      const minute = dateObject.getMinutes().toString().padStart(2, '0')
+      const str = year +'-'+ month +'-'+ day +'T'+ hour +':'+ minute
+      return str
+    },
+    dateToHTMLInputString(date){
+      const dateObject = new Date(date)
+      const year = dateObject.getFullYear()
+      const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
+      const day = dateObject.getDate().toString().padStart(2, '0')
+      const str = year +'-'+ month +'-'+ day
+      return str
+    },
   },
   beforeMount() {
     document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
@@ -210,8 +244,12 @@ footer {
 }
 
 @keyframes run {
-  0%   {width: 0%;}
-  100% {width: 100%;}
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
 }
 
 #alert-progress {

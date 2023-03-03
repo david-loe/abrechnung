@@ -21,6 +21,11 @@
     "edit": "Bearbeiten",
     "save": "Speichern",
     "delete": "Löschen",
+    "addX": "{X} hinzufügen",
+    "deleteX": "{X} löschen",
+    "saveX": "{X} speichern",
+    "editX": "{X} bearbeiten",
+    "applyForX": "{X} beantragen",
     "signIn": "Anmelden",
     "search": "Suchen",
     "image": "Bild",
@@ -28,7 +33,9 @@
     "createdBy": "Erstellt von",
     "by": "von",
     "filter": "Filter",
-    "import": "Importieren"
+    "import": "Importieren",
+    "travel": "Reise",
+    "myTravels": "Meine Reisen"
   },
   "alerts": {
     "loginFailed": "Anmeldung fehlgeschlagen!",
@@ -48,8 +55,7 @@
   "login": {
     "signIn": "Bitte Anmelden"
   },
-  "settings": {
-  },
+  "settings": {},
   "weekdays": {
     "0": "Sonntag",
     "1": "Montag",
@@ -67,5 +73,11 @@
     "4": "Do",
     "5": "Fr",
     "6": "Sa"
+  },
+  "states":{
+    "appliedFor": "Beantragt",
+    "approved": "Genehmigt",
+    "underExamination": "Wird Geprüft",
+    "refunded": "Erstattet"
   }
 }
