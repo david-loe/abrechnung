@@ -2,6 +2,7 @@ const router = require('express').Router()
 const User = require('../models/user')
 const i18n = require('../i18n')
 const helper = require('../helper')
+const Travel = require('../models/travel')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -14,23 +15,30 @@ router.delete('/logout', function (req, res) {
 
 router.get('/user', async (req, res) => {
   var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!user) {
-        var mail = req.user[process.env.LDAP_MAIL_ATTRIBUTE]
-        if (Array.isArray(mail)) {
-            if (mail.length > 0) {
-                mail = mail[0]
-            } else {
-                mail = ""
-            }
-        }
-        user = new User({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE], mail: mail })
-        try {
-            await user.save()
-        } catch (error) {
-            return res.status(400).send({ message: "Error while creating User" })
-        }
+  var email = req.user[process.env.LDAP_MAIL_ATTRIBUTE]
+  if (Array.isArray(email)) {
+    if (email.length > 0) {
+      email = email[0]
+    } else {
+      email = undefined
     }
-    res.send({data: Object.assign(user, {name: req.user[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]})})
+  }
+  const ldapUser = {
+    uid: req.user[process.env.LDAP_UID_ATTRIBUTE],
+    email: email,
+    name: req.user[process.env.LDAP_DISPLAYNAME_ATTRIBUTE],
+  }
+  if (!user) {
+    user = new User(ldapUser)
+  } else {
+    Object.assign(user, ldapUser)
+  }
+  try {
+    res.send({ data: await user.save() })
+  } catch (error) {
+    return res.status(400).send({ message: "Error while creating User" })
+  }
+
 })
 
 
@@ -44,6 +52,56 @@ router.post('/user/settings', async (req, res) => {
   } catch (error) {
     res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
   }
+})
+
+router.get('/travel', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, { history: 0 })(req, res)
+})
+
+router.post('/travel', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  req.body.editor = user._id
+  delete req.body.state
+  delete req.body.traveler
+  delete req.body.history
+  delete req.body.historic
+
+  const check = async (oldObject) => {
+    return oldObject.state !== 'refunded'
+  }
+  return helper.setter(Travel, 'traveler', false, check)(req, res)
+})
+
+router.post('/travel/appliedFor', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  req.body.state = 'appliedFor'
+  req.body.editor = user._id
+  req.body.traveler = user._id
+  delete req.body.history
+  delete req.body.historic
+  delete req.body.records
+
+  const check = async (oldObject) => {
+    return oldObject.state === 'appliedFor'
+  }
+  return helper.setter(Travel, 'traveler', true, check)(req, res)
+})
+
+router.post('/travel/underExamination', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  req.body.state = 'underExamination'
+  req.body.editor = user._id
+  delete req.body.traveler
+  delete req.body.history
+  delete req.body.historic
+
+  const check = async (oldObject) => {
+    await oldObject.saveToHistory()
+    await oldObject.save()
+    return oldObject.state === 'approved'
+  }
+  return helper.setter(Travel, 'traveler', false, check)(req, res)
 })
 
 

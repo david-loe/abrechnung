@@ -1,7 +1,7 @@
 const i18n = require('./i18n')
 const Country = require('./models/country')
 
-function getter(model, name, defaultLimit = 10, searchAlias = false) {
+function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}) {
   return async (req, res) => {
     const meta = {
       limit: defaultLimit,
@@ -24,37 +24,40 @@ function getter(model, name, defaultLimit = 10, searchAlias = false) {
       }
     } else {
       var conditions = {}
-      var message = 'No ' + name
-      if (req.query.search && req.query.search.length >= 2) {
-        conditions = { $and: [{ $or: [] }] }
-        conditions.$and[0].$or.push({ name: { $regex: req.query.search, $options: 'i' } })
-        if (searchAlias) conditions.$and[0].$or.push({ alias: { $regex: req.query.search, $options: 'i' } })
-        message = message + " with name containing: '" + req.query.search + "'"
-      }
-      delete req.query.search
       for (const filter of Object.keys(req.query)) {
         if (req.query[filter] && req.query[filter].length > 0) {
           var qFilter = {}
-          qFilter[filter] = req.query[filter]
+          if(req.query[filter].indexOf('name') !== -1){
+            qFilter[filter] = { $regex: req.query[filter], $options: 'i' }
+          }else{
+            qFilter[filter] = req.query[filter]
+          }
           if (!('$and' in conditions)) {
             conditions.$and = []
           }
           conditions.$and.push(qFilter)
         }
       }
-      const result = await model.find(conditions)
+      if(Object.keys(preConditions).length > 0){
+        if (!('$and' in conditions)) {
+          conditions.$and = []
+        }
+        conditions.$and.push(preConditions)
+      }
+      const result = await model.find(conditions, select)
       meta.count = result.length
       meta.countPages = Math.ceil(meta.count / meta.limit)
       if (result != null) {
         res.send({ meta: meta, data: result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page) })
       } else {
-        res.status(204).send({ message: message })
+        res.status(204).send({ message: 'No content' })
       }
     }
   }
 }
 
-function setter(model) {
+
+function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null) {
   return async (req, res) => {
     for (const field of Object.keys(model.schema.tree)) {
       if (model.schema.tree[field].required) {
@@ -69,10 +72,15 @@ function setter(model) {
       }
     }
     if (req.body._id && req.body._id !== '') {
-      if ('author' in model.schema.tree) {
+      if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var oldObject = await model.findOne({ _id: req.body._id })
-        if (!oldObject.author._id.equals(req.user._id)) {
+        if (!oldObject[checkUserIdField]._id.equals(req.user._id)) {
           return res.send(403)
+        }
+        if(checkOldObject){
+          if(!(await checkOldObject(oldObject))){
+            return res.send(403)
+          }
         }
       }
       try {
@@ -81,24 +89,26 @@ function setter(model) {
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
-    } else {
+    } else if(allowNew) {
       try {
         const result = await (new model(req.body)).save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
+    }else{
+      return res.send(403)
     }
 
   }
 }
 
-function deleter(model) {
+function deleter(model, checkUserIdField = '') {
   return async (req, res) => {
     if (req.query.id && req.query.id !== '') {
-      if ('author' in model.schema.tree) {
+      if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var doc = await model.findOne({ _id: req.query.id })
-        if (!doc.author._id.equals(req.user._id)) {
+        if (!doc[checkUserIdField]._id.equals(req.user._id)) {
           return res.send(403)
         }
       }
@@ -216,7 +226,8 @@ function rawCountryAndCurrencyToCountryAndCurrency(rawCountry) {
       },
       code: rawCountry.countryCode,
       currency: rawCountry.currencyCode,
-      lumpSumsFrom: rawCountry.lumpSumsFrom
+      lumpSumsFrom: rawCountry.lumpSumsFrom,
+      flag: getFlagEmoji(rawCountry.countryCode)
     },
     currency: {
       name: {
