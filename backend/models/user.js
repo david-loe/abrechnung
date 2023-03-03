@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   settings: {
     language: {type: String, default: 'de'},
-    currency: {type: String, default: 'EUR'},
+    lastCurrencies: [{type: String, ref: 'Currency'}],
   }
 })
 

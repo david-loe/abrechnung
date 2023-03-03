@@ -9,7 +9,8 @@ const countrySchema = new mongoose.Schema({
     de: { type: String, trim: true },
     en: { type: String, trim: true }
   },
-  code: { type: String, required: true, unique: true, index: true, trim: true },
+  _id: { type: String, required: true, trim: true, alias: 'code' },
+  flag: { type: String },
   lumpSums: [{
     validFrom: { type: Date },
     catering24: { type: Number },
@@ -23,7 +24,7 @@ const countrySchema = new mongoose.Schema({
     }]
   }],
   lumpSumsFrom: { type: String, trim: true },
-  currency: {type: mongoose.Schema.Types.ObjectId, ref: 'Currency'}
+  currency: {type: String, ref: 'Currency'}
 })
 
 module.exports = mongoose.model('Country', countrySchema)

@@ -10,7 +10,7 @@ const travelSchema = new mongoose.Schema({
   endDate: { type: Date, required: true },
   advance: {
     amount: { type: Number, min: 0, required: true },
-    currency: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required: true },
+    currency: { type: String, ref: 'Currency', required: true },
   },
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
   claimOvernightLumpSum: { type: Boolean, required: true },
@@ -25,7 +25,7 @@ const travelSchema = new mongoose.Schema({
     transport: { type: String, enum: ['ownCar', 'other'] },
     cost: {
       amount: { type: Number, min: 0, required: true },
-      currency: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required: true },
+      currency: { type: String, ref: 'Currency', required: true },
       receipt: { type: mongoose.Schema.Types.ObjectId, ref: 'File' }
     },
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
@@ -40,6 +40,7 @@ const travelSchema = new mongoose.Schema({
 travelSchema.pre(/^find((?!Update).)*$/, function () {
   this.populate({ path: 'advance.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.currency', model: 'Currency' })
+  this.populate({ path: 'traveler', model: 'User', select: {name: 1, email: 1} })
 })
 
 travelSchema.methods.saveToHistory = async function () {

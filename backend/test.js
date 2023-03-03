@@ -1,17 +1,15 @@
 const User = require('./models/user')
 const Travel = require('./models/travel')
-const Cost = require('./models/cost')
 const Currency = require('./models/currency')
 
 async function test(){
   const user = await User.findOne({})
   const euro = await Currency.findOne({code: 'EUR'})
   if(euro){
-    const advance = new Cost({
+    const advance = {
       amount: 100,
       currency: euro,
-    })
-    await advance.save()
+    }
   
     var travel = new Travel({
       name: 'Test',
