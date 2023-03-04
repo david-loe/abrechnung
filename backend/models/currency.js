@@ -6,7 +6,8 @@ const currencySchema = new mongoose.Schema({
     en: { type: String, trim: true }
   },
   _id: { type: String, required: true, trim: true, alias: 'code' },
-  subunit: { type: String, trim: true }
+  subunit: { type: String, trim: true },
+  symbol: { type: String, trim: true }
 })
 
 

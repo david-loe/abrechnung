@@ -145,7 +145,9 @@ function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
       // search for [] to identify arrays
       const match = currentline[j].match(/^\[(.*)\]$/)
       if (match === null) {
-        obj[headers[j]] = currentline[j];
+        if(currentline[j] !== ''){
+          obj[headers[j]] = currentline[j];
+        }
       } else {
         obj[headers[j]] = match[1].split(arraySeparator)
       }
@@ -157,23 +159,35 @@ function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
 }
 
 function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
-  const array = [Object.keys(objects[0])].concat(objects)
-
-  return array.map(it => {
-    return Object.values(it).map(item => {
-      if (Array.isArray(item)) {
-        return '[' + item.join(arraySeparator) + ']'
-      } else if (item === null) {
-        return 'null'
+  var keys = []
+  for(const obj of objects){
+    const oKeys =  Object.keys(obj)
+    if(keys.length < oKeys.length){
+      keys = oKeys
+    }
+  }
+  var str = keys.join(separator) + '\n'
+  for(const obj of objects){
+    col = []
+    for(const key of keys){
+      if(!key in obj){
+        col.push('')
+      }else if (Array.isArray(obj[key])) {
+        col.push('[' + obj[key].join(arraySeparator) + ']')
+      } else if (obj[key] === null) {
+        col.push('null')
       } else {
-        return item
+        col.push(obj[key])
       }
-    }).join(separator)
-  }).join('\n')
+    }
+    str += col.join(separator) + '\n'
+  }
+  return str
 }
 
 function getFlagEmoji(countryCode) {
   const codePoints = countryCode
+    .slice(0,2)
     .toUpperCase()
     .split('')
     .map(char => 127397 + char.charCodeAt());
@@ -212,46 +226,6 @@ function parseRawLumpSums(dataStr) {
     }
   }
   return data
-}
-
-function rawCountryAndCurrencyToCountryAndCurrency(rawCountry) {
-  return {
-    country: {
-      name: {
-        de: rawCountry.countryNameDE,
-        en: rawCountry.countryNameEN
-      },
-      alias: {
-        de: rawCountry.countryAliasDE
-      },
-      code: rawCountry.countryCode,
-      currency: rawCountry.currencyCode,
-      lumpSumsFrom: rawCountry.lumpSumsFrom,
-      flag: getFlagEmoji(rawCountry.countryCode)
-    },
-    currency: {
-      name: {
-        de: rawCountry.currencyNameDE,
-        en: rawCountry.currencyNameEN
-      },
-      code: rawCountry.currencyCode,
-      subUnit: rawCountry.currencySubunit
-    }
-  }
-}
-
-function parseRawCountriesAndCurrencies(dataStr) {
-  const data = csvToObjects(dataStr)
-  const countries = []
-  const currencies = []
-  for (const rawCountry of data) {
-    const {country, currency} = rawCountryAndCurrencyToCountryAndCurrency(rawCountry)
-    countries.push(country)
-    if(currencies.findIndex((c) => c.code === currency.code) === -1){
-      currencies.push(currency)
-    }
-  }
-  return {countries, currencies}
 }
 
 async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage = 'de'){
@@ -297,6 +271,5 @@ module.exports = {
   objectsToCSV: objectsToCSV,
   getFlagEmoji: getFlagEmoji,
   parseRawLumpSums: parseRawLumpSums,
-  parseRawCountriesAndCurrencies: parseRawCountriesAndCurrencies,
   addLumpSumsToCountries: addLumpSumsToCountries
 }

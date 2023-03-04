@@ -1,0 +1,249 @@
+name.en	name.de	alias.de	code	currency	lumpSumsFrom
+Andorra	Andorra		AD	EUR	
+United Arab Emirates	Vereinigte Arabische Emirate		AE	AED	
+Afghanistan	Afghanistan		AF	AFN	
+Antigua and Barbuda	Antigua und Barbuda		AG	XCD	TT
+Anguilla	Anguilla		AI	XCD	UK
+Albania	Albanien		AL	ALL	
+Armenia	Armenien		AM	AMD	
+Angola	Angola		AO	AOA	
+Argentina	Argentinien		AR	ARS	
+American Samoa	Amerikanisch-Samoa		AS	USD	US
+Austria	Österreich		AT	EUR	
+Australia	Australien		AU	AUD	
+Aruba	Aruba		AW	AWG	NL
+Åland Islands	Ålandinseln		AX	EUR	
+Azerbaijan	Aserbaidschan		AZ	AZN	
+Bosnia and Herzegovina	Bosnien und Herzegowina		BA	BAM	
+Barbados	Barbados		BB	BBD	
+Bangladesh	Bangladesch		BD	BDT	
+Belgium	Belgien		BE	EUR	
+Burkina Faso	Burkina Faso		BF	XOF	
+Bulgaria	Bulgarien		BG	BGN	
+Bahrain	Bahrain		BH	BHD	
+Burundi	Burundi		BI	BIF	
+Benin	Benin		BJ	XOF	
+Saint Barthélemy	St. Barthélemy		BL	EUR	FR
+Bermuda	Bermuda		BM	BMD	UK
+Brunei	Brunei		BN	BND	
+Bolivia	Bolivien		BO	BOB	
+Brazil	Brasilien		BR	BRL	
+Bahamas	Bahamas		BS	BSD	
+Bhutan	Bhutan		BT	BTN	
+Bouvet Island	Bouvetinsel		BV		NO
+Botswana	Botsuana		BW	BWP	
+Belarus	Belarus	Weißrussland	BY	BYN	
+Belize	Belize		BZ	BZD	
+Canada	Kanada		CA	CAD	
+Cocos Islands	Kokosinseln		CC	AUD	AU
+Democratic Republic of the Congo	Demokratische Republik Kongo	Kongo, Demokratische Republik	CD	CDF	
+Central African Republic	Zentralafrikanische Republik		CF	XAF	
+Congo	Kongo	Kongo, Republik	CG	XAF	
+Switzerland	Schweiz		CH	CHF	
+Côte d’Ivoire	Côte d’Ivoire		CI	XOF	
+Cook Islands	Cookinseln		CK	NZD	
+Chile	Chile		CL	CLP	
+Cameroon	Kamerun		CM	XAF	
+China	China		CN	CNY	
+Colombia	Kolumbien		CO	COP	
+Clipperton	Clipperton		CP		FR
+Costa Rica	Costa Rica		CR	CRC	
+Cuba	Kuba		CU	CUP	
+Cabo Verde	Cabo Verde	Kap Verde	CV	CVE	
+Curaçao	Curaçao		CW	ANG	NL
+Christmas Island	Weihnachtsinsel		CX	AUD	AU
+Cyprus	Zypern		CY	EUR	
+Czechia	Tschechien	Tschechische Republik	CZ	CZK	
+Germany	Deutschland		DE	EUR	
+Djibouti	Dschibuti		DJ	DJF	
+Denmark	Dänemark		DK	DKK	
+Dominica	Dominica		DM	XCD	TT
+Dominican Republic	Dominikanische Republik		DO	DOP	
+Algeria	Algerien		DZ	DZD	
+Ecuador	Ecuador		EC	USD	
+Estonia	Estland		EE	EUR	
+Egypt	Ägypten		EG	EGP	
+Western Sahara	Westsahara		EH	MAD	
+Greece	Griechenland		EL	EUR	
+Eritrea	Eritrea		ER	ERN	
+Spain	Spanien		ES	EUR	
+Ethiopia	Äthiopien		ET	ETB	
+Finland	Finnland		FI	EUR	
+Fiji	Fidschi		FJ	FJD	
+Falkland Islands	Falklandinseln		FK	FKP	UK
+Micronesia	Mikronesien		FM	USD	PH
+Faroes	Färöer		FO	DKK	DK
+France	Frankreich		FR	EUR	
+Gabon	Gabun		GA	XAF	
+Grenada	Grenada		GD	XCD	TT
+Georgia	Georgien		GE	GEL	
+French Guiana	Französisch-Guayana		GF	EUR	FR
+Guernsey	Guernsey		GG	GBP	UK
+Ghana	Ghana		GH	GHS	
+Gibraltar	Gibraltar		GI	GIP	UK
+Greenland	Grönland		GL	DKK	DK
+The Gambia	Gambia		GM	GMD	
+Guinea	Guinea		GN	GNF	
+Guadeloupe	Guadeloupe		GP	EUR	FR
+Equatorial Guinea	Äquatorialguinea		GQ	XAF	
+South Georgia and the South Sandwich Islands	Südgeorgien und Südliche Sandwichinseln		GS		UK
+Guatemala	Guatemala		GT	GTQ	
+Guam	Guam		GU	USD	US
+Guinea-Bissau	Guinea-Bissau		GW	XOF	
+Guyana	Guyana		GY	GYD	TT
+Hong Kong	Hongkong		HK	HKD	CN
+Heard Island and McDonald Islands	Heard und die McDonaldinseln		HM		AU
+Honduras	Honduras		HN	HNL	
+Croatia	Kroatien		HR	EUR	
+Haiti	Haiti		HT	HTG	
+Hungary	Ungarn		HU	HUF	
+Indonesia	Indonesien		ID	IDR	
+Ireland	Irland		IE	EUR	
+Israel	Israel		IL	ILS	
+Isle of Man	Insel Man		IM	GBP	
+India	Indien		IN	INR	
+British Indian Ocean Territory	Britisches Territorium im Indischen Ozean		IO	USD	UK
+Iraq	Irak		IQ	IQD	
+Iran	Iran		IR	IRR	
+Iceland	Island		IS	ISK	
+Italy	Italien		IT	EUR	
+Jersey	Jersey		JE	GBP	
+Jamaica	Jamaika		JM	JMD	
+Jordan	Jordanien		JO	JOD	
+Japan	Japan		JP	JPY	
+Kenya	Kenia		KE	KES	
+Kyrgyzstan	Kirgisistan		KG	KGS	
+Cambodia	Kambodscha		KH	KHR	
+Kiribati	Kiribati		KI	AUD	
+Comoros	Komoren		KM	KMF	
+Saint Kitts and Nevis	St. Kitts und Nevis		KN	XCD	TT
+North Korea	Nordkorea	Korea, Demokratische Volksrepublik	KP	KPW	
+South Korea	Südkorea	Korea, Republik	KR	KRW	
+Kuwait	Kuwait		KW	KWD	
+Cayman Islands	Kaimaninseln		KY	KYD	UK
+Kazakhstan	Kasachstan		KZ	KZT	
+Laos	Laos		LA	LAK	
+Lebanon	Libanon		LB	LBP	
+Saint Lucia	St. Lucia		LC	XCD	TT
+Liechtenstein	Liechtenstein		LI	CHF	
+Sri Lanka	Sri Lanka		LK	LKR	
+Liberia	Liberia		LR	LRD	
+Lesotho	Lesotho		LS	LSL	
+Lithuania	Litauen		LT	EUR	
+Luxembourg	Luxemburg		LU	EUR	
+Latvia	Lettland		LV	EUR	
+Libya	Libyen		LY	LYD	
+Morocco	Marokko		MA	MAD	
+Monaco	Monaco		MC	EUR	
+Moldova	Moldau	Moldau, Republik	MD	MDL	
+Montenegro	Montenegro		ME	EUR	
+Saint Martin	St. Martin		MF	EUR	FR
+Madagascar	Madagaskar		MG	MGA	
+Marshall Islands	Marshallinseln	Marshall Inseln	MH	USD	
+North Macedonia	Nordmazedonien		MK	MKD	
+Mali	Mali		ML	XOF	
+Myanmar/Burma	Myanmar		MM	MMK	
+Mongolia	Mongolei		MN	MNT	
+Macao	Macau		MO	MOP	CN
+Northern Mariana Islands	Nördliche Marianen		MP	USD	US
+Martinique	Martinique		MQ	EUR	FR
+Mauritania	Mauretanien		MR	MRU	
+Montserrat	Montserrat		MS	XCD	UK
+Malta	Malta		MT	EUR	
+Mauritius	Mauritius		MU	MUR	
+Maldives	Malediven		MV	MVR	
+Malawi	Malawi		MW	MWK	
+Mexico	Mexiko		MX	MXN	
+Malaysia	Malaysia		MY	MYR	
+Mozambique	Mosambik		MZ	MZN	
+Namibia	Namibia		NA	NAD	
+New Caledonia	Neukaledonien		NC	XPF	FR
+Niger	Niger		NE	XOF	
+Norfolk Island	Norfolkinsel		NF	AUD	AU
+Nigeria	Nigeria		NG	NGN	
+Nicaragua	Nicaragua		NI	NIO	
+Netherlands	Niederlande		NL	EUR	
+Norway	Norwegen		NO	NOK	
+Nepal	Nepal		NP	NPR	
+Nauru	Nauru		NR	AUD	
+Niue	Niue		NU	NZD	NZ
+New Zealand	Neuseeland		NZ	NZD	
+Oman	Oman		OM	OMR	
+Panama	Panama		PA	PAB	
+Peru	Peru		PE	PEN	
+French Polynesia	Französisch-Polynesien		PF	XPF	FR
+Papua New Guinea	Papua-Neuguinea		PG	PGK	
+Philippines	Philippinen		PH	PHP	
+Pakistan	Pakistan		PK	PKR	
+Poland	Polen		PL	PLN	
+Saint Pierre and Miquelon	St. Pierre und Miquelon		PM	EUR	FR
+Pitcairn Islands	Pitcairninseln		PN	NZD	UK
+Puerto Rico	Puerto Rico		PR	USD	US
+Portugal	Portugal		PT	EUR	
+Palau	Palau		PW	USD	
+Paraguay	Paraguay		PY	PYG	
+Qatar	Katar		QA	QAR	
+Réunion	Réunion		RE	EUR	FR
+Romania	Rumänien		RO	RON	
+Serbia	Serbien		RS	RSD	
+Russia	Russland	Russische Föderation	RU	RUB	
+Rwanda	Ruanda		RW	RWF	
+Saudi Arabia	Saudi-Arabien		SA	SAR	
+Solomon Islands	Salomonen		SB	SBD	
+Seychelles	Seychellen		SC	SCR	
+Sudan	Sudan		SD	SDG	
+Sweden	Schweden		SE	SEK	
+Singapore	Singapur		SG	SGD	
+Saint Helena, Ascension and Tristan da Cunha	St. Helena, Ascension und Tristan da Cunha		SH	SHP	UK
+Slovenia	Slowenien		SI	EUR	
+Svalbard and Jan Mayen	Svalbard und Jan Mayen		SJ	NOK	NO
+Slovakia	Slowakei	Slowakische Republik	SK	EUR	
+Sierra Leone	Sierra Leone		SL	SLE	
+San Marino	San Marino		SM	EUR	
+Senegal	Senegal		SN	XOF	
+Somalia	Somalia		SO	SOS	
+Suriname	Suriname		SR	SRD	TT
+South Sudan	Südsudan		SS	SSP	
+São Tomé and Príncipe	São Tomé und Príncipe	São Tomé – Príncipe	ST	STN	
+El Salvador	El Salvador		SV	SVC	
+Sint Maarten	Sint Maarten		SX	ANG	NL
+Syria	Syrien		SY	SYP	
+Eswatini	Eswatini		SZ	SZL	
+Turks and Caicos Islands	Turks- und Caicosinseln		TC	USD	UK
+Chad	Tschad		TD	XAF	
+French Southern and Antarctic Lands	Französische Süd- und Antarktisgebiete		TF	EUR	FR
+Togo	Togo		TG	XOF	
+Thailand	Thailand		TH	THB	
+Tajikistan	Tadschikistan		TJ	TJS	
+Tokelau	Tokelau		TK	NZD	NZ
+Timor-Leste	Timor-Leste		TL	USD	
+Turkmenistan	Turkmenistan		TM	TMT	
+Tunisia	Tunesien		TN	TND	
+Tonga	Tonga		TO	TOP	
+Türkiye	Türkei		TR	TRY	
+Trinidad and Tobago	Trinidad und Tobago		TT	TTD	
+Tuvalu	Tuvalu		TV	AUD	
+Taiwan	Taiwan		TW	TWD	
+Tanzania	Tansania		TZ	TZS	
+Ukraine	Ukraine		UA	UAH	
+Uganda	Uganda		UG	UGX	
+United Kingdom	Vereinigtes Königreich	Vereinigte Königreich Großbritannien und Nordirland	UK	GBP	
+United States Minor Outlying Islands	Kleinere Amerikanische Überseeinseln		UM	USD	US
+United States	Vereinigte Staaten	Vereinigten Staaten von Amerika	US	USD	
+Uruguay	Uruguay		UY	UYU	
+Uzbekistan	Usbekistan		UZ	UZS	
+Vatican City State	Vatikanstadt	Vatikanstaat	VA	EUR	
+Saint Vincent and the Grenadines	St. Vincent und Grenadinen		VC	XCD	TT
+Venezuela	Venezuela		VE	VES	
+British Virgin Islands	Britische Jungferninseln		VG	USD	UK
+US Virgin Islands	Amerikanische Jungferninseln		VI	USD	US
+Vietnam	Vietnam		VN	VND	
+Vanuatu	Vanuatu		VU	VUV	
+Wallis and Futuna	Wallis und Futuna		WF	XPF	FR
+Samoa	Samoa		WS	WST	
+Yemen	Jemen		YE	YER	
+Mayotte	Mayotte		YT	EUR	FR
+South Africa	Südafrika		ZA	ZAR	
+Zambia	Sambia		ZM	ZMW	
+Zimbabwe	Simbabwe		ZW	ZWL	
+Kosovo	Kosovo		XK	EUR	

@@ -17,15 +17,17 @@ function loadLumpSums() {
   return lumpSums
 }
 
-function loadCountriesAndCurrencies() {
-  var result = { countries: [], currencies: [] }
-  fs.readdirSync('./data').forEach(file => {
-    const matched = file.match(/countries_(\d{4}-\d{2}-\d{2})\.tsv/i)
-    if (matched && matched.length > 1) {
-      const dataStr = fs.readFileSync('./data/' + file, 'utf8')
-      result = helper.parseRawCountriesAndCurrencies(dataStr)
-    }
-  });
+function loadCountries() {
+  const dataStr = fs.readFileSync('./data/countries.tsv', 'utf8')
+  const result = helper.csvToObjects(dataStr)
+  result.forEach(c => c.flag = helper.getFlagEmoji(c.code))
+  return result
+}
+
+function loadCurrencies() {
+  const dataStr = fs.readFileSync('./data/currencies.tsv', 'utf8')
+  const result = helper.csvToObjects(dataStr)
+  result.forEach(c => c.flag = helper.getFlagEmoji(c.code))
   return result
 }
 
@@ -48,28 +50,6 @@ const initer = function (model, name, data) {
   })
 }
 
-function initCountries(countries) {
-  return new Promise((resolve) => {
-    Country.find({}, async (err, docs) => {
-      if (docs.length === 0) {
-        for (const country of countries) {
-          const currency = await Currency.findOne({ code: country.currency })
-          country.currency = currency._id
-        }
-        Country.insertMany(countries, (err, result) => {
-          if (err) {
-            console.log(err)
-          }
-          console.log('Added ' + result.length + ' countries')
-          resolve()
-        })
-      } else {
-        console.log(docs.length + ' Countries exist')
-        resolve()
-      }
-    })
-  })
-}
 
 function addAllLumpSums() {
   const lumpSums = loadLumpSums()
@@ -85,9 +65,8 @@ function addAllLumpSums() {
 }
 
 function initDB() {
-  const { countries, currencies } = loadCountriesAndCurrencies()
-  initer(Currency, 'currencies', currencies).then(() => {
-    initCountries(countries).then(() => {
+  initer(Currency, 'currencies', loadCurrencies()).then(() => {
+    initer(Country, 'countries', loadCountries()).then(() => {
       addAllLumpSums()
     })
   })
