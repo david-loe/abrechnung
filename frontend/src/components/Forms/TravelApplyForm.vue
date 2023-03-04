@@ -1,6 +1,5 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-    
     <div class="mb-2">
       <label for="travelFormName" class="form-label">
         {{ $t('labels.name') }}
@@ -9,10 +8,10 @@
     </div>
 
     <div class="mb-2">
-      <label for="travelFormHint" class="form-label">
+      <label for="travelFormReason" class="form-label">
         {{ $t('labels.reason') }}
       </label>
-      <input type="text" class="form-control" id="travelFormHint" v-model="formTravel.reason" required />
+      <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
     </div>
 
     <div class="row mb-2">
@@ -22,24 +21,25 @@
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
-        <input
-          id="endDateInput"
-          class="form-control"
-          type="date"
-          v-model="formTravel.endDate"
-          required
-          v-bind:min="formTravel.startDate"
-        />
+        <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" required v-bind:min="formTravel.startDate" />
       </div>
     </div>
 
-    <label for="travelFormName" class="form-label">
-        {{ $t('labels.advance') }}
-      </label>
+    <label for="travelFormAdvance" class="form-label">
+      {{ $t('labels.advance') }}
+    </label>
 
-    <div class="input-group mb-2">
-      <input type="number" class="form-control" id="travelFormName" v-model="formTravel.advance.amount" />
-      
+    <div class="input-group mb-2" id="travelFormAdvance">
+      <input type="number" class="form-control" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
+      <v-select :options="$root.currencies" style="min-width: 250px">
+        <template #option="{ name, code, symbol, flag }">
+          <h3 style="margin: 0">{{ flag }}</h3>
+          <em>{{ name.de }} {{ symbol }} {{ code }}</em>
+        </template>
+        <template #selected-option="{ code, symbol, flag }">
+            <strong>{{ symbol ? symbol : code }}</strong> <span>{{flag}}</span>
+        </template>
+      </v-select>
     </div>
 
     <div class="mb-2">
@@ -107,7 +107,7 @@ export default {
       output.startDate = new Date(output.startDate)
       output.endDate = new Date(output.endDate)
       return output
-    }
+    },
   },
   beforeMount() {},
   watch: {

@@ -3,6 +3,8 @@ const User = require('../models/user')
 const i18n = require('../i18n')
 const helper = require('../helper')
 const Travel = require('../models/travel')
+const Currency = require('../models/currency')
+const Country = require('../models/country')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -53,6 +55,8 @@ router.post('/user/settings', async (req, res) => {
     res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
   }
 })
+
+router.get('/currency', helper.getter(Currency, 'currency', 200))
 
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })

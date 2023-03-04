@@ -7,7 +7,7 @@
     --vs-controls-color: var(--bs-gray-800);
     --vs-dropdown-option--active-bg: #1e90ff;
     --vs-dropdown-min-width: 60px;
-    --vs-dropdown-max-height: 350px;
+    --vs-dropdown-max-height: 250px;
     --vs-selected-bg: #f0f0f0;
     --vs-selected-color: var(--vs-colors--dark);
     --vs-selected-border-color: var(--vs-border-color);

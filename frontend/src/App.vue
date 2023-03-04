@@ -111,6 +111,7 @@ export default {
       auth: false,
       user: {},
       travels: [],
+      currencies: [],
       loadState: 'UNLOADED',
       loadingPromise: null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -132,6 +133,7 @@ export default {
             this.auth = true
           }
           this.travels = await this.getter('travel')
+          this.currencies = await this.getter('currency')
           this.loadState = 'LOADED'
           resolve()
         })
@@ -222,8 +224,20 @@ export default {
 </script>
 
 <style>
-#app {
+@font-face {
+  font-family: 'Twemoji Country Flags';
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
+  src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1/dist/TwemojiCountryFlags.woff2') format('woff2');
+}
+
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.win {
+  font-family: "Twemoji Country Flags", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
