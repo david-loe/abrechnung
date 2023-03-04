@@ -1,2 +1,2 @@
-FROM rroemhild/test-openldap
+FROM gitea/test-openldap
 HEALTHCHECK NONE
