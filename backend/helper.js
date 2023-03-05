@@ -186,6 +186,10 @@ function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
 }
 
 function getFlagEmoji(countryCode) {
+  const noFlag = ['XCD', 'XOF', 'XAF', 'ANG', 'XPF']
+  if(noFlag.indexOf(countryCode) !== -1){
+    return null
+  }
   const codePoints = countryCode
     .slice(0,2)
     .toUpperCase()

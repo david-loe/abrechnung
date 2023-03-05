@@ -31,17 +31,9 @@
 
     <div class="input-group mb-2" id="travelFormAdvance">
       <input type="number" class="form-control" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
-      <v-select :options="$root.currencies" style="min-width: 250px">
-        <template #option="{ name, code, symbol, flag }">
-          <h3 style="margin: 0">{{ flag }}</h3>
-          <em>{{ name.de }} {{ symbol }} {{ code }}</em>
-        </template>
-        <template #selected-option="{ code, symbol, flag }">
-            <strong>{{ symbol ? symbol : code }}</strong> <span>{{flag}}</span>
-        </template>
-      </v-select>
+      <CurrencySelector v-model="formTravel.advance.currency"></CurrencySelector>
     </div>
-
+    
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
         {{ $t('labels.add') }}
@@ -57,9 +49,10 @@
 </template>
 
 <script>
+import CurrencySelector from '../Elements/CurrencySelector.vue'
 export default {
-  components: {},
   name: 'TravelApplyForm',
+  components: {CurrencySelector},
   props: {
     travel: {
       type: Object,

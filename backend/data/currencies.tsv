@@ -1,13 +1,24 @@
 code	name.de	name.en	subunit	symbol
 EUR	Euro	euro	Cent	€
+USD	US-Dollar	US dollar	Cent	$
+GBP	Pfund Sterling	Guernsey pound	Penny	£
+CNY	Renminbi Yuan	renminbi-yuan	Fen	¥
+CHF	Schweizer Franken	Swiss franc	Rappen;Centime	CHF
+HKD	Hongkong-Dollar	Hong Kong dollar	Cent	$
+SGD	Singapur-Dollar	Singapore dollar	Cent	$
+NZD	Neuseeland-Dollar	New Zealand dollar	Cent	$
+INR	indische Rupie	Indian rupee	Paisa	₹
+ZAR	Rand	rand	Cent	R
+THB	Baht	baht	Satang	฿
+IDR	Rupiah	rupiah	Sen	Rp
 AED	VAE-Dirham	UAE dirham	Fils	
-AFN	Afghani	afghani	Pul	؋
+TRY	türkische Lira	Turkish lira	Kurus	₺
 XCD	ostkaribischer Dollar	East Caribbean dollar	Cent	$
 ALL	Lek	lek		Lek
+AFN	Afghani	afghani	Pul	؋
 AMD	Dram	dram	Lumma	
 AOA	Kwanza	kwanza	Cêntimo	
 ARS	argentinischer Peso	Argentine peso	Centavo	$
-USD	US-Dollar	US dollar	Cent	$
 AUD	australischer Dollar	Australian dollar	Cent	$
 AWG	Aruba-Gulden	Aruban guilder	Cent	ƒ
 AZN	Aserbaidschan-Manat	Azerbaijan manat	Qäpik	₼
@@ -30,10 +41,7 @@ BZD	Belize-Dollar	Belize dollar	Cent	BZ$
 CAD	kanadischer Dollar	Canadian dollar	Cent	$
 CDF	Kongo-Franc	Congolese franc	Centime	
 XAF	CFA-Franc (BEAC)	CFA franc	Centime	
-CHF	Schweizer Franken	Swiss franc	Rappen;Centime	CHF
-NZD	Neuseeland-Dollar	New Zealand dollar	Cent	$
 CLP	chilenischer Peso	Chilean peso	Centavo	$
-CNY	Renminbi Yuan	renminbi-yuan	Fen	¥
 COP	kolumbianischer Peso	Colombian peso	Centavo	$
 CRC	Costa-Rica-Colón	Costa Rican colón	Céntimo	₡
 CUP	kubanischer Peso	Cuban peso	Centavo	₱
@@ -51,20 +59,16 @@ ETB	Birr	birr	Cent
 FJD	Fidschi-Dollar	Fiji dollar	Cent	$
 FKP	Falkland-Pfund	Falkland Islands pound	Penny	£
 GEL	Lari	lari	Tetri	₾
-GBP	Pfund Sterling	Guernsey pound	Penny	£
 GHS	Ghana Cedi	Ghana cedi	Pesewa	¢
 GIP	Gibraltar-Pfund	Gibraltar pound	Penny	£
 GMD	Dalasi	dalasi	Butut	
 GNF	Guinea-Franc	Guinean franc		
 GTQ	Quetzal	quetzal	Centavo	Q
 GYD	Guyana-Dollar	Guyana dollar	Cent	$
-HKD	Hongkong-Dollar	Hong Kong dollar	Cent	$
 HNL	Lempira	lempira	Centavo	L
 HTG	Gourde	gourde	Centime	
 HUF	Forint	forint		Ft
-IDR	Rupiah	rupiah	Sen	Rp
 ILS	Schekel	shekel	Agora	₪
-INR	indische Rupie	Indian rupee	Paisa	₹
 IQD	Irak-Dinar	Iraqi dinar	Fils	
 IRR	iranischer Rial	Iranian rial		﷼
 ISK	isländische Krone	króna		kr
@@ -123,8 +127,7 @@ SBD	Salomonen-Dollar	Solomon Islands dollar	Cent	$
 SCR	Seychellen-Rupie	Seychelles rupee	Cent	₨
 SDG	sudanesisches Pfund	Sudanese pound	Piaster	
 SEK	schwedische Krone	krona	Öre	kr
-SGD	Singapur-Dollar	Singapore dollar	Cent	$
-SHP	St.-Helena-Pfund (St. Helena und Ascension)	Saint Helena pound	Penny	£
+SHP	St.-Helena-Pfund	Saint Helena pound	Penny	£
 SLE	Leone	leone	Cent	
 SOS	Somalia-Schilling	Somali shilling	Cent	S
 SRD	Suriname-Dollar	Surinamese dollar	Cent	$
@@ -133,12 +136,10 @@ STN	Dobra	dobra	Centime
 SVC	El-Salvador-Colón	Salvadorian colón	Centavo	$
 SYP	syrisches Pfund	Syrian pound	Piastre	£
 SZL	Lilangeni	lilangeni	Cent	
-THB	Baht	baht	Satang	฿
 TJS	Somoni	somoni	Diram	
 TMT	Turkmenistan-Manat	Turkmen manat	Tenge	
 TND	tunesischer Dinar	Tunisian dinar	Millime	
 TOP	Pa’anga	pa’anga	Seniti	
-TRY	türkische Lira	Turkish lira	Kurus	₺
 TTD	Trinidad-und-Tobago-Dollar	Trinidad and Tobago dollar	Cent	TT$
 TWD	neuer Taiwan-Dollar	new Taiwan dollar	Cent	NT$
 TZS	Tansania-Schilling	Tanzanian shilling	Cent	
@@ -151,6 +152,5 @@ VND	Dong	dong		₫
 VUV	Vatu	vatu		
 WST	Tala	tala	Sene	
 YER	Jemen-Rial	Yemeni rial	Fils	﷼
-ZAR	Rand	rand	Cent	R
 ZMW	sambischer Kwacha	Zambian kwacha	Ngwee	
 ZWL	Simbabwe-Dollar	Zimbabwe dollar	Cent	
