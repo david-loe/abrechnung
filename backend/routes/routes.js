@@ -60,7 +60,8 @@ router.get('/currency', helper.getter(Currency, 'currency', 200))
 
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, { history: 0 })(req, res)
+  const sortFn = (a,b) => a.startDate - b.startDate
+  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, { history: 0 }, sortFn)(req, res)
 })
 
 router.post('/travel', async (req, res) => {

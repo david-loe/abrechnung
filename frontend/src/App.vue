@@ -199,6 +199,7 @@ export default {
       }, 5000)
     },
     dateTimeToHTMLInputString(date){
+      if(!date) return ''
       const dateObject = new Date(date)
       const year = dateObject.getFullYear()
       const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
@@ -209,12 +210,26 @@ export default {
       return str
     },
     dateToHTMLInputString(date){
+      if(!date) return ''
       const dateObject = new Date(date)
       const year = dateObject.getFullYear()
       const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
       const day = dateObject.getDate().toString().padStart(2, '0')
       const str = year +'-'+ month +'-'+ day
       return str
+    },
+    async pushSettings(){
+      try {
+        await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {
+          withCredentials: true,
+        })
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.$router.push('login')
+        } else {
+          console.log(error.response.data)
+        }
+      }
     },
   },
   beforeMount() {

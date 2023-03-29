@@ -9,7 +9,8 @@
     "account": "Konto",
     "approve": "Genehmigen",
     "examine": "Prüfen",
-    "home": "Start"
+    "home": "Start",
+    "myTravels": "Meine Reisen"
   },
   "labels": {
     "email": "Email Addresse",
@@ -35,7 +36,16 @@
     "filter": "Filter",
     "import": "Importieren",
     "travel": "Reise",
-    "myTravels": "Meine Reisen"
+    "advance": "Vorschuss",
+    "from": "Von",
+    "to": "Bis",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "reason": "Grund",
+    "newX": "{X} - Neu",
+    "destinationPlace": "Zielort",
+    "travelInsideOfEU": "Reise innerhalb der EU",
+    "state": "Status"
   },
   "alerts": {
     "loginFailed": "Anmeldung fehlgeschlagen!",
@@ -51,6 +61,12 @@
     "db": {
       "success": "Erfolgreich mit der Datenbank verbunden."
     }
+  },
+  "info": {
+    "reason": "Gib hier kurz den Grund deiner Reise an.",
+    "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
+    "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wieviel du benötigst.",
+    "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?"
   },
   "login": {
     "signIn": "Bitte Anmelden"

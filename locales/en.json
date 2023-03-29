@@ -9,7 +9,8 @@
     "account": "Account",
     "approve": "Approve",
     "examine": "Examine",
-    "home": "Home"
+    "home": "Home",
+    "myTravels": "My travels"
   },
   "labels": {
     "email": "Email address",
@@ -21,11 +22,11 @@
     "edit": "Edit",
     "save": "Save",
     "delete": "Delete",
-    "addX": "Add $t({X})",
-    "deleteX": "Delete $t({X})",
-    "saveX": "Save $t({X})",
-    "editX": "Edit $t({X})",
-    "applyForX": "{X} beantragen",
+    "addX": "Add {X}",
+    "deleteX": "Delete {X}",
+    "saveX": "Save {X}",
+    "editX": "Edit {X}",
+    "applyForX": "Apply for {X}",
     "signIn": "Sign in",
     "search": "Search",
     "image": "Image",
@@ -35,7 +36,16 @@
     "filter": "Filter",
     "import": "Import",
     "travel": "Travel",
-    "myTravels": "Meine Reisen"
+    "advance": "Advance",
+    "from": "From",
+    "to": "To",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "reason": "Reason",
+    "newX": "New {X}",
+    "destinationPlace": "Destination place",
+    "travelInsideOfEU": "Travel inside of the EU",
+    "state": "State"
   },
   "alerts": {
     "loginFailed": "Failed to login!",
@@ -51,6 +61,12 @@
     "db": {
       "success": "Successfully connected to the Database."
     }
+  },
+  "info": {
+    "reason": "Briefly state the reason for your trip here.",
+    "destinationPlace": "Specify here the place that is the destination of your trip.",
+    "advance": "If you need an advance (e.g. for the plane tickets), specify here how much you need.",
+    "travelInsideOfEU": "Is your trip a cross-country trip within the EU?"
   },
   "login": {
     "signIn": "Please sign in"

@@ -4,8 +4,8 @@
     :modelValue="modelValue"
     @update:modelValue="(v) => $emit('update:modelValue', v)"
     :filter="filter"
-    :reduce="cur => cur._id"
-    style="min-width: 250px"
+    :reduce="(cur) => cur._id"
+    style="min-width: 250px;"
   >
     <template #option="{ name, _id, symbol, flag }">
       <div class="row align-items-center">
@@ -24,9 +24,12 @@
       </div>
     </template>
     <template #selected-option="{ _id, symbol, flag }">
-      <span v-if="flag" class="me-1">{{ flag }}</span
-      ><span>{{ _id }}</span
-      ><span v-if="symbol" class="ms-1 text-secondary">{{ symbol }}</span>
+      <span v-if="flag" class="me-1">{{ flag }}</span>
+      <span>{{ _id }}</span>
+      <span v-if="symbol" class="ms-1 text-secondary">{{ symbol }}</span>
+    </template>
+    <template v-if="required" #search="{ attributes, events }">
+      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" />
     </template>
   </v-select>
 </template>
@@ -38,7 +41,7 @@ export default {
     return {}
   },
   components: {},
-  props: ['modelValue'],
+  props: ['modelValue', 'required'],
   emits: ['update:modelValue'],
   methods: {
     filter(options, search) {

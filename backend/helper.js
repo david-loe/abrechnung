@@ -1,7 +1,8 @@
 const i18n = require('./i18n')
 const Country = require('./models/country')
+const User = require('./models/user')
 
-function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}) {
+function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null) {
   return async (req, res) => {
     const meta = {
       limit: defaultLimit,
@@ -48,6 +49,9 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {})
       meta.count = result.length
       meta.countPages = Math.ceil(meta.count / meta.limit)
       if (result != null) {
+        if(sortFn){
+          result.sort(sortFn)
+        }
         res.send({ meta: meta, data: result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page) })
       } else {
         res.status(204).send({ message: 'No content' })
@@ -60,7 +64,7 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {})
 function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null) {
   return async (req, res) => {
     for (const field of Object.keys(model.schema.tree)) {
-      if (model.schema.tree[field].required) {
+      if (model.schema.tree[field].required && !'default' in model.schema.tree[field]) {
         if (
           req.body[field] === undefined ||
           (model.schema.tree[field].type === String && req.body[field].length === 0) ||
@@ -74,12 +78,13 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
     if (req.body._id && req.body._id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var oldObject = await model.findOne({ _id: req.body._id })
-        if (!oldObject[checkUserIdField]._id.equals(req.user._id)) {
-          return res.send(403)
+        var user = await User.findOne({uid: req.user[process.env.LDAP_UID_ATTRIBUTE]})
+        if (!oldObject[checkUserIdField]._id.equals(user._id)) {
+          return res.sendStatus(403)
         }
         if(checkOldObject){
           if(!(await checkOldObject(oldObject))){
-            return res.send(403)
+            return res.sendStatus(403)
           }
         }
       }
@@ -97,7 +102,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
     }else{
-      return res.send(403)
+      return res.sendStatus(403)
     }
 
   }
@@ -108,8 +113,9 @@ function deleter(model, checkUserIdField = '') {
     if (req.query.id && req.query.id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var doc = await model.findOne({ _id: req.query.id })
-        if (!doc[checkUserIdField]._id.equals(req.user._id)) {
-          return res.send(403)
+        var user = await User.findOne({uid: req.user[process.env.LDAP_UID_ATTRIBUTE]})
+        if (!doc[checkUserIdField]._id.equals(user._id)) {
+          return res.sendStatus(403)
         }
       }
       try {

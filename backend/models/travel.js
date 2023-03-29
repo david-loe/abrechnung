@@ -6,6 +6,8 @@ const travelSchema = new mongoose.Schema({
   state: { type: String, required: true, enum: ['appliedFor', 'approved', 'underExamination', 'refunded'], default: 'appliedFor' },
   editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   reason: { type: String, required: true },
+  destinationPlace: {type: String, required: true},
+  travelInsideOfEU: {type: Boolean, required: true},
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   advance: {
@@ -13,7 +15,7 @@ const travelSchema = new mongoose.Schema({
     currency: { type: String, ref: 'Currency', required: true },
   },
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
-  claimOvernightLumpSum: { type: Boolean, required: true },
+  claimOvernightLumpSum: { type: Boolean, default: true },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: {type: Boolean, required: true, default: false},
   records: [{
