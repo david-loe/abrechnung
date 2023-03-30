@@ -3,7 +3,7 @@ import LoginPage from '../components/LoginPage.vue'
 import SettingsPage from '../components/SettingsPage.vue'
 import ApprovePage from '../components/ApprovePage.vue'
 import ExaminePage from '../components/ExaminePage.vue'
-import HomePage from '../components/HomePage.vue'
+import MyTravelsPage from '../components/MyTravelsPage.vue'
 import axios from 'axios'
 
 const routes = [
@@ -33,8 +33,8 @@ const routes = [
   },
   {
     path: '/',
-    name: 'Home',
-    component: HomePage,
+    name: 'MyTravels',
+    component: MyTravelsPage,
     meta: { requiresAuth: true},
   },
   {

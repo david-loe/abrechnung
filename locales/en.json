@@ -5,11 +5,6 @@
     "settings": "Settings",
     "login": "Login",
     "logout": "Logout",
-    "user": "User",
-    "account": "Account",
-    "approve": "Approve",
-    "examine": "Examine",
-    "home": "Home",
     "myTravels": "My travels"
   },
   "labels": {
@@ -27,6 +22,7 @@
     "saveX": "Save {X}",
     "editX": "Edit {X}",
     "applyForX": "Apply for {X}",
+    "reapplyForX": "Reapply for {X}",
     "signIn": "Sign in",
     "search": "Search",
     "image": "Image",
@@ -45,7 +41,16 @@
     "newX": "New {X}",
     "destinationPlace": "Destination place",
     "travelInsideOfEU": "Travel inside of the EU",
-    "state": "State"
+    "state": "State",
+    "traveler": "Traveler",
+    "uid": "UID",
+    "admin": "Administrator",
+    "user": "User",
+    "approve": "Approve",
+    "examine": "Examine",
+    "reject": "Reject",
+    "comment": "Comment",
+    "editor": "Editor"
   },
   "alerts": {
     "loginFailed": "Failed to login!",
@@ -92,6 +97,7 @@
     "6": "Sat"
   },
   "states":{
+    "rejected": "Rejected",
     "appliedFor": "Applied for",
     "approved": "Approved",
     "underExamination": "Under examination",

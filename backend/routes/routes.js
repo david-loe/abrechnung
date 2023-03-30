@@ -60,7 +60,7 @@ router.get('/currency', helper.getter(Currency, 'currency', 200))
 
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  const sortFn = (a,b) => a.startDate - b.startDate
+  const sortFn = (a, b) => a.startDate - b.startDate
   return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, { history: 0 }, sortFn)(req, res)
 })
 
@@ -88,7 +88,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   delete req.body.records
 
   const check = async (oldObject) => {
-    return oldObject.state === 'appliedFor'
+    return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'
   }
   return helper.setter(Travel, 'traveler', true, check)(req, res)
 })
@@ -102,9 +102,14 @@ router.post('/travel/underExamination', async (req, res) => {
   delete req.body.historic
 
   const check = async (oldObject) => {
-    await oldObject.saveToHistory()
-    await oldObject.save()
-    return oldObject.state === 'approved'
+    if (oldObject.state === 'approved') {
+      await oldObject.saveToHistory()
+      await oldObject.save()
+      return true
+    } else {
+      return false
+    }
+
   }
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })

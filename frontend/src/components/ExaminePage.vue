@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-  <h1>{{$t('headlines.examine')}}</h1>
+  <h1>{{$t('labels.examine')}}</h1>
 </div>
 </template>
 

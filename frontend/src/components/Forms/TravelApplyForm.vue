@@ -32,11 +32,11 @@
     <div class="row mb-2">
       <div class="col-auto">
         <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label>
-        <input id="startDateInput" class="form-control" type="date" v-model="formTravel.startDate" required />
+        <input id="startDateInput" class="form-control" type="date" v-model="formTravel.startDate" :min="$root.dateToHTMLInputString(new Date())" required />
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
-        <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" required v-bind:min="formTravel.startDate" />
+        <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" :min="formTravel.startDate" required />
       </div>
     </div>
 
@@ -55,7 +55,7 @@
         {{ $t('labels.applyForX', { X: $t('labels.travel') }) }}
       </button>
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
-        {{ $t('labels.save') }}
+        {{ travel.state === 'rejected' ? $t('labels.reapplyForX', { X: $t('labels.travel') }) : $t('labels.save') }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}

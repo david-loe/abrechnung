@@ -3,6 +3,7 @@
     <a href="#" class="nav-link" @click="$emit('clicked')">
       <div class="card-body">
         <h5 class="card-title">{{ travel.name ? travel.name : travel.reason }}</h5>
+        <h6 v-if="showTraveler" class="card-subtitle mb-1 text-muted">{{travel.traveler.name}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">
           {{
             new Date(travel.startDate).toLocaleDateString(undefined, dateFormat) +
@@ -32,7 +33,7 @@ export default {
     }
   },
   components: {},
-  props: { travel: { type: Object } },
+  props: { travel: { type: Object }, showTraveler: {type: Boolean, default: false} },
   methods: {},
 }
 </script>

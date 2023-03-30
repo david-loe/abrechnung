@@ -10,15 +10,21 @@
             </a>
           </div>
           <div>
-            <router-link v-if="auth" to="/approve" class="nav-link link-dark d-flex align-items-center">
-              <i class="fs-4 bi bi-calendar-check"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('headlines.approve') }}</span>
+            <router-link v-if="auth" to="/" class="nav-link link-dark d-flex align-items-center">
+              <i class="fs-4 bi bi-card-list"></i>
+              <span class="ms-1 d-none d-md-block">{{ $t('headlines.myTravels') }}</span>
             </router-link>
           </div>
           <div>
-            <router-link v-if="auth" to="/examine" class="nav-link link-dark d-flex align-items-center">
+            <router-link v-if="auth && user.access.approve" to="/approve" class="nav-link link-dark d-flex align-items-center">
+              <i class="fs-4 bi bi-calendar-check"></i>
+              <span class="ms-1 d-none d-md-block">{{ $t('labels.approve') }}</span>
+            </router-link>
+          </div>
+          <div>
+            <router-link v-if="auth && user.access.examine" to="/examine" class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-pencil-square"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('headlines.examine') }}</span>
+              <span class="ms-1 d-none d-md-block">{{ $t('labels.examine') }}</span>
             </router-link>
           </div>
           <div v-if="auth" class="dropdown">
@@ -28,6 +34,11 @@
             </a>
             <ul class="dropdown-menu" style="min-width: 0px">
               <li>
+                <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px">
+                  <option v-for="lang of languages" :key="lang.key" :value="lang.key">{{ lang.flag }}</option>
+                </select>
+              </li>
+              <li v-if="user.access.admin">
                 <router-link to="/settings" class="nav-link link-dark d-flex align-items-center dropdown-item">
                   <i class="fs-4 bi bi-gear"></i>
                   <span class="ms-1">{{ $t('headlines.settings') }}</span>
@@ -110,29 +121,32 @@ export default {
       alerts: [],
       auth: false,
       user: {},
-      travels: [],
       currencies: [],
       loadState: 'UNLOADED',
       loadingPromise: null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       stateColors: {
+        rejected: { color: '#E8998D', text: 'black' },
         appliedFor: { color: '#cae5ff', text: 'black' },
         approved: { color: '#89bbfe', text: 'black' },
         underExamination: { color: '#6f8ab7', text: 'white' },
         refunded: { color: '#615d6c', text: 'white' },
       },
+      languages: [
+        { flag: '🇩🇪', key: 'de' },
+        { flag: '🇬🇧', key: 'en' },
+      ],
     }
   },
   methods: {
     async load() {
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
-        this.loadingPromise = new Promise(async (resolve) => { // eslint-disable-line no-async-promise-executor
+        this.loadingPromise = new Promise(async (resolve) => {// eslint-disable-line no-async-promise-executor
           this.user = await this.getter('user')
           if (Object.keys(this.user).length > 0) {
             this.auth = true
           }
-          this.travels = await this.getter('travel')
           this.currencies = await this.getter('currency')
           this.loadState = 'LOADED'
           resolve()
@@ -175,6 +189,25 @@ export default {
         }
       }
     },
+    async setter(endpoint, data) {
+      try {
+        const res = await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, data, {
+          withCredentials: true,
+        })
+        if (res.status === 200) {
+          this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
+          return res.data.result
+        }
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.$router.push('login')
+        } else {
+          console.log(error.response.data)
+          this.$root.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          return null
+        }
+      }
+    },
     getById(property, id) {
       if (property in this) {
         for (const element of this[property]) {
@@ -198,27 +231,27 @@ export default {
         }
       }, 5000)
     },
-    dateTimeToHTMLInputString(date){
-      if(!date) return ''
+    dateTimeToHTMLInputString(date) {
+      if (!date) return ''
       const dateObject = new Date(date)
       const year = dateObject.getFullYear()
       const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
       const day = dateObject.getDate().toString().padStart(2, '0')
       const hour = dateObject.getHours().toString().padStart(2, '0')
       const minute = dateObject.getMinutes().toString().padStart(2, '0')
-      const str = year +'-'+ month +'-'+ day +'T'+ hour +':'+ minute
+      const str = year + '-' + month + '-' + day + 'T' + hour + ':' + minute
       return str
     },
-    dateToHTMLInputString(date){
-      if(!date) return ''
+    dateToHTMLInputString(date) {
+      if (!date) return ''
       const dateObject = new Date(date)
       const year = dateObject.getFullYear()
       const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
       const day = dateObject.getDate().toString().padStart(2, '0')
-      const str = year +'-'+ month +'-'+ day
+      const str = year + '-' + month + '-' + day
       return str
     },
-    async pushSettings(){
+    async pushSettings() {
       try {
         await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {
           withCredentials: true,
@@ -252,7 +285,7 @@ body {
 }
 
 .win {
-  font-family: "Twemoji Country Flags", Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Twemoji Country Flags', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -285,5 +318,9 @@ footer {
   animation-name: run;
   animation-duration: 5s;
   animation-timing-function: linear;
+}
+
+.router-link-active {
+  font-weight: bold !important;
 }
 </style>

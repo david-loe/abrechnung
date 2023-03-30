@@ -2,9 +2,10 @@ const mongoose = require('mongoose')
 
 const travelSchema = new mongoose.Schema({
   name: { type: String },
-  traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  state: { type: String, required: true, enum: ['appliedFor', 'approved', 'underExamination', 'refunded'], default: 'appliedFor' },
-  editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  state: { type: String, required: true, enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'], default: 'appliedFor' },
+  editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  comment: { type: String },
   reason: { type: String, required: true },
   destinationPlace: {type: String, required: true},
   travelInsideOfEU: {type: Boolean, required: true},
@@ -43,6 +44,7 @@ travelSchema.pre(/^find((?!Update).)*$/, function () {
   this.populate({ path: 'advance.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.currency', model: 'Currency' })
   this.populate({ path: 'traveler', model: 'User', select: {name: 1, email: 1} })
+  this.populate({ path: 'editor', model: 'User', select: {name: 1, email: 1} })
 })
 
 travelSchema.methods.saveToHistory = async function () {
