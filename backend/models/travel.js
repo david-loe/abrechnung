@@ -53,6 +53,7 @@ travelSchema.methods.saveToHistory = async function () {
   doc.historic = true
   const old = await mongoose.model('Travel').create(doc)
   this.history.push(old)
+  this.comment = null
   this.markModified('history')
 };
 

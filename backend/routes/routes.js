@@ -61,8 +61,14 @@ router.get('/currency', helper.getter(Currency, 'currency', 200))
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   const sortFn = (a, b) => a.startDate - b.startDate
-  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, { history: 0 }, sortFn)(req, res)
+  const select = {history: 0, historic: 0}
+  if(!req.query.records){
+    select.records = 0
+  }
+  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, select, sortFn)(req, res)
 })
+
+router.delete('/travel', helper.deleter(Travel, 'traveler'))
 
 router.post('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })

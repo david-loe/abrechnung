@@ -1,5 +1,6 @@
 <template>
   <div>
+    <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
     <table class="table">
       <tbody>
         <tr v-for="key in keys" :key="key">
@@ -15,6 +16,9 @@
       <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')">
         {{ $t('labels.edit') }}
       </button>
+      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted')">
+        {{ $t('labels.delete') }}
+      </button>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -23,15 +27,16 @@
 </template>
 
 <script>
+import StatePipeline from './StatePipeline.vue'
 export default {
   name: 'TravelApply',
   data() {
     return {
-      keys: ['traveler', 'reason', 'startDate', 'endDate', 'destinationPlace', 'travelInsideOfEU', 'advance', 'state', 'editor', 'comment']
+      keys: ['traveler', 'reason', 'startDate', 'endDate', 'destinationPlace', 'travelInsideOfEU', 'advance', 'editor', 'comment']
     }
   },
-  components: {},
-  emits: ['cancel', 'edit'],
+  components: {StatePipeline},
+  emits: ['cancel', 'edit', 'deleted'],
   props: {
     travel: { type: Object },
     showButtons: {type: Boolean, default: true}

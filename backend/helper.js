@@ -17,7 +17,8 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
       meta.page = parseInt(req.query.page)
     }
     if (req.query.id && req.query.id != '') {
-      const result = await model.findOne({ _id: req.query.id })
+      var conditions = Object.assign({ _id: req.query.id }, preConditions)
+      const result = await model.findOne(conditions, select)
       if (result != null) {
         res.send({ data: result })
       } else {
@@ -28,9 +29,9 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
       for (const filter of Object.keys(req.query)) {
         if (req.query[filter] && req.query[filter].length > 0) {
           var qFilter = {}
-          if(req.query[filter].indexOf('name') !== -1){
+          if (req.query[filter].indexOf('name') !== -1) {
             qFilter[filter] = { $regex: req.query[filter], $options: 'i' }
-          }else{
+          } else {
             qFilter[filter] = req.query[filter]
           }
           if (!('$and' in conditions)) {
@@ -39,7 +40,7 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
           conditions.$and.push(qFilter)
         }
       }
-      if(Object.keys(preConditions).length > 0){
+      if (Object.keys(preConditions).length > 0) {
         if (!('$and' in conditions)) {
           conditions.$and = []
         }
@@ -49,7 +50,7 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
       meta.count = result.length
       meta.countPages = Math.ceil(meta.count / meta.limit)
       if (result != null) {
-        if(sortFn){
+        if (sortFn) {
           result.sort(sortFn)
         }
         res.send({ meta: meta, data: result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page) })
@@ -76,16 +77,16 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
       }
     }
     if (req.body._id && req.body._id !== '') {
+      var oldObject = await model.findOne({ _id: req.body._id })
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
-        var oldObject = await model.findOne({ _id: req.body._id })
-        var user = await User.findOne({uid: req.user[process.env.LDAP_UID_ATTRIBUTE]})
+        var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
         if (!oldObject[checkUserIdField]._id.equals(user._id)) {
           return res.sendStatus(403)
         }
-        if(checkOldObject){
-          if(!(await checkOldObject(oldObject))){
-            return res.sendStatus(403)
-          }
+      }
+      if (checkOldObject) {
+        if (!(await checkOldObject(oldObject))) {
+          return res.sendStatus(403)
         }
       }
       try {
@@ -94,14 +95,14 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
-    } else if(allowNew) {
+    } else if (allowNew) {
       try {
         const result = await (new model(req.body)).save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
-    }else{
+    } else {
       return res.sendStatus(403)
     }
 
@@ -113,7 +114,7 @@ function deleter(model, checkUserIdField = '') {
     if (req.query.id && req.query.id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var doc = await model.findOne({ _id: req.query.id })
-        var user = await User.findOne({uid: req.user[process.env.LDAP_UID_ATTRIBUTE]})
+        var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
         if (!doc[checkUserIdField]._id.equals(user._id)) {
           return res.sendStatus(403)
         }
@@ -151,7 +152,7 @@ function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
       // search for [] to identify arrays
       const match = currentline[j].match(/^\[(.*)\]$/)
       if (match === null) {
-        if(currentline[j] !== ''){
+        if (currentline[j] !== '') {
           obj[headers[j]] = currentline[j];
         }
       } else {
@@ -166,19 +167,19 @@ function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
 
 function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
   var keys = []
-  for(const obj of objects){
-    const oKeys =  Object.keys(obj)
-    if(keys.length < oKeys.length){
+  for (const obj of objects) {
+    const oKeys = Object.keys(obj)
+    if (keys.length < oKeys.length) {
       keys = oKeys
     }
   }
   var str = keys.join(separator) + '\n'
-  for(const obj of objects){
+  for (const obj of objects) {
     col = []
-    for(const key of keys){
-      if(!key in obj){
+    for (const key of keys) {
+      if (!key in obj) {
         col.push('')
-      }else if (Array.isArray(obj[key])) {
+      } else if (Array.isArray(obj[key])) {
         col.push('[' + obj[key].join(arraySeparator) + ']')
       } else if (obj[key] === null) {
         col.push('null')
@@ -193,11 +194,11 @@ function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
 
 function getFlagEmoji(countryCode) {
   const noFlag = ['XCD', 'XOF', 'XAF', 'ANG', 'XPF']
-  if(noFlag.indexOf(countryCode) !== -1){
+  if (noFlag.indexOf(countryCode) !== -1) {
     return null
   }
   const codePoints = countryCode
-    .slice(0,2)
+    .slice(0, 2)
     .toUpperCase()
     .split('')
     .map(char => 127397 + char.charCodeAt());
@@ -238,38 +239,38 @@ function parseRawLumpSums(dataStr) {
   return data
 }
 
-async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage = 'de'){
+async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage = 'de') {
   const conditions = {}
   const noCountryFound = []
   const success = []
   const noUpdate = []
-  for (const lumpSum of lumpSums){
-    conditions.$or = [{},{}]
+  for (const lumpSum of lumpSums) {
+    conditions.$or = [{}, {}]
     conditions.$or[0]['name.' + countryNameLanguage] = lumpSum.country
     conditions.$or[1]['alias.' + countryNameLanguage] = lumpSum.country
 
     const country = await Country.findOne(conditions)
-    if(country){
+    if (country) {
       var newData = true
-      for(const countrylumpSums of country.lumpSums){
-        if(countrylumpSums.validFrom >= validFrom){
+      for (const countrylumpSums of country.lumpSums) {
+        if (countrylumpSums.validFrom >= validFrom) {
           newData = false
           break
         }
       }
-      if(newData){
+      if (newData) {
         lumpSum.validFrom = validFrom
         country.lumpSums.push(lumpSum)
         country.markModified('lumpSums')
         success.push(await country.save())
-      }else{
+      } else {
         noUpdate.push(country)
       }
-    }else{
+    } else {
       noCountryFound.push(lumpSum)
     }
   }
-  return {success, noUpdate, noCountryFound}
+  return { success, noUpdate, noCountryFound }
 }
 
 

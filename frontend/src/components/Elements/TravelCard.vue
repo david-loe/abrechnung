@@ -1,6 +1,5 @@
 <template>
-  <div class="card" style="width: 18rem">
-    <a href="#" class="nav-link" @click="$emit('clicked')">
+  <div class="card" style="width: 18rem; cursor: pointer;" @click="$emit('clicked')">
       <div class="card-body">
         <h5 class="card-title">{{ travel.name ? travel.name : travel.reason }}</h5>
         <h6 v-if="showTraveler" class="card-subtitle mb-1 text-muted">{{travel.traveler.name}}</h6>
@@ -12,18 +11,14 @@
           }}
         </h6>
         <div>
-          <span
-            :class="'badge text-' + $root.stateColors[travel.state].text"
-            :style="'background-color: ' + $root.stateColors[travel.state].color + ';'"
-            >{{ $t('states.' + travel.state) }}</span
-          >
+          <StateBadge :state="travel.state"></StateBadge>
         </div>
       </div>
-    </a>
   </div>
 </template>
 
 <script>
+import StateBadge from './StateBadge.vue'
 export default {
   name: 'TravelCard',
   emits: ['clicked'],
@@ -32,7 +27,7 @@ export default {
       dateFormat: { day: '2-digit', month: '2-digit' },
     }
   },
-  components: {},
+  components: {StateBadge},
   props: { travel: { type: Object }, showTraveler: {type: Boolean, default: false} },
   methods: {},
 }

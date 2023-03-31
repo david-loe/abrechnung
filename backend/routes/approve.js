@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 router.get('/travel', async (req, res) => {
     const sortFn = (a, b) => a.startDate - b.startDate
-    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0 }, sortFn)(req, res)
+    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0, records: 0 }, sortFn)(req, res)
 })
 
 function approve(state) {
@@ -19,8 +19,10 @@ function approve(state) {
         }
         const check = async (oldObject) => {
             if (oldObject.state === 'appliedFor') {
-                await oldObject.saveToHistory()
-                await oldObject.save()
+                if(state === 'approved'){
+                    await oldObject.saveToHistory()
+                    await oldObject.save()
+                }
                 return true
             } else {
                 return false

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import TravelApply from '../Elements/TravelApply.vue'
+import TravelApply from '../Elements/TravelApplication.vue'
 export default {
   name: 'InfoPoint',
   data() {

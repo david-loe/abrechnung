@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="modal fade" id="newTravelModal" tabindex="-1" aria-labelledby="newTravelModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
             <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.travel') }) }}</h5>
@@ -14,6 +14,7 @@
               :travel="modalTravel"
               @cancel="hideModal()"
               @edit="showModal('edit', modalTravel)"
+              @deleted="deleteTravel(modalTravel._id)"
             ></TravelApply>
             <TravelApplyForm
               v-else
@@ -42,7 +43,7 @@
       </div>
       <div class="row justify-content-center gx-4 gy-2">
         <div class="col-auto" v-for="travel in travels" :key="travel._id">
-          <TravelCard :travel="travel" @clicked="showModal('view', travel)"></TravelCard>
+          <TravelCard :travel="travel" @clicked="clickCard(travel)"></TravelCard>
         </div>
       </div>
     </div>
@@ -52,7 +53,7 @@
 <script>
 import { Modal } from 'bootstrap'
 import TravelCard from './Elements/TravelCard.vue'
-import TravelApply from './Elements/TravelApply.vue'
+import TravelApply from './Elements/TravelApplication.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
 
 export default {
@@ -68,6 +69,13 @@ export default {
     }
   },
   methods: {
+    clickCard(travel) {
+      if (['appliedFor', 'rejected'].indexOf(travel.state) > -1) {
+        this.showModal('view', travel)
+      } else {
+        this.$router.push(`/travel/${travel._id}`)
+      }
+    },
     showModal(mode, travel) {
       this.modalMode = mode
       this.modalTravel = travel
@@ -81,6 +89,13 @@ export default {
     },
     async applyForTravel(travel) {
       const result = await this.$root.setter('travel/appliedFor', travel)
+      if (result) {
+        this.travels = await this.$root.getter('travel')
+        this.hideModal()
+      }
+    },
+    async deleteTravel(id) {
+      const result = await this.$root.deleter('travel', id)
       if (result) {
         this.travels = await this.$root.getter('travel')
         this.hideModal()

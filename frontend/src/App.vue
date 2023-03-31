@@ -32,21 +32,25 @@
               <i class="fs-4 bi bi-person-circle"></i>
               <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
             </a>
-            <ul class="dropdown-menu" style="min-width: 0px">
+            <ul class="dropdown-menu dropdown-menu-end">
               <li>
                 <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px">
                   <option v-for="lang of languages" :key="lang.key" :value="lang.key">{{ lang.flag }}</option>
                 </select>
               </li>
-              <li v-if="user.access.admin">
-                <router-link to="/settings" class="nav-link link-dark d-flex align-items-center dropdown-item">
+              <template v-if="user.access.admin">
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <router-link to="/settings" class="d-flex align-items-center dropdown-item">
                   <i class="fs-4 bi bi-gear"></i>
                   <span class="ms-1">{{ $t('headlines.settings') }}</span>
                 </router-link>
               </li>
+              </template>
+              
               <li><hr class="dropdown-divider" /></li>
               <li>
-                <a class="nav-link link-dark d-flex align-items-center dropdown-item" href="#" @click="logout">
+                <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
                   <i class="fs-4 bi bi-box-arrow-left"></i>
                   <span class="ms-1">{{ $t('headlines.logout') }}</span>
                 </a>
@@ -164,7 +168,7 @@ export default {
         if (res.status === 200) {
           this.auth = false
           this.user = {}
-          this.$router.push('/login')
+          this.$router.push({path: '/login'})
         }
       } catch (error) {
         this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -182,10 +186,11 @@ export default {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          this.$router.push('login')
+          this.$router.push({path: '/login', query: { redirect: this.$route }})
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          return null
         }
       }
     },
@@ -200,10 +205,33 @@ export default {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          this.$router.push('login')
+          this.$router.push({path: '/login', query: { redirect: this.$route }})
         } else {
           console.log(error.response.data)
           this.$root.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          return null
+        }
+      }
+    },
+    async deleter(endpoint, id) {
+      if(!confirm(this.$t('alerts.areYouSureDelete'))){
+        return null
+      }
+      try {
+        const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, {
+          params: {id: id},
+          withCredentials: true,
+        })
+        if (res.status === 200) {
+          this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
+          return true
+        }
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.$router.push({path: '/login', query: { redirect: this.$route }})
+        } else {
+          console.log(error.response.data)
+          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
           return null
         }
       }
