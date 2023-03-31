@@ -77,11 +77,43 @@ router.post('/travel', async (req, res) => {
   delete req.body.traveler
   delete req.body.history
   delete req.body.historic
+  delete req.body.records
 
   const check = async (oldObject) => {
     return oldObject.state !== 'refunded'
   }
   return helper.setter(Travel, 'traveler', false, check)(req, res)
+})
+
+router.post('/travel/record', async (req, res) => {
+  const travel = await Travel.findOne({ _id: req.body.travelId })
+  delete req.body.travelId
+  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    return res.sendStatus(403)
+  }
+  if (req.body._id && req.body._id !== '') {
+    var found = false
+    for(const record in travel.records){
+      if(record._id.equals(req.body._id)){
+        found = true
+        Object.assign(record, req.body)
+        break
+      }
+    }
+    if(!found){
+      return res.sendStatus(403)
+    }
+  } else {
+    travel.records.push(req.body)
+  }
+  travel.markModified('records')
+  try {
+    const result = await travel.save()
+    res.send({ message: i18n.t('alerts.successSaving'), result: result })
+  } catch (error) {
+    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+  }
 })
 
 router.post('/travel/appliedFor', async (req, res) => {

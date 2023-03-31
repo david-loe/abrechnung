@@ -4,10 +4,12 @@
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">TITELELEL</h5>
+            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.record') }) }}</h5>
+            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.record') }) }}</h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
           <div class="modal-body">
+            <RecordForm :mode="modalMode" :record="modalRecord" @add="postRecord" @edit="postRecord"></RecordForm>
           </div>
         </div>
       </div>
@@ -33,7 +35,23 @@
           </div>
         </div>
       </div>
-      <StatePipeline :state="travel.state"></StatePipeline>
+      <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
+
+    <button class="btn btn-secondary" @click="showModal('add', undefined)">
+            <i class="bi bi-plus-lg"></i>
+            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
+          </button>
+    <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
+      {{$t('alerts.noRecordsPresent')}}
+    </div>
+    <table class="table">
+      <tbody>
+        <tr v-for="record in travel.records" :key="record._id">
+            <th>{{ record.startDate }}</th>
+            <td>{{ $t('labels.' + record.type) }}</td>
+        </tr>
+      </tbody>
+    </table>
     </div>
   </div>
 </template>
@@ -41,25 +59,29 @@
 <script>
 import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
+import RecordForm from './Forms/RecordForm.vue'
 export default {
   name: 'TravelPage',
   data() {
     return {
       travel: undefined,
-      recordModal: undefined
+      recordModal: undefined,
+      modalRecord: undefined,
+      modalMode: 'add'
     }
   },
-  components: { StatePipeline },
+  components: { StatePipeline, RecordForm },
   props: { _id: { type: String } },
   methods: {
-    showModal(travel) {
-      this.modalTravel = travel
+    showModal(mode, record) {
+      this.modalRecord = record
+      this.modalMode = mode
       this.recordModal.show()
     },
     hideModal() {
       this.recordModal.hide()
-      if (this.$refs.travelApproveForm) {
-        this.$refs.travelApproveForm.clear()
+      if (this.$refs.recordForm) {
+        this.$refs.recordForm.clear()
       }
     },
     async deleteTravel() {
@@ -68,6 +90,14 @@ export default {
         this.$router.push({ path: '/' })
       }
     },
+    async postRecord(record) {
+      record.travelId = this.travel._id
+      const result = await this.$root.setter('travel/record', record)
+      if(result){
+        this.travel = await this.$root.getter('travel', { id: this._id, records: true })
+        this.hideModal()
+      }
+    }
   },
   async beforeMount() {
     await this.$root.load()
@@ -77,11 +107,11 @@ export default {
     this.recordModal = new Modal(document.getElementById('recordModal'), {})
   },
   watch: {
-    _id: async function () {
-      if (this._id.match(/^[0-9a-fA-F]{24}$/)) {
-        this.travel = await this.$root.getter('travel', { id: this._id, details: true })
-      }
-    },
+    // _id: async function () {
+    //   if (this._id.match(/^[0-9a-fA-F]{24}$/)) {
+    //     this.travel = await this.$root.getter('travel', { id: this._id, details: true })
+    //   }
+    // },
   },
 }
 </script>

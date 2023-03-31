@@ -99,7 +99,7 @@ export default {
   },
   data() {
     return {
-      formTravel: this.travel,
+      formTravel: undefined,
     }
   },
   methods: {

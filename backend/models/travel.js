@@ -20,15 +20,17 @@ const travelSchema = new mongoose.Schema({
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: {type: Boolean, required: true, default: false},
   records: [{
-    type: { type: String, enum: ['route', 'stay'] },
+    type: { type: String, enum: ['route', 'stay'], required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     startLocation: { type: String },
     endLocation: { type: String },
+    distance: {type: Number, min: 0},
+    location: { type: String },
     transport: { type: String, enum: ['ownCar', 'other'] },
     cost: {
-      amount: { type: Number, min: 0, required: true },
-      currency: { type: String, ref: 'Currency', required: true },
+      amount: { type: Number, min: 0 },
+      currency: { type: String, ref: 'Currency' },
       receipt: { type: mongoose.Schema.Types.ObjectId, ref: 'File' }
     },
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
