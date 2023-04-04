@@ -9,7 +9,10 @@
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
           <div class="modal-body">
-            <RecordForm :mode="modalMode" :record="modalRecord" @add="postRecord" @edit="postRecord"></RecordForm>
+            <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
+              :askPurpose="travel.professionalShare && travel.professionalShare < 0.8"
+              :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord" @cancel="hideModal">
+            </RecordForm>
           </div>
         </div>
       </div>
@@ -37,21 +40,59 @@
       </div>
       <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
 
-    <button class="btn btn-secondary" @click="showModal('add', undefined)">
-            <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
-          </button>
-    <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
-      {{$t('alerts.noRecordsPresent')}}
-    </div>
-    <table class="table">
-      <tbody>
-        <tr v-for="record in travel.records" :key="record._id">
-            <th>{{ record.startDate }}</th>
-            <td>{{ $t('labels.' + record.type) }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <form class="mb-3" @submit.prevent ref="travelSettingsForm">
+        <div class="row align-items-end justify-content-center gx-4 gy-2">
+          <div class="col-auto">
+            <div class="row align-items-center">
+              <div class="col-auto pe-1">
+                <InfoPoint :text="$t('info.professionalShare')" />
+              </div>
+              <div class="col-auto ps-0">
+                <input type="number" class="form-control form-control-sm" v-model="travel.professionalShare" min="0.5"
+                  max="0.8" step="any" :placeholder="$t('labels.professionalShare')" @change="postTravelSettings" />
+              </div>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
+                v-model="travel.claimOvernightLumpSum" @change="postTravelSettings">
+              <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
+              }}</label>
+              <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
+            </div>
+
+          </div>
+        </div>
+      </form>
+
+
+      <button class="btn btn-secondary" @click="showModal('add', undefined)">
+        <i class="bi bi-plus-lg"></i>
+        <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
+      </button>
+      <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
+        {{ $t('alerts.noRecordsPresent') }}
+      </div>
+
+      <div v-for="(row, index) in table" :key="index">
+        <div v-if="row.recordIndex" class="row ps-4 mb-1" style="cursor: pointer;"
+          @click="showModal('edit', travel.records[row.recordIndex - 1])">
+          <template v-if="travel.records[row.recordIndex - 1].type == 'stay'">
+            <div class="col-auto">{{ travel.records[row.recordIndex - 1].location }}</div>
+          </template>
+          <template v-else>
+            <div class="col-auto">{{ travel.records[row.recordIndex - 1].startLocation }} - {{
+              travel.records[row.recordIndex - 1].endLocation }}</div>
+          </template>
+          <div class="col">{{ $t('labels.' + travel.records[row.recordIndex - 1].type) }}</div>
+        </div>
+        <div v-else class="row mb-1">
+          <div class="col-auto">{{ row.date }}</div>
+          <div class="col-auto">{{ row.time }}</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -60,6 +101,7 @@
 import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import RecordForm from './Forms/RecordForm.vue'
+import InfoPoint from './Elements/InfoPoint.vue'
 export default {
   name: 'TravelPage',
   data() {
@@ -67,10 +109,13 @@ export default {
       travel: undefined,
       recordModal: undefined,
       modalRecord: undefined,
-      modalMode: 'add'
+      modalMode: 'add',
+      dateFormat: { day: '2-digit', month: '2-digit' },
+      timeFormat: { hour: '2-digit', minute: '2-digit' },
+      table: []
     }
   },
-  components: { StatePipeline, RecordForm },
+  components: { StatePipeline, RecordForm, InfoPoint },
   props: { _id: { type: String } },
   methods: {
     showModal(mode, record) {
@@ -84,8 +129,21 @@ export default {
         this.$refs.recordForm.clear()
       }
     },
+    async postTravelSettings() {
+      if (this.$refs.travelSettingsForm.reportValidity()) {
+        const travel = {
+          _id: this.travel._id,
+          claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
+          professionalShare: this.travel.professionalShare
+        }
+        const result = await this.$root.setter('travel', travel)
+        if (!result) {
+          await this.getTravel()
+        }
+      }
+    },
     async deleteTravel() {
-      const result = await this.$root.deleter('travel', this.travel._id)
+      const result = await this.$root.deleter('travel', { id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -93,28 +151,74 @@ export default {
     async postRecord(record) {
       record.travelId = this.travel._id
       const result = await this.$root.setter('travel/record', record)
-      if(result){
-        this.travel = await this.$root.getter('travel', { id: this._id, records: true })
+      if (result) {
+        await this.getTravel()
         this.hideModal()
       }
+    },
+    async deleteRecord(id) {
+      const result = await this.$root.deleter('travel/record', { id: id, travelId: this._id })
+      if (result) {
+        await this.getTravel()
+        this.hideModal()
+      }
+    },
+    sameDay(a, b) {
+      const dateA = new Date(a)
+      const dateB = new Date(b)
+      return dateA.getDate() === dateB.getDate() && dateA.getMonth() === dateB.getMonth()
+    },
+    sameHour(a, b) {
+      const dateA = new Date(a)
+      const dateB = new Date(b)
+      return this.sameDay(a, b) && dateA.getHours() === dateB.getHours()
+    },
+    renderTable() {
+      this.table = []
+      var previousStartDate = null
+      var previousEndDate = null
+      var index = 0
+      for (var i = 0; i < this.travel.records.length; i++) {
+        var startDate = new Date(this.travel.records[i].startDate)
+        var startTime = startDate.toLocaleTimeString(undefined, this.timeFormat)
+        var startDateStr = startDate.toLocaleDateString(undefined, this.dateFormat)
+        var endDate = new Date(this.travel.records[i].endDate)
+        var endTime = endDate.toLocaleTimeString(undefined, this.timeFormat)
+        var endDateStr = endDate.toLocaleDateString(undefined, this.dateFormat)
+        if (previousStartDate && this.sameDay(previousEndDate, startDate)) {
+          if (this.sameHour(previousEndDate, startDate)) {
+            this.table.splice(--index, 1)
+
+          } else {
+            startDateStr = false
+          }
+        }
+        this.table.push({ date: startDateStr, time: startTime })
+        this.table.push({ recordIndex: i + 1 })
+        this.table.push({ date: endDateStr, time: endTime, gap: true })
+        index += 3
+        previousStartDate = startDate
+        previousEndDate = endDate
+      }
+    },
+    async getTravel() {
+      this.travel = await this.$root.getter('travel', { id: this._id, records: true })
+      this.renderTable()
     }
   },
   async beforeMount() {
     await this.$root.load()
-    this.travel = await this.$root.getter('travel', { id: this._id, records: true })
+    await this.getTravel()
   },
   mounted() {
     this.recordModal = new Modal(document.getElementById('recordModal'), {})
   },
   watch: {
-    // _id: async function () {
-    //   if (this._id.match(/^[0-9a-fA-F]{24}$/)) {
-    //     this.travel = await this.$root.getter('travel', { id: this._id, details: true })
-    //   }
+    // travel: function () {
+    //   this.renderTable()
     // },
   },
 }
 </script>
 
-<style>
-</style>
+<style></style>

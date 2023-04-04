@@ -53,10 +53,9 @@
         </div>
       </div>
 
-      <label for="recordFormTransport" class="form-label me-2">
+      <label for="recordFormTransport" class="form-label">
         {{ $t('labels.transport') }}
       </label>
-      <InfoPoint :text="$t('info.transport')" />
       <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
         <option value="other">{{ $t('labels.otherTransport') }}</option>
         <option value="ownCar">{{ $t('labels.ownCar') }}</option>
@@ -116,7 +115,10 @@
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
+      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit'" @click="$emit('deleted', formRecord._id)">
+        {{ $t('labels.delete') }}
+      </button>
+      <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
     </div>
@@ -129,7 +131,7 @@ import InfoPoint from '../Elements/InfoPoint.vue'
 export default {
   name: 'RecordForm',
   components: { InfoPoint, CurrencySelector },
-  emits: ['cancel', 'edit', 'add'],
+  emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     record: {
       type: Object,
@@ -173,11 +175,13 @@ export default {
         type: 'route',
         startDate: '',
         endDate: '',
-        startLocation: '',
-        endLocation: '',
+        startLocation: null,
+        endLocation: null,
+        distance: null,
+        location: null,
         transport: 'other',
         cost: {
-          amount: 0,
+          amount: null,
           currency: 'EUR',
           receipt: null,
         },

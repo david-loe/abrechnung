@@ -61,12 +61,14 @@
     "private": "Privat",
     "cost": "Kosten",
     "receipt": "Beleg",
-    "startLocation": "Start",
-    "endLocation": "Ende",
+    "startLocation": "Startpunkt",
+    "endLocation": "Endpunkt",
     "transport": "Verkehrsmittel",
     "otherTransport": "Anderes Verkehrsmittel ✈🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
-    "distance": "Entfernung [km]"
+    "distance": "Entfernung [km]",
+    "claimOvernightLumpSum": "Übernachtungspauschalen beanspruchen",
+    "professionalShare": "Beruflicher Anteil"
   },
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Einträge vorhanden.",
@@ -88,7 +90,12 @@
     "reason": "Gib hier kurz den Grund deiner Reise an.",
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wieviel du benötigst.",
-    "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?"
+    "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?",
+    "professionalShare": "Wenn deine Reise teilweise auch private Zwecke erfüllt, gib hier den beruflichen Anteil an.",
+    "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
+    "cost": "Trage hier die Kosten ein.",
+    "receipt": "Lade hier den entsprechenden Beleg hoch.",
+    "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten."
   },
   "login": {
     "signIn": "Bitte Anmelden"

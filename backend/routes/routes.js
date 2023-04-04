@@ -61,8 +61,8 @@ router.get('/currency', helper.getter(Currency, 'currency', 200))
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   const sortFn = (a, b) => a.startDate - b.startDate
-  const select = {history: 0, historic: 0}
-  if(!req.query.records){
+  const select = { history: 0, historic: 0 }
+  if (!req.query.records) {
     select.records = 0
   }
   return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, select, sortFn)(req, res)
@@ -94,23 +94,55 @@ router.post('/travel/record', async (req, res) => {
   }
   if (req.body._id && req.body._id !== '') {
     var found = false
-    for(const record in travel.records){
-      if(record._id.equals(req.body._id)){
+    for (const record of travel.records) {
+      if (record._id.equals(req.body._id)) {
         found = true
         Object.assign(record, req.body)
         break
       }
     }
-    if(!found){
+    if (!found) {
       return res.sendStatus(403)
     }
   } else {
     travel.records.push(req.body)
   }
+  travel.records.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
   travel.markModified('records')
   try {
     const result = await travel.save()
     res.send({ message: i18n.t('alerts.successSaving'), result: result })
+  } catch (error) {
+    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+  }
+})
+
+router.delete('/travel/record', async (req, res) => {
+  const travel = await Travel.findOne({ _id: req.query.travelId })
+  delete req.query.travelId
+  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    return res.sendStatus(403)
+  }
+  if (req.query.id && req.query.id !== '') {
+    var found = false
+    for (var i = 0; i < travel.records.length; i++) {
+      if (travel.records[i]._id.equals(req.query.id)) {
+        found = true
+        travel.records.splice(i, 1)
+        break
+      }
+    }
+    if (!found) {
+      return res.sendStatus(403)
+    }
+  } else {
+    return res.status(400).send({ message: 'No record found' })
+  }
+  travel.markModified('records')
+  try {
+    await travel.save()
+    res.send({ message: i18n.t('alerts.successDeleting') })
   } catch (error) {
     res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
   }

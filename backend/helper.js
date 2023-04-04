@@ -80,7 +80,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
       var oldObject = await model.findOne({ _id: req.body._id })
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-        if (!oldObject[checkUserIdField]._id.equals(user._id)) {
+        if (!oldObject || !oldObject[checkUserIdField]._id.equals(user._id)) {
           return res.sendStatus(403)
         }
       }
@@ -115,7 +115,7 @@ function deleter(model, checkUserIdField = '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var doc = await model.findOne({ _id: req.query.id })
         var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-        if (!doc[checkUserIdField]._id.equals(user._id)) {
+        if (!doc || !doc[checkUserIdField]._id.equals(user._id)) {
           return res.sendStatus(403)
         }
       }

@@ -213,13 +213,13 @@ export default {
         }
       }
     },
-    async deleter(endpoint, id) {
+    async deleter(endpoint, params) {
       if(!confirm(this.$t('alerts.areYouSureDelete'))){
         return null
       }
       try {
         const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, {
-          params: {id: id},
+          params: params,
           withCredentials: true,
         })
         if (res.status === 200) {

@@ -95,7 +95,7 @@ export default {
       }
     },
     async deleteTravel(id) {
-      const result = await this.$root.deleter('travel', id)
+      const result = await this.$root.deleter('travel', {id: id})
       if (result) {
         this.travels = await this.$root.getter('travel')
         this.hideModal()
