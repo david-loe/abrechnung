@@ -1,5 +1,5 @@
 <template>
-  <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <ul class="nav nav-pills nav-justified mb-3">
       <li class="nav-item">
         <a href="#" :class="'nav-link' + (formRecord.type == 'route' ? ' active' : '')" @click="formRecord.type = 'route'">
@@ -90,9 +90,9 @@
         <CurrencySelector v-model="formRecord.cost.currency" :required="true"></CurrencySelector>
       </div>
       <div class="mb-3">
-        <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipt') }}</label>
-        <InfoPoint :text="$t('info.receipt')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipt" :required="true"/>
+        <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
+        <InfoPoint :text="$t('info.receipts')" />
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true"/>
       </div>
     </template>
 
@@ -149,7 +149,7 @@ export default {
           cost: {
             amount: null,
             currency: 'EUR',
-            receipt: null,
+            receipts: [],
           },
           purpose: 'professional',
         }
@@ -184,7 +184,7 @@ export default {
         cost: {
           amount: null,
           currency: 'EUR',
-          receipt: null,
+          receipts: [],
         },
         purpose: 'professional',
       }
@@ -208,7 +208,7 @@ export default {
         cost: {
           amount: null,
           currency: 'EUR',
-          receipt: null,
+          receipts: [],
         },
         purpose: 'professional',
       }, this.record)

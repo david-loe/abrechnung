@@ -1,5 +1,22 @@
 <template>
-  <input class="form-control" type="file" id="recordFormFile" accept="image/png, image/jpeg, .pdf" @change="changeFile" :required="required"/>
+  <div class="row">
+    <div v-for="(file, index) of modelValue" class="col-auto border rounded" :key="index + Math.random()">
+      <div class="mt-1">
+        <button type="button" class="btn btn-sm btn-light me-1" @click="viewFile(index)">
+          <i class="bi bi-eye"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-light" @click="deleteFile(index)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
+      <div class="fs-2 text-center">
+        <i class="bi bi-file-earmark-text"></i>
+      </div>
+    </div>
+  </div>
+  <input class="form-control" type="file" id="recordFormFile" accept="image/png, image/jpeg, .pdf" @change="changeFile"
+    :required="required" multiple />
 </template>
 
 <script>
@@ -9,25 +26,27 @@ export default {
     return {}
   },
   components: {},
-  props: {modelValue: {type: [Object, String], default: function(){return {data: undefined, type: undefined}}}, required: {type: Boolean, default: false}},
+  props: { modelValue: { type: Array, default: function () { return [] } }, required: { type: Boolean, default: false } },
   emits: ['update:modelValue'],
   methods: {
     changeFile(form) {
       const reader = new FileReader()
-      if (form.target.files.length === 1 && form.target.files[0].size < 15000000) {
-        console.log(form.target.files[0])
-        if(form.target.files[0].type.indexOf('image') > -1){
-          reader.readAsDataURL(form.target.files[0])
-          reader.onload = async () => {
-            console.log(await this.resizedataURL(reader.result, 450))
-            this.$emit('update:modelValue', {data: await this.resizedataURL(reader.result, 450), type: form.target.files[0].type})
+      const files = this.modelValue
+      for (const file of form.target.files) {
+        if (file.size < 15000000) {
+          if (file.type.indexOf('image') > -1) {
+            reader.readAsDataURL(file)
+            reader.onload = async () => {
+              console.log(await this.resizedataURL(reader.result, 450))
+              files.push({ data: await this.resizedataURL(reader.result, 450), type: file.type })
+            }
           }
+          files.push({ data: file, type: file.type })
+        } else {
+          alert(this.$t('alerts.imageToBig'))
         }
-        this.$emit('update:modelValue', {data: form.target.files[0], type: form.target.files[0].type})
-      } else {
-        alert(this.$t('alerts.imageToBig'))
-        this.$emit('update:modelValue', {data: undefined, type: undefined})
       }
+      this.$emit('update:modelValue', files)
     },
     // From https://stackoverflow.com/a/52983833/13582326
     resizedataURL(datas, wantedWidth) {
@@ -54,5 +73,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

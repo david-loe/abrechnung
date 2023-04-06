@@ -10,7 +10,7 @@
           </div>
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
-              :askPurpose="travel.professionalShare && travel.professionalShare < 0.8"
+              :askPurpose="Boolean(travel.professionalShare && travel.professionalShare < 0.8)"
               :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
               @cancel="hideModal">
             </RecordForm>
@@ -221,6 +221,7 @@ export default {
     async getTravel() {
       this.travel = await this.$root.getter('travel', { id: this._id, records: true })
       this.renderTable()
+      console.log(this.travel)
     }
   },
   async beforeMount() {

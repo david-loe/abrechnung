@@ -31,7 +31,7 @@ const travelSchema = new mongoose.Schema({
     cost: {
       amount: { type: Number, min: 0 },
       currency: { type: String, ref: 'Currency' },
-      receipt: { type: mongoose.Schema.Types.ObjectId, ref: 'File' }
+      receipts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
     },
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
     cateringNoRefund: [{
