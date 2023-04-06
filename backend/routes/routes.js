@@ -1,10 +1,13 @@
 const router = require('express').Router()
+const multer  = require('multer')
+const fileHandler = multer()
 const User = require('../models/user')
 const i18n = require('../i18n')
 const helper = require('../helper')
 const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
+const File = require('../models/file')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -85,7 +88,10 @@ router.post('/travel', async (req, res) => {
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })
 
-router.post('/travel/record', async (req, res) => {
+router.post('/travel/record', fileHandler.single('cost[receipt][data]'), async (req, res) => {
+  if(req.body.cost && req.file){
+    req.body.cost.receipt.data = req.file.buffer
+  }
   const travel = await Travel.findOne({ _id: req.body.travelId })
   delete req.body.travelId
   var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
@@ -96,7 +102,18 @@ router.post('/travel/record', async (req, res) => {
     var found = false
     for (const record of travel.records) {
       if (record._id.equals(req.body._id)) {
+        if(req.body.cost && req.file){
+          if(req.body.cost.receipt._id){
+            if(!record.cost.receipt._id.equals(req.body.cost.receipt._id)){
+            break
+            }
+            await File.findOneAndUpdate({ _id: req.body.cost.receipt._id }, req.body.cost.receipt)
+          }else{
+            req.body.cost.receipt = await (new File(req.body.cost.receipt)).save()
+          }
+        }
         found = true
+        console.log(req.body)
         Object.assign(record, req.body)
         break
       }
@@ -105,6 +122,9 @@ router.post('/travel/record', async (req, res) => {
       return res.sendStatus(403)
     }
   } else {
+    if(req.body.cost && req.file){
+      req.body.cost.receipt = await (new File(req.body.cost.receipt)).save()
+    }
     travel.records.push(req.body)
   }
   travel.records.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))

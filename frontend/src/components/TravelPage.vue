@@ -11,7 +11,8 @@
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
               :askPurpose="travel.professionalShare && travel.professionalShare < 0.8"
-              :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord" @cancel="hideModal">
+              :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
+              @cancel="hideModal">
             </RecordForm>
           </div>
         </div>
@@ -67,10 +68,11 @@
       </form>
 
 
-      <button class="btn btn-secondary" @click="showModal('add', undefined)">
+      <button class="btn btn-secondary mb-3" @click="showModal('add', undefined)">
         <i class="bi bi-plus-lg"></i>
         <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
       </button>
+
       <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
         {{ $t('alerts.noRecordsPresent') }}
       </div>
@@ -89,7 +91,15 @@
         </div>
         <div v-else class="row mb-1">
           <div class="col-auto">{{ row.date }}</div>
-          <div class="col-auto">{{ row.time }}</div>
+          <div class="col-auto text-secondary">{{ row.time }}</div>
+        </div>
+        <div v-if="row.gap" class="row ps-5">
+          <div class="col-auto">
+            <button class="btn btn-sm btn-light"
+              @click="showModal('add', { startDate: row.startDate, endDate: row.endDate })" style="border-radius: 50%;">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -149,8 +159,14 @@ export default {
       }
     },
     async postRecord(record) {
+      var headers = {}
+      if (record.cost.receipt) {
+        headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
       record.travelId = this.travel._id
-      const result = await this.$root.setter('travel/record', record)
+      const result = await this.$root.setter('travel/record', record, {headers})
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -195,7 +211,8 @@ export default {
         }
         this.table.push({ date: startDateStr, time: startTime })
         this.table.push({ recordIndex: i + 1 })
-        this.table.push({ date: endDateStr, time: endTime, gap: true })
+        var isNotLast = i !== this.travel.records.length - 1
+        this.table.push({ date: endDateStr, time: endTime, gap: true, startDate: endDate, endDate: isNotLast ? this.travel.records[i + 1].startDate : null })
         index += 3
         previousStartDate = startDate
         previousEndDate = endDate

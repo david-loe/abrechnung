@@ -14,7 +14,7 @@
     </ul>
 
     <div class="row mb-3">
-      <div class="col-auto">
+      <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label>
         <input
           id="startDateInput"
@@ -24,7 +24,7 @@
           required
         />
       </div>
-      <div class="col-auto">
+      <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
         <input
           id="endDateInput"
@@ -92,7 +92,7 @@
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipt') }}</label>
         <InfoPoint :text="$t('info.receipt')" />
-        <input class="form-control" type="file" id="recordFormFile" accept="image/png, image/jpeg, .pdf" required/>
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipt" :required="true"/>
       </div>
     </template>
 
@@ -128,9 +128,10 @@
 <script>
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
+import FileUpload from '../Elements/FileUpload.vue'
 export default {
   name: 'RecordForm',
-  components: { InfoPoint, CurrencySelector },
+  components: { InfoPoint, CurrencySelector, FileUpload },
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     record: {
@@ -195,7 +196,22 @@ export default {
       return output
     },
     input() {
-      const input = Object.assign({}, this.record)
+      const input = Object.assign({
+        type: 'route',
+        startDate: '',
+        endDate: '',
+        startLocation: null,
+        endLocation: null,
+        distance: null,
+        location: null,
+        transport: 'other',
+        cost: {
+          amount: null,
+          currency: 'EUR',
+          receipt: null,
+        },
+        purpose: 'professional',
+      }, this.record)
       input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)
       return input

@@ -194,11 +194,11 @@ export default {
         }
       }
     },
-    async setter(endpoint, data) {
+    async setter(endpoint, data, config = {}) {
       try {
-        const res = await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, data, {
+        const res = await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, data, Object.assign({
           withCredentials: true,
-        })
+        }, config))
         if (res.status === 200) {
           this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
           return res.data.result
