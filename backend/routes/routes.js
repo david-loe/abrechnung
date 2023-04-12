@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const multer  = require('multer')
-const fileHandler = multer()
+const fileHandler = multer({limits: { fileSize: 16000000 }})
 const User = require('../models/user')
 const i18n = require('../i18n')
 const helper = require('../helper')
@@ -8,6 +8,7 @@ const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
 const File = require('../models/file')
+const file = require('../models/file')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -88,9 +89,20 @@ router.post('/travel', async (req, res) => {
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })
 
-router.post('/travel/record', fileHandler.single('cost[receipt][data]'), async (req, res) => {
-  if(req.body.cost && req.file){
-    req.body.cost.receipt.data = req.file.buffer
+router.post('/travel/record', fileHandler.any(), async (req, res) => {
+  if(req.body.cost && req.files){
+    for(var i = 0; i < req.body.cost.receipts.length; i++){
+      var buffer = null
+      for(const file of req.files){
+        if(file.fieldname == 'cost[receipts][' + i + '][data]'){
+          buffer = file.buffer
+          break
+        }
+      }
+      if(buffer){
+        req.body.cost.receipts[i].data = buffer
+      }
+    }
   }
   const travel = await Travel.findOne({ _id: req.body.travelId })
   delete req.body.travelId
@@ -100,20 +112,30 @@ router.post('/travel/record', fileHandler.single('cost[receipt][data]'), async (
   }
   if (req.body._id && req.body._id !== '') {
     var found = false
+    outer_loop:
     for (const record of travel.records) {
       if (record._id.equals(req.body._id)) {
-        if(req.body.cost && req.file){
-          if(req.body.cost.receipt._id){
-            if(!record.cost.receipt._id.equals(req.body.cost.receipt._id)){
-            break
+        if(req.body.cost && req.files){
+          for(var i = 0; i < req.body.cost.receipts.length; i++){
+            if(req.body.cost.receipts[i]._id){
+              var foundReceipt = false
+              for(const oldReceipt of record.cost.receipts){
+                if(oldReceipt._id.equals(req.body.cost.receipts[i]._id)){
+                  foundReceipt = true
+                }
+              }
+              if(!foundReceipt){
+              break outer_loop
+              }
+              await File.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
+            }else{
+              var result = await (new File(req.body.cost.receipts[i])).save()
+              req.body.cost.receipts[i] = result._id
             }
-            await File.findOneAndUpdate({ _id: req.body.cost.receipt._id }, req.body.cost.receipt)
-          }else{
-            req.body.cost.receipt = await (new File(req.body.cost.receipt)).save()
           }
+          travel.markModified('records.cost.receipts')
         }
         found = true
-        console.log(req.body)
         Object.assign(record, req.body)
         break
       }
@@ -122,8 +144,12 @@ router.post('/travel/record', fileHandler.single('cost[receipt][data]'), async (
       return res.sendStatus(403)
     }
   } else {
-    if(req.body.cost && req.file){
-      req.body.cost.receipt = await (new File(req.body.cost.receipt)).save()
+    if(req.body.cost && req.files){
+      for(var i = 0; i < req.body.cost.receipts.length; i++){
+        var result = await (new File(req.body.cost.receipts[i])).save()
+        req.body.cost.receipts[i] = result._id
+      }
+      travel.markModified('records.cost.receipts')
     }
     travel.records.push(req.body)
   }
@@ -149,8 +175,85 @@ router.delete('/travel/record', async (req, res) => {
     for (var i = 0; i < travel.records.length; i++) {
       if (travel.records[i]._id.equals(req.query.id)) {
         found = true
+        if(travel.records[i].cost){
+          for(const receipt of travel.records[i].cost.receipts){
+            File.deleteOne({ _id: receipt._id })
+          }
+        }
         travel.records.splice(i, 1)
         break
+      }
+    }
+    if (!found) {
+      return res.sendStatus(403)
+    }
+  } else {
+    return res.status(400).send({ message: 'No record found' })
+  }
+  travel.markModified('records')
+  try {
+    await travel.save()
+    res.send({ message: i18n.t('alerts.successDeleting') })
+  } catch (error) {
+    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+  }
+})
+
+router.get('/travel/record/receipt', async (req, res) => {
+  const travel = await Travel.findOne({ _id: req.query.travelId })
+  delete req.query.travelId
+  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    return res.sendStatus(403)
+  }
+  if (req.query.recordId) {
+    var found = false
+    outer_loop:
+    for (var i = 0; i < travel.records.length; i++) {
+      if (travel.records[i]._id.equals(req.query.recordId)) {
+        if(travel.records[i].cost){
+          for(var r = 0; r < travel.records[i].cost.receipts.length; r++){
+            if(req.query.id && travel.records[i].cost.receipts[r]._id.equals(req.query.id)){
+              found = true
+              var file = await File.findOne({ _id: req.query.id })
+              res.setHeader('Content-Type', file.type);
+              res.setHeader('Content-Length', file.data.length);
+              return res.send(file.data)
+            }
+          }
+        }
+      }
+    }
+    if (!found) {
+      return res.sendStatus(403)
+    }
+  } else {
+    return res.status(400).send({ message: 'No record found' })
+  }
+})
+
+router.delete('/travel/record/receipt', async (req, res) => {
+  const travel = await Travel.findOne({ _id: req.query.travelId })
+  delete req.query.travelId
+  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    return res.sendStatus(403)
+  }
+  if (req.query.recordId) {
+    var found = false
+    outer_loop:
+    for (var i = 0; i < travel.records.length; i++) {
+      if (travel.records[i]._id.equals(req.query.recordId)) {
+        if(travel.records[i].cost){
+          for(var r = 0; r < travel.records[i].cost.receipts.length; r++){
+            if(req.query.id && travel.records[i].cost.receipts[r]._id.equals(req.query.id)){
+              found = true
+              await File.deleteOne({ _id: req.query.id })
+              travel.records[i].cost.receipts.splice(r, 1)
+              break outer_loop
+            }
+          }
+        }
       }
     }
     if (!found) {

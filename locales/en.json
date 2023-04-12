@@ -61,6 +61,7 @@
     "private": "Private",
     "cost": "Cost",
     "receipt": "Receipt",
+    "receipts": "Receipts",
     "startLocation": "Start",
     "endLocation": "End",
     "transport": "Transport",
@@ -94,7 +95,7 @@
     "professionalShare": "If your travel is partly for personal purposes, enter the professional share here.",
     "claimOvernightLumpSum": "You can either claim overnight per diems and account for the actual cost of overnight accommodations.",
     "cost": "Enter the cost here.",
-    "receipt": "Upload the corresponding receipt here.",
+    "receipts": "Upload the corresponding receipts here.",
     "purpose": "Since your trip is proportionately private, you must specify which entries served what purpose."
   },
   "login": {

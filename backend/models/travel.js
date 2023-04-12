@@ -45,6 +45,7 @@ const travelSchema = new mongoose.Schema({
 travelSchema.pre(/^find((?!Update).)*$/, function () {
   this.populate({ path: 'advance.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.currency', model: 'Currency' })
+  this.populate({ path: 'records.cost.receipts', model: 'File', select: {name: 1, type: 1} })
   this.populate({ path: 'traveler', model: 'User', select: {name: 1, email: 1} })
   this.populate({ path: 'editor', model: 'User', select: {name: 1, email: 1} })
 })

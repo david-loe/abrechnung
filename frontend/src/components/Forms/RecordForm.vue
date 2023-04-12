@@ -92,7 +92,7 @@
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true"/>
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true" @deleteFile="(id) => $emit('deleteReceipt', id, record._id)" @showFile="(id) => $emit('showReceipt', id, record._id)"/>
       </div>
     </template>
 
@@ -132,7 +132,7 @@ import FileUpload from '../Elements/FileUpload.vue'
 export default {
   name: 'RecordForm',
   components: { InfoPoint, CurrencySelector, FileUpload },
-  emits: ['cancel', 'edit', 'add', 'deleted'],
+  emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     record: {
       type: Object,

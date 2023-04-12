@@ -61,6 +61,7 @@
     "private": "Privat",
     "cost": "Kosten",
     "receipt": "Beleg",
+    "receipts": "Belege",
     "startLocation": "Startpunkt",
     "endLocation": "Endpunkt",
     "transport": "Verkehrsmittel",
@@ -94,7 +95,7 @@
     "professionalShare": "Wenn deine Reise teilweise auch private Zwecke erfüllt, gib hier den beruflichen Anteil an.",
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
     "cost": "Trage hier die Kosten ein.",
-    "receipt": "Lade hier den entsprechenden Beleg hoch.",
+    "receipts": "Lade hier die entsprechenden Belege hoch.",
     "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten."
   },
   "login": {

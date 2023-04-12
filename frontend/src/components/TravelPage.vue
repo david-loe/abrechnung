@@ -6,13 +6,13 @@
           <div class="modal-header">
             <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.record') }) }}</h5>
             <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.record') }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal()"></button>
+            <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
               :askPurpose="Boolean(travel.professionalShare && travel.professionalShare < 0.8)"
               :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
-              @cancel="hideModal">
+              @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </RecordForm>
           </div>
         </div>
@@ -138,6 +138,7 @@ export default {
       if (this.$refs.recordForm) {
         this.$refs.recordForm.clear()
       }
+      this.modalRecord = undefined
     },
     async postTravelSettings() {
       if (this.$refs.travelSettingsForm.reportValidity()) {
@@ -160,7 +161,7 @@ export default {
     },
     async postRecord(record) {
       var headers = {}
-      if (record.cost.receipt) {
+      if (record.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
@@ -177,6 +178,19 @@ export default {
       if (result) {
         await this.getTravel()
         this.hideModal()
+      }
+    },
+    async deleteReceipt(id, recordId) {
+      const result = await this.$root.deleter('travel/record/receipt', { id: id, recordId: recordId, travelId: this._id })
+      if (result) {
+        await this.getTravel()
+      }
+    },
+    async showReceipt(id, recordId){
+      const result = await this.$root.getter('travel/record/receipt', { id: id, recordId: recordId, travelId: this._id }, { responseType: 'blob' })
+      if(result){
+        const fileURL = URL.createObjectURL(result);
+        window.open(fileURL)
       }
     },
     sameDay(a, b) {
@@ -221,7 +235,6 @@ export default {
     async getTravel() {
       this.travel = await this.$root.getter('travel', { id: this._id, records: true })
       this.renderTable()
-      console.log(this.travel)
     }
   },
   async beforeMount() {

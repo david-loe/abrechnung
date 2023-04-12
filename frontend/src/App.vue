@@ -175,13 +175,16 @@ export default {
         console.log(error.response.data)
       }
     },
-    async getter(endpoint, params = {}) {
+    async getter(endpoint, params = {}, config= {}) {
       try {
-        const res = await axios.get(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, {
+        const res = await axios.get(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, Object.assign({
           params: params,
           withCredentials: true,
-        })
+        }, config))
         if (res.status === 200) {
+          if(config.responseType == 'blob'){
+            return res.data
+          }
           return res.data.data
         }
       } catch (error) {
