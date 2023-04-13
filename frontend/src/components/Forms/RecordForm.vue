@@ -2,38 +2,27 @@
   <form @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <ul class="nav nav-pills nav-justified mb-3">
       <li class="nav-item">
-        <a href="#" :class="'nav-link' + (formRecord.type == 'route' ? ' active' : '')" @click="formRecord.type = 'route'">
-          {{ $t('labels.route')}} <i class="bi bi-bus-front-fill"></i>
-          </a>
+        <a href="#" :class="'nav-link' + (formRecord.type == 'route' ? ' active' : '')"
+          @click="formRecord.type = 'route'">
+          {{ $t('labels.route') }} <i class="bi bi-bus-front-fill"></i>
+        </a>
       </li>
       <li class="nav-item">
         <a href="#" :class="'nav-link' + (formRecord.type == 'stay' ? ' active' : '')" @click="formRecord.type = 'stay'">
-          {{$t('labels.stay')}} <i class="bi bi-house-fill"></i>
-          </a>
+          {{ $t('labels.stay') }} <i class="bi bi-house-fill"></i>
+        </a>
       </li>
     </ul>
 
     <div class="row mb-3">
       <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label>
-        <input
-          id="startDateInput"
-          class="form-control"
-          type="datetime-local"
-          v-model="formRecord.startDate"
-          required
-        />
+        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formRecord.startDate" required />
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
-        <input
-          id="endDateInput"
-          class="form-control"
-          type="datetime-local"
-          v-model="formRecord.endDate"
-          :min="formRecord.startDate"
-          required
-        />
+        <input id="endDateInput" class="form-control" type="datetime-local" v-model="formRecord.endDate"
+          :min="formRecord.startDate" required />
       </div>
     </div>
 
@@ -43,13 +32,14 @@
           <label for="recordFormStartLocation" class="form-label">
             {{ $t('labels.startLocation') }}
           </label>
-          <input type="text" class="form-control" id="recordFormStartLocation" v-model="formRecord.startLocation" required/>
+          <input type="text" class="form-control" id="recordFormStartLocation" v-model="formRecord.startLocation"
+            required />
         </div>
         <div class="col">
           <label for="recordFormEndLocation" class="form-label">
             {{ $t('labels.endLocation') }}
           </label>
-          <input type="text" class="form-control" id="recordFormEndLocation" v-model="formRecord.endLocation" required/>
+          <input type="text" class="form-control" id="recordFormEndLocation" v-model="formRecord.endLocation" required />
         </div>
       </div>
 
@@ -57,8 +47,7 @@
         {{ $t('labels.transport') }}
       </label>
       <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
-        <option value="other">{{ $t('labels.otherTransport') }}</option>
-        <option value="ownCar">{{ $t('labels.ownCar') }}</option>
+        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport" :key="transport">{{ $t('labels.' + transport) }}</option>
       </select>
     </template>
 
@@ -67,7 +56,7 @@
         <label for="recordFormLocation" class="form-label">
           {{ $t('labels.location') }}
         </label>
-        <input type="text" class="form-control" id="recordFormLocation" v-model="formRecord.location" required/>
+        <input type="text" class="form-control" id="recordFormLocation" v-model="formRecord.location" required />
       </div>
     </template>
 
@@ -80,7 +69,8 @@
       </div>
     </template>
 
-    <template v-if="(formRecord.type == 'route' && formRecord.transport == 'other') || (formRecord.type == 'stay' && askStayCost)">
+    <template
+      v-if="(formRecord.type == 'route' && formRecord.transport != 'ownCar') || (formRecord.type == 'stay' && askStayCost)">
       <label for="recordFormCost" class="form-label me-2">
         {{ $t('labels.cost') }}
       </label>
@@ -92,7 +82,9 @@
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true" @deleteFile="(id) => $emit('deleteReceipt', id, record._id)" @showFile="(id) => $emit('showReceipt', id, record._id)"/>
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true"
+          @deleteFile="(id) => $emit('deleteReceipt', id, record._id)"
+          @showFile="(id) => $emit('showReceipt', id, record._id)" />
       </div>
     </template>
 
@@ -102,9 +94,7 @@
       </label>
       <InfoPoint :text="$t('info.purpose')" />
       <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" required>
-        <option value="professional">{{ $t('labels.professional') }}</option>
-        <option value="mixed">{{ $t('labels.mixed') }}</option>
-        <option value="private">{{ $t('labels.private') }}</option>
+        <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
       </select>
     </template>
 
@@ -129,6 +119,22 @@
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
+const defaultRecord = {
+  type: 'route',
+  startDate: '',
+  endDate: '',
+  startLocation: null,
+  endLocation: null,
+  distance: null,
+  location: null,
+  transport: 'otherTransport',
+  cost: {
+    amount: null,
+    currency: 'EUR',
+    receipts: [],
+  },
+  purpose: 'professional',
+}
 export default {
   name: 'RecordForm',
   components: { InfoPoint, CurrencySelector, FileUpload },
@@ -137,22 +143,7 @@ export default {
     record: {
       type: Object,
       default: function () {
-        return {
-          type: 'route',
-          startDate: '',
-          endDate: '',
-          startLocation: null,
-          endLocation: null,
-          distance: null,
-          location: null,
-          transport: 'other',
-          cost: {
-            amount: null,
-            currency: 'EUR',
-            receipts: [],
-          },
-          purpose: 'professional',
-        }
+        return defaultRecord
       },
     },
     mode: {
@@ -172,46 +163,24 @@ export default {
   },
   methods: {
     clear() {
-      this.formRecord = {
-        type: 'route',
-        startDate: '',
-        endDate: '',
-        startLocation: null,
-        endLocation: null,
-        distance: null,
-        location: null,
-        transport: 'other',
-        cost: {
-          amount: null,
-          currency: 'EUR',
-          receipts: [],
-        },
-        purpose: 'professional',
-      }
+      this.formRecord = defaultRecord
     },
     output() {
       const output = Object.assign({}, this.formRecord)
-      output.startDate = new Date(output.startDate)
-      output.endDate = new Date(output.endDate)
+      if(output.type == 'route'){
+        delete output.location
+      }else{
+        delete output.startLocation
+        delete output.endLocation
+        delete output.distance
+        delete output.transport
+      }
+      output.startDate = this.$root.htmlInputStringToDateTime(output.startDate)
+      output.endDate = this.$root.htmlInputStringToDateTime(output.endDate)
       return output
     },
     input() {
-      const input = Object.assign({
-        type: 'route',
-        startDate: '',
-        endDate: '',
-        startLocation: null,
-        endLocation: null,
-        distance: null,
-        location: null,
-        transport: 'other',
-        cost: {
-          amount: null,
-          currency: 'EUR',
-          receipts: [],
-        },
-        purpose: 'professional',
-      }, this.record)
+      const input = Object.assign({}, defaultRecord, this.record)
       input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)
       return input
@@ -228,5 +197,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

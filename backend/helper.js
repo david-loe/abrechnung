@@ -90,7 +90,8 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
         }
       }
       try {
-        const result = await model.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+        Object.assign(oldObject, req.body)
+        const result = await oldObject.save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })

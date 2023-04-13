@@ -46,7 +46,7 @@ export default {
       switch (key) {
         case 'startDate':
         case 'endDate':
-          return new Date(this.travel[key]).toLocaleDateString()
+          return this.$root.datetoDateString(this.travel[key])
         case 'advance':
           return this.travel[key].amount + ' ' + this.travel[key].currency._id
         case 'state':

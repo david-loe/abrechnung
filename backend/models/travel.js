@@ -27,18 +27,19 @@ const travelSchema = new mongoose.Schema({
     endLocation: { type: String },
     distance: {type: Number, min: 0},
     location: { type: String },
-    transport: { type: String, enum: ['ownCar', 'other'] },
+    transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] },
     cost: {
       amount: { type: Number, min: 0 },
       currency: { type: String, ref: 'Currency' },
       receipts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
     },
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
-    cateringNoRefund: [{
-      breakfast: { type: Boolean, default: false },
-      lunch: { type: Boolean, default: false },
-      dinner: { type: Boolean, default: false }
-    }]
+  }],
+  cateringNoRefund: [{
+    date: {type: Date, required: true},
+    breakfast: { type: Boolean, default: false },
+    lunch: { type: Boolean, default: false },
+    dinner: { type: Boolean, default: false }
   }]
 }, {timestamps: true})
 
@@ -59,5 +60,30 @@ travelSchema.methods.saveToHistory = async function () {
   this.comment = null
   this.markModified('history')
 };
+
+travelSchema.pre('save', function(next) {
+  if(this.records.length > 0){
+    const oldCateringNoRefund = JSON.parse(JSON.stringify(this.cateringNoRefund))
+    const newCateringNoRefund = []
+    const dayCount = this.diffInDays(this.records[0].startDate, this.records[this.records.length - 1].endDate) + 1
+    for(var i = 0; i < dayCount; i++){
+      newCateringNoRefund.push({
+        date: new Date(new Date(this.$root.dateToHTMLInputString(this.records[0].startDate)).valueOf() + i * 1000 * 60 * 60 * 24)
+      })
+    }
+    for(const oldCNR of oldCateringNoRefund){
+      for(const newCNR of newCateringNoRefund){
+        if(new Date(oldCNR.date) - new Date(newCNR.date) == 0){
+          Object.assign(newCNR, oldCNR)
+          break
+        }
+      }
+    }
+    this.cateringNoRefund = newCateringNoRefund
+  }else{
+    this.cateringNoRefund = []
+  }
+  next();
+});
 
 module.exports = mongoose.model('Travel', travelSchema)

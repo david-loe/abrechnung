@@ -62,7 +62,34 @@
               }}</label>
               <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
             </div>
+          </div>
 
+          <div class="w-100"></div>
+          <div class="col-auto">
+            <div class="row align-items-center">
+              <div class="col-auto pe-1">
+                <input type="checkbox" class="btn-check" id="configCateringRefund" v-model="configCateringRefund">
+            <label class="btn btn-sm btn-light" for="configCateringRefund">
+              {{$t('labels.configCateringRefund')}}
+              <i v-if="configCateringRefund" class="bi bi-chevron-up"></i>
+              <i v-else class="bi bi-chevron-down"></i>
+            </label>
+              </div>
+              <div class="col-auto ps-0">
+                <InfoPoint class="ms-1" :text="$t('info.configCateringRefund')" />
+              </div>
+            </div>
+            <table v-if="configCateringRefund && travel.records.length > 0" class="table">
+              <tbody>
+                <tr v-for="day in (diffInDays(travel.records[0].startDate, travel.records[travel.records.length - 1].endDate) + 1)" :key="day">
+                    <th>{{ this.$root.datetoDateString(new Date(travel.records[0].startDate).valueOf() + (day - 1) * 1000 * 60 * 60 * 24) }}</th>
+                    <td v-for="key of ['breakfast', 'lunch', 'dinner']" :key="key">
+                      <input class="form-check-input" type="checkbox" role="switch" :id="'configCateringRefund' + day + key">
+                      <label class="form-check-label" :for="'configCateringRefund' + day + key">{{$t('labels.' + key)}}</label>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </form>
@@ -90,13 +117,15 @@
           <div class="col">{{ $t('labels.' + travel.records[row.recordIndex - 1].type) }}</div>
         </div>
         <div v-else class="row mb-1">
-          <div class="col-auto">{{ row.date }}</div>
+          <div class="col-auto" style="width: 65px;">
+            {{ row.date ? row.date : '' }}
+          </div>
           <div class="col-auto text-secondary">{{ row.time }}</div>
         </div>
         <div v-if="row.gap" class="row ps-5">
           <div class="col-auto">
             <button class="btn btn-sm btn-light"
-              @click="showModal('add', { startDate: row.startDate, endDate: row.endDate })" style="border-radius: 50%;">
+              @click="showModal('add', row.gapRecord)" style="border-radius: 50%;">
               <i class="bi bi-plus-lg"></i>
             </button>
           </div>
@@ -120,9 +149,8 @@ export default {
       recordModal: undefined,
       modalRecord: undefined,
       modalMode: 'add',
-      dateFormat: { day: '2-digit', month: '2-digit' },
-      timeFormat: { hour: '2-digit', minute: '2-digit' },
-      table: []
+      table: [],
+      configCateringRefund: false
     }
   },
   components: { StatePipeline, RecordForm, InfoPoint },
@@ -196,12 +224,17 @@ export default {
     sameDay(a, b) {
       const dateA = new Date(a)
       const dateB = new Date(b)
-      return dateA.getDate() === dateB.getDate() && dateA.getMonth() === dateB.getMonth()
+      return dateA.getUTCDate() === dateB.getUTCDate() && dateA.getUTCMonth() === dateB.getUTCMonth()
     },
     sameHour(a, b) {
       const dateA = new Date(a)
       const dateB = new Date(b)
-      return this.sameDay(a, b) && dateA.getHours() === dateB.getHours()
+      return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
+    },
+    diffInDays(a, b){
+      const dayA = new Date(this.$root.dateToHTMLInputString(a))
+      const dayB = new Date(this.$root.dateToHTMLInputString(b))
+      return (dayB.valueOf() - dayA.valueOf()) / (1000 * 60 * 60 * 24)
     },
     renderTable() {
       this.table = []
@@ -210,23 +243,39 @@ export default {
       var index = 0
       for (var i = 0; i < this.travel.records.length; i++) {
         var startDate = new Date(this.travel.records[i].startDate)
-        var startTime = startDate.toLocaleTimeString(undefined, this.timeFormat)
-        var startDateStr = startDate.toLocaleDateString(undefined, this.dateFormat)
+        var startTime = this.$root.dateToTimeString(startDate)
+        var startDateStr = this.$root.datetoDateString(startDate)
         var endDate = new Date(this.travel.records[i].endDate)
-        var endTime = endDate.toLocaleTimeString(undefined, this.timeFormat)
-        var endDateStr = endDate.toLocaleDateString(undefined, this.dateFormat)
-        if (previousStartDate && this.sameDay(previousEndDate, startDate)) {
+        var endTime = this.$root.dateToTimeString(endDate)
+        var endDateStr = this.$root.datetoDateString(endDate)
+        if (previousEndDate && this.sameDay(previousEndDate, startDate)) {
           if (this.sameHour(previousEndDate, startDate)) {
             this.table.splice(--index, 1)
-
-          } else {
+          }else{
+            startDateStr = false
+          }
+          if(previousStartDate && this.sameDay(previousStartDate, startDate)){
             startDateStr = false
           }
         }
+        if(this.sameDay(startDate, endDate)){
+          endDateStr = false
+        }
+        var isNotLast = i < this.travel.records.length - 1
+        var dayCount = startDateStr ? this.diffInDays(startDate, endDate) + 1 : null
+        var startLocation = this.travel.records[i].endLocation ? this.travel.records[i].endLocation : this.travel.records[i].location
+        var endLocation = isNotLast ? (this.travel.records[i + 1].startLocation ? this.travel.records[i + 1].startLocation : this.travel.records[i + 1].location) : null
+        var gapRecord = {
+          startDate: endDate,
+          endDate: isNotLast ? this.travel.records[i + 1].startDate : null,
+          startLocation: startLocation,
+          location: startLocation,
+          endLocation: endLocation
+        }
+
         this.table.push({ date: startDateStr, time: startTime })
-        this.table.push({ recordIndex: i + 1 })
-        var isNotLast = i !== this.travel.records.length - 1
-        this.table.push({ date: endDateStr, time: endTime, gap: true, startDate: endDate, endDate: isNotLast ? this.travel.records[i + 1].startDate : null })
+        this.table.push({ recordIndex: i + 1, dayCount: dayCount })
+        this.table.push({ date: endDateStr, time: endTime, gap: true, gapRecord: gapRecord})
         index += 3
         previousStartDate = startDate
         previousEndDate = endDate

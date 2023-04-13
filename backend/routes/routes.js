@@ -90,7 +90,7 @@ router.post('/travel', async (req, res) => {
 })
 
 router.post('/travel/record', fileHandler.any(), async (req, res) => {
-  if(req.body.cost && req.files){
+  if(req.body.cost && req.body.cost.receipts && req.files){
     for(var i = 0; i < req.body.cost.receipts.length; i++){
       var buffer = null
       for(const file of req.files){
@@ -115,7 +115,7 @@ router.post('/travel/record', fileHandler.any(), async (req, res) => {
     outer_loop:
     for (const record of travel.records) {
       if (record._id.equals(req.body._id)) {
-        if(req.body.cost && req.files){
+        if(req.body.cost && req.body.cost.receipts && req.files){
           for(var i = 0; i < req.body.cost.receipts.length; i++){
             if(req.body.cost.receipts[i]._id){
               var foundReceipt = false
@@ -144,7 +144,7 @@ router.post('/travel/record', fileHandler.any(), async (req, res) => {
       return res.sendStatus(403)
     }
   } else {
-    if(req.body.cost && req.files){
+    if(req.body.cost && req.body.cost.receipts && req.files){
       for(var i = 0; i < req.body.cost.receipts.length; i++){
         var result = await (new File(req.body.cost.receipts[i])).save()
         req.body.cost.receipts[i] = result._id

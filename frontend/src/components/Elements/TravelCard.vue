@@ -5,9 +5,9 @@
         <h6 v-if="showTraveler" class="card-subtitle mb-1 text-muted">{{travel.traveler.name}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">
           {{
-            new Date(travel.startDate).toLocaleDateString(undefined, dateFormat) +
+            this.$root.datetoDateString(travel.startDate) +
             ' - ' +
-            new Date(travel.endDate).toLocaleDateString(undefined, dateFormat)
+            this.$root.datetoDateString(travel.endDate)
           }}
         </h6>
         <div>
@@ -24,7 +24,6 @@ export default {
   emits: ['clicked'],
   data() {
     return {
-      dateFormat: { day: '2-digit', month: '2-digit' },
     }
   },
   components: {StateBadge},

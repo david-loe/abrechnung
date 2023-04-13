@@ -65,8 +65,10 @@
     "startLocation": "Startpunkt",
     "endLocation": "Endpunkt",
     "transport": "Verkehrsmittel",
-    "otherTransport": "Anderes Verkehrsmittel ✈🚆🚖",
+    "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
+    "airplane": "Flugzeug ✈",
+    "shipOrFerry": "Schiff oder Fähre 🚢",
     "distance": "Entfernung [km]",
     "claimOvernightLumpSum": "Übernachtungspauschalen beanspruchen",
     "professionalShare": "Beruflicher Anteil"

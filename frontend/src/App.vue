@@ -262,25 +262,35 @@ export default {
         }
       }, 5000)
     },
+    // Handling all dates as UTC
     dateTimeToHTMLInputString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
-      const year = dateObject.getFullYear()
-      const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
-      const day = dateObject.getDate().toString().padStart(2, '0')
-      const hour = dateObject.getHours().toString().padStart(2, '0')
-      const minute = dateObject.getMinutes().toString().padStart(2, '0')
-      const str = year + '-' + month + '-' + day + 'T' + hour + ':' + minute
-      return str
+      return dateObject.toISOString().slice(0,-8)
+    },
+    htmlInputStringToDateTime(dateTimeStr) {
+      if (!dateTimeStr) return null
+      const dateObject = new Date(dateTimeStr)
+      return new Date(dateObject.valueOf() - dateObject.getTimezoneOffset() * 60 * 1000)
     },
     dateToHTMLInputString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
-      const year = dateObject.getFullYear()
-      const month = (dateObject.getMonth() + 1).toString().padStart(2, '0')
-      const day = dateObject.getDate().toString().padStart(2, '0')
-      const str = year + '-' + month + '-' + day
-      return str
+      return dateObject.toISOString().slice(0,-14)
+    },
+    dateToTimeString(date){
+      if (!date) return ''
+      const dateObject = new Date(date)
+      const hour = dateObject.getUTCHours().toString().padStart(2, '0')
+      const minute = dateObject.getUTCMinutes().toString().padStart(2, '0')
+      return hour + ':' + minute
+    },
+    datetoDateString(date){
+      if (!date) return ''
+      const dateObject = new Date(date)
+      const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
+      const day = dateObject.getUTCDate().toString().padStart(2, '0')
+      return day + '.' + month
     },
     async pushSettings() {
       try {
