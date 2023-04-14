@@ -45,6 +45,15 @@ const travelSchema = new mongoose.Schema({
     breakfast: { type: Boolean, default: false },
     lunch: { type: Boolean, default: false },
     dinner: { type: Boolean, default: false }
+  }],
+  refunds: [{
+    type: { type: String, enum: ['overnight', 'catering8', 'catering24', 'expense'], required: true },
+    date: { type: Date, required: true },
+    refund: {
+      amount: { type: Number, min: 0 },
+      currency: { type: String, ref: 'Currency' },
+    },
+    recordIndex: { type: Number, min: 0 }
   }]
 }, { timestamps: true })
 
@@ -66,7 +75,7 @@ travelSchema.methods.saveToHistory = async function () {
   this.markModified('history')
 };
 
-travelSchema.pre('save', function (next) {
+travelSchema.methods.calculateCateringNoRefund = function () {
   if (this.records.length > 0) {
     const oldCateringNoRefund = JSON.parse(JSON.stringify(this.cateringNoRefund))
     const newCateringNoRefund = []
@@ -90,6 +99,18 @@ travelSchema.pre('save', function (next) {
   } else {
     this.cateringNoRefund = []
   }
+}
+
+travelSchema.methods.calculateRefunds = async function () {
+  if (this.records.length > 0) {
+  } else {
+    this.refunds = []
+  }
+}
+
+travelSchema.pre('save', async function (next) {
+  this.calculateCateringNoRefund()
+  await this.calculateRefunds()
   next();
 });
 

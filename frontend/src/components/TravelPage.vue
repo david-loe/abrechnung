@@ -115,17 +115,28 @@
       </div>
 
       <div v-for="(row, index) of table" :key="index">
-        <div v-if="row.recordIndex" class="row ps-4 mb-1" style="cursor: pointer;"
+        <!-- Record -->
+        <div v-if="row.recordIndex" class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
           @click="showModal('edit', travel.records[row.recordIndex - 1])">
+          <div v-if="row.icon" class="col-auto fs-3">
+              <i :class="row.icon"></i>
+          </div>
+          <!-- Stay -->
           <template v-if="travel.records[row.recordIndex - 1].type == 'stay'">
-            <div class="col-auto">{{ travel.records[row.recordIndex - 1].location }}</div>
+            <div class="col-auto">
+              {{ travel.records[row.recordIndex - 1].location.place }}
+            </div>
           </template>
+          <!-- Route -->
           <template v-else>
-            <div class="col-auto">{{ travel.records[row.recordIndex - 1].startLocation }} - {{
-              travel.records[row.recordIndex - 1].endLocation }}</div>
+            <div class="col-auto">
+              {{ displayLocation(travel.records[row.recordIndex - 1], 'start') }}
+              <i class="bi bi-arrow-right"></i>
+              {{ displayLocation(travel.records[row.recordIndex - 1], 'end') }}
+              </div>
           </template>
-          <div class="col">{{ $t('labels.' + travel.records[row.recordIndex - 1].type) }}</div>
         </div>
+        <!-- Date -->
         <div v-else class="row mb-1">
           <div class="col-auto" style="width: 65px;">
             {{ row.date ? row.date : '' }}
@@ -246,6 +257,13 @@ export default {
       const dayB = new Date(this.$root.dateToHTMLInputString(b))
       return (dayB.valueOf() - dayA.valueOf()) / (1000 * 60 * 60 * 24)
     },
+    displayLocation(record, location){
+      if(record.endLocation.country == record.startLocation.country){
+        return record[location + 'Location'].place
+      }else{
+        return record[location + 'Location'].place + ' ' + this.$root.getFlagEmoji(record[location + 'Location'].country)
+      }
+    },
     renderTable() {
       this.table = []
       var previousStartDate = null
@@ -271,6 +289,20 @@ export default {
         if (this.sameDay(startDate, endDate)) {
           endDateStr = false
         }
+        var icon = null
+        if(this.travel.records[i].type == 'stay'){
+          icon = 'bi bi-house'
+        }else{
+          if(this.travel.records[i].transport == 'own car'){
+            icon = 'bi bi-car-front'
+          }else if(this.travel.records[i].transport == 'airplane'){
+            icon = 'bi bi-airplane'
+          }else if(this.travel.records[i].transport == 'shipOrFerry'){
+            icon = 'bi bi-water'
+          }else if(this.travel.records[i].transport == 'otherTransport'){
+            icon = 'bi bi-train-front'
+          }
+        }
         var isNotLast = i < this.travel.records.length - 1
         var dayCount = startDateStr ? this.diffInDays(startDate, endDate) + 1 : undefined
         var startLocation = this.travel.records[i].endLocation ? this.travel.records[i].endLocation : this.travel.records[i].location
@@ -284,7 +316,7 @@ export default {
         }
 
         this.table.push({ date: startDateStr, time: startTime })
-        this.table.push({ recordIndex: i + 1, dayCount: dayCount })
+        this.table.push({ recordIndex: i + 1, dayCount: dayCount, icon: icon })
         this.table.push({ date: endDateStr, time: endTime, gap: true, gapRecord: gapRecord })
         index += 3
         previousStartDate = startDate

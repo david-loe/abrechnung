@@ -16,19 +16,22 @@
             </router-link>
           </div>
           <div>
-            <router-link v-if="auth && user.access.approve" to="/approve" class="nav-link link-dark d-flex align-items-center">
+            <router-link v-if="auth && user.access.approve" to="/approve"
+              class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-calendar-check"></i>
               <span class="ms-1 d-none d-md-block">{{ $t('labels.approve') }}</span>
             </router-link>
           </div>
           <div>
-            <router-link v-if="auth && user.access.examine" to="/examine" class="nav-link link-dark d-flex align-items-center">
+            <router-link v-if="auth && user.access.examine" to="/examine"
+              class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-pencil-square"></i>
               <span class="ms-1 d-none d-md-block">{{ $t('labels.examine') }}</span>
             </router-link>
           </div>
           <div v-if="auth" class="dropdown">
-            <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
+            <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#"
+              role="button">
               <i class="fs-4 bi bi-person-circle"></i>
               <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
             </a>
@@ -39,16 +42,20 @@
                 </select>
               </li>
               <template v-if="user.access.admin">
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <router-link to="/settings" class="d-flex align-items-center dropdown-item">
-                  <i class="fs-4 bi bi-gear"></i>
-                  <span class="ms-1">{{ $t('headlines.settings') }}</span>
-                </router-link>
-              </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <router-link to="/settings" class="d-flex align-items-center dropdown-item">
+                    <i class="fs-4 bi bi-gear"></i>
+                    <span class="ms-1">{{ $t('headlines.settings') }}</span>
+                  </router-link>
+                </li>
               </template>
-              
-              <li><hr class="dropdown-divider" /></li>
+
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
               <li>
                 <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
                   <i class="fs-4 bi bi-box-arrow-left"></i>
@@ -81,13 +88,9 @@
     <div class="position-relative">
       <div class="position-absolute top-0 end-0" style="height: 100%">
         <div class="position-sticky top-0 pt-2 pe-2" style="z-index: 1100">
-          <div
-            v-for="(alert, index) of alerts"
-            :key="alert.id"
-            :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'"
-            role="alert"
-            style="z-index: 1100; max-width: 250px"
-          >
+          <div v-for="(alert, index) of alerts" :key="alert.id"
+            :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'" role="alert"
+            style="z-index: 1100; max-width: 250px">
             <strong>
               <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
               <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
@@ -95,7 +98,8 @@
             </strong>
             {{ alert.message }}
             <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
-              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress" aria-label="Danger example"></div>
+              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress"
+                aria-label="Danger example"></div>
             </div>
             <button type="button" class="btn-close" @click="alerts.splice(index, 1)"></button>
           </div>
@@ -151,7 +155,7 @@ export default {
           this.getter('user'),
           this.getter('currency'),
           this.getter('country'),
-        ]).then((result)=>{
+        ]).then((result) => {
           this.user = result[0].value
           if (Object.keys(this.user).length > 0) {
             this.auth = true
@@ -173,28 +177,28 @@ export default {
         if (res.status === 200) {
           this.auth = false
           this.user = {}
-          this.$router.push({path: '/login'})
+          this.$router.push({ path: '/login' })
         }
       } catch (error) {
         this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
         console.log(error.response.data)
       }
     },
-    async getter(endpoint, params = {}, config= {}) {
+    async getter(endpoint, params = {}, config = {}) {
       try {
         const res = await axios.get(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, Object.assign({
           params: params,
           withCredentials: true,
         }, config))
         if (res.status === 200) {
-          if(config.responseType == 'blob'){
+          if (config.responseType == 'blob') {
             return res.data
           }
           return res.data.data
         }
       } catch (error) {
         if (error.response.status === 401) {
-          this.$router.push({path: '/login', query: { redirect: this.$route }})
+          this.$router.push({ path: '/login', query: { redirect: this.$route } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -213,7 +217,7 @@ export default {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          this.$router.push({path: '/login', query: { redirect: this.$route }})
+          this.$router.push({ path: '/login', query: { redirect: this.$route } })
         } else {
           console.log(error.response.data)
           this.$root.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -222,7 +226,7 @@ export default {
       }
     },
     async deleter(endpoint, params) {
-      if(!confirm(this.$t('alerts.areYouSureDelete'))){
+      if (!confirm(this.$t('alerts.areYouSureDelete'))) {
         return null
       }
       try {
@@ -236,7 +240,7 @@ export default {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          this.$router.push({path: '/login', query: { redirect: this.$route }})
+          this.$router.push({ path: '/login', query: { redirect: this.$route } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -271,7 +275,7 @@ export default {
     dateTimeToHTMLInputString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
-      return dateObject.toISOString().slice(0,-8)
+      return dateObject.toISOString().slice(0, -8)
     },
     htmlInputStringToDateTime(dateTimeStr) {
       if (!dateTimeStr) return null
@@ -281,21 +285,29 @@ export default {
     dateToHTMLInputString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
-      return dateObject.toISOString().slice(0,-14)
+      return dateObject.toISOString().slice(0, -14)
     },
-    dateToTimeString(date){
+    dateToTimeString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
       const hour = dateObject.getUTCHours().toString().padStart(2, '0')
       const minute = dateObject.getUTCMinutes().toString().padStart(2, '0')
       return hour + ':' + minute
     },
-    datetoDateString(date){
+    datetoDateString(date) {
       if (!date) return ''
       const dateObject = new Date(date)
       const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
       const day = dateObject.getUTCDate().toString().padStart(2, '0')
       return day + '.' + month
+    },
+    getFlagEmoji(countryCode) {
+      const codePoints = countryCode
+        .slice(0, 2)
+        .toUpperCase()
+        .split('')
+        .map(char => 127397 + char.charCodeAt());
+      return String.fromCodePoint(...codePoints);
     },
     async pushSettings() {
       try {
@@ -340,14 +352,18 @@ html {
   position: relative;
   min-height: 100%;
 }
+
 body {
-  margin-bottom: 75px !important; /* Margin bottom by footer height */
+  margin-bottom: 75px !important;
+  /* Margin bottom by footer height */
 }
+
 footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 60px; /* Set the fixed height of the footer here */
+  height: 60px;
+  /* Set the fixed height of the footer here */
   z-index: -999;
 }
 
@@ -355,6 +371,7 @@ footer {
   0% {
     width: 0%;
   }
+
   100% {
     width: 100%;
   }
@@ -368,5 +385,4 @@ footer {
 
 .router-link-active {
   font-weight: bold !important;
-}
-</style>
+}</style>
