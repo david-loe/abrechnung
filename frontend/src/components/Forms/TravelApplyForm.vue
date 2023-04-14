@@ -12,7 +12,7 @@
         {{ $t('labels.destinationPlace') }}
       </label>
       <InfoPoint :text="$t('info.destinationPlace')" />
-      <input type="text" class="form-control" id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" required />
+      <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
 
     <div class="form-check mb-3">
@@ -67,27 +67,27 @@
 <script>
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
-export default {
-  name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint },
-  emits: ['cancel', 'edit', 'add'],
-  props: {
-    travel: {
-      type: Object,
-      default: function () {
-        return {
+import PlaceInput from '../Elements/PlaceInput.vue'
+const defaultTravel= {
           name: '',
           reason: '',
           startDate: '',
           endDate: '',
-          destinationPlace: '',
+          destinationPlace: undefined,
           travelInsideOfEU: false,
           advance: {
             amount: 0,
             currency: 'EUR',
           },
         }
-      },
+export default {
+  name: 'TravelApplyForm',
+  components: { CurrencySelector, InfoPoint, PlaceInput },
+  emits: ['cancel', 'edit', 'add'],
+  props: {
+    travel: {
+      type: Object,
+      default: () => defaultTravel
     },
     mode: {
       type: String,

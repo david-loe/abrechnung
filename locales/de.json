@@ -71,7 +71,12 @@
     "shipOrFerry": "Schiff oder Fähre 🚢",
     "distance": "Entfernung [km]",
     "claimOvernightLumpSum": "Übernachtungspauschalen beanspruchen",
-    "professionalShare": "Beruflicher Anteil"
+    "professionalShare": "Beruflicher Anteil",
+    "configCateringRefund": "Einstellungen Verpflegungspauschalen",
+    "cateringNoRefund": "Verpflegungspauschalen Kürzung",
+    "breakfast": "Frühstück",
+    "lunch": "Mittagessen",
+    "dinner": "Abendessen"
   },
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Einträge vorhanden.",
@@ -98,7 +103,8 @@
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
     "cost": "Trage hier die Kosten ein.",
     "receipts": "Lade hier die entsprechenden Belege hoch.",
-    "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten."
+    "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten.",
+    "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden."
   },
   "login": {
     "signIn": "Bitte Anmelden"

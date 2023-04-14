@@ -22,7 +22,7 @@
     <div class="container">
       <h1 class="mb-3">{{ $t('labels.approve') }}</h1>
       <div class="row justify-content-center gx-4 gy-2">
-        <div class="col-auto" v-for="travel in travels" :key="travel._id">
+        <div class="col-auto" v-for="travel of travels" :key="travel._id">
           <TravelCard :travel="travel" :showTraveler="true" @clicked="showModal(travel)"></TravelCard>
         </div>
       </div>

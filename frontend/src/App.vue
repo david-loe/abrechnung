@@ -126,6 +126,7 @@ export default {
       auth: false,
       user: {},
       currencies: [],
+      countries: [],
       loadState: 'UNLOADED',
       loadingPromise: null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -146,14 +147,18 @@ export default {
     async load() {
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
-        this.loadingPromise = new Promise(async (resolve) => {// eslint-disable-line no-async-promise-executor
-          this.user = await this.getter('user')
+        this.loadingPromise = Promise.allSettled([
+          this.getter('user'),
+          this.getter('currency'),
+          this.getter('country'),
+        ]).then((result)=>{
+          this.user = result[0].value
           if (Object.keys(this.user).length > 0) {
             this.auth = true
           }
-          this.currencies = await this.getter('currency')
+          this.currencies = result[1].value
+          this.countries = result[2].value
           this.loadState = 'LOADED'
-          resolve()
         })
         await this.loadingPromise
       } else if (this.loadState === 'LOADING') {

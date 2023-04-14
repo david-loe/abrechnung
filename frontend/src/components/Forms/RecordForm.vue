@@ -32,14 +32,13 @@
           <label for="recordFormStartLocation" class="form-label">
             {{ $t('labels.startLocation') }}
           </label>
-          <input type="text" class="form-control" id="recordFormStartLocation" v-model="formRecord.startLocation"
-            required />
+          <PlaceInput id="recordFormStartLocation" v-model="formRecord.startLocation" :required="true"></PlaceInput>
         </div>
         <div class="col">
           <label for="recordFormEndLocation" class="form-label">
             {{ $t('labels.endLocation') }}
           </label>
-          <input type="text" class="form-control" id="recordFormEndLocation" v-model="formRecord.endLocation" required />
+          <PlaceInput id="recordFormEndLocation" v-model="formRecord.endLocation" :required="true"></PlaceInput>
         </div>
       </div>
 
@@ -56,16 +55,16 @@
         <label for="recordFormLocation" class="form-label">
           {{ $t('labels.location') }}
         </label>
-        <input type="text" class="form-control" id="recordFormLocation" v-model="formRecord.location" required />
+        <PlaceInput id="recordFormLocation" v-model="formRecord.location" :required="true"></PlaceInput>
       </div>
     </template>
 
     <template v-if="(formRecord.type == 'route' && formRecord.transport == 'ownCar')">
       <div class="mb-3">
-        <label for="recordFormEndLocation" class="form-label">
+        <label for="recordFormDistance" class="form-label">
           {{ $t('labels.distance') }}
         </label>
-        <input type="number" class="form-control" v-model="formRecord.distance" required />
+        <input type="number" class="form-control" v-model="formRecord.distance" id="recordFormDistance" required />
       </div>
     </template>
 
@@ -76,13 +75,13 @@
       </label>
       <InfoPoint :text="$t('info.cost')" />
       <div class="input-group mb-2" id="recordFormCost">
-        <input type="number" class="form-control" v-model="formRecord.cost.amount" min="0" required />
+        <input type="number" class="form-control" v-model="formRecord.cost.amount" min="0" />
         <CurrencySelector v-model="formRecord.cost.currency" :required="true"></CurrencySelector>
       </div>
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="true"
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="formRecord.cost.amount"
           @deleteFile="(id) => $emit('deleteReceipt', id, record._id)"
           @showFile="(id) => $emit('showReceipt', id, record._id)" />
       </div>
@@ -119,14 +118,15 @@
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
+import PlaceInput from '../Elements/PlaceInput.vue'
 const defaultRecord = {
   type: 'route',
   startDate: '',
   endDate: '',
-  startLocation: null,
-  endLocation: null,
+  startLocation: undefined,
+  endLocation: undefined,
   distance: null,
-  location: null,
+  location: undefined,
   transport: 'otherTransport',
   cost: {
     amount: null,
@@ -137,7 +137,7 @@ const defaultRecord = {
 }
 export default {
   name: 'RecordForm',
-  components: { InfoPoint, CurrencySelector, FileUpload },
+  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     record: {

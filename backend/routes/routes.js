@@ -8,7 +8,6 @@ const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
 const File = require('../models/file')
-const file = require('../models/file')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -61,6 +60,14 @@ router.post('/user/settings', async (req, res) => {
 })
 
 router.get('/currency', helper.getter(Currency, 'currency', 200))
+router.get('/country', async (req, res) => {
+  const select = {}
+  if (!req.query.lumpSums) {
+    select.lumpSums = 0
+    select.lumpSumsFrom = 0
+  }
+  return helper.getter(Country, 'country', 400, {}, select)(req, res)
+})
 
 router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })

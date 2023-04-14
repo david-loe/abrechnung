@@ -66,30 +66,40 @@
 
           <div class="w-100"></div>
           <div class="col-auto">
-            <div class="row align-items-center">
+            <div class="row align-items-center justify-content-center">
               <div class="col-auto pe-1">
                 <input type="checkbox" class="btn-check" id="configCateringRefund" v-model="configCateringRefund">
-            <label class="btn btn-sm btn-light" for="configCateringRefund">
-              {{$t('labels.configCateringRefund')}}
-              <i v-if="configCateringRefund" class="bi bi-chevron-up"></i>
-              <i v-else class="bi bi-chevron-down"></i>
-            </label>
+                <label class="btn btn-sm btn-light" for="configCateringRefund">
+                  {{ $t('labels.configCateringRefund') }}
+                  <i v-if="configCateringRefund" class="bi bi-chevron-up"></i>
+                  <i v-else class="bi bi-chevron-down"></i>
+                </label>
               </div>
               <div class="col-auto ps-0">
-                <InfoPoint class="ms-1" :text="$t('info.configCateringRefund')" />
+                <InfoPoint class="ms-1" :text="$t('info.cateringNoRefund')" />
               </div>
             </div>
-            <table v-if="configCateringRefund && travel.records.length > 0" class="table">
-              <tbody>
-                <tr v-for="day in (diffInDays(travel.records[0].startDate, travel.records[travel.records.length - 1].endDate) + 1)" :key="day">
-                    <th>{{ this.$root.datetoDateString(new Date(travel.records[0].startDate).valueOf() + (day - 1) * 1000 * 60 * 60 * 24) }}</th>
+            <div v-if="configCateringRefund && travel.cateringNoRefund.length > 0" class="mt-1">
+              <table class="table">
+                <tbody>
+                  <tr v-for="day of travel.cateringNoRefund" :key="day._id">
+                    <th>{{ this.$root.datetoDateString(day.date) }}</th>
                     <td v-for="key of ['breakfast', 'lunch', 'dinner']" :key="key">
-                      <input class="form-check-input" type="checkbox" role="switch" :id="'configCateringRefund' + day + key">
-                      <label class="form-check-label" :for="'configCateringRefund' + day + key">{{$t('labels.' + key)}}</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          :id="'configCateringRefund' + key + day._id" v-model="day[key]">
+                        <label class="form-check-label" :for="'configCateringRefund' + key + day._id">{{ $t('labels.' +
+                          key) }}</label>
+                      </div>
                     </td>
-                </tr>
-              </tbody>
-            </table>
+                  </tr>
+                </tbody>
+              </table>
+              <div>
+                <button class="btn btn-sm btn-light" @click="postTravelSettings">{{ $t('labels.save') }}</button>
+              </div>
+            </div>
+
           </div>
         </div>
       </form>
@@ -104,7 +114,7 @@
         {{ $t('alerts.noRecordsPresent') }}
       </div>
 
-      <div v-for="(row, index) in table" :key="index">
+      <div v-for="(row, index) of table" :key="index">
         <div v-if="row.recordIndex" class="row ps-4 mb-1" style="cursor: pointer;"
           @click="showModal('edit', travel.records[row.recordIndex - 1])">
           <template v-if="travel.records[row.recordIndex - 1].type == 'stay'">
@@ -124,8 +134,7 @@
         </div>
         <div v-if="row.gap" class="row ps-5">
           <div class="col-auto">
-            <button class="btn btn-sm btn-light"
-              @click="showModal('add', row.gapRecord)" style="border-radius: 50%;">
+            <button class="btn btn-sm btn-light" @click="showModal('add', row.gapRecord)" style="border-radius: 50%;">
               <i class="bi bi-plus-lg"></i>
             </button>
           </div>
@@ -173,7 +182,8 @@ export default {
         const travel = {
           _id: this.travel._id,
           claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
-          professionalShare: this.travel.professionalShare
+          professionalShare: this.travel.professionalShare,
+          cateringNoRefund: this.travel.cateringNoRefund
         }
         const result = await this.$root.setter('travel', travel)
         if (!result) {
@@ -195,7 +205,7 @@ export default {
         }
       }
       record.travelId = this.travel._id
-      const result = await this.$root.setter('travel/record', record, {headers})
+      const result = await this.$root.setter('travel/record', record, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -214,9 +224,9 @@ export default {
         await this.getTravel()
       }
     },
-    async showReceipt(id, recordId){
+    async showReceipt(id, recordId) {
       const result = await this.$root.getter('travel/record/receipt', { id: id, recordId: recordId, travelId: this._id }, { responseType: 'blob' })
-      if(result){
+      if (result) {
         const fileURL = URL.createObjectURL(result);
         window.open(fileURL)
       }
@@ -231,7 +241,7 @@ export default {
       const dateB = new Date(b)
       return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
     },
-    diffInDays(a, b){
+    diffInDays(a, b) {
       const dayA = new Date(this.$root.dateToHTMLInputString(a))
       const dayB = new Date(this.$root.dateToHTMLInputString(b))
       return (dayB.valueOf() - dayA.valueOf()) / (1000 * 60 * 60 * 24)
@@ -251,20 +261,20 @@ export default {
         if (previousEndDate && this.sameDay(previousEndDate, startDate)) {
           if (this.sameHour(previousEndDate, startDate)) {
             this.table.splice(--index, 1)
-          }else{
+          } else {
             startDateStr = false
           }
-          if(previousStartDate && this.sameDay(previousStartDate, startDate)){
+          if (previousStartDate && this.sameDay(previousStartDate, startDate)) {
             startDateStr = false
           }
         }
-        if(this.sameDay(startDate, endDate)){
+        if (this.sameDay(startDate, endDate)) {
           endDateStr = false
         }
         var isNotLast = i < this.travel.records.length - 1
-        var dayCount = startDateStr ? this.diffInDays(startDate, endDate) + 1 : null
+        var dayCount = startDateStr ? this.diffInDays(startDate, endDate) + 1 : undefined
         var startLocation = this.travel.records[i].endLocation ? this.travel.records[i].endLocation : this.travel.records[i].location
-        var endLocation = isNotLast ? (this.travel.records[i + 1].startLocation ? this.travel.records[i + 1].startLocation : this.travel.records[i + 1].location) : null
+        var endLocation = isNotLast ? (this.travel.records[i + 1].startLocation ? this.travel.records[i + 1].startLocation : this.travel.records[i + 1].location) : undefined
         var gapRecord = {
           startDate: endDate,
           endDate: isNotLast ? this.travel.records[i + 1].startDate : null,
@@ -275,7 +285,7 @@ export default {
 
         this.table.push({ date: startDateStr, time: startTime })
         this.table.push({ recordIndex: i + 1, dayCount: dayCount })
-        this.table.push({ date: endDateStr, time: endTime, gap: true, gapRecord: gapRecord})
+        this.table.push({ date: endDateStr, time: endTime, gap: true, gapRecord: gapRecord })
         index += 3
         previousStartDate = startDate
         previousEndDate = endDate

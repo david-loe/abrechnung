@@ -15,3 +15,7 @@
     --vs-selected-border-width: var(--vs-border-width);
 
 }
+
+.input-group>.v-select .vs__dropdown-toggle {
+    border-radius: 0px var(--vs-border-radius) var(--vs-border-radius) 0px;
+  }

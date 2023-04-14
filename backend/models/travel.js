@@ -1,5 +1,10 @@
 const mongoose = require('mongoose')
 
+const place = {
+  country: { type: String, ref: 'Country' },
+  place: { type: String }
+}
+
 const travelSchema = new mongoose.Schema({
   name: { type: String },
   traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -7,8 +12,8 @@ const travelSchema = new mongoose.Schema({
   editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   comment: { type: String },
   reason: { type: String, required: true },
-  destinationPlace: {type: String, required: true},
-  travelInsideOfEU: {type: Boolean, required: true},
+  destinationPlace: place,
+  travelInsideOfEU: { type: Boolean, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   advance: {
@@ -18,15 +23,15 @@ const travelSchema = new mongoose.Schema({
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
   claimOvernightLumpSum: { type: Boolean, default: true },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
-  historic: {type: Boolean, required: true, default: false},
+  historic: { type: Boolean, required: true, default: false },
   records: [{
     type: { type: String, enum: ['route', 'stay'], required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    startLocation: { type: String },
-    endLocation: { type: String },
-    distance: {type: Number, min: 0},
-    location: { type: String },
+    startLocation: place,
+    endLocation: place,
+    distance: { type: Number, min: 0 },
+    location: place,
     transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] },
     cost: {
       amount: { type: Number, min: 0 },
@@ -36,19 +41,19 @@ const travelSchema = new mongoose.Schema({
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
   }],
   cateringNoRefund: [{
-    date: {type: Date, required: true},
+    date: { type: Date, required: true },
     breakfast: { type: Boolean, default: false },
     lunch: { type: Boolean, default: false },
     dinner: { type: Boolean, default: false }
   }]
-}, {timestamps: true})
+}, { timestamps: true })
 
 travelSchema.pre(/^find((?!Update).)*$/, function () {
   this.populate({ path: 'advance.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.currency', model: 'Currency' })
-  this.populate({ path: 'records.cost.receipts', model: 'File', select: {name: 1, type: 1} })
-  this.populate({ path: 'traveler', model: 'User', select: {name: 1, email: 1} })
-  this.populate({ path: 'editor', model: 'User', select: {name: 1, email: 1} })
+  this.populate({ path: 'records.cost.receipts', model: 'File', select: { name: 1, type: 1 } })
+  this.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } })
+  this.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
 })
 
 travelSchema.methods.saveToHistory = async function () {
@@ -61,26 +66,28 @@ travelSchema.methods.saveToHistory = async function () {
   this.markModified('history')
 };
 
-travelSchema.pre('save', function(next) {
-  if(this.records.length > 0){
+travelSchema.pre('save', function (next) {
+  if (this.records.length > 0) {
     const oldCateringNoRefund = JSON.parse(JSON.stringify(this.cateringNoRefund))
     const newCateringNoRefund = []
-    const dayCount = this.diffInDays(this.records[0].startDate, this.records[this.records.length - 1].endDate) + 1
-    for(var i = 0; i < dayCount; i++){
+    const firstDay = new Date(this.records[0].startDate.toISOString().slice(0, -14))
+    const lastDay = new Date(this.records[this.records.length - 1].endDate.toISOString().slice(0, -14))
+    const dayCount = ((lastDay.valueOf() - firstDay.valueOf()) / (1000 * 60 * 60 * 24)) + 1
+    for (var i = 0; i < dayCount; i++) {
       newCateringNoRefund.push({
-        date: new Date(new Date(this.$root.dateToHTMLInputString(this.records[0].startDate)).valueOf() + i * 1000 * 60 * 60 * 24)
+        date: new Date(firstDay.valueOf() + i * 1000 * 60 * 60 * 24)
       })
     }
-    for(const oldCNR of oldCateringNoRefund){
-      for(const newCNR of newCateringNoRefund){
-        if(new Date(oldCNR.date) - new Date(newCNR.date) == 0){
+    for (const oldCNR of oldCateringNoRefund) {
+      for (const newCNR of newCateringNoRefund) {
+        if (new Date(oldCNR.date) - new Date(newCNR.date) == 0) {
           Object.assign(newCNR, oldCNR)
           break
         }
       }
     }
     this.cateringNoRefund = newCateringNoRefund
-  }else{
+  } else {
     this.cateringNoRefund = []
   }
   next();

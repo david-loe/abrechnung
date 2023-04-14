@@ -1,5 +1,5 @@
 <template>
-  <i class="bi bi-info-circle-fill text-primary" data-bs-toggle="tooltip" :data-bs-title="text" :id="id"></i>
+  <i class="bi bi-info-circle-fill text-primary" data-bs-toggle="tooltip" :data-bs-title="text" ref="icon"></i>
 </template>
 
 <script>
@@ -8,20 +8,20 @@ export default {
   name: 'InfoPoint',
   data() {
     return {
-      tooltip: undefined,
-      id: null
+      tooltip: undefined
     }
   },
   components: {},
   props: { text: { type: String } },
-  beforeMount () {
-    this.id = Math.random()
-  },
   mounted() {
-    this.tooltipList = new Tooltip(document.getElementById(this.id))
+    this.tooltip = new Tooltip(this.$refs.icon)
   },
+  watch: {
+    text: function () {
+      this.tooltip.setContent({ '.tooltip-inner': this.text })
+    },
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>

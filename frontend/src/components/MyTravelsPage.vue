@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="row justify-content-center gx-4 gy-2">
-        <div class="col-auto" v-for="travel in travels" :key="travel._id">
+        <div class="col-auto" v-for="travel of travels" :key="travel._id">
           <TravelCard :travel="travel" @clicked="clickCard(travel)"></TravelCard>
         </div>
       </div>

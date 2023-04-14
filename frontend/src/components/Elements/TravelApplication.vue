@@ -3,7 +3,7 @@
     <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
     <table class="table">
       <tbody>
-        <tr v-for="key in keys" :key="key">
+        <tr v-for="key of keys" :key="key">
           <template v-if="displayKey(key)">
             <th>{{ $t('labels.' + key) }}</th>
             <td>{{ displayKey(key) }}</td>

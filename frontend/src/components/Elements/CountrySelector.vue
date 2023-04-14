@@ -1,27 +1,21 @@
 <template>
-  <v-select v-if="$root.user.settings" :options="$root.currencies" :modelValue="modelValue" @update:modelValue="(v) => $emit('update:modelValue', v)"
-    :filter="filter" :reduce="(cur) => cur._id" style="min-width: 200px;">
-    <template #option="{ name, _id, symbol, flag }">
-      <div class="row align-items-center">
+  <v-select v-if="$root.user.settings" :options="$root.countries" :modelValue="modelValue"
+    @update:modelValue="(v) => $emit('update:modelValue', v)" :filter="filter" :reduce="(cur) => cur._id"
+    style="min-width: 160px;">
+    <template #option="{ name, flag }">
+      <div class="row align-items-center" :title="name[$root.user.settings.language]">
         <div v-if="flag" class="col-auto px-1">
-          <span class="fs-2">{{ flag }}</span>
+          <span class="fs-3">{{ flag }}</span>
         </div>
-        <div class="col p-1 lh-1 text-truncate" :title="name[$root.user.settings.language]">
-          <span>{{ _id }}</span><br />
-          <span class="text-secondary">
-            <small>{{ name[$root.user.settings.language] }}</small>
-          </span>
-        </div>
-        <div v-if="symbol" class="col-auto ms-auto ps-0">
-          {{ symbol }}
+        <div class="col p-1 text-truncate">
+          <small>{{ name[$root.user.settings.language] }}</small>
         </div>
       </div>
     </template>
-    <template #selected-option="{ name, _id, symbol, flag }">
+    <template #selected-option="{ _id, name, flag }">
       <div :title="name[$root.user.settings.language]">
         <span v-if="flag" class="me-1">{{ flag }}</span>
         <span>{{ _id }}</span>
-        <span v-if="symbol" class="ms-1 text-secondary">{{ symbol }}</span>
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
@@ -32,7 +26,7 @@
 
 <script>
 export default {
-  name: 'CurrencySelector',
+  name: 'CountrySelector',
   data() {
     return {}
   },
@@ -46,6 +40,13 @@ export default {
         if (name) {
           return name
         }
+        if (option.alias && option.alias[this.$root.user.settings.language]) {
+          const alias = option.alias[this.$root.user.settings.language].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+          if (alias) {
+            return alias
+          }
+        }
+
         const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
         return code
       })
