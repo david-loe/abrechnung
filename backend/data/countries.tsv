@@ -3,7 +3,7 @@ Andorra	Andorra		AD	EUR
 United Arab Emirates	Vereinigte Arabische Emirate		AE	AED	
 Afghanistan	Afghanistan		AF	AFN	
 Antigua and Barbuda	Antigua und Barbuda		AG	XCD	TT
-Anguilla	Anguilla		AI	XCD	UK
+Anguilla	Anguilla		AI	XCD	GB
 Albania	Albanien		AL	ALL	
 Armenia	Armenien		AM	AMD	
 Angola	Angola		AO	AOA	
@@ -24,7 +24,7 @@ Bahrain	Bahrain		BH	BHD
 Burundi	Burundi		BI	BIF	
 Benin	Benin		BJ	XOF	
 Saint Barthélemy	St. Barthélemy		BL	EUR	FR
-Bermuda	Bermuda		BM	BMD	UK
+Bermuda	Bermuda		BM	BMD	GB
 Brunei	Brunei		BN	BND	
 Bolivia	Bolivien		BO	BOB	
 Brazil	Brasilien		BR	BRL	
@@ -64,13 +64,13 @@ Ecuador	Ecuador		EC	USD
 Estonia	Estland		EE	EUR	
 Egypt	Ägypten		EG	EGP	
 Western Sahara	Westsahara		EH	MAD	
-Greece	Griechenland		EL	EUR	
+Greece	Griechenland		GR	EUR	
 Eritrea	Eritrea		ER	ERN	
 Spain	Spanien		ES	EUR	
 Ethiopia	Äthiopien		ET	ETB	
 Finland	Finnland		FI	EUR	
 Fiji	Fidschi		FJ	FJD	
-Falkland Islands	Falklandinseln		FK	FKP	UK
+Falkland Islands	Falklandinseln		FK	FKP	GB
 Micronesia	Mikronesien		FM	USD	PH
 Faroes	Färöer		FO	DKK	DK
 France	Frankreich		FR	EUR	
@@ -78,15 +78,15 @@ Gabon	Gabun		GA	XAF
 Grenada	Grenada		GD	XCD	TT
 Georgia	Georgien		GE	GEL	
 French Guiana	Französisch-Guayana		GF	EUR	FR
-Guernsey	Guernsey		GG	GBP	UK
+Guernsey	Guernsey		GG	GBP	GB
 Ghana	Ghana		GH	GHS	
-Gibraltar	Gibraltar		GI	GIP	UK
+Gibraltar	Gibraltar		GI	GIP	GB
 Greenland	Grönland		GL	DKK	DK
 The Gambia	Gambia		GM	GMD	
 Guinea	Guinea		GN	GNF	
 Guadeloupe	Guadeloupe		GP	EUR	FR
 Equatorial Guinea	Äquatorialguinea		GQ	XAF	
-South Georgia and the South Sandwich Islands	Südgeorgien und Südliche Sandwichinseln		GS		UK
+South Georgia and the South Sandwich Islands	Südgeorgien und Südliche Sandwichinseln		GS		GB
 Guatemala	Guatemala		GT	GTQ	
 Guam	Guam		GU	USD	US
 Guinea-Bissau	Guinea-Bissau		GW	XOF	
@@ -102,7 +102,7 @@ Ireland	Irland		IE	EUR
 Israel	Israel		IL	ILS	
 Isle of Man	Insel Man		IM	GBP	
 India	Indien		IN	INR	
-British Indian Ocean Territory	Britisches Territorium im Indischen Ozean		IO	USD	UK
+British Indian Ocean Territory	Britisches Territorium im Indischen Ozean		IO	USD	GB
 Iraq	Irak		IQ	IQD	
 Iran	Iran		IR	IRR	
 Iceland	Island		IS	ISK	
@@ -120,7 +120,7 @@ Saint Kitts and Nevis	St. Kitts und Nevis		KN	XCD	TT
 North Korea	Nordkorea	Korea, Demokratische Volksrepublik	KP	KPW	
 South Korea	Südkorea	Korea, Republik	KR	KRW	
 Kuwait	Kuwait		KW	KWD	
-Cayman Islands	Kaimaninseln		KY	KYD	UK
+Cayman Islands	Kaimaninseln		KY	KYD	GB
 Kazakhstan	Kasachstan		KZ	KZT	
 Laos	Laos		LA	LAK	
 Lebanon	Libanon		LB	LBP	
@@ -148,7 +148,7 @@ Macao	Macau		MO	MOP	CN
 Northern Mariana Islands	Nördliche Marianen		MP	USD	US
 Martinique	Martinique		MQ	EUR	FR
 Mauritania	Mauretanien		MR	MRU	
-Montserrat	Montserrat		MS	XCD	UK
+Montserrat	Montserrat		MS	XCD	GB
 Malta	Malta		MT	EUR	
 Mauritius	Mauritius		MU	MUR	
 Maldives	Malediven		MV	MVR	
@@ -177,7 +177,7 @@ Philippines	Philippinen		PH	PHP
 Pakistan	Pakistan		PK	PKR	
 Poland	Polen		PL	PLN	
 Saint Pierre and Miquelon	St. Pierre und Miquelon		PM	EUR	FR
-Pitcairn Islands	Pitcairninseln		PN	NZD	UK
+Pitcairn Islands	Pitcairninseln		PN	NZD	GB
 Puerto Rico	Puerto Rico		PR	USD	US
 Portugal	Portugal		PT	EUR	
 Palau	Palau		PW	USD	
@@ -194,7 +194,7 @@ Seychelles	Seychellen		SC	SCR
 Sudan	Sudan		SD	SDG	
 Sweden	Schweden		SE	SEK	
 Singapore	Singapur		SG	SGD	
-Saint Helena, Ascension and Tristan da Cunha	St. Helena, Ascension und Tristan da Cunha		SH	SHP	UK
+Saint Helena, Ascension and Tristan da Cunha	St. Helena, Ascension und Tristan da Cunha		SH	SHP	GB
 Slovenia	Slowenien		SI	EUR	
 Svalbard and Jan Mayen	Svalbard und Jan Mayen		SJ	NOK	NO
 Slovakia	Slowakei	Slowakische Republik	SK	EUR	
@@ -209,7 +209,7 @@ El Salvador	El Salvador		SV	SVC
 Sint Maarten	Sint Maarten		SX	ANG	NL
 Syria	Syrien		SY	SYP	
 Eswatini	Eswatini		SZ	SZL	
-Turks and Caicos Islands	Turks- und Caicosinseln		TC	USD	UK
+Turks and Caicos Islands	Turks- und Caicosinseln		TC	USD	GB
 Chad	Tschad		TD	XAF	
 French Southern and Antarctic Lands	Französische Süd- und Antarktisgebiete		TF	EUR	FR
 Togo	Togo		TG	XOF	
@@ -227,7 +227,7 @@ Taiwan	Taiwan		TW	TWD
 Tanzania	Tansania		TZ	TZS	
 Ukraine	Ukraine		UA	UAH	
 Uganda	Uganda		UG	UGX	
-United Kingdom	Vereinigtes Königreich	Vereinigte Königreich Großbritannien und Nordirland	UK	GBP	
+United Kingdom	Vereinigtes Königreich	Vereinigte Königreich Großbritannien und Nordirland	GB	GBP	
 United States Minor Outlying Islands	Kleinere Amerikanische Überseeinseln		UM	USD	US
 United States	Vereinigte Staaten	Vereinigten Staaten von Amerika	US	USD	
 Uruguay	Uruguay		UY	UYU	
@@ -235,7 +235,7 @@ Uzbekistan	Usbekistan		UZ	UZS
 Vatican City State	Vatikanstadt	Vatikanstaat	VA	EUR	
 Saint Vincent and the Grenadines	St. Vincent und Grenadinen		VC	XCD	TT
 Venezuela	Venezuela		VE	VES	
-British Virgin Islands	Britische Jungferninseln		VG	USD	UK
+British Virgin Islands	Britische Jungferninseln		VG	USD	GB
 US Virgin Islands	Amerikanische Jungferninseln		VI	USD	US
 Vietnam	Vietnam		VN	VND	
 Vanuatu	Vanuatu		VU	VUV	
