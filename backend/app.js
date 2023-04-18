@@ -12,7 +12,7 @@ const User = require('./models/user')
 const port = process.env.BACKEND_PORT
 const url = process.env.VUE_APP_BACKEND_URL
 
-mongoose.connect(process.env.MONGO_URL, {}, () => {
+const mongoClientPromise = mongoose.connect(process.env.MONGO_URL, {}).then( () => {
   console.log(i18n.t("alerts.db.success"))
 })
 require('./initdb')
@@ -43,7 +43,7 @@ app.use(cors({
 app.use(cookierParser())
 
 app.use(session({
-  store: MongoStore.create(mongoose.connection),
+  store: MongoStore.create({ client: mongoose.connection.getClient() }),
   secret: new Date(Math.random * 100000).toString().toUpperCase(),
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -68,7 +68,7 @@ app.post('/login', passport.authenticate('ldapauth', { session: true }), async (
   res.send({ status: 'ok' })
 });
 
-User.find({}, async (err, docs) => {
+User.find({}).then( async (docs) => {
   if (docs.length === 0) {
     const admin = new User({ uid: process.env.ADMIN_UID, access: {admin: true}})
     await admin.save()
@@ -100,9 +100,4 @@ for(const access of accesses){
   app.use('/api/' + access, adminRoutes)
 }
 
-// require('./test')
-
-
-app.listen(port, () => {
-  console.log(`Backend listening at ${url}`)
-})
+module.exports = app

@@ -33,12 +33,9 @@ function loadCurrencies() {
 
 const initer = function (model, name, data) {
   return new Promise((resolve) => {
-    model.find({}, (err, docs) => {
+    model.find({}).then((docs) => {
       if (docs.length === 0) {
-        model.insertMany(data, (err, docs) => {
-          if (err) {
-            console.log(err)
-          }
+        model.insertMany(data).then((docs) => {
           console.log('Added ' + docs.length + ' ' + name)
           resolve()
         })
