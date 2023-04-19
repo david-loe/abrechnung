@@ -15,4 +15,4 @@ jobs:
     - name: Build the stack
       run: docker-compose up -d --build
     - name: Run Tests
-      run: docker-compose exec --no-TTY backend npm test
+      run: docker-compose exec -T backend npm test
