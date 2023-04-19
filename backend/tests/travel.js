@@ -43,6 +43,11 @@ async function testHistory(t) {
   travelWithHistory.deleteOne()
 }
 
+async function testLumpSumCalc(t) {
+  const travel = await getTestTravel()
+}
+
 module.exports = {
-  testHistory
+  testHistory,
+  testLumpSumCalc
 }

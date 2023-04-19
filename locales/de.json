@@ -51,7 +51,7 @@
     "reject": "Ablehnen",
     "comment": "Kommentar",
     "editor": "Bearbeiter",
-    "record": "Eintrag",
+    "record": "Etappe",
     "route": "Strecke",
     "stay": "Aufenthalt",
     "location": "Ort",
@@ -76,10 +76,12 @@
     "cateringNoRefund": "Verpflegungspauschalen Kürzung",
     "breakfast": "Frühstück",
     "lunch": "Mittagessen",
-    "dinner": "Abendessen"
+    "dinner": "Abendessen",
+    "midnightCountries": "Erreichte Länder um Mitternacht",
+    "midnight": "24 Uhr"
   },
   "alerts": {
-    "noRecordsPresent": "Es sind noch keine Einträge vorhanden.",
+    "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "wrongPassword": "Falsches Passwort",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
@@ -104,7 +106,8 @@
     "cost": "Trage hier die Kosten ein.",
     "receipts": "Lade hier die entsprechenden Belege hoch.",
     "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten.",
-    "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden."
+    "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
+    "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab."
   },
   "login": {
     "signIn": "Bitte Anmelden"

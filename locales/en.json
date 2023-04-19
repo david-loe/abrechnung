@@ -76,7 +76,9 @@
     "cateringNoRefund": "Catering refund cut",
     "breakfast": "Breakfast",
     "lunch": "Lunch",
-    "dinner": "Dinner"
+    "dinner": "Dinner",
+    "midnightCountries": "Countries reached by midnight",
+    "midnight": "12AM"
   },
   "alerts": {
     "noRecordsPresent": "There are no records present jet.",
@@ -104,7 +106,8 @@
     "cost": "Enter the cost here.",
     "receipts": "Upload the corresponding receipts here.",
     "purpose": "Since your trip is proportionately private, you must specify which entries served what purpose.",
-    "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer."
+    "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
+    "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it."
   },
   "login": {
     "signIn": "Please sign in"

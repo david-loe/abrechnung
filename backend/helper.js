@@ -193,19 +193,6 @@ function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
   return str
 }
 
-function getFlagEmoji(countryCode) {
-  const noFlag = ['XCD', 'XOF', 'XAF', 'ANG', 'XPF']
-  if (noFlag.indexOf(countryCode) !== -1) {
-    return null
-  }
-  const codePoints = countryCode
-    .slice(0, 2)
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
-}
-
 /**
  * 
  * @param {String} dataStr 
@@ -276,12 +263,11 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
 
 
 module.exports = {
-  getter: getter,
-  setter: setter,
-  deleter: deleter,
-  csvToObjects: csvToObjects,
-  objectsToCSV: objectsToCSV,
-  getFlagEmoji: getFlagEmoji,
-  parseRawLumpSums: parseRawLumpSums,
-  addLumpSumsToCountries: addLumpSumsToCountries
+  getter,
+  setter,
+  deleter,
+  csvToObjects,
+  objectsToCSV,
+  parseRawLumpSums,
+  addLumpSumsToCountries,
 }

@@ -42,11 +42,29 @@
         </div>
       </div>
 
+      <template v-if="showMidnightCountries()">
+        <label for="recordFormMidnightCountries" class="form-label me-2">
+          {{ $t('labels.midnightCountries') }}
+        </label>
+        <InfoPoint :text="$t('info.midnightCountries')" />
+        <div class="row mb-3" id="recordFormMidnightCountries">
+          <div v-for="midnightCountry of formRecord.midnightCountries" class="col-auto" :key="midnightCountry.date">
+            <label for="recordFormLocation" class="form-label">
+              {{ $root.datetoDateString(midnightCountry.date) }}
+              {{ $t('labels.midnight') }}
+            </label>
+            <CountrySelector id="recordFormEndLocation" v-model="midnightCountry.country" :required="true">
+            </CountrySelector>
+          </div>
+        </div>
+      </template>
+
       <label for="recordFormTransport" class="form-label">
         {{ $t('labels.transport') }}
       </label>
       <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
-        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport" :key="transport">{{ $t('labels.' + transport) }}</option>
+        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
+          :key="transport">{{ $t('labels.' + transport) }}</option>
       </select>
     </template>
 
@@ -81,7 +99,7 @@
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="formRecord.cost.amount"
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="Boolean(formRecord.cost.amount)"
           @deleteFile="(id) => $emit('deleteReceipt', id, record._id)"
           @showFile="(id) => $emit('showReceipt', id, record._id)" />
       </div>
@@ -93,7 +111,8 @@
       </label>
       <InfoPoint :text="$t('info.purpose')" />
       <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" required>
-        <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
+        <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' +
+          purpose) }}</option>
       </select>
     </template>
 
@@ -116,15 +135,18 @@
 
 <script>
 import CurrencySelector from '../Elements/CurrencySelector.vue'
+import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
+import { getDayList } from '../../scripts.js'
 const defaultRecord = {
   type: 'route',
   startDate: '',
   endDate: '',
   startLocation: undefined,
   endLocation: undefined,
+  midnightCountries: [],
   distance: null,
   location: undefined,
   transport: 'otherTransport',
@@ -137,13 +159,13 @@ const defaultRecord = {
 }
 export default {
   name: 'RecordForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput },
+  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     record: {
       type: Object,
       default: function () {
-        return defaultRecord
+        return structuredClone(defaultRecord)
       },
     },
     mode: {
@@ -162,25 +184,55 @@ export default {
     }
   },
   methods: {
+    showMidnightCountries() {
+      return this.formRecord.type == 'route' && ['ownCar', 'otherTransport'].indexOf(this.formRecord.transport) !== -1 &&
+        this.formRecord.startLocation && this.formRecord.endLocation &&
+        this.formRecord.startLocation.country !== this.formRecord.endLocation.country &&
+        this.$root.dateToHTMLInputString(this.formRecord.startDate) !== this.$root.dateToHTMLInputString(this.formRecord.endDate)
+    },
+    calcMidnightCountries() {
+      if (this.showMidnightCountries()) {
+        const newMidnightCountries = []
+        const days = getDayList(this.formRecord.startDate, this.formRecord.endDate)
+        days.splice(-1, 1)
+        for (const day of days) {
+          newMidnightCountries.push({ date: day })
+        }
+        for (const oldMC of this.formRecord.midnightCountries) {
+          for (const newMC of newMidnightCountries) {
+            if (new Date(oldMC.date) - newMC.date == 0) {
+              Object.assign(newMC, oldMC)
+              break
+            }
+          }
+        }
+        console.log(newMidnightCountries)
+        this.formRecord.midnightCountries = newMidnightCountries
+      }
+    },
     clear() {
-      this.formRecord = defaultRecord
+      this.formRecord = structuredClone(defaultRecord)
     },
     output() {
-      const output = Object.assign({}, this.formRecord)
-      if(output.type == 'route'){
+      const output = structuredClone(this.formRecord)
+      if (output.type == 'route') {
         delete output.location
-      }else{
+      } else {
         delete output.startLocation
         delete output.endLocation
         delete output.distance
         delete output.transport
       }
+      if (!this.showMidnightCountries()) {
+        delete output.midnightCountries
+      }
       output.startDate = this.$root.htmlInputStringToDateTime(output.startDate)
       output.endDate = this.$root.htmlInputStringToDateTime(output.endDate)
+      console.log(output.midnightCountries)
       return output
     },
     input() {
-      const input = Object.assign({}, defaultRecord, this.record)
+      const input = Object.assign({}, structuredClone(defaultRecord), this.record)
       input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)
       return input
@@ -193,6 +245,8 @@ export default {
     record: function () {
       this.formRecord = this.input()
     },
+    'formRecord.startDate': function () { this.calcMidnightCountries() },
+    'formRecord.endDate': function () { this.calcMidnightCountries() },
   },
 }
 </script>

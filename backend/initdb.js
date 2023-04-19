@@ -1,5 +1,6 @@
 const fs = require('fs');
 const helper = require('./helper')
+const { getFlagEmoji } = require('./scripts')
 const Currency = require('./models/currency')
 const Country = require('./models/country')
 
@@ -20,14 +21,14 @@ function loadLumpSums() {
 function loadCountries() {
   const dataStr = fs.readFileSync('./data/countries.tsv', 'utf8')
   const result = helper.csvToObjects(dataStr)
-  result.forEach(c => c.flag = helper.getFlagEmoji(c.code))
+  result.forEach(c => c.flag = getFlagEmoji(c.code))
   return result
 }
 
 function loadCurrencies() {
   const dataStr = fs.readFileSync('./data/currencies.tsv', 'utf8')
   const result = helper.csvToObjects(dataStr)
-  result.forEach(c => c.flag = helper.getFlagEmoji(c.code))
+  result.forEach(c => c.flag = getFlagEmoji(c.code))
   return result
 }
 

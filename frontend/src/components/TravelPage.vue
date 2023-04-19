@@ -161,6 +161,7 @@ import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import RecordForm from './Forms/RecordForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
+import { getFlagEmoji, getDiffInDays } from '../scripts.js'
 export default {
   name: 'TravelPage',
   data() {
@@ -252,16 +253,11 @@ export default {
       const dateB = new Date(b)
       return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
     },
-    diffInDays(a, b) {
-      const dayA = new Date(this.$root.dateToHTMLInputString(a))
-      const dayB = new Date(this.$root.dateToHTMLInputString(b))
-      return (dayB.valueOf() - dayA.valueOf()) / (1000 * 60 * 60 * 24)
-    },
     displayLocation(record, location){
       if(record.endLocation.country == record.startLocation.country){
         return record[location + 'Location'].place
       }else{
-        return record[location + 'Location'].place + ' ' + this.$root.getFlagEmoji(record[location + 'Location'].country)
+        return record[location + 'Location'].place + ' ' + getFlagEmoji(record[location + 'Location'].country)
       }
     },
     renderTable() {
@@ -293,7 +289,7 @@ export default {
         if(this.travel.records[i].type == 'stay'){
           icon = 'bi bi-house'
         }else{
-          if(this.travel.records[i].transport == 'own car'){
+          if(this.travel.records[i].transport == 'ownCar'){
             icon = 'bi bi-car-front'
           }else if(this.travel.records[i].transport == 'airplane'){
             icon = 'bi bi-airplane'
@@ -304,7 +300,7 @@ export default {
           }
         }
         var isNotLast = i < this.travel.records.length - 1
-        var dayCount = startDateStr ? this.diffInDays(startDate, endDate) + 1 : undefined
+        var dayCount = startDateStr ? getDiffInDays(startDate, endDate) + 1 : undefined
         var startLocation = this.travel.records[i].endLocation ? this.travel.records[i].endLocation : this.travel.records[i].location
         var endLocation = isNotLast ? (this.travel.records[i + 1].startLocation ? this.travel.records[i + 1].startLocation : this.travel.records[i + 1].location) : undefined
         var gapRecord = {

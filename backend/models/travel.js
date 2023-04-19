@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { getDayList, getDiffInDays } = require('../scripts')
 
 const place = {
   country: { type: String, ref: 'Country' },
@@ -30,6 +31,7 @@ const travelSchema = new mongoose.Schema({
     endDate: { type: Date, required: true },
     startLocation: place,
     endLocation: place,
+    midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
     distance: { type: Number, min: 0 },
     location: place,
     transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] },
@@ -49,6 +51,7 @@ const travelSchema = new mongoose.Schema({
   refunds: [{
     type: { type: String, enum: ['overnight', 'catering8', 'catering24', 'expense'], required: true },
     date: { type: Date, required: true },
+    country: { type: String, ref: 'Country' },
     refund: {
       amount: { type: Number, min: 0 },
       currency: { type: String, ref: 'Currency' },
@@ -61,6 +64,7 @@ travelSchema.pre(/^find((?!Update).)*$/, function () {
   this.populate({ path: 'advance.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.currency', model: 'Currency' })
   this.populate({ path: 'records.cost.receipts', model: 'File', select: { name: 1, type: 1 } })
+  this.populate({ path: 'refunds.refund.currency', model: 'Currency' })
   this.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } })
   this.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
 })
@@ -79,12 +83,10 @@ travelSchema.methods.calculateCateringNoRefund = function () {
   if (this.records.length > 0) {
     const oldCateringNoRefund = JSON.parse(JSON.stringify(this.cateringNoRefund))
     const newCateringNoRefund = []
-    const firstDay = new Date(this.records[0].startDate.toISOString().slice(0, -14))
-    const lastDay = new Date(this.records[this.records.length - 1].endDate.toISOString().slice(0, -14))
-    const dayCount = ((lastDay.valueOf() - firstDay.valueOf()) / (1000 * 60 * 60 * 24)) + 1
-    for (var i = 0; i < dayCount; i++) {
+    const days = getDayList(this.records[0].startDate, this.records[this.records.length - 1].endDate)
+    for (const day of days) {
       newCateringNoRefund.push({
-        date: new Date(firstDay.valueOf() + i * 1000 * 60 * 60 * 24)
+        date: day
       })
     }
     for (const oldCNR of oldCateringNoRefund) {
@@ -101,8 +103,48 @@ travelSchema.methods.calculateCateringNoRefund = function () {
   }
 }
 
+travelSchema.methods.getBorderCrossings = function () {
+  if (this.records.length > 0) {
+    const startCountry = this.records[0].startLocation ? this.records[0].startLocation.country : this.records[0].location.country
+    const borderCrossings = [{date: new Date(this.records[0].startDate), country: startCountry}]
+    for (var i = 1; i < this.records.length; i++) {
+      const record = this.records[i]
+      // Country Change
+      if(record.type == 'route' && record.startLocation && record.endLocation && record.startLocation.country !== record.endLocation.country){
+        // More than 1 night
+        if(getDiffInDays(record.startDate, record.endDate) > 1){
+          if(['ownCar', 'otherTransport'].indexOf(record.transport) !== -1){
+            borderCrossings.push(...record.midnightCountries)
+          }else if(record.transport = 'airplane'){
+            borderCrossings.push({date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: 'AT'})
+          }else if(record.transport = 'shipOrFerry'){
+            borderCrossings.push({date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: 'LU'})
+          }
+        }
+        borderCrossings.push({date: new Date(record.endDate), country: record.endLocation.country})
+      }
+    }
+    return borderCrossings
+  }else{
+    return []
+  }
+}
+
 travelSchema.methods.calculateRefunds = async function () {
   if (this.records.length > 0) {
+    const borderCrossings = this.getBorderCrossings()
+    console.log(borderCrossings)
+
+    const days = getDayList(this.records[0].startDate, this.records[this.records.length - 1].endDate)
+    const catering = []
+    for(var i = 0; i < days.length; i++){
+      var type = 'catering24'
+      if( i == 0 || i == days.length - 1){
+        type = 'catering8'
+      }
+      catering.push({type: type, date: days[i]})
+    }
+    
   } else {
     this.refunds = []
   }

@@ -10,6 +10,7 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./locales:/app/locales:ro
+      - ./scripts.js:/app/scripts.js:ro
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:
@@ -30,6 +31,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - ./locales:/app/src/locales:ro
+      - ./scripts.js:/app/src/scripts.js:ro
     restart: always
     depends_on:
       - backend

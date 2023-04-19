@@ -61,9 +61,9 @@ export default {
       files.splice(index, 1)
       this.$emit('update:modelValue', files)
     },
-    changeFile(form) {
+    changeFile(event) {
       const files = this.modelValue
-      for (const file of form.target.files) {
+      for (const file of event.target.files) {
         if (file.size < 16000000) {
           if (file.type.indexOf('image') > -1) {
             const reader = new FileReader()
@@ -79,6 +79,7 @@ export default {
         }
       }
       this.$emit('update:modelValue', files)
+      event.target.value = ''
     },
     // From https://stackoverflow.com/a/52983833/13582326
     resizedataURL(datas, longestSide) {
