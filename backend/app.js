@@ -1,7 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const cookierParser = require('cookie-parser')
 const passport = require('passport')
 const LdapStrategy = require('passport-ldapauth')
 const session = require("express-session")
@@ -40,14 +39,14 @@ app.use(cors({
   credentials: true,
   origin: process.env.VUE_APP_FRONTEND_URL
 }))
-app.use(cookierParser())
 
 app.use(session({
   store: MongoStore.create({ client: mongoose.connection.getClient() }),
-  secret: new Date(Math.random * 100000).toString().toUpperCase(),
+  secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : new mongoose.Types.ObjectId().toString(),
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    secure: false
+    secure: false,
+    sameSite: 'strict'
   },
   resave: false,
   saveUninitialized: true
