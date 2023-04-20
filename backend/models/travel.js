@@ -147,29 +147,57 @@ travelSchema.methods.addCountriesToDays = async function () {
 travelSchema.methods.addCateringRefunds = async function () {
   for (var i = 0; i < this.days.length; i++) {
     const day = this.days[i]
-    if(day.purpose == 'professional'){
+    if (day.purpose == 'professional') {
       const result = { type: 'catering24' }
       if (i == 0 || i == this.days.length - 1) {
         result.type = 'catering8'
       }
       var amount = (await day.country.getLumpSum(day.date))[result.type]
       var leftover = 1
-      if(day.cateringNoRefund.breakfast) leftover -= settings.breakfastCateringLumpSumCut
-      if(day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
-      if(day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
-      
-      result.refund = { amount: Math.round(amount * leftover  * settings.factorCateringLumpSum * 100) / 100 , currency: 'EUR' }
+      if (day.cateringNoRefund.breakfast) leftover -= settings.breakfastCateringLumpSumCut
+      if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
+      if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
+
+      result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: 'EUR' }
       day.refunds.push(result)
     }
   }
 }
+
+travelSchema.methods.addOvernightRefunds = async function () {
+  if (this.claimOvernightLumpSum) {
+    var recordIndex = 0
+    for (var i = 0; i < this.days.length; i++) {
+      const day = this.days[i]
+      if (day.purpose == 'professional') {
+        if (i == this.days.length - 1) {
+          break
+        }
+        var midnight = day.date.valueOf() + 1000 * 24 * 60 * 60 - 1
+        while (recordIndex < this.records.length && this.records[recordIndex].type != 'route' && midnight - new Date(this.records[recordIndex].endDate).valueOf() > 0) {
+          recordIndex++
+        }
+        if (midnight - new Date(this.records[recordIndex].startDate).valueOf() > 0 &&
+          new Date(this.records[recordIndex].endDate).valueOf() - midnight > 0) {
+          continue
+        }
+        const result = { type: 'overnight' }
+        var amount = (await day.country.getLumpSum(day.date))[result.type]
+        result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: 'EUR' }
+        day.refunds.push(result)
+      }
+    }
+  }
+
+}
+
 
 
 travelSchema.pre('save', async function (next) {
   this.calculateDays()
   await this.addCountriesToDays()
   await this.addCateringRefunds()
-  console.log(this.days[0].refunds)
+  await this.addOvernightRefunds()
   next();
 });
 

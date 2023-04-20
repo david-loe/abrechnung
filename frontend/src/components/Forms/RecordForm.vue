@@ -229,7 +229,6 @@ export default {
       }
       output.startDate = this.$root.htmlInputStringToDateTime(output.startDate)
       output.endDate = this.$root.htmlInputStringToDateTime(output.endDate)
-      console.log(output.midnightCountries)
       return output
     },
     input() {
