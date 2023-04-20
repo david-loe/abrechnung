@@ -1,0 +1,10 @@
+{
+    "fallBackLumpSumCountry": "LU",
+    "secoundNightOnAirplaneLumpSumCountry": "AT",
+    "secoundNightOnShipOrFerryLumpSumCountry": "LU",
+    "factorOvernightLumpSum": 0.5,
+    "factorCateringLumpSum": 1,
+    "breakfastCateringLumpSumCut": 0.2,
+    "lunchCateringLumpSumCut": 0.4,
+    "dinnerCateringLumpSumCut": 0.4
+}

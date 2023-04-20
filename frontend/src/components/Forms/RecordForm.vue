@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <template v-if="showMidnightCountries()">
+      <template v-if="formRecord.midnightCountries.length > 0">
         <label for="recordFormMidnightCountries" class="form-label me-2">
           {{ $t('labels.midnightCountries') }}
         </label>
@@ -206,8 +206,9 @@ export default {
             }
           }
         }
-        console.log(newMidnightCountries)
         this.formRecord.midnightCountries = newMidnightCountries
+      }else{
+        this.formRecord.midnightCountries = []
       }
     },
     clear() {
@@ -245,6 +246,10 @@ export default {
     record: function () {
       this.formRecord = this.input()
     },
+    'formRecord.type': function () { this.calcMidnightCountries() },
+    'formRecord.transport': function () { this.calcMidnightCountries() },
+    'formRecord.startLocation.country': function () { this.calcMidnightCountries() },
+    'formRecord.endLocation.country': function () { this.calcMidnightCountries() },
     'formRecord.startDate': function () { this.calcMidnightCountries() },
     'formRecord.endDate': function () { this.calcMidnightCountries() },
   },

@@ -79,15 +79,15 @@
                 <InfoPoint class="ms-1" :text="$t('info.cateringNoRefund')" />
               </div>
             </div>
-            <div v-if="configCateringRefund && travel.cateringNoRefund.length > 0" class="mt-1">
+            <div v-if="configCateringRefund && travel.days.length > 0" class="mt-1">
               <table class="table">
                 <tbody>
-                  <tr v-for="day of travel.cateringNoRefund" :key="day._id">
+                  <tr v-for="day of travel.days" :key="day._id">
                     <th>{{ this.$root.datetoDateString(day.date) }}</th>
                     <td v-for="key of ['breakfast', 'lunch', 'dinner']" :key="key">
                       <div class="form-check">
                         <input class="form-check-input" type="checkbox" role="switch"
-                          :id="'configCateringRefund' + key + day._id" v-model="day[key]">
+                          :id="'configCateringRefund' + key + day._id" v-model="day.cateringNoRefund[key]">
                         <label class="form-check-label" :for="'configCateringRefund' + key + day._id">{{ $t('labels.' +
                           key) }}</label>
                       </div>
@@ -195,7 +195,7 @@ export default {
           _id: this.travel._id,
           claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
           professionalShare: this.travel.professionalShare,
-          cateringNoRefund: this.travel.cateringNoRefund
+          days: this.travel.days
         }
         const result = await this.$root.setter('travel', travel)
         if (!result) {

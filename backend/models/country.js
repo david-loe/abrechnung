@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const settings = require('../settings')
+
 
 const countrySchema = new mongoose.Schema({
   name: {
@@ -26,5 +28,25 @@ const countrySchema = new mongoose.Schema({
   lumpSumsFrom: { type: String, trim: true },
   currency: {type: String, ref: 'Currency'}
 })
+
+countrySchema.methods.getLumpSum = async function(date){
+  if(this.lumpSumsFrom){
+    return (await mongoose.model('Country').findOne({ _id: this.lumpSumsFrom })).getLumpSum(date)
+  }else if(this.lumpSums.length == 0){
+    return (await mongoose.model('Country').findOne({ _id: settings.fallBackLumpSumCountry })).getLumpSum(date)
+  }else{
+    var nearest = 0;
+    for(var i = 0; i < this.lumpSums.length;i++){
+      var diff = date.valueOf() - this.lumpSums[i].validFrom.valueOf()
+      if(diff >= 0 && diff < date.valueOf() - this.lumpSums[nearest].validFrom.valueOf()){
+        nearest = i
+      }
+    }
+    if(date.valueOf() - this.lumpSums[nearest].validFrom.valueOf() < 0){
+      throw Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
+    }
+    return this.lumpSums[nearest]
+  }
+}
 
 module.exports = mongoose.model('Country', countrySchema)
