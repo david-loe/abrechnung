@@ -20,9 +20,18 @@ async function getTestTravel() {
     },
     claimOvernightLumpSum: true,
     records: [{
-      type: 'stay',
+      type: 'route',
       startDate: new Date(),
-      endDate: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+      endDate: new Date(new Date().getTime() + 3 * 60 * 60 * 1000),
+      transport: 'airplane',
+      startLocation: {
+        country: 'DE',
+        place: 'München'
+    },
+      endLocation: {
+        country: 'SE',
+        place: 'Malmö'
+    },
     }]
   })
 }
