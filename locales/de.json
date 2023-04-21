@@ -78,7 +78,9 @@
     "lunch": "Mittagessen",
     "dinner": "Abendessen",
     "midnightCountries": "Erreichte Länder um Mitternacht",
-    "midnight": "24 Uhr"
+    "midnight": "24 Uhr",
+    "expandAll": "Alle ausklappen",
+    "collapseAll": "Alle einklappen"
   },
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -137,5 +139,10 @@
     "approved": "Genehmigt",
     "underExamination": "Wird Geprüft",
     "refunded": "Erstattet"
+  },
+  "lumpSums": {
+    "catering8": "Verpflegungspauschale (gekürzt)",
+    "catering24": "Verpflegungspauschale",
+    "overnight": "Übernachtungspauschale"
   }
 }

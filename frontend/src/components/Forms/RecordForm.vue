@@ -42,6 +42,14 @@
         </div>
       </div>
 
+      <label for="recordFormTransport" class="form-label">
+        {{ $t('labels.transport') }}
+      </label>
+      <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
+        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
+          :key="transport">{{ $t('labels.' + transport) }}</option>
+      </select>
+
       <template v-if="formRecord.midnightCountries.length > 0">
         <label for="recordFormMidnightCountries" class="form-label me-2">
           {{ $t('labels.midnightCountries') }}
@@ -58,14 +66,6 @@
           </div>
         </div>
       </template>
-
-      <label for="recordFormTransport" class="form-label">
-        {{ $t('labels.transport') }}
-      </label>
-      <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
-        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
-          :key="transport">{{ $t('labels.' + transport) }}</option>
-      </select>
     </template>
 
     <template v-else>
@@ -105,16 +105,15 @@
       </div>
     </template>
 
-    <template v-if="askPurpose">
-      <label for="recordFormPurpose" class="form-label me-2">
-        {{ $t('labels.purpose') }}
-      </label>
-      <InfoPoint :text="$t('info.purpose')" />
-      <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" required>
-        <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' +
-          purpose) }}</option>
-      </select>
-    </template>
+    <label for="recordFormPurpose" class="form-label me-2">
+      {{ $t('labels.purpose') }}
+    </label>
+    <InfoPoint :text="$t('info.purpose')" />
+    <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" required>
+      <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' +
+        purpose) }}</option>
+    </select>
+
 
     <div class="mb-1">
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
@@ -175,7 +174,6 @@ export default {
         return ['add', 'edit'].indexOf(value) !== -1
       },
     },
-    askPurpose: { type: Boolean, default: true },
     askStayCost: { type: Boolean, default: true },
   },
   data() {
@@ -207,7 +205,7 @@ export default {
           }
         }
         this.formRecord.midnightCountries = newMidnightCountries
-      }else{
+      } else {
         this.formRecord.midnightCountries = []
       }
     },

@@ -10,7 +10,6 @@
           </div>
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
-              :askPurpose="Boolean(travel.professionalShare && travel.professionalShare < 0.8)"
               :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
               @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </RecordForm>
@@ -19,9 +18,28 @@
       </div>
     </div>
     <div class="container" v-if="travel">
-      <div class="row justify-content-between">
-        <div class="col-10">
-          <h1>{{ travel.name }}</h1>
+      <h1>{{ travel.name }}</h1>
+
+      <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
+
+      <div class="row justify-content-center mb-3">
+        <div class="col-auto">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
+              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings">
+            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
+            }}</label>
+            <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-auto">
+          <button class="btn btn-secondary mb-3" @click="showModal('add', undefined)">
+            <i class="bi bi-plus-lg"></i>
+            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
+          </button>
         </div>
         <div class="col-auto">
           <div class="dropdown">
@@ -39,110 +57,107 @@
           </div>
         </div>
       </div>
-      <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
-
-      <form class="mb-3" @submit.prevent ref="travelSettingsForm">
-        <div class="row align-items-end justify-content-center gx-4 gy-2">
-          <div class="col-auto">
-            <div class="row align-items-center">
-              <div class="col-auto pe-1">
-                <InfoPoint :text="$t('info.professionalShare')" />
-              </div>
-              <div class="col-auto ps-0">
-                <input type="number" class="form-control form-control-sm" v-model="travel.professionalShare" min="0.5"
-                  max="0.8" step="any" :placeholder="$t('labels.professionalShare')" @change="postTravelSettings" />
-              </div>
-            </div>
-          </div>
-          <div class="col-auto">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
-                v-model="travel.claimOvernightLumpSum" @change="postTravelSettings">
-              <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
-              }}</label>
-              <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
-            </div>
-          </div>
-
-          <div class="w-100"></div>
-          <div class="col-auto">
-            <div class="row align-items-center justify-content-center">
-              <div class="col-auto pe-1">
-                <input type="checkbox" class="btn-check" id="configCateringRefund" v-model="configCateringRefund">
-                <label class="btn btn-sm btn-light" for="configCateringRefund">
-                  {{ $t('labels.configCateringRefund') }}
-                  <i v-if="configCateringRefund" class="bi bi-chevron-up"></i>
-                  <i v-else class="bi bi-chevron-down"></i>
-                </label>
-              </div>
-              <div class="col-auto ps-0">
-                <InfoPoint class="ms-1" :text="$t('info.cateringNoRefund')" />
-              </div>
-            </div>
-            <div v-if="configCateringRefund && travel.days.length > 0" class="mt-1">
-              <table class="table">
-                <tbody>
-                  <tr v-for="day of travel.days" :key="day._id">
-                    <th>{{ this.$root.datetoDateString(day.date) }}</th>
-                    <td v-for="key of ['breakfast', 'lunch', 'dinner']" :key="key">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" role="switch"
-                          :id="'configCateringRefund' + key + day._id" v-model="day.cateringNoRefund[key]">
-                        <label class="form-check-label" :for="'configCateringRefund' + key + day._id">{{ $t('labels.' +
-                          key) }}</label>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div>
-                <button class="btn btn-sm btn-light" @click="postTravelSettings">{{ $t('labels.save') }}</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </form>
-
-
-      <button class="btn btn-secondary mb-3" @click="showModal('add', undefined)">
-        <i class="bi bi-plus-lg"></i>
-        <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
-      </button>
 
       <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
         {{ $t('alerts.noRecordsPresent') }}
       </div>
-
-      <div v-for="(row, index) of table" :key="index">
+      <div v-else class="row mb-2">
+        <div class="col-auto">
+          <button class="btn btn-link btn-sm" @click="travel.days.map(d => d.showSettings = true)">
+            {{ $t('labels.expandAll') }}
+            <i class="bi bi-arrows-expand"></i>
+          </button>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-link btn-sm" @click="travel.days.map(d => d.showSettings = false)">
+            {{ $t('labels.collapseAll') }}
+            <i class="bi bi-arrows-collapse"></i>
+          </button>
+        </div>
+      </div>
+      <div v-for="row of table" class="mb-2" :key="row.data._id">
+        <!-- day -->
+        <div v-if="row.type == 'day'" class="row align-items-center mt-3">
+          <div class="col-auto">
+            <h5 class="m-0">
+              {{ $root.datetoDateString(row.data.date) }}
+            </h5>
+          </div>
+          <div v-if="!row.data.showSettings" class="col">
+            <div class="row align-items-center">
+              <!-- refunds -->
+              <template v-for="refund of row.data.refunds" :key="refund._id">
+                <!-- catering -->
+                <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + getFlagEmoji(row.data.country)">
+                  <i class="bi bi-sun"></i>
+                  {{ $root.moneyString(refund.refund) }}
+                </div>
+                <!-- overnight -->
+                <div v-else class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + getFlagEmoji(row.data.country)">
+                  <i class="bi bi-moon"></i>
+                  {{ $root.moneyString(refund.refund) }}
+                </div>
+              </template>
+              <div class="col-auto ms-auto">
+                <i class="bi bi-sliders" style="cursor: pointer;" @click="row.data.showSettings = true"></i>
+              </div>
+            </div>
+          </div>
+          <div v-else class="col">
+            <div class="row align-items-center">
+              <div class="col-auto pe-1">
+                <InfoPoint :text="$t('info.cateringNoRefund')" />
+              </div>
+              <div v-for="key of ['breakfast', 'lunch', 'dinner']" class="form-check col-auto" :key="key">
+                <input class="form-check-input" type="checkbox" role="switch"
+                  :id="'configCateringRefund' + key + row.data._id" v-model="row.data.cateringNoRefund[key]"
+                  @change="postTravelSettings" />
+                <label class="form-check-label" :for="'configCateringRefund' + key + row.data._id">
+                  {{ $t('labels.' + key) }}
+                </label>
+              </div>
+              <div class="col-auto">
+                <div class="row align-items-center">
+                  <div class="col-auto pe-1">
+                    <InfoPoint :text="$t('info.purpose')" />
+                  </div>
+                  <div class="col-auto ps-0">
+                    <select class="form-select form-select-sm" v-model="row.data.purpose" @change="postTravelSettings"
+                      required>
+                      <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">{{
+                        $t('labels.'
+                          +
+                          purpose) }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col-auto  ms-auto">
+                <i class="bi bi-x-lg" style="cursor: pointer;" @click="row.data.showSettings = false"></i>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Record -->
-        <div v-if="row.recordIndex" class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
-          @click="showModal('edit', travel.records[row.recordIndex - 1])">
-          <div v-if="row.icon" class="col-auto fs-3">
-              <i :class="row.icon"></i>
+        <div v-else class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
+          @click="showModal('edit', row.data)">
+          <div class="col-auto fs-3">
+            <i :class="getRecordIcon(row.data)"></i>
           </div>
           <!-- Stay -->
-          <template v-if="travel.records[row.recordIndex - 1].type == 'stay'">
-            <div class="col-auto">
-              {{ travel.records[row.recordIndex - 1].location.place }}
-            </div>
-          </template>
-          <!-- Route -->
-          <template v-else>
-            <div class="col-auto">
-              {{ displayLocation(travel.records[row.recordIndex - 1], 'start') }}
-              <i class="bi bi-arrow-right"></i>
-              {{ displayLocation(travel.records[row.recordIndex - 1], 'end') }}
-              </div>
-          </template>
-        </div>
-        <!-- Date -->
-        <div v-else class="row mb-1">
-          <div class="col-auto" style="width: 65px;">
-            {{ row.date ? row.date : '' }}
+          <div v-if="row.data.type == 'stay'" class="col-auto">
+            {{ row.data.location.place }}
           </div>
-          <div class="col-auto text-secondary">{{ row.time }}</div>
+          <!-- Route -->
+          <div v-else class="col-auto">
+            {{ displayLocation(row.data, 'start') }}
+            <i class="bi bi-arrow-right"></i>
+            {{ displayLocation(row.data, 'end') }}
+          </div>
         </div>
+
+        <!-- Date -->
+
         <div v-if="row.gap" class="row ps-5">
           <div class="col-auto">
             <button class="btn btn-sm btn-light" @click="showModal('add', row.gapRecord)" style="border-radius: 50%;">
@@ -161,7 +176,7 @@ import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import RecordForm from './Forms/RecordForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
-import { getFlagEmoji, getDiffInDays } from '../scripts.js'
+import { getFlagEmoji } from '../scripts.js'
 export default {
   name: 'TravelPage',
   data() {
@@ -190,17 +205,16 @@ export default {
       this.modalRecord = undefined
     },
     async postTravelSettings() {
-      if (this.$refs.travelSettingsForm.reportValidity()) {
-        const travel = {
-          _id: this.travel._id,
-          claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
-          professionalShare: this.travel.professionalShare,
-          days: this.travel.days
-        }
-        const result = await this.$root.setter('travel', travel)
-        if (!result) {
-          await this.getTravel()
-        }
+      const travel = {
+        _id: this.travel._id,
+        claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
+        days: this.travel.days
+      }
+      const result = await this.$root.setter('travel', travel)
+      if (result) {
+        await this.getTravel()
+      }else{
+        await this.getTravel()
       }
     },
     async deleteTravel() {
@@ -253,70 +267,48 @@ export default {
       const dateB = new Date(b)
       return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
     },
-    displayLocation(record, location){
-      if(record.endLocation.country == record.startLocation.country){
+    getFlagEmoji,
+    displayLocation(record, location) {
+      if (record.endLocation.country == record.startLocation.country) {
         return record[location + 'Location'].place
-      }else{
-        return record[location + 'Location'].place + ' ' + getFlagEmoji(record[location + 'Location'].country)
+      } else {
+        return record[location + 'Location'].place + ' ' + this.getFlagEmoji(record[location + 'Location'].country)
       }
+    },
+    getRecordIcon(record) {
+      var icon = null
+      if (record.type == 'stay') {
+        icon = 'bi bi-house'
+      } else {
+        if (record.transport == 'ownCar') {
+          icon = 'bi bi-car-front'
+        } else if (record.transport == 'airplane') {
+          icon = 'bi bi-airplane'
+        } else if (record.transport == 'shipOrFerry') {
+          icon = 'bi bi-water'
+        } else if (record.transport == 'otherTransport') {
+          icon = 'bi bi-train-front'
+        }
+      }
+      return icon
     },
     renderTable() {
       this.table = []
-      var previousStartDate = null
-      var previousEndDate = null
-      var index = 0
-      for (var i = 0; i < this.travel.records.length; i++) {
-        var startDate = new Date(this.travel.records[i].startDate)
-        var startTime = this.$root.dateToTimeString(startDate)
-        var startDateStr = this.$root.datetoDateString(startDate)
-        var endDate = new Date(this.travel.records[i].endDate)
-        var endTime = this.$root.dateToTimeString(endDate)
-        var endDateStr = this.$root.datetoDateString(endDate)
-        if (previousEndDate && this.sameDay(previousEndDate, startDate)) {
-          if (this.sameHour(previousEndDate, startDate)) {
-            this.table.splice(--index, 1)
-          } else {
-            startDateStr = false
-          }
-          if (previousStartDate && this.sameDay(previousStartDate, startDate)) {
-            startDateStr = false
-          }
+      console.log('render')
+      var recordIndex = 0;
+      for (var i = 0; i < this.travel.days.length; i++) {
+        var recordsStart = recordIndex
+        while (recordIndex < this.travel.records.length && i < this.travel.days.length - 1 && new Date(this.travel.days[i + 1].date).valueOf() - new Date(this.travel.records[recordIndex].startDate).valueOf() > 0) {
+          recordIndex++
         }
-        if (this.sameDay(startDate, endDate)) {
-          endDateStr = false
+        var recordsEnd = recordIndex
+        if (i == this.travel.days.length - 1) {
+          recordsEnd = this.travel.records.length - 1
         }
-        var icon = null
-        if(this.travel.records[i].type == 'stay'){
-          icon = 'bi bi-house'
-        }else{
-          if(this.travel.records[i].transport == 'ownCar'){
-            icon = 'bi bi-car-front'
-          }else if(this.travel.records[i].transport == 'airplane'){
-            icon = 'bi bi-airplane'
-          }else if(this.travel.records[i].transport == 'shipOrFerry'){
-            icon = 'bi bi-water'
-          }else if(this.travel.records[i].transport == 'otherTransport'){
-            icon = 'bi bi-train-front'
-          }
+        this.table.push({ type: 'day', data: this.travel.days[i] })
+        for (const record of this.travel.records.slice(recordsStart, recordsEnd)) {
+          this.table.push({ type: 'record', data: record })
         }
-        var isNotLast = i < this.travel.records.length - 1
-        var dayCount = startDateStr ? getDiffInDays(startDate, endDate) + 1 : undefined
-        var startLocation = this.travel.records[i].endLocation ? this.travel.records[i].endLocation : this.travel.records[i].location
-        var endLocation = isNotLast ? (this.travel.records[i + 1].startLocation ? this.travel.records[i + 1].startLocation : this.travel.records[i + 1].location) : undefined
-        var gapRecord = {
-          startDate: endDate,
-          endDate: isNotLast ? this.travel.records[i + 1].startDate : null,
-          startLocation: startLocation,
-          location: startLocation,
-          endLocation: endLocation
-        }
-
-        this.table.push({ date: startDateStr, time: startTime })
-        this.table.push({ recordIndex: i + 1, dayCount: dayCount, icon: icon })
-        this.table.push({ date: endDateStr, time: endTime, gap: true, gapRecord: gapRecord })
-        index += 3
-        previousStartDate = startDate
-        previousEndDate = endDate
       }
     },
     async getTravel() {

@@ -301,6 +301,9 @@ export default {
       const day = dateObject.getUTCDate().toString().padStart(2, '0')
       return day + '.' + month
     },
+    moneyString(money){
+      return money.amount + (money.currency.symbol ? money.currency.symbol : money.currency._id)
+    },
     async pushSettings() {
       try {
         await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {

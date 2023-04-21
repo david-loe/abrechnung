@@ -78,7 +78,9 @@
     "lunch": "Lunch",
     "dinner": "Dinner",
     "midnightCountries": "Countries reached by midnight",
-    "midnight": "12AM"
+    "midnight": "12AM",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all"
   },
   "alerts": {
     "noRecordsPresent": "There are no records present jet.",
@@ -138,5 +140,10 @@
     "approved": "Approved",
     "underExamination": "Under examination",
     "refunded": "Refunded"
+  },
+  "lumpSums": {
+    "catering8": "Catering lump sum (cut)",
+    "catering24": "Catering lump sum",
+    "overnight": "Overnight lump sum"
   }
 }
