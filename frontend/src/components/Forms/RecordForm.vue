@@ -16,13 +16,16 @@
 
     <div class="row mb-3">
       <div class="col">
-        <label for="startDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.departure': 'labels.from') }}</label>
-        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formRecord.startDate" required />
+        <label for="startDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.departure' :
+          'labels.from') }}</label>
+        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formRecord.startDate"
+          :min="minDate" :max="maxDate" required />
       </div>
       <div class="col">
-        <label for="endDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.arrival': 'labels.to') }}</label>
+        <label for="endDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.arrival' : 'labels.to')
+        }}</label>
         <input id="endDateInput" class="form-control" type="datetime-local" v-model="formRecord.endDate"
-          :min="formRecord.startDate" required />
+          :min="formRecord.startDate ? formRecord.startDate : minDate" :max="maxDate" required />
       </div>
     </div>
 
@@ -175,10 +178,14 @@ export default {
       },
     },
     askStayCost: { type: Boolean, default: true },
+    travelStartDate: { type: Date },
+    travelEndDate: { type: Date },
   },
   data() {
     return {
       formRecord: undefined,
+      minDate: null,
+      maxDate: null
     }
   },
   methods: {
@@ -231,6 +238,9 @@ export default {
       return output
     },
     input() {
+      //toleranceRecordDatesToApprovedTravelDates
+      this.minDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelStartDate).valueOf() - 3 * 24 * 60 * 60 * 1000)
+      this.maxDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelEndDate).valueOf() + 4 * 24 * 60 * 60 * 1000 - 1)
       const input = Object.assign({}, structuredClone(defaultRecord), this.record)
       input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)

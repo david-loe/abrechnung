@@ -10,7 +10,8 @@
           </div>
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
-              :askStayCost="!travel.claimOvernightLumpSum" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
+              :askStayCost="!travel.claimOvernightLumpSum" :travelStartDate="travel.startDate"
+              :travelEndDate="travel.endDate" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
               @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </RecordForm>
           </div>
@@ -20,7 +21,7 @@
     <div class="container" v-if="travel">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><router-link to="/">{{$t('headlines.myTravels')}}</router-link></li>
+          <li class="breadcrumb-item"><router-link to="/">{{ $t('headlines.myTravels') }}</router-link></li>
           <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
         </ol>
       </nav>
@@ -95,12 +96,14 @@
               <!-- refunds -->
               <template v-for="refund of row.data.refunds" :key="refund._id">
                 <!-- catering -->
-                <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary"
+                  :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                   <i class="bi bi-sun"></i>
                   {{ $root.moneyString(refund.refund) }}
                 </div>
                 <!-- overnight -->
-                <div v-else class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                <div v-else class="col-auto text-secondary"
+                  :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                   <i class="bi bi-moon"></i>
                   {{ $root.moneyString(refund.refund) }}
                 </div>
@@ -157,9 +160,11 @@
           </div>
           <!-- Route -->
           <div v-else class="col">
-            <PlaceElement :place="row.data.startLocation" :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
+            <PlaceElement :place="row.data.startLocation"
+              :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
             <i class="bi bi-arrow-right mx-2"></i>
-            <PlaceElement :place="row.data.endLocation" :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
+            <PlaceElement :place="row.data.endLocation"
+              :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
           </div>
         </div>
 
@@ -220,7 +225,7 @@ export default {
       const result = await this.$root.setter('travel', travel)
       if (result) {
         await this.getTravel()
-      }else{
+      } else {
         await this.getTravel()
       }
     },

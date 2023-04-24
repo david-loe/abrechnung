@@ -30,19 +30,11 @@
         </div>
       </li>
     </ul>
-    <UserForm
-      v-if="userFormMode !== ''"
-      :user="userToEdit"
-      :mode="userFormMode"
-      @add="addUser"
-      @edit="addUser"
-      @cancel="userFormMode = ''"
-      ref="userform"
-      id="userform"
-      style="max-width: 650px"
-    ></UserForm>
-    
-    <button v-if="userFormMode === ''" type="button" class="btn btn-secondary" @click="userFormMode = 'add'; userToEdit = undefined">
+    <UserForm v-if="userFormMode !== ''" :user="userToEdit" :mode="userFormMode" @add="postUser" @edit="postUser"
+      @cancel="userFormMode = ''" ref="userform" id="userform" style="max-width: 650px"></UserForm>
+
+    <button v-if="userFormMode === ''" type="button" class="btn btn-secondary"
+      @click="userFormMode = 'add'; userToEdit = undefined">
       {{ $t('labels.addX', {X: $t('labels.user') }) }}
     </button>
   </div>
@@ -50,7 +42,6 @@
 
 <script>
 import UserForm from '../Forms/UserForm.vue'
-import axios from 'axios'
 export default {
   name: 'UserList',
   components: { UserForm },
@@ -62,45 +53,22 @@ export default {
     }
   },
   methods: {
-    clickEdit(user){
+    clickEdit(user) {
       this.userFormMode = 'edit'
       this.userToEdit = user
     },
-    async addUser(user) {
-       try {
-        const res = await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/admin/user',
-        user,
-        {
-          withCredentials: true,
-        })
-        if (res.status === 200) {
-          this.users = await this.$root.getter('admin/user')
-          this.$refs.userform.clear()
-        }
-      } catch (error) {
-        if (error.response.status === 401) {
-          this.$router.push('login')
-        } else {
-          console.log(error.response.data)
-        }
+    async postUser(user) {
+      const result = await this.$root.setter('admin/user', user)
+      if (result) {
+        this.users = await this.$root.getter('admin/user')
+        this.$refs.userform.clear()
+        this.userFormMode = ''
       }
     },
     async deleteUser(user) {
-      try {
-        const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/admin/user',
-        {
-          params: { id: user._id },
-          withCredentials: true,
-        })
-        if (res.status === 200) {
-          this.users = await this.$root.getter('admin/user')
-        }
-      } catch (error) {
-        if (error.response.status === 401) {
-          this.$router.push('login')
-        } else {
-          console.log(error.response.data)
-        }
+      const result = await this.$root.deleter('admin/user', { id: user._id })
+      if (result) {
+        this.users = await this.$root.getter('admin/user')
       }
     },
   },
@@ -110,5 +78,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>
