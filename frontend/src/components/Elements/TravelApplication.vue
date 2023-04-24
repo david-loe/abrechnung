@@ -9,6 +9,10 @@
             <td>{{ displayKey(key) }}</td>
           </template>
         </tr>
+        <tr>
+          <th>{{ $t('labels.destinationPlace') }}</th>
+          <td><PlaceElement :place="travel.destinationPlace"></PlaceElement></td>
+        </tr>
       </tbody>
     </table>
 
@@ -28,14 +32,15 @@
 
 <script>
 import StatePipeline from './StatePipeline.vue'
+import PlaceElement from './PlaceElement.vue'
 export default {
   name: 'TravelApply',
   data() {
     return {
-      keys: ['traveler', 'reason', 'startDate', 'endDate', 'destinationPlace', 'travelInsideOfEU', 'advance', 'editor', 'comment']
+      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'advance', 'editor', 'comment']
     }
   },
-  components: {StatePipeline},
+  components: {StatePipeline, PlaceElement},
   emits: ['cancel', 'edit', 'deleted'],
   props: {
     travel: { type: Object },
@@ -55,10 +60,8 @@ export default {
           if(this.travel.traveler._id == this.travel.editor._id){
             return ''
           }
-        case 'traveler': //eslint-disable-line no-fallthrough
-          if(this.travel.traveler._id == this.$root.user._id){
-            return ''
-          }
+          return this.travel[key].name
+        case 'traveler':
           return this.travel[key].name
         default:
           if (typeof this.travel[key] == 'boolean') {

@@ -76,6 +76,9 @@ router.get('/travel', async (req, res) => {
   if (!req.query.records) {
     select.records = 0
   }
+  if (!req.query.days) {
+    select.days = 0
+  }
   return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, select, sortFn)(req, res)
 })
 

@@ -7,14 +7,15 @@
             <h5 v-if="modalTravel" class="modal-title">{{ modalTravel.name }}</h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
-          <div class="modal-body">
+          <div v-if="modalTravel" class="modal-body">
             <TravelApproveForm
+              v-if="modalTravel.state =='appliedFor'"
               ref="travelApproveForm"
-              v-if="modalTravel"
               :travel="modalTravel"
               @cancel="hideModal()"
               @decision="approveTravel"
             ></TravelApproveForm>
+            <TravelApply v-else :travel="modalTravel" :showButtons="false"></TravelApply>
           </div>
         </div>
       </div>
@@ -26,6 +27,17 @@
           <TravelCard :travel="travel" :showTraveler="true" @clicked="showModal(travel)"></TravelCard>
         </div>
       </div>
+      <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">{{$t('labels.showApproved')}} <i class="bi bi-chevron-down"></i></button>
+      <template v-else>
+        <button type="button" class="btn btn-light" @click="showApproved = false">{{$t('labels.hideApproved')}} <i class="bi bi-chevron-up"></i></button>
+        <hr class="hr">
+        <div class="row justify-content-center gx-4 gy-2">
+        <div class="col-auto" v-for="travel of approvedTravels" :key="travel._id">
+          <TravelCard :travel="travel" :showTraveler="true" @clicked="showModal(travel)"></TravelCard>
+        </div>
+      </div>
+      </template>
+      
     </div>
   </div>
 </template>
@@ -34,15 +46,19 @@
 import { Modal } from 'bootstrap'
 import TravelCard from './Elements/TravelCard.vue'
 import TravelApproveForm from './Forms/TravelApproveForm.vue'
+import TravelApply from './Elements/TravelApplication.vue'
+
 export default {
   name: 'ApprovePage',
-  components: { TravelCard, TravelApproveForm },
+  components: { TravelCard, TravelApproveForm, TravelApply },
   props: [],
   data() {
     return {
       travels: [],
       approveTravelModal: undefined,
       modalTravel: undefined,
+      showApproved: false,
+      approvedTravels : []
     }
   },
   methods: {
@@ -71,6 +87,7 @@ export default {
   async beforeMount() {
     await this.$root.load()
     this.travels = await this.$root.getter('approve/travel')
+    this.approvedTravels = await this.$root.getter('approve/travel/approved')
   },
 }
 </script>

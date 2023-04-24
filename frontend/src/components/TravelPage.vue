@@ -18,6 +18,13 @@
       </div>
     </div>
     <div class="container" v-if="travel">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><router-link to="/">{{$t('headlines.myTravels')}}</router-link></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
+        </ol>
+      </nav>
+
       <h1>{{ travel.name }}</h1>
 
       <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
@@ -88,12 +95,12 @@
               <!-- refunds -->
               <template v-for="refund of row.data.refunds" :key="refund._id">
                 <!-- catering -->
-                <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + getFlagEmoji(row.data.country)">
+                <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                   <i class="bi bi-sun"></i>
                   {{ $root.moneyString(refund.refund) }}
                 </div>
                 <!-- overnight -->
-                <div v-else class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + getFlagEmoji(row.data.country)">
+                <div v-else class="col-auto text-secondary" :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                   <i class="bi bi-moon"></i>
                   {{ $root.moneyString(refund.refund) }}
                 </div>
@@ -145,14 +152,14 @@
             <i :class="getRecordIcon(row.data)"></i>
           </div>
           <!-- Stay -->
-          <div v-if="row.data.type == 'stay'" class="col-auto">
-            {{ row.data.location.place }}
+          <div v-if="row.data.type == 'stay'" class="col">
+            <PlaceElement :place="row.data.location" :showCountry="false"></PlaceElement>
           </div>
           <!-- Route -->
-          <div v-else class="col-auto">
-            {{ displayLocation(row.data, 'start') }}
-            <i class="bi bi-arrow-right"></i>
-            {{ displayLocation(row.data, 'end') }}
+          <div v-else class="col">
+            <PlaceElement :place="row.data.startLocation" :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
+            <i class="bi bi-arrow-right mx-2"></i>
+            <PlaceElement :place="row.data.endLocation" :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
           </div>
         </div>
 
@@ -176,7 +183,7 @@ import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import RecordForm from './Forms/RecordForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
-import { getFlagEmoji } from '../scripts.js'
+import PlaceElement from './Elements/PlaceElement.vue'
 export default {
   name: 'TravelPage',
   data() {
@@ -189,7 +196,7 @@ export default {
       configCateringRefund: false
     }
   },
-  components: { StatePipeline, RecordForm, InfoPoint },
+  components: { StatePipeline, RecordForm, InfoPoint, PlaceElement },
   props: { _id: { type: String } },
   methods: {
     showModal(mode, record) {
@@ -267,14 +274,6 @@ export default {
       const dateB = new Date(b)
       return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
     },
-    getFlagEmoji,
-    displayLocation(record, location) {
-      if (record.endLocation.country == record.startLocation.country) {
-        return record[location + 'Location'].place
-      } else {
-        return record[location + 'Location'].place + ' ' + this.getFlagEmoji(record[location + 'Location'].country)
-      }
-    },
     getRecordIcon(record) {
       var icon = null
       if (record.type == 'stay') {
@@ -294,7 +293,6 @@ export default {
     },
     renderTable() {
       this.table = []
-      console.log('render')
       var recordIndex = 0;
       for (var i = 0; i < this.travel.days.length; i++) {
         var recordsStart = recordIndex
@@ -312,7 +310,7 @@ export default {
       }
     },
     async getTravel() {
-      this.travel = await this.$root.getter('travel', { id: this._id, records: true })
+      this.travel = await this.$root.getter('travel', { id: this._id, records: true, days: true })
       this.renderTable()
     }
   },

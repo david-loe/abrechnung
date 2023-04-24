@@ -1,15 +1,16 @@
 <template>
-  <v-select v-if="$root.user.settings" :options="$root.currencies" :modelValue="modelValue" @update:modelValue="(v) => $emit('update:modelValue', v)"
-    :filter="filter" :reduce="(cur) => cur._id" style="min-width: 200px;">
+  <v-select :options="$root.currencies" :modelValue="modelValue"
+    @update:modelValue="(v) => $emit('update:modelValue', v)" :placeholder="$t('labels.currency')" :filter="filter"
+    :reduce="(cur) => cur._id" style="min-width: 200px;">
     <template #option="{ name, _id, symbol, flag }">
       <div class="row align-items-center">
         <div v-if="flag" class="col-auto px-1">
           <span class="fs-2">{{ flag }}</span>
         </div>
-        <div class="col p-1 lh-1 text-truncate" :title="name[$root.user.settings.language]">
+        <div class="col p-1 lh-1 text-truncate" :title="name[$i18n.locale]">
           <span>{{ _id }}</span><br />
           <span class="text-secondary">
-            <small>{{ name[$root.user.settings.language] }}</small>
+            <small>{{ name[$i18n.locale] }}</small>
           </span>
         </div>
         <div v-if="symbol" class="col-auto ms-auto ps-0">
@@ -18,7 +19,7 @@
       </div>
     </template>
     <template #selected-option="{ name, _id, symbol, flag }">
-      <div :title="name[$root.user.settings.language]">
+      <div :title="name[$i18n.locale]">
         <span v-if="flag" class="me-1">{{ flag }}</span>
         <span>{{ _id }}</span>
         <span v-if="symbol" class="ms-1 text-secondary">{{ symbol }}</span>
@@ -42,7 +43,7 @@ export default {
   methods: {
     filter(options, search) {
       return options.filter((option) => {
-        const name = option.name[this.$root.user.settings.language].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const name = option.name[this.$i18n.locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
         if (name) {
           return name
         }

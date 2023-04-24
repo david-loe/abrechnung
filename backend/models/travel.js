@@ -64,13 +64,25 @@ const travelSchema = new mongoose.Schema({
   }],
 }, { timestamps: true })
 
-travelSchema.pre(/^find((?!Update).)*$/, function () {
-  this.populate({ path: 'advance.currency', model: 'Currency' })
-  this.populate({ path: 'records.cost.currency', model: 'Currency' })
-  this.populate({ path: 'records.cost.receipts', model: 'File', select: { name: 1, type: 1 } })
-  this.populate({ path: 'days.refunds.refund.currency', model: 'Currency' })
-  this.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } })
-  this.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
+function populate(doc) {
+  return Promise.allSettled([
+    doc.populate({ path: 'advance.currency', model: 'Currency' }),
+    doc.populate({ path: 'records.cost.currency', model: 'Currency' }),
+    doc.populate({ path: 'days.refunds.refund.currency', model: 'Currency' }),
+    doc.populate({ path: 'destinationPlace.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'records.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'records.endLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'records.location.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'records.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'records.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
+  ])
+}
+
+travelSchema.pre(/^find((?!Update).)*$/, function(){
+  populate(this)
 })
 
 travelSchema.methods.saveToHistory = async function () {
@@ -102,22 +114,22 @@ travelSchema.methods.calculateDays = function () {
   }
 }
 
-travelSchema.methods.getBorderCrossings = function () {
+travelSchema.methods.getBorderCrossings = async function () {
   if (this.records.length > 0) {
     const startCountry = this.records[0].startLocation ? this.records[0].startLocation.country : this.records[0].location.country
     const borderCrossings = [{ date: new Date(this.records[0].startDate), country: startCountry }]
     for (var i = 0; i < this.records.length; i++) {
       const record = this.records[i]
       // Country Change
-      if (record.type == 'route' && record.startLocation && record.endLocation && record.startLocation.country !== record.endLocation.country) {
+      if (record.type == 'route' && record.startLocation && record.endLocation && record.startLocation.country._id != record.endLocation.country._id) {
         // More than 1 night
         if (getDiffInDays(record.startDate, record.endDate) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(record.transport) !== -1) {
             borderCrossings.push(...record.midnightCountries)
           } else if (record.transport = 'airplane') {
-            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: settings.secoundNightOnAirplaneLumpSumCountry })
+            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }) })
           } else if (record.transport = 'shipOrFerry') {
-            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: settings.secoundNightOnShipOrFerryLumpSumCountry })
+            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }) })
           }
         }
         borderCrossings.push({ date: new Date(record.endDate), country: record.endLocation.country })
@@ -130,9 +142,9 @@ travelSchema.methods.getBorderCrossings = function () {
 }
 
 travelSchema.methods.addCountriesToDays = async function () {
-  const borderCrossings = this.getBorderCrossings()
+  const borderCrossings = await this.getBorderCrossings()
   for (const borderX of borderCrossings) {
-    borderX.country = await Country.findOne({ _id: borderX.country })
+    borderX.country = await Country.findOne({ _id: borderX.country._id })
   }
   var bXIndex = 0
   for (const day of this.days) {
@@ -194,6 +206,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
 
 
 travelSchema.pre('save', async function (next) {
+  await populate(this)
   this.calculateDays()
   await this.addCountriesToDays()
   await this.addCateringRefunds()

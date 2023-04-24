@@ -64,6 +64,8 @@
     "receipts": "Receipts",
     "startLocation": "Start",
     "endLocation": "End",
+    "departure": "Departure",
+    "arrival": "Arrival",
     "transport": "Transport",
     "otherTransport": "Other transport ✈🚆🚖",
     "ownCar": "Own car 🚘",
@@ -80,7 +82,12 @@
     "midnightCountries": "Countries reached by midnight",
     "midnight": "12AM",
     "expandAll": "Expand all",
-    "collapseAll": "Collapse all"
+    "collapseAll": "Collapse all",
+    "country": "Country",
+    "place": "Place",
+    "currency": "Currency",
+    "hideApproved": "Hide approved travels",
+    "showApproved": "Show approved travels"
   },
   "alerts": {
     "noRecordsPresent": "There are no records present jet.",
@@ -145,5 +152,9 @@
     "catering8": "Catering lump sum (cut)",
     "catering24": "Catering lump sum",
     "overnight": "Overnight lump sum"
+  },
+  "languages":{
+    "de": "German",
+    "en": "English"
   }
 }

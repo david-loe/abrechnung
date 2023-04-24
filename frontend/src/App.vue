@@ -37,8 +37,8 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px">
-                  <option v-for="lang of languages" :key="lang.key" :value="lang.key">{{ lang.flag }}</option>
+                <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushSettings">
+                  <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">{{ lang.flag }}</option>
                 </select>
               </li>
               <template v-if="user.access.admin">
@@ -158,6 +158,7 @@ export default {
         ]).then((result) => {
           this.user = result[0].value
           if (Object.keys(this.user).length > 0) {
+            this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
           this.currencies = result[1].value
@@ -305,6 +306,7 @@ export default {
       return money.amount + (money.currency.symbol ? money.currency.symbol : money.currency._id)
     },
     async pushSettings() {
+      this.user.settings.language = this.$i18n.locale
       try {
         await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {
           withCredentials: true,

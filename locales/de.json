@@ -37,9 +37,11 @@
     "to": "Bis",
     "startDate": "Startdatum",
     "endDate": "Enddatum",
+    "departure": "Abfahrt/-flug",
+    "arrival": "Ankunft",
     "reason": "Grund",
     "newX": "{X} - Neu",
-    "destinationPlace": "Zielort",
+    "destinationPlace": "Reiseziel",
     "travelInsideOfEU": "Reise innerhalb der EU",
     "state": "Status",
     "traveler": "Reisender",
@@ -62,8 +64,8 @@
     "cost": "Kosten",
     "receipt": "Beleg",
     "receipts": "Belege",
-    "startLocation": "Startpunkt",
-    "endLocation": "Endpunkt",
+    "startLocation": "Von",
+    "endLocation": "Nach",
     "transport": "Verkehrsmittel",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
@@ -80,7 +82,12 @@
     "midnightCountries": "Erreichte Länder um Mitternacht",
     "midnight": "24 Uhr",
     "expandAll": "Alle ausklappen",
-    "collapseAll": "Alle einklappen"
+    "collapseAll": "Alle einklappen",
+    "country": "Land",
+    "place": "Ort",
+    "currency": "Währung",
+    "hideApproved": "Genehmigte Reisen ausblenden",
+    "showApproved": "Genehmigte Reisen anzeigen"
   },
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -144,5 +151,9 @@
     "catering8": "Verpflegungspauschale (gekürzt)",
     "catering24": "Verpflegungspauschale",
     "overnight": "Übernachtungspauschale"
+  },
+  "languages":{
+    "de": "Deutsch",
+    "en": "Englisch"
   }
 }

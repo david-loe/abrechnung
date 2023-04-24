@@ -16,11 +16,11 @@
 
     <div class="row mb-3">
       <div class="col">
-        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label>
+        <label for="startDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.departure': 'labels.from') }}</label>
         <input id="startDateInput" class="form-control" type="datetime-local" v-model="formRecord.startDate" required />
       </div>
       <div class="col">
-        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
+        <label for="endDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.arrival': 'labels.to') }}</label>
         <input id="endDateInput" class="form-control" type="datetime-local" v-model="formRecord.endDate"
           :min="formRecord.startDate" required />
       </div>
@@ -185,7 +185,8 @@ export default {
     showMidnightCountries() {
       return this.formRecord.type == 'route' && ['ownCar', 'otherTransport'].indexOf(this.formRecord.transport) !== -1 &&
         this.formRecord.startLocation && this.formRecord.endLocation &&
-        this.formRecord.startLocation.country !== this.formRecord.endLocation.country &&
+        this.formRecord.startLocation.country && this.formRecord.endLocation.country &&
+        this.formRecord.startLocation.country._id != this.formRecord.endLocation.country._id &&
         this.$root.dateToHTMLInputString(this.formRecord.startDate) !== this.$root.dateToHTMLInputString(this.formRecord.endDate)
     },
     calcMidnightCountries() {
