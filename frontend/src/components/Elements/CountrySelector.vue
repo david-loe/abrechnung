@@ -1,6 +1,6 @@
 <template>
-  <v-select :options="$root.countries" :modelValue="modelValue"
-    :placeholder="$t('labels.country')" @update:modelValue="(v) => $emit('update:modelValue', v)" :filter="filter"
+  <v-select v-if="$root.countries.length > 0" :options="$root.countries" :modelValue="modelValue"
+    :placeholder="$t('labels.country')" @update:modelValue="(v) => $emit('update:modelValue', v)" :filter="filter" :disabled="disabled"
     style="min-width: 160px;">
     <template #option="{ name, flag }">
       <div class="row align-items-center" :title="name[$i18n.locale]">
@@ -31,7 +31,7 @@ export default {
     return {}
   },
   components: {},
-  props: ['modelValue', 'required'],
+  props: ['modelValue', 'required', 'disabled'],
   emits: ['update:modelValue'],
   methods: {
     filter(options, search) {

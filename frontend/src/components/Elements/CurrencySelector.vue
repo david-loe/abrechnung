@@ -1,6 +1,6 @@
 <template>
-  <v-select :options="$root.currencies" :modelValue="modelValue"
-    @update:modelValue="(v) => $emit('update:modelValue', v)" :placeholder="$t('labels.currency')" :filter="filter"
+  <v-select v-if="$root.currencies.length > 0" :options="$root.currencies" :modelValue="modelValue"
+    @update:modelValue="(v) => $emit('update:modelValue', v)" :placeholder="$t('labels.currency')" :filter="filter" :disabled="disabled"
     :reduce="(cur) => cur._id" style="min-width: 200px;">
     <template #option="{ name, _id, symbol, flag }">
       <div class="row align-items-center">
@@ -38,7 +38,7 @@ export default {
     return {}
   },
   components: {},
-  props: ['modelValue', 'required'],
+  props: ['modelValue', 'required', 'disabled'],
   emits: ['update:modelValue'],
   methods: {
     filter(options, search) {

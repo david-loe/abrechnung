@@ -33,11 +33,18 @@ const routes = [
     meta: { requiresAuth: true}
   },
   {
+    path: '/examine/:_id([0-9a-fA-F]{24})',
+    name: 'Examine Travel',
+    component: TravelPage,
+    meta: { requiresAuth: true},
+    props: route => ({ _id: route.params._id, readOnly: true, parentPages: [{link: '/examine', title: 'labels.examine'}], endpointMiddleware: 'examine/' })
+  },
+  {
     path: '/travel/:_id([0-9a-fA-F]{24})',
     name: 'Travel',
     component: TravelPage,
     meta: { requiresAuth: true},
-    props: true
+    props: route => ({ _id: route.params._id, parentPages: [{link: '/', title: 'headlines.myTravels'}]})
   },
   {
     path: '/',

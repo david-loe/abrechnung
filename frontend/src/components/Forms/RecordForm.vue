@@ -1,14 +1,14 @@
 <template>
-  <form @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form @submit.prevent="disabled ? null : (mode === 'add' ? $emit('add', output()) : $emit('edit', output()))">
     <ul class="nav nav-pills nav-justified mb-3">
       <li class="nav-item">
-        <a href="#" :class="'nav-link' + (formRecord.type == 'route' ? ' active' : '')"
-          @click="formRecord.type = 'route'">
+        <a href="#" :class="'nav-link' + (formRecord.type == 'route' ? ' active' : (disabled ? ' disabled' : ''))"
+          @click="disabled ? null : formRecord.type = 'route'">
           {{ $t('labels.route') }} <i class="bi bi-bus-front-fill"></i>
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" :class="'nav-link' + (formRecord.type == 'stay' ? ' active' : '')" @click="formRecord.type = 'stay'">
+        <a href="#" :class="'nav-link' + (formRecord.type == 'stay' ? ' active' : (disabled ? ' disabled' : ''))" @click="disabled ? null : formRecord.type = 'stay'">
           {{ $t('labels.stay') }} <i class="bi bi-house-fill"></i>
         </a>
       </li>
@@ -19,13 +19,13 @@
         <label for="startDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.departure' :
           'labels.from') }}</label>
         <input id="startDateInput" class="form-control" type="datetime-local" v-model="formRecord.startDate"
-          :min="minDate" :max="maxDate" required />
+          :min="minDate" :max="maxDate" :disabled="disabled" required />
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t(formRecord.type == 'route' ? 'labels.arrival' : 'labels.to')
         }}</label>
         <input id="endDateInput" class="form-control" type="datetime-local" v-model="formRecord.endDate"
-          :min="formRecord.startDate ? formRecord.startDate : minDate" :max="maxDate" required />
+          :min="formRecord.startDate ? formRecord.startDate : minDate" :max="maxDate" :disabled="disabled" required />
       </div>
     </div>
 
@@ -35,20 +35,20 @@
           <label for="recordFormStartLocation" class="form-label">
             {{ $t('labels.startLocation') }}
           </label>
-          <PlaceInput id="recordFormStartLocation" v-model="formRecord.startLocation" :required="true"></PlaceInput>
+          <PlaceInput id="recordFormStartLocation" v-model="formRecord.startLocation" :disabled="disabled" :required="true"></PlaceInput>
         </div>
         <div class="col">
           <label for="recordFormEndLocation" class="form-label">
             {{ $t('labels.endLocation') }}
           </label>
-          <PlaceInput id="recordFormEndLocation" v-model="formRecord.endLocation" :required="true"></PlaceInput>
+          <PlaceInput id="recordFormEndLocation" v-model="formRecord.endLocation" :disabled="disabled" :required="true"></PlaceInput>
         </div>
       </div>
 
       <label for="recordFormTransport" class="form-label">
         {{ $t('labels.transport') }}
       </label>
-      <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" required>
+      <select class="form-select mb-3" v-model="formRecord.transport" id="recordFormTransport" :disabled="disabled" required>
         <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
           :key="transport">{{ $t('labels.' + transport) }}</option>
       </select>
@@ -64,7 +64,7 @@
               {{ $root.datetoDateString(midnightCountry.date) }}
               {{ $t('labels.midnight') }}
             </label>
-            <CountrySelector id="recordFormEndLocation" v-model="midnightCountry.country" :required="true">
+            <CountrySelector id="recordFormEndLocation" v-model="midnightCountry.country" :disabled="disabled" :required="true">
             </CountrySelector>
           </div>
         </div>
@@ -76,7 +76,7 @@
         <label for="recordFormLocation" class="form-label">
           {{ $t('labels.location') }}
         </label>
-        <PlaceInput id="recordFormLocation" v-model="formRecord.location" :required="true"></PlaceInput>
+        <PlaceInput id="recordFormLocation" v-model="formRecord.location" :disabled="disabled" :required="true"></PlaceInput>
       </div>
     </template>
 
@@ -85,7 +85,7 @@
         <label for="recordFormDistance" class="form-label">
           {{ $t('labels.distance') }}
         </label>
-        <input type="number" class="form-control" v-model="formRecord.distance" id="recordFormDistance" required />
+        <input type="number" class="form-control" v-model="formRecord.distance" id="recordFormDistance" :disabled="disabled" required />
       </div>
     </template>
 
@@ -96,13 +96,13 @@
       </label>
       <InfoPoint :text="$t('info.cost')" />
       <div class="input-group mb-2" id="recordFormCost">
-        <input type="number" class="form-control" v-model="formRecord.cost.amount" min="0" />
-        <CurrencySelector v-model="formRecord.cost.currency" :required="true"></CurrencySelector>
+        <input type="number" class="form-control" v-model="formRecord.cost.amount" min="0" :disabled="disabled" />
+        <CurrencySelector v-model="formRecord.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
       </div>
       <div class="mb-3">
         <label for="recordFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :required="Boolean(formRecord.cost.amount)"
+        <FileUpload id="recordFormFile" v-model="formRecord.cost.receipts" :disabled="disabled" :required="Boolean(formRecord.cost.amount)"
           @deleteFile="(id) => $emit('deleteReceipt', id, record._id)"
           @showFile="(id) => $emit('showReceipt', id, record._id)" />
       </div>
@@ -112,20 +112,20 @@
       {{ $t('labels.purpose') }}
     </label>
     <InfoPoint :text="$t('info.purpose')" />
-    <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" required>
+    <select class="form-select mb-3" v-model="formRecord.purpose" id="recordFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' +
         purpose) }}</option>
     </select>
 
 
     <div class="mb-1">
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
+      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add' && !disabled">
         {{ $t('labels.addX', { X: $t('labels.record') }) }}
       </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
+      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit' && !disabled">
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit'" @click="$emit('deleted', formRecord._id)">
+      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit' && !disabled" @click="disabled ? null : $emit('deleted', formRecord._id)">
         {{ $t('labels.delete') }}
       </button>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
@@ -177,6 +177,7 @@ export default {
         return ['add', 'edit'].indexOf(value) !== -1
       },
     },
+    disabled: { type: Boolean, default: false },
     askStayCost: { type: Boolean, default: true },
     travelStartDate: { type: Date },
     travelEndDate: { type: Date },

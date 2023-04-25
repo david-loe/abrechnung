@@ -11,7 +11,7 @@
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
               :askStayCost="!travel.claimOvernightLumpSum" :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
+              :travelEndDate="travel.endDate" :disabled="readOnly" @add="postRecord" @edit="postRecord" @deleted="deleteRecord"
               @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </RecordForm>
           </div>
@@ -19,9 +19,9 @@
       </div>
     </div>
     <div class="container" v-if="travel">
-      <nav aria-label="breadcrumb">
+      <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><router-link to="/">{{ $t('headlines.myTravels') }}</router-link></li>
+          <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link"><router-link :to="page.link">{{ $t(page.title) }}</router-link></li>
           <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
         </ol>
       </nav>
@@ -34,7 +34,7 @@
         <div class="col-auto">
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
-              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings">
+              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings" :disabled="readOnly">
             <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
             }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
@@ -44,7 +44,7 @@
 
       <div class="row justify-content-end">
         <div class="col-auto">
-          <button class="btn btn-secondary mb-3" @click="showModal('add', undefined)">
+          <button class="btn btn-secondary mb-3" @click="readOnly ? null : showModal('add', undefined)" :disabled="readOnly">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
           </button>
@@ -56,7 +56,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a class="dropdown-item" href="#" @click="deleteTravel">
+                <a :class="'dropdown-item' + (readOnly ? ' disabled' : '')" href="#" @click="readOnly ? null : deleteTravel">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ $t('labels.delete') }}</span>
                 </a>
@@ -121,7 +121,7 @@
               <div v-for="key of ['breakfast', 'lunch', 'dinner']" class="form-check col-auto" :key="key">
                 <input class="form-check-input" type="checkbox" role="switch"
                   :id="'configCateringRefund' + key + row.data._id" v-model="row.data.cateringNoRefund[key]"
-                  @change="postTravelSettings" />
+                  @change="readOnly ? null : postTravelSettings" :disabled="readOnly"/>
                 <label class="form-check-label" :for="'configCateringRefund' + key + row.data._id">
                   {{ $t('labels.' + key) }}
                 </label>
@@ -132,8 +132,8 @@
                     <InfoPoint :text="$t('info.purpose')" />
                   </div>
                   <div class="col-auto ps-0">
-                    <select class="form-select form-select-sm" v-model="row.data.purpose" @change="postTravelSettings"
-                      required>
+                    <select class="form-select form-select-sm" v-model="row.data.purpose" @change="readOnly ? null : postTravelSettings"
+                      :disabled="readOnly" required>
                       <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">{{
                         $t('labels.'
                           +
@@ -202,7 +202,7 @@ export default {
     }
   },
   components: { StatePipeline, RecordForm, InfoPoint, PlaceElement },
-  props: { _id: { type: String } },
+  props: { _id: { type: String }, readOnly: {type: Boolean, default: false}, parentPages: {type: Array}, endpointMiddleware: {type: String, default: ''} },
   methods: {
     showModal(mode, record) {
       this.modalRecord = record
@@ -263,7 +263,7 @@ export default {
       }
     },
     async showReceipt(id, recordId) {
-      const result = await this.$root.getter('travel/record/receipt', { id: id, recordId: recordId, travelId: this._id }, { responseType: 'blob' })
+      const result = await this.$root.getter(this.endpointMiddleware + 'travel/record/receipt', { id: id, recordId: recordId, travelId: this._id }, { responseType: 'blob' })
       if (result) {
         const fileURL = URL.createObjectURL(result);
         window.open(fileURL)
@@ -315,7 +315,7 @@ export default {
       }
     },
     async getTravel() {
-      this.travel = await this.$root.getter('travel', { id: this._id, records: true, days: true })
+      this.travel = await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, records: true, days: true })
       this.renderTable()
     }
   },

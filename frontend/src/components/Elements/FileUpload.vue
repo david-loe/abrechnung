@@ -10,7 +10,7 @@
           </button>
         </div>
         <div class="col-auto p-0">
-          <button type="button" class="btn btn-sm btn-light" @click="deleteFile(index)">
+          <button type="button" class="btn btn-sm btn-light" @click="disabled ? null : deleteFile(index)"  :disabled="disabled">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -26,7 +26,7 @@
     </div>
   </div>
   <input class="form-control" type="file" :id="id" accept="image/png, image/jpeg, .pdf" @change="changeFile"
-    :required="required && modelValue.length == 0" multiple />
+    :required="required && modelValue.length == 0" multiple :disabled="disabled" />
   </div>
   
 </template>
@@ -38,7 +38,7 @@ export default {
     return {}
   },
   components: {},
-  props: { modelValue: { type: Array, default: function () { return [] } }, required: { type: Boolean, default: false }, id: {type: String} },
+  props: { modelValue: { type: Array, default: function () { return [] } }, required: { type: Boolean, default: false }, disabled:{ type: Boolean, default: false}, id: {type: String} },
   emits: ['update:modelValue', 'deleteFile', 'showFile'],
   methods: {
     showFile(index){
