@@ -56,7 +56,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a :class="'dropdown-item' + (readOnly ? ' disabled' : '')" href="#" @click="readOnly ? null : deleteTravel">
+                <a :class="'dropdown-item' + (readOnly ? ' disabled' : '')" href="#" @click="readOnly ? null : deleteTravel()">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ $t('labels.delete') }}</span>
                 </a>
@@ -121,7 +121,7 @@
               <div v-for="key of ['breakfast', 'lunch', 'dinner']" class="form-check col-auto" :key="key">
                 <input class="form-check-input" type="checkbox" role="switch"
                   :id="'configCateringRefund' + key + row.data._id" v-model="row.data.cateringNoRefund[key]"
-                  @change="readOnly ? null : postTravelSettings" :disabled="readOnly"/>
+                  @change="readOnly ? null : postTravelSettings()" :disabled="readOnly"/>
                 <label class="form-check-label" :for="'configCateringRefund' + key + row.data._id">
                   {{ $t('labels.' + key) }}
                 </label>
@@ -132,7 +132,7 @@
                     <InfoPoint :text="$t('info.purpose')" />
                   </div>
                   <div class="col-auto ps-0">
-                    <select class="form-select form-select-sm" v-model="row.data.purpose" @change="readOnly ? null : postTravelSettings"
+                    <select class="form-select form-select-sm" v-model="row.data.purpose" @change="readOnly ? null : postTravelSettings()"
                       :disabled="readOnly" required>
                       <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">{{
                         $t('labels.'

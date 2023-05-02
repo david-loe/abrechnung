@@ -179,8 +179,8 @@ export default {
     },
     disabled: { type: Boolean, default: false },
     askStayCost: { type: Boolean, default: true },
-    travelStartDate: { type: Date },
-    travelEndDate: { type: Date },
+    travelStartDate: { type: [String, Date] },
+    travelEndDate: { type: [String, Date] },
   },
   data() {
     return {
