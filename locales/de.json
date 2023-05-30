@@ -87,10 +87,23 @@
     "place": "Ort",
     "currency": "Währung",
     "hideApproved": "Genehmigte Reisen ausblenden",
-    "showApproved": "Genehmigte Reisen anzeigen"
+    "showApproved": "Genehmigte Reisen anzeigen",
+    "summary": "Zusammenfassung",
+    "progress": "Fortschritt",
+    "lumpSums": "Pauschalen",
+    "expences": "Umlagen",
+    "total": "Gesamt",
+    "toExamination": "Zum Prüfen"
   },
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
+    "noTravels": {
+      "travel": "Du hast noch meine Reisen beantragt. Beantrage deine erste Reise!",
+      "approve/travel": "Es gibt keine Reisen zu genehmigen.",
+      "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
+      "examine/travel": "Es gibt keine Reisen zu prüfen.",
+      "examine/travel/refunded": "Es gibt keine erstatteten Reisen."
+    },
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "wrongPassword": "Falsches Passwort",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
@@ -114,7 +127,7 @@
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
     "cost": "Trage hier die Kosten ein.",
     "receipts": "Lade hier die entsprechenden Belege hoch.",
-    "purpose": "Da deine Reise anteilig privat ist, musst du angeben welche Einträge welchem Zweck dienten.",
+    "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
     "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab."
   },

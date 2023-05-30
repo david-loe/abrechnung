@@ -41,28 +41,25 @@
           </button>
         </div>
       </div>
-      <div class="row justify-content-center gx-4 gy-2">
-        <div class="col-auto" v-for="travel of travels" :key="travel._id">
-          <TravelCard :travel="travel" @clicked="clickCard(travel)"></TravelCard>
-        </div>
-      </div>
+      
+          <TravelCardList endpoint="travel" @clicked="(t) => clickCard(t)"></TravelCardList>
+       
     </div>
   </div>
 </template>
 
 <script>
 import { Modal } from 'bootstrap'
-import TravelCard from './Elements/TravelCard.vue'
+import TravelCardList from './Elements/TravelCardList.vue'
 import TravelApply from './Elements/TravelApplication.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
 
 export default {
   name: 'MyTravelsPage',
-  components: { TravelCard, TravelApplyForm, TravelApply },
+  components: { TravelCardList, TravelApplyForm, TravelApply },
   props: [],
   data() {
     return {
-      travels: [],
       newTravelModal: undefined,
       modalMode: 'add',
       modalTravel: undefined,
@@ -90,14 +87,14 @@ export default {
     async applyForTravel(travel) {
       const result = await this.$root.setter('travel/appliedFor', travel)
       if (result) {
-        this.travels = await this.$root.getter('travel')
+        //this.travels = (await this.$root.getter('travel')).data
         this.hideModal()
       }
     },
     async deleteTravel(id) {
       const result = await this.$root.deleter('travel', {id: id})
       if (result) {
-        this.travels = await this.$root.getter('travel')
+        //this.travels = (await this.$root.getter('travel')).data
         this.hideModal()
       }
     },
@@ -107,7 +104,6 @@ export default {
   },
   async beforeMount() {
     await this.$root.load()
-    this.travels = await this.$root.getter('travel')
   },
 }
 </script>

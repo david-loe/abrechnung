@@ -13,9 +13,11 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
     if (req.query.limit && parseInt(req.query.limit) <= meta.limit && parseInt(req.query.limit) > 0) {
       meta.limit = parseInt(req.query.limit)
     }
+    delete req.query.limit
     if (req.query.page && parseInt(req.query.page) > 0) {
       meta.page = parseInt(req.query.page)
     }
+    delete req.query.page
     if (req.query.id && req.query.id != '') {
       var conditions = Object.assign({ _id: req.query.id }, preConditions)
       const result = await model.findOne(conditions, select)

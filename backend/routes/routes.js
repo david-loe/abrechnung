@@ -298,11 +298,12 @@ router.post('/travel/appliedFor', async (req, res) => {
 
 router.post('/travel/underExamination', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  req.body.state = 'underExamination'
-  req.body.editor = user._id
-  delete req.body.traveler
-  delete req.body.history
-  delete req.body.historic
+  req.body = {
+      state: 'underExamination',
+      editor: user._id,
+      comment: req.body.comment,
+      _id: req.body._id
+  }
 
   const check = async (oldObject) => {
     if (oldObject.state === 'approved') {
@@ -312,7 +313,6 @@ router.post('/travel/underExamination', async (req, res) => {
     } else {
       return false
     }
-
   }
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })

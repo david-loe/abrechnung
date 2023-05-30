@@ -7,5 +7,6 @@
     "breakfastCateringLumpSumCut": 0.2,
     "lunchCateringLumpSumCut": 0.4,
     "dinnerCateringLumpSumCut": 0.4,
-    "toleranceRecordDatesToApprovedTravelDates": 3
+    "toleranceRecordDatesToApprovedTravelDates": 3,
+    "baseCurrency": "EUR"
 }

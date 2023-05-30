@@ -87,10 +87,23 @@
     "place": "Place",
     "currency": "Currency",
     "hideApproved": "Hide approved travels",
-    "showApproved": "Show approved travels"
+    "showApproved": "Show approved travels",
+    "summary": "Summary",
+    "progress": "Progress",
+    "lumpSums": "Lump sums",
+    "expences": "Expences",
+    "total": "Total",
+    "toExamination": "To Examination"
   },
   "alerts": {
     "noRecordsPresent": "There are no records present jet.",
+    "noTravels": {
+      "travel": "There are no travels. Add one!",
+      "approve/travel": "There are no travels to approve",
+      "approve/travel/approved": "There are no approved travels",
+      "examine/travel": "There are no travels to examine",
+      "examine/travel/refunded": "There are no refunded travels"
+    },
     "loginFailed": "Failed to login!",
     "wrongPassword": "Wrong Password",
     "areYouSureDelete": "Are you sure that you want to delete this?",
@@ -114,7 +127,7 @@
     "claimOvernightLumpSum": "You can either claim overnight per diems and account for the actual cost of overnight accommodations.",
     "cost": "Enter the cost here.",
     "receipts": "Upload the corresponding receipts here.",
-    "purpose": "Since your trip is proportionately private, you must specify which entries served what purpose.",
+    "purpose": "Specify which purpose this record served.",
     "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it."
   },

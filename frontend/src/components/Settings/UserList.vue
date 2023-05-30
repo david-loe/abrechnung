@@ -60,7 +60,7 @@ export default {
     async postUser(user) {
       const result = await this.$root.setter('admin/user', user)
       if (result) {
-        this.users = await this.$root.getter('admin/user')
+        this.users = (await this.$root.getter('admin/user')).data
         this.$refs.userform.clear()
         this.userFormMode = ''
       }
@@ -68,12 +68,12 @@ export default {
     async deleteUser(user) {
       const result = await this.$root.deleter('admin/user', { id: user._id })
       if (result) {
-        this.users = await this.$root.getter('admin/user')
+        this.users = (await this.$root.getter('admin/user')).data
       }
     },
   },
   async beforeMount() {
-    this.users = await this.$root.getter('admin/user')
+    this.users = (await this.$root.getter('admin/user')).data
   },
 }
 </script>

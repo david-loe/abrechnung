@@ -156,13 +156,13 @@ export default {
           this.getter('currency'),
           this.getter('country'),
         ]).then((result) => {
-          this.user = result[0].value
+          this.user = result[0].value.data
           if (Object.keys(this.user).length > 0) {
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
-          this.currencies = result[1].value
-          this.countries = result[2].value
+          this.currencies = result[1].value.data
+          this.countries = result[2].value.data
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -192,10 +192,7 @@ export default {
           withCredentials: true,
         }, config))
         if (res.status === 200) {
-          if (config.responseType == 'blob') {
-            return res.data
-          }
-          return res.data.data
+          return res.data
         }
       } catch (error) {
         if (error.response.status === 401) {

@@ -26,6 +26,7 @@ const travelSchema = new mongoose.Schema({
   },
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
   claimOvernightLumpSum: { type: Boolean, default: true },
+  progress: {type: Number, min: 0, max: 100, default: 0},
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
   records: [{
@@ -85,6 +86,15 @@ travelSchema.pre(/^find((?!Update).)*$/, function(){
   populate(this)
 })
 
+travelSchema.post('deleteOne', function(){
+  // console.log(this._id)
+  // console.log(this.history)
+  // for (const historyId of this.history){
+  //   console.log(historyId)
+  //   mongoose.model('Travel').deleteOne({_id: historyId})
+  // }
+})
+
 travelSchema.methods.saveToHistory = async function () {
   const doc = (await mongoose.model('Travel').findOne({ _id: this._id }, { history: 0 })).toObject()
   delete doc._id
@@ -94,6 +104,20 @@ travelSchema.methods.saveToHistory = async function () {
   this.comment = null
   this.markModified('history')
 };
+
+travelSchema.methods.calculateProgress = function () {
+  if (this.records.length > 0) {
+    var approvedLength = getDiffInDays(this.startDate, this.endDate)
+    var recordLength = getDiffInDays(this.records[0].startDate, this.records[this.records.length - 1].endDate)
+    if(recordLength >= approvedLength){
+      this.progress = 100
+    }else{
+      this.progress = Math.round((recordLength / approvedLength) * 100) / 100
+    }
+  }else{
+    this.progress = 0
+  }
+}
 
 travelSchema.methods.calculateDays = function () {
   if (this.records.length > 0) {
@@ -170,7 +194,7 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
       if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
 
-      result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: 'EUR' }
+      result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: settings.baseCurrency }
       day.refunds.push(result)
     }
   }
@@ -195,7 +219,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
         }
         const result = { type: 'overnight' }
         var amount = (await day.country.getLumpSum(day.date))[result.type]
-        result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: 'EUR' }
+        result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: settings.baseCurrency }
         day.refunds.push(result)
       }
     }
@@ -207,6 +231,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
 
 travelSchema.pre('save', async function (next) {
   await populate(this)
+  this.calculateProgress()
   this.calculateDays()
   await this.addCountriesToDays()
   await this.addCateringRefunds()

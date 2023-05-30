@@ -11,7 +11,7 @@
           <div class="modal-body">
             <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
               :askStayCost="!travel.claimOvernightLumpSum" :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate" :disabled="readOnly" @add="postRecord" @edit="postRecord"
+              :travelEndDate="travel.endDate" :disabled="isReadOnly" @add="postRecord" @edit="postRecord"
               @deleted="deleteRecord" @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </RecordForm>
           </div>
@@ -38,8 +38,8 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a :class="'dropdown-item' + (readOnly ? ' disabled' : '')" href="#"
-                  @click="readOnly ? null : deleteTravel()">
+                <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#"
+                  @click="isReadOnly ? null : deleteTravel()">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ $t('labels.delete') }}</span>
                 </a>
@@ -55,7 +55,7 @@
         <div class="col-auto">
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
-              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings" :disabled="readOnly">
+              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings" :disabled="isReadOnly">
             <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
             }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
@@ -67,8 +67,8 @@
         <div class="col-lg-8 col-12">
           <div class="row mb-2">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="readOnly ? null : showModal('add', undefined)"
-                :disabled="readOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
               </button>
@@ -126,7 +126,7 @@
                     <div v-for="key of ['breakfast', 'lunch', 'dinner']" class="form-check col-auto" :key="key">
                       <input class="form-check-input" type="checkbox" role="switch"
                         :id="'configCateringRefund' + key + row.data._id" v-model="row.data.cateringNoRefund[key]"
-                        @change="readOnly ? null : postTravelSettings()" :disabled="readOnly" />
+                        @change="isReadOnly ? null : postTravelSettings()" :disabled="isReadOnly" />
                       <label class="form-check-label" :for="'configCateringRefund' + key + row.data._id">
                         {{ $t('labels.' + key) }}
                       </label>
@@ -138,7 +138,7 @@
                         </div>
                         <div class="col-auto ps-0">
                           <select class="form-select form-select-sm" v-model="row.data.purpose"
-                            @change="readOnly ? null : postTravelSettings()" :disabled="readOnly" required>
+                            @change="isReadOnly ? null : postTravelSettings()" :disabled="isReadOnly" required>
                             <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">{{
                               $t('labels.'
                                 +
@@ -194,28 +194,27 @@
                 <table class="table">
                   <tbody>
                     <tr>
-                      <th>{{'labels.progress'}}</th>
-                      <td></td>
-                    </tr>
-                    
-                    <tr>
-                      <td><small>{{'labels.lumpSums'}}</small></td>
-                      <td><small></small></td>
+                      <th>{{$t('labels.progress')}}</th>
+                      <td>{{ travel.progress + ' %' }}</td>
                     </tr>
                     <tr>
-                      <td><small>{{'labels.expences'}}</small></td>
-                      <td><small></small></td>
+                      <td><small>{{$t('labels.lumpSums')}}</small></td>
+                      <td><small>{{ getRefunds(['overnight', 'catering8', 'catering24']) }}</small></td>
                     </tr>
                     <tr>
-                      <th>{{'labels.sum'}}</th>
-                      <td></td>
+                      <td><small>{{$t('labels.expences')}}</small></td>
+                      <td><small>{{ getRefunds(['expence']) }}</small></td>
+                    </tr>
+                    <tr>
+                      <th>{{$t('labels.total')}}</th>
+                      <td>{{ getRefunds() }}</td>
                     </tr>
                   </tbody>
                 </table>
-                <button class="btn btn-primary" @click="readOnly ? null : showModal('add', undefined)"
-                :disabled="readOnly">
+                <button class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
+                :disabled="isReadOnly">
                 <i class="bi bi-pencil-square"></i>
-                <span class="ms-1">{{ $t('labels.toExamniation') }}</span>
+                <span class="ms-1">{{ $t('labels.toExamination') }}</span>
               </button>
               </div>
             </div>
@@ -243,7 +242,8 @@ export default {
       modalRecord: undefined,
       modalMode: 'add',
       table: [],
-      configCateringRefund: false
+      configCateringRefund: false,
+      isReadOnly: false
     }
   },
   components: { StatePipeline, RecordForm, InfoPoint, PlaceElement },
@@ -276,6 +276,12 @@ export default {
     },
     async deleteTravel() {
       const result = await this.$root.deleter('travel', { id: this._id })
+      if (result) {
+        this.$router.push({ path: '/' })
+      }
+    },
+    async toExamination() {
+      const result = await this.$root.setter('travel/underExamination', {_id: this.travel._id})
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -314,16 +320,6 @@ export default {
         window.open(fileURL)
       }
     },
-    sameDay(a, b) {
-      const dateA = new Date(a)
-      const dateB = new Date(b)
-      return dateA.getUTCDate() === dateB.getUTCDate() && dateA.getUTCMonth() === dateB.getUTCMonth()
-    },
-    sameHour(a, b) {
-      const dateA = new Date(a)
-      const dateB = new Date(b)
-      return this.sameDay(a, b) && dateA.getUTCHours() === dateB.getUTCHours()
-    },
     getRecordIcon(record) {
       var icon = null
       if (record.type == 'stay') {
@@ -340,6 +336,17 @@ export default {
         }
       }
       return icon
+    },
+    getRefunds(types = ['overnight', 'catering8', 'catering24', 'expense']){
+      var sum = 0
+      for(const day of this.travel.days){
+        for(const refund of day.refunds){
+          if(types.indexOf(refund.type) !== -1){
+            sum += refund.refund.amount
+          }
+        }
+      }
+      return sum
     },
     renderTable() {
       this.table = []
@@ -360,7 +367,9 @@ export default {
       }
     },
     async getTravel() {
-      this.travel = await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, records: true, days: true })
+      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, records: true, days: true })).data
+      this.isReadOnly = this.readOnly || ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
+      console.log(this.isReadOnly)
       this.renderTable()
     }
   },
