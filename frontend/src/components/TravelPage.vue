@@ -369,7 +369,6 @@ export default {
     async getTravel() {
       this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, records: true, days: true })).data
       this.isReadOnly = this.readOnly || ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
-      console.log(this.isReadOnly)
       this.renderTable()
     }
   },

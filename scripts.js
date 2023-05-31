@@ -11,8 +11,12 @@ function getFlagEmoji(countryCode) {
   return String.fromCodePoint(...codePoints);
 }
 
+function datetimeToDateString(datetime){
+  return new Date(datetime).toISOString().slice(0, -14)
+}
+
 function datetimeToDate(datetime){
-  return new Date(new Date(datetime).toISOString().slice(0, -14))
+  return new Date(datetimeToDateString(datetime))
 }
 
 function getDiffInDays(startDate, endDate) {
@@ -32,5 +36,6 @@ function getDayList(startDate, endDate) {
 module.exports= {
   getFlagEmoji,
   getDiffInDays,
-  getDayList
+  getDayList,
+  datetimeToDateString
 }

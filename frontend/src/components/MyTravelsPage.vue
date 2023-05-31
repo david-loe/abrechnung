@@ -9,22 +9,10 @@
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
           <div class="modal-body">
-            <TravelApply
-              v-if="modalMode === 'view'"
-              :travel="modalTravel"
-              @cancel="hideModal()"
-              @edit="showModal('edit', modalTravel)"
-              @deleted="deleteTravel(modalTravel._id)"
-            ></TravelApply>
-            <TravelApplyForm
-              v-else
-              :mode="modalMode"
-              @cancel="hideModal()"
-              :travel="modalTravel"
-              @add="applyForTravel"
-              @edit="applyForTravel"
-              ref="travelApplyForm"
-            ></TravelApplyForm>
+            <TravelApply v-if="modalMode === 'view'" :travel="modalTravel" @cancel="hideModal()"
+              @edit="showModal('edit', modalTravel)" @deleted="deleteTravel(modalTravel._id)"></TravelApply>
+            <TravelApplyForm v-else :mode="modalMode" @cancel="hideModal()" :travel="modalTravel" @add="applyForTravel"
+              @edit="applyForTravel" ref="travelApplyForm"></TravelApplyForm>
           </div>
         </div>
       </div>
@@ -41,9 +29,7 @@
           </button>
         </div>
       </div>
-      
-          <TravelCardList endpoint="travel" @clicked="(t) => clickCard(t)"></TravelCardList>
-       
+      <TravelCardList ref="travelCardListRef" endpoint="travel" @clicked="(t) => clickCard(t)"></TravelCardList>
     </div>
   </div>
 </template>
@@ -87,14 +73,14 @@ export default {
     async applyForTravel(travel) {
       const result = await this.$root.setter('travel/appliedFor', travel)
       if (result) {
-        //this.travels = (await this.$root.getter('travel')).data
+        this.$refs.travelCardListRef.getTravels()
         this.hideModal()
       }
     },
     async deleteTravel(id) {
-      const result = await this.$root.deleter('travel', {id: id})
+      const result = await this.$root.deleter('travel', { id: id })
       if (result) {
-        //this.travels = (await this.$root.getter('travel')).data
+        this.$refs.travelCardListRef.getTravels()
         this.hideModal()
       }
     },
@@ -108,5 +94,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

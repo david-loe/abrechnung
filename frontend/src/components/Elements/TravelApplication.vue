@@ -53,7 +53,7 @@ export default {
         case 'endDate':
           return this.$root.datetoDateString(this.travel[key])
         case 'advance':
-          return this.travel[key].amount + ' ' + this.travel[key].currency._id
+          return this.travel[key].amount + (this.travel[key].currency.symbol ? this.travel[key].currency.symbol + ' (' + this.travel[key].currency._id + ')' : ' ' + this.travel[key].currency._id)
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':

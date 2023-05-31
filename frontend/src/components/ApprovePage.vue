@@ -18,17 +18,16 @@
     </div>
     <div class="container">
       <h1 class="mb-3">{{ $t('labels.approve') }}</h1>
-      <TravelCardList endpoint="approve/travel" :showTraveler="true" @clicked="(t) => showModal(t)"></TravelCardList>
+      <TravelCardList class="mb-5" ref="travelCardListRef" endpoint="approve/travel" :showTraveler="true" @clicked="(t) => showModal(t)"></TravelCardList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">{{
-        $t('labels.showApproved') }} <i class="bi bi-chevron-down"></i></button>
+        $t('labels.showApprovedTravels') }} <i class="bi bi-chevron-down"></i></button>
       <template v-else>
-        <button type="button" class="btn btn-light" @click="showApproved = false">{{ $t('labels.hideApproved') }} <i
+        <button type="button" class="btn btn-light" @click="showApproved = false">{{ $t('labels.hideApprovedTravels') }} <i
             class="bi bi-chevron-up"></i></button>
         <hr class="hr">
         <TravelCardList endpoint="approve/travel/approved" :showTraveler="true" @clicked="(t) => showModal(t)">
         </TravelCardList>
       </template>
-
     </div>
   </div>
 </template>
@@ -65,7 +64,7 @@ export default {
       this.modalTravel.comment = comment
       const result = await this.$root.setter('approve/travel/' + decision, this.modalTravel)
       if (result) {
-        //this.travels = (await this.$root.getter('approve/travel')).data
+        this.$refs.travelCardListRef.getTravels()
         this.hideModal()
       }
     },

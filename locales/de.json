@@ -86,8 +86,10 @@
     "country": "Land",
     "place": "Ort",
     "currency": "Währung",
-    "hideApproved": "Genehmigte Reisen ausblenden",
-    "showApproved": "Genehmigte Reisen anzeigen",
+    "hideApprovedTravels": "Genehmigte Reisen ausblenden",
+    "showApprovedTravels": "Genehmigte Reisen anzeigen",
+    "hideRefundedTravels": "Erstattete Reisen ausblenden",
+    "showRefundedTravels": "Erstattete Reisen anzeigen",
     "summary": "Zusammenfassung",
     "progress": "Fortschritt",
     "lumpSums": "Pauschalen",
@@ -98,7 +100,7 @@
   "alerts": {
     "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
     "noTravels": {
-      "travel": "Du hast noch meine Reisen beantragt. Beantrage deine erste Reise!",
+      "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!",
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
       "examine/travel": "Es gibt keine Reisen zu prüfen.",

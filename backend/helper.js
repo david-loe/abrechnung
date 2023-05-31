@@ -1,6 +1,9 @@
 const i18n = require('./i18n')
 const Country = require('./models/country')
 const User = require('./models/user')
+const axios = require('axios')
+const settings = require('./settings')
+const scripts = require('./scripts')
 
 function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null) {
   return async (req, res) => {
@@ -263,6 +266,31 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
   return { success, noUpdate, noCountryFound }
 }
 
+async function convertCurrency (date, amount, from, to = settings.baseCurrency){
+  from = from.toLowerCase()
+  to = to.toLowerCase()
+  dateStr = scripts.datetimeToDateString(date)
+  const baseURLs = ['https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/', 'https://raw.githubusercontent.com/fawazahmed0/currency-api/1/']
+  const suffixs = ['.min.json', '.json']
+  var rate = null
+  outerloop:
+  for(const baseURL of baseURLs){
+    for(const suffix of suffixs){
+      const url = baseURL + dateStr + '/currencies/' + from + '/' + to + suffix
+      const res = await axios.get()
+      if(res.staus === 200){
+        rate = res.data[to]
+        break outerloop;
+      }
+    }
+  }
+  if(rate == null){
+    amount = null
+  }else{
+    amount = Math.round(amount * rate * 100) / 100
+  }
+  return {date, rate, amount}
+}
 
 module.exports = {
   getter,
@@ -272,4 +300,5 @@ module.exports = {
   objectsToCSV,
   parseRawLumpSums,
   addLumpSumsToCountries,
+  convertCurrency
 }

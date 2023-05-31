@@ -9,6 +9,12 @@ const place = {
   place: { type: String }
 }
 
+const exchangeRate = {
+  date: { type: Date },
+  rate: { type: Number, min: 0 },
+  amount: { type: Number, min: 0 }
+}
+
 const travelSchema = new mongoose.Schema({
   name: { type: String },
   traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -23,10 +29,11 @@ const travelSchema = new mongoose.Schema({
   advance: {
     amount: { type: Number, min: 0, required: true },
     currency: { type: String, ref: 'Currency', required: true },
+    exchangeRate: exchangeRate
   },
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
   claimOvernightLumpSum: { type: Boolean, default: true },
-  progress: {type: Number, min: 0, max: 100, default: 0},
+  progress: { type: Number, min: 0, max: 100, default: 0 },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
   records: [{
@@ -42,6 +49,7 @@ const travelSchema = new mongoose.Schema({
     cost: {
       amount: { type: Number, min: 0 },
       currency: { type: String, ref: 'Currency' },
+      exchangeRate: exchangeRate,
       receipts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
     },
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
@@ -60,6 +68,7 @@ const travelSchema = new mongoose.Schema({
       refund: {
         amount: { type: Number, min: 0 },
         currency: { type: String, ref: 'Currency' },
+        exchangeRate: exchangeRate
       }
     }]
   }],
@@ -82,11 +91,11 @@ function populate(doc) {
   ])
 }
 
-travelSchema.pre(/^find((?!Update).)*$/, function(){
+travelSchema.pre(/^find((?!Update).)*$/, function () {
   populate(this)
 })
 
-travelSchema.post('deleteOne', function(){
+travelSchema.post('deleteOne', function () {
   // console.log(this._id)
   // console.log(this.history)
   // for (const historyId of this.history){
@@ -109,12 +118,12 @@ travelSchema.methods.calculateProgress = function () {
   if (this.records.length > 0) {
     var approvedLength = getDiffInDays(this.startDate, this.endDate)
     var recordLength = getDiffInDays(this.records[0].startDate, this.records[this.records.length - 1].endDate)
-    if(recordLength >= approvedLength){
+    if (recordLength >= approvedLength) {
       this.progress = 100
-    }else{
+    } else {
       this.progress = Math.round((recordLength / approvedLength) * 100) / 100
     }
-  }else{
+  } else {
     this.progress = 0
   }
 }

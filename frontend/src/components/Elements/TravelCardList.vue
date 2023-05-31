@@ -37,6 +37,8 @@ export default {
         }else if(this.meta && page > this.meta.countPages){
           page = this.meta.countPages
         }
+      }else if(this.meta){
+        page = this.meta.page
       }
       var result = await this.$root.getter(this.endpoint, { page })
       this.travels = result.data
