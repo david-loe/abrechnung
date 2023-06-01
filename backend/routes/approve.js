@@ -5,12 +5,12 @@ const router = require('express').Router()
 
 router.get('/travel', async (req, res) => {
     const sortFn = (a, b) => a.startDate - b.startDate
-    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0, records: 0, days: 0 }, sortFn)(req, res)
+    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0, stages: 0, days: 0 }, sortFn)(req, res)
 })
 
 router.get('/travel/approved', async (req, res) => {
     const sortFn = (a, b) => a.startDate - b.startDate
-    return helper.getter(Travel, 'travel', 20, { state: 'approved', historic: false }, { history: 0, records: 0, days: 0 }, sortFn)(req, res)
+    return helper.getter(Travel, 'travel', 20, { state: 'approved', historic: false }, { history: 0, stages: 0, days: 0 }, sortFn)(req, res)
 })
 
 function approve(state) {

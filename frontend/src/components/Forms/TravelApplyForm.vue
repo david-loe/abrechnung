@@ -46,7 +46,7 @@
     <InfoPoint :text="$t('info.advance')" />
 
     <div class="input-group mb-2" id="travelFormAdvance">
-      <input type="number" class="form-control" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" required />
+      <input type="number" class="form-control" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
       <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
     </div>
 
@@ -110,7 +110,7 @@ export default {
         startDate: '',
         endDate: '',
         advance: {
-          amount: 0,
+          amount: null,
           currency: 'EUR',
         },
       }

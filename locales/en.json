@@ -51,7 +51,7 @@
     "reject": "Reject",
     "comment": "Comment",
     "editor": "Editor",
-    "record": "Records",
+    "stage": "Stage",
     "route": "Route",
     "stay": "Stay",
     "location": "Location",
@@ -98,7 +98,7 @@
     "toExamination": "To Examination"
   },
   "alerts": {
-    "noRecordsPresent": "There are no records present jet.",
+    "noStagesPresent": "There are no stages present jet.",
     "noTravels": {
       "travel": "There are no travels. Add one!",
       "approve/travel": "There are no travels to approve",
@@ -129,7 +129,7 @@
     "claimOvernightLumpSum": "You can either claim overnight per diems and account for the actual cost of overnight accommodations.",
     "cost": "Enter the cost here.",
     "receipts": "Upload the corresponding receipts here.",
-    "purpose": "Specify which purpose this record served.",
+    "purpose": "Specify which purpose this stage served.",
     "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it."
   },

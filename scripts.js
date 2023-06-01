@@ -11,11 +11,11 @@ function getFlagEmoji(countryCode) {
   return String.fromCodePoint(...codePoints);
 }
 
-function datetimeToDateString(datetime){
+function datetimeToDateString(datetime) {
   return new Date(datetime).toISOString().slice(0, -14)
 }
 
-function datetimeToDate(datetime){
+function datetimeToDate(datetime) {
   return new Date(datetimeToDateString(datetime))
 }
 
@@ -33,9 +33,17 @@ function getDayList(startDate, endDate) {
   return days
 }
 
-module.exports= {
+function getMoneyString(money, useExchangeRate = true, func = (x) => x) {
+  return (func(((useExchangeRate && money.exchangeRate) ? money.exchangeRate.amount : money.amount))).toLocaleString(undefined, {
+    style: "currency",
+    currency: (useExchangeRate && money.exchangeRate) ? "EUR" : money.currency._id // baseCurrency
+  })
+}
+
+module.exports = {
   getFlagEmoji,
   getDiffInDays,
   getDayList,
-  datetimeToDateString
+  datetimeToDateString,
+  getMoneyString,
 }

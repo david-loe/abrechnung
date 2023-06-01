@@ -2,17 +2,33 @@ const mongoose = require('mongoose')
 const { getDayList, getDiffInDays } = require('../scripts')
 const Country = require('./country')
 const settings = require('../settings')
+const helper = require('../helper')
 
 
-const place = {
-  country: { type: String, ref: 'Country' },
-  place: { type: String }
+function place(required = false) {
+  return {
+    country: { type: String, ref: 'Country', required: required },
+    place: { type: String, required: required }
+  }
 }
 
-const exchangeRate = {
-  date: { type: Date },
-  rate: { type: Number, min: 0 },
-  amount: { type: Number, min: 0 }
+function costObject(exchangeRate = true, receipts = true, required = false){
+  const costObject = {
+    amount: { type: Number, min: 0, required: required },
+    currency: { type: String, ref: 'Currency', required: required },
+  }
+  if(exchangeRate){
+    costObject.exchangeRate = {
+      date: { type: Date },
+      rate: { type: Number, min: 0 },
+      amount: { type: Number, min: 0 }
+    }
+  }
+  if(receipts){
+    costObject.receipts = [{ type: mongoose.Schema.Types.ObjectId, ref: 'File', required: required }]
+    costObject.date = {type: Date, required: required }
+  }
+  return costObject
 }
 
 const travelSchema = new mongoose.Schema({
@@ -22,36 +38,25 @@ const travelSchema = new mongoose.Schema({
   editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   comment: { type: String },
   reason: { type: String, required: true },
-  destinationPlace: place,
+  destinationPlace: place(true),
   travelInsideOfEU: { type: Boolean, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
-  advance: {
-    amount: { type: Number, min: 0, required: true },
-    currency: { type: String, ref: 'Currency', required: true },
-    exchangeRate: exchangeRate
-  },
+  advance: costObject(true, false),
   professionalShare: { type: Number, min: 0.5, max: 0.8 },
   claimOvernightLumpSum: { type: Boolean, default: true },
   progress: { type: Number, min: 0, max: 100, default: 0 },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
-  records: [{
-    type: { type: String, enum: ['route', 'stay'], required: true },
+  stages: [{
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    startLocation: place,
-    endLocation: place,
+    startLocation: place(true),
+    endLocation: place(true),
     midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
     distance: { type: Number, min: 0 },
-    location: place,
-    transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] },
-    cost: {
-      amount: { type: Number, min: 0 },
-      currency: { type: String, ref: 'Currency' },
-      exchangeRate: exchangeRate,
-      receipts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
-    },
+    transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'], required: true },
+    cost: costObject(true, true),
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
   }],
   days: [{
@@ -65,11 +70,7 @@ const travelSchema = new mongoose.Schema({
     purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
     refunds: [{
       type: { type: String, enum: ['overnight', 'catering8', 'catering24', 'expense'], required: true },
-      refund: {
-        amount: { type: Number, min: 0 },
-        currency: { type: String, ref: 'Currency' },
-        exchangeRate: exchangeRate
-      }
+      refund: costObject(true, false, true)
     }]
   }],
 }, { timestamps: true })
@@ -77,15 +78,14 @@ const travelSchema = new mongoose.Schema({
 function populate(doc) {
   return Promise.allSettled([
     doc.populate({ path: 'advance.currency', model: 'Currency' }),
-    doc.populate({ path: 'records.cost.currency', model: 'Currency' }),
+    doc.populate({ path: 'stages.cost.currency', model: 'Currency' }),
     doc.populate({ path: 'days.refunds.refund.currency', model: 'Currency' }),
     doc.populate({ path: 'destinationPlace.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'records.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'records.endLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'records.location.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'records.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.endLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'records.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'stages.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
   ])
@@ -115,13 +115,13 @@ travelSchema.methods.saveToHistory = async function () {
 };
 
 travelSchema.methods.calculateProgress = function () {
-  if (this.records.length > 0) {
-    var approvedLength = getDiffInDays(this.startDate, this.endDate)
-    var recordLength = getDiffInDays(this.records[0].startDate, this.records[this.records.length - 1].endDate)
-    if (recordLength >= approvedLength) {
+  if (this.stages.length > 0) {
+    var approvedLength = getDiffInDays(this.startDate, this.endDate) + 1
+    var stageLength = getDiffInDays(this.stages[0].startDate, this.stages[this.stages.length - 1].endDate) + 1
+    if (stageLength >= approvedLength) {
       this.progress = 100
     } else {
-      this.progress = Math.round((recordLength / approvedLength) * 100) / 100
+      this.progress = Math.round((stageLength / approvedLength) * 100) / 100
     }
   } else {
     this.progress = 0
@@ -129,8 +129,8 @@ travelSchema.methods.calculateProgress = function () {
 }
 
 travelSchema.methods.calculateDays = function () {
-  if (this.records.length > 0) {
-    const days = getDayList(this.records[0].startDate, this.records[this.records.length - 1].endDate)
+  if (this.stages.length > 0) {
+    const days = getDayList(this.stages[0].startDate, this.stages[this.stages.length - 1].endDate)
     const newDays = days.map((d) => { return { date: d } })
     for (const oldDay of this.days) {
       for (const newDay of newDays) {
@@ -148,24 +148,24 @@ travelSchema.methods.calculateDays = function () {
 }
 
 travelSchema.methods.getBorderCrossings = async function () {
-  if (this.records.length > 0) {
-    const startCountry = this.records[0].startLocation ? this.records[0].startLocation.country : this.records[0].location.country
-    const borderCrossings = [{ date: new Date(this.records[0].startDate), country: startCountry }]
-    for (var i = 0; i < this.records.length; i++) {
-      const record = this.records[i]
+  if (this.stages.length > 0) {
+    const startCountry = this.stages[0].startLocation.country
+    const borderCrossings = [{ date: new Date(this.stages[0].startDate), country: startCountry }]
+    for (var i = 0; i < this.stages.length; i++) {
+      const stage = this.stages[i]
       // Country Change
-      if (record.type == 'route' && record.startLocation && record.endLocation && record.startLocation.country._id != record.endLocation.country._id) {
+      if (stage.startLocation && stage.endLocation && stage.startLocation.country._id != stage.endLocation.country._id) {
         // More than 1 night
-        if (getDiffInDays(record.startDate, record.endDate) > 1) {
-          if (['ownCar', 'otherTransport'].indexOf(record.transport) !== -1) {
-            borderCrossings.push(...record.midnightCountries)
-          } else if (record.transport = 'airplane') {
-            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }) })
-          } else if (record.transport = 'shipOrFerry') {
-            borderCrossings.push({ date: new Date(new Date(record.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }) })
+        if (getDiffInDays(stage.startDate, stage.endDate) > 1) {
+          if (['ownCar', 'otherTransport'].indexOf(stage.transport) !== -1) {
+            borderCrossings.push(...stage.midnightCountries)
+          } else if (stage.transport = 'airplane') {
+            borderCrossings.push({ date: new Date(new Date(stage.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }) })
+          } else if (stage.transport = 'shipOrFerry') {
+            borderCrossings.push({ date: new Date(new Date(stage.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }) })
           }
         }
-        borderCrossings.push({ date: new Date(record.endDate), country: record.endLocation.country })
+        borderCrossings.push({ date: new Date(stage.endDate), country: stage.endLocation.country })
       }
     }
     return borderCrossings
@@ -211,7 +211,7 @@ travelSchema.methods.addCateringRefunds = async function () {
 
 travelSchema.methods.addOvernightRefunds = async function () {
   if (this.claimOvernightLumpSum) {
-    var recordIndex = 0
+    var stageIndex = 0
     for (var i = 0; i < this.days.length; i++) {
       const day = this.days[i]
       if (day.purpose == 'professional') {
@@ -219,11 +219,12 @@ travelSchema.methods.addOvernightRefunds = async function () {
           break
         }
         var midnight = day.date.valueOf() + 1000 * 24 * 60 * 60 - 1
-        while (recordIndex < this.records.length && (this.records[recordIndex].type != 'route' || midnight - new Date(this.records[recordIndex].endDate).valueOf() > 0)) {
-          recordIndex++
+        while (stageIndex < this.stages.length - 1 && (this.stages[stageIndex].type != 'route' || midnight - new Date(this.stages[stageIndex].endDate).valueOf() > 0)) {
+          stageIndex++
         }
-        if (midnight - new Date(this.records[recordIndex].startDate).valueOf() > 0 &&
-          new Date(this.records[recordIndex].endDate).valueOf() - midnight > 0) {
+        console.log(stageIndex)
+        if (midnight - new Date(this.stages[stageIndex].startDate).valueOf() > 0 &&
+          new Date(this.stages[stageIndex].endDate).valueOf() - midnight > 0) {
           continue
         }
         const result = { type: 'overnight' }
@@ -236,7 +237,37 @@ travelSchema.methods.addOvernightRefunds = async function () {
 
 }
 
+async function exchange(costObject, date) {
+  var exchangeRate = null
+  if (costObject.amount > 0 && costObject.currency._id !== settings.baseCurrency._id) {
+    exchangeRate = await helper.convertCurrency(date, costObject.amount, costObject.currency._id)
+  }
+  costObject.exchangeRate = exchangeRate
+  return costObject
+}
 
+travelSchema.methods.calculateExchangeRates = async function () {
+  const promiseList = []
+  promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
+  for (const day of this.days) {
+    for (const refund of day.refunds) {
+      promiseList.push(exchange(refund.refund, day.date))
+    }
+  }
+  results = await Promise.allSettled(promiseList)
+  if (results[0].status === 'fulfilled') {
+    this.advance = results[0].value
+  }
+  var i = 1
+  for (const day of this.days) {
+    for (const refund of day.refunds) {
+      if (results[i].status === 'fulfilled') {
+        refund.refund = results[i].value
+      }
+      i++
+    }
+  }
+}
 
 travelSchema.pre('save', async function (next) {
   await populate(this)
@@ -245,6 +276,8 @@ travelSchema.pre('save', async function (next) {
   await this.addCountriesToDays()
   await this.addCateringRefunds()
   await this.addOvernightRefunds()
+
+  await this.calculateExchangeRates()
   next();
 });
 

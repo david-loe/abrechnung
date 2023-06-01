@@ -73,8 +73,8 @@ router.get('/travel', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   const sortFn = (a, b) => a.startDate - b.startDate
   const select = { history: 0, historic: 0 }
-  if (!req.query.records) {
-    select.records = 0
+  if (!req.query.stages) {
+    select.stages = 0
   }
   if (!req.query.days) {
     select.days = 0
@@ -91,7 +91,7 @@ router.post('/travel', async (req, res) => {
   delete req.body.traveler
   delete req.body.history
   delete req.body.historic
-  delete req.body.records
+  delete req.body.stages
 
   const check = async (oldObject) => {
     return oldObject.state !== 'refunded'
@@ -99,7 +99,8 @@ router.post('/travel', async (req, res) => {
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })
 
-router.post('/travel/record', fileHandler.any(), async (req, res) => {
+router.post('/travel/stage', fileHandler.any(), async (req, res) => {
+  console.log(req.body)
   if(req.body.cost && req.body.cost.receipts && req.files){
     for(var i = 0; i < req.body.cost.receipts.length; i++){
       var buffer = null
@@ -123,13 +124,13 @@ router.post('/travel/record', fileHandler.any(), async (req, res) => {
   if (req.body._id && req.body._id !== '') {
     var found = false
     outer_loop:
-    for (const record of travel.records) {
-      if (record._id.equals(req.body._id)) {
+    for (const stage of travel.stages) {
+      if (stage._id.equals(req.body._id)) {
         if(req.body.cost && req.body.cost.receipts && req.files){
           for(var i = 0; i < req.body.cost.receipts.length; i++){
             if(req.body.cost.receipts[i]._id){
               var foundReceipt = false
-              for(const oldReceipt of record.cost.receipts){
+              for(const oldReceipt of stage.cost.receipts){
                 if(oldReceipt._id.equals(req.body.cost.receipts[i]._id)){
                   foundReceipt = true
                 }
@@ -143,10 +144,10 @@ router.post('/travel/record', fileHandler.any(), async (req, res) => {
               req.body.cost.receipts[i] = result._id
             }
           }
-          travel.markModified('records.cost.receipts')
+          travel.markModified('stages.cost.receipts')
         }
         found = true
-        Object.assign(record, req.body)
+        Object.assign(stage, req.body)
         break
       }
     }
@@ -159,21 +160,21 @@ router.post('/travel/record', fileHandler.any(), async (req, res) => {
         var result = await (new File(req.body.cost.receipts[i])).save()
         req.body.cost.receipts[i] = result._id
       }
-      travel.markModified('records.cost.receipts')
+      travel.markModified('stages.cost.receipts')
     }
-    travel.records.push(req.body)
+    travel.stages.push(req.body)
   }
-  travel.records.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-  travel.markModified('records')
+  travel.stages.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+  travel.markModified('stages')
   try {
-    const result = await travel.save()
-    res.send({ message: i18n.t('alerts.successSaving'), result: result })
+    const result1 = await travel.save()
+    res.send({ message: i18n.t('alerts.successSaving'), result: result1 })
   } catch (error) {
     res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
   }
 })
 
-router.delete('/travel/record', async (req, res) => {
+router.delete('/travel/stage', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.travelId })
   delete req.query.travelId
   var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
@@ -182,15 +183,15 @@ router.delete('/travel/record', async (req, res) => {
   }
   if (req.query.id && req.query.id !== '') {
     var found = false
-    for (var i = 0; i < travel.records.length; i++) {
-      if (travel.records[i]._id.equals(req.query.id)) {
+    for (var i = 0; i < travel.stages.length; i++) {
+      if (travel.stages[i]._id.equals(req.query.id)) {
         found = true
-        if(travel.records[i].cost){
-          for(const receipt of travel.records[i].cost.receipts){
+        if(travel.stages[i].cost){
+          for(const receipt of travel.stages[i].cost.receipts){
             File.deleteOne({ _id: receipt._id })
           }
         }
-        travel.records.splice(i, 1)
+        travel.stages.splice(i, 1)
         break
       }
     }
@@ -198,9 +199,9 @@ router.delete('/travel/record', async (req, res) => {
       return res.sendStatus(403)
     }
   } else {
-    return res.status(400).send({ message: 'No record found' })
+    return res.status(400).send({ message: 'No stage found' })
   }
-  travel.markModified('records')
+  travel.markModified('stages')
   try {
     await travel.save()
     res.send({ message: i18n.t('alerts.successDeleting') })
@@ -209,21 +210,21 @@ router.delete('/travel/record', async (req, res) => {
   }
 })
 
-router.get('/travel/record/receipt', async (req, res) => {
+router.get('/travel/stage/receipt', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.travelId })
   delete req.query.travelId
   var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
     return res.sendStatus(403)
   }
-  if (req.query.recordId) {
+  if (req.query.stageId) {
     var found = false
     outer_loop:
-    for (var i = 0; i < travel.records.length; i++) {
-      if (travel.records[i]._id.equals(req.query.recordId)) {
-        if(travel.records[i].cost){
-          for(var r = 0; r < travel.records[i].cost.receipts.length; r++){
-            if(req.query.id && travel.records[i].cost.receipts[r]._id.equals(req.query.id)){
+    for (var i = 0; i < travel.stages.length; i++) {
+      if (travel.stages[i]._id.equals(req.query.stageId)) {
+        if(travel.stages[i].cost){
+          for(var r = 0; r < travel.stages[i].cost.receipts.length; r++){
+            if(req.query.id && travel.stages[i].cost.receipts[r]._id.equals(req.query.id)){
               found = true
               var file = await File.findOne({ _id: req.query.id })
               res.setHeader('Content-Type', file.type);
@@ -238,28 +239,28 @@ router.get('/travel/record/receipt', async (req, res) => {
       return res.sendStatus(403)
     }
   } else {
-    return res.status(400).send({ message: 'No record found' })
+    return res.status(400).send({ message: 'No stage found' })
   }
 })
 
-router.delete('/travel/record/receipt', async (req, res) => {
+router.delete('/travel/stage/receipt', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.travelId })
   delete req.query.travelId
   var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
     return res.sendStatus(403)
   }
-  if (req.query.recordId) {
+  if (req.query.stageId) {
     var found = false
     outer_loop:
-    for (var i = 0; i < travel.records.length; i++) {
-      if (travel.records[i]._id.equals(req.query.recordId)) {
-        if(travel.records[i].cost){
-          for(var r = 0; r < travel.records[i].cost.receipts.length; r++){
-            if(req.query.id && travel.records[i].cost.receipts[r]._id.equals(req.query.id)){
+    for (var i = 0; i < travel.stages.length; i++) {
+      if (travel.stages[i]._id.equals(req.query.stageId)) {
+        if(travel.stages[i].cost){
+          for(var r = 0; r < travel.stages[i].cost.receipts.length; r++){
+            if(req.query.id && travel.stages[i].cost.receipts[r]._id.equals(req.query.id)){
               found = true
               await File.deleteOne({ _id: req.query.id })
-              travel.records[i].cost.receipts.splice(r, 1)
+              travel.stages[i].cost.receipts.splice(r, 1)
               break outer_loop
             }
           }
@@ -270,9 +271,9 @@ router.delete('/travel/record/receipt', async (req, res) => {
       return res.sendStatus(403)
     }
   } else {
-    return res.status(400).send({ message: 'No record found' })
+    return res.status(400).send({ message: 'No stage found' })
   }
-  travel.markModified('records')
+  travel.markModified('stages')
   try {
     await travel.save()
     res.send({ message: i18n.t('alerts.successDeleting') })
@@ -288,7 +289,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   req.body.traveler = user._id
   delete req.body.history
   delete req.body.historic
-  delete req.body.records
+  delete req.body.stages
 
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'

@@ -299,9 +299,6 @@ export default {
       const day = dateObject.getUTCDate().toString().padStart(2, '0')
       return day + '.' + month
     },
-    moneyString(money){
-      return money.amount + (money.currency.symbol ? money.currency.symbol : money.currency._id)
-    },
     async pushSettings() {
       this.user.settings.language = this.$i18n.locale
       try {

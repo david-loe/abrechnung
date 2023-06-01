@@ -53,7 +53,7 @@
     "reject": "Ablehnen",
     "comment": "Kommentar",
     "editor": "Bearbeiter",
-    "record": "Etappe",
+    "stage": "Etappe",
     "route": "Strecke",
     "stay": "Aufenthalt",
     "location": "Ort",
@@ -93,12 +93,12 @@
     "summary": "Zusammenfassung",
     "progress": "Fortschritt",
     "lumpSums": "Pauschalen",
-    "expences": "Umlagen",
+    "expences": "Auslagen",
     "total": "Gesamt",
     "toExamination": "Zum Prüfen"
   },
   "alerts": {
-    "noRecordsPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
+    "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
     "noTravels": {
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!",
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",

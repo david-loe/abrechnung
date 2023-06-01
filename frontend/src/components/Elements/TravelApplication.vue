@@ -11,7 +11,22 @@
         </tr>
         <tr>
           <th>{{ $t('labels.destinationPlace') }}</th>
-          <td><PlaceElement :place="travel.destinationPlace"></PlaceElement></td>
+          <td>
+            <PlaceElement :place="travel.destinationPlace"></PlaceElement>
+          </td>
+        </tr>
+        <tr v-if="travel.advance.amount > 0">
+          <th>{{ $t('labels.advance') }}</th>
+          <td>
+            <span>
+              {{ getMoneyString(travel.advance) }}
+            </span>
+            <!-- baseCurrency -->
+            <span v-if="travel.advance.exchangeRate" class="text-secondary">
+              &nbsp;-&nbsp;
+              {{ getMoneyString(travel.advance, false) }}
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -33,18 +48,19 @@
 <script>
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
+import { getMoneyString } from '../../scripts.js'
 export default {
   name: 'TravelApply',
   data() {
     return {
-      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'advance', 'editor', 'comment']
+      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'editor', 'comment']
     }
   },
-  components: {StatePipeline, PlaceElement},
+  components: { StatePipeline, PlaceElement },
   emits: ['cancel', 'edit', 'deleted'],
   props: {
     travel: { type: Object },
-    showButtons: {type: Boolean, default: true}
+    showButtons: { type: Boolean, default: true }
   },
   methods: {
     displayKey(key) {
@@ -52,12 +68,10 @@ export default {
         case 'startDate':
         case 'endDate':
           return this.$root.datetoDateString(this.travel[key])
-        case 'advance':
-          return this.travel[key].amount + (this.travel[key].currency.symbol ? this.travel[key].currency.symbol + ' (' + this.travel[key].currency._id + ')' : ' ' + this.travel[key].currency._id)
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':
-          if(this.travel.traveler._id == this.travel.editor._id){
+          if (this.travel.traveler._id == this.travel.editor._id) {
             return ''
           }
           return this.travel[key].name
@@ -74,10 +88,10 @@ export default {
           return this.travel[key]
       }
     },
+    getMoneyString
   },
-  mounted() {},
+  mounted() { },
 }
 </script>
 
-<style>
-</style>
+<style></style>

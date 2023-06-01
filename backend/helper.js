@@ -266,7 +266,7 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
   return { success, noUpdate, noCountryFound }
 }
 
-async function convertCurrency (date, amount, from, to = settings.baseCurrency){
+async function convertCurrency (date, amount, from, to = settings.baseCurrency._id){
   from = from.toLowerCase()
   to = to.toLowerCase()
   dateStr = scripts.datetimeToDateString(date)
@@ -277,18 +277,18 @@ async function convertCurrency (date, amount, from, to = settings.baseCurrency){
   for(const baseURL of baseURLs){
     for(const suffix of suffixs){
       const url = baseURL + dateStr + '/currencies/' + from + '/' + to + suffix
-      const res = await axios.get()
-      if(res.staus === 200){
+      const res = await axios.get(url)
+      if(res.status === 200){
         rate = res.data[to]
         break outerloop;
       }
     }
   }
   if(rate == null){
-    amount = null
-  }else{
-    amount = Math.round(amount * rate * 100) / 100
+    return null
   }
+
+  amount = Math.round(amount * rate * 100) / 100
   return {date, rate, amount}
 }
 

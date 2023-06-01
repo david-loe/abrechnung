@@ -1,19 +1,19 @@
 <template>
   <div>
-    <div class="modal fade" id="recordModal" tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
+    <div class="modal fade" id="stageModal" tabindex="-1" aria-labelledby="stageModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.record') }) }}</h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.record') }) }}</h5>
+            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.stage') }) }}</h5>
+            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.stage') }) }}</h5>
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
           <div class="modal-body">
-            <RecordForm v-if="travel" ref="recordForm" :mode="modalMode" :record="modalRecord"
-              :askStayCost="!travel.claimOvernightLumpSum" :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate" :disabled="isReadOnly" @add="postRecord" @edit="postRecord"
-              @deleted="deleteRecord" @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
-            </RecordForm>
+            <StageForm v-if="travel" ref="stageForm" :mode="modalMode" :stage="modalStage"
+              :travelStartDate="travel.startDate" :travelEndDate="travel.endDate" :disabled="isReadOnly" @add="postStage"
+              @edit="postStage" @deleted="deleteStage" @cancel="hideModal" @deleteReceipt="deleteReceipt"
+              @showReceipt="showReceipt">
+            </StageForm>
           </div>
         </div>
       </div>
@@ -64,32 +64,32 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-8 col-12">
+        <div class="col-lg-9 col-12">
           <div class="row mb-2">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)"
                 :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.record') }) }}</span>
+                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
               </button>
             </div>
             <div class="col-auto">
               <button class="btn btn-link btn-sm" @click="travel.days.map(d => d.showSettings = true)"
-                :disabled="travel.records.length == 0">
+                :disabled="travel.stages.length == 0">
                 {{ $t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
               </button>
             </div>
             <div class="col-auto">
               <button class="btn btn-link btn-sm" @click="travel.days.map(d => d.showSettings = false)"
-                :disabled="travel.records.length == 0">
+                :disabled="travel.stages.length == 0">
                 {{ $t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
               </button>
             </div>
           </div>
-          <div v-if="travel.records.length == 0" class="alert alert-light" role="alert">
-            {{ $t('alerts.noRecordsPresent') }}
+          <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">
+            {{ $t('alerts.noStagesPresent') }}
           </div>
 
           <div v-for="row of table" class="mb-2" :key="row.data._id">
@@ -109,13 +109,13 @@
                       <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary"
                         :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                         <i class="bi bi-sun"></i>
-                        {{ $root.moneyString(refund.refund) }}
+                        {{ getMoneyString(refund.refund) }}
                       </div>
                       <!-- overnight -->
                       <div v-else class="col-auto text-secondary"
                         :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                         <i class="bi bi-moon"></i>
-                        {{ $root.moneyString(refund.refund) }}
+                        {{ getMoneyString(refund.refund) }}
                       </div>
                     </template>
                   </template>
@@ -157,18 +157,13 @@
               </div>
 
             </div>
-            <!-- Record -->
+            <!-- Stage -->
             <div v-else class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
               @click="showModal('edit', row.data)">
               <div class="col-auto fs-3">
-                <i :class="getRecordIcon(row.data)"></i>
+                <i :class="getStageIcon(row.data)"></i>
               </div>
-              <!-- Stay -->
-              <div v-if="row.data.type == 'stay'" class="col">
-                <PlaceElement :place="row.data.location" :showCountry="false"></PlaceElement>
-              </div>
-              <!-- Route -->
-              <div v-else class="col">
+              <div class="col">
                 <PlaceElement :place="row.data.startLocation"
                   :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
                 <i class="bi bi-arrow-right mx-2"></i>
@@ -179,7 +174,7 @@
             <!-- Date -->
             <div v-if="row.gap" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.gapRecord)" style="border-radius: 50%;">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.gapStage)" style="border-radius: 50%;">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -194,28 +189,33 @@
                 <table class="table">
                   <tbody>
                     <tr>
-                      <th>{{$t('labels.progress')}}</th>
-                      <td>{{ travel.progress + ' %' }}</td>
+                      <th>{{ $t('labels.progress') }}</th>
+                      <td class="text-end">{{ travel.progress + ' %' }}</td>
+                    </tr>
+                    <!-- baseCurrency -->
+                    <tr>
+                      <td><small>{{ $t('labels.lumpSums') }}</small></td>
+                      <td class="text-end"><small>{{ getMoneyString(getRefunds(['overnight', 'catering8', 'catering24'])) }}</small></td>
                     </tr>
                     <tr>
-                      <td><small>{{$t('labels.lumpSums')}}</small></td>
-                      <td><small>{{ getRefunds(['overnight', 'catering8', 'catering24']) }}</small></td>
+                      <td><small>{{ $t('labels.expences') }}</small></td>
+                      <td class="text-end"><small>{{ getMoneyString(getRefunds(['expence'])) }}</small></td>
+                    </tr>
+                    <tr v-if="travel.advance.amount > 0">
+                      <td class="text-secondary"><small>{{ $t('labels.advance') }}</small></td>
+                      <td class="text-end text-secondary"><small>{{ getMoneyString(travel.advance, true, (x) => 0 - x) }}</small></td>
                     </tr>
                     <tr>
-                      <td><small>{{$t('labels.expences')}}</small></td>
-                      <td><small>{{ getRefunds(['expence']) }}</small></td>
-                    </tr>
-                    <tr>
-                      <th>{{$t('labels.total')}}</th>
-                      <td>{{ getRefunds() }}</td>
+                      <th>{{ $t('labels.total') }}</th>
+                      <td class="text-end">{{ getMoneyString(travel.advance, true, (x) => getRefunds().amount - x) }}</td>
                     </tr>
                   </tbody>
                 </table>
                 <button class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
-                :disabled="isReadOnly">
-                <i class="bi bi-pencil-square"></i>
-                <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-              </button>
+                  :disabled="isReadOnly || travel.stages.length < 1">
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -230,36 +230,37 @@
 <script>
 import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
-import RecordForm from './Forms/RecordForm.vue'
+import StageForm from './Forms/StageForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
+import { getMoneyString } from '../scripts.js'
 export default {
   name: 'TravelPage',
   data() {
     return {
       travel: undefined,
-      recordModal: undefined,
-      modalRecord: undefined,
+      stageModal: undefined,
+      modalStage: undefined,
       modalMode: 'add',
       table: [],
       configCateringRefund: false,
       isReadOnly: false
     }
   },
-  components: { StatePipeline, RecordForm, InfoPoint, PlaceElement },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement },
   props: { _id: { type: String }, readOnly: { type: Boolean, default: false }, parentPages: { type: Array }, endpointMiddleware: { type: String, default: '' } },
   methods: {
-    showModal(mode, record) {
-      this.modalRecord = record
+    showModal(mode, stage) {
+      this.modalStage = stage
       this.modalMode = mode
-      this.recordModal.show()
+      this.stageModal.show()
     },
     hideModal() {
-      this.recordModal.hide()
-      if (this.$refs.recordForm) {
-        this.$refs.recordForm.clear()
+      this.stageModal.hide()
+      if (this.$refs.stageForm) {
+        this.$refs.stageForm.clear()
       }
-      this.modalRecord = undefined
+      this.modalStage = undefined
     },
     async postTravelSettings() {
       const travel = {
@@ -281,103 +282,101 @@ export default {
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('travel/underExamination', {_id: this.travel._id})
+      const result = await this.$root.setter('travel/underExamination', { _id: this.travel._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
     },
-    async postRecord(record) {
+    async postStage(stage) {
       var headers = {}
-      if (record.cost.receipts) {
+      if (stage.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
       }
-      record.travelId = this.travel._id
-      const result = await this.$root.setter('travel/record', record, { headers })
+      stage.travelId = this.travel._id
+      const result = await this.$root.setter('travel/stage', stage, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteRecord(id) {
-      const result = await this.$root.deleter('travel/record', { id: id, travelId: this._id })
+    async deleteStage(id) {
+      const result = await this.$root.deleter('travel/stage', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteReceipt(id, recordId) {
-      const result = await this.$root.deleter('travel/record/receipt', { id: id, recordId: recordId, travelId: this._id })
+    async deleteReceipt(id, stageId) {
+      const result = await this.$root.deleter('travel/stage/receipt', { id: id, stageId: stageId, travelId: this._id })
       if (result) {
         await this.getTravel()
       }
     },
-    async showReceipt(id, recordId) {
-      const result = await this.$root.getter(this.endpointMiddleware + 'travel/record/receipt', { id: id, recordId: recordId, travelId: this._id }, { responseType: 'blob' })
+    async showReceipt(id, stageId) {
+      const result = await this.$root.getter(this.endpointMiddleware + 'travel/stage/receipt', { id: id, stageId: stageId, travelId: this._id }, { responseType: 'blob' })
       if (result) {
         const fileURL = URL.createObjectURL(result);
         window.open(fileURL)
       }
     },
-    getRecordIcon(record) {
+    getStageIcon(stage) {
       var icon = null
-      if (record.type == 'stay') {
-        icon = 'bi bi-house'
-      } else {
-        if (record.transport == 'ownCar') {
-          icon = 'bi bi-car-front'
-        } else if (record.transport == 'airplane') {
-          icon = 'bi bi-airplane'
-        } else if (record.transport == 'shipOrFerry') {
-          icon = 'bi bi-water'
-        } else if (record.transport == 'otherTransport') {
-          icon = 'bi bi-train-front'
-        }
+      if (stage.transport == 'ownCar') {
+        icon = 'bi bi-car-front'
+      } else if (stage.transport == 'airplane') {
+        icon = 'bi bi-airplane'
+      } else if (stage.transport == 'shipOrFerry') {
+        icon = 'bi bi-water'
+      } else if (stage.transport == 'otherTransport') {
+        icon = 'bi bi-train-front'
       }
       return icon
     },
-    getRefunds(types = ['overnight', 'catering8', 'catering24', 'expense']){
+    getRefunds(types = ['overnight', 'catering8', 'catering24', 'expense']) {
       var sum = 0
-      for(const day of this.travel.days){
-        for(const refund of day.refunds){
-          if(types.indexOf(refund.type) !== -1){
+      for (const day of this.travel.days) {
+        for (const refund of day.refunds) {
+          if (types.indexOf(refund.type) !== -1) {
             sum += refund.refund.amount
           }
         }
       }
-      return sum
+      // baseCurrency
+      return {amount: sum, currency: {_id: "EUR"}}
     },
     renderTable() {
       this.table = []
-      var recordIndex = 0;
+      var stageIndex = 0;
       for (var i = 0; i < this.travel.days.length; i++) {
-        var recordsStart = recordIndex
-        while (recordIndex < this.travel.records.length && i < this.travel.days.length - 1 && new Date(this.travel.days[i + 1].date).valueOf() - new Date(this.travel.records[recordIndex].startDate).valueOf() > 0) {
-          recordIndex++
+        var stagesStart = stageIndex
+        while (stageIndex < this.travel.stages.length && i < this.travel.days.length - 1 && new Date(this.travel.days[i + 1].date).valueOf() - new Date(this.travel.stages[stageIndex].startDate).valueOf() > 0) {
+          stageIndex++
         }
-        var recordsEnd = recordIndex
+        var stagesEnd = stageIndex
         if (i == this.travel.days.length - 1) {
-          recordsEnd = this.travel.records.length - 1
+          stagesEnd = this.travel.stages.length
         }
         this.table.push({ type: 'day', data: this.travel.days[i] })
-        for (const record of this.travel.records.slice(recordsStart, recordsEnd)) {
-          this.table.push({ type: 'record', data: record })
+        for (const stage of this.travel.stages.slice(stagesStart, stagesEnd)) {
+          this.table.push({ type: 'stage', data: stage })
         }
       }
     },
     async getTravel() {
-      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, records: true, days: true })).data
+      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, days: true })).data
       this.isReadOnly = this.readOnly || ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
       this.renderTable()
-    }
+    },
+    getMoneyString
   },
   async beforeMount() {
     await this.$root.load()
     await this.getTravel()
   },
   mounted() {
-    this.recordModal = new Modal(document.getElementById('recordModal'), {})
+    this.stageModal = new Modal(document.getElementById('stageModal'), {})
   },
   watch: {
     // travel: function () {

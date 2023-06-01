@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const settings = require('../settings')
-
 
 const currencySchema = new mongoose.Schema({
   name: {
@@ -12,10 +10,5 @@ const currencySchema = new mongoose.Schema({
   symbol: { type: String, trim: true },
   flag: { type: String }
 })
-
-currencySchema.methods.convert = function (amount, to = settings.baseCurrency) {
-  // To do
-  return amount
-},
 
 module.exports = mongoose.model('Currency', currencySchema)

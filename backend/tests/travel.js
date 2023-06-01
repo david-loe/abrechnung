@@ -19,8 +19,7 @@ async function getTestTravel() {
       currency: 'EUR',
     },
     claimOvernightLumpSum: true,
-    records: [{
-      type: 'route',
+    stages: [{
       startDate: new Date(),
       endDate: new Date(new Date().getTime() + 3 * 60 * 60 * 1000),
       transport: 'airplane',
