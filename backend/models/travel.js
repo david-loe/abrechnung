@@ -43,8 +43,9 @@ const travelSchema = new mongoose.Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   advance: costObject(true, false),
-  professionalShare: { type: Number, min: 0.5, max: 0.8 },
+  professionalShare: { type: Number, min: 0, max: 1},
   claimOvernightLumpSum: { type: Boolean, default: true },
+  claimSpouseRefund: { type: Boolean, default: false },
   progress: { type: Number, min: 0, max: 100, default: 0 },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
@@ -58,6 +59,11 @@ const travelSchema = new mongoose.Schema({
     transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'], required: true },
     cost: costObject(true, true),
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
+  }],
+  expences: [{
+    description: {type: String, required: true},
+    cost: costObject(true, true, true),
+    purpose: { type: String, enum: ['professional', 'mixed'] },
   }],
   days: [{
     date: { type: Date, required: true },
@@ -204,6 +210,9 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
 
       result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: settings.baseCurrency }
+      if(settings.allowSpouseRefund && this.claimSpouseRefund){
+        result.refund.amount *= 2
+      }
       day.refunds.push(result)
     }
   }
@@ -222,7 +231,6 @@ travelSchema.methods.addOvernightRefunds = async function () {
         while (stageIndex < this.stages.length - 1 && (this.stages[stageIndex].type != 'route' || midnight - new Date(this.stages[stageIndex].endDate).valueOf() > 0)) {
           stageIndex++
         }
-        console.log(stageIndex)
         if (midnight - new Date(this.stages[stageIndex].startDate).valueOf() > 0 &&
           new Date(this.stages[stageIndex].endDate).valueOf() - midnight > 0) {
           continue
@@ -230,6 +238,9 @@ travelSchema.methods.addOvernightRefunds = async function () {
         const result = { type: 'overnight' }
         var amount = (await day.country.getLumpSum(day.date))[result.type]
         result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: settings.baseCurrency }
+        if(settings.allowSpouseRefund && this.claimSpouseRefund){
+          result.refund.amount *= 2
+        }
         day.refunds.push(result)
       }
     }
@@ -269,10 +280,25 @@ travelSchema.methods.calculateExchangeRates = async function () {
   }
 }
 
+travelSchema.methods.calculateProfessionalShare = function () {
+  if(this.days.length > 0){
+    var professionalDays = 0
+    for(const day of this.days){
+      if(day.purpose === 'professional'){
+        professionalDays += 1
+      }
+    }
+    this.professionalShare = professionalDays / this.days.length
+  }else{
+    this.professionalShare = null
+  }
+}
+
 travelSchema.pre('save', async function (next) {
   await populate(this)
   this.calculateProgress()
   this.calculateDays()
+  this.calculateProfessionalShare()
   await this.addCountriesToDays()
   await this.addCateringRefunds()
   await this.addOvernightRefunds()

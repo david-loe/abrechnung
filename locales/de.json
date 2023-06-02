@@ -73,6 +73,7 @@
     "shipOrFerry": "Schiff oder Fähre 🚢",
     "distance": "Entfernung [km]",
     "claimOvernightLumpSum": "Übernachtungspauschalen beanspruchen",
+    "claimSpouseRefund": "Ehepartner mitabrechnen",
     "professionalShare": "Beruflicher Anteil",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
     "cateringNoRefund": "Verpflegungspauschalen Kürzung",
@@ -95,7 +96,10 @@
     "lumpSums": "Pauschalen",
     "expences": "Auslagen",
     "total": "Gesamt",
-    "toExamination": "Zum Prüfen"
+    "toExamination": "Zum Prüfen",
+    "readOnly": "Schreibgeschützt",
+    "refund": "Erstatten",
+    "invoiceDate": "Rechnungsdatum"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -127,6 +131,7 @@
     "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?",
     "professionalShare": "Wenn deine Reise teilweise auch private Zwecke erfüllt, gib hier den beruflichen Anteil an.",
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
+    "claimSpouseRefund": "Wenn du gemeinsam mit deinem Ehepartner unterwegs warst und er auch erstattungsberechtigt ist, kannst du ihn mitabrechnen.",
     "cost": "Trage hier die Kosten ein.",
     "receipts": "Lade hier die entsprechenden Belege hoch.",
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",

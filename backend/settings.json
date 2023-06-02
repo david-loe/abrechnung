@@ -8,5 +8,6 @@
     "lunchCateringLumpSumCut": 0.4,
     "dinnerCateringLumpSumCut": 0.4,
     "toleranceStageDatesToApprovedTravelDates": 3,
-    "baseCurrency": {"_id": "EUR", "symbol": "€"}
+    "baseCurrency": {"_id": "EUR", "symbol": "€"},
+    "allowSpouseRefund": true
 }

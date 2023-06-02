@@ -73,6 +73,7 @@
     "shipOrFerry": "Ship or ferry 🚢",
     "distance": "Distance [km]",
     "claimOvernightLumpSum": "Claim overnight lump sum",
+    "claimSpouseRefund": "Refund Spouse",
     "professionalShare": "Professional share",
     "configCateringRefund": "Config catering refund",
     "cateringNoRefund": "Catering refund cut",
@@ -95,7 +96,10 @@
     "lumpSums": "Lump sums",
     "expences": "Expences",
     "total": "Total",
-    "toExamination": "To Examination"
+    "toExamination": "To Examination",
+    "readOnly": "Read only",
+    "refund": "Refund",
+    "invoiceDate": "Date of invoice"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
@@ -127,6 +131,7 @@
     "travelInsideOfEU": "Is your trip a cross-country trip within the EU?",
     "professionalShare": "If your travel is partly for personal purposes, enter the professional share here.",
     "claimOvernightLumpSum": "You can either claim overnight per diems and account for the actual cost of overnight accommodations.",
+    "claimSpouseRefund": "If you traveled with your spouse and they are also eligible for a refund, you can claim them as well.",
     "cost": "Enter the cost here.",
     "receipts": "Upload the corresponding receipts here.",
     "purpose": "Specify which purpose this stage served.",

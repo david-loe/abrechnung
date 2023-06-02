@@ -92,6 +92,7 @@ router.post('/travel', async (req, res) => {
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
+  delete req.body.professionalShare
 
   const check = async (oldObject) => {
     return oldObject.state !== 'refunded'
@@ -99,188 +100,207 @@ router.post('/travel', async (req, res) => {
   return helper.setter(Travel, 'traveler', false, check)(req, res)
 })
 
-router.post('/travel/stage', fileHandler.any(), async (req, res) => {
-  console.log(req.body)
-  if(req.body.cost && req.body.cost.receipts && req.files){
-    for(var i = 0; i < req.body.cost.receipts.length; i++){
-      var buffer = null
-      for(const file of req.files){
-        if(file.fieldname == 'cost[receipts][' + i + '][data]'){
-          buffer = file.buffer
+function postRecord(recordType) {
+  return async (req, res) => {
+    if(req.body.cost && req.body.cost.receipts && req.files){
+      for(var i = 0; i < req.body.cost.receipts.length; i++){
+        var buffer = null
+        for(const file of req.files){
+          if(file.fieldname == 'cost[receipts][' + i + '][data]'){
+            buffer = file.buffer
+            break
+          }
+        }
+        if(buffer){
+          req.body.cost.receipts[i].data = buffer
+        }
+      }
+    }
+    const travel = await Travel.findOne({ _id: req.body.travelId })
+    delete req.body.travelId
+    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+      return res.sendStatus(403)
+    }
+    if (req.body._id && req.body._id !== '') {
+      var found = false
+      outer_loop:
+      for (const record of travel[recordType]) {
+        if (record._id.equals(req.body._id)) {
+          if(req.body.cost && req.body.cost.receipts && req.files){
+            for(var i = 0; i < req.body.cost.receipts.length; i++){
+              if(req.body.cost.receipts[i]._id){
+                var foundReceipt = false
+                for(const oldReceipt of record.cost.receipts){
+                  if(oldReceipt._id.equals(req.body.cost.receipts[i]._id)){
+                    foundReceipt = true
+                  }
+                }
+                if(!foundReceipt){
+                break outer_loop
+                }
+                await File.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
+              }else{
+                var result = await (new File(req.body.cost.receipts[i])).save()
+                req.body.cost.receipts[i] = result._id
+              }
+            }
+            travel.markModified(recordType + '.cost.receipts')
+          }
+          found = true
+          Object.assign(record, req.body)
           break
         }
       }
-      if(buffer){
-        req.body.cost.receipts[i].data = buffer
+      if (!found) {
+        return res.sendStatus(403)
       }
+    } else {
+      if(req.body.cost && req.body.cost.receipts && req.files){
+        for(var i = 0; i < req.body.cost.receipts.length; i++){
+          var result = await (new File(req.body.cost.receipts[i])).save()
+          req.body.cost.receipts[i] = result._id
+        }
+        travel.markModified(recordType + '.cost.receipts')
+      }
+      travel[recordType].push(req.body)
+    }
+    travel[recordType].sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+    travel.markModified(recordType)
+    try {
+      const result1 = await travel.save()
+      res.send({ message: i18n.t('alerts.successSaving'), result: result1 })
+    } catch (error) {
+      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
     }
   }
-  const travel = await Travel.findOne({ _id: req.body.travelId })
-  delete req.body.travelId
-  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
-    return res.sendStatus(403)
+}
+
+router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
+router.post('/travel/expence', fileHandler.any(), postRecord('expences'))
+
+function deleteRecord(recordType){
+  return async (req, res) => {
+    const travel = await Travel.findOne({ _id: req.query.travelId })
+    delete req.query.travelId
+    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+      return res.sendStatus(403)
+    }
+    if (req.query.id && req.query.id !== '') {
+      var found = false
+      for (var i = 0; i < travel[recordType].length; i++) {
+        if (travel[recordType][i]._id.equals(req.query.id)) {
+          found = true
+          if(travel[recordType][i].cost){
+            for(const receipt of travel[recordType][i].cost.receipts){
+              File.deleteOne({ _id: receipt._id })
+            }
+          }
+          travel[recordType].splice(i, 1)
+          break
+        }
+      }
+      if (!found) {
+        return res.sendStatus(403)
+      }
+    } else {
+      return res.status(400).send({ message: 'No ' + recordType.replace(/s$/, '') + ' found' })
+    }
+    travel.markModified(recordType)
+    try {
+      await travel.save()
+      res.send({ message: i18n.t('alerts.successDeleting') })
+    } catch (error) {
+      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+    }
   }
-  if (req.body._id && req.body._id !== '') {
-    var found = false
-    outer_loop:
-    for (const stage of travel.stages) {
-      if (stage._id.equals(req.body._id)) {
-        if(req.body.cost && req.body.cost.receipts && req.files){
-          for(var i = 0; i < req.body.cost.receipts.length; i++){
-            if(req.body.cost.receipts[i]._id){
-              var foundReceipt = false
-              for(const oldReceipt of stage.cost.receipts){
-                if(oldReceipt._id.equals(req.body.cost.receipts[i]._id)){
-                  foundReceipt = true
-                }
+}
+
+router.delete('/travel/stage', deleteRecord('stages'))
+router.delete('/travel/expence', deleteRecord('expences'))
+
+function getRecordReceipt(recordType) {
+  return async (req, res) => {
+    const travel = await Travel.findOne({ _id: req.query.travelId })
+    delete req.query.travelId
+    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+      return res.sendStatus(403)
+    }
+    if (req.query[recordType.replace(/s$/, '') + 'Id']) { // e.g. stageId
+      var found = false
+      outer_loop:
+      for (var i = 0; i < travel[recordType].length; i++) {
+        if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) { // e.g. stageId
+          if(travel[recordType][i].cost){
+            for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
+              if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
+                found = true
+                var file = await File.findOne({ _id: req.query.id })
+                res.setHeader('Content-Type', file.type);
+                res.setHeader('Content-Length', file.data.length);
+                return res.send(file.data)
               }
-              if(!foundReceipt){
-              break outer_loop
+            }
+          }
+        }
+      }
+      if (!found) {
+        return res.sendStatus(403)
+      }
+    } else {
+      return res.status(400).send({ message: 'No stage found' })
+    }
+  }
+}
+
+router.get('/travel/stage/receipt', getRecordReceipt('stages'))
+router.get('/travel/expence/receipt', getRecordReceipt('expences'))
+
+function deleteRecordReceipt(recordType) {
+  return async (req, res) => {
+    const travel = await Travel.findOne({ _id: req.query.travelId })
+    delete req.query.travelId
+    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+      return res.sendStatus(403)
+    }
+    if (req.query[recordType.replace(/s$/, '') + 'Id']) {
+      var found = false
+      outer_loop:
+      for (var i = 0; i < travel[recordType].length; i++) {
+        if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) {
+          if(travel[recordType][i].cost){
+            for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
+              if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
+                found = true
+                await File.deleteOne({ _id: req.query.id })
+                travel[recordType][i].cost.receipts.splice(r, 1)
+                break outer_loop
               }
-              await File.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
-            }else{
-              var result = await (new File(req.body.cost.receipts[i])).save()
-              req.body.cost.receipts[i] = result._id
-            }
-          }
-          travel.markModified('stages.cost.receipts')
-        }
-        found = true
-        Object.assign(stage, req.body)
-        break
-      }
-    }
-    if (!found) {
-      return res.sendStatus(403)
-    }
-  } else {
-    if(req.body.cost && req.body.cost.receipts && req.files){
-      for(var i = 0; i < req.body.cost.receipts.length; i++){
-        var result = await (new File(req.body.cost.receipts[i])).save()
-        req.body.cost.receipts[i] = result._id
-      }
-      travel.markModified('stages.cost.receipts')
-    }
-    travel.stages.push(req.body)
-  }
-  travel.stages.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-  travel.markModified('stages')
-  try {
-    const result1 = await travel.save()
-    res.send({ message: i18n.t('alerts.successSaving'), result: result1 })
-  } catch (error) {
-    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-  }
-})
-
-router.delete('/travel/stage', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.travelId })
-  delete req.query.travelId
-  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
-    return res.sendStatus(403)
-  }
-  if (req.query.id && req.query.id !== '') {
-    var found = false
-    for (var i = 0; i < travel.stages.length; i++) {
-      if (travel.stages[i]._id.equals(req.query.id)) {
-        found = true
-        if(travel.stages[i].cost){
-          for(const receipt of travel.stages[i].cost.receipts){
-            File.deleteOne({ _id: receipt._id })
-          }
-        }
-        travel.stages.splice(i, 1)
-        break
-      }
-    }
-    if (!found) {
-      return res.sendStatus(403)
-    }
-  } else {
-    return res.status(400).send({ message: 'No stage found' })
-  }
-  travel.markModified('stages')
-  try {
-    await travel.save()
-    res.send({ message: i18n.t('alerts.successDeleting') })
-  } catch (error) {
-    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-  }
-})
-
-router.get('/travel/stage/receipt', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.travelId })
-  delete req.query.travelId
-  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
-    return res.sendStatus(403)
-  }
-  if (req.query.stageId) {
-    var found = false
-    outer_loop:
-    for (var i = 0; i < travel.stages.length; i++) {
-      if (travel.stages[i]._id.equals(req.query.stageId)) {
-        if(travel.stages[i].cost){
-          for(var r = 0; r < travel.stages[i].cost.receipts.length; r++){
-            if(req.query.id && travel.stages[i].cost.receipts[r]._id.equals(req.query.id)){
-              found = true
-              var file = await File.findOne({ _id: req.query.id })
-              res.setHeader('Content-Type', file.type);
-              res.setHeader('Content-Length', file.data.length);
-              return res.send(file.data)
             }
           }
         }
       }
-    }
-    if (!found) {
-      return res.sendStatus(403)
-    }
-  } else {
-    return res.status(400).send({ message: 'No stage found' })
-  }
-})
-
-router.delete('/travel/stage/receipt', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.travelId })
-  delete req.query.travelId
-  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
-    return res.sendStatus(403)
-  }
-  if (req.query.stageId) {
-    var found = false
-    outer_loop:
-    for (var i = 0; i < travel.stages.length; i++) {
-      if (travel.stages[i]._id.equals(req.query.stageId)) {
-        if(travel.stages[i].cost){
-          for(var r = 0; r < travel.stages[i].cost.receipts.length; r++){
-            if(req.query.id && travel.stages[i].cost.receipts[r]._id.equals(req.query.id)){
-              found = true
-              await File.deleteOne({ _id: req.query.id })
-              travel.stages[i].cost.receipts.splice(r, 1)
-              break outer_loop
-            }
-          }
-        }
+      if (!found) {
+        return res.sendStatus(403)
       }
+    } else {
+      return res.status(400).send({ message: 'No ' + recordType.replace(/s$/, '') + ' found' })
     }
-    if (!found) {
-      return res.sendStatus(403)
+    travel.markModified(recordType)
+    try {
+      await travel.save()
+      res.send({ message: i18n.t('alerts.successDeleting') })
+    } catch (error) {
+      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
     }
-  } else {
-    return res.status(400).send({ message: 'No stage found' })
   }
-  travel.markModified('stages')
-  try {
-    await travel.save()
-    res.send({ message: i18n.t('alerts.successDeleting') })
-  } catch (error) {
-    res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-  }
-})
+}
+
+router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
+router.delete('/travel/expence/receipt', deleteRecordReceipt('expences'))
 
 router.post('/travel/appliedFor', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
@@ -290,6 +310,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
+  delete req.body.professionalShare
 
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'

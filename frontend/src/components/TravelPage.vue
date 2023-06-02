@@ -33,10 +33,27 @@
         </div>
         <div class="col-auto">
           <div class="dropdown">
-            <a class="nav-link link-dark" data-bs-toggle="dropdown" href="#" role="button">
+            <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
               <i class="bi bi-three-dots-vertical fs-3"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
+              <template v-if="endpointMiddleware === 'examine/'">
+                <li>
+                  <div class="p-1 ps-3">
+                    <div class="form-check form-switch form-check-reverse me-1">
+                      <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly">
+                      <label class="form-check-label text-nowrap" for="editTravel">
+                        <span class="me-1"><i class="bi bi-lock"></i></span>
+                        <span>{{ $t('labels.readOnly') }}</span>
+                      </label>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+              </template>
+
               <li>
                 <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#"
                   @click="isReadOnly ? null : deleteTravel()">
@@ -59,6 +76,16 @@
             <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
             }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
+          </div>
+        </div>
+        <!-- v-if="settings.allowSpouseRefund" -->
+        <div class="col-auto">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="travelClaimSpouseRefund"
+              v-model="travel.claimSpouseRefund" @change="postTravelSettings" :disabled="isReadOnly">
+            <label class="form-check-label" for="travelClaimSpouseRefund">{{ $t('labels.claimSpouseRefund')
+            }}</label>
+            <InfoPoint class="ms-1" :text="$t('info.claimSpouseRefund')" />
           </div>
         </div>
       </div>
@@ -107,13 +134,13 @@
                     <template v-for="refund of row.data.refunds" :key="refund._id">
                       <!-- catering -->
                       <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary"
-                        :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                         <i class="bi bi-sun"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
                       <!-- overnight -->
                       <div v-else class="col-auto text-secondary"
-                        :title="$t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
                         <i class="bi bi-moon"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -186,16 +213,17 @@
             <div class="card-body">
               <h5 class="card-title">{{ $t('labels.summary') }}</h5>
               <div>
-                <table class="table">
+                <table class="table align-bottom">
                   <tbody>
                     <tr>
                       <th>{{ $t('labels.progress') }}</th>
-                      <td class="text-end">{{ travel.progress + ' %' }}</td>
+                      <td class="text-end"><ProgressCircle :progress="travel.progress"></ProgressCircle></td>
                     </tr>
                     <!-- baseCurrency -->
                     <tr>
                       <td><small>{{ $t('labels.lumpSums') }}</small></td>
-                      <td class="text-end"><small>{{ getMoneyString(getRefunds(['overnight', 'catering8', 'catering24'])) }}</small></td>
+                      <td class="text-end"><small>{{ getMoneyString(getRefunds(['overnight', 'catering8', 'catering24']))
+                      }}</small></td>
                     </tr>
                     <tr>
                       <td><small>{{ $t('labels.expences') }}</small></td>
@@ -203,7 +231,8 @@
                     </tr>
                     <tr v-if="travel.advance.amount > 0">
                       <td class="text-secondary"><small>{{ $t('labels.advance') }}</small></td>
-                      <td class="text-end text-secondary"><small>{{ getMoneyString(travel.advance, true, (x) => 0 - x) }}</small></td>
+                      <td class="text-end text-secondary"><small>{{ getMoneyString(travel.advance, true, (x) => 0 - x)
+                      }}</small></td>
                     </tr>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
@@ -211,10 +240,19 @@
                     </tr>
                   </tbody>
                 </table>
-                <button class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
+                <div class="mb-3">
+                  <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
+                  <textarea class="form-control" id="comment" rows="1" v-model="travel.comment"
+                    :disabled="isReadOnly && endpointMiddleware !== 'examine/'"></textarea>
+                </div>
+                <button v-if="travel.state === 'approved'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
                   :disabled="isReadOnly || travel.stages.length < 1">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                </button>
+                <button v-else-if="endpointMiddleware === 'examine/'" class="btn btn-success" @click="refund()">
+                  <i class="bi bi-coin"></i>
+                  <span class="ms-1">{{ $t('labels.refund') }}</span>
                 </button>
               </div>
             </div>
@@ -230,6 +268,7 @@
 <script>
 import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
+import ProgressCircle from './Elements/ProgressCircle.vue'
 import StageForm from './Forms/StageForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
@@ -247,8 +286,8 @@ export default {
       isReadOnly: false
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement },
-  props: { _id: { type: String }, readOnly: { type: Boolean, default: false }, parentPages: { type: Array }, endpointMiddleware: { type: String, default: '' } },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle },
+  props: { _id: { type: String }, parentPages: { type: Array }, endpointMiddleware: { type: String, default: '' } },
   methods: {
     showModal(mode, stage) {
       this.modalStage = stage
@@ -266,6 +305,7 @@ export default {
       const travel = {
         _id: this.travel._id,
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
+        claimSpouseRefund: this.travel.claimSpouseRefund,
         days: this.travel.days
       }
       const result = await this.$root.setter('travel', travel)
@@ -282,9 +322,15 @@ export default {
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('travel/underExamination', { _id: this.travel._id })
+      const result = await this.$root.setter('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
       if (result) {
         this.$router.push({ path: '/' })
+      }
+    },
+    async refund() {
+      const result = await this.$root.setter('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
+      if (result) {
+        this.$router.push({ path: '/examine' })
       }
     },
     async postStage(stage) {
@@ -308,14 +354,18 @@ export default {
         this.hideModal()
       }
     },
-    async deleteReceipt(id, stageId) {
-      const result = await this.$root.deleter('travel/stage/receipt', { id: id, stageId: stageId, travelId: this._id })
+    async deleteReceipt(id, recordId, recordType) {
+      const params = { id: id, travelId: this._id }
+      params[recordType + 'Id'] = recordId
+      const result = await this.$root.deleter('travel/' + recordType + '/receipt', params)
       if (result) {
         await this.getTravel()
       }
     },
-    async showReceipt(id, stageId) {
-      const result = await this.$root.getter(this.endpointMiddleware + 'travel/stage/receipt', { id: id, stageId: stageId, travelId: this._id }, { responseType: 'blob' })
+    async showReceipt(id, recordId, recordType) {
+      const params = { id: id, travelId: this._id }
+      params[recordType + 'Id'] = recordId
+      const result = await this.$root.getter(this.endpointMiddleware + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
       if (result) {
         const fileURL = URL.createObjectURL(result);
         window.open(fileURL)
@@ -344,7 +394,7 @@ export default {
         }
       }
       // baseCurrency
-      return {amount: sum, currency: {_id: "EUR"}}
+      return { amount: sum, currency: { _id: "EUR" } }
     },
     renderTable() {
       this.table = []
@@ -366,14 +416,15 @@ export default {
     },
     async getTravel() {
       this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, days: true })).data
-      this.isReadOnly = this.readOnly || ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
       this.renderTable()
+      console.log(this.travel.professionalShare)
     },
     getMoneyString
   },
   async beforeMount() {
     await this.$root.load()
     await this.getTravel()
+    this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
   },
   mounted() {
     this.stageModal = new Modal(document.getElementById('stageModal'), {})

@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="disabled ? null : (mode === 'add' ? $emit('add', output()) : $emit('edit', output()))">
-    
+
     <div class="row mb-3">
       <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}</label>
-        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formStage.startDate"
-          :min="minDate" :max="maxDate" :disabled="disabled" required />
+        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formStage.startDate" :min="minDate"
+          :max="maxDate" :disabled="disabled" required />
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.arrival')
@@ -16,45 +16,48 @@
     </div>
 
 
-      <div class="row mb-3">
-        <div class="col">
-          <label for="stageFormStartLocation" class="form-label">
-            {{ $t('labels.startLocation') }}
+    <div class="row mb-3">
+      <div class="col">
+        <label for="stageFormStartLocation" class="form-label">
+          {{ $t('labels.startLocation') }}
+        </label>
+        <PlaceInput id="stageFormStartLocation" v-model="formStage.startLocation" :disabled="disabled" :required="true">
+        </PlaceInput>
+      </div>
+      <div class="col">
+        <label for="stageFormEndLocation" class="form-label">
+          {{ $t('labels.endLocation') }}
+        </label>
+        <PlaceInput id="stageFormEndLocation" v-model="formStage.endLocation" :disabled="disabled" :required="true">
+        </PlaceInput>
+      </div>
+    </div>
+
+    <label for="stageFormTransport" class="form-label">
+      {{ $t('labels.transport') }}
+    </label>
+    <select class="form-select mb-3" v-model="formStage.transport" id="stageFormTransport" :disabled="disabled" required>
+      <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
+        :key="transport">{{ $t('labels.' + transport) }}</option>
+    </select>
+
+    <template v-if="formStage.midnightCountries.length > 0">
+      <label for="stageFormMidnightCountries" class="form-label me-2">
+        {{ $t('labels.midnightCountries') }}
+      </label>
+      <InfoPoint :text="$t('info.midnightCountries')" />
+      <div class="row mb-3" id="stageFormMidnightCountries">
+        <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date">
+          <label for="stageFormLocation" class="form-label">
+            {{ $root.datetoDateString(midnightCountry.date) }}
+            {{ $t('labels.midnight') }}
           </label>
-          <PlaceInput id="stageFormStartLocation" v-model="formStage.startLocation" :disabled="disabled" :required="true"></PlaceInput>
-        </div>
-        <div class="col">
-          <label for="stageFormEndLocation" class="form-label">
-            {{ $t('labels.endLocation') }}
-          </label>
-          <PlaceInput id="stageFormEndLocation" v-model="formStage.endLocation" :disabled="disabled" :required="true"></PlaceInput>
+          <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled"
+            :required="true">
+          </CountrySelector>
         </div>
       </div>
-
-      <label for="stageFormTransport" class="form-label">
-        {{ $t('labels.transport') }}
-      </label>
-      <select class="form-select mb-3" v-model="formStage.transport" id="stageFormTransport" :disabled="disabled" required>
-        <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
-          :key="transport">{{ $t('labels.' + transport) }}</option>
-      </select>
-
-      <template v-if="formStage.midnightCountries.length > 0">
-        <label for="stageFormMidnightCountries" class="form-label me-2">
-          {{ $t('labels.midnightCountries') }}
-        </label>
-        <InfoPoint :text="$t('info.midnightCountries')" />
-        <div class="row mb-3" id="stageFormMidnightCountries">
-          <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date">
-            <label for="stageFormLocation" class="form-label">
-              {{ $root.datetoDateString(midnightCountry.date) }}
-              {{ $t('labels.midnight') }}
-            </label>
-            <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled" :required="true">
-            </CountrySelector>
-          </div>
-        </div>
-      </template>
+    </template>
 
 
     <template v-if="formStage.transport == 'ownCar'">
@@ -62,26 +65,35 @@
         <label for="stageFormDistance" class="form-label">
           {{ $t('labels.distance') }}
         </label>
-        <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled" required />
+        <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled"
+          required />
       </div>
     </template>
 
-    <template
-      v-if="formStage.transport !== 'ownCar'">
-      <label for="stageFormCost" class="form-label me-2">
-        {{ $t('labels.cost') }}
-      </label>
-      <InfoPoint :text="$t('info.cost')" />
-      <div class="input-group mb-2" id="stageFormCost">
-        <input type="number" class="form-control" v-model="formStage.cost.amount" min="0" :disabled="disabled" />
-        <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+    <template v-if="formStage.transport !== 'ownCar'">
+      <div class="row mb-2">
+        <div class="col">
+          <label for="stageFormCost" class="form-label me-2">
+            {{ $t('labels.cost') }}
+          </label>
+          <InfoPoint :text="$t('info.cost')" />
+          <div class="input-group" id="stageFormCost">
+            <input type="number" class="form-control" v-model="formStage.cost.amount" min="0" :disabled="disabled" />
+            <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+          </div>
+        </div>
+        <div class="col">
+          <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}</label>
+          <input id="endDateInput" class="form-control" type="date" v-model="formStage.cost.date" :required="Boolean(formStage.cost.amount)" :disabled="disabled" />
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="stageFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
         <InfoPoint :text="$t('info.receipts')" />
-        <FileUpload id="stageFormFile" v-model="formStage.cost.receipts" :disabled="disabled" :required="Boolean(formStage.cost.amount)"
-          @deleteFile="(id) => $emit('deleteReceipt', id, stage._id)"
-          @showFile="(id) => $emit('showReceipt', id, stage._id)" />
+        <FileUpload id="stageFormFile" v-model="formStage.cost.receipts" :disabled="disabled"
+          :required="Boolean(formStage.cost.amount)" @deleteFile="(id) => $emit('deleteReceipt', id, stage._id, 'stage')"
+          @showFile="(id) => $emit('showReceipt', id, stage._id, 'stage')" />
       </div>
     </template>
 
@@ -102,7 +114,8 @@
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit' && !disabled">
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit' && !disabled" @click="disabled ? null : $emit('deleted', formStage._id)">
+      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit' && !disabled"
+        @click="disabled ? null : $emit('deleted', formStage._id)">
         {{ $t('labels.delete') }}
       </button>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
@@ -126,12 +139,12 @@ const defaultStage = {
   endLocation: undefined,
   midnightCountries: [],
   distance: null,
-  location: undefined,
   transport: 'otherTransport',
   cost: {
     amount: null,
     currency: 'EUR',
     receipts: [],
+    date: ''
   },
   purpose: 'professional',
 }
@@ -198,13 +211,15 @@ export default {
     },
     output() {
       const output = structuredClone(this.formStage)
-      
+
       if (!this.showMidnightCountries()) {
         delete output.midnightCountries
       }
       output.startDate = this.$root.htmlInputStringToDateTime(output.startDate)
       output.endDate = this.$root.htmlInputStringToDateTime(output.endDate)
-      console.log(output)
+      if(output.cost.date){
+        output.cost.date = new Date(output.cost.date)
+      }
       return output
     },
     input() {
@@ -214,6 +229,7 @@ export default {
       const input = Object.assign({}, structuredClone(defaultStage), this.stage)
       input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)
+      input.cost.date = this.$root.dateToHTMLInputString(input.cost.date)
       return input
     },
   },
