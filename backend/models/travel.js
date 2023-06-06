@@ -75,7 +75,7 @@ const travelSchema = new mongoose.Schema({
     },
     purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
     refunds: [{
-      type: { type: String, enum: ['overnight', 'catering8', 'catering24', 'expense'], required: true },
+      type: { type: String, enum: ['overnight', 'catering8', 'catering24'], required: true },
       refund: costObject(true, false, true)
     }]
   }],
@@ -85,6 +85,7 @@ function populate(doc) {
   return Promise.allSettled([
     doc.populate({ path: 'advance.currency', model: 'Currency' }),
     doc.populate({ path: 'stages.cost.currency', model: 'Currency' }),
+    doc.populate({ path: 'expences.cost.currency', model: 'Currency' }),
     doc.populate({ path: 'days.refunds.refund.currency', model: 'Currency' }),
     doc.populate({ path: 'destinationPlace.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
@@ -92,6 +93,7 @@ function populate(doc) {
     doc.populate({ path: 'stages.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'expences.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
   ])
@@ -127,7 +129,7 @@ travelSchema.methods.calculateProgress = function () {
     if (stageLength >= approvedLength) {
       this.progress = 100
     } else {
-      this.progress = Math.round((stageLength / approvedLength) * 100) / 100
+      this.progress = Math.round((stageLength / approvedLength) * 100)
     }
   } else {
     this.progress = 0
@@ -260,23 +262,28 @@ async function exchange(costObject, date) {
 travelSchema.methods.calculateExchangeRates = async function () {
   const promiseList = []
   promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
-  for (const day of this.days) {
-    for (const refund of day.refunds) {
-      promiseList.push(exchange(refund.refund, day.date))
-    }
+  for(const stage of this.stages){
+    promiseList.push(exchange(stage.cost, stage.cost.date))
+  }
+  for(const expence of this.expences){
+    promiseList.push(exchange(expence.cost, expence.cost.date))
   }
   results = await Promise.allSettled(promiseList)
   if (results[0].status === 'fulfilled') {
     this.advance = results[0].value
   }
   var i = 1
-  for (const day of this.days) {
-    for (const refund of day.refunds) {
-      if (results[i].status === 'fulfilled') {
-        refund.refund = results[i].value
-      }
-      i++
+  for(const stage of this.stages){
+    if (results[i].status === 'fulfilled') {
+      stage.cost = results[i].value
     }
+    i++
+  }
+  for(const expence of this.expences){
+    if (results[i].status === 'fulfilled') {
+      expence.cost = results[i].value
+    }
+    i++
   }
 }
 

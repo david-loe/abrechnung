@@ -36,7 +36,7 @@ function getDayList(startDate, endDate) {
 function getMoneyString(money, useExchangeRate = true, func = (x) => x) {
   return (func(((useExchangeRate && money.exchangeRate) ? money.exchangeRate.amount : money.amount))).toLocaleString(undefined, {
     style: "currency",
-    currency: (useExchangeRate && money.exchangeRate) ? "EUR" : money.currency._id // baseCurrency
+    currency: (useExchangeRate && money.exchangeRate) ? "EUR" : (money.currency._id ? money.currency._id : money.currency) // baseCurrency
   })
 }
 

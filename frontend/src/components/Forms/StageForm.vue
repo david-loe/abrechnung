@@ -84,7 +84,7 @@
         </div>
         <div class="col">
           <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}</label>
-          <input id="endDateInput" class="form-control" type="date" v-model="formStage.cost.date" :required="Boolean(formStage.cost.amount)" :disabled="disabled" />
+          <input id="endDateInput" class="form-control" type="date" v-model="formStage.cost.date" :required="Boolean(formStage.cost.amount)" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
         </div>
       </div>
 

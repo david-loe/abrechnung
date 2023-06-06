@@ -5,7 +5,7 @@
       <label for="travelFormDescription" class="form-label">
         {{ $t('labels.description') }}
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpence.description" />
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpence.description" :disabled="disabled"/>
     </div>
 
     <div class="row mb-2">
@@ -22,7 +22,7 @@
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}</label>
         <input id="endDateInput" class="form-control" type="date" v-model="formExpence.cost.date"
-          :required="Boolean(formExpence.cost.amount)" :disabled="disabled" />
+          :required="Boolean(formExpence.cost.amount)" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
       </div>
     </div>
 

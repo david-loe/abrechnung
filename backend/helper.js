@@ -269,7 +269,10 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
 async function convertCurrency (date, amount, from, to = settings.baseCurrency._id){
   from = from.toLowerCase()
   to = to.toLowerCase()
-  dateStr = scripts.datetimeToDateString(date)
+  if(new Date(date) - new Date() > 0){
+    date = new Date()
+  }
+  const dateStr = scripts.datetimeToDateString(date)
   const baseURLs = ['https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/', 'https://raw.githubusercontent.com/fawazahmed0/currency-api/1/']
   const suffixs = ['.min.json', '.json']
   var rate = null

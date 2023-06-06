@@ -95,11 +95,13 @@
     "progress": "Fortschritt",
     "lumpSums": "Pauschalen",
     "expences": "Auslagen",
+    "expence": "Auslage",
     "total": "Gesamt",
     "toExamination": "Zum Prüfen",
     "readOnly": "Schreibgeschützt",
     "refund": "Erstatten",
-    "invoiceDate": "Rechnungsdatum"
+    "invoiceDate": "Rechnungsdatum",
+    "description": "Beschreibung"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

@@ -95,11 +95,13 @@
     "progress": "Progress",
     "lumpSums": "Lump sums",
     "expences": "Expences",
+    "expence": "Expence",
     "total": "Total",
     "toExamination": "To Examination",
     "readOnly": "Read only",
     "refund": "Refund",
-    "invoiceDate": "Date of invoice"
+    "invoiceDate": "Date of invoice",
+    "description": "Description"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
