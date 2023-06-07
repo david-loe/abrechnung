@@ -66,7 +66,7 @@ function getReceipt(){
 }
 
 router.get('/travel/stage/receipt', getReceipt())
-router.get('/travel/expence/receipt', getReceipt())
+router.get('/travel/expense/receipt', getReceipt())
 
 function postRecord(recordType) {
   return async (req, res) => {
@@ -144,7 +144,7 @@ function postRecord(recordType) {
 }
 
 router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
-router.post('/travel/expence', fileHandler.any(), postRecord('expences'))
+router.post('/travel/expense', fileHandler.any(), postRecord('expenses'))
 
 function deleteRecordReceipt(recordType) {
   return async (req, res) => {
@@ -187,6 +187,6 @@ function deleteRecordReceipt(recordType) {
 }
 
 router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
-router.delete('/travel/expence/receipt', deleteRecordReceipt('expences'))
+router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
 
 module.exports = router

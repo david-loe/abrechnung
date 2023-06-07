@@ -23,6 +23,7 @@
     "editX": "{X} bearbeiten",
     "applyForX": "{X} beantragen",
     "reapplyForX": "{X} neu beantragen",
+    "viewX": "{X} ansehen",
     "signIn": "Anmelden",
     "search": "Suchen",
     "image": "Bild",
@@ -94,8 +95,8 @@
     "summary": "Zusammenfassung",
     "progress": "Fortschritt",
     "lumpSums": "Pauschalen",
-    "expences": "Auslagen",
-    "expence": "Auslage",
+    "expenses": "Auslagen",
+    "expense": "Auslage",
     "total": "Gesamt",
     "toExamination": "Zum Prüfen",
     "readOnly": "Schreibgeschützt",
@@ -139,6 +140,36 @@
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
     "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab."
+  },
+  "mail" : {
+    "hi": "Hallo Zusammen,",
+    "hiX": "Hallo {X},",
+    "regards": "Beste Grüße",
+    "rejected": {
+      "subject": "❌ Reise abgelehnt",
+      "paragraph": "Dein Reiseantrag wurde abgelehnt.",
+      "lastParagraph": "{editor} schrieb: {comment}"
+    },
+    "appliedFor": {
+      "subject": "🆕 Neue Reise",
+      "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
+      "lastParagraph": ""
+    },
+    "approved": {
+      "subject": "✅ Reise genehmigt",
+      "paragraph": "Dein Reiseantrag wurde genehmigt.",
+      "lastParagraph": ""
+    },
+    "underExamination": {
+      "subject": "🛂 Reise zu prüfen",
+      "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
+      "lastParagraph": ""
+    },
+    "refunded": {
+      "subject": "💲 Reisekosten erstattet",
+      "paragraph": "Deine Reisekosten werden erstattet.",
+      "lastParagraph": ""
+    }
   },
   "login": {
     "signIn": "Bitte Anmelden"

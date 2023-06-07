@@ -8,6 +8,7 @@ const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
 const File = require('../models/file')
+const mail = require('../mail/mail')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -177,7 +178,7 @@ function postRecord(recordType) {
 }
 
 router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
-router.post('/travel/expence', fileHandler.any(), postRecord('expences'))
+router.post('/travel/expense', fileHandler.any(), postRecord('expenses'))
 
 function deleteRecord(recordType){
   return async (req, res) => {
@@ -218,7 +219,7 @@ function deleteRecord(recordType){
 }
 
 router.delete('/travel/stage', deleteRecord('stages'))
-router.delete('/travel/expence', deleteRecord('expences'))
+router.delete('/travel/expense', deleteRecord('expenses'))
 
 function getRecordReceipt(recordType) {
   return async (req, res) => {
@@ -256,7 +257,7 @@ function getRecordReceipt(recordType) {
 }
 
 router.get('/travel/stage/receipt', getRecordReceipt('stages'))
-router.get('/travel/expence/receipt', getRecordReceipt('expences'))
+router.get('/travel/expense/receipt', getRecordReceipt('expenses'))
 
 function deleteRecordReceipt(recordType) {
   return async (req, res) => {
@@ -300,7 +301,7 @@ function deleteRecordReceipt(recordType) {
 }
 
 router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
-router.delete('/travel/expence/receipt', deleteRecordReceipt('expences'))
+router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
 
 router.post('/travel/appliedFor', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
@@ -315,7 +316,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'
   }
-  return helper.setter(Travel, 'traveler', true, check)(req, res)
+  return helper.setter(Travel, 'traveler', true, check)(req, res, (req, res) => {mail.sendNotificationMail(req.body)})
 })
 
 router.post('/travel/underExamination', async (req, res) => {

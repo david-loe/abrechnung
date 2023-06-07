@@ -23,6 +23,7 @@
     "editX": "Edit {X}",
     "applyForX": "Apply for {X}",
     "reapplyForX": "Reapply for {X}",
+    "viewX": "View {X}",
     "signIn": "Sign in",
     "search": "Search",
     "image": "Image",
@@ -94,8 +95,8 @@
     "summary": "Summary",
     "progress": "Progress",
     "lumpSums": "Lump sums",
-    "expences": "Expences",
-    "expence": "Expence",
+    "expenses": "Expenses",
+    "expense": "Expense",
     "total": "Total",
     "toExamination": "To Examination",
     "readOnly": "Read only",
@@ -139,6 +140,36 @@
     "purpose": "Specify which purpose this stage served.",
     "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it."
+  },
+  "mail" : {
+    "hi": "Hi there,",
+    "hiX": "Hi {X},",
+    "regards": "Best Regards",
+    "rejected": {
+      "subject": "❌ Travel rejected",
+      "paragraph": "Your travel application got rejected.",
+      "lastParagraph": "{editor} wrote: '{comment}'"
+    },
+    "appliedFor": {
+      "subject": "🆕 New Travel",
+      "paragraph": "A new travel application from {traveler} just came in.",
+      "lastParagraph": ""
+    },
+    "approved": {
+      "subject": "✅ Travel approved",
+      "paragraph": "Your travel application got approved.",
+      "lastParagraph": ""
+    },
+    "underExamination": {
+      "subject": "🛂 Travel to examine",
+      "paragraph": "{traveler} has finished his travel expenses.",
+      "lastParagraph": ""
+    },
+    "refunded": {
+      "subject": "💲 Travel refunded",
+      "paragraph": "Your travel expenses get refunded.",
+      "lastParagraph": ""
+    }
   },
   "login": {
     "signIn": "Please sign in"

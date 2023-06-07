@@ -14,10 +14,10 @@
               @edit="postStage" @deleted="deleteStage" @cancel="hideModal" @deleteReceipt="deleteReceipt"
               @showReceipt="showReceipt">
             </StageForm>
-            <ExpenceForm v-else-if="modalObjectType === 'expence'" ref="expenceForm" :expence="modalObject" :disabled="isReadOnly" :mode="modalMode" @add="postExpence"
-              @edit="postExpence" @deleted="deleteExpence" @cancel="hideModal" @deleteReceipt="deleteReceipt"
+            <expenseForm v-else-if="modalObjectType === 'expense'" ref="expenseForm" :expense="modalObject" :disabled="isReadOnly" :mode="modalMode" @add="postExpense"
+              @edit="postExpense" @deleted="deleteExpense" @cancel="hideModal" @deleteReceipt="deleteReceipt"
               @showReceipt="showReceipt">
-            </ExpenceForm>
+            </expenseForm>
           </div>
         </div>
       </div>
@@ -105,10 +105,10 @@
               </button>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expence')"
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')"
                 :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expence') }) }}</span>
+                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
               </button>
             </div>
           </div>
@@ -211,9 +211,9 @@
                   :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
               </div>
             </div>
-            <!-- Expence -->
-            <div v-else-if="row.type === 'expence'" class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
-              @click="showModal('edit', row.data, 'expence')">
+            <!-- expense -->
+            <div v-else-if="row.type === 'expense'" class="row align-items-center ps-4 mb-1" style="cursor: pointer;"
+              @click="showModal('edit', row.data, 'expense')">
               <div class="col-auto fs-3">
                 <i class="bi bi-coin"></i>
               </div>
@@ -250,8 +250,8 @@
                       }}</small></td>
                     </tr>
                     <tr>
-                      <td><small>{{ $t('labels.expences') }}</small></td>
-                      <td class="text-end"><small>{{ getMoneyString(getExpencesSum()) }}</small></td>
+                      <td><small>{{ $t('labels.expenses') }}</small></td>
+                      <td class="text-end"><small>{{ getMoneyString(getExpensesSum()) }}</small></td>
                     </tr>
                     <tr v-if="travel.advance.amount > 0">
                       <td class="text-secondary"><small>{{ $t('labels.advance') }}</small></td>
@@ -260,7 +260,7 @@
                     </tr>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(travel.advance, true, (x) => getExpencesSum().amount + getLumpSumsSum().amount - x) }}</td>
+                      <td class="text-end">{{ getMoneyString(travel.advance, true, (x) => getExpensesSum().amount + getLumpSumsSum().amount - x) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -294,7 +294,7 @@ import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import ProgressCircle from './Elements/ProgressCircle.vue'
 import StageForm from './Forms/StageForm.vue'
-import ExpenceForm from './Forms/ExpenceForm.vue'
+import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
 import { getMoneyString } from '../scripts.js'
@@ -312,7 +312,7 @@ export default {
       isReadOnly: false
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenceForm },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, expenseForm },
   props: { _id: { type: String }, parentPages: { type: Array }, endpointMiddleware: { type: String, default: '' } },
   methods: {
     showModal(mode, object, type) {
@@ -326,8 +326,8 @@ export default {
       if (this.$refs.stageForm) {
         this.$refs.stageForm.clear()
       }
-      if (this.$refs.expenceForm) {
-        this.$refs.expenceForm.clear()
+      if (this.$refs.expenseForm) {
+        this.$refs.expenseForm.clear()
       }
       this.modalObject = undefined
     },
@@ -384,7 +384,7 @@ export default {
         this.hideModal()
       }
     },
-    async postExpence(stage) {
+    async postExpense(stage) {
       var headers = {}
       if (stage.cost.receipts) {
         headers = {
@@ -392,14 +392,14 @@ export default {
         }
       }
       stage.travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointMiddleware + 'travel/expence', stage, { headers })
+      const result = await this.$root.setter(this.endpointMiddleware + 'travel/expense', stage, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteExpence(id) {
-      const result = await this.$root.deleter(this.endpointMiddleware + 'travel/expence', { id: id, travelId: this._id })
+    async deleteExpense(id) {
+      const result = await this.$root.deleter(this.endpointMiddleware + 'travel/expense', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -445,16 +445,16 @@ export default {
       // baseCurrency
       return { amount: sum, currency: { _id: "EUR" } }
     },
-    getExpencesSum() {
+    getExpensesSum() {
       var sum = 0
       for (const stage of this.travel.stages){
         if(stage.cost && stage.cost.amount > 0){
           sum += stage.cost.exchangeRate ? stage.cost.exchangeRate.amount : stage.cost.amount
         }
       }
-      for (const expence of this.travel.expences){
-        if(expence.cost && expence.cost.amount > 0){
-          sum += expence.cost.exchangeRate ? expence.cost.exchangeRate.amount : expence.cost.amount
+      for (const expense of this.travel.expenses){
+        if(expense.cost && expense.cost.amount > 0){
+          sum += expense.cost.exchangeRate ? expense.cost.exchangeRate.amount : expense.cost.amount
         }
       }
       // baseCurrency
@@ -463,9 +463,9 @@ export default {
     renderTable() {
       this.table = []
       var stageIndex = 0;
-      for(const expence of this.travel.expences){
-        if(this.travel.days.length === 0 || expence.cost.date < this.travel.days[0].date){
-          this.table.push({type: 'expence', data: expence})
+      for(const expense of this.travel.expenses){
+        if(this.travel.days.length === 0 || expense.cost.date < this.travel.days[0].date){
+          this.table.push({type: 'expense', data: expense})
         }
       }
       for (var i = 0; i < this.travel.days.length; i++) {
@@ -478,9 +478,9 @@ export default {
           stagesEnd = this.travel.stages.length
         }
         this.table.push({ type: 'day', data: this.travel.days[i] })
-        for(const expence of this.travel.expences){
-          if(expence.cost.date == this.travel.days[i].date){
-            this.table.push({type: 'expence', data: expence})
+        for(const expense of this.travel.expenses){
+          if(expense.cost.date == this.travel.days[i].date){
+            this.table.push({type: 'expense', data: expense})
           }
         }
         for (const stage of this.travel.stages.slice(stagesStart, stagesEnd)) {
@@ -488,9 +488,9 @@ export default {
         }
       }
       if(this.travel.days.length !== 0){
-        for(const expence of this.travel.expences){
-          if(expence.cost.date > this.travel.days[this.travel.days.length - 1].date){
-            this.table.push({type: 'expence', data: expence})
+        for(const expense of this.travel.expenses){
+          if(expense.cost.date > this.travel.days[this.travel.days.length - 1].date){
+            this.table.push({type: 'expense', data: expense})
           }
         }
       }

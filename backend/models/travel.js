@@ -60,7 +60,7 @@ const travelSchema = new mongoose.Schema({
     cost: costObject(true, true),
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
   }],
-  expences: [{
+  expenses: [{
     description: {type: String, required: true},
     cost: costObject(true, true, true),
     purpose: { type: String, enum: ['professional', 'mixed'] },
@@ -85,7 +85,7 @@ function populate(doc) {
   return Promise.allSettled([
     doc.populate({ path: 'advance.currency', model: 'Currency' }),
     doc.populate({ path: 'stages.cost.currency', model: 'Currency' }),
-    doc.populate({ path: 'expences.cost.currency', model: 'Currency' }),
+    doc.populate({ path: 'expenses.cost.currency', model: 'Currency' }),
     doc.populate({ path: 'days.refunds.refund.currency', model: 'Currency' }),
     doc.populate({ path: 'destinationPlace.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
@@ -93,7 +93,7 @@ function populate(doc) {
     doc.populate({ path: 'stages.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expences.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'expenses.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
   ])
@@ -265,8 +265,8 @@ travelSchema.methods.calculateExchangeRates = async function () {
   for(const stage of this.stages){
     promiseList.push(exchange(stage.cost, stage.cost.date))
   }
-  for(const expence of this.expences){
-    promiseList.push(exchange(expence.cost, expence.cost.date))
+  for(const expense of this.expenses){
+    promiseList.push(exchange(expense.cost, expense.cost.date))
   }
   results = await Promise.allSettled(promiseList)
   if (results[0].status === 'fulfilled') {
@@ -279,9 +279,9 @@ travelSchema.methods.calculateExchangeRates = async function () {
     }
     i++
   }
-  for(const expence of this.expences){
+  for(const expense of this.expenses){
     if (results[i].status === 'fulfilled') {
-      expence.cost = results[i].value
+      expense.cost = results[i].value
     }
     i++
   }
