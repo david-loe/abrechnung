@@ -42,7 +42,7 @@ app.use(cors({
 
 app.use(session({
   store: MongoStore.create({ client: mongoose.connection.getClient() }),
-  secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : new mongoose.Types.ObjectId().toString(),
+  secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     secure: false,
