@@ -203,13 +203,18 @@
               <div class="col-auto fs-3">
                 <i :class="getStageIcon(row.data)"></i>
               </div>
-              <div class="col">
+              <div class="col-auto">
                 <PlaceElement :place="row.data.startLocation"
                   :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
                 <i class="bi bi-arrow-right mx-2"></i>
                 <PlaceElement :place="row.data.endLocation"
                   :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
               </div>
+              <div v-if="row.data.cost.amount > 0" class="col-auto text-secondary">
+                <i class="bi bi-coin"></i>
+                {{ getMoneyString(row.data.cost) }}
+              </div>
+
             </div>
             <!-- expense -->
             <div v-else-if="row.type === 'expense'" class="row align-items-center ps-4 mb-1" style="cursor: pointer;"

@@ -301,11 +301,20 @@ travelSchema.methods.calculateProfessionalShare = function () {
   }
 }
 
+travelSchema.methods.calculateRefundforOwnCar = function () {
+  for(const stage of this.stages){
+    if(stage.transport === 'ownCar'){
+      stage.cost = { amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100, currency: settings.baseCurrency }
+    }
+  }
+}
+
 travelSchema.pre('save', async function (next) {
   await populate(this)
   this.calculateProgress()
   this.calculateDays()
   this.calculateProfessionalShare()
+  this.calculateRefundforOwnCar()
   await this.addCountriesToDays()
   await this.addCateringRefunds()
   await this.addOvernightRefunds()

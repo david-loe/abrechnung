@@ -9,5 +9,6 @@
     "dinnerCateringLumpSumCut": 0.4,
     "toleranceStageDatesToApprovedTravelDates": 3,
     "baseCurrency": {"_id": "EUR", "symbol": "€"},
-    "allowSpouseRefund": true
+    "allowSpouseRefund": true,
+    "refundPerKM" : 0.3
 }
