@@ -77,6 +77,9 @@ router.get('/travel', async (req, res) => {
   if (!req.query.stages) {
     select.stages = 0
   }
+  if (!req.query.expenses) {
+    select.expenses = 0
+  }
   if (!req.query.days) {
     select.days = 0
   }
@@ -93,6 +96,7 @@ router.post('/travel', async (req, res) => {
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
+  delete req.body.expenses
   delete req.body.professionalShare
 
   const check = async (oldObject) => {
@@ -308,15 +312,17 @@ router.post('/travel/appliedFor', async (req, res) => {
   req.body.state = 'appliedFor'
   req.body.editor = user._id
   req.body.traveler = user._id
+  req.body.comment = null
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
+  delete req.body.expenses
   delete req.body.professionalShare
 
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'
   }
-  return helper.setter(Travel, 'traveler', true, check)(req, res, (req, res) => {mail.sendNotificationMail(req.body)})
+  return helper.setter(Travel, 'traveler', true, check, mail.sendNotificationMail)(req, res)
 })
 
 router.post('/travel/underExamination', async (req, res) => {

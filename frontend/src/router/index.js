@@ -21,10 +21,11 @@ const routes = [
     meta: { requiresAuth: true}
   },
   {
-    path: '/approve',
+    path: '/approve/:_id([0-9a-fA-F]{24})?',
     name: 'Approve',
     component: ApprovePage,
-    meta: { requiresAuth: true}
+    meta: { requiresAuth: true},
+    props: route => ({ _id: route.params._id })
   },
   {
     path: '/examine',

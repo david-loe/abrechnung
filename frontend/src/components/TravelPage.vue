@@ -497,7 +497,7 @@ export default {
       
     },
     async getTravel() {
-      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, days: true })).data
+      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
       this.renderTable()
     },
     getMoneyString

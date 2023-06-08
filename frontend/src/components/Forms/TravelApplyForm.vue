@@ -76,7 +76,7 @@ const defaultTravel= {
           destinationPlace: undefined,
           travelInsideOfEU: false,
           advance: {
-            amount: 0,
+            amount: null,
             currency: 'EUR',
           },
         }
@@ -104,16 +104,7 @@ export default {
   },
   methods: {
     clear() {
-      this.formTravel = {
-        name: '',
-        reason: '',
-        startDate: '',
-        endDate: '',
-        advance: {
-          amount: null,
-          currency: 'EUR',
-        },
-      }
+      this.formTravel = defaultTravel
     },
     output() {
       const output = Object.assign({}, this.formTravel)

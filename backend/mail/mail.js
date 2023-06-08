@@ -5,7 +5,7 @@ const fs = require('fs')
 const User = require('../models/user')
 
 function sendMail(recipients, subject, paragaph, button, lastParagraph) {
-  if (mailClient == undefined) {
+  if (mailClient == undefined || recipients.length === 0) {
     return false
   }
   var salutation = i18n.t('mail.hi')
@@ -39,27 +39,26 @@ async function sendNotificationMail(travel) {
   const interpolation = {comment: travel.comment, traveler: travel.traveler.name, editor: travel.editor.name}
 
   var recipients = []
-  const subject = i18n.t('mail.' + travel.state + 'subject', interpolation)
-  const paragraph = i18n.t('mail.' + travel.state + 'paragraph', interpolation)
+  const subject = i18n.t('mail.' + travel.state + '.subject', interpolation)
+  const paragraph = i18n.t('mail.' + travel.state + '.paragraph', interpolation)
   const button = {
-    text: i18n.t('labels.viewX', { X: i18n.t('labels.' + travel) })
+    text: i18n.t('labels.viewX', { X: i18n.t('labels.travel') })
   }
-  const lastParagraph = i18n.t('mail.' + travel.state + 'lastParagraph', interpolation)
+  const lastParagraph = i18n.t('mail.' + travel.state + '.lastParagraph', interpolation)
 
 
   if(travel.state === 'appliedFor'){
-    recipients = await User.find({access: {approve: true}})
+    recipients = await User.find({'access.approve': true})
     button.link = process.env.VUE_APP_FRONTEND_URL + '/approve/' + travel._id
 
   }else if(travel.state === 'underExamination'){
-    recipients = await User.find({access: {examine: true}})
+    recipients = await User.find({'access.examine': true})
     button.link = process.env.VUE_APP_FRONTEND_URL + '/examine/' + travel._id
 
   }else{ // 'rejected', 'approved', 'refunded'
     recipients = [travel.traveler]
-    button.link = process.env.VUE_APP_FRONTEND_URL + '/travel/' + travel._id
+    button.link = process.env.VUE_APP_FRONTEND_URL + '/travel'+ (travel.state === 'rejected'? '' : ('/' + travel._id))
   }
-
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
 

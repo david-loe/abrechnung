@@ -14,6 +14,9 @@ router.get('/travel', async (req, res) => {
   if (!req.query.stages) {
     select.stages = 0
   }
+  if (!req.query.expenses) {
+    select.expenses = 0
+  }
   if (!req.query.days) {
     select.days = 0
   }
@@ -25,6 +28,9 @@ router.get('/travel/refunded', async (req, res) => {
   const select = { history: 0, historic: 0 }
   if (!req.query.stages) {
     select.stages = 0
+  }
+  if (!req.query.expenses) {
+    select.expenses = 0
   }
   if (!req.query.days) {
     select.days = 0

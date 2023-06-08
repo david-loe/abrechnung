@@ -2,15 +2,17 @@ const helper = require('../helper')
 const Travel = require('../models/travel')
 const User = require('../models/user')
 const router = require('express').Router()
+const mail = require('../mail/mail')
+
 
 router.get('/travel', async (req, res) => {
     const sortFn = (a, b) => a.startDate - b.startDate
-    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0, stages: 0, days: 0 }, sortFn)(req, res)
+    return helper.getter(Travel, 'travel', 20, { state: 'appliedFor', historic: false }, { history: 0, stages: 0, expenses: 0, days: 0 }, sortFn)(req, res)
 })
 
 router.get('/travel/approved', async (req, res) => {
     const sortFn = (a, b) => a.startDate - b.startDate
-    return helper.getter(Travel, 'travel', 20, { state: 'approved', historic: false }, { history: 0, stages: 0, days: 0 }, sortFn)(req, res)
+    return helper.getter(Travel, 'travel', 20, { state: 'approved', historic: false }, { history: 0, stages: 0, expenses: 0, days: 0 }, sortFn)(req, res)
 })
 
 function approve(state) {
@@ -33,7 +35,7 @@ function approve(state) {
                 return false
             }
         }
-        return helper.setter(Travel, '', false, check)(req, res)
+        return helper.setter(Travel, '', false, check, mail.sendNotificationMail)(req, res)
     }
 }
 router.post('/travel/approved', approve('approved'))

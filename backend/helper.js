@@ -5,8 +5,8 @@ const axios = require('axios')
 const settings = require('./settings')
 const scripts = require('./scripts')
 
-function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null) {
-  return async (req, res, next = null) => {
+function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null, cb = null) {
+  return async (req, res) => {
     const meta = {
       limit: defaultLimit,
       page: 1,
@@ -58,8 +58,9 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
         if (sortFn) {
           result.sort(sortFn)
         }
-        res.send({ meta: meta, data: result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page) })
-        if(next) next()
+        const data = result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page)
+        res.send({ meta, data})
+        if(cb) cb(data)
       } else {
         res.status(204).send({ message: 'No content' })
       }
@@ -68,8 +69,8 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
 }
 
 
-function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null) {
-  return async (req, res, next = null) => {
+function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null, cb = null) {
+  return async (req, res) => {
     for (const field of Object.keys(model.schema.tree)) {
       if (model.schema.tree[field].required && !'default' in model.schema.tree[field]) {
         if (
@@ -99,6 +100,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
         Object.assign(oldObject, req.body)
         const result = await oldObject.save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
+        if(cb) cb(result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
@@ -106,7 +108,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
       try {
         const result = await (new model(req.body)).save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if(next) next()
+        if(cb) cb(result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
@@ -117,7 +119,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
   }
 }
 
-function deleter(model, checkUserIdField = '') {
+function deleter(model, checkUserIdField = '', cb = null) {
   return async (req, res, next = null) => {
     if (req.query.id && req.query.id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
@@ -130,7 +132,7 @@ function deleter(model, checkUserIdField = '') {
       try {
         await model.deleteOne({ _id: req.query.id })
         res.send({ message: i18n.t('alerts.successDeleting') })
-        if(next) next()
+        if(cb) cb(req.query.id)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorDeleting'), error: error })
       }

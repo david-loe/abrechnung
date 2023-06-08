@@ -48,5 +48,14 @@ services:
     environment:
       - DEBUG=false
 
+# Test SMTP + mail client only in development mode
+  inbucket:
+    build:
+      context: ./inbucket
+      dockerfile: Dockerfile-${NODE_ENV}
+    ports:
+      - ${INBUCKET_UI_PORT}:9000
+      - ${INBUCKET_SMTP_PORT}:2500
+
 volumes:
   db_data:

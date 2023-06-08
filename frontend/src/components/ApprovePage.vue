@@ -41,7 +41,7 @@ import TravelApply from './Elements/TravelApplication.vue'
 export default {
   name: 'ApprovePage',
   components: { TravelCardList, TravelApproveForm, TravelApply },
-  props: [],
+  props: {_id: {type: String}},
   data() {
     return {
       approveTravelModal: undefined,
@@ -69,8 +69,14 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     this.approveTravelModal = new Modal(document.getElementById('approveTravelModal'), {})
+    if(this._id){
+      const result = await this.$root.getter('approve/travel', { id: this._id })
+      if(result){
+        this.showModal(result.data)
+      }
+    }
   },
   async beforeMount() {
     await this.$root.load()
