@@ -12,6 +12,8 @@ COPY .env .
 
 COPY locales ./src/locales
 
+COPY scripts.js ./src/scripts.js
+
 RUN npm run build
 
 FROM nginx as production-stage
