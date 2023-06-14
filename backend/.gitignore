@@ -1,4 +1,5 @@
 /node_modules/
+/pdf/output.pdf
 
 # Docker Volume Feedback
 scripts.js
