@@ -9,10 +9,10 @@ const fs = require('fs');
  */
 function loadLocaleMessages() {
   const messages = {}
-  fs.readdirSync('./locales').forEach(file => {
+  fs.readdirSync('./common/locales').forEach(file => {
       const matched = file.match(/([A-Za-z0-9-_]+)\./i)
       if (matched && matched.length > 1) {
-        const rawdata = fs.readFileSync('./locales/' + file)
+        const rawdata = fs.readFileSync('./common/locales/' + file)
         const locale = matched[1]
         messages[locale] = {translation: JSON.parse(rawdata)}
       }

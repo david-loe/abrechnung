@@ -40,10 +40,15 @@ function getMoneyString(money, useExchangeRate = true, func = (x) => x) {
   })
 }
 
+function placeToString(place, locale = 'de'){
+  return place.place +  ', ' + place.country.name[locale] + place.country.flag
+}
+
 module.exports = {
   getFlagEmoji,
   getDiffInDays,
   getDayList,
   datetimeToDateString,
   getMoneyString,
+  placeToString
 }

@@ -2,5 +2,4 @@
 /pdf/output.pdf
 
 # Docker Volume Feedback
-scripts.js
-locales
+common

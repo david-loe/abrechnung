@@ -131,7 +131,7 @@ import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import { getDayList } from '../../scripts.js'
+import { getDayList } from '../../common/scripts.js'
 const defaultStage = {
   startDate: '',
   endDate: '',

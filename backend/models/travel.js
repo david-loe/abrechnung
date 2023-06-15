@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { getDayList, getDiffInDays } = require('../scripts')
+const { getDayList, getDiffInDays } = require('../common/scripts')
 const Country = require('./country')
 const settings = require('../settings')
 const helper = require('../helper')

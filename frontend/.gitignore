@@ -1,6 +1,5 @@
 # Docker Volume Feedback
-src/scripts.js
-src/locales
+src/common
 
 
 .DS_Store

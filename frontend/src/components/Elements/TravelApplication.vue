@@ -48,7 +48,7 @@
 <script>
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
-import { getMoneyString } from '../../scripts.js'
+import { getMoneyString } from '../../common/scripts.js'
 export default {
   name: 'TravelApply',
   data() {

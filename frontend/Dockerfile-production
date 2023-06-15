@@ -10,9 +10,7 @@ COPY frontend/ .
 
 COPY .env .
 
-COPY locales ./src/locales
-
-COPY scripts.js ./src/scripts.js
+COPY common ./src/common
 
 RUN npm run build
 

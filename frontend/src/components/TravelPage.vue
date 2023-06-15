@@ -302,7 +302,7 @@ import StageForm from './Forms/StageForm.vue'
 import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
-import { getMoneyString } from '../scripts.js'
+import { getMoneyString } from '../common/scripts.js'
 export default {
   name: 'TravelPage',
   data() {
