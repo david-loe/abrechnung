@@ -343,7 +343,7 @@ router.post('/travel/underExamination', async (req, res) => {
       return false
     }
   }
-  return helper.setter(Travel, 'traveler', false, check)(req, res)
+  return helper.setter(Travel, 'traveler', false, check, mail.sendNotificationMail)(req, res)
 })
 
 

@@ -36,7 +36,7 @@ const travelSchema = new mongoose.Schema({
   traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   state: { type: String, required: true, enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'], default: 'appliedFor' },
   editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  comment: { type: String },
+  comments: [{text: {type: String }, author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }}],
   reason: { type: String, required: true },
   destinationPlace: place(true),
   travelInsideOfEU: { type: Boolean, required: true },
@@ -95,7 +95,8 @@ function populate(doc) {
     doc.populate({ path: 'stages.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } })
+    doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'comments.author', model: 'User', select: { name: 1 } })
   ])
 }
 
@@ -118,7 +119,6 @@ travelSchema.methods.saveToHistory = async function () {
   doc.historic = true
   const old = await mongoose.model('Travel').create(doc)
   this.history.push(old)
-  this.comment = null
   this.markModified('history')
 };
 
@@ -308,6 +308,17 @@ travelSchema.methods.calculateRefundforOwnCar = function () {
     }
   }
 }
+
+travelSchema.methods.addComment = function () {
+  if(this.comment){
+    this.comments.push({text: this.comment, author: this.editor, state: this.state})
+    delete this.comment
+  }
+}
+
+travelSchema.pre('validate', function() {
+  this.addComment()
+});
 
 travelSchema.pre('save', async function (next) {
   await populate(this)

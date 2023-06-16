@@ -6,7 +6,7 @@
           <h5 class="card-title">{{ travel.name ? travel.name : travel.reason }}</h5>
         </div>
         <div class="col-auto">
-          <ProgressCircle v-if="['approved', 'underExamination', 'refunded'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
+          <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
         </div>
       </div>
 

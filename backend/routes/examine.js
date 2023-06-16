@@ -6,6 +6,8 @@ const User = require('../models/user')
 const i18n = require('../i18n')
 const multer  = require('multer')
 const fileHandler = multer({limits: { fileSize: 16000000 }})
+const mail = require('../mail/mail')
+
 
 
 router.get('/travel', async (req, res) => {
@@ -55,7 +57,7 @@ router.post('/travel/refunded', async (req, res) => {
           return false
       }
   }
-  return helper.setter(Travel, '', false, check)(req, res)
+  return helper.setter(Travel, '', false, check, mail.sendNotificationMail)(req, res)
 })
 
 function getReceipt(){

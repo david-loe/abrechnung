@@ -148,27 +148,27 @@
     "rejected": {
       "subject": "❌ Travel rejected",
       "paragraph": "Your travel application got rejected.",
-      "lastParagraph": "{editor} wrote: '{comment}'"
+      "lastParagraph": "{commentator} wrote: '{comment}'"
     },
     "appliedFor": {
       "subject": "🆕 New Travel",
       "paragraph": "A new travel application from {traveler} just came in.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} wrote: '{comment}'"
     },
     "approved": {
       "subject": "✅ Travel approved",
       "paragraph": "Your travel application got approved.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} wrote: '{comment}'"
     },
     "underExamination": {
       "subject": "🛂 Travel to examine",
       "paragraph": "{traveler} has finished his travel expenses.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} wrote: '{comment}'"
     },
     "refunded": {
       "subject": "💲 Travel refunded",
       "paragraph": "Your travel expenses get refunded.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} wrote: '{comment}'"
     }
   },
   "login": {

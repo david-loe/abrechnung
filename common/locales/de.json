@@ -148,27 +148,27 @@
     "rejected": {
       "subject": "❌ Reise abgelehnt",
       "paragraph": "Dein Reiseantrag wurde abgelehnt.",
-      "lastParagraph": "{editor} schrieb: {comment}"
+      "lastParagraph": "{commentator} schrieb: '{comment}'"
     },
     "appliedFor": {
       "subject": "🆕 Neue Reise",
       "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} schrieb: '{comment}'"
     },
     "approved": {
       "subject": "✅ Reise genehmigt",
       "paragraph": "Dein Reiseantrag wurde genehmigt.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} schrieb: '{comment}'"
     },
     "underExamination": {
       "subject": "🛂 Reise zu prüfen",
       "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} schrieb: '{comment}'"
     },
     "refunded": {
       "subject": "💲 Reisekosten erstattet",
       "paragraph": "Deine Reisekosten werden erstattet.",
-      "lastParagraph": ""
+      "lastParagraph": "{commentator} schrieb: '{comment}'"
     }
   },
   "login": {

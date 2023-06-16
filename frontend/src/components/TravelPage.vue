@@ -31,9 +31,12 @@
         </ol>
       </nav>
 
-      <div class="row justify-content-between">
+      <div class="row justify-content-between align-items-end mb-2">
+        <div class="col-auto">
+          <h1 class="m-0">{{ travel.name }}</h1>
+        </div>
         <div class="col">
-          <h1>{{ travel.name }}</h1>
+          <h4 class="text-secondary m-0">{{ $root.datetoDateString(travel.startDate) + ' - ' + $root.datetoDateString(travel.endDate) }}</h4>
         </div>
         <div class="col-auto">
           <div class="dropdown">
@@ -96,7 +99,7 @@
 
       <div class="row">
         <div class="col-lg-9 col-12">
-          <div class="row mb-2">
+          <div class="row g-1 mb-2">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')"
                 :disabled="isReadOnly">
@@ -504,6 +507,7 @@ export default {
     async getTravel() {
       this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
       this.renderTable()
+      console.log(this.travel)
     },
     getMoneyString
   },
