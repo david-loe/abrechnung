@@ -1,6 +1,6 @@
 
 const pdf_lib = require('pdf-lib')
-const pdf_fontkit = require('@pdf-lib/fontkit')
+const pdf_fontkit = require('pdf-fontkit')
 const fs = require('fs')
 const i18n = require('../i18n')
 const scripts = require('../common/scripts')
@@ -10,10 +10,8 @@ const scripts = require('../common/scripts')
 async function createDocument() {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
-  const montserratBytes = fs.readFileSync('./common/fonts/Montserrat-Regular.ttf')
-  const montserrat = await pdfDoc.embedFont(montserratBytes)
-  const flagBytes = fs.readFileSync('./common/fonts/TwemojiCountryFlags.woff2')
-  const flagFont = await pdfDoc.embedFont(flagBytes)
+  const fontBytes = fs.readFileSync('./common/fonts/NotoSans-Regular.ttf')
+  const font = await pdfDoc.embedFont(fontBytes, { subset: true })
   const edge = 36
   const fontSize = 11
   function newPage() {
@@ -30,7 +28,7 @@ async function createDocument() {
     state: 'refunded',
     editor: { name: 'Edi Editor' },
     reason: 'reason',
-    destinationPlace: { place: 'place', country: {code: 'DE', name: {de: 'Deutschland'}, flag: scripts.getFlagEmoji('DE')} },
+    destinationPlace: { place: 'place', country: { _id: 'DE', name: { de: 'Deutschland' }, flag: scripts.getFlagEmoji('DE') } },
     travelInsideOfEU: false,
     startDate: new Date(),
     endDate: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
@@ -53,8 +51,8 @@ async function createDocument() {
       },
     }]
   }
-  page.drawText(' 🇩🇪 ', {font: flagFont, size: 21, x:0, y:0})
-  drawGeneralTravelInformation(page, travel, { font: montserrat })
+  drawLogo(page, pdfDoc, {font:font, fontSize: 16, x: 16, y: page.getSize().height - 32})
+  drawGeneralTravelInformation(page, pdfDoc, travel, { font: font, xStart: edge, yStart: page.getSize().height - edge - 16, fontSize: fontSize})
   const pdfBytes = await pdfDoc.save()
   var callback = (err) => {
     if (err) throw err;
@@ -63,7 +61,7 @@ async function createDocument() {
   fs.writeFile('output.pdf', pdfBytes, callback);
 }
 
-function drawGeneralTravelInformation(page, travel, options = { font }) {
+function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) {
   if (!travel || !options.font) {
     return
   }
@@ -99,7 +97,15 @@ function drawGeneralTravelInformation(page, travel, options = { font }) {
 
   // Reason + Place
   var y = y - (opts.fontSize * 1.5)
-  page.drawText(i18n.t('labels.reason') + ': ' + travel.reason + '    ' + i18n.t('labels.destinationPlace') + ': ' + scripts.placeToString(travel.destinationPlace, i18n.locale), {
+  drawPlace(page, pdfDoc, travel.destinationPlace, Object.assign(opts, { x: opts.xStart, y: y, prefix: i18n.t('labels.reason') + ': ' + travel.reason + '    ' + i18n.t('labels.destinationPlace') + ': ' }))
+
+  // Dates + professionalShare
+  var text = i18n.t('labels.from') + ': ' + new Date(travel.startDate).toLocaleDateString(i18n.language) + '    ' + i18n.t('labels.to') + ': ' + new Date(travel.endDate).toLocaleDateString(i18n.language)
+  if(travel.professionalShare !== 1){
+    text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare / 100) * 100 + '%'
+  }
+  var y = y - (opts.fontSize * 1.5)
+  page.drawText(text, {
     x: opts.xStart,
     y: y,
     size: opts.fontSize,
@@ -107,27 +113,92 @@ function drawGeneralTravelInformation(page, travel, options = { font }) {
     color: opts.textColor
   })
 
-  // Dates
-  var y = y - (opts.fontSize * 1.5)
-  page.drawText(i18n.t('labels.from') + ': ' + new Date(travel.startDate).toLocaleDateString(i18n.language) + '    ' + i18n.t('labels.to') + ': ' + new Date(travel.endDate).toLocaleDateString(i18n.language), {
-    x: opts.xStart,
-    y: y,
-    size: opts.fontSize,
-    font: opts.font,
-    color: opts.textColor
-  })
-
-  // Details
-  var y = y - (opts.fontSize * 1.5)
-  page.drawText(i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare / 100) * 100 + '%    ', {
-    x: opts.xStart,
-    y: y,
-    size: opts.fontSize,
-    font: opts.font,
-    color: opts.textColor
-  })
 }
 
+async function drawPlace(page, pdfDoc, place, options = { font, x, y }) {
+  if (!place || !options.font) {
+    return
+  }
+  const opts = {
+    fontSize: 11,
+    x: 10,
+    y: 10,
+    textColor: pdf_lib.rgb(0, 0, 0),
+    prefix: ''
+  }
+  Object.assign(opts, options)
+
+  const text = opts.prefix + place.place + ', ' + place.country.name[i18n.language]
+  const flagX = opts.x + opts.font.widthOfTextAtSize(text, opts.fontSize) + (opts.fontSize / 4)
+
+  page.drawText(text, {
+    x: opts.x,
+    y: opts.y,
+    size: opts.fontSize,
+    font: opts.font,
+    color: opts.textColor
+  })
+
+  var filename = place.country._id
+  if (opts.fontSize > 42 * 0.75) { // 0.75 px <=> 1 pt
+    filename = filename + '@3x'
+  } else if (opts.fontSize > 21 * 0.75) { // 0.75 px <=> 1 pt
+    filename = filename + '@2x'
+  }
+  const flagBytes = fs.readFileSync('./pdf/flags/' + filename + '.png')
+  const flag = await pdfDoc.embedPng(flagBytes)
+
+  page.drawImage(flag, {
+    x: flagX,
+    y: opts.y - (opts.fontSize / 9),
+    height: opts.fontSize,
+    width: opts.fontSize * (3 / 2)
+  })
+
+}
+
+async function drawLogo(page, pdfDoc, options = {font, x, y}){
+  if (!options.font) {
+    return
+  }
+  const opts = {
+    fontSize: 11,
+    x: 10,
+    y: 10,
+    textColor: pdf_lib.rgb(0, 0, 0),
+    prefix: ''
+  }
+  Object.assign(opts, options)
+
+  const text = i18n.t('headlines.title')
+  const flagX = opts.x + opts.font.widthOfTextAtSize(text, opts.fontSize) + (opts.fontSize / 4)
+
+  page.drawText(text, {
+    x: opts.x,
+    y: opts.y,
+    size: opts.fontSize,
+    font: opts.font,
+    color: opts.textColor
+  })
+
+  var filename = 'airplane'
+  if (opts.fontSize > 24) {
+    filename = filename + '36'
+  } else if (opts.fontSize > 12) {
+    filename = filename + '24'
+  }else{
+    filename = filename + '12'
+  }
+  const logoBytes = fs.readFileSync('./pdf/airplanes/' + filename + '.png')
+  const logo = await pdfDoc.embedPng(logoBytes)
+
+  page.drawImage(logo, {
+    x: flagX,
+    y: opts.y - (opts.fontSize / 9),
+    height: opts.fontSize,
+    width: opts.fontSize
+  })
+}
 
 function drawTable(page, newPageFn, data, columns, options = { font }) {
   if (!data || data.length < 0 || !options.font) {
