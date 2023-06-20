@@ -36,7 +36,6 @@ function sendMail(recipients, subject, paragaph, button, lastParagraph) {
 }
 
 async function sendNotificationMail(travel) {
-  console.log(travel.comment)
   const interpolation = {traveler: travel.traveler.name}
 
   if(travel.comments.length > 0){

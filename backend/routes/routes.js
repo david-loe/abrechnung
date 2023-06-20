@@ -226,6 +226,7 @@ router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
 function getRecordReceipt(recordType) {
+  
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId

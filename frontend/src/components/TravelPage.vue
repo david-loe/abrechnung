@@ -421,13 +421,15 @@ export default {
         await this.getTravel()
       }
     },
-    async showReceipt(id, recordId, recordType) {
+    async showReceipt(id, windowProxy, recordId, recordType) {
       const params = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
       const result = await this.$root.getter(this.endpointMiddleware + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
       if (result) {
         const fileURL = URL.createObjectURL(result);
-        window.open(fileURL)
+        windowProxy.location.assign(fileURL)
+      }else{
+        windowProxy.close()
       }
     },
     getStageIcon(stage) {
@@ -507,7 +509,6 @@ export default {
     async getTravel() {
       this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
       this.renderTable()
-      console.log(this.travel)
     },
     getMoneyString
   },

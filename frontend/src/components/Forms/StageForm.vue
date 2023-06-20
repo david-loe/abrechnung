@@ -93,7 +93,7 @@
         <InfoPoint :text="$t('info.receipts')" />
         <FileUpload id="stageFormFile" v-model="formStage.cost.receipts" :disabled="disabled"
           :required="Boolean(formStage.cost.amount)" @deleteFile="(id) => $emit('deleteReceipt', id, stage._id, 'stage')"
-          @showFile="(id) => $emit('showReceipt', id, stage._id, 'stage')" />
+          @showFile="(id, winProxy) => $emit('showReceipt', id, winProxy, stage._id, 'stage')" />
       </div>
     </template>
 

@@ -42,11 +42,12 @@ export default {
   emits: ['update:modelValue', 'deleteFile', 'showFile'],
   methods: {
     showFile(index){
+      const windowProxy = window.open('', '_blank')
       if(this.modelValue[index]._id){
-        this.$emit('showFile', this.modelValue[index]._id)
+        this.$emit('showFile', this.modelValue[index]._id, windowProxy)
       }else{
         const fileURL = URL.createObjectURL(this.modelValue[index].data);
-        window.open(fileURL)
+        windowProxy.location.assign(fileURL)
       }
     },
     deleteFile(index){
