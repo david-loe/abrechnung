@@ -4,14 +4,14 @@
     <div class="row mb-3">
       <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}</label>
-        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formStage.startDate" :min="minDate"
+        <input id="startDateInput" class="form-control" type="datetime-local" v-model="formStage.departure" :min="minDate"
           :max="maxDate" :disabled="disabled" required />
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.arrival')
         }}</label>
-        <input id="endDateInput" class="form-control" type="datetime-local" v-model="formStage.endDate"
-          :min="formStage.startDate ? formStage.startDate : minDate" :max="maxDate" :disabled="disabled" required />
+        <input id="endDateInput" class="form-control" type="datetime-local" v-model="formStage.arrival"
+          :min="formStage.departure ? formStage.departure : minDate" :max="maxDate" :disabled="disabled" required />
       </div>
     </div>
 
@@ -49,7 +49,7 @@
       <div class="row mb-3" id="stageFormMidnightCountries">
         <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date">
           <label for="stageFormLocation" class="form-label">
-            {{ $root.datetoDateString(midnightCountry.date) }}
+            {{ datetoDateString(midnightCountry.date) }}
             {{ $t('labels.midnight') }}
           </label>
           <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled"
@@ -131,10 +131,10 @@ import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import { getDayList } from '../../common/scripts.js'
+import { getDayList, datetoDateString } from '../../common/scripts.js'
 const defaultStage = {
-  startDate: '',
-  endDate: '',
+  departure: '',
+  arrival: '',
   startLocation: undefined,
   endLocation: undefined,
   midnightCountries: [],
@@ -183,12 +183,12 @@ export default {
         this.formStage.startLocation && this.formStage.endLocation &&
         this.formStage.startLocation.country && this.formStage.endLocation.country &&
         this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
-        this.$root.dateToHTMLInputString(this.formStage.startDate) !== this.$root.dateToHTMLInputString(this.formStage.endDate)
+        this.$root.dateToHTMLInputString(this.formStage.departure) !== this.$root.dateToHTMLInputString(this.formStage.arrival)
     },
     calcMidnightCountries() {
       if (this.showMidnightCountries()) {
         const newMidnightCountries = []
-        const days = getDayList(this.formStage.startDate, this.formStage.endDate)
+        const days = getDayList(this.formStage.departure, this.formStage.arrival)
         days.splice(-1, 1)
         for (const day of days) {
           newMidnightCountries.push({ date: day })
@@ -215,8 +215,8 @@ export default {
       if (!this.showMidnightCountries()) {
         delete output.midnightCountries
       }
-      output.startDate = this.$root.htmlInputStringToDateTime(output.startDate)
-      output.endDate = this.$root.htmlInputStringToDateTime(output.endDate)
+      output.departure = this.$root.htmlInputStringToDateTime(output.departure)
+      output.arrival = this.$root.htmlInputStringToDateTime(output.arrival)
       if(output.cost.date){
         output.cost.date = new Date(output.cost.date)
       }
@@ -227,11 +227,12 @@ export default {
       this.minDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelStartDate).valueOf() - 3 * 24 * 60 * 60 * 1000)
       this.maxDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelEndDate).valueOf() + (3 + 1) * 24 * 60 * 60 * 1000 - 1)
       const input = Object.assign({}, structuredClone(defaultStage), this.stage)
-      input.startDate = this.$root.dateTimeToHTMLInputString(input.startDate)
-      input.endDate = this.$root.dateTimeToHTMLInputString(input.endDate)
+      input.departure = this.$root.dateTimeToHTMLInputString(input.departure)
+      input.arrival = this.$root.dateTimeToHTMLInputString(input.arrival)
       input.cost.date = this.$root.dateToHTMLInputString(input.cost.date)
       return input
     },
+    datetoDateString
   },
   beforeMount() {
     this.formStage = this.input()
@@ -243,8 +244,8 @@ export default {
     'formStage.transport': function () { this.calcMidnightCountries() },
     'formStage.startLocation.country': function () { this.calcMidnightCountries() },
     'formStage.endLocation.country': function () { this.calcMidnightCountries() },
-    'formStage.startDate': function () { this.calcMidnightCountries() },
-    'formStage.endDate': function () { this.calcMidnightCountries() },
+    'formStage.departure': function () { this.calcMidnightCountries() },
+    'formStage.arrival': function () { this.calcMidnightCountries() },
   },
 }
 </script>

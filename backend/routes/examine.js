@@ -140,7 +140,7 @@ function postRecord(recordType) {
       }
       travel[recordType].push(req.body)
     }
-    travel[recordType].sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+    travel[recordType].sort((a, b) => new Date(a.departure) - new Date(b.departure))
     travel.markModified(recordType)
     try {
       const result1 = await travel.save()

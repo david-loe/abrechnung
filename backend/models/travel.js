@@ -50,8 +50,8 @@ const travelSchema = new mongoose.Schema({
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
   stages: [{
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
+    departure: { type: Date, required: true },
+    arrival: { type: Date, required: true },
     startLocation: place(true),
     endLocation: place(true),
     midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
@@ -125,7 +125,7 @@ travelSchema.methods.saveToHistory = async function () {
 travelSchema.methods.calculateProgress = function () {
   if (this.stages.length > 0) {
     var approvedLength = getDiffInDays(this.startDate, this.endDate) + 1
-    var stageLength = getDiffInDays(this.stages[0].startDate, this.stages[this.stages.length - 1].endDate) + 1
+    var stageLength = getDiffInDays(this.stages[0].departure, this.stages[this.stages.length - 1].arrival) + 1
     if (stageLength >= approvedLength) {
       this.progress = 100
     } else {
@@ -138,7 +138,7 @@ travelSchema.methods.calculateProgress = function () {
 
 travelSchema.methods.calculateDays = function () {
   if (this.stages.length > 0) {
-    const days = getDayList(this.stages[0].startDate, this.stages[this.stages.length - 1].endDate)
+    const days = getDayList(this.stages[0].departure, this.stages[this.stages.length - 1].arrival)
     const newDays = days.map((d) => { return { date: d } })
     for (const oldDay of this.days) {
       for (const newDay of newDays) {
@@ -158,22 +158,22 @@ travelSchema.methods.calculateDays = function () {
 travelSchema.methods.getBorderCrossings = async function () {
   if (this.stages.length > 0) {
     const startCountry = this.stages[0].startLocation.country
-    const borderCrossings = [{ date: new Date(this.stages[0].startDate), country: startCountry }]
+    const borderCrossings = [{ date: new Date(this.stages[0].departure), country: startCountry }]
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
       // Country Change
       if (stage.startLocation && stage.endLocation && stage.startLocation.country._id != stage.endLocation.country._id) {
         // More than 1 night
-        if (getDiffInDays(stage.startDate, stage.endDate) > 1) {
+        if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport) !== -1) {
             borderCrossings.push(...stage.midnightCountries)
           } else if (stage.transport = 'airplane') {
-            borderCrossings.push({ date: new Date(new Date(stage.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }) })
+            borderCrossings.push({ date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }) })
           } else if (stage.transport = 'shipOrFerry') {
-            borderCrossings.push({ date: new Date(new Date(stage.startDate).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }) })
+            borderCrossings.push({ date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000), country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }) })
           }
         }
-        borderCrossings.push({ date: new Date(stage.endDate), country: stage.endLocation.country })
+        borderCrossings.push({ date: new Date(stage.arrival), country: stage.endLocation.country })
       }
     }
     return borderCrossings
@@ -189,7 +189,7 @@ travelSchema.methods.addCountriesToDays = async function () {
   }
   var bXIndex = 0
   for (const day of this.days) {
-    if (bXIndex < borderCrossings.length - 1 &&
+    while (bXIndex < borderCrossings.length - 1 &&
       (day.date.valueOf() + 1000 * 24 * 60 * 60 - 1) - borderCrossings[bXIndex + 1].date.valueOf() > 0) {
       bXIndex++
     }
@@ -230,11 +230,11 @@ travelSchema.methods.addOvernightRefunds = async function () {
           break
         }
         var midnight = day.date.valueOf() + 1000 * 24 * 60 * 60 - 1
-        while (stageIndex < this.stages.length - 1 && (this.stages[stageIndex].type != 'route' || midnight - new Date(this.stages[stageIndex].endDate).valueOf() > 0)) {
+        while (stageIndex < this.stages.length - 1 && (this.stages[stageIndex].type != 'route' || midnight - new Date(this.stages[stageIndex].arrival).valueOf() > 0)) {
           stageIndex++
         }
-        if (midnight - new Date(this.stages[stageIndex].startDate).valueOf() > 0 &&
-          new Date(this.stages[stageIndex].endDate).valueOf() - midnight > 0) {
+        if (midnight - new Date(this.stages[stageIndex].departure).valueOf() > 0 &&
+          new Date(this.stages[stageIndex].arrival).valueOf() - midnight > 0) {
           continue
         }
         const result = { type: 'overnight' }

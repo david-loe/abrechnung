@@ -20,8 +20,8 @@ async function getTestTravel() {
     },
     claimOvernightLumpSum: true,
     stages: [{
-      startDate: new Date(),
-      endDate: new Date(new Date().getTime() + 3 * 60 * 60 * 1000),
+      departure: new Date(),
+      arrival: new Date(new Date().getTime() + 3 * 60 * 60 * 1000),
       transport: 'airplane',
       startLocation: {
         country: 'DE',

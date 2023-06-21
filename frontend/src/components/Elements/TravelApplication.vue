@@ -48,7 +48,7 @@
 <script>
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
-import { getMoneyString } from '../../common/scripts.js'
+import { getMoneyString, datetoDateString } from '../../common/scripts.js'
 export default {
   name: 'TravelApply',
   data() {
@@ -67,7 +67,7 @@ export default {
       switch (key) {
         case 'startDate':
         case 'endDate':
-          return this.$root.datetoDateString(this.travel[key])
+          return datetoDateString(this.travel[key])
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':

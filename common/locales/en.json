@@ -102,7 +102,8 @@
     "readOnly": "Read only",
     "refund": "Refund",
     "invoiceDate": "Date of invoice",
-    "description": "Description"
+    "description": "Description",
+    "receiptNumber" : "Receipt No."
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",

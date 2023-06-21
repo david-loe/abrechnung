@@ -285,20 +285,6 @@ export default {
       const dateObject = new Date(date)
       return dateObject.toISOString().slice(0, -14)
     },
-    dateToTimeString(date) {
-      if (!date) return ''
-      const dateObject = new Date(date)
-      const hour = dateObject.getUTCHours().toString().padStart(2, '0')
-      const minute = dateObject.getUTCMinutes().toString().padStart(2, '0')
-      return hour + ':' + minute
-    },
-    datetoDateString(date) {
-      if (!date) return ''
-      const dateObject = new Date(date)
-      const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
-      const day = dateObject.getUTCDate().toString().padStart(2, '0')
-      return day + '.' + month
-    },
     async pushSettings() {
       this.user.settings.language = this.$i18n.locale
       try {

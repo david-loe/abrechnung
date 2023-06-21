@@ -19,6 +19,10 @@ function datetimeToDate(datetime) {
   return new Date(datetimeToDateString(datetime))
 }
 
+function dateTimeToString(datetime){
+  return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
+}
+
 function getDiffInDays(startDate, endDate) {
   const firstDay = datetimeToDate(startDate)
   const lastDay = datetimeToDate(endDate)
@@ -33,15 +37,47 @@ function getDayList(startDate, endDate) {
   return days
 }
 
-function getMoneyString(money, useExchangeRate = true, func = (x) => x) {
-  return (func(((useExchangeRate && money.exchangeRate) ? money.exchangeRate.amount : money.amount))).toLocaleString(undefined, {
+function getMoneyString(money, useExchangeRate = true, func = (x) => x, locale) {
+  return (func(((useExchangeRate && money.exchangeRate) ? money.exchangeRate.amount : money.amount))).toLocaleString(locale, {
     style: "currency",
     currency: (useExchangeRate && money.exchangeRate) ? "EUR" : (money.currency._id ? money.currency._id : money.currency) // baseCurrency
   })
 }
 
+function getDetailedMoneyString(money, locale){
+  string = money.amount.toLocaleString(locale, {
+    style: "currency",
+    currency: (money.currency._id ? money.currency._id : money.currency)
+  })
+  if(money.exchangeRate){
+    string = string + ' * ' + money.exchangeRate.rate.toLocaleString(locale, {maximumFractionDigits: 3}) + ' =\n'
+    string = string + money.exchangeRate.amount.toLocaleString(locale, {
+      style: "currency",
+      currency: "EUR" // baseCurrency
+    })
+  }
+  return string
+}
+
 function placeToString(place, locale = 'de'){
   return place.place +  ', ' + place.country.name[locale] + place.country.flag
+}
+
+
+function dateToTimeString(date) {
+  if (!date) return ''
+  const dateObject = new Date(date)
+  const hour = dateObject.getUTCHours().toString().padStart(2, '0')
+  const minute = dateObject.getUTCMinutes().toString().padStart(2, '0')
+  return hour + ':' + minute
+}
+
+function datetoDateString(date) {
+  if (!date) return ''
+  const dateObject = new Date(date)
+  const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
+  const day = dateObject.getUTCDate().toString().padStart(2, '0')
+  return day + '.' + month
 }
 
 module.exports = {
@@ -50,5 +86,9 @@ module.exports = {
   getDayList,
   datetimeToDateString,
   getMoneyString,
-  placeToString
+  getDetailedMoneyString,
+  placeToString,
+  dateTimeToString,
+  dateToTimeString,
+  datetoDateString
 }

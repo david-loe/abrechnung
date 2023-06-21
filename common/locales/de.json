@@ -102,7 +102,8 @@
     "readOnly": "Schreibgeschützt",
     "refund": "Erstatten",
     "invoiceDate": "Rechnungsdatum",
-    "description": "Beschreibung"
+    "description": "Beschreibung",
+    "receiptNumber" : "Beleg Nr."
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

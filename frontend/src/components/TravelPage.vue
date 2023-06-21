@@ -36,7 +36,7 @@
           <h1 class="m-0">{{ travel.name }}</h1>
         </div>
         <div class="col">
-          <h4 class="text-secondary m-0">{{ $root.datetoDateString(travel.startDate) + ' - ' + $root.datetoDateString(travel.endDate) }}</h4>
+          <h4 class="text-secondary m-0">{{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}</h4>
         </div>
         <div class="col-auto">
           <div class="dropdown">
@@ -140,7 +140,7 @@
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
                 <h5 class="m-0">
-                  {{ $root.datetoDateString(row.data.date) }}
+                  {{ datetoDateString(row.data.date) }}
                 </h5>
               </div>
               <div class="col">
@@ -305,7 +305,7 @@ import StageForm from './Forms/StageForm.vue'
 import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
-import { getMoneyString } from '../common/scripts.js'
+import { getMoneyString, datetoDateString } from '../common/scripts.js'
 export default {
   name: 'TravelPage',
   data() {
@@ -480,7 +480,7 @@ export default {
       }
       for (var i = 0; i < this.travel.days.length; i++) {
         var stagesStart = stageIndex
-        while (stageIndex < this.travel.stages.length && i < this.travel.days.length - 1 && new Date(this.travel.days[i + 1].date).valueOf() - new Date(this.travel.stages[stageIndex].startDate).valueOf() > 0) {
+        while (stageIndex < this.travel.stages.length && i < this.travel.days.length - 1 && new Date(this.travel.days[i + 1].date).valueOf() - new Date(this.travel.stages[stageIndex].departure).valueOf() > 0) {
           stageIndex++
         }
         var stagesEnd = stageIndex
@@ -510,7 +510,8 @@ export default {
       this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
       this.renderTable()
     },
-    getMoneyString
+    getMoneyString,
+    datetoDateString
   },
   async beforeMount() {
     await this.$root.load()
