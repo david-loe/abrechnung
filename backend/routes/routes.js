@@ -7,7 +7,7 @@ const helper = require('../helper')
 const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
-const File = require('../models/file')
+const DocumentFile = require('../models/documentFile')
 const mail = require('../mail/mail')
 
 router.delete('/logout', function (req, res) {
@@ -144,9 +144,9 @@ function postRecord(recordType) {
                 if(!foundReceipt){
                 break outer_loop
                 }
-                await File.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
+                await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
               }else{
-                var result = await (new File(req.body.cost.receipts[i])).save()
+                var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
                 req.body.cost.receipts[i] = result._id
               }
             }
@@ -163,7 +163,7 @@ function postRecord(recordType) {
     } else {
       if(req.body.cost && req.body.cost.receipts && req.files){
         for(var i = 0; i < req.body.cost.receipts.length; i++){
-          var result = await (new File(req.body.cost.receipts[i])).save()
+          var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
           req.body.cost.receipts[i] = result._id
         }
         travel.markModified(recordType + '.cost.receipts')
@@ -199,7 +199,7 @@ function deleteRecord(recordType){
           found = true
           if(travel[recordType][i].cost){
             for(const receipt of travel[recordType][i].cost.receipts){
-              File.deleteOne({ _id: receipt._id })
+              DocumentFile.deleteOne({ _id: receipt._id })
             }
           }
           travel[recordType].splice(i, 1)
@@ -243,7 +243,7 @@ function getRecordReceipt(recordType) {
             for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
               if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
                 found = true
-                var file = await File.findOne({ _id: req.query.id })
+                var file = await DocumentFile.findOne({ _id: req.query.id })
                 res.setHeader('Content-Type', file.type);
                 res.setHeader('Content-Length', file.data.length);
                 return res.send(file.data)
@@ -281,7 +281,7 @@ function deleteRecordReceipt(recordType) {
             for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
               if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
                 found = true
-                await File.deleteOne({ _id: req.query.id })
+                await DocumentFile.deleteOne({ _id: req.query.id })
                 travel[recordType][i].cost.receipts.splice(r, 1)
                 break outer_loop
               }

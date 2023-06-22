@@ -103,7 +103,8 @@
     "refund": "Refund",
     "invoiceDate": "Date of invoice",
     "description": "Description",
-    "receiptNumber" : "Receipt No."
+    "receiptNumber" : "Receipt No.",
+    "date": "Date"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
@@ -205,7 +206,10 @@
   "lumpSums": {
     "catering8": "Catering lump sum (cut)",
     "catering24": "Catering lump sum",
-    "overnight": "Overnight lump sum"
+    "overnight": "Overnight lump sum",
+    "catering8\n": "Catering lump sum (cut)",
+    "catering24\n": "Catering lump sum",
+    "overnight\n": "Overnight lump sum"
   },
   "languages":{
     "de": "German",

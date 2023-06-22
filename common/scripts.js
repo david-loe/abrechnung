@@ -19,10 +19,6 @@ function datetimeToDate(datetime) {
   return new Date(datetimeToDateString(datetime))
 }
 
-function dateTimeToString(datetime){
-  return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
-}
-
 function getDiffInDays(startDate, endDate) {
   const firstDay = datetimeToDate(startDate)
   const lastDay = datetimeToDate(endDate)
@@ -49,8 +45,8 @@ function getDetailedMoneyString(money, locale){
     style: "currency",
     currency: (money.currency._id ? money.currency._id : money.currency)
   })
-  if(money.exchangeRate){
-    string = string + ' * ' + money.exchangeRate.rate.toLocaleString(locale, {maximumFractionDigits: 3}) + ' =\n'
+  if(money.exchangeRate && money.exchangeRate.rate){
+    string = string + ' * ' + money.exchangeRate.rate.toLocaleString(locale, {maximumFractionDigits: 4}) + ' = '
     string = string + money.exchangeRate.amount.toLocaleString(locale, {
       style: "currency",
       currency: "EUR" // baseCurrency
@@ -80,6 +76,19 @@ function datetoDateString(date) {
   return day + '.' + month
 }
 
+function dateTimeToString(datetime){
+  return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
+}
+
+function datetoDateStringWithYear(date) {
+  if (!date) return ''
+  const dateObject = new Date(date)
+  const year = (dateObject.getUTCFullYear()).toString()
+  const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
+  const day = dateObject.getUTCDate().toString().padStart(2, '0')
+  return day + '.' + month + '.' + year
+}
+
 module.exports = {
   getFlagEmoji,
   getDiffInDays,
@@ -90,5 +99,6 @@ module.exports = {
   placeToString,
   dateTimeToString,
   dateToTimeString,
-  datetoDateString
+  datetoDateString,
+  datetoDateStringWithYear
 }

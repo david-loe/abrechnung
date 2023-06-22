@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { getDayList, getDiffInDays } = require('../common/scripts')
 const Country = require('./country')
+const Currency = require('./currency')
 const settings = require('../settings')
 const helper = require('../helper')
 
@@ -25,7 +26,7 @@ function costObject(exchangeRate = true, receipts = true, required = false){
     }
   }
   if(receipts){
-    costObject.receipts = [{ type: mongoose.Schema.Types.ObjectId, ref: 'File', required: required }]
+    costObject.receipts = [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
     costObject.date = {type: Date, required: required }
   }
   return costObject
@@ -92,8 +93,8 @@ function populate(doc) {
     doc.populate({ path: 'stages.endLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.receipts', model: 'File', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'stages.cost.receipts', model: 'DocumentFile', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'expenses.cost.receipts', model: 'DocumentFile', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', model: 'User', select: { name: 1 } })
@@ -252,10 +253,12 @@ travelSchema.methods.addOvernightRefunds = async function () {
 
 async function exchange(costObject, date) {
   var exchangeRate = null
+
   if (costObject.amount > 0 && costObject.currency._id !== settings.baseCurrency._id) {
     exchangeRate = await helper.convertCurrency(date, costObject.amount, costObject.currency._id)
   }
   costObject.exchangeRate = exchangeRate
+
   return costObject
 }
 

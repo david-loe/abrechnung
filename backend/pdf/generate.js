@@ -5,15 +5,31 @@ const fs = require('fs')
 const i18n = require('../i18n')
 const scripts = require('../common/scripts')
 const Travel = require('../models/travel')
+const DocumentFile = require('../models/documentFile')
+const mongoose = require('mongoose')
 
+test()
 
-async function createDocument() {
+async function test() {
+  await mongoose.connect(process.env.MONGO_URL, {})
+  const travel = await Travel.findOne({ historic: false })
+
+  var callback = (err) => {
+    if (err) throw err;
+    console.log('It\'s saved!');
+  }
+  fs.writeFile('output.pdf', await generateReport(travel), callback);
+  mongoose.disconnect()
+}
+
+async function generateReport(travel) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('./common/fonts/NotoSans-Regular.ttf')
   const font = await pdfDoc.embedFont(fontBytes, { subset: true })
   const edge = 36
   const fontSize = 11
+
   function newPage() {
     return pdfDoc.addPage([pdf_lib.PageSizes.A4[1], pdf_lib.PageSizes.A4[0]]) // landscape page
   }
@@ -22,23 +38,18 @@ async function createDocument() {
   }
   newPage()
 
-  const table = [{ erste: 'asdgtd', zweite: new Date(), 'dritte Spalte': 14 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }, { erste: 'Mein Name ist', zweite: new Date(), 'dritte Spalte': 144 }]
-
-  
-  const travel = {"destinationPlace":{"country":{"name":{"en":"Afghanistan","de":"Afghanistan"},"_id":"AF","flag":"🇦🇫","currency":"AFN"},"place":"as"},"advance":{"exchangeRate":null,"amount":null,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"_id":"6492f5356fcd319e6a0e4608","name":"Test1","traveler":{"_id":"64918e8d0ab0310c7706b335","email":"professor@planetexpress.com","name":"Professor Farnsworth"},"state":"approved","editor":{"_id":"64918e8d0ab0310c7706b335","email":"professor@planetexpress.com","name":"Professor Farnsworth"},"reason":"asdf","travelInsideOfEU":false,"startDate":"2023-06-22T00:00:00.000Z","endDate":"2023-06-22T00:00:00.000Z","claimOvernightLumpSum":true,"claimSpouseRefund":false,"progress":100,"comments":[{"text":"asdfa","author":{"_id":"64918e8d0ab0310c7706b335","name":"Professor Farnsworth"},"_id":"6492f53a6fcd319e6a0e4635"}],"stages":[{"startLocation":{"country":{"name":{"en":"Burkina Faso","de":"Burkina Faso"},"_id":"BF","flag":"🇧🇫","currency":"XOF"},"place":"asd"},"endLocation":{"country":{"name":{"en":"Afghanistan","de":"Afghanistan"},"_id":"AF","flag":"🇦🇫","currency":"AFN"},"place":"aswf"},"cost":{"exchangeRate":null,"amount":12,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0},"receipts":[{"_id":"6492f56b6fcd319e6a0e465a","type":"application/pdf","name":"output.pdf"}],"date":"2023-06-20T00:00:00.000Z"},"departure":"2023-06-20T12:04:00.000Z","arrival":"2023-06-21T01:04:00.000Z","transport":"airplane","purpose":"professional","_id":"6492f56b6fcd319e6a0e465c","midnightCountries":[]},{"startLocation":{"country":{"name":{"en":"Afghanistan","de":"Afghanistan"},"_id":"AF","flag":"🇦🇫","currency":"AFN"},"place":"aswf"},"endLocation":{"country":{"name":{"en":"Pakistan","de":"Pakistan"},"_id":"PK","flag":"🇵🇰","currency":"PKR"},"place":"gagagaga"},"cost":{"exchangeRate":null,"receipts":[],"amount":15.3,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"departure":"2023-06-21T17:01:00.000Z","arrival":"2023-06-21T18:00:00.000Z","distance":51,"transport":"ownCar","purpose":"professional","_id":"6492f5f36fcd319e6a0e4697","midnightCountries":[]},{"startLocation":{"country":{"name":{"en":"Pakistan","de":"Pakistan"},"_id":"PK","flag":"🇵🇰","currency":"PKR"},"place":"gagagaga"},"endLocation":{"country":{"name":{"en":"American Samoa","de":"Amerikanisch-Samoa"},"_id":"AS","flag":"🇦🇸","currency":"USD"},"place":"agggg"},"cost":{"exchangeRate":null,"amount":23,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0},"receipts":[{"_id":"6492f63a6fcd319e6a0e46da","type":"image/png","name":"schema.png"},{"_id":"649305a034c0466080f247d4","type":"image/png","name":"airplane12.png"}],"date":"2023-06-13T00:00:00.000Z"},"departure":"2023-06-21T21:05:00.000Z","arrival":"2023-06-21T23:51:00.000Z","transport":"otherTransport","purpose":"professional","_id":"6492f63a6fcd319e6a0e46dc","midnightCountries":[]},{"startLocation":{"country":{"name":{"en":"American Samoa","de":"Amerikanisch-Samoa"},"_id":"AS","flag":"🇦🇸","currency":"USD"},"place":"agggg"},"endLocation":{"country":{"name":{"en":"Burkina Faso","de":"Burkina Faso"},"_id":"BF","flag":"🇧🇫","currency":"XOF"},"place":"asd"},"cost":{"exchangeRate":{"date":"2023-06-20T00:00:00.000Z","rate":0.127901,"amount":159.11},"amount":1244,"currency":{"name":{"de":"Renminbi Yuan","en":"renminbi-yuan"},"_id":"CNY","subunit":"Fen","symbol":"¥","flag":"🇨🇳","__v":0},"receipts":[{"_id":"6492fccd58ca92b22696535f","type":"image/png","name":"airplane12.png"}],"date":"2023-06-20T00:00:00.000Z"},"departure":"2023-06-24T12:03:00.000Z","arrival":"2023-06-24T12:03:00.000Z","transport":"shipOrFerry","purpose":"professional","_id":"6492fccd58ca92b226965361","midnightCountries":[]}],"expenses":[],"days":[{"cateringNoRefund":{"breakfast":false,"lunch":false,"dinner":false},"date":"2023-06-20T00:00:00.000Z","purpose":"professional","_id":"649305a034c0466080f247e2","refunds":[{"refund":{"amount":25,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"catering8","_id":"649305a034c0466080f247f1"},{"refund":{"amount":87,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"overnight","_id":"649305a034c0466080f24817"}],"country":{"name":{"en":"Burkina Faso","de":"Burkina Faso"},"_id":"BF","flag":"🇧🇫","currency":"XOF"}},{"cateringNoRefund":{"breakfast":false,"lunch":false,"dinner":false},"date":"2023-06-21T00:00:00.000Z","purpose":"professional","_id":"649305a034c0466080f247e3","refunds":[{"refund":{"amount":59,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"catering24","_id":"649305a034c0466080f247fd"},{"refund":{"amount":91,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"overnight","_id":"649305a034c0466080f24823"}],"country":{"name":{"en":"American Samoa","de":"Amerikanisch-Samoa"},"_id":"AS","flag":"🇦🇸","currency":"USD"}},{"cateringNoRefund":{"breakfast":false,"lunch":false,"dinner":false},"date":"2023-06-22T00:00:00.000Z","purpose":"professional","_id":"649305a034c0466080f247e4","refunds":[{"refund":{"amount":59,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"catering24","_id":"649305a034c0466080f24809"},{"refund":{"amount":91,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"overnight","_id":"649305a034c0466080f2482f"}],"country":{"name":{"en":"American Samoa","de":"Amerikanisch-Samoa"},"_id":"AS","flag":"🇦🇸","currency":"USD"}},{"cateringNoRefund":{"breakfast":false,"lunch":false,"dinner":false},"date":"2023-06-23T00:00:00.000Z","purpose":"professional","_id":"649305a034c0466080f247e5","refunds":[{"refund":{"amount":59,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"catering24","_id":"649305a034c0466080f24815"},{"refund":{"amount":91,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"overnight","_id":"649305a034c0466080f2483b"}],"country":{"name":{"en":"American Samoa","de":"Amerikanisch-Samoa"},"_id":"AS","flag":"🇦🇸","currency":"USD"}},{"cateringNoRefund":{"breakfast":false,"lunch":false,"dinner":false},"date":"2023-06-24T00:00:00.000Z","purpose":"professional","_id":"649305a034c0466080f247e6","refunds":[{"refund":{"amount":25,"currency":{"name":{"de":"Euro","en":"euro"},"_id":"EUR","subunit":"Cent","symbol":"€","flag":"🇪🇺","__v":0}},"type":"catering8","_id":"649305a034c0466080f24816"}],"country":{"name":{"en":"Burkina Faso","de":"Burkina Faso"},"_id":"BF","flag":"🇧🇫","currency":"XOF"}}],"createdAt":"2023-06-21T13:03:49.683Z","updatedAt":"2023-06-21T14:13:52.642Z","professionalShare":1,"__v":16}
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), pdfDoc, {font:font, fontSize: 16, x: 16, y: y - 32})
+  drawLogo(getLastPage(), pdfDoc, { font: font, fontSize: 16, x: 16, y: y - 32 })
   y = y - edge
-  y = drawGeneralTravelInformation(getLastPage(), pdfDoc, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize})
+  y = drawGeneralTravelInformation(getLastPage(), pdfDoc, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
   const receiptMap = getReceiptMap(travel)
-  
-  drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9})
-  const pdfBytes = await pdfDoc.save()
-  var callback = (err) => {
-    if (err) throw err;
-    console.log('It\'s saved!');
-  }
-  fs.writeFile('output.pdf', pdfBytes, callback);
+
+  y = drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawDays(getLastPage(), newPage, travel.days, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
+
+  return await pdfDoc.save()
 }
 
 function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) {
@@ -81,7 +92,7 @@ function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) 
 
   // Dates + professionalShare
   var text = i18n.t('labels.from') + ': ' + new Date(travel.startDate).toLocaleDateString(i18n.language) + '    ' + i18n.t('labels.to') + ': ' + new Date(travel.endDate).toLocaleDateString(i18n.language)
-  if(travel.professionalShare !== 1){
+  if (travel.professionalShare !== 1) {
     text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare / 100) * 100 + '%'
   }
   var y = y - (opts.fontSize * 1.5)
@@ -95,91 +106,131 @@ function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) 
   return y
 }
 
-function getReceiptMap(travel){
+function getReceiptMap(travel) {
   map = {}
   number = 1
-  for(const stage of travel.stages){
-    if(stage.cost && stage.cost.receipts){
-      for(const receipt of stage.cost.receipts){
-        receipt.number = number++
-        map[receipt._id] = receipt
+  for (const stage of travel.stages) {
+    if (stage.cost && stage.cost.receipts) {
+      for (const receipt of stage.cost.receipts) {
+        map[receipt._id.toString()] = Object.assign({ number: number++, date: stage.cost.date }, receipt._doc)
       }
     }
   }
 
-  for(const expense of travel.expenses){
-    if(expense.cost && expense.cost.receipts){
-      for(const receipt of expense.cost.receipts){
-        receipt.number = number++
-        map[receipt._id] = receipt
+  for (const expense of travel.expenses) {
+    if (expense.cost && expense.cost.receipts) {
+      for (const receipt of expense.cost.receipts) {
+        map[receipt._id.toString()] = Object.assign({ number: number++, date: expense.cost.date }, receipt._doc)
       }
     }
   }
   return map
 }
 
-function drawStages(page, newPageFn, stages, receiptMap, options = {font}){
+function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
   const columns = []
-  columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => scripts.dateTimeToString(d, i18n.language) })
-  columns.push ({ key: 'arrival', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.arrival'), fn: (d) => scripts.dateTimeToString(d, i18n.language) })
+  columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => scripts.dateTimeToString(d) })
+  columns.push({ key: 'arrival', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.arrival'), fn: (d) => scripts.dateTimeToString(d) })
   columns.push({ key: 'startLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.startLocation'), fn: scripts.placeToString })
-  columns.push({ key: 'endLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.endLocation'), fn: scripts.placeToString  })
+  columns.push({ key: 'endLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.endLocation'), fn: scripts.placeToString })
   columns.push({ key: 'transport', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.transport'), fn: (t) => i18n.t('labels.' + t) })
   columns.push({ key: 'distance', width: 65, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.distance') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
-  columns.push({ key: 'cost', width: 70, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost') , fn: (m) => scripts.getDetailedMoneyString(m, i18n.language)} )
-  columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.receiptNumber') , fn: (m) => m.receipts.map((r) => receiptMap[r._id].number)} )
+  columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
+  columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
 
   return drawTable(page, newPageFn, stages, columns, options)
 }
 
-function drawExpenses(page, newPageFn, days, receiptMap, options = {font}){
+function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font }) {
   const columns = []
-  columns.push({ key: 'description', width: 165, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
+  columns.push({ key: 'description', width: 270, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
-  columns.push({ key: 'cost', width: 70, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost') , fn: (m) => scripts.getDetailedMoneyString(m, i18n.language)} )
-  columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.receiptNumber') , fn: (m) => m.receipts.map((r) => receiptMap[r._id].number)} )
+  columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
+  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.invoiceDate'), fn: (c) => scripts.datetoDateStringWithYear(c.date) })
+  columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
+
+  return drawTable(page, newPageFn, expenses, columns, options)
+}
+
+function drawDays(page, newPageFn, days, options = { font }) {
+  const columns = []
+  columns.push({ key: 'date', width: 70, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.date'), fn: (d) => scripts.datetoDateString(d) })
+  columns.push({ key: 'country', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.country'), fn: (c) => c.name[i18n.language] })
+  columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
+  columns.push({ key: 'cateringNoRefund', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.cateringNoRefund'), fn: (c) => Object.keys(c).map((k) => c[k] ? i18n.t('labels.' + k) : '').join(' ') })
+  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.catering24\n'), fn: (r) => r.filter((r) => r.type.indexOf('catering') === 0).length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund, i18n.language) : '' })
+  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.overnight\n'), fn: (r) => r.filter((r) => r.type == 'overnight').length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type == 'overnight')[0].refund, i18n.language) : '' })
 
   return drawTable(page, newPageFn, days, columns, options)
 }
 
-function drawDays(page, pdfDoc, days, options = {font}){
+async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
+  if (!options.font) {
+    return
+  }
+  const opts = {
+    fontSize: 16,
+    textColor: pdf_lib.rgb(0, 0, 0),
+    edge: 36
+  }
+  Object.assign(opts, options)
 
-}
-
-async function attachReceipts(pdfDoc, receiptMap, options = {font}){
-  for(const receipt of receiptMap){
-    const data = receipt.data
-    if(receipt.type === 'image/jpeg'){
-      const image = await pdfDoc.embedJpg(data)
-      page.drawImage(image, {
-        x: flagX,
-        y: opts.y - (opts.fontSize / 9),
-        height: opts.fontSize,
-        width: opts.fontSize
-      }) 
-    }else if(receipt.type === 'image/png'){
-      const image = await pdfDoc.embedPng(data)
-      page.drawImage(image, {
-        x: flagX,
-        y: opts.y - (opts.fontSize / 9),
-        height: opts.fontSize,
-        width: opts.fontSize
-      })
-    }else if(receipt.type == 'application/pdf'){
-      const pages = await pdfDoc.embedPdf(data)
-      for(const p of pages){
-        page.drawPage(p, {
-          ...americanFlagDims,
-          x: page.getWidth() / 2 - americanFlagDims.width / 2,
-          y: page.getHeight() - americanFlagDims.height - 150,
-        });
+  function drawNumber(page, receipt) {
+    const text = '#' + receipt.number + ' - ' + scripts.datetoDateStringWithYear(receipt.date)
+    const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
+    page.drawRectangle({
+      x: 2,
+      y: page.getSize().height - (opts.fontSize + 2),
+      width: width,
+      height: opts.fontSize + 2,
+      color: pdf_lib.rgb(1, 1, 1),
+      opacity: 0.5,
+    })
+    page.drawText(text, {
+      x: 2,
+      y: page.getSize().height - (opts.fontSize + 2),
+      size: opts.fontSize,
+      font: opts.font,
+      color: opts.textColor
+    })
+  }
+  for (const receiptId in receiptMap) {
+    const receipt = receiptMap[receiptId]
+    const data = (await DocumentFile.findOne({ _id: receipt._id })).data
+    if (receipt.type == 'application/pdf') {
+      const insertPDF = await pdf_lib.PDFDocument.load(data)
+      const pages = await pdfDoc.copyPages(insertPDF, insertPDF.getPageIndices())
+      for (const p of pages) {
+        const page = pdfDoc.addPage(p)
+        drawNumber(page, receipt)
       }
+    } else {
+      var image = {}
+      if (receipt.type === 'image/jpeg') {
+        image = await pdfDoc.embedJpg(data)
+      } else if (receipt.type === 'image/png') {
+        image = await pdfDoc.embedPng(data)
+      }
+      var page = null
+      if (image.width > image.height) {
+        page = pdfDoc.addPage([pdf_lib.PageSizes.A4[1], pdf_lib.PageSizes.A4[0]]) // landscape page
+      } else {
+        page = pdfDoc.addPage(pdf_lib.PageSizes.A4)
+      }
+      const size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
+      page.drawImage(image, {
+        x: (page.getSize().width - size.width) / 2,
+        y: (page.getSize().height - size.height) / 2,
+        width: size.width,
+        height: size.height
+      })
+      drawNumber(page, receipt)
     }
-    
-    
 
-  
+
+
+
   }
 }
 
@@ -226,7 +277,7 @@ async function drawPlace(page, pdfDoc, place, options = { font, x, y }) {
 
 }
 
-async function drawLogo(page, pdfDoc, options = {font, x, y}){
+async function drawLogo(page, pdfDoc, options = { font, x, y }) {
   if (!options.font) {
     return
   }
@@ -255,7 +306,7 @@ async function drawLogo(page, pdfDoc, options = {font, x, y}){
     filename = filename + '36'
   } else if (opts.fontSize > 12) {
     filename = filename + '24'
-  }else{
+  } else {
     filename = filename + '12'
   }
   const logoBytes = fs.readFileSync('./pdf/airplanes/' + filename + '.png')
@@ -317,13 +368,13 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     const cellTexts = []
     for (const column of columns) {
       var cell = data[i][column.key]
-      if(column.fn){
+      if (column.fn) {
         cell = column.fn(cell)
       }
-      if(firstRow){
+      if (firstRow) {
         cell = column.title
       }
-      if(cell == undefined){
+      if (cell == undefined) {
         cell = '---'
       }
       const fontSize = firstRow ? opts.fontSize + 1 : opts.fontSize
@@ -379,7 +430,7 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
       i--
       continue
     }
-    if(firstRow){
+    if (firstRow) {
       firstRow = false
       i--
     }
@@ -413,5 +464,3 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
   })
   return y
 }
-
-createDocument()

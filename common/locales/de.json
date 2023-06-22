@@ -77,7 +77,7 @@
     "claimSpouseRefund": "Ehepartner mitabrechnen",
     "professionalShare": "Beruflicher Anteil",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
-    "cateringNoRefund": "Verpflegungspauschalen Kürzung",
+    "cateringNoRefund": "Verpflegungs pauschalen Kürzung",
     "breakfast": "Frühstück",
     "lunch": "Mittagessen",
     "dinner": "Abendessen",
@@ -103,7 +103,8 @@
     "refund": "Erstatten",
     "invoiceDate": "Rechnungsdatum",
     "description": "Beschreibung",
-    "receiptNumber" : "Beleg Nr."
+    "receiptNumber" : "Beleg Nr.",
+    "date": "Datum"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -204,7 +205,10 @@
   "lumpSums": {
     "catering8": "Verpflegungspauschale (gekürzt)",
     "catering24": "Verpflegungspauschale",
-    "overnight": "Übernachtungspauschale"
+    "overnight": "Übernachtungspauschale",
+    "catering8\n": "Verpflegungs\npauschale (gekürzt)",
+    "catering24\n": "Verpflegungs\npauschale",
+    "overnight\n": "Übernachtungs\npauschale"
   },
   "languages":{
     "de": "Deutsch",

@@ -1,6 +1,6 @@
 const helper = require('../helper')
 const router = require('express').Router()
-const File = require('../models/file')
+const DocumentFile = require('../models/documentFile')
 const Travel = require('../models/travel')
 const User = require('../models/user')
 const i18n = require('../i18n')
@@ -62,7 +62,7 @@ router.post('/travel/refunded', async (req, res) => {
 
 function getReceipt(){
   return async (req, res) => {
-    const file = await File.findOne({ _id: req.query.id })
+    const file = await DocumentFile.findOne({ _id: req.query.id })
     if (file) {
       res.setHeader('Content-Type', file.type);
       res.setHeader('Content-Length', file.data.length);
@@ -114,9 +114,9 @@ function postRecord(recordType) {
                 if(!foundReceipt){
                 break outer_loop
                 }
-                await File.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
+                await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
               }else{
-                var result = await (new File(req.body.cost.receipts[i])).save()
+                var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
                 req.body.cost.receipts[i] = result._id
               }
             }
@@ -133,7 +133,7 @@ function postRecord(recordType) {
     } else {
       if(req.body.cost && req.body.cost.receipts && req.files){
         for(var i = 0; i < req.body.cost.receipts.length; i++){
-          var result = await (new File(req.body.cost.receipts[i])).save()
+          var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
           req.body.cost.receipts[i] = result._id
         }
         travel.markModified(recordType + '.cost.receipts')
@@ -170,7 +170,7 @@ function deleteRecordReceipt(recordType) {
             for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
               if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
                 found = true
-                await File.deleteOne({ _id: req.query.id })
+                await DocumentFile.deleteOne({ _id: req.query.id })
                 travel[recordType][i].cost.receipts.splice(r, 1)
                 break outer_loop
               }
