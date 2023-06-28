@@ -48,7 +48,7 @@
 <script>
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
-import { getMoneyString, datetoDateString } from '../../common/scripts.js'
+import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../common/scripts.js'
 export default {
   name: 'TravelApply',
   data() {
@@ -66,8 +66,9 @@ export default {
     displayKey(key) {
       switch (key) {
         case 'startDate':
+          return datetoDateStringWithYear(this.travel[key])
         case 'endDate':
-          return datetoDateString(this.travel[key])
+          return datetoDateStringWithYear(this.travel[key]) + ' (' + (getDiffInDays(this.travel.startDate, this.travel.endDate) + 1) + ' ' + this.$t('labels.days') + ')'
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':

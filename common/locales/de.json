@@ -104,7 +104,8 @@
     "invoiceDate": "Rechnungsdatum",
     "description": "Beschreibung",
     "receiptNumber" : "Beleg Nr.",
-    "date": "Datum"
+    "date": "Datum",
+    "days": "Tage"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -194,6 +195,20 @@
     "4": "Do",
     "5": "Fr",
     "6": "Sa"
+  },
+  "monthsShort": {
+    "0": "Jan",
+    "1": "Feb",
+    "2": "März",
+    "3": "Apr",
+    "4": "Mai",
+    "5": "Jun",
+    "6": "Jul",
+    "7": "Aug",
+    "8": "Sept",
+    "9": "Okt",
+    "10": "Nov",
+    "11": "Dez"
   },
   "states":{
     "rejected": "Abgelehnt",

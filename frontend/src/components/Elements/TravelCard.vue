@@ -3,7 +3,7 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-          <h5 class="card-title">{{ travel.name ? travel.name : travel.reason }}</h5>
+          <h5 class="card-title">{{ travel.name }}</h5>
         </div>
         <div class="col-auto">
           <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>

@@ -319,6 +319,11 @@ router.post('/travel/appliedFor', async (req, res) => {
   delete req.body.stages
   delete req.body.expenses
   delete req.body.professionalShare
+  
+  if(!req.body.name){
+    var date = new Date(req.body.startDate)
+    req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), {lng: user.settings.language}) + ' ' + date.getUTCFullYear()
+  }
 
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'

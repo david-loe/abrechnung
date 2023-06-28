@@ -10,5 +10,6 @@
     "toleranceStageDatesToApprovedTravelDates": 3,
     "baseCurrency": {"_id": "EUR", "symbol": "€"},
     "allowSpouseRefund": true,
-    "refundPerKM" : 0.3
+    "refundPerKM" : 0.3,
+    "version": 0
 }
