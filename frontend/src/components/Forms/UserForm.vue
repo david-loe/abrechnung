@@ -3,13 +3,13 @@
     <div class="row mb-2">
       <div class="col">
         <label for="userFormUid" class="form-label">
-          {{ $t('labels.uid') }}
+          {{ $t('labels.uid') }}<span class="text-danger">*</span>
         </label>
         <input type="text" class="form-control" id="userFormUid" v-model="formUser.uid" required :disabled="this.mode === 'edit'" />
       </div>
       <div class="col">
         <label for="userFormMail" class="form-label">
-          {{ $t('labels.email') }}
+          {{ $t('labels.email') }}<span class="text-danger">*</span>
         </label>
         <input type="text" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="this.mode === 'edit'" />
       </div>

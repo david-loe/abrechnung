@@ -3,15 +3,15 @@
 
     <div class="mb-2">
       <label for="travelFormDescription" class="form-label">
-        {{ $t('labels.description') }}
+        {{ $t('labels.description') }}<span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled"/>
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required/>
     </div>
 
     <div class="row mb-2">
       <div class="col">
         <label for="expenseFormCost" class="form-label me-2">
-          {{ $t('labels.cost') }}
+          {{ $t('labels.cost') }}<span class="text-danger">*</span>
         </label>
         <InfoPoint :text="$t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
@@ -20,23 +20,23 @@
         </div>
       </div>
       <div class="col">
-        <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}</label>
+        <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
         <input id="endDateInput" class="form-control" type="date" v-model="formExpense.cost.date"
-          :required="Boolean(formExpense.cost.amount)" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
+          :required="true" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
+      <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
       <InfoPoint :text="$t('info.receipts')" />
       <FileUpload id="expenseFormFile" v-model="formExpense.cost.receipts" :disabled="disabled"
-        :required="Boolean(formExpense.cost.amount)" @deleteFile="(id) => $emit('deleteReceipt', id, expense._id, 'expense')"
+        :required="true" @deleteFile="(id) => $emit('deleteReceipt', id, expense._id, 'expense')"
         @showFile="(id, winProxy) => $emit('showReceipt', id, winProxy, expense._id, 'expense')" />
     </div>
 
 
     <label for="expenseFormPurpose" class="form-label me-2">
-      {{ $t('labels.purpose') }}
+      {{ $t('labels.purpose') }}<span class="text-danger">*</span>
     </label>
     <InfoPoint :text="$t('info.purpose')" />
     <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>

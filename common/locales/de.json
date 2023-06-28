@@ -10,7 +10,7 @@
   "labels": {
     "email": "Email Addresse",
     "username": "Benutzername",
-    "name": "Name",
+    "name": "Name der Reise",
     "password": "Passwort",
     "done": "Erledigt",
     "cancel": "Abbrechen",

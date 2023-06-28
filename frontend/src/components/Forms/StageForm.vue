@@ -3,13 +3,14 @@
 
     <div class="row mb-3">
       <div class="col">
-        <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}</label>
+        <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}<span class="text-danger">*</span></label>
         <input id="startDateInput" class="form-control" type="datetime-local" v-model="formStage.departure" :min="minDate"
           :max="maxDate" :disabled="disabled" required />
       </div>
       <div class="col">
-        <label for="endDateInput" class="form-label">{{ $t('labels.arrival')
-        }}</label>
+        <label for="endDateInput" class="form-label">
+          {{ $t('labels.arrival') }}<span class="text-danger">*</span>
+        </label>
         <input id="endDateInput" class="form-control" type="datetime-local" v-model="formStage.arrival"
           :min="formStage.departure ? formStage.departure : minDate" :max="maxDate" :disabled="disabled" required />
       </div>
@@ -19,14 +20,14 @@
     <div class="row mb-3">
       <div class="col">
         <label for="stageFormStartLocation" class="form-label">
-          {{ $t('labels.startLocation') }}
+          {{ $t('labels.startLocation') }}<span class="text-danger">*</span>
         </label>
         <PlaceInput id="stageFormStartLocation" v-model="formStage.startLocation" :disabled="disabled" :required="true">
         </PlaceInput>
       </div>
       <div class="col">
         <label for="stageFormEndLocation" class="form-label">
-          {{ $t('labels.endLocation') }}
+          {{ $t('labels.endLocation') }}<span class="text-danger">*</span>
         </label>
         <PlaceInput id="stageFormEndLocation" v-model="formStage.endLocation" :disabled="disabled" :required="true">
         </PlaceInput>
@@ -34,7 +35,7 @@
     </div>
 
     <label for="stageFormTransport" class="form-label">
-      {{ $t('labels.transport') }}
+      {{ $t('labels.transport') }}<span class="text-danger">*</span>
     </label>
     <select class="form-select mb-3" v-model="formStage.transport" id="stageFormTransport" :disabled="disabled" required>
       <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport"
@@ -43,7 +44,7 @@
 
     <template v-if="formStage.midnightCountries.length > 0">
       <label for="stageFormMidnightCountries" class="form-label me-2">
-        {{ $t('labels.midnightCountries') }}
+        {{ $t('labels.midnightCountries') }}<span class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.midnightCountries')" />
       <div class="row mb-3" id="stageFormMidnightCountries">
@@ -63,7 +64,7 @@
     <template v-if="formStage.transport == 'ownCar'">
       <div class="mb-3">
         <label for="stageFormDistance" class="form-label">
-          {{ $t('labels.distance') }}
+          {{ $t('labels.distance') }}<span class="text-danger">*</span>
         </label>
         <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled"
           required />
@@ -83,13 +84,13 @@
           </div>
         </div>
         <div class="col">
-          <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}</label>
+          <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span v-if="formStage.cost.amount" class="text-danger">*</span></label>
           <input id="endDateInput" class="form-control" type="date" v-model="formStage.cost.date" :required="Boolean(formStage.cost.amount)" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
         </div>
       </div>
 
       <div class="mb-3">
-        <label for="stageFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
+        <label for="stageFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span v-if="formStage.cost.amount" class="text-danger">*</span></label>
         <InfoPoint :text="$t('info.receipts')" />
         <FileUpload id="stageFormFile" v-model="formStage.cost.receipts" :disabled="disabled"
           :required="Boolean(formStage.cost.amount)" @deleteFile="(id) => $emit('deleteReceipt', id, stage._id, 'stage')"
@@ -98,7 +99,7 @@
     </template>
 
     <label for="stageFormPurpose" class="form-label me-2">
-      {{ $t('labels.purpose') }}
+      {{ $t('labels.purpose') }}<span class="text-danger">*</span>
     </label>
     <InfoPoint :text="$t('info.purpose')" />
     <select class="form-select mb-3" v-model="formStage.purpose" id="stageFormPurpose" :disabled="disabled" required>

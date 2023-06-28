@@ -9,8 +9,9 @@
 
     <div class="mb-2">
       <label for="travelFormDestinationPlace" class="form-label me-2">
-        {{ $t('labels.destinationPlace') }}
+        {{ $t('labels.destinationPlace') }}<span class="text-danger">*</span>
       </label>
+      
       <InfoPoint :text="$t('info.destinationPlace')" />
       <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
@@ -23,7 +24,7 @@
 
     <div class="mb-2">
       <label for="travelFormReason" class="form-label me-2">
-        {{ $t('labels.reason') }}
+        {{ $t('labels.reason') }}<span class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.reason')" />
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
@@ -31,11 +32,11 @@
 
     <div class="row mb-2">
       <div class="col-auto">
-        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label>
+        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label><span class="text-danger">*</span>
         <input id="startDateInput" class="form-control" type="date" v-model="formTravel.startDate" :min="$root.dateToHTMLInputString(new Date())" required />
       </div>
       <div class="col-auto">
-        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label>
+        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label><span class="text-danger">*</span>
         <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" :min="formTravel.startDate" required />
       </div>
     </div>
