@@ -41,6 +41,9 @@ function getMoneyString(money, useExchangeRate = true, func = (x) => x, locale) 
 }
 
 function getDetailedMoneyString(money, locale){
+  if(!money || money && !money.amount){
+    return ''
+  }
   string = money.amount.toLocaleString(locale, {
     style: "currency",
     currency: (money.currency._id ? money.currency._id : money.currency)

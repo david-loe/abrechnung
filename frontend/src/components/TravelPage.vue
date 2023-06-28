@@ -507,15 +507,20 @@ export default {
       
     },
     async getTravel() {
-      this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
-      this.renderTable()
+        this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
+        this.renderTable()
     },
     getMoneyString,
     datetoDateString
   },
   async beforeMount() {
     await this.$root.load()
-    await this.getTravel()
+    try {
+      await this.getTravel()
+    } catch (e) {
+      console.log(e)
+      return this.$router.push({ path: '/' })
+    }
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
   },
   mounted() {

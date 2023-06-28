@@ -1,5 +1,6 @@
 /node_modules/
 /pdf/output.pdf
+output.pdf
 
 # Docker Volume Feedback
 common
