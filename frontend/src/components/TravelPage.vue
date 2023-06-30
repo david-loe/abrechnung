@@ -44,7 +44,7 @@
               <i class="bi bi-three-dots-vertical fs-3"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <template v-if="endpointMiddleware === 'examine/'">
+              <template v-if="endpointPrefix === 'examine/' && travel.state !== 'refunded'">
                 <li>
                   <div class="p-1 ps-3">
                     <div class="form-check form-switch form-check-reverse me-1">
@@ -262,17 +262,30 @@
                     </tr>
                   </tbody>
                 </table>
-                <div class="mb-3">
+                <div class="mb-3 p-2 pb-0 bg-light-subtle">
+                  <small>
+                    <p v-for="comment of travel.comments" :key="comment._id">
+                    <span class="fw-bold">{{ comment.author.name  + ': '}}</span>
+                    <span>{{ comment.text }}</span>
+                  </p>
+                  </small>
+                  
+                </div>
+                <div v-if="travel.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
                   <textarea class="form-control" id="comment" rows="1" v-model="travel.comment"
-                    :disabled="isReadOnly && endpointMiddleware !== 'examine/'"></textarea>
+                    :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
                 <button v-if="travel.state === 'approved'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
                   :disabled="isReadOnly || travel.stages.length < 1">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <button v-else-if="endpointMiddleware === 'examine/'" class="btn btn-success" @click="refund()">
+                <a v-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
+                  <i class="bi bi-download"></i>
+                  <span class="ms-1">{{ $t('labels.downloadX', {X: $t('labels.report')}) }}</span>
+                </a>
+                <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success" @click="refund()">
                   <i class="bi bi-coin"></i>
                   <span class="ms-1">{{ $t('labels.refund') }}</span>
                 </button>
@@ -311,7 +324,7 @@ export default {
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, expenseForm },
-  props: { _id: { type: String }, parentPages: { type: Array }, endpointMiddleware: { type: String, default: '' } },
+  props: { _id: { type: String }, parentPages: { type: Array }, endpointPrefix: { type: String, default: '' }, endpointSuffix: { type: String, default: '' } },
   methods: {
     showModal(mode, object, type) {
       this.modalObjectType = type
@@ -344,7 +357,7 @@ export default {
       }
     },
     async deleteTravel() {
-      const result = await this.$root.deleter('travel', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -361,6 +374,9 @@ export default {
         this.$router.push({ path: '/examine' })
       }
     },
+    reportLink() {
+      return process.env.VUE_APP_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
+    },
     async postStage(stage) {
       var headers = {}
       if (stage.cost.receipts) {
@@ -369,14 +385,14 @@ export default {
         }
       }
       stage.travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointMiddleware + 'travel/stage', stage, { headers })
+      const result = await this.$root.setter(this.endpointPrefix + 'travel/stage', stage, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
     async deleteStage(id) {
-      const result = await this.$root.deleter(this.endpointMiddleware + 'travel/stage', { id: id, travelId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -390,14 +406,14 @@ export default {
         }
       }
       stage.travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointMiddleware + 'travel/expense', stage, { headers })
+      const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', stage, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
     async deleteExpense(id) {
-      const result = await this.$root.deleter(this.endpointMiddleware + 'travel/expense', { id: id, travelId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -406,7 +422,7 @@ export default {
     async deleteReceipt(id, recordId, recordType) {
       const params = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
-      const result = await this.$root.deleter(this.endpointMiddleware + 'travel/' + recordType + '/receipt', params)
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params)
       if (result) {
         await this.getTravel()
       }
@@ -414,7 +430,7 @@ export default {
     async showReceipt(id, windowProxy, recordId, recordType) {
       const params = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
-      const result = await this.$root.getter(this.endpointMiddleware + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
+      const result = await this.$root.getter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
       if (result) {
         const fileURL = URL.createObjectURL(result);
         windowProxy.location.assign(fileURL)
@@ -502,7 +518,7 @@ export default {
       
     },
     async getTravel() {
-        this.travel = (await this.$root.getter(this.endpointMiddleware + 'travel', { id: this._id, stages: true, expenses: true, days: true })).data
+        this.travel = (await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, { id: this._id, stages: true, expenses: true, days: true })).data
         this.renderTable()
     },
     getMoneyString,
@@ -514,7 +530,7 @@ export default {
       await this.getTravel()
     } catch (e) {
       console.log(e)
-      return this.$router.push({ path: '/' })
+      return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
   },

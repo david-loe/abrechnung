@@ -9,6 +9,7 @@ const Currency = require('../models/currency')
 const Country = require('../models/country')
 const DocumentFile = require('../models/documentFile')
 const mail = require('../mail/mail')
+const pdf = require('../pdf/generate')
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -361,6 +362,21 @@ router.post('/travel/underExamination', async (req, res) => {
     }
   }
   return helper.setter(Travel, 'traveler', false, check, mail.sendNotificationMail)(req, res)
+})
+
+
+router.get('/travel/report', async (req, res) =>{
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  const travel = await Travel.findOne({ _id:req.query.id, traveler: user._id, historic: false, state:'refunded' })
+  if(travel){
+    const report = await pdf.generateReport(travel)
+    res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', report.length);
+    return res.send(new Buffer.from(report))
+  }else{
+    res.status(400).send({message: 'No travel found'})
+  }
 })
 
 

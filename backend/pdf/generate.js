@@ -8,7 +8,7 @@ const Travel = require('../models/travel')
 const DocumentFile = require('../models/documentFile')
 const mongoose = require('mongoose')
 
-test()
+//test()
 
 async function test() {
   await mongoose.connect(process.env.MONGO_URL, {})
@@ -48,7 +48,7 @@ async function generateReport(travel) {
   y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel.days, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
-
+  
   return await pdfDoc.save()
 }
 
@@ -463,4 +463,9 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     color: opts.borderColor,
   })
   return y
+}
+
+
+module.exports = {
+  generateReport
 }

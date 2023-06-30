@@ -7,7 +7,7 @@ const i18n = require('../i18n')
 const multer  = require('multer')
 const fileHandler = multer({limits: { fileSize: 16000000 }})
 const mail = require('../mail/mail')
-
+const pdf = require('../pdf/generate')
 
 
 router.get('/travel', async (req, res) => {
@@ -236,5 +236,19 @@ function deleteRecordReceipt(recordType) {
 
 router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
 router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
+
+router.get('/travel/report', async (req, res) =>{
+  const travel = await Travel.findOne({ _id:req.query.id, historic: false, state:'refunded' })
+  if(travel){
+    const report = await pdf.generateReport(travel)
+    res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', report.length);
+    return res.send(new Buffer.from(report))
+  }else{
+    res.status(400).send({message: 'No travel found'})
+  }
+})
+
 
 module.exports = router
