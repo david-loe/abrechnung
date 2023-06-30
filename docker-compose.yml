@@ -41,7 +41,7 @@ services:
 # Test LDAP only in development mode
   ldap:
     build:
-      context: ./ldap
+      context: ./dev-tools/ldap
       dockerfile: Dockerfile-${NODE_ENV}
     environment:
       - DEBUG=false
@@ -49,11 +49,24 @@ services:
 # Test SMTP + mail client only in development mode
   inbucket:
     build:
-      context: ./inbucket
+      context: ./dev-tools/inbucket
       dockerfile: Dockerfile-${NODE_ENV}
     ports:
       - ${INBUCKET_UI_PORT}:9000
-      - ${INBUCKET_SMTP_PORT}:2500
+
+# Test SMTP + mail client only in development mode
+  mongo-express:
+    build:
+      context: ./dev-tools/mongo-express
+      dockerfile: Dockerfile-${NODE_ENV}
+    depends_on:
+      - db
+    ports:
+      - ${MONGO_EXPRESS_PORT}:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=db
+    
+      
 
 volumes:
   db_data:
