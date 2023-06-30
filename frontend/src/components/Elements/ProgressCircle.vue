@@ -25,7 +25,12 @@ export default {
   },
   beforeMount() {
     this.calc()
-  }
+  },
+  watch: {
+    progress: function () {
+      this.calc()
+    },
+  },
 }
 </script>
   
