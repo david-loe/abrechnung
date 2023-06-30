@@ -70,7 +70,7 @@ export default {
             const reader = new FileReader()
             reader.readAsDataURL(file)
             reader.onload = async () => {
-              files.push({ data: await this.resizedataURL(reader.result, 1400), type: file.type, name: file.name })
+              files.push({ data: await this.resizeImage(file, 1400), type: file.type, name: file.name })
             }
           }else{
             files.push({ data: file, type: file.type, name: file.name })
@@ -83,26 +83,35 @@ export default {
       event.target.value = ''
     },
     // From https://stackoverflow.com/a/52983833/13582326
-    resizedataURL(datas, longestSide) {
+    resizeImage(file, longestSide) {
+      
       return new Promise((resolve) => {
-        // We create an image to receive the Data URI
-        var img = document.createElement('img')
-        // When the img "onload" is triggered we can resize the image.
-        img.onload = function () {
-          // We create a canvas and get its context.
-          var canvas = document.createElement('canvas')
-          var ctx = canvas.getContext('2d')
-          // We set the dimensions to the wanted size.
-          var max = img.height < img.width ? 'width' : 'height'
-          var min = max == 'width' ? 'height' : 'width'
-          canvas[max] = longestSide
-          canvas[min] = img[min] * (longestSide / img[max])
-          // We resize the image with the canvas method drawImage();
-          ctx.drawImage(this, 0, 0, canvas.width, canvas.height)
-          canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85)
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => {
+          // We create an image to receive the Data URI
+          var img = document.createElement('img')
+          // When the img "onload" is triggered we can resize the image.
+          img.onload = () => {
+            // We create a canvas and get its context.
+            var canvas = document.createElement('canvas')
+            var ctx = canvas.getContext('2d')
+            // We set the dimensions to the wanted size.
+            var max = img.height < img.width ? 'width' : 'height'
+            var min = max == 'width' ? 'height' : 'width'
+            if(canvas[max] > longestSide){
+              canvas[max] = longestSide
+              canvas[min] = img[min] * (longestSide / img[max])
+            }else{
+              return resolve(file)
+            }
+            // We resize the image with the canvas method drawImage();
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height)
+            canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85)
+          }
+          // We put the Data URI in the image's src attribute
+          img.src = reader.result
         }
-        // We put the Data URI in the image's src attribute
-        img.src = datas
       })
     },
   },
