@@ -51,7 +51,7 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
         }
         conditions.$and.push(preConditions)
       }
-      const result = await model.find(conditions, select)
+      const result = await model.find(conditions, select).lean()
       meta.count = result.length
       meta.countPages = Math.ceil(meta.count / meta.limit)
       if (result != null) {
@@ -120,7 +120,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
 }
 
 function deleter(model, checkUserIdField = '', cb = null) {
-  return async (req, res, next = null) => {
+  return async (req, res) => {
     if (req.query.id && req.query.id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
         var doc = await model.findOne({ _id: req.query.id })
@@ -130,7 +130,8 @@ function deleter(model, checkUserIdField = '', cb = null) {
         }
       }
       try {
-        await model.deleteOne({ _id: req.query.id })
+        doc = await model.findOne({ _id: req.query.id })
+        await doc.deleteOne()
         res.send({ message: i18n.t('alerts.successDeleting') })
         if(cb) cb(req.query.id)
       } catch (error) {

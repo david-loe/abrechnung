@@ -199,7 +199,7 @@ function deleteRecord(recordType){
           found = true
           if(travel[recordType][i].cost){
             for(const receipt of travel[recordType][i].cost.receipts){
-              DocumentFile.deleteOne({ _id: receipt._id })
+              DocumentFile.deleteOne({ _id: receipt._id }).exec()
             }
           }
           travel[recordType].splice(i, 1)
@@ -321,8 +321,12 @@ router.post('/travel/appliedFor', async (req, res) => {
   delete req.body.professionalShare
   
   if(!req.body.name){
-    var date = new Date(req.body.startDate)
-    req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), {lng: user.settings.language}) + ' ' + date.getUTCFullYear()
+    try {
+      var date = new Date(req.body.startDate)
+      req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), {lng: user.settings.language}) + ' ' + date.getUTCFullYear()
+    } catch (error) {
+      return res.status(400).send(error)
+    }
   }
 
   const check = async (oldObject) => {

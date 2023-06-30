@@ -13,10 +13,10 @@ function place(required = false) {
   }
 }
 
-function costObject(exchangeRate = true, receipts = true, required = false){
+function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency = null){
   const costObject = {
-    amount: { type: Number, min: 0, required: required },
-    currency: { type: String, ref: 'Currency', required: required },
+    amount: { type: Number, min: 0, required: required, default: null },
+    currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency },
   }
   if(exchangeRate){
     costObject.exchangeRate = {
@@ -43,7 +43,7 @@ const travelSchema = new mongoose.Schema({
   travelInsideOfEU: { type: Boolean, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
-  advance: costObject(true, false),
+  advance: costObject(true, false, false, 'EUR'),
   professionalShare: { type: Number, min: 0, max: 1},
   claimOvernightLumpSum: { type: Boolean, default: true },
   claimSpouseRefund: { type: Boolean, default: false },
@@ -105,13 +105,21 @@ travelSchema.pre(/^find((?!Update).)*$/, function () {
   populate(this)
 })
 
-travelSchema.post('deleteOne', function () {
-  // console.log(this._id)
-  // console.log(this.history)
-  // for (const historyId of this.history){
-  //   console.log(historyId)
-  //   mongoose.model('Travel').deleteOne({_id: historyId})
-  // }
+travelSchema.pre('deleteOne', { document: true, query: false }, function () {
+  for (const historyId of this.history){
+    mongoose.model('Travel').deleteOne({_id: historyId}).exec()
+  }
+  function deleteReceipts(records) {
+    for(const record of records){
+      if(record.cost){
+        for(const receipt of record.cost.receipts){
+          mongoose.model('DocumentFile').deleteOne({ _id: receipt._id }).exec()
+        }
+      }
+    }
+  }
+  deleteReceipts(this.stages)
+  deleteReceipts(this.expenses)
 })
 
 travelSchema.methods.saveToHistory = async function () {
