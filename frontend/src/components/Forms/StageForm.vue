@@ -184,6 +184,7 @@ export default {
         this.formStage.startLocation && this.formStage.endLocation &&
         this.formStage.startLocation.country && this.formStage.endLocation.country &&
         this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
+        !isNaN(new Date(this.formStage.departure)) && !isNaN(new Date(this.formStage.arrival)) && 
         this.$root.dateToHTMLInputString(this.formStage.departure) !== this.$root.dateToHTMLInputString(this.formStage.arrival)
     },
     calcMidnightCountries() {
