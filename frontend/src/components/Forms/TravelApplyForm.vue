@@ -30,7 +30,7 @@
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
     </div>
 
-    <div class="row mb-2">
+    <div class="row mb-3">
       <div class="col-auto">
         <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label><span class="text-danger">*</span>
         <input id="startDateInput" class="form-control" type="date" v-model="formTravel.startDate" :min="$root.dateToHTMLInputString(new Date())" required />
@@ -39,6 +39,15 @@
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label><span class="text-danger">*</span>
         <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" :min="formTravel.startDate" required />
       </div>
+    </div>
+
+    <!-- v-if="settings.allowSpouseRefund" -->
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" required>
+      <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
+        {{ $t('labels.claimSpouseRefund') }}
+      </label>
+      <InfoPoint :text="$t('info.claimSpouseRefund')" />
     </div>
 
     <label for="travelFormAdvance" class="form-label me-2">
@@ -76,6 +85,7 @@ const defaultTravel= {
           endDate: '',
           destinationPlace: undefined,
           travelInsideOfEU: false,
+          claimSpouseRefund: false,
           advance: {
             amount: null,
             currency: 'EUR',

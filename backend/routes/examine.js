@@ -154,6 +154,46 @@ function postRecord(recordType) {
 router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
 router.post('/travel/expense', fileHandler.any(), postRecord('expenses'))
 
+function deleteRecord(recordType){
+  return async (req, res) => {
+    const travel = await Travel.findOne({ _id: req.query.travelId })
+    delete req.query.travelId
+    if (!travel || travel.historic || travel.state !== 'underExamination') {
+      return res.sendStatus(403)
+    }
+    if (req.query.id && req.query.id !== '') {
+      var found = false
+      for (var i = 0; i < travel[recordType].length; i++) {
+        if (travel[recordType][i]._id.equals(req.query.id)) {
+          found = true
+          if(travel[recordType][i].cost){
+            for(const receipt of travel[recordType][i].cost.receipts){
+              DocumentFile.deleteOne({ _id: receipt._id }).exec()
+            }
+          }
+          travel[recordType].splice(i, 1)
+          break
+        }
+      }
+      if (!found) {
+        return res.sendStatus(403)
+      }
+    } else {
+      return res.status(400).send({ message: 'No ' + recordType.replace(/s$/, '') + ' found' })
+    }
+    travel.markModified(recordType)
+    try {
+      await travel.save()
+      res.send({ message: i18n.t('alerts.successDeleting') })
+    } catch (error) {
+      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+    }
+  }
+}
+
+router.delete('/travel/stage', deleteRecord('stages'))
+router.delete('/travel/expense', deleteRecord('expenses'))
+
 function deleteRecordReceipt(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })

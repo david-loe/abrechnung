@@ -96,6 +96,7 @@ router.post('/travel', async (req, res) => {
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
+  delete req.body.days
   delete req.body.expenses
   delete req.body.professionalShare
 
@@ -310,15 +311,21 @@ router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
 
 router.post('/travel/appliedFor', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  req.body.state = 'appliedFor'
-  req.body.editor = user._id
-  req.body.traveler = user._id
-  req.body.comment = null
-  delete req.body.history
-  delete req.body.historic
-  delete req.body.stages
-  delete req.body.expenses
-  delete req.body.professionalShare
+  req.body = {
+    state: 'appliedFor',
+    traveler: user._id,
+    editor: user._id,
+    comment: null,
+    _id: req.body._id,
+    name: req.body.name,
+    reason: req.body.reason,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    destinationPlace: req.body.destinationPlace,
+    travelInsideOfEU: req.body.travelInsideOfEU,
+    advance: req.body.advance,
+    claimSpouseRefund: req.body.claimSpouseRefund
+  }
   
   if(!req.body.name){
     try {

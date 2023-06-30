@@ -53,7 +53,7 @@ export default {
   name: 'TravelApply',
   data() {
     return {
-      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'editor', 'comment']
+      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'editor', 'comment', 'claimSpouseRefund']
     }
   },
   components: { StatePipeline, PlaceElement },

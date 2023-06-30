@@ -46,7 +46,6 @@ const travelSchema = new mongoose.Schema({
   advance: costObject(true, false, false, 'EUR'),
   professionalShare: { type: Number, min: 0, max: 1},
   claimOvernightLumpSum: { type: Boolean, default: true },
-  claimSpouseRefund: { type: Boolean, default: false },
   progress: { type: Number, min: 0, max: 100, default: 0 },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
   historic: { type: Boolean, required: true, default: false },
@@ -81,6 +80,10 @@ const travelSchema = new mongoose.Schema({
     }]
   }],
 }, { timestamps: true })
+
+if(settings.allowSpouseRefund){
+  travelSchema.add({claimSpouseRefund: { type: Boolean, default: false }})
+}
 
 function populate(doc) {
   return Promise.allSettled([

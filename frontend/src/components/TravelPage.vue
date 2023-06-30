@@ -85,16 +85,6 @@
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
           </div>
         </div>
-        <!-- v-if="settings.allowSpouseRefund" -->
-        <div class="col-auto">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="travelClaimSpouseRefund"
-              v-model="travel.claimSpouseRefund" @change="postTravelSettings" :disabled="isReadOnly">
-            <label class="form-check-label" for="travelClaimSpouseRefund">{{ $t('labels.claimSpouseRefund')
-            }}</label>
-            <InfoPoint class="ms-1" :text="$t('info.claimSpouseRefund')" />
-          </div>
-        </div>
       </div>
 
       <div class="row">
@@ -231,9 +221,9 @@
               <div class="col-auto text-secondary">{{ getMoneyString(row.data.cost) }}</div>
             </div>
             <!-- Date -->
-            <div v-if="row.gap" class="row ps-5">
+            <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.gapStage, 'stage')" style="border-radius: 50%;">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.data, 'stage')" style="border-radius: 50%;">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -497,7 +487,12 @@ export default {
           this.table.push({ type: 'stage', data: stage })
         }
       }
-      if(this.travel.days.length !== 0){
+      if(this.travel.stages.length > 0){
+        const last = this.travel.stages[this.travel.stages.length - 1]
+        this.table.push({type: 'gap', data: {departure: last.arrival, startLocation: last.endLocation }})
+      }
+
+      if(this.travel.days.length > 0){
         for(const expense of this.travel.expenses){
           if(expense.cost.date > this.travel.days[this.travel.days.length - 1].date){
             this.table.push({type: 'expense', data: expense})
