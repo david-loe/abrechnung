@@ -50,6 +50,15 @@
       <InfoPoint :text="$t('info.claimSpouseRefund')" />
     </div>
 
+    <div class="mb-2">
+      <label for="travelFormFellowTravelersNames" class="form-label me-2">
+        {{ $t('labels.fellowTravelersNames') }}<span v-if="formTravel.claimSpouseRefund" class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.fellowTravelersNames')" />
+      <input type="text" class="form-control" id="travelFormFellowTravelersNames" v-model="formTravel.fellowTravelersNames" :required="formTravel.claimSpouseRefund" />
+    </div>
+    
+
     <label for="travelFormAdvance" class="form-label me-2">
       {{ $t('labels.advance') }}
     </label>

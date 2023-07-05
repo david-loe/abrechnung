@@ -8,7 +8,6 @@ const Travel = require('../models/travel')
 const DocumentFile = require('../models/documentFile')
 const mongoose = require('mongoose')
 
-//test()
 
 async function test() {
   await mongoose.connect(process.env.MONGO_URL, {})
@@ -44,11 +43,13 @@ async function generateReport(travel) {
   y = drawGeneralTravelInformation(getLastPage(), pdfDoc, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
   const receiptMap = getReceiptMap(travel)
 
+  y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
   y = drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel.days, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
-  await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
   
+  await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
+
   return await pdfDoc.save()
 }
 
@@ -127,6 +128,35 @@ function getReceiptMap(travel) {
   return map
 }
 
+function drawSummary(page, newPageFn, travel, options = { font }) {
+  const columns = []
+  columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left })
+  columns.push({ key: 'sum', width: 65, alignment: pdf_lib.TextAlignment.Right, fn: (m) => scripts.getDetailedMoneyString(m, i18n.language, true) })
+
+  const summary = []
+  summary.push({ reference: i18n.t('labels.lumpSums'), sum: scripts.getLumpSumsSum(travel) })
+  summary.push({ reference: i18n.t('labels.expenses'), sum: scripts.getExpensesSum(travel) })
+  if (travel.advance.amount > 0) {
+    travel.advance.amount = -1 * travel.advance.amount
+    summary.push({ reference: i18n.t('labels.advance'), sum: travel.advance })
+    travel.advance.amount = -1 * travel.advance.amount
+  }
+  summary.push({ reference: i18n.t('labels.total'), sum: scripts.getTravelTotal(travel) })
+
+  const fontSize = options.fontSize + 2
+  page.drawText(i18n.t('labels.summary'), {
+    x: options.xStart,
+    y: options.yStart - fontSize,
+    size: fontSize,
+    font: options.font,
+    color: options.textColor
+  })
+  options.yStart -= fontSize * 1.25
+  options.firstRow = false
+
+  return drawTable(page, newPageFn, summary, columns, options)
+}
+
 function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
   const columns = []
   columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => scripts.dateTimeToString(d) })
@@ -139,6 +169,16 @@ function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
   columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
   columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
 
+  const fontSize = options.fontSize + 2
+  page.drawText(i18n.t('labels.stages'), {
+    x: options.xStart,
+    y: options.yStart - fontSize,
+    size: fontSize,
+    font: options.font,
+    color: options.textColor
+  })
+  options.yStart -= fontSize * 1.25
+
   return drawTable(page, newPageFn, stages, columns, options)
 }
 
@@ -146,9 +186,19 @@ function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font })
   const columns = []
   columns.push({ key: 'description', width: 270, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
-  columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
+  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
   columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.invoiceDate'), fn: (c) => scripts.datetoDateStringWithYear(c.date) })
   columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
+  
+  const fontSize = options.fontSize + 2
+  page.drawText(i18n.t('labels.expenses'), {
+    x: options.xStart,
+    y: options.yStart - fontSize,
+    size: fontSize,
+    font: options.font,
+    color: options.textColor
+  })
+  options.yStart -= fontSize * 1.25
 
   return drawTable(page, newPageFn, expenses, columns, options)
 }
@@ -161,6 +211,16 @@ function drawDays(page, newPageFn, days, options = { font }) {
   columns.push({ key: 'cateringNoRefund', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.cateringNoRefund'), fn: (c) => Object.keys(c).map((k) => c[k] ? i18n.t('labels.' + k) : '').join(' ') })
   columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.catering24\n'), fn: (r) => r.filter((r) => r.type.indexOf('catering') === 0).length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund, i18n.language) : '' })
   columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.overnight\n'), fn: (r) => r.filter((r) => r.type == 'overnight').length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type == 'overnight')[0].refund, i18n.language) : '' })
+
+  const fontSize = options.fontSize + 2
+  page.drawText(i18n.t('labels.lumpSums'), {
+    x: options.xStart,
+    y: options.yStart - fontSize,
+    size: fontSize,
+    font: options.font,
+    color: options.textColor
+  })
+  options.yStart -= fontSize * 1.25
 
   return drawTable(page, newPageFn, days, columns, options)
 }
@@ -218,7 +278,10 @@ async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
       } else {
         page = pdfDoc.addPage(pdf_lib.PageSizes.A4)
       }
-      const size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
+      var size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
+      if(size.width > image.width){
+        size = image.size()
+      }
       page.drawImage(image, {
         x: (page.getSize().width - size.width) / 2,
         y: (page.getSize().height - size.height) / 2,
@@ -227,10 +290,6 @@ async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
       })
       drawNumber(page, receipt)
     }
-
-
-
-
   }
 }
 
@@ -340,7 +399,8 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     newPageYStart: page.getSize().height - edge,
     minimumY: edge,
     borderColor: pdf_lib.rgb(0, 0, 0),
-    textColor: pdf_lib.rgb(0, 0, 0)
+    textColor: pdf_lib.rgb(0, 0, 0),
+    firstRow: true
   }
   Object.assign(opts, options)
   delete edge
@@ -360,7 +420,6 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
 
   var x = opts.xStart
   var y = opts.yStart
-  var firstRow = true
   for (var i = 0; i < data.length; i++) {
     x = opts.xStart
     var yMin = y
@@ -371,15 +430,15 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
       if (column.fn) {
         cell = column.fn(cell)
       }
-      if (firstRow) {
+      if (opts.firstRow) {
         cell = column.title
       }
       if (cell == undefined) {
         cell = '---'
       }
-      const fontSize = firstRow ? opts.fontSize + 1 : opts.fontSize
+      const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
       const multiText = pdf_lib.layoutMultilineText(cell.toString(), {
-        alignment: firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
+        alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
         font: opts.font,
         fontSize: fontSize,
         lineHeight: fontSize,
@@ -427,11 +486,13 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
       var page = newPageFn()
       x = opts.newPageXStart
       y = opts.newPageYStart
+      opts.xStart = opts.newPageXStart
+      opts.yStart = opts.newPageYStart
       i--
       continue
     }
-    if (firstRow) {
-      firstRow = false
+    if (opts.firstRow) {
+      opts.firstRow = false
       i--
     }
     for (const text of cellTexts) {
@@ -467,5 +528,6 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
 
 
 module.exports = {
-  generateReport
+  generateReport,
+  test
 }

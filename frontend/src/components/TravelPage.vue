@@ -4,7 +4,9 @@
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.' + modalObjectType) }) }}</h5>
+            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', {
+              X: $t('labels.' + modalObjectType)
+            }) }}</h5>
             <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
@@ -14,9 +16,9 @@
               @edit="postStage" @deleted="deleteStage" @cancel="hideModal" @deleteReceipt="deleteReceipt"
               @showReceipt="showReceipt">
             </StageForm>
-            <expenseForm v-else-if="modalObjectType === 'expense'" ref="expenseForm" :expense="modalObject" :disabled="isReadOnly" :mode="modalMode" @add="postExpense"
-              @edit="postExpense" @deleted="deleteExpense" @cancel="hideModal" @deleteReceipt="deleteReceipt"
-              @showReceipt="showReceipt">
+            <expenseForm v-else-if="modalObjectType === 'expense'" ref="expenseForm" :expense="modalObject"
+              :disabled="isReadOnly" :mode="modalMode" @add="postExpense" @edit="postExpense" @deleted="deleteExpense"
+              @cancel="hideModal" @deleteReceipt="deleteReceipt" @showReceipt="showReceipt">
             </expenseForm>
           </div>
         </div>
@@ -31,45 +33,52 @@
         </ol>
       </nav>
 
-      <div class="row justify-content-between align-items-end mb-2">
-        <div class="col-auto">
-          <h1 class="m-0">{{ travel.name }}</h1>
-        </div>
-        <div class="col">
-          <h4 class="text-secondary m-0">{{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}</h4>
-        </div>
-        <div class="col-auto">
-          <div class="dropdown">
-            <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
-              <i class="bi bi-three-dots-vertical fs-3"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <template v-if="endpointPrefix === 'examine/' && travel.state !== 'refunded'">
-                <li>
-                  <div class="p-1 ps-3">
-                    <div class="form-check form-switch form-check-reverse me-1">
-                      <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly">
-                      <label class="form-check-label text-nowrap" for="editTravel">
-                        <span class="me-1"><i class="bi bi-lock"></i></span>
-                        <span>{{ $t('labels.readOnly') }}</span>
-                      </label>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-              </template>
-
-              <li>
-                <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#"
-                  @click="isReadOnly ? null : deleteTravel()">
-                  <span class="me-1"><i class="bi bi-trash"></i></span>
-                  <span>{{ $t('labels.delete') }}</span>
-                </a>
-              </li>
-            </ul>
+      <div class="mb-2">
+        <div class="row justify-content-between align-items-end">
+          <div class="col-auto">
+            <h1 class="m-0">{{ travel.name }}</h1>
           </div>
+          <div class="col">
+            <h4 class="text-secondary m-0">{{ datetoDateString(travel.startDate) + ' - ' +
+              datetoDateString(travel.endDate) }}</h4>
+          </div>
+          <div class="col-auto">
+            <div class="dropdown">
+              <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+                <i class="bi bi-three-dots-vertical fs-3"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <template v-if="endpointPrefix === 'examine/' && travel.state !== 'refunded'">
+                  <li>
+                    <div class="p-1 ps-3">
+                      <div class="form-check form-switch form-check-reverse me-1">
+                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel"
+                          v-model="isReadOnly">
+                        <label class="form-check-label text-nowrap" for="editTravel">
+                          <span class="me-1"><i class="bi bi-lock"></i></span>
+                          <span>{{ $t('labels.readOnly') }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                </template>
+
+                <li>
+                  <a :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')" href="#"
+                    @click="isReadOnly && endpointPrefix === 'examine/' ? null : deleteTravel()">
+                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span>{{ $t('labels.delete') }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
+          {{ travel.traveler.name }}
         </div>
       </div>
 
@@ -216,14 +225,15 @@
                 <i class="bi bi-coin"></i>
               </div>
               <div class="col-auto">
-                {{row.data.description}}
+                {{ row.data.description }}
               </div>
               <div class="col-auto text-secondary">{{ getMoneyString(row.data.cost) }}</div>
             </div>
             <!-- Date -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.data, 'stage')" style="border-radius: 50%;">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.data, 'stage')"
+                  style="border-radius: 50%;">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -239,17 +249,19 @@
                   <tbody>
                     <tr>
                       <th>{{ $t('labels.progress') }}</th>
-                      <td class="text-end"><ProgressCircle :progress="travel.progress"></ProgressCircle></td>
+                      <td class="text-end">
+                        <ProgressCircle :progress="travel.progress"></ProgressCircle>
+                      </td>
                     </tr>
                     <!-- baseCurrency -->
                     <tr>
                       <td><small>{{ $t('labels.lumpSums') }}</small></td>
-                      <td class="text-end"><small>{{ getMoneyString(getLumpSumsSum())
+                      <td class="text-end"><small>{{ getMoneyString(getLumpSumsSum(travel))
                       }}</small></td>
                     </tr>
                     <tr>
                       <td><small>{{ $t('labels.expenses') }}</small></td>
-                      <td class="text-end"><small>{{ getMoneyString(getExpensesSum()) }}</small></td>
+                      <td class="text-end"><small>{{ getMoneyString(getExpensesSum(travel)) }}</small></td>
                     </tr>
                     <tr v-if="travel.advance.amount > 0">
                       <td class="text-secondary"><small>{{ $t('labels.advance') }}</small></td>
@@ -258,32 +270,32 @@
                     </tr>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(travel.advance, true, (x) => getExpensesSum().amount + getLumpSumsSum().amount - x) }}</td>
+                      <td class="text-end">{{ getMoneyString(getTravelTotal(travel)) }}</td>
                     </tr>
                   </tbody>
                 </table>
-                <div class="mb-3 p-2 pb-0 bg-light-subtle">
+                <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
-                    <span class="fw-bold">{{ comment.author.name  + ': '}}</span>
-                    <span>{{ comment.text }}</span>
-                  </p>
+                      <span class="fw-bold">{{ comment.author.name + ': ' }}</span>
+                      <span>{{ comment.text }}</span>
+                    </p>
                   </small>
-                  
                 </div>
                 <div v-if="travel.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
                   <textarea class="form-control" id="comment" rows="1" v-model="travel.comment"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
-                <button v-if="travel.state === 'approved'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || travel.stages.length < 1">
+                <button v-if="travel.state === 'approved'" class="btn btn-primary"
+                  @click="isReadOnly ? null : toExamination()" :disabled="isReadOnly || travel.stages.length < 1">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <a v-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
+                <a v-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink()"
+                  :download="travel.name + '.pdf'">
                   <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ $t('labels.downloadX', {X: $t('labels.report')}) }}</span>
+                  <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                 </a>
                 <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success" @click="refund()">
                   <i class="bi bi-coin"></i>
@@ -308,7 +320,7 @@ import StageForm from './Forms/StageForm.vue'
 import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
-import { getMoneyString, datetoDateString } from '../common/scripts.js'
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../common/scripts.js'
 export default {
   name: 'TravelPage',
   data() {
@@ -346,7 +358,6 @@ export default {
       const travel = {
         _id: this.travel._id,
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
-        claimSpouseRefund: this.travel.claimSpouseRefund,
         days: this.travel.days
       }
       const result = await this.$root.setter('travel', travel)
@@ -434,7 +445,7 @@ export default {
       if (result) {
         const fileURL = URL.createObjectURL(result);
         windowProxy.location.assign(fileURL)
-      }else{
+      } else {
         windowProxy.close()
       }
     },
@@ -451,37 +462,12 @@ export default {
       }
       return icon
     },
-    getLumpSumsSum() {
-      var sum = 0
-      for (const day of this.travel.days) {
-        for (const refund of day.refunds) {
-          sum += refund.refund.amount
-        }
-      }
-      // baseCurrency
-      return { amount: sum, currency: { _id: "EUR" } }
-    },
-    getExpensesSum() {
-      var sum = 0
-      for (const stage of this.travel.stages){
-        if(stage.cost && stage.cost.amount > 0){
-          sum += stage.cost.exchangeRate ? stage.cost.exchangeRate.amount : stage.cost.amount
-        }
-      }
-      for (const expense of this.travel.expenses){
-        if(expense.cost && expense.cost.amount > 0){
-          sum += expense.cost.exchangeRate ? expense.cost.exchangeRate.amount : expense.cost.amount
-        }
-      }
-      // baseCurrency
-      return { amount: sum, currency: { _id: "EUR" } }
-    },
     renderTable() {
       this.table = []
       var stageIndex = 0;
-      for(const expense of this.travel.expenses){
-        if(this.travel.days.length === 0 || expense.cost.date < this.travel.days[0].date){
-          this.table.push({type: 'expense', data: expense})
+      for (const expense of this.travel.expenses) {
+        if (this.travel.days.length === 0 || expense.cost.date < this.travel.days[0].date) {
+          this.table.push({ type: 'expense', data: expense })
         }
       }
       for (var i = 0; i < this.travel.days.length; i++) {
@@ -494,35 +480,38 @@ export default {
           stagesEnd = this.travel.stages.length
         }
         this.table.push({ type: 'day', data: this.travel.days[i] })
-        for(const expense of this.travel.expenses){
-          if(expense.cost.date == this.travel.days[i].date){
-            this.table.push({type: 'expense', data: expense})
+        for (const expense of this.travel.expenses) {
+          if (expense.cost.date == this.travel.days[i].date) {
+            this.table.push({ type: 'expense', data: expense })
           }
         }
         for (const stage of this.travel.stages.slice(stagesStart, stagesEnd)) {
           this.table.push({ type: 'stage', data: stage })
         }
       }
-      if(this.travel.stages.length > 0){
+      if (this.travel.stages.length > 0) {
         const last = this.travel.stages[this.travel.stages.length - 1]
-        this.table.push({type: 'gap', data: {departure: last.arrival, startLocation: last.endLocation }})
+        this.table.push({ type: 'gap', data: { departure: last.arrival, startLocation: last.endLocation } })
       }
 
-      if(this.travel.days.length > 0){
-        for(const expense of this.travel.expenses){
-          if(expense.cost.date > this.travel.days[this.travel.days.length - 1].date){
-            this.table.push({type: 'expense', data: expense})
+      if (this.travel.days.length > 0) {
+        for (const expense of this.travel.expenses) {
+          if (expense.cost.date > this.travel.days[this.travel.days.length - 1].date) {
+            this.table.push({ type: 'expense', data: expense })
           }
         }
       }
-      
+
     },
     async getTravel() {
-        this.travel = (await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, { id: this._id, stages: true, expenses: true, days: true })).data
-        this.renderTable()
+      this.travel = (await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, { id: this._id, stages: true, expenses: true, days: true })).data
+      this.renderTable()
     },
     getMoneyString,
-    datetoDateString
+    datetoDateString,
+    getLumpSumsSum,
+    getExpensesSum,
+    getTravelTotal
   },
   async beforeMount() {
     await this.$root.load()

@@ -55,6 +55,7 @@
     "comment": "Comment",
     "editor": "Editor",
     "stage": "Stage",
+    "stages": "Stages",
     "route": "Route",
     "stay": "Stay",
     "location": "Location",
@@ -107,7 +108,8 @@
     "description": "Description",
     "receiptNumber" : "Receipt No.",
     "date": "Date",
-    "days": "Days"
+    "days": "Days",
+    "fellowTravelersNames": "Name of all fellow travelers"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
@@ -144,7 +146,8 @@
     "receipts": "Upload the corresponding receipts here.",
     "purpose": "Specify which purpose this stage served.",
     "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
-    "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it."
+    "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
+    "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)"
   },
   "mail" : {
     "hi": "Hi there,",

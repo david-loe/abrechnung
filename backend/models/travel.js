@@ -82,7 +82,7 @@ const travelSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 if(settings.allowSpouseRefund){
-  travelSchema.add({claimSpouseRefund: { type: Boolean, default: false }})
+  travelSchema.add({claimSpouseRefund: { type: Boolean, default: false }, fellowTravelersNames: { type: String }})
 }
 
 function populate(doc) {

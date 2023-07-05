@@ -40,8 +40,8 @@ function getMoneyString(money, useExchangeRate = true, func = (x) => x, locale) 
   })
 }
 
-function getDetailedMoneyString(money, locale){
-  if(!money || money && !money.amount){
+function getDetailedMoneyString(money, locale, printZero = false){
+  if(!money || money && (typeof money.amount !== 'number' || !money.amount && !printZero) ){
     return ''
   }
   string = money.amount.toLocaleString(locale, {
@@ -92,6 +92,50 @@ function datetoDateStringWithYear(date) {
   return day + '.' + month + '.' + year
 }
 
+function getLumpSumsSum(travel) {
+  var sum = 0
+  for (const day of travel.days) {
+    for (const refund of day.refunds) {
+      sum += refund.refund.amount
+    }
+  }
+  // baseCurrency
+  return { amount: sum, currency: { _id: "EUR" } }
+}
+
+function getExpensesSum(travel) {
+  var sum = 0
+  for (const stage of travel.stages) {
+    if (stage.cost && stage.cost.amount > 0) {
+      if(stage.cost.exchangeRate && typeof stage.cost.exchangeRate.amount == 'number'){
+        sum += stage.cost.exchangeRate.amount
+      }else{
+        sum += stage.cost.amount
+      }
+    }
+  }
+  for (const expense of travel.expenses) {
+    if (expense.cost && expense.cost.amount > 0) {
+      if(expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number'){
+        sum += expense.cost.exchangeRate.amount
+      }else{
+        sum += expense.cost.amount
+      }
+    }
+  }
+  // baseCurrency
+  return { amount: sum, currency: { _id: "EUR" } }
+}
+
+function getTravelTotal(travel) {
+  var advance = 0
+  if(travel.advance && travel.advance.amount){
+    advance = travel.advance.exchangeRate ? travel.advance.exchangeRate.amount : travel.advance.amount
+  }
+  // baseCurrency
+  return { amount: getExpensesSum(travel).amount + getLumpSumsSum(travel).amount - advance, currency: { _id: "EUR" } }
+}
+
 module.exports = {
   getFlagEmoji,
   getDiffInDays,
@@ -103,5 +147,8 @@ module.exports = {
   dateTimeToString,
   dateToTimeString,
   datetoDateString,
-  datetoDateStringWithYear
+  datetoDateStringWithYear,
+  getLumpSumsSum,
+  getExpensesSum,
+  getTravelTotal
 }

@@ -325,7 +325,8 @@ router.post('/travel/appliedFor', async (req, res) => {
     destinationPlace: req.body.destinationPlace,
     travelInsideOfEU: req.body.travelInsideOfEU,
     advance: req.body.advance,
-    claimSpouseRefund: req.body.claimSpouseRefund
+    claimSpouseRefund: req.body.claimSpouseRefund,
+    fellowTravelersNames: req.body.fellowTravelersNames
   }
   
   if(!req.body.name){
