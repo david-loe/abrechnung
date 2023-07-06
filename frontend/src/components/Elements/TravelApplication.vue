@@ -53,7 +53,17 @@ export default {
   name: 'TravelApply',
   data() {
     return {
-      keys: ['traveler', 'reason', 'startDate', 'endDate', 'travelInsideOfEU', 'editor', 'comment', 'claimSpouseRefund', 'fellowTravelersNames']
+      keys: [
+        'traveler',
+        'reason',
+        'startDate',
+        'endDate',
+        'travelInsideOfEU',
+        'editor',
+        'comment',
+        'claimSpouseRefund',
+        'fellowTravelersNames'
+      ]
     }
   },
   components: { StatePipeline, PlaceElement },
@@ -68,7 +78,14 @@ export default {
         case 'startDate':
           return datetoDateStringWithYear(this.travel[key])
         case 'endDate':
-          return datetoDateStringWithYear(this.travel[key]) + ' (' + (getDiffInDays(this.travel.startDate, this.travel.endDate) + 1) + ' ' + this.$t('labels.days') + ')'
+          return (
+            datetoDateStringWithYear(this.travel[key]) +
+            ' (' +
+            (getDiffInDays(this.travel.startDate, this.travel.endDate) + 1) +
+            ' ' +
+            this.$t('labels.days') +
+            ')'
+          )
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':
@@ -91,7 +108,7 @@ export default {
     },
     getMoneyString
   },
-  mounted() { },
+  mounted() {}
 }
 </script>
 

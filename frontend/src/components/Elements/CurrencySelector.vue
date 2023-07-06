@@ -1,14 +1,22 @@
 <template>
-  <v-select v-if="$root.currencies.length > 0" :options="$root.currencies" :modelValue="modelValue"
-    @update:modelValue="(v) => $emit('update:modelValue', v)" :placeholder="$t('labels.currency')" :filter="filter" :disabled="disabled"
-    :reduce="(cur) => cur._id" style="min-width: 200px;">
+  <v-select
+    v-if="$root.currencies.length > 0"
+    :options="$root.currencies"
+    :modelValue="modelValue"
+    @update:modelValue="(v) => $emit('update:modelValue', v)"
+    :placeholder="$t('labels.currency')"
+    :filter="filter"
+    :disabled="disabled"
+    :reduce="(cur) => cur._id"
+    style="min-width: 200px">
     <template #option="{ name, _id, symbol, flag }">
       <div class="row align-items-center">
         <div v-if="flag" class="col-auto px-1">
           <span class="fs-2">{{ flag }}</span>
         </div>
         <div class="col p-1 lh-1 text-truncate" :title="name[$i18n.locale]">
-          <span>{{ _id }}</span><br />
+          <span>{{ _id }}</span
+          ><br />
           <span class="text-secondary">
             <small>{{ name[$i18n.locale] }}</small>
           </span>
@@ -50,8 +58,8 @@ export default {
         const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
         return code
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

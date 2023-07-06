@@ -13,21 +13,21 @@ function place(required = false) {
   }
 }
 
-function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency = null){
+function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency = null) {
   const costObject = {
     amount: { type: Number, min: 0, required: required, default: null },
     currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency },
   }
-  if(exchangeRate){
+  if (exchangeRate) {
     costObject.exchangeRate = {
       date: { type: Date },
       rate: { type: Number, min: 0 },
       amount: { type: Number, min: 0 }
     }
   }
-  if(receipts){
+  if (receipts) {
     costObject.receipts = [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = {type: Date, required: required }
+    costObject.date = { type: Date, required: required }
   }
   return costObject
 }
@@ -37,14 +37,14 @@ const travelSchema = new mongoose.Schema({
   traveler: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   state: { type: String, required: true, enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'], default: 'appliedFor' },
   editor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  comments: [{text: {type: String }, author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }}],
+  comments: [{ text: { type: String }, author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } }],
   reason: { type: String, required: true },
   destinationPlace: place(true),
   travelInsideOfEU: { type: Boolean, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   advance: costObject(true, false, false, 'EUR'),
-  professionalShare: { type: Number, min: 0, max: 1},
+  professionalShare: { type: Number, min: 0, max: 1 },
   claimOvernightLumpSum: { type: Boolean, default: true },
   progress: { type: Number, min: 0, max: 100, default: 0 },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Travel' }],
@@ -61,7 +61,7 @@ const travelSchema = new mongoose.Schema({
     purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
   }],
   expenses: [{
-    description: {type: String, required: true},
+    description: { type: String, required: true },
     cost: costObject(true, true, true),
     purpose: { type: String, enum: ['professional', 'mixed'] },
   }],
@@ -81,8 +81,8 @@ const travelSchema = new mongoose.Schema({
   }],
 }, { timestamps: true })
 
-if(settings.allowSpouseRefund){
-  travelSchema.add({claimSpouseRefund: { type: Boolean, default: false }, fellowTravelersNames: { type: String }})
+if (settings.allowSpouseRefund) {
+  travelSchema.add({ claimSpouseRefund: { type: Boolean, default: false }, fellowTravelersNames: { type: String } })
 }
 
 function populate(doc) {
@@ -109,13 +109,13 @@ travelSchema.pre(/^find((?!Update).)*$/, function () {
 })
 
 travelSchema.pre('deleteOne', { document: true, query: false }, function () {
-  for (const historyId of this.history){
-    mongoose.model('Travel').deleteOne({_id: historyId}).exec()
+  for (const historyId of this.history) {
+    mongoose.model('Travel').deleteOne({ _id: historyId }).exec()
   }
   function deleteReceipts(records) {
-    for(const record of records){
-      if(record.cost){
-        for(const receipt of record.cost.receipts){
+    for (const record of records) {
+      if (record.cost) {
+        for (const receipt of record.cost.receipts) {
           mongoose.model('DocumentFile').deleteOne({ _id: receipt._id }).exec()
         }
       }
@@ -224,7 +224,7 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
 
       result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: settings.baseCurrency }
-      if(settings.allowSpouseRefund && this.claimSpouseRefund){
+      if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount *= 2
       }
       day.refunds.push(result)
@@ -252,7 +252,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
         const result = { type: 'overnight' }
         var amount = (await day.country.getLumpSum(day.date))[result.type]
         result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: settings.baseCurrency }
-        if(settings.allowSpouseRefund && this.claimSpouseRefund){
+        if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount *= 2
         }
         day.refunds.push(result)
@@ -276,10 +276,10 @@ async function exchange(costObject, date) {
 travelSchema.methods.calculateExchangeRates = async function () {
   const promiseList = []
   promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
-  for(const stage of this.stages){
+  for (const stage of this.stages) {
     promiseList.push(exchange(stage.cost, stage.cost.date))
   }
-  for(const expense of this.expenses){
+  for (const expense of this.expenses) {
     promiseList.push(exchange(expense.cost, expense.cost.date))
   }
   results = await Promise.allSettled(promiseList)
@@ -287,13 +287,13 @@ travelSchema.methods.calculateExchangeRates = async function () {
     this.advance = results[0].value
   }
   var i = 1
-  for(const stage of this.stages){
+  for (const stage of this.stages) {
     if (results[i].status === 'fulfilled') {
       stage.cost = results[i].value
     }
     i++
   }
-  for(const expense of this.expenses){
+  for (const expense of this.expenses) {
     if (results[i].status === 'fulfilled') {
       expense.cost = results[i].value
     }
@@ -302,35 +302,35 @@ travelSchema.methods.calculateExchangeRates = async function () {
 }
 
 travelSchema.methods.calculateProfessionalShare = function () {
-  if(this.days.length > 0){
+  if (this.days.length > 0) {
     var professionalDays = 0
-    for(const day of this.days){
-      if(day.purpose === 'professional'){
+    for (const day of this.days) {
+      if (day.purpose === 'professional') {
         professionalDays += 1
       }
     }
     this.professionalShare = professionalDays / this.days.length
-  }else{
+  } else {
     this.professionalShare = null
   }
 }
 
 travelSchema.methods.calculateRefundforOwnCar = function () {
-  for(const stage of this.stages){
-    if(stage.transport === 'ownCar'){
+  for (const stage of this.stages) {
+    if (stage.transport === 'ownCar') {
       stage.cost = { amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100, currency: settings.baseCurrency }
     }
   }
 }
 
 travelSchema.methods.addComment = function () {
-  if(this.comment){
-    this.comments.push({text: this.comment, author: this.editor, state: this.state})
+  if (this.comment) {
+    this.comments.push({ text: this.comment, author: this.editor, state: this.state })
     delete this.comment
   }
 }
 
-travelSchema.pre('validate', function() {
+travelSchema.pre('validate', function () {
   this.addComment()
 });
 

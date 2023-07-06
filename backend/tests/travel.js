@@ -26,11 +26,11 @@ async function getTestTravel() {
       startLocation: {
         country: 'DE',
         place: 'München'
-    },
+      },
       endLocation: {
         country: 'SE',
         place: 'Malmö'
-    },
+      },
     }]
   })
 }

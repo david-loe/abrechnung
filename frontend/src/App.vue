@@ -16,29 +16,28 @@
             </router-link>
           </div>
           <div>
-            <router-link v-if="auth && user.access.approve" to="/approve"
-              class="nav-link link-dark d-flex align-items-center">
+            <router-link v-if="auth && user.access.approve" to="/approve" class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-calendar-check"></i>
               <span class="ms-1 d-none d-md-block">{{ $t('labels.approve') }}</span>
             </router-link>
           </div>
           <div>
-            <router-link v-if="auth && user.access.examine" to="/examine"
-              class="nav-link link-dark d-flex align-items-center">
+            <router-link v-if="auth && user.access.examine" to="/examine" class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-pencil-square"></i>
               <span class="ms-1 d-none d-md-block">{{ $t('labels.examine') }}</span>
             </router-link>
           </div>
           <div v-if="auth" class="dropdown">
-            <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#"
-              role="button">
+            <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
               <i class="fs-4 bi bi-person-circle"></i>
               <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
                 <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushSettings">
-                  <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">{{ lang.flag }}</option>
+                  <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">
+                    {{ lang.flag }}
+                  </option>
                 </select>
               </li>
               <template v-if="user.access.admin">
@@ -88,8 +87,11 @@
     <div class="position-relative">
       <div class="position-absolute top-0 end-0" style="height: 100%">
         <div class="position-sticky top-0 pt-2 pe-2" style="z-index: 1100">
-          <div v-for="(alert, index) of alerts" :key="alert.id"
-            :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'" role="alert"
+          <div
+            v-for="(alert, index) of alerts"
+            :key="alert.id"
+            :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'"
+            role="alert"
             style="z-index: 1100; max-width: 250px">
             <strong>
               <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
@@ -98,8 +100,7 @@
             </strong>
             {{ alert.message }}
             <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
-              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress"
-                aria-label="Danger example"></div>
+              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress" aria-label="Danger example"></div>
             </div>
             <button type="button" class="btn-close" @click="alerts.splice(index, 1)"></button>
           </div>
@@ -139,23 +140,19 @@ export default {
         appliedFor: { color: '#cae5ff', text: 'black' },
         approved: { color: '#89bbfe', text: 'black' },
         underExamination: { color: '#6f8ab7', text: 'white' },
-        refunded: { color: '#615d6c', text: 'white' },
+        refunded: { color: '#615d6c', text: 'white' }
       },
       languages: [
         { flag: '🇩🇪', key: 'de' },
-        { flag: '🇬🇧', key: 'en' },
-      ],
+        { flag: '🇬🇧', key: 'en' }
+      ]
     }
   },
   methods: {
     async load() {
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
-        this.loadingPromise = Promise.allSettled([
-          this.getter('user'),
-          this.getter('currency'),
-          this.getter('country'),
-        ]).then((result) => {
+        this.loadingPromise = Promise.allSettled([this.getter('user'), this.getter('currency'), this.getter('country')]).then((result) => {
           this.user = result[0].value.data
           if (Object.keys(this.user).length > 0) {
             this.$i18n.locale = this.user.settings.language
@@ -173,7 +170,7 @@ export default {
     async logout() {
       try {
         const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/logout', {
-          withCredentials: true,
+          withCredentials: true
         })
         if (res.status === 200) {
           this.auth = false
@@ -187,10 +184,16 @@ export default {
     },
     async getter(endpoint, params = {}, config = {}) {
       try {
-        const res = await axios.get(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, Object.assign({
-          params: params,
-          withCredentials: true,
-        }, config))
+        const res = await axios.get(
+          process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint,
+          Object.assign(
+            {
+              params: params,
+              withCredentials: true
+            },
+            config
+          )
+        )
         if (res.status === 200) {
           return res.data
         }
@@ -206,9 +209,16 @@ export default {
     },
     async setter(endpoint, data, config = {}) {
       try {
-        const res = await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, data, Object.assign({
-          withCredentials: true,
-        }, config))
+        const res = await axios.post(
+          process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint,
+          data,
+          Object.assign(
+            {
+              withCredentials: true
+            },
+            config
+          )
+        )
         if (res.status === 200) {
           this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
           return res.data.result
@@ -230,7 +240,7 @@ export default {
       try {
         const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, {
           params: params,
-          withCredentials: true,
+          withCredentials: true
         })
         if (res.status === 200) {
           this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
@@ -289,7 +299,7 @@ export default {
       this.user.settings.language = this.$i18n.locale
       try {
         await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {
-          withCredentials: true,
+          withCredentials: true
         })
       } catch (error) {
         if (error.response.status === 401) {
@@ -298,11 +308,11 @@ export default {
           console.log(error.response.data)
         }
       }
-    },
+    }
   },
   beforeMount() {
     document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
-  },
+  }
 }
 </script>
 
@@ -362,4 +372,5 @@ footer {
 
 .router-link-active {
   font-weight: bold !important;
-}</style>
+}
+</style>

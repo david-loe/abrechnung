@@ -1,7 +1,13 @@
 <template>
-  <v-select v-if="$root.countries.length > 0" :options="$root.countries" :modelValue="modelValue"
-    :placeholder="$t('labels.country')" @update:modelValue="(v) => $emit('update:modelValue', v)" :filter="filter" :disabled="disabled"
-    style="min-width: 160px;">
+  <v-select
+    v-if="$root.countries.length > 0"
+    :options="$root.countries"
+    :modelValue="modelValue"
+    :placeholder="$t('labels.country')"
+    @update:modelValue="(v) => $emit('update:modelValue', v)"
+    :filter="filter"
+    :disabled="disabled"
+    style="min-width: 160px">
     <template #option="{ name, flag }">
       <div class="row align-items-center" :title="name[$i18n.locale]">
         <div v-if="flag" class="col-auto px-1">
@@ -50,8 +56,8 @@ export default {
         const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
         return code
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

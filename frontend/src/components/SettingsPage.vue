@@ -20,9 +20,8 @@ export default {
   methods: {},
   async beforeMount() {
     await this.$root.load()
-  },
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>

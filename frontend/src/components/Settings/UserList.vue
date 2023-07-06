@@ -30,12 +30,19 @@
         </div>
       </li>
     </ul>
-    <UserForm v-if="userFormMode !== ''" :user="userToEdit" :mode="userFormMode" @add="postUser" @edit="postUser"
-      @cancel="userFormMode = ''" ref="userform" id="userform" style="max-width: 650px"></UserForm>
-
-    <button v-if="userFormMode === ''" type="button" class="btn btn-secondary"
-      @click="userFormMode = 'add'; userToEdit = undefined">
-      {{ $t('labels.addX', {X: $t('labels.user') }) }}
+    <UserForm
+      v-if="userFormMode !== ''"
+      :user="userToEdit"
+      :mode="userFormMode"
+      @add="postUser"
+      @edit="postUser"
+      @cancel="userFormMode = ''"
+      ref="userform"
+      id="userform"
+      style="max-width: 650px"></UserForm>
+    <!-- prettier-ignore-attribute @click -->
+    <button v-if="userFormMode === ''" type="button" class="btn btn-secondary" @click="userFormMode = 'add'; userToEdit = undefined">
+      {{ $t('labels.addX', { X: $t('labels.user') }) }}
     </button>
   </div>
 </template>
@@ -70,11 +77,11 @@ export default {
       if (result) {
         this.users = (await this.$root.getter('admin/user')).data
       }
-    },
+    }
   },
   async beforeMount() {
     this.users = (await this.$root.getter('admin/user')).data
-  },
+  }
 }
 </script>
 

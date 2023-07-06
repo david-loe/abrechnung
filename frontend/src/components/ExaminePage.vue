@@ -1,7 +1,11 @@
 <template>
   <div class="container">
     <h1 class="mb-3">{{ $t('labels.examine') }}</h1>
-    <TravelCardList class="mb-5" ref="travelCardListRef" endpoint="examine/travel" :showTraveler="true"
+    <TravelCardList
+      class="mb-5"
+      ref="travelCardListRef"
+      endpoint="examine/travel"
+      :showTraveler="true"
       @clicked="(t) => $router.push('/examine/' + t._id)">
     </TravelCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
@@ -11,8 +15,11 @@
       <button type="button" class="btn btn-light" @click="showRefunded = false">
         {{ $t('labels.hideRefundedTravels') }} <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr">
-      <TravelCardList endpoint="examine/travel/refunded" :showTraveler="true" @clicked="(t) => $router.push('/examine/' + t._id + '/%2Frefunded')">
+      <hr class="hr" />
+      <TravelCardList
+        endpoint="examine/travel/refunded"
+        :showTraveler="true"
+        @clicked="(t) => $router.push('/examine/' + t._id + '/%2Frefunded')">
       </TravelCardList>
     </template>
   </div>
@@ -30,11 +37,10 @@ export default {
       showRefunded: false
     }
   },
-  methods: {
-  },
+  methods: {},
   async beforeMount() {
     await this.$root.load()
-  },
+  }
 }
 </script>
 

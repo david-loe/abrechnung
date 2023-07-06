@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
     admin: { type: Boolean, default: false }
   },
   settings: {
-    language: {type: String, default: 'de'},
-    lastCurrencies: [{type: String, ref: 'Currency'}],
+    language: { type: String, default: 'de' },
+    lastCurrencies: [{ type: String, ref: 'Currency' }],
   }
 })
 

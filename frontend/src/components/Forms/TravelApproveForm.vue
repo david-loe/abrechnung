@@ -25,13 +25,13 @@ export default {
   name: 'InfoPoint',
   data() {
     return {
-      comment: null,
+      comment: null
     }
   },
   components: { TravelApply },
   props: { travel: { type: Object } },
   emits: ['decision', 'cancel'],
-  methods:{
+  methods: {
     clear() {
       this.comment = null
     }
@@ -39,5 +39,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

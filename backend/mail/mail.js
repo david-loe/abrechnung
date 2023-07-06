@@ -9,7 +9,7 @@ function sendMail(recipients, subject, paragaph, button, lastParagraph) {
     return false
   }
   var salutation = i18n.t('mail.hi')
-  if(recipients.length === 1){
+  if (recipients.length === 1) {
     salutation = i18n.t('mail.hiX', { X: recipients[0].name })
   }
   const regards = i18n.t('mail.regards')
@@ -36,16 +36,16 @@ function sendMail(recipients, subject, paragaph, button, lastParagraph) {
 }
 
 async function sendNotificationMail(travel) {
-  const interpolation = {traveler: travel.traveler.name}
+  const interpolation = { traveler: travel.traveler.name }
 
-  if(travel.comments.length > 0){
+  if (travel.comments.length > 0) {
     const comment = travel.comments[travel.comments.length - 1]
-    if(comment.state == travel.state){
+    if (comment.state == travel.state) {
       interpolation.comment = comment.text
       interpolation.commentator = comment.author
     }
   }
-  
+
   var recipients = []
   const subject = i18n.t('mail.' + travel.state + '.subject', interpolation)
   const paragraph = i18n.t('mail.' + travel.state + '.paragraph', interpolation)
@@ -54,16 +54,16 @@ async function sendNotificationMail(travel) {
   }
   const lastParagraph = interpolation.comment ? i18n.t('mail.' + travel.state + '.lastParagraph', interpolation) : ''
 
-  if(travel.state === 'appliedFor'){
-    recipients = await User.find({'access.approve': true})
+  if (travel.state === 'appliedFor') {
+    recipients = await User.find({ 'access.approve': true })
     button.link = process.env.VUE_APP_FRONTEND_URL + '/approve/' + travel._id
 
-  }else if(travel.state === 'underExamination'){
-    recipients = await User.find({'access.examine': true})
+  } else if (travel.state === 'underExamination') {
+    recipients = await User.find({ 'access.examine': true })
     button.link = process.env.VUE_APP_FRONTEND_URL + '/examine/' + travel._id
-  }else{ // 'rejected', 'approved', 'refunded'
+  } else { // 'rejected', 'approved', 'refunded'
     recipients = [travel.traveler]
-    button.link = process.env.VUE_APP_FRONTEND_URL + '/travel'+ (travel.state === 'rejected'? '' : ('/' + travel._id))
+    button.link = process.env.VUE_APP_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : ('/' + travel._id))
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

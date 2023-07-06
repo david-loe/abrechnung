@@ -15,13 +15,12 @@
           id="floatingPassword"
           placeholder="{{ $t('labels.password') }}"
           v-model="password"
-          required
-        />
+          required />
         <label for="floatingPassword">{{ $t('labels.password') }}</label>
       </div>
 
-      <button class="w-100 btn btn-lg btn-primary" type="submit">{{$t('labels.signIn')}}</button>
-    </form> 
+      <button class="w-100 btn btn-lg btn-primary" type="submit">{{ $t('labels.signIn') }}</button>
+    </form>
   </div>
 </template>
 
@@ -33,7 +32,7 @@ export default {
   data() {
     return {
       password: '',
-      username: '',
+      username: ''
     }
   },
   methods: {
@@ -43,9 +42,9 @@ export default {
           process.env.VUE_APP_BACKEND_URL + '/login',
           {
             username: this.username,
-            password: this.password,
+            password: this.password
           },
-          { withCredentials: true },
+          { withCredentials: true }
         )
         if (res.status === 200) {
           this.$root.loadState = 'UNLOADED'
@@ -53,13 +52,13 @@ export default {
         }
       } catch (error) {
         this.password = ''
-        this.$root.addAlert({message: this.$t('alerts.loginFailed'), title: "ERROR", type: "danger"})
+        this.$root.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
       }
-    },
+    }
   },
   beforeMount() {
     this.$root.loadState = 'LOADED'
-  },
+  }
 }
 </script>
 

@@ -1,34 +1,40 @@
 <template>
   <div>
     <div class="row g-2 mb-1">
-    <div v-for="(file, index) of modelValue" class="col-auto" :key="file.name" style="max-width: 110px;" :title="file.name">
-      <div class="border rounded p-2">
-        <div class="row justify-content-between m-0">
-        <div class="col-auto p-0">
-          <button type="button" class="btn btn-sm btn-light" @click="showFile(index)">
-            <i class="bi bi-eye"></i>
-          </button>
-        </div>
-        <div class="col-auto p-0">
-          <button type="button" class="btn btn-sm btn-light" @click="disabled ? null : deleteFile(index)"  :disabled="disabled">
-            <i class="bi bi-trash"></i>
-          </button>
-        </div>
-      </div>
+      <div v-for="(file, index) of modelValue" class="col-auto" :key="file.name" style="max-width: 110px" :title="file.name">
+        <div class="border rounded p-2">
+          <div class="row justify-content-between m-0">
+            <div class="col-auto p-0">
+              <button type="button" class="btn btn-sm btn-light" @click="showFile(index)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div class="col-auto p-0">
+              <button type="button" class="btn btn-sm btn-light" @click="disabled ? null : deleteFile(index)" :disabled="disabled">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
 
-      <div class="fs-2 text-center">
-        <i class="bi bi-file-earmark-text"></i>
-      </div>
-      <div class="text-truncate text-center">
-        {{ file.name }}
-      </div>
+          <div class="fs-2 text-center">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <div class="text-truncate text-center">
+            {{ file.name }}
+          </div>
+        </div>
       </div>
     </div>
+    <input
+      class="form-control"
+      type="file"
+      :id="id"
+      accept="image/png, image/jpeg, .pdf"
+      @change="changeFile"
+      :required="required && modelValue.length == 0"
+      multiple
+      :disabled="disabled" />
   </div>
-  <input class="form-control" type="file" :id="id" accept="image/png, image/jpeg, .pdf" @change="changeFile"
-    :required="required && modelValue.length == 0" multiple :disabled="disabled" />
-  </div>
-  
 </template>
 
 <script>
@@ -38,25 +44,35 @@ export default {
     return {}
   },
   components: {},
-  props: { modelValue: { type: Array, default: function () { return [] } }, required: { type: Boolean, default: false }, disabled:{ type: Boolean, default: false}, id: {type: String} },
+  props: {
+    modelValue: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    required: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    id: { type: String }
+  },
   emits: ['update:modelValue', 'deleteFile', 'showFile'],
   methods: {
-    showFile(index){
+    showFile(index) {
       const windowProxy = window.open('', '_blank')
-      if(this.modelValue[index]._id){
+      if (this.modelValue[index]._id) {
         this.$emit('showFile', this.modelValue[index]._id, windowProxy)
-      }else{
-        const fileURL = URL.createObjectURL(this.modelValue[index].data);
+      } else {
+        const fileURL = URL.createObjectURL(this.modelValue[index].data)
         windowProxy.location.assign(fileURL)
       }
     },
-    deleteFile(index){
-      if(this.modelValue[index]._id){
+    deleteFile(index) {
+      if (this.modelValue[index]._id) {
         this.$emit('deleteFile', this.modelValue[index]._id)
-      }else{
-        if(!confirm(this.$t('alerts.areYouSureDelete'))){
-        return null
-      }
+      } else {
+        if (!confirm(this.$t('alerts.areYouSureDelete'))) {
+          return null
+        }
       }
       const files = this.modelValue
       files.splice(index, 1)
@@ -72,7 +88,7 @@ export default {
             reader.onload = async () => {
               files.push({ data: await this.resizeImage(file, 1400), type: file.type, name: file.name })
             }
-          }else{
+          } else {
             files.push({ data: file, type: file.type, name: file.name })
           }
         } else {
@@ -84,7 +100,6 @@ export default {
     },
     // From https://stackoverflow.com/a/52983833/13582326
     resizeImage(file, longestSide) {
-      
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -99,10 +114,10 @@ export default {
             // We set the dimensions to the wanted size.
             var max = img.height < img.width ? 'width' : 'height'
             var min = max == 'width' ? 'height' : 'width'
-            if(canvas[max] > longestSide){
+            if (canvas[max] > longestSide) {
               canvas[max] = longestSide
               canvas[min] = img[min] * (longestSide / img[max])
-            }else{
+            } else {
               return resolve(file)
             }
             // We resize the image with the canvas method drawImage();
@@ -113,8 +128,8 @@ export default {
           img.src = reader.result
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

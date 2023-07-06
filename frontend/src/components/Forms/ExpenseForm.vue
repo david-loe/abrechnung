@@ -1,18 +1,13 @@
 <template>
-  <form @submit.prevent="disabled ? null : (mode === 'add' ? $emit('add', output()) : $emit('edit', output()))">
-
+  <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="mb-2">
-      <label for="travelFormDescription" class="form-label">
-        {{ $t('labels.description') }}<span class="text-danger">*</span>
-      </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required/>
+      <label for="travelFormDescription" class="form-label"> {{ $t('labels.description') }}<span class="text-danger">*</span> </label>
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required />
     </div>
 
     <div class="row mb-2">
       <div class="col">
-        <label for="expenseFormCost" class="form-label me-2">
-          {{ $t('labels.cost') }}<span class="text-danger">*</span>
-        </label>
+        <label for="expenseFormCost" class="form-label me-2"> {{ $t('labels.cost') }}<span class="text-danger">*</span> </label>
         <InfoPoint :text="$t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
           <input type="number" class="form-control" v-model="formExpense.cost.amount" min="0" :disabled="disabled" />
@@ -21,29 +16,34 @@
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
-        <input id="endDateInput" class="form-control" type="date" v-model="formExpense.cost.date"
-          :required="true" :disabled="disabled" :max="$root.dateToHTMLInputString(new Date())" />
+        <input
+          id="endDateInput"
+          class="form-control"
+          type="date"
+          v-model="formExpense.cost.date"
+          :required="true"
+          :disabled="disabled"
+          :max="$root.dateToHTMLInputString(new Date())" />
       </div>
     </div>
 
     <div class="mb-3">
       <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
       <InfoPoint :text="$t('info.receipts')" />
-      <FileUpload id="expenseFormFile" v-model="formExpense.cost.receipts" :disabled="disabled"
-        :required="true" @deleteFile="(id) => $emit('deleteReceipt', id, expense._id, 'expense')"
+      <FileUpload
+        id="expenseFormFile"
+        v-model="formExpense.cost.receipts"
+        :disabled="disabled"
+        :required="true"
+        @deleteFile="(id) => $emit('deleteReceipt', id, expense._id, 'expense')"
         @showFile="(id, winProxy) => $emit('showReceipt', id, winProxy, expense._id, 'expense')" />
     </div>
 
-
-    <label for="expenseFormPurpose" class="form-label me-2">
-      {{ $t('labels.purpose') }}<span class="text-danger">*</span>
-    </label>
+    <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
     <InfoPoint :text="$t('info.purpose')" />
     <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
-      <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ $t('labels.' +
-        purpose) }}</option>
+      <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
     </select>
-
 
     <div class="mb-1">
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add' && !disabled">
@@ -52,7 +52,10 @@
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit' && !disabled">
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" v-if="mode === 'edit' && !disabled"
+      <button
+        type="button"
+        class="btn btn-danger me-2"
+        v-if="mode === 'edit' && !disabled"
         @click="disabled ? null : $emit('deleted', formExpense._id)">
         {{ $t('labels.delete') }}
       </button>
@@ -74,7 +77,7 @@ const defaultExpense = {
     receipts: [],
     date: ''
   },
-  purpose: 'professional',
+  purpose: 'professional'
 }
 export default {
   name: 'expenseForm',
@@ -85,14 +88,14 @@ export default {
       type: Object,
       default: function () {
         return structuredClone(defaultExpense)
-      },
+      }
     },
     mode: {
       type: String,
       required: true,
       validator: function (value) {
         return ['add', 'edit'].indexOf(value) !== -1
-      },
+      }
     },
     disabled: { type: Boolean, default: false }
   },
@@ -114,7 +117,7 @@ export default {
       const input = Object.assign({}, structuredClone(defaultExpense), this.expense)
       input.cost.date = this.$root.dateToHTMLInputString(input.cost.date)
       return input
-    },
+    }
   },
   beforeMount() {
     this.formExpense = this.input()
@@ -122,8 +125,8 @@ export default {
   watch: {
     expense: function () {
       this.formExpense = this.input()
-    },
-  },
+    }
+  }
 }
 </script>
 

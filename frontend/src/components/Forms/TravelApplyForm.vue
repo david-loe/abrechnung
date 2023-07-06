@@ -11,39 +11,45 @@
       <label for="travelFormDestinationPlace" class="form-label me-2">
         {{ $t('labels.destinationPlace') }}<span class="text-danger">*</span>
       </label>
-      
+
       <InfoPoint :text="$t('info.destinationPlace')" />
       <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
 
     <div class="form-check mb-3">
       <input class="form-check-input" type="checkbox" v-model="formTravel.travelInsideOfEU" id="travelFormTravelInsideOfEU" />
-      <label class="form-check-label me-2" for="travelFormTravelInsideOfEU"> {{$t('labels.travelInsideOfEU')}} </label>
+      <label class="form-check-label me-2" for="travelFormTravelInsideOfEU"> {{ $t('labels.travelInsideOfEU') }} </label>
       <InfoPoint :text="$t('info.travelInsideOfEU')" />
     </div>
 
     <div class="mb-2">
-      <label for="travelFormReason" class="form-label me-2">
-        {{ $t('labels.reason') }}<span class="text-danger">*</span>
-      </label>
+      <label for="travelFormReason" class="form-label me-2"> {{ $t('labels.reason') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.reason')" />
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
     </div>
 
     <div class="row mb-3">
       <div class="col-auto">
-        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label><span class="text-danger">*</span>
-        <input id="startDateInput" class="form-control" type="date" v-model="formTravel.startDate" :min="$root.dateToHTMLInputString(new Date())" required />
+        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label
+        ><span class="text-danger">*</span>
+        <input
+          id="startDateInput"
+          class="form-control"
+          type="date"
+          v-model="formTravel.startDate"
+          :min="$root.dateToHTMLInputString(new Date())"
+          required />
       </div>
       <div class="col-auto">
-        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label><span class="text-danger">*</span>
+        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label
+        ><span class="text-danger">*</span>
         <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" :min="formTravel.startDate" required />
       </div>
     </div>
 
     <!-- v-if="settings.allowSpouseRefund" -->
     <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" required>
+      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" required />
       <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
         {{ $t('labels.claimSpouseRefund') }}
       </label>
@@ -55,9 +61,13 @@
         {{ $t('labels.fellowTravelersNames') }}<span v-if="formTravel.claimSpouseRefund" class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.fellowTravelersNames')" />
-      <input type="text" class="form-control" id="travelFormFellowTravelersNames" v-model="formTravel.fellowTravelersNames" :required="formTravel.claimSpouseRefund" />
+      <input
+        type="text"
+        class="form-control"
+        id="travelFormFellowTravelersNames"
+        v-model="formTravel.fellowTravelersNames"
+        :required="formTravel.claimSpouseRefund" />
     </div>
-    
 
     <label for="travelFormAdvance" class="form-label me-2">
       {{ $t('labels.advance') }}
@@ -87,19 +97,19 @@
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-const defaultTravel= {
-          name: '',
-          reason: '',
-          startDate: '',
-          endDate: '',
-          destinationPlace: undefined,
-          travelInsideOfEU: false,
-          claimSpouseRefund: false,
-          advance: {
-            amount: null,
-            currency: 'EUR',
-          },
-        }
+const defaultTravel = {
+  name: '',
+  reason: '',
+  startDate: '',
+  endDate: '',
+  destinationPlace: undefined,
+  travelInsideOfEU: false,
+  claimSpouseRefund: false,
+  advance: {
+    amount: null,
+    currency: 'EUR'
+  }
+}
 export default {
   name: 'TravelApplyForm',
   components: { CurrencySelector, InfoPoint, PlaceInput },
@@ -114,12 +124,12 @@ export default {
       required: true,
       validator: function (value) {
         return ['add', 'edit'].indexOf(value) !== -1
-      },
-    },
+      }
+    }
   },
   data() {
     return {
-      formTravel: undefined,
+      formTravel: undefined
     }
   },
   methods: {
@@ -132,7 +142,7 @@ export default {
       output.endDate = new Date(output.endDate)
       return output
     },
-    input(){
+    input() {
       const input = Object.assign({}, this.travel)
       input.startDate = this.$root.dateToHTMLInputString(input.startDate)
       input.endDate = this.$root.dateToHTMLInputString(input.endDate)
@@ -145,10 +155,9 @@ export default {
   watch: {
     travel: function () {
       this.formTravel = this.input()
-    },
-  },
+    }
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>

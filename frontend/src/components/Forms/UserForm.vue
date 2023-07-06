@@ -2,15 +2,11 @@
   <form class="container" @submit.prevent="this.mode === 'add' ? this.$emit('add', this.formUser) : this.$emit('edit', this.formUser)">
     <div class="row mb-2">
       <div class="col">
-        <label for="userFormUid" class="form-label">
-          {{ $t('labels.uid') }}<span class="text-danger">*</span>
-        </label>
+        <label for="userFormUid" class="form-label"> {{ $t('labels.uid') }}<span class="text-danger">*</span> </label>
         <input type="text" class="form-control" id="userFormUid" v-model="formUser.uid" required :disabled="this.mode === 'edit'" />
       </div>
       <div class="col">
-        <label for="userFormMail" class="form-label">
-          {{ $t('labels.email') }}<span class="text-danger">*</span>
-        </label>
+        <label for="userFormMail" class="form-label"> {{ $t('labels.email') }}<span class="text-danger">*</span> </label>
         <input type="text" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="this.mode === 'edit'" />
       </div>
     </div>
@@ -38,7 +34,7 @@
 
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" v-if="this.mode === 'add'">
-        {{ $t('labels.addX', {X: $t('labels.user') }) }}
+        {{ $t('labels.addX', { X: $t('labels.user') }) }}
       </button>
       <button type="submit" class="btn btn-primary me-2" v-if="this.mode === 'edit'">
         {{ $t('labels.save') }}
@@ -63,23 +59,23 @@ export default {
           access: {
             approve: false,
             examine: false,
-            admin: false,
+            admin: false
           },
-          email: '',
+          email: ''
         }
-      },
+      }
     },
     mode: {
       type: String,
       required: true,
       validator: function (value) {
         return ['add', 'edit'].indexOf(value) !== -1
-      },
-    },
+      }
+    }
   },
   data() {
     return {
-      formUser: this.user,
+      formUser: this.user
     }
   },
   methods: {
@@ -89,20 +85,19 @@ export default {
         access: {
           approve: false,
           examine: false,
-          admin: false,
+          admin: false
         },
-        email: '',
+        email: ''
       }
-    },
+    }
   },
   beforeMount() {},
   watch: {
     user: function () {
       this.formUser = this.user
-    },
-  },
+    }
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>

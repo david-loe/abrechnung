@@ -26,7 +26,7 @@ function approve(state) {
         }
         const check = async (oldObject) => {
             if (oldObject.state === 'appliedFor') {
-                if(state === 'approved'){
+                if (state === 'approved') {
                     await oldObject.saveToHistory()
                     await oldObject.save()
                 }

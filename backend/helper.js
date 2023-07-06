@@ -59,8 +59,8 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
           result.sort(sortFn)
         }
         const data = result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page)
-        res.send({ meta, data})
-        if(cb) cb(data)
+        res.send({ meta, data })
+        if (cb) cb(data)
       } else {
         res.status(204).send({ message: 'No content' })
       }
@@ -100,7 +100,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
         Object.assign(oldObject, req.body)
         const result = await oldObject.save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if(cb) cb(result)
+        if (cb) cb(result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
@@ -108,7 +108,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
       try {
         const result = await (new model(req.body)).save()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if(cb) cb(result)
+        if (cb) cb(result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
@@ -133,7 +133,7 @@ function deleter(model, checkUserIdField = '', cb = null) {
         doc = await model.findOne({ _id: req.query.id })
         await doc.deleteOne()
         res.send({ message: i18n.t('alerts.successDeleting') })
-        if(cb) cb(req.query.id)
+        if (cb) cb(req.query.id)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorDeleting'), error: error })
       }
@@ -272,10 +272,10 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
   return { success, noUpdate, noCountryFound }
 }
 
-async function convertCurrency (date, amount, from, to = settings.baseCurrency._id){
+async function convertCurrency(date, amount, from, to = settings.baseCurrency._id) {
   from = from.toLowerCase()
   to = to.toLowerCase()
-  if(new Date(date) - new Date() > 0){
+  if (new Date(date) - new Date() > 0) {
     date = new Date()
   }
   const dateStr = scripts.datetimeToDateString(date)
@@ -283,22 +283,22 @@ async function convertCurrency (date, amount, from, to = settings.baseCurrency._
   const suffixs = ['.min.json', '.json']
   var rate = null
   outerloop:
-  for(const baseURL of baseURLs){
-    for(const suffix of suffixs){
+  for (const baseURL of baseURLs) {
+    for (const suffix of suffixs) {
       const url = baseURL + dateStr + '/currencies/' + from + '/' + to + suffix
       const res = await axios.get(url)
-      if(res.status === 200){
+      if (res.status === 200) {
         rate = res.data[to]
         break outerloop;
       }
     }
   }
-  if(rate == null){
+  if (rate == null) {
     return null
   }
 
   amount = Math.round(amount * rate * 100) / 100
-  return {date, rate, amount}
+  return { date, rate, amount }
 }
 
 module.exports = {

@@ -10,29 +10,29 @@ const fs = require('fs');
 function loadLocaleMessages() {
   const messages = {}
   fs.readdirSync('./common/locales').forEach(file => {
-      const matched = file.match(/([A-Za-z0-9-_]+)\./i)
-      if (matched && matched.length > 1) {
-        const rawdata = fs.readFileSync('./common/locales/' + file)
-        const locale = matched[1]
-        messages[locale] = {translation: JSON.parse(rawdata)}
-      }
-    });
-    return messages
+    const matched = file.match(/([A-Za-z0-9-_]+)\./i)
+    if (matched && matched.length > 1) {
+      const rawdata = fs.readFileSync('./common/locales/' + file)
+      const locale = matched[1]
+      messages[locale] = { translation: JSON.parse(rawdata) }
+    }
+  });
+  return messages
 }
 
 i18next.init({
-    legacy: false,
-    lng: process.env.VUE_APP_I18N_LOCALE || 'de',
-    fallbackLng: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'de',
-    resources: loadLocaleMessages(),
-    globalInjection: true,
-    interpolation: {
-      prefix: "{",
-      suffix: "}",
-      nestingPrefix: "@:{'",
-      nestingSuffix: "'}"
-    }
-  })
+  legacy: false,
+  lng: process.env.VUE_APP_I18N_LOCALE || 'de',
+  fallbackLng: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'de',
+  resources: loadLocaleMessages(),
+  globalInjection: true,
+  interpolation: {
+    prefix: "{",
+    suffix: "}",
+    nestingPrefix: "@:{'",
+    nestingSuffix: "'}"
+  }
+})
 
 module.exports = i18next
 

@@ -19,7 +19,7 @@ export default {
   watch: {
     text: function () {
       this.tooltip.setContent({ '.tooltip-inner': this.text })
-    },
+    }
   }
 }
 </script>

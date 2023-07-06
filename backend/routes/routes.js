@@ -1,6 +1,6 @@
 const router = require('express').Router()
-const multer  = require('multer')
-const fileHandler = multer({limits: { fileSize: 16000000 }})
+const multer = require('multer')
+const fileHandler = multer({ limits: { fileSize: 16000000 } })
 const User = require('../models/user')
 const i18n = require('../i18n')
 const helper = require('../helper')
@@ -109,16 +109,16 @@ router.post('/travel', async (req, res) => {
 
 function postRecord(recordType) {
   return async (req, res) => {
-    if(req.body.cost && req.body.cost.receipts && req.files){
-      for(var i = 0; i < req.body.cost.receipts.length; i++){
+    if (req.body.cost && req.body.cost.receipts && req.files) {
+      for (var i = 0; i < req.body.cost.receipts.length; i++) {
         var buffer = null
-        for(const file of req.files){
-          if(file.fieldname == 'cost[receipts][' + i + '][data]'){
+        for (const file of req.files) {
+          if (file.fieldname == 'cost[receipts][' + i + '][data]') {
             buffer = file.buffer
             break
           }
         }
-        if(buffer){
+        if (buffer) {
           req.body.cost.receipts[i].data = buffer
         }
       }
@@ -134,20 +134,20 @@ function postRecord(recordType) {
       outer_loop:
       for (const record of travel[recordType]) {
         if (record._id.equals(req.body._id)) {
-          if(req.body.cost && req.body.cost.receipts && req.files){
-            for(var i = 0; i < req.body.cost.receipts.length; i++){
-              if(req.body.cost.receipts[i]._id){
+          if (req.body.cost && req.body.cost.receipts && req.files) {
+            for (var i = 0; i < req.body.cost.receipts.length; i++) {
+              if (req.body.cost.receipts[i]._id) {
                 var foundReceipt = false
-                for(const oldReceipt of record.cost.receipts){
-                  if(oldReceipt._id.equals(req.body.cost.receipts[i]._id)){
+                for (const oldReceipt of record.cost.receipts) {
+                  if (oldReceipt._id.equals(req.body.cost.receipts[i]._id)) {
                     foundReceipt = true
                   }
                 }
-                if(!foundReceipt){
-                break outer_loop
+                if (!foundReceipt) {
+                  break outer_loop
                 }
                 await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
-              }else{
+              } else {
                 var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
                 req.body.cost.receipts[i] = result._id
               }
@@ -163,8 +163,8 @@ function postRecord(recordType) {
         return res.sendStatus(403)
       }
     } else {
-      if(req.body.cost && req.body.cost.receipts && req.files){
-        for(var i = 0; i < req.body.cost.receipts.length; i++){
+      if (req.body.cost && req.body.cost.receipts && req.files) {
+        for (var i = 0; i < req.body.cost.receipts.length; i++) {
           var result = await (new DocumentFile(req.body.cost.receipts[i])).save()
           req.body.cost.receipts[i] = result._id
         }
@@ -186,7 +186,7 @@ function postRecord(recordType) {
 router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
 router.post('/travel/expense', fileHandler.any(), postRecord('expenses'))
 
-function deleteRecord(recordType){
+function deleteRecord(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
@@ -199,8 +199,8 @@ function deleteRecord(recordType){
       for (var i = 0; i < travel[recordType].length; i++) {
         if (travel[recordType][i]._id.equals(req.query.id)) {
           found = true
-          if(travel[recordType][i].cost){
-            for(const receipt of travel[recordType][i].cost.receipts){
+          if (travel[recordType][i].cost) {
+            for (const receipt of travel[recordType][i].cost.receipts) {
               DocumentFile.deleteOne({ _id: receipt._id }).exec()
             }
           }
@@ -228,7 +228,7 @@ router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
 function getRecordReceipt(recordType) {
-  
+
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
@@ -241,9 +241,9 @@ function getRecordReceipt(recordType) {
       outer_loop:
       for (var i = 0; i < travel[recordType].length; i++) {
         if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) { // e.g. stageId
-          if(travel[recordType][i].cost){
-            for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
-              if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
+          if (travel[recordType][i].cost) {
+            for (var r = 0; r < travel[recordType][i].cost.receipts.length; r++) {
+              if (req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)) {
                 found = true
                 var file = await DocumentFile.findOne({ _id: req.query.id })
                 res.setHeader('Content-Type', file.type);
@@ -279,9 +279,9 @@ function deleteRecordReceipt(recordType) {
       outer_loop:
       for (var i = 0; i < travel[recordType].length; i++) {
         if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) {
-          if(travel[recordType][i].cost){
-            for(var r = 0; r < travel[recordType][i].cost.receipts.length; r++){
-              if(req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)){
+          if (travel[recordType][i].cost) {
+            for (var r = 0; r < travel[recordType][i].cost.receipts.length; r++) {
+              if (req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)) {
                 found = true
                 await DocumentFile.deleteOne({ _id: req.query.id })
                 travel[recordType][i].cost.receipts.splice(r, 1)
@@ -328,11 +328,11 @@ router.post('/travel/appliedFor', async (req, res) => {
     claimSpouseRefund: req.body.claimSpouseRefund,
     fellowTravelersNames: req.body.fellowTravelersNames
   }
-  
-  if(!req.body.name){
+
+  if (!req.body.name) {
     try {
       var date = new Date(req.body.startDate)
-      req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), {lng: user.settings.language}) + ' ' + date.getUTCFullYear()
+      req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), { lng: user.settings.language }) + ' ' + date.getUTCFullYear()
     } catch (error) {
       return res.status(400).send(error)
     }
@@ -347,10 +347,10 @@ router.post('/travel/appliedFor', async (req, res) => {
 router.post('/travel/underExamination', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   req.body = {
-      state: 'underExamination',
-      editor: user._id,
-      comment: req.body.comment,
-      _id: req.body._id
+    state: 'underExamination',
+    editor: user._id,
+    comment: req.body.comment,
+    _id: req.body._id
   }
 
   const check = async (oldObject) => {
@@ -366,17 +366,17 @@ router.post('/travel/underExamination', async (req, res) => {
 })
 
 
-router.get('/travel/report', async (req, res) =>{
+router.get('/travel/report', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  const travel = await Travel.findOne({ _id:req.query.id, traveler: user._id, historic: false, state:'refunded' })
-  if(travel){
+  const travel = await Travel.findOne({ _id: req.query.id, traveler: user._id, historic: false, state: 'refunded' })
+  if (travel) {
     const report = await pdf.generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Length', report.length);
     return res.send(new Buffer.from(report))
-  }else{
-    res.status(400).send({message: 'No travel found'})
+  } else {
+    res.status(400).send({ message: 'No travel found' })
   }
 })
 

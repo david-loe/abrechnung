@@ -1,5 +1,5 @@
 <template>
-  <div class="card" style="width: 18rem; cursor: pointer;" @click="$emit('clicked')">
+  <div class="card" style="width: 18rem; cursor: pointer" @click="$emit('clicked')">
     <div class="card-body">
       <div class="row">
         <div class="col">
@@ -12,14 +12,11 @@
 
       <h6 v-if="showTraveler" class="card-subtitle mb-1 text-muted">{{ travel.traveler.name }}</h6>
       <h6 class="card-subtitle mb-2 text-muted">
-        {{ datetoDateString(travel.startDate) +
-          ' - ' +
-          datetoDateString(travel.endDate) }}
+        {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
       </h6>
       <div>
         <StateBadge :state="travel.state"></StateBadge>
       </div>
-
     </div>
   </div>
 </template>
@@ -33,12 +30,11 @@ export default {
   name: 'TravelCard',
   emits: ['clicked'],
   data() {
-    return {
-    }
+    return {}
   },
   components: { StateBadge, ProgressCircle },
   props: { travel: { type: Object }, showTraveler: { type: Boolean, default: false } },
-  methods: {datetoDateString},
+  methods: { datetoDateString }
 }
 </script>
 

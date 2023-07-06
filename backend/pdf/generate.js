@@ -47,7 +47,7 @@ async function generateReport(travel) {
   y = drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel.days, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
-  
+
   await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
 
   return await pdfDoc.save()
@@ -189,7 +189,7 @@ function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font })
   columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
   columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.invoiceDate'), fn: (c) => scripts.datetoDateStringWithYear(c.date) })
   columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
-  
+
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.expenses'), {
     x: options.xStart,
@@ -279,7 +279,7 @@ async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
         page = pdfDoc.addPage(pdf_lib.PageSizes.A4)
       }
       var size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
-      if(size.width > image.width){
+      if (size.width > image.width) {
         size = image.size()
       }
       page.drawImage(image, {

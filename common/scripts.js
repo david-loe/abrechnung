@@ -40,16 +40,16 @@ function getMoneyString(money, useExchangeRate = true, func = (x) => x, locale) 
   })
 }
 
-function getDetailedMoneyString(money, locale, printZero = false){
-  if(!money || money && (typeof money.amount !== 'number' || !money.amount && !printZero) ){
+function getDetailedMoneyString(money, locale, printZero = false) {
+  if (!money || money && (typeof money.amount !== 'number' || !money.amount && !printZero)) {
     return ''
   }
   string = money.amount.toLocaleString(locale, {
     style: "currency",
     currency: (money.currency._id ? money.currency._id : money.currency)
   })
-  if(money.exchangeRate && money.exchangeRate.rate){
-    string = string + ' * ' + money.exchangeRate.rate.toLocaleString(locale, {maximumFractionDigits: 4}) + ' = '
+  if (money.exchangeRate && money.exchangeRate.rate) {
+    string = string + ' * ' + money.exchangeRate.rate.toLocaleString(locale, { maximumFractionDigits: 4 }) + ' = '
     string = string + money.exchangeRate.amount.toLocaleString(locale, {
       style: "currency",
       currency: "EUR" // baseCurrency
@@ -58,8 +58,8 @@ function getDetailedMoneyString(money, locale, printZero = false){
   return string
 }
 
-function placeToString(place, locale = 'de'){
-  return place.place +  ', ' + place.country.name[locale] + place.country.flag
+function placeToString(place, locale = 'de') {
+  return place.place + ', ' + place.country.name[locale] + place.country.flag
 }
 
 
@@ -79,7 +79,7 @@ function datetoDateString(date) {
   return day + '.' + month
 }
 
-function dateTimeToString(datetime){
+function dateTimeToString(datetime) {
   return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
 }
 
@@ -107,18 +107,18 @@ function getExpensesSum(travel) {
   var sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount > 0) {
-      if(stage.cost.exchangeRate && typeof stage.cost.exchangeRate.amount == 'number'){
+      if (stage.cost.exchangeRate && typeof stage.cost.exchangeRate.amount == 'number') {
         sum += stage.cost.exchangeRate.amount
-      }else{
+      } else {
         sum += stage.cost.amount
       }
     }
   }
   for (const expense of travel.expenses) {
     if (expense.cost && expense.cost.amount > 0) {
-      if(expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number'){
+      if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
         sum += expense.cost.exchangeRate.amount
-      }else{
+      } else {
         sum += expense.cost.amount
       }
     }
@@ -129,7 +129,7 @@ function getExpensesSum(travel) {
 
 function getTravelTotal(travel) {
   var advance = 0
-  if(travel.advance && travel.advance.amount){
+  if (travel.advance && travel.advance.amount) {
     advance = travel.advance.exchangeRate ? travel.advance.exchangeRate.amount : travel.advance.amount
   }
   // baseCurrency

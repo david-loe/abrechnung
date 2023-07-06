@@ -9,10 +9,20 @@
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
           <div class="modal-body">
-            <TravelApply v-if="modalMode === 'view'" :travel="modalTravel" @cancel="hideModal()"
-              @edit="showModal('edit', modalTravel)" @deleted="deleteTravel(modalTravel._id)"></TravelApply>
-            <TravelApplyForm v-else :mode="modalMode" @cancel="hideModal()" :travel="modalTravel" @add="applyForTravel"
-              @edit="applyForTravel" ref="travelApplyForm"></TravelApplyForm>
+            <TravelApply
+              v-if="modalMode === 'view'"
+              :travel="modalTravel"
+              @cancel="hideModal()"
+              @edit="showModal('edit', modalTravel)"
+              @deleted="deleteTravel(modalTravel._id)"></TravelApply>
+            <TravelApplyForm
+              v-else
+              :mode="modalMode"
+              @cancel="hideModal()"
+              :travel="modalTravel"
+              @add="applyForTravel"
+              @edit="applyForTravel"
+              ref="travelApplyForm"></TravelApplyForm>
           </div>
         </div>
       </div>
@@ -48,7 +58,7 @@ export default {
     return {
       newTravelModal: undefined,
       modalMode: 'add',
-      modalTravel: undefined,
+      modalTravel: undefined
     }
   },
   methods: {
@@ -83,14 +93,14 @@ export default {
         this.$refs.travelCardListRef.getTravels()
         this.hideModal()
       }
-    },
+    }
   },
   mounted() {
     this.newTravelModal = new Modal(document.getElementById('newTravelModal'), {})
   },
   async beforeMount() {
     await this.$root.load()
-  },
+  }
 }
 </script>
 

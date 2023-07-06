@@ -12,46 +12,46 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage,
-    meta: { requiresAuth: false}
+    meta: { requiresAuth: false }
   },
   {
     path: '/settings',
     name: 'Settings',
     component: SettingsPage,
-    meta: { requiresAuth: true}
+    meta: { requiresAuth: true }
   },
   {
     path: '/approve/:_id([0-9a-fA-F]{24})?',
     name: 'Approve',
     component: ApprovePage,
-    meta: { requiresAuth: true},
+    meta: { requiresAuth: true },
     props: route => ({ _id: route.params._id })
   },
   {
     path: '/examine',
     name: 'Examine',
     component: ExaminePage,
-    meta: { requiresAuth: true}
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/:_id([0-9a-fA-F]{24})/:endpointSuffix?',
     name: 'Examine Travel',
     component: TravelPage,
-    meta: { requiresAuth: true},
-    props: route => ({ _id: route.params._id, parentPages: [{link: '/examine', title: 'labels.examine'}], endpointPrefix: 'examine/', endpointSuffix: route.params.endpointSuffix})
+    meta: { requiresAuth: true },
+    props: route => ({ _id: route.params._id, parentPages: [{ link: '/examine', title: 'labels.examine' }], endpointPrefix: 'examine/', endpointSuffix: route.params.endpointSuffix })
   },
   {
     path: '/travel/:_id([0-9a-fA-F]{24})',
     name: 'Travel',
     component: TravelPage,
-    meta: { requiresAuth: true},
-    props: route => ({ _id: route.params._id, parentPages: [{link: '/', title: 'headlines.myTravels'}]})
+    meta: { requiresAuth: true },
+    props: route => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.myTravels' }] })
   },
   {
     path: '/',
     name: 'MyTravels',
     component: MyTravelsPage,
-    meta: { requiresAuth: true},
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -80,7 +80,7 @@ async function auth() {
     })
     auth = res.status === 200
   } catch (error) {
-    if (error.response.status !== 401){
+    if (error.response.status !== 401) {
       console.log(error)
     }
   }
@@ -89,7 +89,7 @@ async function auth() {
 
 router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !await auth()) {
-    return {path: '/login', query: { redirect: to.fullPath }}
+    return { path: '/login', query: { redirect: to.fullPath } }
   }
 })
 
