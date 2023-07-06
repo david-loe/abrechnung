@@ -22,8 +22,8 @@ function loadLocaleMessages() {
 
 i18next.init({
   legacy: false,
-  lng: process.env.VUE_APP_I18N_LOCALE || 'de',
-  fallbackLng: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'de',
+  lng: process.env.VITE_I18N_LOCALE || 'de',
+  fallbackLng: process.env.VITE_I18N_FALLBACK_LOCALE || 'de',
   resources: loadLocaleMessages(),
   globalInjection: true,
   interpolation: {

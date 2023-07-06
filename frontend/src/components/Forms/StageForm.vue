@@ -144,7 +144,7 @@ import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import { getDayList, datetoDateString } from '../../common/scripts.js'
+import { getDayList, datetoDateString } from '../../common/scripts.mjs'
 const defaultStage = {
   departure: '',
   arrival: '',

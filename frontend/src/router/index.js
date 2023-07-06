@@ -60,7 +60,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to) {
     if (to.hash) {
@@ -75,7 +75,7 @@ const router = createRouter({
 async function auth() {
   var auth = false;
   try {
-    const res = await axios.get(process.env.VUE_APP_BACKEND_URL + '/api/user', {
+    const res = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/user', {
       withCredentials: true,
     })
     auth = res.status === 200

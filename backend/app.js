@@ -9,7 +9,7 @@ const i18n = require('./i18n')
 const User = require('./models/user')
 
 const port = process.env.BACKEND_PORT
-const url = process.env.VUE_APP_BACKEND_URL
+const url = process.env.VITE_BACKEND_URL
 
 const mongoClientPromise = mongoose.connect(process.env.MONGO_URL, {}).then(() => {
   console.log(i18n.t('alerts.db.success'))
@@ -40,7 +40,7 @@ app.use(express.urlencoded({ limit: '2mb', extended: true }))
 app.use(
   cors({
     credentials: true,
-    origin: process.env.VUE_APP_FRONTEND_URL,
+    origin: process.env.VITE_FRONTEND_URL,
   }),
 )
 

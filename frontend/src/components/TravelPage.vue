@@ -383,7 +383,7 @@ import StageForm from './Forms/StageForm.vue'
 import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../common/scripts.js'
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../common/scripts.mjs'
 export default {
   name: 'TravelPage',
   data() {
@@ -454,7 +454,7 @@ export default {
       }
     },
     reportLink() {
-      return process.env.VUE_APP_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
+      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
     },
     async postStage(stage) {
       var headers = {}

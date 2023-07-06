@@ -48,7 +48,7 @@
 <script>
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
-import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../common/scripts.js'
+import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../common/scripts.mjs'
 export default {
   name: 'TravelApply',
   data() {

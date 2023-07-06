@@ -169,7 +169,7 @@ export default {
     },
     async logout() {
       try {
-        const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/logout', {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/logout', {
           withCredentials: true
         })
         if (res.status === 200) {
@@ -185,7 +185,7 @@ export default {
     async getter(endpoint, params = {}, config = {}) {
       try {
         const res = await axios.get(
-          process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
           Object.assign(
             {
               params: params,
@@ -210,7 +210,7 @@ export default {
     async setter(endpoint, data, config = {}) {
       try {
         const res = await axios.post(
-          process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
           data,
           Object.assign(
             {
@@ -238,7 +238,7 @@ export default {
         return null
       }
       try {
-        const res = await axios.delete(process.env.VUE_APP_BACKEND_URL + '/api/' + endpoint, {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint, {
           params: params,
           withCredentials: true
         })
@@ -298,7 +298,7 @@ export default {
     async pushSettings() {
       this.user.settings.language = this.$i18n.locale
       try {
-        await axios.post(process.env.VUE_APP_BACKEND_URL + '/api/user/settings', this.user.settings, {
+        await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', this.user.settings, {
           withCredentials: true
         })
       } catch (error) {
@@ -309,9 +309,6 @@ export default {
         }
       }
     }
-  },
-  beforeMount() {
-    document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
   }
 }
 </script>

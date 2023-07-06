@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile-${NODE_ENV}
     restart: always
     depends_on:
-      - db  
+      - db
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -21,14 +21,13 @@ services:
     volumes:
       - db_data:/data/db
 
-# Uses ningx in production mode see /frontend/Dockerfile-production
+  # Uses ningx in production mode see /frontend/Dockerfile-production
   frontend:
     build:
       context: ./
       dockerfile: ./frontend/Dockerfile-${NODE_ENV}
     volumes:
       - ./frontend:/app
-      - /app/node_modules
       - ./common:/app/src/common:ro
     restart: always
     depends_on:
@@ -38,7 +37,7 @@ services:
     env_file:
       - .env
 
-# Test LDAP only in development mode
+  # Test LDAP only in development mode
   ldap:
     build:
       context: ./dev-tools/ldap
@@ -46,7 +45,7 @@ services:
     environment:
       - DEBUG=false
 
-# Test SMTP + mail client only in development mode
+  # Test SMTP + mail client only in development mode
   inbucket:
     build:
       context: ./dev-tools/inbucket
@@ -54,7 +53,7 @@ services:
     ports:
       - ${INBUCKET_UI_PORT}:9000
 
-# Test SMTP + mail client only in development mode
+  # Test SMTP + mail client only in development mode
   mongo-express:
     build:
       context: ./dev-tools/mongo-express
@@ -65,8 +64,6 @@ services:
       - ${MONGO_EXPRESS_PORT}:8081
     environment:
       - ME_CONFIG_MONGODB_SERVER=db
-    
-      
 
 volumes:
   db_data:

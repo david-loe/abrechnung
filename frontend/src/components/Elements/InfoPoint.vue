@@ -2,26 +2,28 @@
   <i class="bi bi-info-circle-fill text-primary" data-bs-toggle="tooltip" :data-bs-title="text" ref="icon"></i>
 </template>
 
-<script>
+<script lang="ts">
 import { Tooltip } from 'bootstrap'
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'InfoPoint',
   data() {
     return {
-      tooltip: undefined
+      tooltip: new Tooltip('test')
     }
   },
   components: {},
-  props: { text: { type: String } },
+  props: { text: { type: String, required: true } },
   mounted() {
-    this.tooltip = new Tooltip(this.$refs.icon)
+    //this.tooltip = new Tooltip(this.$refs.icon as Element)
   },
   watch: {
     text: function () {
       this.tooltip.setContent({ '.tooltip-inner': this.text })
     }
   }
-}
+})
 </script>
 
 <style></style>

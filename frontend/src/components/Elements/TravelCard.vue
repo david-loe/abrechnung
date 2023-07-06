@@ -24,7 +24,7 @@
 <script>
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { datetoDateString } from '../../common/scripts.js'
+import { datetoDateString } from '../../common/scripts.mjs'
 
 export default {
   name: 'TravelCard',

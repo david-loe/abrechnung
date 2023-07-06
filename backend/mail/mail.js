@@ -13,7 +13,7 @@ function sendMail(recipients, subject, paragaph, button, lastParagraph) {
     salutation = i18n.t('mail.hiX', { X: recipients[0].name })
   }
   const regards = i18n.t('mail.regards')
-  const app = { name: i18n.t("headlines.title") + ' ' + i18n.t("headlines.emoji"), url: process.env.VUE_APP_FRONTEND_URL }
+  const app = { name: i18n.t("headlines.title") + ' ' + i18n.t("headlines.emoji"), url: process.env.VITE_FRONTEND_URL }
 
   const template = fs.readFileSync('./mail/mail_template.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
@@ -56,14 +56,14 @@ async function sendNotificationMail(travel) {
 
   if (travel.state === 'appliedFor') {
     recipients = await User.find({ 'access.approve': true })
-    button.link = process.env.VUE_APP_FRONTEND_URL + '/approve/' + travel._id
+    button.link = process.env.VITE_FRONTEND_URL + '/approve/' + travel._id
 
   } else if (travel.state === 'underExamination') {
     recipients = await User.find({ 'access.examine': true })
-    button.link = process.env.VUE_APP_FRONTEND_URL + '/examine/' + travel._id
+    button.link = process.env.VITE_FRONTEND_URL + '/examine/' + travel._id
   } else { // 'rejected', 'approved', 'refunded'
     recipients = [travel.traveler]
-    button.link = process.env.VUE_APP_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : ('/' + travel._id))
+    button.link = process.env.VITE_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : ('/' + travel._id))
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
