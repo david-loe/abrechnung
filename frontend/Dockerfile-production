@@ -10,7 +10,7 @@ COPY frontend/ .
 
 COPY .env .
 
-COPY common ./src/common
+COPY common /common
 
 RUN npm run build
 

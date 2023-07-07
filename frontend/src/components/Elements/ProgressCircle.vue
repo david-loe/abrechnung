@@ -9,17 +9,19 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ProgressCircle',
-  props: { progress: { type: Number } },
+  props: { progress: { type: Number, required: true } },
   data() {
     return {
       dashoffset: 50
     }
   },
   methods: {
-    calc() {
+    calc(): void {
       this.dashoffset = 100 - this.progress
     }
   },
@@ -31,7 +33,7 @@ export default {
       this.calc()
     }
   }
-}
+})
 </script>
 
 <style scoped>

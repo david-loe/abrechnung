@@ -4,11 +4,13 @@
   </span>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'StateBadge',
-  props: { state: { type: String } }
-}
+  props: { state: { type: String, required: true } }
+})
 </script>
 
 <style></style>

@@ -122,18 +122,28 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import axios from 'axios'
-export default {
+import { defineComponent } from 'vue'
+import { User } from '../../common/types'
+
+interface Alert {
+  type: 'danger' | 'success'
+  title: string
+  message?: string
+  id?: number
+}
+
+export default defineComponent({
   data() {
     return {
-      alerts: [],
+      alerts: [] as Alert[],
       auth: false,
-      user: {},
+      user: {} as User,
       currencies: [],
       countries: [],
       loadState: 'UNLOADED',
-      loadingPromise: null,
+      loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       stateColors: {
         rejected: { color: '#E8998D', text: 'black' },
@@ -153,13 +163,13 @@ export default {
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
         this.loadingPromise = Promise.allSettled([this.getter('user'), this.getter('currency'), this.getter('country')]).then((result) => {
-          this.user = result[0].value.data
+          this.user = (result[0] as PromiseFulfilledResult<any>).value.data
           if (Object.keys(this.user).length > 0) {
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
-          this.currencies = result[1].value.data
-          this.countries = result[2].value.data
+          this.currencies = (result[1] as PromiseFulfilledResult<any>).value.data
+          this.countries = (result[2] as PromiseFulfilledResult<any>).value.data
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -174,15 +184,14 @@ export default {
         })
         if (res.status === 200) {
           this.auth = false
-          this.user = {}
           this.$router.push({ path: '/login' })
         }
-      } catch (error) {
+      } catch (error: any) {
         this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
         console.log(error.response.data)
       }
     },
-    async getter(endpoint, params = {}, config = {}) {
+    async getter(endpoint: string, params = {}, config = {}) {
       try {
         const res = await axios.get(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -197,9 +206,9 @@ export default {
         if (res.status === 200) {
           return res.data
         }
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route } })
+          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -207,7 +216,7 @@ export default {
         }
       }
     },
-    async setter(endpoint, data, config = {}) {
+    async setter(endpoint: string, data: any, config = {}) {
       try {
         const res = await axios.post(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -220,20 +229,20 @@ export default {
           )
         )
         if (res.status === 200) {
-          this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
+          this.addAlert({ message: '', title: res.data.message, type: 'success' })
           return res.data.result
         }
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route } })
+          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
-          this.$root.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
           return null
         }
       }
     },
-    async deleter(endpoint, params) {
+    async deleter(endpoint: string, params = {}) {
       if (!confirm(this.$t('alerts.areYouSureDelete'))) {
         return null
       }
@@ -243,12 +252,12 @@ export default {
           withCredentials: true
         })
         if (res.status === 200) {
-          this.$root.addAlert({ message: '', title: res.data.message, type: 'success' })
+          this.addAlert({ message: '', title: res.data.message, type: 'success' })
           return true
         }
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route } })
+          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
@@ -256,18 +265,7 @@ export default {
         }
       }
     },
-    getById(property, id) {
-      if (property in this) {
-        for (const element of this[property]) {
-          if (element._id == id) {
-            return element
-          }
-        }
-        return false
-      }
-      return false
-    },
-    addAlert(alert) {
+    addAlert(alert: Alert) {
       alert = Object.assign(alert, { id: Math.random() })
       this.alerts.push(alert)
       setTimeout(() => {
@@ -280,17 +278,17 @@ export default {
       }, 5000)
     },
     // Handling all dates as UTC
-    dateTimeToHTMLInputString(date) {
+    dateTimeToHTMLInputString(date: Date) {
       if (!date) return ''
       const dateObject = new Date(date)
       return dateObject.toISOString().slice(0, -8)
     },
-    htmlInputStringToDateTime(dateTimeStr) {
+    htmlInputStringToDateTime(dateTimeStr: string) {
       if (!dateTimeStr) return null
       const dateObject = new Date(dateTimeStr)
       return new Date(dateObject.valueOf() - dateObject.getTimezoneOffset() * 60 * 1000)
     },
-    dateToHTMLInputString(date) {
+    dateToHTMLInputString(date: Date) {
       if (!date) return ''
       const dateObject = new Date(date)
       return dateObject.toISOString().slice(0, -14)
@@ -301,7 +299,7 @@ export default {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', this.user.settings, {
           withCredentials: true
         })
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push('login')
         } else {
@@ -310,7 +308,7 @@ export default {
       }
     }
   }
-}
+})
 </script>
 
 <style>

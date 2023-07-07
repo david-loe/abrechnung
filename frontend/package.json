@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "@types/bootstrap": "^5.2.6",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.5",
@@ -22,10 +21,12 @@
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^3.3.0",
+    "@types/node": "*",
+    "@types/bootstrap": "*",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/compiler-sfc": "^3.0.0",
     "eslint": "^8.44.0",
-    "eslint-plugin-vue": "^8.7.1",
+    "eslint-plugin-vue": "^9.15.1",
     "vite": "^4.4.1",
     "vue-tsc": "^1.8.4"
   },
@@ -38,9 +39,6 @@
     "extends": [
       "plugin:vue/vue3-essential"
     ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
-    },
     "rules": {}
   },
   "browserslist": [

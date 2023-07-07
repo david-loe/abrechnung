@@ -1,14 +1,19 @@
 <template>
-  <span>{{ place.place }}</span
-  >&nbsp;<span v-if="showCountry" :title="place.country.name[$i18n.locale]">{{ place.country.flag }}</span>
+  <div>
+    <span>{{ place.place }}</span>
+    &nbsp;<span v-if="showCountry" :title="place.country.name[$i18n.locale as Locales]">{{ place.country.flag }}</span>
+  </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
+import { Locales, Place } from './../../../../common/types'
+
+export default defineComponent({
   name: 'PlaceElement',
   components: {},
-  props: { place: { type: Object }, showCountry: { type: Boolean, default: true } }
-}
+  props: { place: { type: Object as PropType<Place>, required: true }, showCountry: { type: Boolean, default: true } }
+})
 </script>
 
 <style></style>
