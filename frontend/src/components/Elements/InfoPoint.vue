@@ -1,5 +1,5 @@
 <template>
-  <i class="bi bi-info-circle-fill text-primary" data-bs-toggle="tooltip" :data-bs-title="text" ref="icon"></i>
+  <i class="bi bi-info-circle-fill text-primary" :data-bs-title="text" ref="icon"></i>
 </template>
 
 <script lang="ts">
@@ -8,15 +8,15 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'InfoPoint',
-  data() {
+  data(): {tooltip: any} {
     return {
-      tooltip: new Tooltip('test')
+      tooltip: undefined
     }
   },
   components: {},
   props: { text: { type: String, required: true } },
   mounted() {
-    //this.tooltip = new Tooltip(this.$refs.icon as Element)
+    this.tooltip = new Tooltip(this.$refs.icon as Element)
   },
   watch: {
     text: function () {

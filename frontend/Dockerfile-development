@@ -6,6 +6,4 @@ RUN npm install
 
 WORKDIR /app
 
-
-
-ENTRYPOINT [ "/bin/sh", "-c" , "cp -r /npm_cache/node_modules /app/node_modules && npm run dev" ]
+ENTRYPOINT [ "/bin/sh", "-c" , "cp -r /npm_cache/node_modules/. /app/node_modules && npm run dev" ]
