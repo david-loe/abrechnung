@@ -43,9 +43,11 @@ export interface User extends UserSimple {
     admin: boolean
   }
   settings: {
-    language: Locales
+    language: Locale
     lastCurrencies?: Array<string>
   }
 }
 
-export type Locales = 'de' | 'en'
+export type Locale = 'de' | 'en'
+
+export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'

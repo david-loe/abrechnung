@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const { getDayList, getDiffInDays } = require('../common/scripts')
 const Country = require('./country')
 const Currency = require('./currency')
-const settings = require('../settings')
+const settings = require('../common/settings')
 const helper = require('../helper')
 
 

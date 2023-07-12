@@ -1,13 +1,13 @@
 <template>
   <div>
     <span>{{ place.place }}</span>
-    &nbsp;<span v-if="showCountry" :title="place.country.name[$i18n.locale as Locales]">{{ place.country.flag }}</span>
+    &nbsp;<span v-if="showCountry" :title="place.country.name[$i18n.locale as Locale]">{{ place.country.flag }}</span>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { Locales, Place } from './../../../../common/types'
+import { Locale, Place } from './../../../../common/types'
 
 export default defineComponent({
   name: 'PlaceElement',

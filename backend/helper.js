@@ -2,7 +2,7 @@ const i18n = require('./i18n')
 const Country = require('./models/country')
 const User = require('./models/user')
 const axios = require('axios')
-const settings = require('./settings')
+const settings = require('./common/settings')
 const scripts = require('./common/scripts')
 
 function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null, cb = null) {

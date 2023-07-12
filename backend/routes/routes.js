@@ -49,7 +49,7 @@ router.get('/user', async (req, res) => {
 })
 
 
-router.post('/user/settings', async (req, res) => {
+router.post('/user/common/settings', async (req, res) => {
   const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   Object.assign(user.settings, req.body)
   user.markModified('settings')

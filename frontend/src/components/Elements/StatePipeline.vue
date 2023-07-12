@@ -4,7 +4,7 @@
       <StateBadge :state="state" class="fs-6"></StateBadge>
     </div>
     <div v-else class="row align-items-center justify-content-around m-0 flex-nowrap">
-      <template v-for="(value, key, index) in $root.stateColors">
+      <template v-for="(value, key, index) in stateColors">
         <template v-if="key !== 'rejected'">
           <div class="col-auto p-0" :key="key">
             <StateBadge :state="key" :class="state === key ? 'fs-6' : 'fw-normal'"></StateBadge>
@@ -13,9 +13,9 @@
             <hr
               :style="
                 'background: linear-gradient(to right, ' +
-                $root.stateColors[key].color +
+                stateColors[key].color +
                 ', ' +
-                $root.stateColors[Object.keys($root.stateColors)[index + 1]].color +
+                stateColors[Object.keys(stateColors)[index + 1]].color +
                 '); height: 5px; border: 0px'
               " />
           </div>
@@ -27,10 +27,14 @@
 
 <script>
 import StateBadge from './StateBadge.vue'
+import { stateColors } from '../../../../common/settings.json'
+
 export default {
   name: 'StatePipeline',
   data() {
-    return {}
+    return {
+      stateColors
+    }
   },
   components: { StateBadge },
   props: { state: { type: String } },

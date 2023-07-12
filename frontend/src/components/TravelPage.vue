@@ -383,7 +383,7 @@ import StageForm from './Forms/StageForm.vue'
 import expenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../common/scripts.mjs'
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.mjs'
 export default {
   name: 'TravelPage',
   data() {

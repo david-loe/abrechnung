@@ -125,7 +125,8 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { User } from '../../common/types'
+import { Locale, User } from '../../common/types'
+import { languages } from '../../common/settings.json'
 
 interface Alert {
   type: 'danger' | 'success'
@@ -145,17 +146,7 @@ export default defineComponent({
       loadState: 'UNLOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
-      stateColors: {
-        rejected: { color: '#E8998D', text: 'black' },
-        appliedFor: { color: '#cae5ff', text: 'black' },
-        approved: { color: '#89bbfe', text: 'black' },
-        underExamination: { color: '#6f8ab7', text: 'white' },
-        refunded: { color: '#615d6c', text: 'white' }
-      },
-      languages: [
-        { flag: '🇩🇪', key: 'de' },
-        { flag: '🇬🇧', key: 'en' }
-      ]
+      languages
     }
   },
   methods: {
@@ -294,7 +285,7 @@ export default defineComponent({
       return dateObject.toISOString().slice(0, -14)
     },
     async pushSettings() {
-      this.user.settings.language = this.$i18n.locale
+      this.user.settings.language = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', this.user.settings, {
           withCredentials: true
