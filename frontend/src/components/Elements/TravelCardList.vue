@@ -6,7 +6,7 @@
       </div>
     </div>
     <div v-if="travels.length === 0" class="alert alert-light" role="alert">
-      {{ $t('alerts.noTravels.' + this.endpoint) }}
+      {{ $t('alerts.noTravels.' + endpoint) }}
     </div>
     <div v-else-if="meta && meta.countPages > 1" class="mx-auto text-secondary" style="width: fit-content">
       <span class="me-2 p-2" style="cursor: pointer" @click="getTravels(meta.page - 1)">&lt;</span>
@@ -23,39 +23,45 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { TravelSimple } from '../../../../common/types'
 import TravelCard from './TravelCard.vue'
-export default {
+export default defineComponent({
   name: 'TravelCardList',
   emits: ['clicked'],
   data() {
     return {
-      travels: [false],
-      meta: false
+      hasTravels: false,
+      hasMeta: false,
+      travels: [] as TravelSimple[],
+      meta: { countPages: -1, page: -1 }
     }
   },
   components: { TravelCard },
-  props: { endpoint: { type: String }, showTraveler: { type: Boolean, default: false } },
+  props: { endpoint: { type: String, required: true }, showTraveler: { type: Boolean, default: false } },
   methods: {
-    async getTravels(page) {
+    async getTravels(page?: number): Promise<void> {
       if (page === 0 || page) {
         if (page < 1) {
           page = 1
-        } else if (this.meta && page > this.meta.countPages) {
+        } else if (this.hasMeta && page > this.meta.countPages) {
           page = this.meta.countPages
         }
-      } else if (this.meta) {
+      } else if (this.hasMeta) {
         page = this.meta.page
       }
       var result = await this.$root.getter(this.endpoint, { page })
       this.travels = result.data
+      this.hasTravels = true
       this.meta = result.meta
+      this.hasMeta = true
     }
   },
   async beforeMount() {
     await this.getTravels()
   }
-}
+})
 </script>
 
 <style></style>

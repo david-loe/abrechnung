@@ -233,9 +233,9 @@ export default defineComponent({
         }
       }
     },
-    async deleter(endpoint: string, params = {}) {
+    async deleter(endpoint: string, params = {}): Promise<boolean> {
       if (!confirm(this.$t('alerts.areYouSureDelete'))) {
-        return null
+        return false
       }
       try {
         const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint, {
@@ -252,9 +252,9 @@ export default defineComponent({
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
-          return null
         }
       }
+      return false
     },
     addAlert(alert: Alert) {
       alert = Object.assign(alert, { id: Math.random() })

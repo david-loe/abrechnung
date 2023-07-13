@@ -1,3 +1,5 @@
+import settings from './settings.json'
+
 export interface Country {
   name: {
     de: string
@@ -109,13 +111,15 @@ export interface TravelSimple {
   startDate: Date
   endDate: Date
   advance: Money
-  professionalShare: number
   progress: number
   _id: string
+  claimSpouseRefund?: boolean //settings.allowSpouseRefund
+  fellowTravelersNames?: string //settings.allowSpouseRefund
 }
 
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
+  professionalShare: number
   history: Array<string>
   historic: boolean
   stages: Array<Stage>

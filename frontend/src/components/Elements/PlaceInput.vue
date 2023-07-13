@@ -4,7 +4,7 @@
       type="text"
       class="form-control"
       :value="modelValue.place"
-      @input="$emit('update:modelValue', Object.assign({}, modelValue, { place: $event.target.value }))"
+      @input="$emit('update:modelValue', Object.assign({}, modelValue, { place: ($event.target as HTMLInputElement).value }))"
       :placeholder="$t('labels.place')"
       :disabled="disabled"
       :required="required" />
@@ -16,27 +16,27 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
+import { Place } from '../../../../common/types'
 import CountrySelector from './CountrySelector.vue'
 const defaultPlace = {
   country: null,
   place: null
 }
-export default {
+export default defineComponent({
   name: 'PlaceInput',
   data() {
     return {}
   },
   components: { CountrySelector },
   props: {
-    modelValue: { type: Object, default: () => defaultPlace },
+    modelValue: { type: Object as PropType<Place>, default: () => defaultPlace },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false }
   },
-  emits: ['update:modelValue'],
-  beforeMount() {},
-  mounted() {}
-}
+  emits: ['update:modelValue']
+})
 </script>
 
 <style></style>

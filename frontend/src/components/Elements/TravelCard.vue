@@ -21,21 +21,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { datetoDateString } from '../../../../common/scripts.mjs'
+import { datetoDateString } from '../../../../common/scriptsts'
+import { TravelSimple } from '../../../../common/types'
 
-export default {
+export default defineComponent({
   name: 'TravelCard',
   emits: ['clicked'],
-  data() {
-    return {}
-  },
   components: { StateBadge, ProgressCircle },
-  props: { travel: { type: Object }, showTraveler: { type: Boolean, default: false } },
+  props: { travel: { type: Object as PropType<TravelSimple>, required: true }, showTraveler: { type: Boolean, default: false } },
   methods: { datetoDateString }
-}
+})
 </script>
 
 <style></style>

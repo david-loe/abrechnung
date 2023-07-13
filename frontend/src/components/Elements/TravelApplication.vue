@@ -52,6 +52,8 @@ import PlaceElement from './PlaceElement.vue'
 import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../common/scriptsts'
 import { TravelSimple } from '../../../../common/types'
 
+const myNumber: keyof TravelSimple = 'claimSpouseRefund'
+
 const keys = [
   'traveler',
   'reason',
@@ -59,7 +61,7 @@ const keys = [
   'endDate',
   'travelInsideOfEU',
   'editor',
-  'comment',
+  'comments',
   'claimSpouseRefund',
   'fellowTravelersNames'
 ]
@@ -99,6 +101,12 @@ export default defineComponent({
           return this.travel[key].name
         case 'traveler':
           return this.travel[key].name
+        case 'comments':
+          if (this.travel.comments.length > 0) {
+            return this.travel.comments[this.travel.comments.length - 1].text
+          } else {
+            return ''
+          }
         default:
           if (typeof this.travel[key] == 'boolean') {
             if (this.travel[key]) {
@@ -107,7 +115,12 @@ export default defineComponent({
               return '❌'
             }
           }
-          return this.travel[key].toString()
+          if (this.travel[key]) {
+            return this.travel[key].toString()
+          } else {
+            console.log(key)
+            return ''
+          }
       }
     },
     getMoneyString

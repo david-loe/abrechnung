@@ -20,16 +20,15 @@ if (/windows/i.test(navigator.userAgent)) {
   }
 }
 
-// declare module 'vue' {
-//   interface ComponentCustomProperties {
-//     $t: ((key: string) => string) | ((key: string, options: any) => string)
-//   }
-// }
-
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $t: typeof i18n.global.t
     $i18n: typeof i18n.global
+    $root: {
+      getter: (endpoint: string, params?: {}, config?: {}) => Promise<any>
+      setter: (endpoint: string, data: any, config?: {}) => Promise<any>
+      deleter: (endpoint: string, params: {}) => Promise<boolean>
+    }
   }
 }
 
