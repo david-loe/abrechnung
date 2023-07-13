@@ -4,9 +4,9 @@
     <table class="table">
       <tbody>
         <tr v-for="key of keys" :key="key">
-          <template v-if="displayKey(key)">
+          <template v-if="displayKey(key as keyof TravelSimple)">
             <th>{{ $t('labels.' + key) }}</th>
-            <td>{{ displayKey(key) }}</td>
+            <td>{{ displayKey(key as keyof TravelSimple) }}</td>
           </template>
         </tr>
         <tr>
@@ -45,35 +45,39 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
-import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../common/scripts.mjs'
-export default {
+import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../common/scriptsts'
+import { TravelSimple } from '../../../../common/types'
+
+const keys = [
+  'traveler',
+  'reason',
+  'startDate',
+  'endDate',
+  'travelInsideOfEU',
+  'editor',
+  'comment',
+  'claimSpouseRefund',
+  'fellowTravelersNames'
+]
+export default defineComponent({
   name: 'TravelApply',
   data() {
     return {
-      keys: [
-        'traveler',
-        'reason',
-        'startDate',
-        'endDate',
-        'travelInsideOfEU',
-        'editor',
-        'comment',
-        'claimSpouseRefund',
-        'fellowTravelersNames'
-      ]
+      keys
     }
   },
   components: { StatePipeline, PlaceElement },
   emits: ['cancel', 'edit', 'deleted'],
   props: {
-    travel: { type: Object },
+    travel: { type: Object as PropType<TravelSimple>, required: true },
     showButtons: { type: Boolean, default: true }
   },
   methods: {
-    displayKey(key) {
+    displayKey(key: keyof TravelSimple): string {
       switch (key) {
         case 'startDate':
           return datetoDateStringWithYear(this.travel[key])
@@ -103,13 +107,13 @@ export default {
               return '❌'
             }
           }
-          return this.travel[key]
+          return this.travel[key].toString()
       }
     },
     getMoneyString
   },
   mounted() {}
-}
+})
 </script>
 
 <style></style>

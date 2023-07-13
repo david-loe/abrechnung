@@ -16,7 +16,7 @@ export default defineComponent({
       stateColors
     }
   },
-  props: { state: { type: Object as PropType<State>, required: true } }
+  props: { state: { type: String as PropType<State>, required: true } }
 })
 </script>
 

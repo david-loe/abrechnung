@@ -100,7 +100,7 @@ function populate(doc) {
     doc.populate({ path: 'expenses.cost.receipts', model: 'DocumentFile', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'comments.author', model: 'User', select: { name: 1 } })
+    doc.populate({ path: 'comments.author', model: 'User', select: { name: 1, email: 1 } })
   ])
 }
 
