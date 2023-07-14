@@ -10,10 +10,18 @@
         </div>
       </div>
 
-      <h6 v-if="showTraveler" class="card-subtitle mb-1 text-muted">{{ travel.traveler.name }}</h6>
-      <h6 class="card-subtitle mb-2 text-muted">
-        {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
-      </h6>
+      <span v-if="showTraveler" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{ travel.traveler.name }}</span>
+      <div class="row mb-2">
+        <div class="col-auto">
+          <span class="fs-6 fw-medium text-muted">
+            {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
+          </span>
+        </div>
+        <div v-if="travel.claimSpouseRefund" :title="$t('labels.claimSpouseRefund')" class="col-auto">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+      </div>
+
       <div>
         <StateBadge :state="travel.state"></StateBadge>
       </div>

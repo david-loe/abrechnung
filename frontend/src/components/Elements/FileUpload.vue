@@ -37,16 +37,21 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
+
+interface DocumentFile {
+  data?: Blob
+  type: 'image/jpeg' | 'image/png' | 'application/pdf'
+  name: string
+  _id?: string
+}
+
+export default defineComponent({
   name: 'FileUpload',
-  data() {
-    return {}
-  },
-  components: {},
   props: {
     modelValue: {
-      type: Array,
+      type: Array as PropType<DocumentFile[]>,
       default: function () {
         return []
       }
@@ -57,16 +62,16 @@ export default {
   },
   emits: ['update:modelValue', 'deleteFile', 'showFile'],
   methods: {
-    showFile(index) {
-      const windowProxy = window.open('', '_blank')
+    showFile(index: number): void {
+      const windowProxy = window.open('', '_blank') as Window
       if (this.modelValue[index]._id) {
         this.$emit('showFile', this.modelValue[index]._id, windowProxy)
-      } else {
-        const fileURL = URL.createObjectURL(this.modelValue[index].data)
+      } else if (this.modelValue[index].data) {
+        const fileURL = URL.createObjectURL(this.modelValue[index].data!)
         windowProxy.location.assign(fileURL)
       }
     },
-    deleteFile(index) {
+    deleteFile(index: number) {
       if (this.modelValue[index]._id) {
         this.$emit('deleteFile', this.modelValue[index]._id)
       } else {
@@ -78,28 +83,30 @@ export default {
       files.splice(index, 1)
       this.$emit('update:modelValue', files)
     },
-    changeFile(event) {
+    changeFile(event: Event) {
       const files = this.modelValue
-      for (const file of event.target.files) {
-        if (file.size < 16000000) {
-          if (file.type.indexOf('image') > -1) {
-            const reader = new FileReader()
-            reader.readAsDataURL(file)
-            reader.onload = async () => {
-              files.push({ data: await this.resizeImage(file, 1400), type: file.type, name: file.name })
+      if (event.target && (event.target as HTMLInputElement).files) {
+        for (const file of (event.target as HTMLInputElement).files!) {
+          if (file.size < 16000000) {
+            if (file.type.indexOf('image') > -1) {
+              const reader = new FileReader()
+              reader.readAsDataURL(file)
+              reader.onload = async () => {
+                files.push({ data: await this.resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
+              }
+            } else {
+              files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
             }
           } else {
-            files.push({ data: file, type: file.type, name: file.name })
+            alert(this.$t('alerts.imageToBig'))
           }
-        } else {
-          alert(this.$t('alerts.imageToBig'))
         }
+        this.$emit('update:modelValue', files)
+        ;(event.target as HTMLInputElement).value = ''
       }
-      this.$emit('update:modelValue', files)
-      event.target.value = ''
     },
     // From https://stackoverflow.com/a/52983833/13582326
-    resizeImage(file, longestSide) {
+    resizeImage(file: Blob, longestSide: number): Promise<Blob> {
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -112,8 +119,8 @@ export default {
             var canvas = document.createElement('canvas')
             var ctx = canvas.getContext('2d')
             // We set the dimensions to the wanted size.
-            var max = img.height < img.width ? 'width' : 'height'
-            var min = max == 'width' ? 'height' : 'width'
+            var max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
+            var min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
             if (canvas[max] > longestSide) {
               canvas[max] = longestSide
               canvas[min] = img[min] * (longestSide / img[max])
@@ -121,16 +128,16 @@ export default {
               return resolve(file)
             }
             // We resize the image with the canvas method drawImage();
-            ctx.drawImage(this, 0, 0, canvas.width, canvas.height)
-            canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85)
+            ;(ctx as CanvasRenderingContext2D).drawImage(this as unknown as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+            canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
           }
           // We put the Data URI in the image's src attribute
-          img.src = reader.result
+          img.src = reader.result as string
         }
       })
     }
   }
-}
+})
 </script>
 
 <style></style>

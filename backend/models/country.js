@@ -5,7 +5,7 @@ const settings = require('../common/settings')
 const countrySchema = new mongoose.Schema({
   name: {
     de: { type: String, required: true, trim: true },
-    en: { type: String, trim: true }
+    en: { type: String, required: true, trim: true }
   },
   alias: {
     de: { type: String, trim: true },

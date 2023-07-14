@@ -109,16 +109,11 @@ export default defineComponent({
           }
         default:
           if (typeof this.travel[key] == 'boolean') {
-            if (this.travel[key]) {
-              return '✅'
-            } else {
-              return '❌'
-            }
+            return this.travel[key] ? '✅' : ''
           }
           if (this.travel[key]) {
-            return this.travel[key].toString()
+            return this.travel[key]!.toString()
           } else {
-            console.log(key)
             return ''
           }
       }

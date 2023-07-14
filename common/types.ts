@@ -1,17 +1,21 @@
 import settings from './settings.json'
 
-export interface Country {
+export interface CountrySimple {
   name: {
-    de: string
-    en?: string
-  }
-  alias?: {
     de: string
     en: string
   }
+  alias?: {
+    de: string
+    en?: string
+  }
   _id: string
   flag?: string
-  lumpSums?: [
+  currency?: Currency
+}
+
+export interface Country extends CountrySimple {
+  lumpSums: [
     {
       validFrom: Date
       catering24: number
@@ -28,13 +32,12 @@ export interface Country {
     }
   ]
   lumpSumsFrom?: string
-  currency?: Currency
 }
 
 export interface Currency {
-  name?: {
+  name: {
     de: string
-    en?: string
+    en: string
   }
   _id: string
   subunit?: string
@@ -44,7 +47,7 @@ export interface Currency {
 
 export interface Place {
   place: string
-  country: Country
+  country: CountrySimple
 }
 
 export interface UserSimple {
@@ -86,7 +89,7 @@ export interface Stage {
   arrival: Date
   startLocation: Place
   endLocation: Place
-  midnightCountries?: [{ date: Date; country: Country }]
+  midnightCountries?: [{ date: Date; country: CountrySimple }]
   distance?: number
   transport: 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
   cost: Cost
@@ -127,7 +130,7 @@ export interface Travel extends TravelSimple {
   days: [
     {
       date: Date
-      country: Country
+      country: CountrySimple
       cateringNoRefund: {
         breakfast: boolean
         lunch: boolean

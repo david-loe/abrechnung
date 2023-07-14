@@ -4,7 +4,7 @@
     :options="$root.countries"
     :modelValue="modelValue"
     :placeholder="$t('labels.country')"
-    @update:modelValue="(v) => $emit('update:modelValue', v)"
+    @update:modelValue="(v: CountrySimple) => $emit('update:modelValue', v)"
     :filter="filter"
     :disabled="disabled"
     style="min-width: 160px">
@@ -30,24 +30,32 @@
   </v-select>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { PropType, defineComponent } from 'vue'
+import { CountrySimple } from '../../../../common/types'
+import { Locale } from '../../../../common/types'
+
+export default defineComponent({
   name: 'CountrySelector',
   data() {
     return {}
   },
   components: {},
-  props: ['modelValue', 'required', 'disabled'],
+  props: {
+    modelValue: { type: Object as PropType<CountrySimple> },
+    required: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false }
+  },
   emits: ['update:modelValue'],
   methods: {
-    filter(options, search) {
+    filter(options: CountrySimple[], search: string): CountrySimple[] {
       return options.filter((option) => {
-        const name = option.name[this.$i18n.locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const name = option.name[this.$i18n.locale as Locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
         if (name) {
           return name
         }
-        if (option.alias && option.alias[this.$i18n.locale]) {
-          const alias = option.alias[this.$i18n.locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        if (option.alias && option.alias[this.$i18n.locale as Locale]) {
+          const alias = option.alias[this.$i18n.locale as Locale]!.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
           if (alias) {
             return alias
           }
@@ -58,7 +66,7 @@ export default {
       })
     }
   }
-}
+})
 </script>
 
 <style></style>

@@ -49,7 +49,7 @@
 
     <!-- v-if="settings.allowSpouseRefund" -->
     <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" required />
+      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
       <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
         {{ $t('labels.claimSpouseRefund') }}
       </label>
