@@ -8,6 +8,30 @@
         <div class="col-auto">
           <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
         </div>
+        <div class="col-auto">
+          <div class="dropdown" @click="(e) => e.stopPropagation()">
+            <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+              <i class="bi bi-three-dots-vertical"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a
+                  :class="'dropdown-item' + (['underExamination', 'refunded'].indexOf(travel.state) != -1 ? ' disabled' : '')"
+                  href="#"
+                  @click=";['underExamination', 'refunded'].indexOf(travel.state) != -1 ? null : $emit('edit')">
+                  <span class="me-1"><i class="bi bi-pencil"></i></span>
+                  <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" @click="$emit('deleted')">
+                  <span class="me-1"><i class="bi bi-trash"></i></span>
+                  <span>{{ $t('labels.delete') }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <span v-if="showTraveler" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{ travel.traveler.name }}</span>
@@ -38,10 +62,12 @@ import { TravelSimple } from '../../../../common/types'
 
 export default defineComponent({
   name: 'TravelCard',
-  emits: ['clicked'],
+  emits: ['clicked', 'deleted', 'edit'],
   components: { StateBadge, ProgressCircle },
   props: { travel: { type: Object as PropType<TravelSimple>, required: true }, showTraveler: { type: Boolean, default: false } },
-  methods: { datetoDateString }
+  methods: {
+    datetoDateString
+  }
 })
 </script>
 

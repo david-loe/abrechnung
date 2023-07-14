@@ -2,7 +2,12 @@
   <div style="min-height: 120px">
     <div class="row justify-content-center gx-4 gy-2">
       <div class="col-auto" v-for="travel of travels" :key="travel._id">
-        <TravelCard v-if="travel" :travel="travel" :showTraveler="showTraveler" @clicked="$emit('clicked', travel)"></TravelCard>
+        <TravelCard
+          v-if="travel"
+          :travel="travel"
+          :showTraveler="showTraveler"
+          @clicked="$emit('clicked', travel)"
+          @deleted="deleteTravel(travel._id)"></TravelCard>
       </div>
     </div>
     <div v-if="travels.length === 0" class="alert alert-light" role="alert">
@@ -56,6 +61,12 @@ export default defineComponent({
       this.hasTravels = true
       this.meta = result.meta
       this.hasMeta = true
+    },
+    async deleteTravel(id: string): Promise<void> {
+      const result = await this.$root.deleter('travel', { id: id })
+      if (result) {
+        this.getTravels()
+      }
     }
   },
   async beforeMount() {

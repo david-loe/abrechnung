@@ -106,10 +106,11 @@
     "refund": "Refund",
     "invoiceDate": "Date of invoice",
     "description": "Description",
-    "receiptNumber" : "Receipt No.",
+    "receiptNumber": "Receipt No.",
     "date": "Date",
     "days": "Days",
-    "fellowTravelersNames": "Name of all fellow travelers"
+    "fellowTravelersNames": "Name of all fellow travelers",
+    "travelDetails": "Travel details"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
@@ -149,7 +150,7 @@
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)"
   },
-  "mail" : {
+  "mail": {
     "hi": "Hi there,",
     "hiX": "Hi {X},",
     "regards": "Best Regards",
@@ -182,8 +183,7 @@
   "login": {
     "signIn": "Please sign in"
   },
-  "settings": {
-  },
+  "settings": {},
   "weekdays": {
     "0": "Sunday",
     "1": "Monday",
@@ -216,7 +216,7 @@
     "10": "Nov",
     "11": "Dec"
   },
-  "states":{
+  "states": {
     "rejected": "Rejected",
     "appliedFor": "Applied for",
     "approved": "Approved",
@@ -231,7 +231,7 @@
     "catering24\n": "Catering lump sum",
     "overnight\n": "Overnight lump sum"
   },
-  "languages":{
+  "languages": {
     "de": "German",
     "en": "English"
   }

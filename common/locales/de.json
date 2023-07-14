@@ -106,10 +106,11 @@
     "refund": "Erstatten",
     "invoiceDate": "Rechnungsdatum",
     "description": "Beschreibung",
-    "receiptNumber" : "Beleg Nr.",
+    "receiptNumber": "Beleg Nr.",
     "date": "Datum",
     "days": "Tage",
-    "fellowTravelersNames": "Namen aller Mitreisenden"
+    "fellowTravelersNames": "Namen aller Mitreisenden",
+    "travelDetails": "Reisedetails"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -149,7 +150,7 @@
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)"
   },
-  "mail" : {
+  "mail": {
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "regards": "Beste Grüße",
@@ -215,7 +216,7 @@
     "10": "Nov",
     "11": "Dez"
   },
-  "states":{
+  "states": {
     "rejected": "Abgelehnt",
     "appliedFor": "Beantragt",
     "approved": "Genehmigt",
@@ -230,7 +231,7 @@
     "catering24\n": "Verpflegungs\npauschale",
     "overnight\n": "Übernachtungs\npauschale"
   },
-  "languages":{
+  "languages": {
     "de": "Deutsch",
     "en": "Englisch"
   }
