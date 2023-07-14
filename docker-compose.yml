@@ -17,6 +17,7 @@ services:
 
   db:
     image: mongo
+    command: --quiet --logpath /dev/null
     restart: always
     volumes:
       - db_data:/data/db
@@ -52,6 +53,8 @@ services:
       dockerfile: Dockerfile-${NODE_ENV}
     ports:
       - ${INBUCKET_UI_PORT}:9000
+    environment:
+      - INBUCKET_LOGLEVEL=error
 
   # Test SMTP + mail client only in development mode
   mongo-express:
