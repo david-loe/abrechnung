@@ -15,7 +15,7 @@
             <PlaceElement :place="travel.destinationPlace"></PlaceElement>
           </td>
         </tr>
-        <tr v-if="travel.advance.amount > 0">
+        <tr v-if="travel.advance.amount != null">
           <th>{{ $t('labels.advance') }}</th>
           <td>
             <span>
@@ -51,8 +51,6 @@ import StatePipeline from './StatePipeline.vue'
 import PlaceElement from './PlaceElement.vue'
 import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../common/scriptsts'
 import { TravelSimple } from '../../../../common/types'
-
-const myNumber: keyof TravelSimple = 'claimSpouseRefund'
 
 const keys = [
   'traveler',

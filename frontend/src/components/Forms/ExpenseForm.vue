@@ -23,7 +23,7 @@
           v-model="formExpense.cost.date"
           :required="true"
           :disabled="disabled"
-          :max="$root.dateToHTMLInputString(new Date())" />
+          :max="datetimeToDateString(new Date())" />
       </div>
     </div>
 
@@ -66,11 +66,20 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType, toRaw } from 'vue'
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
-const defaultExpense = {
+import { Expense } from '../../../../common/types'
+import { datetimeToDateString } from '../../../../common/scriptsts'
+
+interface FormExpense extends Omit<Expense, '_id'> {
+  _id?: string
+}
+
+const defaultExpense: FormExpense = {
+  description: '',
   cost: {
     amount: null,
     currency: 'EUR',
@@ -79,29 +88,24 @@ const defaultExpense = {
   },
   purpose: 'professional'
 }
-export default {
+export default defineComponent({
   name: 'expenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     expense: {
-      type: Object,
-      default: function () {
-        return structuredClone(defaultExpense)
-      }
+      type: Object as PropType<Expense>,
+      default: () => structuredClone(defaultExpense)
     },
     mode: {
-      type: String,
-      required: true,
-      validator: function (value) {
-        return ['add', 'edit'].indexOf(value) !== -1
-      }
+      type: String as PropType<'add' | 'edit'>,
+      required: true
     },
     disabled: { type: Boolean, default: false }
   },
   data() {
     return {
-      formExpense: undefined
+      formExpense: structuredClone(defaultExpense)
     }
   },
   methods: {
@@ -109,15 +113,16 @@ export default {
       this.formExpense = structuredClone(defaultExpense)
     },
     output() {
-      const output = structuredClone(this.formExpense)
+      const output = structuredClone(toRaw(this.formExpense))
       output.cost.date = new Date(output.cost.date)
       return output
     },
     input() {
       const input = Object.assign({}, structuredClone(defaultExpense), this.expense)
-      input.cost.date = this.$root.dateToHTMLInputString(input.cost.date)
+      input.cost.date = datetimeToDateString(input.cost.date)
       return input
-    }
+    },
+    datetimeToDateString
   },
   beforeMount() {
     this.formExpense = this.input()
@@ -127,7 +132,7 @@ export default {
       this.formExpense = this.input()
     }
   }
-}
+})
 </script>
 
 <style></style>

@@ -37,13 +37,19 @@
           class="form-control"
           type="date"
           v-model="formTravel.startDate"
-          :min="$root.dateToHTMLInputString(new Date())"
+          :min="datetimeToDateString(new Date())"
           required />
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label
         ><span class="text-danger">*</span>
-        <input id="endDateInput" class="form-control" type="date" v-model="formTravel.endDate" :min="formTravel.startDate" required />
+        <input
+          id="endDateInput"
+          class="form-control"
+          type="date"
+          v-model="formTravel.endDate"
+          :min="(formTravel.startDate as string)"
+          required />
       </div>
     </div>
 
@@ -93,11 +99,20 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-const defaultTravel = {
+import { datetimeToDateString, clone } from '../../../../common/scriptsts'
+import { TravelSimple, Place } from '../../../../common/types'
+
+interface FormTravelSimple
+  extends Omit<TravelSimple, 'destinationPlace' | 'traveler' | 'state' | 'editor' | 'comments' | 'progress' | '_id'> {
+  destinationPlace?: Place
+}
+
+const defaultTravel: FormTravelSimple = {
   name: '',
   reason: '',
   startDate: '',
@@ -110,44 +125,42 @@ const defaultTravel = {
     currency: 'EUR'
   }
 }
-export default {
+export default defineComponent({
   name: 'TravelApplyForm',
   components: { CurrencySelector, InfoPoint, PlaceInput },
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: {
-      type: Object,
-      default: () => defaultTravel
+      type: Object as PropType<TravelSimple>,
+      default: () => structuredClone(defaultTravel)
     },
     mode: {
-      type: String,
-      required: true,
-      validator: function (value) {
-        return ['add', 'edit'].indexOf(value) !== -1
-      }
+      type: String as PropType<'add' | 'edit'>,
+      required: true
     }
   },
   data() {
     return {
-      formTravel: undefined
+      formTravel: structuredClone(defaultTravel)
     }
   },
   methods: {
     clear() {
-      this.formTravel = defaultTravel
+      this.formTravel = structuredClone(defaultTravel)
     },
     output() {
-      const output = Object.assign({}, this.formTravel)
+      const output = clone(this.formTravel)
       output.startDate = new Date(output.startDate)
       output.endDate = new Date(output.endDate)
       return output
     },
     input() {
       const input = Object.assign({}, this.travel)
-      input.startDate = this.$root.dateToHTMLInputString(input.startDate)
-      input.endDate = this.$root.dateToHTMLInputString(input.endDate)
+      input.startDate = datetimeToDateString(input.startDate)
+      input.endDate = datetimeToDateString(input.endDate)
       return input
-    }
+    },
+    datetimeToDateString
   },
   beforeMount() {
     this.formTravel = this.input()
@@ -157,7 +170,7 @@ export default {
       this.formTravel = this.input()
     }
   }
-}
+})
 </script>
 
 <style></style>

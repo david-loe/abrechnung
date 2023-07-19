@@ -19,24 +19,26 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import TravelApply from '../Elements/TravelApplication.vue'
-export default {
+import { TravelSimple } from '../../../../common/types'
+export default defineComponent({
   name: 'InfoPoint',
   data() {
     return {
-      comment: null
+      comment: ''
     }
   },
   components: { TravelApply },
-  props: { travel: { type: Object } },
+  props: { travel: { type: Object as PropType<TravelSimple>, required: true } },
   emits: ['decision', 'cancel'],
   methods: {
     clear() {
-      this.comment = null
+      this.comment = ''
     }
   }
-}
+})
 </script>
 
 <style></style>

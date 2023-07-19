@@ -20,7 +20,7 @@
           class="form-control"
           type="datetime-local"
           v-model="formStage.arrival"
-          :min="formStage.departure ? formStage.departure : minDate"
+          :min="formStage.departure ? formStage.departure as string : minDate"
           :max="maxDate"
           :disabled="disabled"
           required />
@@ -51,7 +51,7 @@
       </label>
       <InfoPoint :text="$t('info.midnightCountries')" />
       <div class="row mb-3" id="stageFormMidnightCountries">
-        <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date">
+        <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date.toString()">
           <label for="stageFormLocation" class="form-label">
             {{ datetoDateString(midnightCountry.date) }}
             {{ $t('labels.midnight') }}
@@ -92,7 +92,7 @@
             v-model="formStage.cost.date"
             :required="Boolean(formStage.cost.amount)"
             :disabled="disabled"
-            :max="$root.dateToHTMLInputString(new Date())" />
+            :max="datetimeToDateString(new Date())" />
         </div>
       </div>
 
@@ -138,14 +138,31 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import { getDayList, datetoDateString } from '../../../../common/scripts.mjs'
-const defaultStage = {
+import {
+  getDayList,
+  datetoDateString,
+  datetimeToDateString,
+  datetimeToDatetimeString,
+  htmlInputStringToDateTime,
+  clone
+} from '../../../../common/scriptsts'
+import { Stage, Place, CountrySimple } from '../../../../common/types'
+import settings from '../../../../common/settings.json'
+
+interface FormStage extends Omit<Stage, 'startLocation' | 'endLocation' | 'midnightCountries' | '_id'> {
+  startLocation?: Place
+  endLocation?: Place
+  midnightCountries: { date: Date; country?: CountrySimple }[]
+  _id?: string
+}
+const defaultStage: FormStage = {
   departure: '',
   arrival: '',
   startLocation: undefined,
@@ -161,33 +178,28 @@ const defaultStage = {
   },
   purpose: 'professional'
 }
-export default {
+export default defineComponent({
   name: 'StageForm',
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     stage: {
-      type: Object,
-      default: function () {
-        return structuredClone(defaultStage)
-      }
+      type: Object as PropType<Stage>,
+      default: () => structuredClone(defaultStage)
     },
     mode: {
-      type: String,
-      required: true,
-      validator: function (value) {
-        return ['add', 'edit'].indexOf(value) !== -1
-      }
+      type: String as PropType<'add' | 'edit'>,
+      required: true
     },
     disabled: { type: Boolean, default: false },
-    travelStartDate: { type: [String, Date] },
-    travelEndDate: { type: [String, Date] }
+    travelStartDate: { type: [String, Date], required: true },
+    travelEndDate: { type: [String, Date], required: true }
   },
   data() {
     return {
-      formStage: undefined,
-      minDate: null,
-      maxDate: null
+      formStage: structuredClone(defaultStage),
+      minDate: '',
+      maxDate: ''
     }
   },
   methods: {
@@ -199,9 +211,9 @@ export default {
         this.formStage.startLocation.country &&
         this.formStage.endLocation.country &&
         this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
-        !isNaN(new Date(this.formStage.departure)) &&
-        !isNaN(new Date(this.formStage.arrival)) &&
-        this.$root.dateToHTMLInputString(this.formStage.departure) !== this.$root.dateToHTMLInputString(this.formStage.arrival)
+        !isNaN(new Date(this.formStage.departure).valueOf()) &&
+        !isNaN(new Date(this.formStage.arrival).valueOf()) &&
+        datetimeToDatetimeString(this.formStage.departure) !== datetimeToDatetimeString(this.formStage.arrival)
       )
     },
     calcMidnightCountries() {
@@ -214,7 +226,7 @@ export default {
         }
         for (const oldMC of this.formStage.midnightCountries) {
           for (const newMC of newMidnightCountries) {
-            if (new Date(oldMC.date) - newMC.date == 0) {
+            if (new Date(oldMC.date).valueOf() - newMC.date.valueOf() == 0) {
               Object.assign(newMC, oldMC)
               break
             }
@@ -229,13 +241,13 @@ export default {
       this.formStage = structuredClone(defaultStage)
     },
     output() {
-      const output = structuredClone(this.formStage)
+      const output = clone(this.formStage) as Stage
 
       if (!this.showMidnightCountries()) {
         delete output.midnightCountries
       }
-      output.departure = this.$root.htmlInputStringToDateTime(output.departure)
-      output.arrival = this.$root.htmlInputStringToDateTime(output.arrival)
+      output.departure = htmlInputStringToDateTime(output.departure.toString()) as Date
+      output.arrival = htmlInputStringToDateTime(output.arrival.toString()) as Date
       if (output.cost.date) {
         output.cost.date = new Date(output.cost.date)
       }
@@ -243,15 +255,20 @@ export default {
     },
     input() {
       //toleranceStageDatesToApprovedTravelDates
-      this.minDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelStartDate).valueOf() - 3 * 24 * 60 * 60 * 1000)
-      this.maxDate = this.$root.dateTimeToHTMLInputString(new Date(this.travelEndDate).valueOf() + (3 + 1) * 24 * 60 * 60 * 1000 - 1)
+      this.minDate = datetimeToDatetimeString(
+        new Date(this.travelStartDate).valueOf() - settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+      )
+      this.maxDate = datetimeToDatetimeString(
+        new Date(this.travelEndDate).valueOf() + (settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 - 1
+      )
       const input = Object.assign({}, structuredClone(defaultStage), this.stage)
-      input.departure = this.$root.dateTimeToHTMLInputString(input.departure)
-      input.arrival = this.$root.dateTimeToHTMLInputString(input.arrival)
-      input.cost.date = this.$root.dateToHTMLInputString(input.cost.date)
+      input.departure = datetimeToDatetimeString(input.departure)
+      input.arrival = datetimeToDatetimeString(input.arrival)
+      input.cost.date = datetimeToDateString(input.cost.date)
       return input
     },
-    datetoDateString
+    datetoDateString,
+    datetimeToDateString
   },
   beforeMount() {
     this.formStage = this.input()
@@ -276,7 +293,7 @@ export default {
       this.calcMidnightCountries()
     }
   }
-}
+})
 </script>
 
 <style></style>

@@ -39,13 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-
-interface DocumentFile {
-  data?: Blob
-  type: 'image/jpeg' | 'image/png' | 'application/pdf'
-  name: string
-  _id?: string
-}
+import { DocumentFile } from '../../../../common/types'
 
 export default defineComponent({
   name: 'FileUpload',

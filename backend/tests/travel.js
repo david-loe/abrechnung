@@ -13,7 +13,7 @@ async function getTestTravel() {
     destinationPlace: { place: 'place', country: 'DE' },
     travelInsideOfEU: false,
     startDate: new Date(),
-    endDate: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    endDate: new Date(new Date().valueOf() + 7 * 24 * 60 * 60 * 1000),
     advance: {
       amount: 100,
       currency: 'EUR',
@@ -21,7 +21,7 @@ async function getTestTravel() {
     claimOvernightLumpSum: true,
     stages: [{
       departure: new Date(),
-      arrival: new Date(new Date().getTime() + 3 * 60 * 60 * 1000),
+      arrival: new Date(new Date().valueOf() + 3 * 60 * 60 * 1000),
       transport: 'airplane',
       startLocation: {
         country: 'DE',

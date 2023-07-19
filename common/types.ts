@@ -50,6 +50,13 @@ export interface Place {
   country: CountrySimple
 }
 
+export interface DocumentFile {
+  data?: Blob
+  type: 'image/jpeg' | 'image/png' | 'application/pdf'
+  name: string
+  _id?: string
+}
+
 export interface UserSimple {
   uid: string
   email: string
@@ -70,7 +77,7 @@ export interface User extends UserSimple {
 }
 
 export interface Money {
-  amount: number
+  amount: number | null
   currency: Currency | string
   exchangeRate?: {
     date: Date
@@ -80,26 +87,28 @@ export interface Money {
 }
 
 export interface Cost extends Money {
-  receipts: Array<string>
-  date: Date
+  receipts: Array<DocumentFile>
+  date: Date | string
 }
 
 export interface Stage {
-  departure: Date
-  arrival: Date
+  departure: Date | string
+  arrival: Date | string
   startLocation: Place
   endLocation: Place
-  midnightCountries?: [{ date: Date; country: CountrySimple }]
-  distance?: number
+  midnightCountries?: { date: Date; country: CountrySimple }[]
+  distance?: number | null
   transport: 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
   cost: Cost
   purpose: 'professional' | 'mixed' | 'private'
+  _id: string
 }
 
 export interface Expense {
   description: string
   cost: Cost
   purpose: 'professional' | 'mixed'
+  _id: string
 }
 
 export interface TravelSimple {
@@ -111,8 +120,8 @@ export interface TravelSimple {
   reason: string
   destinationPlace: Place
   travelInsideOfEU: boolean
-  startDate: Date
-  endDate: Date
+  startDate: Date | string
+  endDate: Date | string
   advance: Money
   progress: number
   _id: string

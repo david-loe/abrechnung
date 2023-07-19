@@ -127,6 +127,7 @@ import axios from 'axios'
 import { defineComponent } from 'vue'
 import { Locale, User } from '../../common/types'
 import { languages } from '../../common/settings.json'
+import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 
 interface Alert {
   type: 'danger' | 'success'
@@ -146,7 +147,8 @@ export default defineComponent({
       loadState: 'UNLOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
-      languages
+      languages,
+      TwemojiCountryFlags
     }
   },
   methods: {
@@ -268,22 +270,6 @@ export default defineComponent({
         }
       }, 5000)
     },
-    // Handling all dates as UTC
-    dateTimeToHTMLInputString(date: Date) {
-      if (!date) return ''
-      const dateObject = new Date(date)
-      return dateObject.toISOString().slice(0, -8)
-    },
-    htmlInputStringToDateTime(dateTimeStr: string) {
-      if (!dateTimeStr) return null
-      const dateObject = new Date(dateTimeStr)
-      return new Date(dateObject.valueOf() - dateObject.getTimezoneOffset() * 60 * 1000)
-    },
-    dateToHTMLInputString(date: Date) {
-      if (!date) return ''
-      const dateObject = new Date(date)
-      return dateObject.toISOString().slice(0, -14)
-    },
     async pushSettings() {
       this.user.settings.language = this.$i18n.locale as Locale
       try {
@@ -306,7 +292,7 @@ export default defineComponent({
 @font-face {
   font-family: 'Twemoji Country Flags';
   unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
-  src: url(./common/fonts/TwemojiCountryFlags.woff2) format('woff2');
+  src: v-bind('TwemojiCountryFlags') format('woff2');
 }
 
 body {

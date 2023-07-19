@@ -8,7 +8,7 @@
   "lunchCateringLumpSumCut": 0.4,
   "dinnerCateringLumpSumCut": 0.4,
   "toleranceStageDatesToApprovedTravelDates": 3,
-  "baseCurrency": { "_id": "EUR", "symbol": "€" },
+  "baseCurrency": { "_id": "EUR", "symbol": "€", "name": { "de": "Euro", "en": "euro" }, "subunit": "Cent" },
   "allowSpouseRefund": true,
   "refundPerKM": 0.3,
   "version": 0,
