@@ -30,13 +30,14 @@
         </div>
       </li>
     </ul>
+    <!-- prettier-ignore-attribute @cancel -->
     <UserForm
       v-if="userFormMode !== ''"
       :user="userToEdit"
       :mode="userFormMode"
       @add="postUser"
       @edit="postUser"
-      @cancel="userFormMode = ''"
+      @cancel="userFormMode = '';userToEdit = undefined"
       ref="userform"
       id="userform"
       style="max-width: 650px"></UserForm>
@@ -71,6 +72,7 @@ export default {
         this.$refs.userform.clear()
         this.userFormMode = ''
       }
+      this.userToEdit = undefined
     },
     async deleteUser(user) {
       const result = await this.$root.deleter('admin/user', { id: user._id })

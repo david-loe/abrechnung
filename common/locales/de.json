@@ -124,6 +124,7 @@
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "wrongPassword": "Falsches Passwort",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
+    "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubantragten Zeitfensters liegen.",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "successSaving": "Gespeichert",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",

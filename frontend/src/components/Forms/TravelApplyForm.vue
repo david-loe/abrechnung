@@ -90,7 +90,11 @@
         {{ $t('labels.applyForX', { X: $t('labels.travel') }) }}
       </button>
       <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
-        {{ travel.state === 'rejected' ? $t('labels.reapplyForX', { X: $t('labels.travel') }) : $t('labels.save') }}
+        {{
+          travel.state === 'rejected' || travel.state === 'approved'
+            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+            : $t('labels.save')
+        }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
@@ -155,7 +159,7 @@ export default defineComponent({
       return output
     },
     input() {
-      const input = Object.assign({}, this.travel)
+      const input = Object.assign({}, structuredClone(defaultTravel), this.travel)
       input.startDate = datetimeToDateString(input.startDate)
       input.endDate = datetimeToDateString(input.endDate)
       return input

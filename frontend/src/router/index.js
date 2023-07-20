@@ -80,7 +80,7 @@ async function auth() {
     })
     auth = res.status === 200
   } catch (error) {
-    if (error.response.status !== 401) {
+    if (error.response && error.response.status !== 401) {
       console.log(error)
     }
   }

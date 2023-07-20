@@ -43,6 +43,13 @@
               @deleteReceipt="deleteReceipt"
               @showReceipt="showReceipt">
             </expenseForm>
+            <TravelApplyForm
+              v-else-if="modalObjectType === 'travel'"
+              :mode="modalMode"
+              @cancel="hideModal"
+              :travel="modalObject"
+              @edit="applyForTravel"
+              ref="travelApplyForm"></TravelApplyForm>
           </div>
         </div>
       </div>
@@ -87,7 +94,12 @@
                     <hr class="dropdown-divider" />
                   </li>
                 </template>
-
+                <li>
+                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', travel, 'travel')">
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')"
@@ -380,9 +392,10 @@ import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import ProgressCircle from './Elements/ProgressCircle.vue'
 import StageForm from './Forms/StageForm.vue'
-import expenseForm from './Forms/ExpenseForm.vue'
+import ExpenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
+import TravelApplyForm from './Forms/TravelApplyForm.vue'
 import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.mjs'
 export default {
   name: 'TravelPage',
@@ -398,7 +411,7 @@ export default {
       isReadOnly: false
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, expenseForm },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
   props: {
     _id: { type: String },
     parentPages: { type: Array },
@@ -431,6 +444,16 @@ export default {
       const result = await this.$root.setter('travel', travel)
       if (result) {
         await this.getTravel()
+      } else {
+        await this.getTravel()
+      }
+    },
+    async applyForTravel(travel) {
+      const result = await this.$root.setter('travel/appliedFor', travel)
+      if (result && confirm(this.$t('alerts.warningReapply'))) {
+        await this.getTravel()
+        this.hideModal()
+        this.$router.push({ path: '/' })
       } else {
         await this.getTravel()
       }
@@ -477,15 +500,15 @@ export default {
         this.hideModal()
       }
     },
-    async postExpense(stage) {
+    async postExpense(expense) {
       var headers = {}
-      if (stage.cost.receipts) {
+      if (expense.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
       }
-      stage.travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', stage, { headers })
+      expense.travelId = this.travel._id
+      const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', expense, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -596,7 +619,6 @@ export default {
     try {
       await this.getTravel()
     } catch (e) {
-      console.log(e)
       return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1

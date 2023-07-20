@@ -339,7 +339,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   }
 
   const check = async (oldObject) => {
-    return oldObject.state === 'appliedFor' || oldObject.state === 'rejected'
+    return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
   }
   return helper.setter(Travel, 'traveler', true, check, mail.sendNotificationMail)(req, res)
 })

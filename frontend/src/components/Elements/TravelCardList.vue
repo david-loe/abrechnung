@@ -6,8 +6,10 @@
           v-if="travel"
           :travel="travel"
           :showTraveler="showTraveler"
+          :showDropdown="showDropdown"
           @clicked="$emit('clicked', travel)"
-          @deleted="deleteTravel(travel._id)"></TravelCard>
+          @deleted="deleteTravel(travel._id)"
+          @edit="$emit('edit', travel)"></TravelCard>
       </div>
     </div>
     <div v-if="travels.length === 0" class="alert alert-light" role="alert">
@@ -34,7 +36,7 @@ import { TravelSimple } from '../../../../common/types'
 import TravelCard from './TravelCard.vue'
 export default defineComponent({
   name: 'TravelCardList',
-  emits: ['clicked'],
+  emits: ['clicked', 'edit'],
   data() {
     return {
       hasTravels: false,
@@ -44,7 +46,11 @@ export default defineComponent({
     }
   },
   components: { TravelCard },
-  props: { endpoint: { type: String, required: true }, showTraveler: { type: Boolean, default: false } },
+  props: {
+    endpoint: { type: String, required: true },
+    showTraveler: { type: Boolean, default: false },
+    showDropdown: { type: Boolean, default: false }
+  },
   methods: {
     async getTravels(page?: number): Promise<void> {
       if (page === 0 || page) {

@@ -8,7 +8,7 @@
         <div class="col-auto">
           <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
         </div>
-        <div class="col-auto">
+        <div v-if="showDropdown" class="col-auto">
           <div class="dropdown" @click="(e) => e.stopPropagation()">
             <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
               <i class="bi bi-three-dots-vertical"></i>
@@ -64,7 +64,11 @@ export default defineComponent({
   name: 'TravelCard',
   emits: ['clicked', 'deleted', 'edit'],
   components: { StateBadge, ProgressCircle },
-  props: { travel: { type: Object as PropType<TravelSimple>, required: true }, showTraveler: { type: Boolean, default: false } },
+  props: {
+    travel: { type: Object as PropType<TravelSimple>, required: true },
+    showTraveler: { type: Boolean, default: false },
+    showDropdown: { type: Boolean, default: false }
+  },
   methods: {
     datetoDateString
   }

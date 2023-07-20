@@ -5,10 +5,10 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.travel') }) }}</h5>
-            <h5 v-else class="modal-title">{{ modalTravel.name }}</h5>
+            <h5 v-else-if="modalTravel" class="modal-title">{{ modalTravel.name }}</h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" v-if="modalTravel">
             <TravelApply
               v-if="modalMode === 'view'"
               :travel="modalTravel"
@@ -39,7 +39,12 @@
           </button>
         </div>
       </div>
-      <TravelCardList ref="travelCardListRef" endpoint="travel" @clicked="(t) => clickCard(t)"></TravelCardList>
+      <TravelCardList
+        ref="travelCardListRef"
+        endpoint="travel"
+        :showDropdown="true"
+        @clicked="(t) => clickCard(t)"
+        @edit="(t) => showModal('edit', t)"></TravelCardList>
     </div>
   </div>
 </template>
@@ -79,6 +84,7 @@ export default {
       if (this.$refs.travelApplyForm) {
         this.$refs.travelApplyForm.clear()
       }
+      this.modalTravel = undefined
     },
     async applyForTravel(travel) {
       const result = await this.$root.setter('travel/appliedFor', travel)

@@ -124,6 +124,7 @@
     "loginFailed": "Failed to login!",
     "wrongPassword": "Wrong Password",
     "areYouSureDelete": "Are you sure that you want to delete this?",
+    "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "errorSaving": "Error while saving",
     "successSaving": "Saved successfully",
     "errorDeleting": "Error while deleting",

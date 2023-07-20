@@ -68,6 +68,7 @@ export default {
       if (this.$refs.travelApproveForm) {
         this.$refs.travelApproveForm.clear()
       }
+      this.modalTravel = undefined
     },
     async approveTravel(decision, comment) {
       this.modalTravel.comment = comment
