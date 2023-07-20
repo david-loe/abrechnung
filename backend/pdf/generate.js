@@ -38,22 +38,22 @@ async function generateReport(travel) {
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), pdfDoc, { font: font, fontSize: 16, x: 16, y: y - 32 })
+  drawLogo(getLastPage(), { font: font, fontSize: 16, x: 16, y: y - 32 })
   y = y - edge
-  y = drawGeneralTravelInformation(getLastPage(), pdfDoc, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
+  y = drawGeneralTravelInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
   const receiptMap = getReceiptMap(travel)
 
   y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
   y = drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
-  y = drawDays(getLastPage(), newPage, travel.days, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
   await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
 
   return await pdfDoc.save()
 }
 
-function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) {
+function drawGeneralTravelInformation(page, travel, options = { font }) {
   if (!travel || !options.font) {
     return
   }
@@ -79,7 +79,7 @@ function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) 
 
   // Traveler
   var y = y - (opts.fontSize * 1.5 * 1.5)
-  page.drawText(i18n.t('labels.traveler') + ': ' + travel.traveler.name, {
+  page.drawText(i18n.t('labels.traveler') + ': ' + travel.traveler.name + (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''), {
     x: opts.xStart,
     y: y,
     size: opts.fontSize,
@@ -89,7 +89,7 @@ function drawGeneralTravelInformation(page, pdfDoc, travel, options = { font }) 
 
   // Reason + Place
   var y = y - (opts.fontSize * 1.5)
-  drawPlace(page, pdfDoc, travel.destinationPlace, Object.assign(opts, { x: opts.xStart, y: y, prefix: i18n.t('labels.reason') + ': ' + travel.reason + '    ' + i18n.t('labels.destinationPlace') + ': ' }))
+  drawPlace(page, travel.destinationPlace, Object.assign(opts, { x: opts.xStart, y: y, prefix: i18n.t('labels.reason') + ': ' + travel.reason + '    ' + i18n.t('labels.destinationPlace') + ': ' }))
 
   // Dates + professionalShare
   var text = i18n.t('labels.from') + ': ' + new Date(travel.startDate).toLocaleDateString(i18n.language) + '    ' + i18n.t('labels.to') + ': ' + new Date(travel.endDate).toLocaleDateString(i18n.language)
@@ -161,8 +161,8 @@ function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
   const columns = []
   columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => scripts.dateTimeToString(d) })
   columns.push({ key: 'arrival', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.arrival'), fn: (d) => scripts.dateTimeToString(d) })
-  columns.push({ key: 'startLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.startLocation'), fn: scripts.placeToString })
-  columns.push({ key: 'endLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.endLocation'), fn: scripts.placeToString })
+  columns.push({ key: 'startLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.startLocation'), fn: (p) => p.place + ', ' + p.country.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (p) => p.country._id })
+  columns.push({ key: 'endLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.endLocation'), fn: (p) => p.place + ', ' + p.country.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (p) => p.country._id })
   columns.push({ key: 'transport', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.transport'), fn: (t) => i18n.t('labels.' + t) })
   columns.push({ key: 'distance', width: 65, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.distance') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
@@ -183,6 +183,9 @@ function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
 }
 
 function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font }) {
+  if (expenses.length == 0) {
+    return options.yStart
+  }
   const columns = []
   columns.push({ key: 'description', width: 270, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
@@ -203,17 +206,17 @@ function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font })
   return drawTable(page, newPageFn, expenses, columns, options)
 }
 
-function drawDays(page, newPageFn, days, options = { font }) {
+function drawDays(page, newPageFn, travel, options = { font }) {
   const columns = []
   columns.push({ key: 'date', width: 70, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.date'), fn: (d) => scripts.datetoDateString(d) })
-  columns.push({ key: 'country', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.country'), fn: (c) => c.name[i18n.language] })
+  columns.push({ key: 'country', width: 120, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.country'), fn: (c) => c.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (c) => c._id })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
   columns.push({ key: 'cateringNoRefund', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.cateringNoRefund'), fn: (c) => Object.keys(c).map((k) => c[k] ? i18n.t('labels.' + k) : '').join(' ') })
   columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.catering24\n'), fn: (r) => r.filter((r) => r.type.indexOf('catering') === 0).length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund, i18n.language) : '' })
   columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.overnight\n'), fn: (r) => r.filter((r) => r.type == 'overnight').length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type == 'overnight')[0].refund, i18n.language) : '' })
 
   const fontSize = options.fontSize + 2
-  page.drawText(i18n.t('labels.lumpSums'), {
+  page.drawText(i18n.t('labels.lumpSums') + (travel.claimSpouseRefund ? ' (' + i18n.t('labels.claimSpouseRefund') + ')' : ''), {
     x: options.xStart,
     y: options.yStart - fontSize,
     size: fontSize,
@@ -222,7 +225,7 @@ function drawDays(page, newPageFn, days, options = { font }) {
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, days, columns, options)
+  return drawTable(page, newPageFn, travel.days, columns, options)
 }
 
 async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
@@ -294,7 +297,7 @@ async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
 }
 
 
-async function drawPlace(page, pdfDoc, place, options = { font, x, y }) {
+async function drawPlace(page, place, options = { font, x, y }) {
   if (!place || !options.font) {
     return
   }
@@ -318,17 +321,32 @@ async function drawPlace(page, pdfDoc, place, options = { font, x, y }) {
     color: opts.textColor
   })
 
-  var filename = place.country._id
+  opts.x = flagX
+  drawFlag(page, place.country._id, opts)
+}
+
+async function drawFlag(page, countryCode, options = { x, y, fontSize }) {
+  if (!countryCode) {
+    return
+  }
+  const opts = {
+    fontSize: 11,
+    x: 10,
+    y: 10
+  }
+  Object.assign(opts, options)
+
+  var filename = countryCode
   if (opts.fontSize > 42 * 0.75) { // 0.75 px <=> 1 pt
     filename = filename + '@3x'
   } else if (opts.fontSize > 21 * 0.75) { // 0.75 px <=> 1 pt
     filename = filename + '@2x'
   }
   const flagBytes = fs.readFileSync('./pdf/flags/' + filename + '.png')
-  const flag = await pdfDoc.embedPng(flagBytes)
+  const flag = await page.doc.embedPng(flagBytes)
 
   page.drawImage(flag, {
-    x: flagX,
+    x: opts.x,
     y: opts.y - (opts.fontSize / 9),
     height: opts.fontSize,
     width: opts.fontSize * (3 / 2)
@@ -336,7 +354,7 @@ async function drawPlace(page, pdfDoc, place, options = { font, x, y }) {
 
 }
 
-async function drawLogo(page, pdfDoc, options = { font, x, y }) {
+async function drawLogo(page, options = { font, x, y }) {
   if (!options.font) {
     return
   }
@@ -369,7 +387,7 @@ async function drawLogo(page, pdfDoc, options = { font, x, y }) {
     filename = filename + '12'
   }
   const logoBytes = fs.readFileSync('./pdf/airplanes/' + filename + '.png')
-  const logo = await pdfDoc.embedPng(logoBytes)
+  const logo = await page.doc.embedPng(logoBytes)
 
   page.drawImage(logo, {
     x: flagX,
@@ -426,7 +444,8 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     const columnBorders = []
     const cellTexts = []
     for (const column of columns) {
-      var cell = data[i][column.key]
+      const datum = data[i][column.key]
+      var cell = datum
       if (column.fn) {
         cell = column.fn(cell)
       }
@@ -437,7 +456,7 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
         cell = '---'
       }
       const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
-      const multiText = pdf_lib.layoutMultilineText(cell.toString(), {
+      const multiText = pdf_lib.layoutMultilineText(cell.toString() + (column.pseudoSuffix && !opts.firstRow ? column.pseudoSuffix : ''), {
         alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
         font: opts.font,
         fontSize: fontSize,
@@ -455,12 +474,26 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
           options: {
             x: line.x + opts.textPadding.x,
             y: line.y + opts.textPadding.bottom,
+            width: line.width,
             size: fontSize,
             font: opts.font,
             color: opts.textColor
-          }
+          },
         })
       }
+      if (multiText.lines.length > 0 && !opts.firstRow) {
+        if (column.pseudoSuffix) {
+          cellTexts[cellTexts.length - 1].text = cellTexts[cellTexts.length - 1].text.slice(0, cellTexts[cellTexts.length - 1].text.length - column.pseudoSuffix.length)
+          cellTexts[cellTexts.length - 1].pseudoSuffixWidth = opts.font.widthOfTextAtSize(column.pseudoSuffix, opts.fontSize) - opts.font.widthOfTextAtSize(' ', opts.fontSize)
+        }
+        cellTexts[cellTexts.length - 1].cb = column.cb
+        if (column.cbValue) {
+          cellTexts[cellTexts.length - 1].cbValue = column.cbValue(datum)
+        }
+
+
+      }
+
       columnBorders.push({ // vertical border ╫
         start: { x: x - opts.borderThickness, y: y + opts.cellHeight - opts.borderThickness },
         end: { x: x - opts.borderThickness },
@@ -497,6 +530,9 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     }
     for (const text of cellTexts) {
       page.drawText(text.text, text.options)
+      if (text.cb) {
+        text.cb(page, text.cbValue, { y: text.options.y, x: text.options.x + text.options.width - text.pseudoSuffixWidth, fontSize: opts.fontSize })
+      }
     }
     for (const border of columnBorders) {
       border.end.y = yMin - opts.borderThickness

@@ -241,7 +241,7 @@ router.get('/travel/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' })
   if (travel) {
     const report = await pdf.generateReport(travel)
-    res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');
+    res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Length', report.length);
     return res.send(new Buffer.from(report))
