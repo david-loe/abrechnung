@@ -1,5 +1,7 @@
 FROM node:18-alpine
 
+RUN mkdir /reports
+
 WORKDIR /app
 
 COPY package*.json ./

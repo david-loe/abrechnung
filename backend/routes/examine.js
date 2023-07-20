@@ -57,7 +57,13 @@ router.post('/travel/refunded', async (req, res) => {
       return false
     }
   }
-  return helper.setter(Travel, '', false, check, mail.sendNotificationMail)(req, res)
+  const cb = async (travel) => {
+    mail.sendNotificationMail(travel)
+    if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+      await pdf.generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
+    }
+  }
+  return helper.setter(Travel, '', false, check, cb)(req, res)
 })
 
 function getReceipt() {

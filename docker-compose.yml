@@ -10,6 +10,7 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./common:/app/common:ro
+      # - ./reports:/reports #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:

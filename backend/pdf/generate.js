@@ -13,12 +13,12 @@ async function test() {
   await mongoose.connect(process.env.MONGO_URL, {})
   const travel = await Travel.findOne({ historic: false })
 
-  var callback = (err) => {
-    if (err) throw err;
-    console.log('It\'s saved!');
-  }
-  fs.writeFile('output.pdf', await generateReport(travel), callback);
+  await generateAndWriteToDisk('output.pdf', travel)
   mongoose.disconnect()
+}
+
+async function generateAndWriteToDisk(filePath, travel) {
+  fs.writeFile(filePath, await generateReport(travel), () => null);
 }
 
 async function generateReport(travel) {
@@ -565,5 +565,6 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
 
 module.exports = {
   generateReport,
-  test
+  test,
+  generateAndWriteToDisk
 }
