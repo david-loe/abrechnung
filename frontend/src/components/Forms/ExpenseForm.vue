@@ -113,7 +113,9 @@ export default defineComponent({
       this.formExpense = structuredClone(defaultExpense)
     },
     output() {
+      console.log(this.formExpense.cost)
       const output = structuredClone(toRaw(this.formExpense))
+      console.log(output.cost)
       output.cost.date = new Date(output.cost.date)
       return output
     },
