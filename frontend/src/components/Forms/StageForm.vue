@@ -77,7 +77,7 @@
           </label>
           <InfoPoint :text="$t('info.cost')" />
           <div class="input-group" id="stageFormCost">
-            <input type="number" class="form-control" v-model="formStage.cost.amount" min="0" :disabled="disabled" />
+            <input type="number" class="form-control" step="0.01" v-model="formStage.cost.amount" min="0" :disabled="disabled" />
             <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     stage: {
-      type: Object as PropType<Stage>,
+      type: Object as PropType<Partial<Stage>>,
       default: () => structuredClone(defaultStage)
     },
     mode: {

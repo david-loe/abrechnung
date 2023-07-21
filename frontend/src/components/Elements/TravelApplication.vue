@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="travel._id">
     <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
     <table class="table">
       <tbody>
@@ -35,7 +35,7 @@
       <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')">
         {{ $t('labels.edit') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted')">
+      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted', travel._id)">
         {{ $t('labels.delete') }}
       </button>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
@@ -82,14 +82,8 @@ export default defineComponent({
         case 'startDate':
           return datetoDateStringWithYear(this.travel[key])
         case 'endDate':
-          return (
-            datetoDateStringWithYear(this.travel[key]) +
-            ' (' +
-            (getDiffInDays(this.travel.startDate, this.travel.endDate) + 1) +
-            ' ' +
-            this.$t('labels.days') +
-            ')'
-          )
+          const dif = getDiffInDays(this.travel.startDate, this.travel.endDate) + 1
+          return datetoDateStringWithYear(this.travel[key]) + ' (' + dif + ' ' + this.$t('labels.' + (dif == 1 ? 'day' : 'days')) + ')'
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':
@@ -101,7 +95,8 @@ export default defineComponent({
           return this.travel[key].name
         case 'comments':
           if (this.travel.comments.length > 0) {
-            return this.travel.comments[this.travel.comments.length - 1].text
+            const c = this.travel.comments[this.travel.comments.length - 1]
+            return c.author.name + ': "' + c.text + '"'
           } else {
             return ''
           }

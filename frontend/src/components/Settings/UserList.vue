@@ -12,7 +12,7 @@
             </span>
           </div>
           <div class="col-auto">
-            <button type="button" class="btn btn-light" @click="clickEdit(user)">
+            <button type="button" class="btn btn-light" @click="showForm('edit', user)">
               <div class="d-none d-md-block">
                 <i class="bi bi-pencil"></i>
                 <span class="ps-1">{{ $t('labels.edit') }}</span>
@@ -30,51 +30,53 @@
         </div>
       </li>
     </ul>
-    <!-- prettier-ignore-attribute @cancel -->
     <UserForm
-      v-if="userFormMode !== ''"
+      v-if="showForm_"
       :user="userToEdit"
       :mode="userFormMode"
       @add="postUser"
       @edit="postUser"
-      @cancel="userFormMode = '';userToEdit = undefined"
+      @cancel="showForm_ = false"
       ref="userform"
       id="userform"
       style="max-width: 650px"></UserForm>
-    <!-- prettier-ignore-attribute @click -->
-    <button v-if="userFormMode === ''" type="button" class="btn btn-secondary" @click="userFormMode = 'add'; userToEdit = undefined">
+    <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.user') }) }}
     </button>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import UserForm from '../Forms/UserForm.vue'
-export default {
+import { User } from '../../../../common/types'
+export default defineComponent({
   name: 'UserList',
   components: { UserForm },
   data() {
     return {
-      users: [],
-      userToEdit: undefined,
-      userFormMode: ''
+      users: [] as User[],
+      userToEdit: undefined as User | undefined,
+      userFormMode: 'add' as 'add' | 'edit',
+      showForm_: false
     }
   },
   methods: {
-    clickEdit(user) {
-      this.userFormMode = 'edit'
+    showForm(mode: 'add' | 'edit', user?: User) {
+      this.userFormMode = mode
       this.userToEdit = user
+      this.showForm_ = true
     },
-    async postUser(user) {
+    async postUser(user: User) {
       const result = await this.$root.setter('admin/user', user)
       if (result) {
         this.users = (await this.$root.getter('admin/user')).data
-        this.$refs.userform.clear()
-        this.userFormMode = ''
+        ;(this.$refs.userform as typeof UserForm).clear()
+        this.showForm_ = false
       }
       this.userToEdit = undefined
     },
-    async deleteUser(user) {
+    async deleteUser(user: User) {
       const result = await this.$root.deleter('admin/user', { id: user._id })
       if (result) {
         this.users = (await this.$root.getter('admin/user')).data
@@ -84,7 +86,7 @@ export default {
   async beforeMount() {
     this.users = (await this.$root.getter('admin/user')).data
   }
-}
+})
 </script>
 
 <style></style>

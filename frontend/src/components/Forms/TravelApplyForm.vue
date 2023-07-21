@@ -81,7 +81,7 @@
     <InfoPoint :text="$t('info.advance')" />
 
     <div class="input-group mb-2" id="travelFormAdvance">
-      <input type="number" class="form-control" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
+      <input type="number" class="form-control" step="0.01" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
       <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
     </div>
 
@@ -135,7 +135,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: {
-      type: Object as PropType<TravelSimple>,
+      type: Object as PropType<Partial<TravelSimple>>,
       default: () => structuredClone(defaultTravel)
     },
     mode: {

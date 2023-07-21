@@ -8,13 +8,13 @@
             <h5 v-else-if="modalTravel" class="modal-title">{{ modalTravel.name }}</h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
-          <div class="modal-body" v-if="modalTravel">
-            <TravelApply
+          <div class="modal-body">
+            <TravelApplication
               v-if="modalMode === 'view'"
-              :travel="modalTravel"
+              :travel="(modalTravel as TravelSimple)"
               @cancel="hideModal()"
               @edit="showModal('edit', modalTravel)"
-              @deleted="deleteTravel(modalTravel._id)"></TravelApply>
+              @deleted="deleteTravel"></TravelApplication>
             <TravelApplyForm
               v-else
               :mode="modalMode"
@@ -33,7 +33,7 @@
           <h1>{{ $t('headlines.myTravels') }}</h1>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', undefined)">
+          <button class="btn btn-secondary" @click="showModal('add', {})">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.travel') }) }}</span>
           </button>
@@ -49,65 +49,78 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
 import TravelCardList from './Elements/TravelCardList.vue'
-import TravelApply from './Elements/TravelApplication.vue'
+import TravelApplication from './Elements/TravelApplication.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
+import { TravelSimple } from '../../../common/types'
 
-export default {
+export default defineComponent({
   name: 'MyTravelsPage',
-  components: { TravelCardList, TravelApplyForm, TravelApply },
+  components: { TravelCardList, TravelApplyForm, TravelApplication },
   props: [],
   data() {
     return {
-      newTravelModal: undefined,
-      modalMode: 'add',
-      modalTravel: undefined
+      newTravelModal: undefined as Modal | undefined,
+      modalMode: 'add' as 'view' | 'add' | 'edit',
+      modalTravel: {} as Partial<TravelSimple>
     }
   },
   methods: {
-    clickCard(travel) {
+    clickCard(travel: TravelSimple) {
       if (['appliedFor', 'rejected'].indexOf(travel.state) > -1) {
         this.showModal('view', travel)
       } else {
         this.$router.push(`/travel/${travel._id}`)
       }
     },
-    showModal(mode, travel) {
+    showModal(mode: 'view' | 'add' | 'edit', travel: Partial<TravelSimple>) {
       this.modalMode = mode
       this.modalTravel = travel
-      this.newTravelModal.show()
+      if (this.newTravelModal) {
+        this.newTravelModal.show()
+      }
     },
     hideModal() {
-      this.newTravelModal.hide()
-      if (this.$refs.travelApplyForm) {
-        this.$refs.travelApplyForm.clear()
+      if (this.newTravelModal) {
+        this.newTravelModal.hide()
       }
-      this.modalTravel = undefined
+      if (this.$refs.travelApplyForm) {
+        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
+      }
+      this.modalTravel = {}
     },
-    async applyForTravel(travel) {
+    async applyForTravel(travel: TravelSimple) {
       const result = await this.$root.setter('travel/appliedFor', travel)
       if (result) {
-        this.$refs.travelCardListRef.getTravels()
+        if (this.$refs.travelCardListRef) {
+          ;(this.$refs.travelCardListRef as typeof TravelCardList).getTravels()
+        }
         this.hideModal()
       }
     },
-    async deleteTravel(id) {
+    async deleteTravel(id: string) {
       const result = await this.$root.deleter('travel', { id: id })
       if (result) {
-        this.$refs.travelCardListRef.getTravels()
+        if (this.$refs.travelCardListRef) {
+          ;(this.$refs.travelCardListRef as typeof TravelCardList).getTravels()
+        }
         this.hideModal()
       }
     }
   },
   mounted() {
-    this.newTravelModal = new Modal(document.getElementById('newTravelModal'), {})
+    const modalEL = document.getElementById('newTravelModal')
+    if (modalEL) {
+      this.newTravelModal = new Modal(modalEL, {})
+    }
   },
   async beforeMount() {
     await this.$root.load()
   }
-}
+})
 </script>
 
 <style></style>

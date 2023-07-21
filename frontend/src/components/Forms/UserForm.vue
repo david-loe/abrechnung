@@ -1,13 +1,13 @@
 <template>
-  <form class="container" @submit.prevent="this.mode === 'add' ? this.$emit('add', this.formUser) : this.$emit('edit', this.formUser)">
+  <form class="container" @submit.prevent="mode === 'add' ? $emit('add', formUser) : $emit('edit', formUser)">
     <div class="row mb-2">
       <div class="col">
         <label for="userFormUid" class="form-label"> {{ $t('labels.uid') }}<span class="text-danger">*</span> </label>
-        <input type="text" class="form-control" id="userFormUid" v-model="formUser.uid" required :disabled="this.mode === 'edit'" />
+        <input type="text" class="form-control" id="userFormUid" v-model="formUser.uid" required :disabled="mode === 'edit'" />
       </div>
       <div class="col">
         <label for="userFormMail" class="form-label"> {{ $t('labels.email') }}<span class="text-danger">*</span> </label>
-        <input type="text" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="this.mode === 'edit'" />
+        <input type="text" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="mode === 'edit'" />
       </div>
     </div>
 
@@ -33,21 +33,22 @@
     </div>
 
     <div class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" v-if="this.mode === 'add'">
+      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
         {{ $t('labels.addX', { X: $t('labels.user') }) }}
       </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="this.mode === 'edit'">
+      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="this.$emit('cancel')">
+      <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
     </div>
   </form>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, PropType } from 'vue'
+export default defineComponent({
   components: {},
   name: 'UserForm',
   props: {
@@ -66,11 +67,8 @@ export default {
       }
     },
     mode: {
-      type: String,
-      required: true,
-      validator: function (value) {
-        return ['add', 'edit'].indexOf(value) !== -1
-      }
+      type: String as PropType<'add' | 'edit'>,
+      required: true
     }
   },
   data() {
@@ -97,7 +95,7 @@ export default {
       this.formUser = this.user
     }
   }
-}
+})
 </script>
 
 <style></style>

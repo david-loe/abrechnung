@@ -25,10 +25,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import TravelCardList from './Elements/TravelCardList.vue'
 
-export default {
+export default defineComponent({
   name: 'ExaminePage',
   components: { TravelCardList },
   props: [],
@@ -41,7 +42,7 @@ export default {
   async beforeMount() {
     await this.$root.load()
   }
-}
+})
 </script>
 
 <style></style>

@@ -55,6 +55,7 @@
     "examine": "Prüfen",
     "reject": "Ablehnen",
     "comment": "Kommentar",
+    "comments": "Kommentare",
     "editor": "Bearbeiter",
     "stage": "Etappe",
     "stages": "Etappen",
@@ -109,6 +110,7 @@
     "receiptNumber": "Beleg Nr.",
     "date": "Datum",
     "days": "Tage",
+    "day": "Tag",
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "travelDetails": "Reisedetails"
   },

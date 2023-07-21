@@ -8,9 +8,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import UserList from './Settings/UserList.vue'
-export default {
+export default defineComponent({
   name: 'SettingsPage',
   components: { UserList },
   props: [],
@@ -21,7 +22,7 @@ export default {
   async beforeMount() {
     await this.$root.load()
   }
-}
+})
 </script>
 
 <style></style>

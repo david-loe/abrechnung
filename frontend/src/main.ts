@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import { Alert } from './App.vue'
 import router from './router'
 
 import vSelect from './vue-select'
@@ -25,10 +26,15 @@ declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $t: typeof i18n.global.t
     $i18n: typeof i18n.global
+    $router: typeof router
+    $route: any
     $root: {
       getter: (endpoint: string, params?: {}, config?: {}) => Promise<any>
       setter: (endpoint: string, data: any, config?: {}) => Promise<any>
       deleter: (endpoint: string, params: {}) => Promise<boolean>
+      addAlert(alert: Alert): void
+      load: () => Promise<void>
+      loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
       currencies: Currency[]
       countries: CountrySimple[]
     }

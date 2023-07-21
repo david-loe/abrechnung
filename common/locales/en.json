@@ -53,6 +53,7 @@
     "examine": "Examine",
     "reject": "Reject",
     "comment": "Comment",
+    "comments": "Comments",
     "editor": "Editor",
     "stage": "Stage",
     "stages": "Stages",
@@ -109,6 +110,7 @@
     "receiptNumber": "Receipt No.",
     "date": "Date",
     "days": "Days",
+    "day": "Day",
     "fellowTravelersNames": "Name of all fellow travelers",
     "travelDetails": "Travel details"
   },

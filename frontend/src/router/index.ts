@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import LoginPage from '../components/LoginPage.vue'
 import SettingsPage from '../components/SettingsPage.vue'
 import ApprovePage from '../components/ApprovePage.vue'
@@ -25,7 +25,7 @@ const routes = [
     name: 'Approve',
     component: ApprovePage,
     meta: { requiresAuth: true },
-    props: route => ({ _id: route.params._id })
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
     path: '/examine',
@@ -38,20 +38,25 @@ const routes = [
     name: 'Examine Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
-    props: route => ({ _id: route.params._id, parentPages: [{ link: '/examine', title: 'labels.examine' }], endpointPrefix: 'examine/', endpointSuffix: route.params.endpointSuffix })
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/examine', title: 'labels.examine' }],
+      endpointPrefix: 'examine/',
+      endpointSuffix: route.params.endpointSuffix
+    })
   },
   {
     path: '/travel/:_id([0-9a-fA-F]{24})',
     name: 'Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
-    props: route => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.myTravels' }] })
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.myTravels' }] })
   },
   {
     path: '/',
     name: 'MyTravels',
     component: MyTravelsPage,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -60,26 +65,26 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
   scrollBehavior(to) {
     if (to.hash) {
       return {
         el: to.hash,
-        behavior: 'smooth',
+        behavior: 'smooth'
       }
     }
   }
 })
 
 async function auth() {
-  var auth = false;
+  var auth = false
   try {
     const res = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/user', {
-      withCredentials: true,
+      withCredentials: true
     })
     auth = res.status === 200
-  } catch (error) {
+  } catch (error: any) {
     if (error.response && error.response.status !== 401) {
       console.log(error)
     }
@@ -88,10 +93,9 @@ async function auth() {
 }
 
 router.beforeEach(async (to) => {
-  if (to.meta.requiresAuth && !await auth()) {
+  if (to.meta.requiresAuth && !(await auth())) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 })
-
 
 export default router

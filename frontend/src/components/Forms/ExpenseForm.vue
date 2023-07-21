@@ -10,7 +10,7 @@
         <label for="expenseFormCost" class="form-label me-2"> {{ $t('labels.cost') }}<span class="text-danger">*</span> </label>
         <InfoPoint :text="$t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
-          <input type="number" class="form-control" v-model="formExpense.cost.amount" min="0" :disabled="disabled" />
+          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" />
           <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
         </div>
       </div>
@@ -72,7 +72,7 @@ import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import { Expense } from '../../../../common/types'
-import { datetimeToDateString } from '../../../../common/scriptsts'
+import { clone, datetimeToDateString } from '../../../../common/scriptsts'
 
 interface FormExpense extends Omit<Expense, '_id'> {
   _id?: string
@@ -94,7 +94,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     expense: {
-      type: Object as PropType<Expense>,
+      type: Object as PropType<Partial<Expense>>,
       default: () => structuredClone(defaultExpense)
     },
     mode: {

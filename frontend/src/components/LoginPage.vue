@@ -24,10 +24,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios'
 
-export default {
+export default defineComponent({
   name: 'LoginPage',
   data() {
     return {
@@ -59,7 +60,7 @@ export default {
   beforeMount() {
     this.$root.loadState = 'LOADED'
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -15,22 +15,18 @@ export interface CountrySimple {
 }
 
 export interface Country extends CountrySimple {
-  lumpSums: [
-    {
-      validFrom: Date
+  lumpSums: {
+    validFrom: Date
+    catering24: number
+    catering8: number
+    overnight: number
+    spezials?: {
+      city: string
       catering24: number
       catering8: number
       overnight: number
-      spezials?: [
-        {
-          city: string
-          catering24: number
-          catering8: number
-          overnight: number
-        }
-      ]
-    }
-  ]
+    }[]
+  }[]
   lumpSumsFrom?: string
 }
 
@@ -111,12 +107,22 @@ export interface Expense {
   _id: string
 }
 
+export type RecordType = 'stage' | 'expense'
+export type Record = Stage | Expense
+
+export interface Comment {
+  text: string
+  author: UserSimple
+  _id: string
+}
+
 export interface TravelSimple {
   name: string
   traveler: UserSimple
   state: State
   editor: UserSimple
-  comments: [{ text: string; author: UserSimple }]
+  comments: Comment[]
+  comment?: string
   reason: string
   destinationPlace: Place
   travelInsideOfEU: boolean
@@ -136,24 +142,20 @@ export interface Travel extends TravelSimple {
   historic: boolean
   stages: Array<Stage>
   expenses: Array<Expense>
-  days: [
-    {
-      date: Date
-      country: CountrySimple
-      cateringNoRefund: {
-        breakfast: boolean
-        lunch: boolean
-        dinner: boolean
-      }
-      purpose: 'professional' | 'private'
-      refunds: [
-        {
-          type: 'overnight' | 'catering8' | 'catering24'
-          refund: Money
-        }
-      ]
+  days: {
+    date: Date
+    country: CountrySimple
+    cateringNoRefund: {
+      breakfast: boolean
+      lunch: boolean
+      dinner: boolean
     }
-  ]
+    purpose: 'professional' | 'private'
+    refunds: {
+      type: 'overnight' | 'catering8' | 'catering24'
+      refund: Money
+    }[]
+  }[]
 }
 
 export type Locale = 'de' | 'en'

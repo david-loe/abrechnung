@@ -41,46 +41,58 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
 import TravelCardList from './Elements/TravelCardList.vue'
 import TravelApproveForm from './Forms/TravelApproveForm.vue'
 import TravelApply from './Elements/TravelApplication.vue'
+import { TravelSimple } from '../../../common/types'
 
-export default {
+export default defineComponent({
   name: 'ApprovePage',
   components: { TravelCardList, TravelApproveForm, TravelApply },
   props: { _id: { type: String } },
   data() {
     return {
-      approveTravelModal: undefined,
-      modalTravel: undefined,
+      approveTravelModal: undefined as Modal | undefined,
+      modalTravel: undefined as TravelSimple | undefined,
       showApproved: false
     }
   },
   methods: {
-    showModal(travel) {
+    showModal(travel: TravelSimple) {
       this.modalTravel = travel
-      this.approveTravelModal.show()
+      if (this.approveTravelModal) {
+        this.approveTravelModal.show()
+      }
     },
     hideModal() {
-      this.approveTravelModal.hide()
-      if (this.$refs.travelApproveForm) {
-        this.$refs.travelApproveForm.clear()
+      if (this.approveTravelModal) {
+        this.approveTravelModal.hide()
       }
+      if (this.$refs.travelApproveForm) {
+        ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
+      }
+
       this.modalTravel = undefined
     },
-    async approveTravel(decision, comment) {
-      this.modalTravel.comment = comment
-      const result = await this.$root.setter('approve/travel/' + decision, this.modalTravel)
-      if (result) {
-        this.$refs.travelCardListRef.getTravels()
-        this.hideModal()
+    async approveTravel(decision: 'approved' | 'rejected', comment?: string) {
+      if (this.modalTravel) {
+        this.modalTravel.comment = comment
+        const result = await this.$root.setter('approve/travel/' + decision, this.modalTravel)
+        if (result) {
+          ;(this.$refs.travelCardListRef as typeof TravelCardList).getTravels()
+          this.hideModal()
+        }
       }
     }
   },
   async mounted() {
-    this.approveTravelModal = new Modal(document.getElementById('approveTravelModal'), {})
+    const modalEl = document.getElementById('approveTravelModal')
+    if (modalEl) {
+      this.approveTravelModal = new Modal(modalEl, {})
+    }
     if (this._id) {
       const result = await this.$root.getter('approve/travel', { id: this._id })
       if (result) {
@@ -91,7 +103,7 @@ export default {
   async beforeMount() {
     await this.$root.load()
   }
-}
+})
 </script>
 
 <style></style>

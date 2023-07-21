@@ -129,7 +129,7 @@ import { Locale, User } from '../../common/types'
 import { languages } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 
-interface Alert {
+export interface Alert {
   type: 'danger' | 'success'
   title: string
   message?: string
@@ -144,7 +144,7 @@ export default defineComponent({
       user: {} as User,
       currencies: [],
       countries: [],
-      loadState: 'UNLOADED',
+      loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       languages,

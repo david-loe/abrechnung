@@ -14,12 +14,12 @@
             <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
-          <div v-if="travel" class="modal-body">
+          <div v-if="travel._id" class="modal-body">
             <StageForm
               v-if="modalObjectType === 'stage'"
               ref="stageForm"
               :mode="modalMode"
-              :stage="modalObject"
+              :stage="(modalObject as Partial<Stage> | Gap | undefined)"
               :travelStartDate="travel.startDate"
               :travelEndDate="travel.endDate"
               :disabled="isReadOnly"
@@ -33,7 +33,7 @@
             <expenseForm
               v-else-if="modalObjectType === 'expense'"
               ref="expenseForm"
-              :expense="modalObject"
+              :expense="(modalObject as Partial<Expense> | undefined)"
               :disabled="isReadOnly"
               :mode="modalMode"
               @add="postExpense"
@@ -47,14 +47,14 @@
               v-else-if="modalObjectType === 'travel'"
               :mode="modalMode"
               @cancel="hideModal"
-              :travel="modalObject"
+              :travel="(modalObject as TravelSimple)"
               @edit="applyForTravel"
               ref="travelApplyForm"></TravelApplyForm>
           </div>
         </div>
       </div>
     </div>
-    <div class="container" v-if="travel">
+    <div class="container" v-if="travel._id">
       <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
@@ -80,8 +80,8 @@
               <ul class="dropdown-menu dropdown-menu-end">
                 <template v-if="endpointPrefix === 'examine/' && travel.state !== 'refunded'">
                   <li>
-                    <div class="p-1 ps-3">
-                      <div class="form-check form-switch form-check-reverse me-1">
+                    <div class="ps-3">
+                      <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly" />
                         <label class="form-check-label text-nowrap" for="editTravel">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
@@ -157,7 +157,7 @@
             <div class="col-auto">
               <button
                 class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => (d.showSettings = true))"
+                @click="travel.days.map((d) => ((d as Day).showSettings = true))"
                 :disabled="travel.stages.length == 0">
                 {{ $t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
@@ -166,7 +166,7 @@
             <div class="col-auto">
               <button
                 class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => (d.showSettings = false))"
+                @click="travel.days.map((d) => ((d as Day).showSettings = false))"
                 :disabled="travel.stages.length == 0">
                 {{ $t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
@@ -177,24 +177,27 @@
             {{ $t('alerts.noStagesPresent') }}
           </div>
 
-          <div v-for="row of table" class="mb-2" :key="row.data._id">
+          <div
+            v-for="row of table"
+            class="mb-2"
+            :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as Record | Day)._id">
             <!-- day -->
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
                 <h5 class="m-0">
-                  {{ datetoDateString(row.data.date) }}
+                  {{ datetoDateString((row.data as Day).date) }}
                 </h5>
               </div>
               <div class="col">
                 <div class="row align-items-center">
                   <!-- refunds -->
-                  <template v-if="!row.data.showSettings">
-                    <template v-for="refund of row.data.refunds" :key="refund._id">
+                  <template v-if="!(row.data as Day).showSettings">
+                    <template v-for="refund of (row.data as Day).refunds" :key="refund._id">
                       <!-- catering -->
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag">
                         <i class="bi bi-sun"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -202,7 +205,7 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + row.data.country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag">
                         <i class="bi bi-moon"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -217,11 +220,11 @@
                         class="form-check-input"
                         type="checkbox"
                         role="switch"
-                        :id="'configCateringRefund' + key + row.data._id"
-                        v-model="row.data.cateringNoRefund[key]"
+                        :id="'configCateringRefund' + key + (row.data as Day).date"
+                        v-model="((row.data as Day).cateringNoRefund as any)[key]"
                         @change="isReadOnly ? null : postTravelSettings()"
                         :disabled="isReadOnly" />
-                      <label class="form-check-label" :for="'configCateringRefund' + key + row.data._id">
+                      <label class="form-check-label" :for="'configCateringRefund' + key + (row.data as Day).date">
                         {{ $t('labels.' + key) }}
                       </label>
                     </div>
@@ -233,7 +236,7 @@
                         <div class="col-auto ps-0">
                           <select
                             class="form-select form-select-sm"
-                            v-model="row.data.purpose"
+                            v-model="(row.data as Day).purpose"
                             @change="isReadOnly ? null : postTravelSettings()"
                             :disabled="isReadOnly"
                             required>
@@ -249,9 +252,9 @@
               </div>
               <div class="col-auto ms-auto">
                 <i
-                  :class="row.data.showSettings ? 'bi bi-x-lg' : 'bi bi-sliders'"
+                  :class="(row.data as Day).showSettings ? 'bi bi-x-lg' : 'bi bi-sliders'"
                   style="cursor: pointer"
-                  @click="row.data.showSettings = !row.data.showSettings"></i>
+                  @click=";(row.data as Day).showSettings = !(row.data as Day).showSettings"></i>
               </div>
             </div>
             <!-- Stage -->
@@ -259,22 +262,18 @@
               v-else-if="row.type === 'stage'"
               class="row align-items-center ps-4 mb-1"
               style="cursor: pointer"
-              @click="showModal('edit', row.data, 'stage')">
+              @click="showModal('edit', row.data as Stage, 'stage')">
               <div class="col-auto fs-3">
-                <i :class="getStageIcon(row.data)"></i>
+                <i :class="getStageIcon(row.data as Stage)"></i>
               </div>
               <div class="col-auto">
-                <PlaceElement
-                  :place="row.data.startLocation"
-                  :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
+                <PlaceElement :place="(row.data as Stage).startLocation"></PlaceElement>
                 <i class="bi bi-arrow-right mx-2"></i>
-                <PlaceElement
-                  :place="row.data.endLocation"
-                  :showCountry="row.data.startLocation.country._id != row.data.endLocation.country._id"></PlaceElement>
+                <PlaceElement :place="(row.data as Stage).endLocation"></PlaceElement>
               </div>
-              <div v-if="row.data.cost.amount > 0" class="col-auto text-secondary">
+              <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary">
                 <i class="bi bi-coin"></i>
-                {{ getMoneyString(row.data.cost) }}
+                {{ getMoneyString((row.data as Stage).cost) }}
               </div>
             </div>
             <!-- expense -->
@@ -282,19 +281,19 @@
               v-else-if="row.type === 'expense'"
               class="row align-items-center ps-4 mb-1"
               style="cursor: pointer"
-              @click="showModal('edit', row.data, 'expense')">
+              @click="showModal('edit', row.data as Expense, 'expense')">
               <div class="col-auto fs-3">
                 <i class="bi bi-coin"></i>
               </div>
               <div class="col-auto">
-                {{ row.data.description }}
+                {{ (row.data as Expense).description }}
               </div>
-              <div class="col-auto text-secondary">{{ getMoneyString(row.data.cost) }}</div>
+              <div class="col-auto text-secondary">{{ getMoneyString((row.data as Expense).cost) }}</div>
             </div>
-            <!-- Date -->
+            <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.data, 'stage')" style="border-radius: 50%">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.data as Gap, 'stage')" style="border-radius: 50%">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -331,7 +330,7 @@
                         <small>{{ getMoneyString(getExpensesSum(travel)) }}</small>
                       </td>
                     </tr>
-                    <tr v-if="travel.advance.amount > 0">
+                    <tr v-if="travel.advance.amount">
                       <td class="text-secondary">
                         <small>{{ $t('labels.advance') }}</small>
                       </td>
@@ -387,7 +386,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
 import StatePipeline from './Elements/StatePipeline.vue'
 import ProgressCircle from './Elements/ProgressCircle.vue'
@@ -396,17 +396,28 @@ import ExpenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.mjs'
-export default {
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scriptsts'
+import { Expense, Record, RecordType, Stage, Travel, TravelSimple } from '../../../common/types'
+import { PropType } from 'vue'
+
+type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
+type ModalMode = 'add' | 'edit'
+type ModalObject = Record | TravelSimple | Gap | undefined
+type ModalObjectType = RecordType | 'travel'
+type Day = Travel['days'][0] & { showSettings?: boolean; _id: string }
+export default defineComponent({
   name: 'TravelPage',
   data() {
     return {
-      travel: undefined,
-      modal: undefined,
-      modalObject: undefined,
-      modalMode: 'add',
-      modalObjectType: 'stage',
-      table: [],
+      travel: {} as Travel,
+      modal: undefined as Modal | undefined,
+      modalObject: undefined as ModalObject,
+      modalMode: 'add' as ModalMode,
+      modalObjectType: 'stage' as ModalObjectType,
+      table: [] as {
+        type: RecordType | 'gap' | 'day'
+        data: Record | Day | Gap
+      }[],
       configCateringRefund: false,
       isReadOnly: false
     }
@@ -414,24 +425,31 @@ export default {
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
   props: {
     _id: { type: String },
-    parentPages: { type: Array },
+    parentPages: {
+      type: Array as PropType<{ link: string; title: string }[]>,
+      required: true
+    },
     endpointPrefix: { type: String, default: '' },
     endpointSuffix: { type: String, default: '' }
   },
   methods: {
-    showModal(mode, object, type) {
+    showModal(mode: ModalMode, object: ModalObject | Gap, type: ModalObjectType) {
       this.modalObjectType = type
       this.modalObject = object
       this.modalMode = mode
-      this.modal.show()
+      if (this.modal) {
+        this.modal.show()
+      }
     },
     hideModal() {
-      this.modal.hide()
+      if (this.modal) {
+        this.modal.hide()
+      }
       if (this.$refs.stageForm) {
-        this.$refs.stageForm.clear()
+        ;(this.$refs.stageForm as typeof StageForm).clear()
       }
       if (this.$refs.expenseForm) {
-        this.$refs.expenseForm.clear()
+        ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
       this.modalObject = undefined
     },
@@ -448,7 +466,7 @@ export default {
         await this.getTravel()
       }
     },
-    async applyForTravel(travel) {
+    async applyForTravel(travel: Travel) {
       const result = await this.$root.setter('travel/appliedFor', travel)
       if (result && confirm(this.$t('alerts.warningReapply'))) {
         await this.getTravel()
@@ -479,58 +497,58 @@ export default {
     reportLink() {
       return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
     },
-    async postStage(stage) {
+    async postStage(stage: Stage) {
       var headers = {}
       if (stage.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
       }
-      stage.travelId = this.travel._id
+      ;(stage as any).travelId = this.travel._id
       const result = await this.$root.setter(this.endpointPrefix + 'travel/stage', stage, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteStage(id) {
+    async deleteStage(id: string) {
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async postExpense(expense) {
+    async postExpense(expense: Expense) {
       var headers = {}
       if (expense.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
       }
-      expense.travelId = this.travel._id
+      ;(expense as any).travelId = this.travel._id
       const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', expense, { headers })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteExpense(id) {
+    async deleteExpense(id: string) {
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { id: id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
       }
     },
-    async deleteReceipt(id, recordId, recordType) {
-      const params = { id: id, travelId: this._id }
+    async deleteReceipt(id: string, recordId: string, recordType: RecordType) {
+      const params: any = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params)
       if (result) {
         await this.getTravel()
       }
     },
-    async showReceipt(id, windowProxy, recordId, recordType) {
-      const params = { id: id, travelId: this._id }
+    async showReceipt(id: string, windowProxy: Window, recordId: string, recordType: RecordType) {
+      const params: any = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
       const result = await this.$root.getter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
       if (result) {
@@ -540,7 +558,7 @@ export default {
         windowProxy.close()
       }
     },
-    getStageIcon(stage) {
+    getStageIcon(stage: Stage) {
       var icon = null
       if (stage.transport == 'ownCar') {
         icon = 'bi bi-car-front'
@@ -574,7 +592,7 @@ export default {
         if (i == this.travel.days.length - 1) {
           stagesEnd = this.travel.stages.length
         }
-        this.table.push({ type: 'day', data: this.travel.days[i] })
+        this.table.push({ type: 'day', data: this.travel.days[i] as Day })
         for (const expense of this.travel.expenses) {
           if (expense.cost.date == this.travel.days[i].date) {
             this.table.push({ type: 'expense', data: expense })
@@ -624,14 +642,12 @@ export default {
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
   },
   mounted() {
-    this.modal = new Modal(document.getElementById('modal'), {})
-  },
-  watch: {
-    // travel: function () {
-    //   this.renderTable()
-    // },
+    const modalEl = document.getElementById('modal')
+    if (modalEl) {
+      this.modal = new Modal(modalEl, {})
+    }
   }
-}
+})
 </script>
 
 <style></style>

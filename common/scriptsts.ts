@@ -15,6 +15,9 @@ function getFlagEmoji(countryCode: string): string | null {
 }
 
 function isValidDate(date: Date | string | number): Date | null {
+  if (date === null) {
+    return null
+  }
   const d = new Date(date)
   if (isNaN(d.valueOf())) {
     return null
@@ -82,12 +85,7 @@ function getMoneyString(
   }
   return func(amount).toLocaleString(locale, {
     style: 'currency',
-    currency:
-      useExchangeRate && money.exchangeRate
-        ? 'EUR'
-        : (money.currency as Currency)
-        ? (money.currency as Currency)._id
-        : (money.currency as string) // baseCurrency
+    currency: useExchangeRate && money.exchangeRate ? 'EUR' : typeof money.currency === 'string' ? money.currency : money.currency._id // baseCurrency
   })
 }
 
