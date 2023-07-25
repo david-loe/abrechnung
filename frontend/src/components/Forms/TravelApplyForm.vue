@@ -32,24 +32,12 @@
       <div class="col-auto">
         <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label
         ><span class="text-danger">*</span>
-        <input
-          id="startDateInput"
-          class="form-control"
-          type="date"
-          v-model="formTravel.startDate"
-          :min="datetimeToDateString(new Date())"
-          required />
+        <DateInput id="startDateInput" v-model="formTravel.startDate" :min="new Date()" required />
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label
         ><span class="text-danger">*</span>
-        <input
-          id="endDateInput"
-          class="form-control"
-          type="date"
-          v-model="formTravel.endDate"
-          :min="(formTravel.startDate as string)"
-          required />
+        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" required />
       </div>
     </div>
 
@@ -108,7 +96,7 @@ import { defineComponent, PropType } from 'vue'
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import { datetimeToDateString, clone } from '../../../../common/scriptsts'
+import DateInput from '../Elements/DateInput.vue'
 import { TravelSimple, Place } from '../../../../common/types'
 
 interface FormTravelSimple
@@ -131,7 +119,7 @@ const defaultTravel: FormTravelSimple = {
 }
 export default defineComponent({
   name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput },
+  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput },
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: {
@@ -153,18 +141,11 @@ export default defineComponent({
       this.formTravel = structuredClone(defaultTravel)
     },
     output() {
-      const output = clone(this.formTravel)
-      output.startDate = new Date(output.startDate)
-      output.endDate = new Date(output.endDate)
-      return output
+      return this.formTravel
     },
     input() {
-      const input = Object.assign({}, structuredClone(defaultTravel), this.travel)
-      input.startDate = datetimeToDateString(input.startDate)
-      input.endDate = datetimeToDateString(input.endDate)
-      return input
-    },
-    datetimeToDateString
+      return Object.assign({}, structuredClone(defaultTravel), this.travel)
+    }
   },
   beforeMount() {
     this.formTravel = this.input()

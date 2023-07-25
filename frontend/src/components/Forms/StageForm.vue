@@ -3,11 +3,10 @@
     <div class="row mb-3">
       <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}<span class="text-danger">*</span></label>
-        <input
+        <DateInput
           id="startDateInput"
-          class="form-control"
-          type="datetime-local"
           v-model="formStage.departure"
+          :withTime="true"
           :min="minDate"
           :max="maxDate"
           :disabled="disabled"
@@ -15,12 +14,11 @@
       </div>
       <div class="col">
         <label for="endDateInput" class="form-label"> {{ $t('labels.arrival') }}<span class="text-danger">*</span> </label>
-        <input
+        <DateInput
           id="endDateInput"
-          class="form-control"
-          type="datetime-local"
           v-model="formStage.arrival"
-          :min="formStage.departure ? formStage.departure as string : minDate"
+          :withTime="true"
+          :min="formStage.departure ? formStage.departure : minDate"
           :max="maxDate"
           :disabled="disabled"
           required />
@@ -82,17 +80,15 @@
           </div>
         </div>
         <div class="col">
-          <label for="endDateInput" class="form-label"
+          <label for="invoiceDateInput" class="form-label"
             >{{ $t('labels.invoiceDate') }}<span v-if="formStage.cost.amount" class="text-danger">*</span></label
           >
-          <input
-            id="endDateInput"
-            class="form-control"
-            type="date"
+          <DateInput
+            id="invoiceDateInput"
             v-model="formStage.cost.date"
             :required="Boolean(formStage.cost.amount)"
             :disabled="disabled"
-            :max="datetimeToDateString(new Date())" />
+            :max="new Date()" />
         </div>
       </div>
 
@@ -145,14 +141,8 @@ import CountrySelector from '../Elements/CountrySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
-import {
-  getDayList,
-  datetoDateString,
-  datetimeToDateString,
-  datetimeToDatetimeString,
-  htmlInputStringToDateTime,
-  clone
-} from '../../../../common/scriptsts'
+import DateInput from '../Elements/DateInput.vue'
+import { getDayList, datetoDateString, datetimeToDateString } from '../../../../common/scriptsts'
 import { Stage, Place, CountrySimple } from '../../../../common/types'
 import settings from '../../../../common/settings.json'
 
@@ -180,7 +170,7 @@ const defaultStage: FormStage = {
 }
 export default defineComponent({
   name: 'StageForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector },
+  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     stage: {
@@ -198,8 +188,8 @@ export default defineComponent({
   data() {
     return {
       formStage: structuredClone(defaultStage),
-      minDate: '',
-      maxDate: ''
+      minDate: '' as string | Date,
+      maxDate: '' as string | Date
     }
   },
   methods: {
@@ -213,7 +203,7 @@ export default defineComponent({
         this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
         !isNaN(new Date(this.formStage.departure).valueOf()) &&
         !isNaN(new Date(this.formStage.arrival).valueOf()) &&
-        datetimeToDatetimeString(this.formStage.departure) !== datetimeToDatetimeString(this.formStage.arrival)
+        datetimeToDateString(this.formStage.departure) !== datetimeToDateString(this.formStage.arrival)
       )
     },
     calcMidnightCountries() {
@@ -241,34 +231,24 @@ export default defineComponent({
       this.formStage = structuredClone(defaultStage)
     },
     output() {
-      const output = clone(this.formStage) as Stage
-
       if (!this.showMidnightCountries()) {
-        delete output.midnightCountries
+        this.formStage.midnightCountries = []
       }
-      output.departure = htmlInputStringToDateTime(output.departure.toString()) as Date
-      output.arrival = htmlInputStringToDateTime(output.arrival.toString()) as Date
-      if (output.cost.date) {
-        output.cost.date = new Date(output.cost.date)
-      }
-      return output
+      return this.formStage
     },
     input() {
       //toleranceStageDatesToApprovedTravelDates
-      this.minDate = datetimeToDatetimeString(
+      this.minDate = new Date(
         new Date(this.travelStartDate).valueOf() - settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
       )
-      this.maxDate = datetimeToDatetimeString(
+
+      this.maxDate = new Date(
         new Date(this.travelEndDate).valueOf() + (settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 - 1
       )
-      const input = Object.assign({}, structuredClone(defaultStage), this.stage)
-      input.departure = datetimeToDatetimeString(input.departure)
-      input.arrival = datetimeToDatetimeString(input.arrival)
-      input.cost.date = datetimeToDateString(input.cost.date)
-      return input
+
+      return Object.assign({}, structuredClone(defaultStage), this.stage)
     },
-    datetoDateString,
-    datetimeToDateString
+    datetoDateString
   },
   beforeMount() {
     this.formStage = this.input()

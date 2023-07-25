@@ -194,10 +194,6 @@ function getTravelTotal(travel: Travel): Money {
   return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
 }
 
-function clone<T>(object: T): T {
-  return JSON.parse(JSON.stringify(object))
-}
-
 export {
   getFlagEmoji,
   getDiffInDays,
@@ -214,6 +210,5 @@ export {
   datetoDateStringWithYear,
   getLumpSumsSum,
   getExpensesSum,
-  getTravelTotal,
-  clone
+  getTravelTotal
 }

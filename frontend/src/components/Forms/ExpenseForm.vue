@@ -15,15 +15,8 @@
         </div>
       </div>
       <div class="col">
-        <label for="endDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
-        <input
-          id="endDateInput"
-          class="form-control"
-          type="date"
-          v-model="formExpense.cost.date"
-          :required="true"
-          :disabled="disabled"
-          :max="datetimeToDateString(new Date())" />
+        <label for="invoiceDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
+        <DateInput id="invoiceDateInput" v-model="formExpense.cost.date" :required="true" :disabled="disabled" :max="new Date()" />
       </div>
     </div>
 
@@ -71,8 +64,8 @@ import { defineComponent, PropType, toRaw } from 'vue'
 import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
+import DateInput from '../Elements/DateInput.vue'
 import { Expense } from '../../../../common/types'
-import { clone, datetimeToDateString } from '../../../../common/scriptsts'
 
 interface FormExpense extends Omit<Expense, '_id'> {
   _id?: string
@@ -90,7 +83,7 @@ const defaultExpense: FormExpense = {
 }
 export default defineComponent({
   name: 'expenseForm',
-  components: { InfoPoint, CurrencySelector, FileUpload },
+  components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
   props: {
     expense: {
@@ -113,18 +106,11 @@ export default defineComponent({
       this.formExpense = structuredClone(defaultExpense)
     },
     output() {
-      console.log(this.formExpense.cost)
-      const output = structuredClone(toRaw(this.formExpense))
-      console.log(output.cost)
-      output.cost.date = new Date(output.cost.date)
-      return output
+      return this.formExpense
     },
     input() {
-      const input = Object.assign({}, structuredClone(defaultExpense), this.expense)
-      input.cost.date = datetimeToDateString(input.cost.date)
-      return input
-    },
-    datetimeToDateString
+      return Object.assign({}, structuredClone(defaultExpense), this.expense)
+    }
   },
   beforeMount() {
     this.formExpense = this.input()
