@@ -2,21 +2,21 @@ name: Production Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   production-build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set production mode in .env
-      uses: jacobtomlinson/gha-find-replace@v3
-      with:
-        find: "NODE_ENV=development"
-        replace: "NODE_ENV=production"
-        include: "./.env"
-    - name: Build
-      run: docker-compose up -d --build
+      - uses: actions/checkout@v3
+      - name: Set production mode in .env
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'NODE_ENV=development'
+          replace: 'NODE_ENV=production'
+          include: '.env'
+      - name: Build
+        run: docker-compose up -d --build
