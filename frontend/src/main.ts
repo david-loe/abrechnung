@@ -27,7 +27,6 @@ declare module '@vue/runtime-core' {
     $t: typeof i18n.global.t
     $i18n: typeof i18n.global
     $router: typeof router
-    $route: any
     $root: {
       getter: (endpoint: string, params?: {}, config?: {}) => Promise<any>
       setter: (endpoint: string, data: any, config?: {}) => Promise<any>

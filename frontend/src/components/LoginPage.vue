@@ -49,7 +49,7 @@ export default defineComponent({
         )
         if (res.status === 200) {
           this.$root.loadState = 'UNLOADED'
-          this.$router.push(this.$route.query.redirect ? this.$route.query.redirect : '/')
+          this.$router.push(this.$route.query.redirect ? (this.$route.query.redirect as string) : '/')
         }
       } catch (error) {
         this.password = ''
