@@ -282,7 +282,7 @@ travelSchema.methods.calculateExchangeRates = async function () {
   for (const expense of this.expenses) {
     promiseList.push(exchange(expense.cost, expense.cost.date))
   }
-  results = await Promise.allSettled(promiseList)
+  const results = await Promise.allSettled(promiseList)
   if (results[0].status === 'fulfilled') {
     this.advance = results[0].value
   }

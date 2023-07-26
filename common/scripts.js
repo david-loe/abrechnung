@@ -44,7 +44,7 @@ function getDetailedMoneyString(money, locale, printZero = false) {
   if (!money || money && (typeof money.amount !== 'number' || !money.amount && !printZero)) {
     return ''
   }
-  string = money.amount.toLocaleString(locale, {
+  var string = money.amount.toLocaleString(locale, {
     style: "currency",
     currency: (money.currency._id ? money.currency._id : money.currency)
   })

@@ -30,9 +30,9 @@
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/app/server.js",
     "dev": "ts-node-dev server.ts",
-    "test": "ava test.mjs"
+    "build": "tsc",
+    "start": "node dist/build/server.js",
+    "test": "npm run build && ava dist/build/test.mjs"
   }
 }

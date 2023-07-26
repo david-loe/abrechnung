@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 RUN mkdir /reports
 
-WORKDIR /app
+WORKDIR /build
 
 COPY backend/package*.json ./
 
@@ -10,4 +10,8 @@ RUN npm install
 
 COPY backend/ .
 
-CMD npm run build && npm run start
+COPY common /common
+
+RUN npm run build
+
+CMD npm run start

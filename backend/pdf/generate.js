@@ -48,7 +48,7 @@ async function generateReport(travel) {
   y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
-  await attachReceipts(pdfDoc, receiptMap, options = { font: font, edge: edge / 2, fontSize: 16 })
+  await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16 })
 
   return await pdfDoc.save()
 }
@@ -107,8 +107,8 @@ function drawGeneralTravelInformation(page, travel, options = { font }) {
 }
 
 function getReceiptMap(travel) {
-  map = {}
-  number = 1
+  const map = {}
+  var number = 1
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.receipts) {
       for (const receipt of stage.cost.receipts) {
