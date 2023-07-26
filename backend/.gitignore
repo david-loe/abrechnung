@@ -1,4 +1,5 @@
 /node_modules/
+/dist/
 /pdf/output.pdf
 output.pdf
 

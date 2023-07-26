@@ -4,14 +4,10 @@ RUN mkdir /reports
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY backend/package*.json ./
 
 RUN npm install
 
-COPY . .
+COPY backend/ .
 
-RUN chown -R node /app/node_modules
-
-USER node
-
-CMD ["npm", "run", "start"]
+CMD npm run build && npm run start

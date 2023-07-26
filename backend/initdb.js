@@ -1,6 +1,6 @@
 const fs = require('fs');
 const helper = require('./helper')
-const { getFlagEmoji } = require('./common/scripts')
+const { getFlagEmoji } = require('../common/scripts')
 const Currency = require('./models/currency')
 const Country = require('./models/country')
 

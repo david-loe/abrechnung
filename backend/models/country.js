@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const settings = require('../common/settings')
+const settings = require('../../common/settings')
 
 
 const countrySchema = new mongoose.Schema({

@@ -3,7 +3,7 @@ const pdf_lib = require('pdf-lib')
 const pdf_fontkit = require('pdf-fontkit')
 const fs = require('fs')
 const i18n = require('../i18n')
-const scripts = require('../common/scripts')
+const scripts = require('../../common/scripts')
 const Travel = require('../models/travel')
 const DocumentFile = require('../models/documentFile')
 const mongoose = require('mongoose')
@@ -24,7 +24,7 @@ async function generateAndWriteToDisk(filePath, travel) {
 async function generateReport(travel) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
-  const fontBytes = fs.readFileSync('./common/fonts/NotoSans-Regular.ttf')
+  const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
   const font = await pdfDoc.embedFont(fontBytes, { subset: true })
   const edge = 36
   const fontSize = 11
@@ -65,7 +65,6 @@ function drawGeneralTravelInformation(page, travel, options = { font }) {
     textColor: pdf_lib.rgb(0, 0, 0)
   }
   Object.assign(opts, options)
-  delete edge
 
   // Title
   var y = opts.yStart - (opts.fontSize * 1.5)
@@ -421,10 +420,6 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     firstRow: true
   }
   Object.assign(opts, options)
-  delete edge
-  delete fontSize
-  delete cellHeight
-  delete options
 
   if (!columns) {
     columns = []

@@ -23,12 +23,16 @@
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.5",
     "ava": "^5.3.0",
-    "nodemon": "^2.0.22"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "build": "tsc",
+    "start": "node dist/app/server.js",
+    "dev": "ts-node-dev server.ts",
     "test": "ava test.mjs"
   }
 }

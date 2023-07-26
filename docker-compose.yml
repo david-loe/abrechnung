@@ -1,15 +1,14 @@
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile-${NODE_ENV}
+      context: ./
+      dockerfile: ./backend/Dockerfile-${NODE_ENV}
     restart: always
     depends_on:
       - db
     volumes:
       - ./backend:/app
-      - /app/node_modules
-      - ./common:/app/common:ro
+      - ./common:/common:ro
       # - ./reports:/reports #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}

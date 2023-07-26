@@ -2,16 +2,10 @@ FROM node:18-alpine
 
 RUN mkdir /reports
 
-WORKDIR /app
-
-COPY package*.json ./
-
+WORKDIR /npm_cache
+COPY backend/package*.json ./
 RUN npm install
 
-COPY . .
+WORKDIR /app
 
-RUN chown -R node /app/node_modules
-
-USER node
-
-CMD ["npm", "run", "dev"]
+ENTRYPOINT [ "/bin/sh", "-c" , "cp -r /npm_cache/node_modules/. /app/node_modules && npm run dev" ]
