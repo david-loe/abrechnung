@@ -6,10 +6,12 @@
       <textarea class="form-control" id="comment" rows="3" v-model="comment"></textarea>
     </div>
     <div class="mb-2">
-      <button type="submit" class="btn btn-success me-2" @click="$emit('decision', 'approved', comment)">
+      <button type="submit" class="btn btn-success me-2" @click="output('approved')" :disabled="loading.approved || loading.rejected">
+        <span v-if="loading.approved" class="spinner-border spinner-border-sm"></span>
         {{ $t('labels.approve') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" @click="$emit('decision', 'rejected', comment)">
+      <button type="button" class="btn btn-danger me-2" @click="output('rejected')" :disabled="loading.approved || loading.rejected">
+        <span v-if="loading.rejected" class="spinner-border spinner-border-sm"></span>
         {{ $t('labels.reject') }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
@@ -27,7 +29,11 @@ export default defineComponent({
   name: 'InfoPoint',
   data() {
     return {
-      comment: ''
+      comment: '',
+      loading: {
+        approved: false,
+        rejected: false
+      }
     }
   },
   components: { TravelApply },
@@ -36,6 +42,14 @@ export default defineComponent({
   methods: {
     clear() {
       this.comment = ''
+      this.loading = {
+        approved: false,
+        rejected: false
+      }
+    },
+    output(decision: 'approved' | 'rejected') {
+      this.loading[decision] = true
+      this.$emit('decision', decision, this.comment)
     }
   }
 })

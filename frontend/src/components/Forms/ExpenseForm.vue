@@ -39,11 +39,9 @@
     </select>
 
     <div class="mb-1">
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add' && !disabled">
-        {{ $t('labels.addX', { X: $t('labels.expense') }) }}
-      </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit' && !disabled">
-        {{ $t('labels.save') }}
+      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+        {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expense') }) : $t('labels.save') }}
       </button>
       <button
         type="button"
@@ -98,17 +96,21 @@ export default defineComponent({
   },
   data() {
     return {
-      formExpense: structuredClone(defaultExpense)
+      formExpense: structuredClone(defaultExpense),
+      loading: false
     }
   },
   methods: {
     clear() {
+      this.loading = false
       this.formExpense = structuredClone(defaultExpense)
     },
     output() {
+      this.loading = true
       return this.formExpense
     },
     input() {
+      this.loading = false
       return Object.assign({}, structuredClone(defaultExpense), this.expense)
     }
   },

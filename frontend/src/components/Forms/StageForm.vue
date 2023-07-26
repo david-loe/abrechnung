@@ -114,11 +114,9 @@
     </select>
 
     <div class="mb-1">
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add' && !disabled">
-        {{ $t('labels.addX', { X: $t('labels.stage') }) }}
-      </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit' && !disabled">
-        {{ $t('labels.save') }}
+      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+        {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.stage') }) : $t('labels.save') }}
       </button>
       <button
         type="button"
@@ -189,7 +187,8 @@ export default defineComponent({
     return {
       formStage: structuredClone(defaultStage),
       minDate: '' as string | Date,
-      maxDate: '' as string | Date
+      maxDate: '' as string | Date,
+      loading: false
     }
   },
   methods: {
@@ -228,15 +227,18 @@ export default defineComponent({
       }
     },
     clear() {
+      this.loading = false
       this.formStage = structuredClone(defaultStage)
     },
     output() {
+      this.loading = true
       if (!this.showMidnightCountries()) {
         this.formStage.midnightCountries = []
       }
       return this.formStage
     },
     input() {
+      this.loading = false
       //toleranceStageDatesToApprovedTravelDates
       this.minDate = new Date(
         new Date(this.travelStartDate).valueOf() - settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000

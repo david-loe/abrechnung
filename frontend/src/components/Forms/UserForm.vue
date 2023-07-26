@@ -1,5 +1,5 @@
 <template>
-  <form class="container" @submit.prevent="mode === 'add' ? $emit('add', formUser) : $emit('edit', formUser)">
+  <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="row mb-2">
       <div class="col">
         <label for="userFormUid" class="form-label"> {{ $t('labels.uid') }}<span class="text-danger">*</span> </label>
@@ -33,11 +33,9 @@
     </div>
 
     <div class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
-        {{ $t('labels.addX', { X: $t('labels.user') }) }}
-      </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
-        {{ $t('labels.save') }}
+      <button type="submit" class="btn btn-primary me-2" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+        {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.user') }) : $t('labels.save') }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
@@ -48,23 +46,30 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { User } from '../../../../common/types'
+
+interface FormUser extends Omit<User, 'settings' | 'name' | '_id'> {
+  name?: string
+  settings?: User['settings']
+  _id?: string
+}
+
+const defaultUser: FormUser = {
+  uid: '',
+  access: {
+    approve: false,
+    examine: false,
+    admin: false
+  },
+  email: ''
+}
 export default defineComponent({
   components: {},
   name: 'UserForm',
   props: {
     user: {
-      type: Object,
-      default: function () {
-        return {
-          uid: '',
-          access: {
-            approve: false,
-            examine: false,
-            admin: false
-          },
-          email: ''
-        }
-      }
+      type: Object as PropType<FormUser>,
+      default: () => structuredClone(defaultUser)
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -73,26 +78,28 @@ export default defineComponent({
   },
   data() {
     return {
-      formUser: this.user
+      formUser: this.user,
+      loading: false
     }
   },
   methods: {
     clear() {
-      this.formUser = {
-        uid: '',
-        access: {
-          approve: false,
-          examine: false,
-          admin: false
-        },
-        email: ''
-      }
+      this.loading = false
+      this.formUser = structuredClone(defaultUser)
+    },
+    output() {
+      this.loading = true
+      return this.formUser
+    },
+    input() {
+      this.loading = false
+      return Object.assign({}, structuredClone(defaultUser), this.user)
     }
   },
   beforeMount() {},
   watch: {
     user: function () {
-      this.formUser = this.user
+      this.formUser = this.input()
     }
   }
 })

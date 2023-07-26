@@ -74,12 +74,12 @@
     </div>
 
     <div class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'add'">
-        {{ $t('labels.applyForX', { X: $t('labels.travel') }) }}
-      </button>
-      <button type="submit" class="btn btn-primary me-2" v-if="mode === 'edit'">
+      <button type="submit" class="btn btn-primary me-2" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{
-          travel.state === 'rejected' || travel.state === 'approved'
+          mode === 'add'
+            ? $t('labels.applyForX', { X: $t('labels.travel') })
+            : travel.state === 'rejected' || travel.state === 'approved'
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
@@ -133,17 +133,21 @@ export default defineComponent({
   },
   data() {
     return {
-      formTravel: structuredClone(defaultTravel)
+      formTravel: structuredClone(defaultTravel),
+      loading: false
     }
   },
   methods: {
     clear() {
+      this.loading = false
       this.formTravel = structuredClone(defaultTravel)
     },
     output() {
+      this.loading = true
       return this.formTravel
     },
     input() {
+      this.loading = false
       return Object.assign({}, structuredClone(defaultTravel), this.travel)
     }
   },
