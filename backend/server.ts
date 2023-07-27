@@ -1,4 +1,4 @@
-const app = require('./app')
+import app from './app'
 const port = process.env.BACKEND_PORT
 const url = process.env.VITE_BACKEND_URL
 
