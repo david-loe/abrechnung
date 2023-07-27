@@ -93,7 +93,7 @@ function drawGeneralTravelInformation(page, travel, options = { font }) {
   // Dates + professionalShare
   var text = i18n.t('labels.from') + ': ' + new Date(travel.startDate).toLocaleDateString(i18n.language) + '    ' + i18n.t('labels.to') + ': ' + new Date(travel.endDate).toLocaleDateString(i18n.language)
   if (travel.professionalShare !== 1) {
-    text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare / 100) * 100 + '%'
+    text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare * 100) + '%'
   }
   var y = y - (opts.fontSize * 1.5)
   page.drawText(text, {

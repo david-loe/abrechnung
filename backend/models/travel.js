@@ -242,7 +242,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
           break
         }
         var midnight = day.date.valueOf() + 1000 * 24 * 60 * 60 - 1
-        while (stageIndex < this.stages.length - 1 && (this.stages[stageIndex].type != 'route' || midnight - new Date(this.stages[stageIndex].arrival).valueOf() > 0)) {
+        while (stageIndex < this.stages.length - 1 && midnight - new Date(this.stages[stageIndex].arrival).valueOf() > 0) {
           stageIndex++
         }
         if (midnight - new Date(this.stages[stageIndex].departure).valueOf() > 0 &&

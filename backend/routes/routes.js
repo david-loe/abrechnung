@@ -97,7 +97,6 @@ router.post('/travel', async (req, res) => {
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
-  delete req.body.days
   delete req.body.expenses
   delete req.body.professionalShare
 
