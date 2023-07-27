@@ -5,18 +5,28 @@
       <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
 
       <div class="form-floating">
-        <input type="username" class="form-control" id="username" placeholder="name@example.com" v-model="username" required />
+        <input
+          type="text"
+          class="form-control"
+          autocomplete="username"
+          id="username"
+          name="username"
+          placeholder=""
+          v-model="username"
+          required />
         <label for="username">{{ $t('labels.username') }}</label>
       </div>
       <div class="form-floating">
         <input
           type="password"
           class="form-control"
-          id="floatingPassword"
-          placeholder="{{ $t('labels.password') }}"
+          id="password"
+          name="password"
+          placeholder=""
+          autocomplete="currentPassword"
           v-model="password"
           required />
-        <label for="floatingPassword">{{ $t('labels.password') }}</label>
+        <label for="password">{{ $t('labels.password') }}</label>
       </div>
 
       <button class="w-100 btn btn-lg btn-primary" type="submit">{{ $t('labels.signIn') }}</button>
