@@ -12,7 +12,7 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import i18n from './i18n'
-import { CountrySimple, Currency } from '../../common/types'
+import { CountrySimple, Currency, User } from '../../common/types'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {
@@ -32,10 +32,13 @@ declare module '@vue/runtime-core' {
       setter: (endpoint: string, data: any, config?: {}) => Promise<any>
       deleter: (endpoint: string, params: {}) => Promise<boolean>
       addAlert(alert: Alert): void
+      setLastCountry(country: CountrySimple): void
+      setLastCurrency(currency: Currency): void
       load: () => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
       currencies: Currency[]
       countries: CountrySimple[]
+      user: User
     }
   }
 }

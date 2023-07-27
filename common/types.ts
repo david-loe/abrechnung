@@ -68,7 +68,9 @@ export interface User extends UserSimple {
   }
   settings: {
     language: Locale
-    lastCurrencies?: Array<string>
+    lastCurrencies: Currency[]
+    lastCountries: CountrySimple[]
+    vehicleRegistration?: DocumentFile
   }
 }
 

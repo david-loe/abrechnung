@@ -125,7 +125,7 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { Locale, User } from '../../common/types'
+import { CountrySimple, Currency, Locale, User } from '../../common/types'
 import { languages } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 
@@ -283,6 +283,28 @@ export default defineComponent({
           console.log(error.response.data)
         }
       }
+    },
+    setLastCurrency(currency: Currency) {
+      const index = this.user.settings.lastCurrencies.indexOf(currency)
+      if (index !== -1) {
+        this.user.settings.lastCurrencies.splice(index, 1)
+      }
+      const length = this.user.settings.lastCurrencies.unshift(currency)
+      if (length > 3) {
+        this.user.settings.lastCurrencies.pop()
+      }
+      this.pushSettings()
+    },
+    setLastCountry(country: CountrySimple) {
+      const index = this.user.settings.lastCountries.indexOf(country)
+      if (index !== -1) {
+        this.user.settings.lastCountries.splice(index, 1)
+      }
+      const length = this.user.settings.lastCountries.unshift(country)
+      if (length > 3) {
+        this.user.settings.lastCountries.pop()
+      }
+      this.pushSettings()
     }
   }
 })

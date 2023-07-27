@@ -1,10 +1,11 @@
 <template>
   <v-select
     v-if="$root.countries.length > 0"
-    :options="$root.countries"
+    :options="$root.user.settings.lastCountries.concat($root.countries)"
     :modelValue="modelValue"
     :placeholder="$t('labels.country')"
     @update:modelValue="(v: CountrySimple) => $emit('update:modelValue', v)"
+    @option:selected="$root.setLastCountry"
     :filter="filter"
     :disabled="disabled"
     style="min-width: 160px">
