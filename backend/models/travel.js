@@ -223,7 +223,7 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
       if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
 
-      result.refund = { amount: Math.round(amount * leftover * settings.factorCateringLumpSum * 100) / 100, currency: settings.baseCurrency }
+      result.refund = { amount: Math.round(amount * leftover * (settings.factorCateringLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) * 100) / 100, currency: settings.baseCurrency }
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount *= 2
       }
@@ -251,7 +251,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
         }
         const result = { type: 'overnight' }
         var amount = (await day.country.getLumpSum(day.date))[result.type]
-        result.refund = { amount: Math.round(amount * settings.factorOvernightLumpSum * 100) / 100, currency: settings.baseCurrency }
+        result.refund = { amount: Math.round(amount * (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) * 100) / 100, currency: settings.baseCurrency }
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount *= 2
         }
