@@ -8,9 +8,9 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'InfoPoint',
-  data(): { tooltip: any } {
+  data() {
     return {
-      tooltip: undefined
+      tooltip: undefined as Tooltip | undefined
     }
   },
   components: {},
