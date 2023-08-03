@@ -141,19 +141,21 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-lg-9 col-12">
+      <div class="row row justify-content-between">
+        <div class="col-lg-auto col-12">
           <div class="row g-1 mb-2">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
+                <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
+                <span class="ms-1 d-md-none">{{ $t('labels.stage') }}</span>
               </button>
             </div>
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
+                <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
+                <span class="ms-1 d-md-none">{{ $t('labels.expense') }}</span>
               </button>
             </div>
           </div>
@@ -264,18 +266,22 @@
             <!-- Stage -->
             <div
               v-else-if="row.type === 'stage'"
-              class="row align-items-center ps-4 mb-1"
+              class="row align-items-center ps-lg-4 mb-1"
               style="cursor: pointer"
               @click="showModal('edit', row.data as Stage, 'stage')">
-              <div class="col-auto fs-3">
+              <div class="col-auto fs-3 d-none d-md-block">
                 <i :class="getStageIcon(row.data as Stage)"></i>
               </div>
-              <div class="col-auto">
+              <div class="col-auto text-truncate">
                 <PlaceElement :place="(row.data as Stage).startLocation"></PlaceElement>
-                <i class="bi bi-arrow-right mx-2"></i>
+                <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i class="bi bi-arrow-right mx-2"></i>
+                <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
+                  <i class="bi bi-coin"></i>
+                  {{ getMoneyString((row.data as Stage).cost) }}
+                </div>
                 <PlaceElement :place="(row.data as Stage).endLocation"></PlaceElement>
               </div>
-              <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary">
+              <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary d-none d-md-block">
                 <i class="bi bi-coin"></i>
                 {{ getMoneyString((row.data as Stage).cost) }}
               </div>
@@ -283,16 +289,17 @@
             <!-- expense -->
             <div
               v-else-if="row.type === 'expense'"
-              class="row align-items-center ps-4 mb-1"
+              class="row align-items-center ps-lg-4 mb-1"
               style="cursor: pointer"
               @click="showModal('edit', row.data as Expense, 'expense')">
-              <div class="col-auto fs-3">
+              <div class="col-auto fs-3 d-none d-md-block">
                 <i class="bi bi-coin"></i>
               </div>
               <div class="col-auto">
-                {{ (row.data as Expense).description }}
+                <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as Expense).description }}&nbsp;
+                <div class="text-secondary d-inline d-md-none">{{ getMoneyString((row.data as Expense).cost) }}</div>
               </div>
-              <div class="col-auto text-secondary">{{ getMoneyString((row.data as Expense).cost) }}</div>
+              <div class="col-auto text-secondary d-none d-md-block">{{ getMoneyString((row.data as Expense).cost) }}</div>
             </div>
             <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
@@ -304,7 +311,7 @@
             </div>
           </div>
         </div>
-        <div class="col">
+        <div class="col-lg-3 col">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ $t('labels.summary') }}</h5>
