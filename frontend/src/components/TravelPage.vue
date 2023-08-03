@@ -23,14 +23,18 @@
               :travelStartDate="travel.startDate"
               :travelEndDate="travel.endDate"
               :disabled="isReadOnly"
+              :showVehicleRegistration="travel.state === 'approved'"
               @add="postStage"
               @edit="postStage"
               @deleted="deleteStage"
               @cancel="hideModal"
               @deleteReceipt="deleteReceipt"
-              @showReceipt="showReceipt">
+              @showReceipt="showReceipt"
+              @deleteVehicleRegistration="deleteVehicleRegistration"
+              @showVehicleRegistration="showVehicleRegistration"
+              @postVehicleRegistration="postVehicleRegistration">
             </StageForm>
-            <expenseForm
+            <ExpenseForm
               v-else-if="modalObjectType === 'expense'"
               ref="expenseForm"
               :expense="(modalObject as Partial<Expense> | undefined)"
@@ -42,7 +46,7 @@
               @cancel="hideModal"
               @deleteReceipt="deleteReceipt"
               @showReceipt="showReceipt">
-            </expenseForm>
+            </ExpenseForm>
             <TravelApplyForm
               v-else-if="modalObjectType === 'travel'"
               :mode="modalMode"
@@ -397,7 +401,7 @@ import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
 import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scriptsts'
-import { Expense, Record, RecordType, Stage, Travel, TravelSimple } from '../../../common/types'
+import { DocumentFile, Expense, Record, RecordType, Stage, Travel, TravelSimple } from '../../../common/types'
 import { PropType } from 'vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -542,7 +546,7 @@ export default defineComponent({
     async deleteReceipt(id: string, recordId: string, recordType: RecordType) {
       const params: any = { id: id, travelId: this._id }
       params[recordType + 'Id'] = recordId
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params)
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params, false)
       if (result) {
         await this.getTravel()
       }
@@ -556,6 +560,34 @@ export default defineComponent({
         windowProxy.location.assign(fileURL)
       } else {
         windowProxy.close()
+      }
+    },
+    async deleteVehicleRegistration(id: string) {
+      const params: any = { id: id }
+      await this.$root.deleter(this.endpointPrefix + 'user/vehicleRegistration', params)
+    },
+    async showVehicleRegistration(id: string, windowProxy: Window) {
+      const params: any = { id: id }
+      const result = await this.$root.getter(this.endpointPrefix + 'user/vehicleRegistration', params, { responseType: 'blob' })
+      if (result) {
+        const fileURL = URL.createObjectURL(result)
+        windowProxy.location.assign(fileURL)
+      } else {
+        windowProxy.close()
+      }
+    },
+    async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
+      const result = await this.$root.setter(
+        this.endpointPrefix + 'user/vehicleRegistration',
+        { vehicleRegistration },
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+      if (result) {
+        this.$root.user = result
       }
     },
     getStageIcon(stage: Stage) {

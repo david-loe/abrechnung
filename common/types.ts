@@ -70,8 +70,8 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    vehicleRegistration?: DocumentFile
   }
+  vehicleRegistration?: DocumentFile[]
 }
 
 export interface Money {

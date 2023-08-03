@@ -65,6 +65,21 @@
         <label for="stageFormDistance" class="form-label"> {{ $t('labels.distance') }}<span class="text-danger">*</span> </label>
         <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled" required />
       </div>
+      <div class="mb-3" v-if="showVehicleRegistration">
+        <label for="stageFormVehicleRegistration" class="form-label me-2">
+          {{ $t('labels.vehicleRegistration') }}
+          <span class="text-danger">*</span>
+        </label>
+        <InfoPoint :text="$t('info.vehicleRegistration')" />
+        <FileUpload
+          id="stageFormVehicleRegistration"
+          v-model="$root.user.vehicleRegistration"
+          @update:model-value="vehicleRegistrationChanged = true"
+          :disabled="disabled"
+          :required="true"
+          @deleteFile="(id) => $emit('deleteVehicleRegistration', id)"
+          @showFile="(id, winProxy) => $emit('showVehicleRegistration', id, winProxy)" />
+      </div>
     </template>
 
     <template v-if="formStage.transport !== 'ownCar'">
@@ -80,9 +95,9 @@
           </div>
         </div>
         <div class="col">
-          <label for="invoiceDateInput" class="form-label"
-            >{{ $t('labels.invoiceDate') }}<span v-if="formStage.cost.amount" class="text-danger">*</span></label
-          >
+          <label for="invoiceDateInput" class="form-label">
+            {{ $t('labels.invoiceDate') }}<span v-if="formStage.cost.amount" class="text-danger">*</span>
+          </label>
           <DateInput
             id="invoiceDateInput"
             v-model="formStage.cost.date"
@@ -91,11 +106,13 @@
             :max="new Date()" />
         </div>
       </div>
+    </template>
 
+    <template v-if="formStage.transport !== 'ownCar' || (formStage.transport == 'ownCar' && formStage.cost.receipts.length > 0)">
       <div class="mb-3">
-        <label for="stageFormFile" class="form-label me-2"
-          >{{ $t('labels.receipts') }}<span v-if="formStage.cost.amount" class="text-danger">*</span></label
-        >
+        <label for="stageFormFile" class="form-label me-2">
+          {{ $t('labels.receipts') }}<span v-if="formStage.cost.amount" class="text-danger">*</span>
+        </label>
         <InfoPoint :text="$t('info.receipts')" />
         <FileUpload
           id="stageFormFile"
@@ -169,7 +186,17 @@ const defaultStage: FormStage = {
 export default defineComponent({
   name: 'StageForm',
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
-  emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
+  emits: [
+    'cancel',
+    'edit',
+    'add',
+    'deleted',
+    'deleteReceipt',
+    'showReceipt',
+    'deleteVehicleRegistration',
+    'showVehicleRegistration',
+    'postVehicleRegistration'
+  ],
   props: {
     stage: {
       type: Object as PropType<Partial<Stage>>,
@@ -181,14 +208,16 @@ export default defineComponent({
     },
     disabled: { type: Boolean, default: false },
     travelStartDate: { type: [String, Date], required: true },
-    travelEndDate: { type: [String, Date], required: true }
+    travelEndDate: { type: [String, Date], required: true },
+    showVehicleRegistration: { type: Boolean, default: true }
   },
   data() {
     return {
       formStage: structuredClone(defaultStage),
       minDate: '' as string | Date,
       maxDate: '' as string | Date,
-      loading: false
+      loading: false,
+      vehicleRegistrationChanged: false
     }
   },
   methods: {
@@ -231,6 +260,9 @@ export default defineComponent({
       this.formStage = structuredClone(defaultStage)
     },
     output() {
+      if (this.vehicleRegistrationChanged) {
+        this.$emit('postVehicleRegistration', this.$root.user.vehicleRegistration)
+      }
       this.loading = true
       if (!this.showMidnightCountries()) {
         this.formStage.midnightCountries = []

@@ -112,7 +112,8 @@
     "days": "Tage",
     "day": "Tag",
     "fellowTravelersNames": "Namen aller Mitreisenden",
-    "travelDetails": "Reisedetails"
+    "travelDetails": "Reisedetails",
+    "vehicleRegistration": "Fahrzeugschein"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -151,7 +152,8 @@
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
     "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
-    "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)"
+    "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
+    "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "mail": {
     "hi": "Hallo Zusammen,",

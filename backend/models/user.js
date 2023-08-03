@@ -12,21 +12,26 @@ const userSchema = new mongoose.Schema({
   settings: {
     language: { type: String, default: 'de' },
     lastCurrencies: [{ type: String, ref: 'Currency' }],
-    lastCountries: [{ type: String, ref: 'Country' }],
-    vehicleRegistration: { type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }
-  }
+    lastCountries: [{ type: String, ref: 'Country' }]
+  },
+  vehicleRegistration: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }]
 })
 
 function populate(doc) {
   return Promise.allSettled([
     doc.populate({ path: 'settings.lastCurrencies', model: 'Currency' }),
     doc.populate({ path: 'settings.lastCountries', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'settings.vehicleRegistration', model: 'DocumentFile', select: { name: 1, type: 1 } })
+    doc.populate({ path: 'vehicleRegistration', model: 'DocumentFile', select: { name: 1, type: 1 } })
   ])
 }
 
 userSchema.pre(/^find((?!Update).)*$/, function () {
   populate(this)
+})
+
+userSchema.pre('save', async function (next) {
+  await populate(this)
+  next();
 })
 
 module.exports = mongoose.model('User', userSchema)

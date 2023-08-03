@@ -61,6 +61,81 @@ router.post('/user/settings', async (req, res) => {
   }
 })
 
+router.get('/user/vehicleRegistration', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  for (const file of user.vehicleRegistration) {
+    if (req.query.id && file._id.equals(req.query.id)) {
+      var docFile = await DocumentFile.findOne({ _id: req.query.id })
+      res.setHeader('Content-Type', docFile.type);
+      res.setHeader('Content-Length', docFile.data.length);
+      return res.send(docFile.data)
+    }
+  }
+  return res.sendStatus(403)
+})
+
+router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => {
+  if (req.body.vehicleRegistration && req.files) {
+    const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+    for (var i = 0; i < req.body.vehicleRegistration.length; i++) {
+      var buffer = null
+      for (const file of req.files) {
+        if (file.fieldname == 'vehicleRegistration[' + i + '][data]') {
+          buffer = file.buffer
+          break
+        }
+      }
+      if (buffer) {
+        req.body.vehicleRegistration[i].data = buffer
+      }
+    }
+    for (var i = 0; i < req.body.vehicleRegistration.length; i++) {
+      if (req.body.vehicleRegistration[i]._id) {
+        var foundReceipt = false
+        for (const oldReceipt of user.vehicleRegistration) {
+          if (oldReceipt._id.equals(req.body.vehicleRegistration[i]._id)) {
+            foundReceipt = true
+          }
+        }
+        if (!foundReceipt) {
+          break
+        }
+        await DocumentFile.findOneAndUpdate({ _id: req.body.vehicleRegistration[i]._id }, req.body.vehicleRegistration[i])
+      } else {
+        var result = await (new DocumentFile(req.body.vehicleRegistration[i])).save()
+        req.body.vehicleRegistration[i] = result._id
+      }
+    }
+    user.vehicleRegistration = req.body.vehicleRegistration
+    user.markModified('vehicleRegistration')
+    try {
+      const result = await user.save()
+      return res.send({ message: i18n.t('alerts.successSaving'), result: result })
+    } catch (error) {
+      return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+    }
+  }
+  return res.sendStatus(403)
+})
+
+router.delete('/user/vehicleRegistration', async (req, res) => {
+  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
+  for (var i = 0; i < user.vehicleRegistration.length; i++) {
+    if (req.query.id && user.vehicleRegistration[i]._id.equals(req.query.id)) {
+      await DocumentFile.deleteOne({ _id: req.query.id })
+      user.vehicleRegistration.splice(i, 1)
+      user.markModified('vehicleRegistration')
+      try {
+        const result = await user.save()
+        return res.send({ message: i18n.t('alerts.successDeleting'), result: result })
+      } catch (error) {
+        return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+      }
+    }
+  }
+  return res.sendStatus(403)
+})
+
 router.get('/currency', helper.getter(Currency, 'currency', 200))
 router.get('/country', async (req, res) => {
   const select = {}
@@ -232,7 +307,7 @@ function getRecordReceipt(recordType) {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
     var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    if (!travel || travel.historic || !travel.traveler._id.equals(user._id)) {
       return res.sendStatus(403)
     }
     if (req.query[recordType.replace(/s$/, '') + 'Id']) { // e.g. stageId
@@ -355,6 +430,19 @@ router.post('/travel/underExamination', async (req, res) => {
   const check = async (oldObject) => {
     if (oldObject.state === 'approved') {
       await oldObject.saveToHistory()
+      const receipts = []
+      for (const stage of oldObject.stages) {
+        if (stage.transport == 'ownCar') {
+          if (receipts.length == 0) {
+            for (const vr of user.vehicleRegistration) {
+              const doc = (await DocumentFile.findOne({ _id: vr._id })).toObject()
+              delete doc._id
+              receipts.push(await DocumentFile.create(doc))
+            }
+          }
+          stage.cost.receipts = receipts
+        }
+      }
       await oldObject.save()
       return true
     } else {

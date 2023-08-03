@@ -318,7 +318,7 @@ travelSchema.methods.calculateProfessionalShare = function () {
 travelSchema.methods.calculateRefundforOwnCar = function () {
   for (const stage of this.stages) {
     if (stage.transport === 'ownCar') {
-      stage.cost = { amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100, currency: settings.baseCurrency }
+      stage.cost = Object.assign(stage.cost, { amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100, currency: settings.baseCurrency })
     }
   }
 }

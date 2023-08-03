@@ -66,16 +66,14 @@ export default defineComponent({
       }
     },
     deleteFile(index: number) {
-      if (this.modelValue[index]._id) {
-        this.$emit('deleteFile', this.modelValue[index]._id)
-      } else {
-        if (!confirm(this.$t('alerts.areYouSureDelete'))) {
-          return null
+      if (confirm(this.$t('alerts.areYouSureDelete'))) {
+        if (this.modelValue[index]._id) {
+          this.$emit('deleteFile', this.modelValue[index]._id)
         }
+        const files = this.modelValue
+        files.splice(index, 1)
+        this.$emit('update:modelValue', files)
       }
-      const files = this.modelValue
-      files.splice(index, 1)
-      this.$emit('update:modelValue', files)
     },
     changeFile(event: Event) {
       const files = this.modelValue

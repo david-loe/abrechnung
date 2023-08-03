@@ -235,9 +235,11 @@ export default defineComponent({
         }
       }
     },
-    async deleter(endpoint: string, params = {}): Promise<boolean> {
-      if (!confirm(this.$t('alerts.areYouSureDelete'))) {
-        return false
+    async deleter(endpoint: string, params = {}, ask = true): Promise<boolean> {
+      if (ask) {
+        if (!confirm(this.$t('alerts.areYouSureDelete'))) {
+          return false
+        }
       }
       try {
         const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint, {
