@@ -209,7 +209,7 @@ export default defineComponent({
         }
       }
     },
-    async setter(endpoint: string, data: any, config = {}) {
+    async setter(endpoint: string, data: any, config = {}, showAlert = true) {
       try {
         const res = await axios.post(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -222,7 +222,7 @@ export default defineComponent({
           )
         )
         if (res.status === 200) {
-          this.addAlert({ message: '', title: res.data.message, type: 'success' })
+          if (showAlert) this.addAlert({ message: '', title: res.data.message, type: 'success' })
           return res.data.result
         }
       } catch (error: any) {
@@ -235,7 +235,7 @@ export default defineComponent({
         }
       }
     },
-    async deleter(endpoint: string, params = {}, ask = true): Promise<boolean> {
+    async deleter(endpoint: string, params = {}, ask = true, showAlert = true): Promise<boolean> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false
@@ -247,7 +247,7 @@ export default defineComponent({
           withCredentials: true
         })
         if (res.status === 200) {
-          this.addAlert({ message: '', title: res.data.message, type: 'success' })
+          if (showAlert) this.addAlert({ message: '', title: res.data.message, type: 'success' })
           return true
         }
       } catch (error: any) {

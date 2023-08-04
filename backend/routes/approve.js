@@ -1,6 +1,5 @@
 const helper = require('../helper')
 const Travel = require('../models/travel')
-const User = require('../models/user')
 const router = require('express').Router()
 const mail = require('../mail/mail')
 
@@ -17,10 +16,9 @@ router.get('/travel/approved', async (req, res) => {
 
 function approve(state) {
     return async (req, res) => {
-        const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
         req.body = {
             state: state,
-            editor: user._id,
+            editor: req.user._id,
             comment: req.body.comment,
             _id: req.body._id
         }

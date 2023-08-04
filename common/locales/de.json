@@ -113,7 +113,9 @@
     "day": "Tag",
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "travelDetails": "Reisedetails",
-    "vehicleRegistration": "Fahrzeugschein"
+    "vehicleRegistration": "Fahrzeugschein",
+    "uploadFromPhone": "Vom Handy hochladen",
+    "tapToUpload": "Zum Hochladen Tippen 👆"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

@@ -87,20 +87,20 @@ if (settings.allowSpouseRefund) {
 
 function populate(doc) {
   return Promise.allSettled([
-    doc.populate({ path: 'advance.currency', model: 'Currency' }),
-    doc.populate({ path: 'stages.cost.currency', model: 'Currency' }),
-    doc.populate({ path: 'expenses.cost.currency', model: 'Currency' }),
-    doc.populate({ path: 'days.refunds.refund.currency', model: 'Currency' }),
-    doc.populate({ path: 'destinationPlace.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.startLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.endLocation.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.midnightCountries.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'days.country', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.cost.receipts', model: 'DocumentFile', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.receipts', model: 'DocumentFile', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'traveler', model: 'User', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', model: 'User', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'comments.author', model: 'User', select: { name: 1, email: 1 } })
+    doc.populate({ path: 'advance.currency' }),
+    doc.populate({ path: 'stages.cost.currency' }),
+    doc.populate({ path: 'expenses.cost.currency' }),
+    doc.populate({ path: 'days.refunds.refund.currency' }),
+    doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'stages.cost.receipts', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'traveler', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
 

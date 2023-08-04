@@ -113,7 +113,9 @@
     "day": "Day",
     "fellowTravelersNames": "Name of all fellow travelers",
     "travelDetails": "Travel details",
-    "vehicleRegistration": "Vehicle Registration"
+    "vehicleRegistration": "Vehicle Registration",
+    "uploadFromPhone": "Upload from Phone",
+    "tapToUpload": "Tap to upload 👆"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",

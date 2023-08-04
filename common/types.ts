@@ -53,6 +53,12 @@ export interface DocumentFile {
   _id?: string
 }
 
+export interface Token {
+  _id: string
+  createdAt: string | Date
+  files: DocumentFile[]
+}
+
 export interface UserSimple {
   uid: string
   email: string

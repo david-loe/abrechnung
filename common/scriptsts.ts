@@ -1,4 +1,4 @@
-import { Currency, Locale, Money, Place, Travel } from './types'
+import { Currency, DocumentFile, Locale, Money, Place, Travel } from './types'
 import settings from './settings.json'
 
 function getFlagEmoji(countryCode: string): string | null {
@@ -194,6 +194,58 @@ function getTravelTotal(travel: Travel): Money {
   return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
 }
 
+async function fileEventToDocumentFiles(event: Event): Promise<DocumentFile[] | null> {
+  const files: DocumentFile[] = []
+  if (event.target && (event.target as HTMLInputElement).files) {
+    for (const file of (event.target as HTMLInputElement).files!) {
+      if (file.size < 16000000) {
+        if (file.type.indexOf('image') > -1) {
+          files.push({ data: await resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
+        } else {
+          files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
+        }
+      } else {
+        alert('alerts.imageToBig ' + file.name)
+      }
+    }
+    ;(event.target as HTMLInputElement).value = ''
+    return files
+  }
+  return null
+}
+
+// From https://stackoverflow.com/a/52983833/13582326
+function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = function (this: FileReader) {
+      // We create an image to receive the Data URI
+      var img = document.createElement('img')
+      // When the img "onload" is triggered we can resize the image.
+      img.onload = function (this: GlobalEventHandlers) {
+        // We create a canvas and get its context.
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        // We set the dimensions to the wanted size.
+        var max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
+        var min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
+        if (img[max] > longestSide) {
+          canvas[max] = longestSide
+          canvas[min] = img[min] * (longestSide / img[max])
+        } else {
+          return resolve(file)
+        }
+        // We resize the image with the canvas method drawImage();
+        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
+      }
+      // We put the Data URI in the image's src attribute
+      img.src = this.result as string
+    }
+  })
+}
+
 export {
   getFlagEmoji,
   getDiffInDays,
@@ -210,5 +262,6 @@ export {
   datetoDateStringWithYear,
   getLumpSumsSum,
   getExpensesSum,
-  getTravelTotal
+  getTravelTotal,
+  fileEventToDocumentFiles
 }

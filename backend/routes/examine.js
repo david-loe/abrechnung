@@ -2,7 +2,6 @@ const helper = require('../helper')
 const router = require('express').Router()
 const DocumentFile = require('../models/documentFile')
 const Travel = require('../models/travel')
-const User = require('../models/user')
 const i18n = require('../i18n')
 const multer = require('multer')
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -41,10 +40,9 @@ router.get('/travel/refunded', async (req, res) => {
 })
 
 router.post('/travel/refunded', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   req.body = {
     state: 'refunded',
-    editor: user._id,
+    editor: req.user._id,
     comment: req.body.comment,
     _id: req.body._id
   }

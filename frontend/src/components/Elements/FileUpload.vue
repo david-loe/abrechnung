@@ -24,6 +24,27 @@
           </div>
         </div>
       </div>
+      <div class="ms-auto col-auto d-none d-md-block">
+        <button v-if="!token" type="button" class="btn btn-light text-center" @click="generateToken">
+          <i class="bi bi-qr-code-scan"></i>
+          <span class="ms-1">{{ $t('labels.uploadFromPhone') }}</span>
+        </button>
+        <div v-else-if="qr">
+          <div class="row g-1 align-items-center">
+            <div class="col">
+              <div class="progress" role="progressbar">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  :style="'width: ' + Math.round((100 * secondsLeft) / expireAfterSeconds) + '%'"></div>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-x-lg" style="cursor: pointer" @click="clear()"></i>
+            </div>
+          </div>
+          <img class="m-1" :src="qr" />
+        </div>
+      </div>
     </div>
     <input
       class="form-control"
@@ -39,7 +60,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { DocumentFile } from '../../../../common/types'
+import { DocumentFile, Token } from '../../../../common/types'
+import { fileEventToDocumentFiles } from '../../../../common/scriptsts'
+import settings from '../../../../common/settings.json'
+import QRCode from 'qrcode'
 
 export default defineComponent({
   name: 'FileUpload',
@@ -53,6 +77,15 @@ export default defineComponent({
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     id: { type: String }
+  },
+  data() {
+    return {
+      token: undefined as Token | undefined,
+      qr: undefined as string | undefined,
+      fetchTokenInterval: undefined as NodeJS.Timer | undefined,
+      secondsLeft: settings.uploadTokenExpireAfterSeconds,
+      expireAfterSeconds: settings.uploadTokenExpireAfterSeconds
+    }
   },
   emits: ['update:modelValue', 'deleteFile', 'showFile'],
   methods: {
@@ -75,59 +108,49 @@ export default defineComponent({
         this.$emit('update:modelValue', files)
       }
     },
-    changeFile(event: Event) {
-      const files = this.modelValue
-      if (event.target && (event.target as HTMLInputElement).files) {
-        for (const file of (event.target as HTMLInputElement).files!) {
-          if (file.size < 16000000) {
-            if (file.type.indexOf('image') > -1) {
-              const reader = new FileReader()
-              reader.readAsDataURL(file)
-              reader.onload = async () => {
-                files.push({ data: await this.resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
-              }
-            } else {
-              files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
-            }
-          } else {
-            alert(this.$t('alerts.imageToBig'))
-          }
-        }
-        this.$emit('update:modelValue', files)
-        ;(event.target as HTMLInputElement).value = ''
+    async changeFile(event: Event) {
+      const newFiles = await fileEventToDocumentFiles(event)
+      if (newFiles) {
+        this.$emit('update:modelValue', this.modelValue.concat(newFiles))
       }
     },
-    // From https://stackoverflow.com/a/52983833/13582326
-    resizeImage(file: Blob, longestSide: number): Promise<Blob> {
-      return new Promise((resolve) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => {
-          // We create an image to receive the Data URI
-          var img = document.createElement('img')
-          // When the img "onload" is triggered we can resize the image.
-          img.onload = () => {
-            // We create a canvas and get its context.
-            var canvas = document.createElement('canvas')
-            var ctx = canvas.getContext('2d')
-            // We set the dimensions to the wanted size.
-            var max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
-            var min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
-            if (canvas[max] > longestSide) {
-              canvas[max] = longestSide
-              canvas[min] = img[min] * (longestSide / img[max])
-            } else {
-              return resolve(file)
-            }
-            // We resize the image with the canvas method drawImage();
-            ;(ctx as CanvasRenderingContext2D).drawImage(this as unknown as CanvasImageSource, 0, 0, canvas.width, canvas.height)
-            canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
-          }
-          // We put the Data URI in the image's src attribute
-          img.src = reader.result as string
+    async generateToken() {
+      this.token = await this.$root.setter('user/token', {}, undefined, false)
+      if (this.token) {
+        const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
+        url.searchParams.append('user', this.$root.user._id)
+        url.searchParams.append('token', this.token._id)
+        this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
+        this.fetchTokenInterval = setInterval(this.getTokenFiles, 5000)
+      }
+    },
+    async getTokenFiles() {
+      if (this.token) {
+        this.secondsLeft = Math.round(
+          (new Date(this.token.createdAt).valueOf() + this.expireAfterSeconds * 1000 - new Date().valueOf()) / 1000
+        )
+      }
+      const result = await this.$root.getter('/user/token')
+      if (result && result.data) {
+        const token: Token = result.data
+        if (token.files.length > 0) {
+          this.$emit('update:modelValue', this.modelValue.concat(token.files))
+          this.clear()
         }
-      })
+      } else {
+        this.clear()
+      }
+    },
+    clear() {
+      clearInterval(this.fetchTokenInterval)
+      this.token = undefined
+      this.qr = undefined
+      this.secondsLeft = this.expireAfterSeconds
+      this.$root.deleter('/user/token', {}, false, false)
     }
+  },
+  unmounted() {
+    clearInterval(this.fetchTokenInterval)
   }
 })
 </script>

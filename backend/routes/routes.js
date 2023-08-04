@@ -2,6 +2,7 @@ const router = require('express').Router()
 const multer = require('multer')
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 const User = require('../models/user')
+const Token = require('../models/token')
 const i18n = require('../i18n')
 const helper = require('../helper')
 const Travel = require('../models/travel')
@@ -21,40 +22,31 @@ router.delete('/logout', function (req, res) {
 })
 
 router.get('/user', async (req, res) => {
-  var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  var email = req.user[process.env.LDAP_MAIL_ATTRIBUTE]
-  if (Array.isArray(email)) {
-    if (email.length > 0) {
-      email = email[0]
-    } else {
-      email = undefined
-    }
-  }
-  const ldapUser = {
-    uid: req.user[process.env.LDAP_UID_ATTRIBUTE],
-    email: email,
-    name: req.user[process.env.LDAP_DISPLAYNAME_ATTRIBUTE],
-  }
-  if (!user) {
-    user = new User(ldapUser)
-  } else {
-    Object.assign(user, ldapUser)
-  }
-  try {
-    res.send({ data: await user.save() })
-  } catch (error) {
-    return res.status(400).send({ message: "Error while creating User" })
-  }
-
+  res.send({ data: req.user })
 })
 
+router.get('/user/token', async (req, res) => {
+  res.send({ data: req.user.token })
+})
+
+router.delete('/user/token', async (req, res) => {
+  req.user.token = null
+  await req.user.save()
+  res.send({ message: i18n.t('alerts.successDeleting') })
+})
+
+router.post('/user/token', async (req, res) => {
+  const token = await (new Token().save())
+  req.user.token = token
+  req.user.save()
+  res.send({ message: i18n.t('alerts.successSaving'), result: token })
+})
 
 router.post('/user/settings', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  Object.assign(user.settings, req.body)
-  user.markModified('settings')
+  Object.assign(req.user.settings, req.body)
+  req.user.markModified('settings')
   try {
-    const result = await user.save()
+    const result = await req.user.save()
     res.send({ message: i18n.t('alerts.successSaving'), result: result.settings })
   } catch (error) {
     res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
@@ -62,8 +54,7 @@ router.post('/user/settings', async (req, res) => {
 })
 
 router.get('/user/vehicleRegistration', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  for (const file of user.vehicleRegistration) {
+  for (const file of req.user.vehicleRegistration) {
     if (req.query.id && file._id.equals(req.query.id)) {
       var docFile = await DocumentFile.findOne({ _id: req.query.id })
       res.setHeader('Content-Type', docFile.type);
@@ -76,7 +67,6 @@ router.get('/user/vehicleRegistration', async (req, res) => {
 
 router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => {
   if (req.body.vehicleRegistration && req.files) {
-    const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
     for (var i = 0; i < req.body.vehicleRegistration.length; i++) {
       var buffer = null
       for (const file of req.files) {
@@ -92,7 +82,7 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
     for (var i = 0; i < req.body.vehicleRegistration.length; i++) {
       if (req.body.vehicleRegistration[i]._id) {
         var foundReceipt = false
-        for (const oldReceipt of user.vehicleRegistration) {
+        for (const oldReceipt of req.user.vehicleRegistration) {
           if (oldReceipt._id.equals(req.body.vehicleRegistration[i]._id)) {
             foundReceipt = true
           }
@@ -106,10 +96,10 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
         req.body.vehicleRegistration[i] = result._id
       }
     }
-    user.vehicleRegistration = req.body.vehicleRegistration
-    user.markModified('vehicleRegistration')
+    req.user.vehicleRegistration = req.body.vehicleRegistration
+    req.user.markModified('vehicleRegistration')
     try {
-      const result = await user.save()
+      const result = await req.user.save()
       return res.send({ message: i18n.t('alerts.successSaving'), result: result })
     } catch (error) {
       return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
@@ -119,14 +109,13 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
 })
 
 router.delete('/user/vehicleRegistration', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  for (var i = 0; i < user.vehicleRegistration.length; i++) {
-    if (req.query.id && user.vehicleRegistration[i]._id.equals(req.query.id)) {
+  for (var i = 0; i < req.user.vehicleRegistration.length; i++) {
+    if (req.query.id && req.user.vehicleRegistration[i]._id.equals(req.query.id)) {
       await DocumentFile.deleteOne({ _id: req.query.id })
-      user.vehicleRegistration.splice(i, 1)
-      user.markModified('vehicleRegistration')
+      req.user.vehicleRegistration.splice(i, 1)
+      req.user.markModified('vehicleRegistration')
       try {
-        const result = await user.save()
+        const result = await req.user.save()
         return res.send({ message: i18n.t('alerts.successDeleting'), result: result })
       } catch (error) {
         return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
@@ -147,7 +136,6 @@ router.get('/country', async (req, res) => {
 })
 
 router.get('/travel', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   const sortFn = (a, b) => a.startDate - b.startDate
   const select = { history: 0, historic: 0 }
   if (!req.query.stages) {
@@ -159,14 +147,13 @@ router.get('/travel', async (req, res) => {
   if (!req.query.days) {
     select.days = 0
   }
-  return helper.getter(Travel, 'travel', 20, { traveler: user._id, historic: false }, select, sortFn)(req, res)
+  return helper.getter(Travel, 'travel', 20, { traveler: req.user._id, historic: false }, select, sortFn)(req, res)
 })
 
 router.delete('/travel', helper.deleter(Travel, 'traveler'))
 
 router.post('/travel', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  req.body.editor = user._id
+  req.body.editor = req.user._id
   delete req.body.state
   delete req.body.traveler
   delete req.body.history
@@ -199,8 +186,7 @@ function postRecord(recordType) {
     }
     const travel = await Travel.findOne({ _id: req.body.travelId })
     delete req.body.travelId
-    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user._id)) {
       return res.sendStatus(403)
     }
     if (req.body._id && req.body._id !== '') {
@@ -264,8 +250,7 @@ function deleteRecord(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
-    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user._id)) {
       return res.sendStatus(403)
     }
     if (req.query.id && req.query.id !== '') {
@@ -306,8 +291,7 @@ function getRecordReceipt(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
-    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!travel || travel.historic || !travel.traveler._id.equals(user._id)) {
+    if (!travel || travel.historic || !travel.traveler._id.equals(req.user._id)) {
       return res.sendStatus(403)
     }
     if (req.query[recordType.replace(/s$/, '') + 'Id']) { // e.g. stageId
@@ -344,8 +328,7 @@ function deleteRecordReceipt(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
-    var user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(user._id)) {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user._id)) {
       return res.sendStatus(403)
     }
     if (req.query[recordType.replace(/s$/, '') + 'Id']) {
@@ -385,11 +368,10 @@ router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
 router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
 
 router.post('/travel/appliedFor', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   req.body = {
     state: 'appliedFor',
-    traveler: user._id,
-    editor: user._id,
+    traveler: req.user._id,
+    editor: req.user._id,
     comment: null,
     _id: req.body._id,
     name: req.body.name,
@@ -406,7 +388,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   if (!req.body.name) {
     try {
       var date = new Date(req.body.startDate)
-      req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), { lng: user.settings.language }) + ' ' + date.getUTCFullYear()
+      req.body.name = req.body.destinationPlace.place + ' ' + i18n.t('monthsShort.' + date.getUTCMonth(), { lng: req.user.settings.language }) + ' ' + date.getUTCFullYear()
     } catch (error) {
       return res.status(400).send(error)
     }
@@ -419,10 +401,9 @@ router.post('/travel/appliedFor', async (req, res) => {
 })
 
 router.post('/travel/underExamination', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
   req.body = {
     state: 'underExamination',
-    editor: user._id,
+    editor: req.user._id,
     comment: req.body.comment,
     _id: req.body._id
   }
@@ -434,7 +415,7 @@ router.post('/travel/underExamination', async (req, res) => {
       for (const stage of oldObject.stages) {
         if (stage.transport == 'ownCar') {
           if (receipts.length == 0) {
-            for (const vr of user.vehicleRegistration) {
+            for (const vr of req.user.vehicleRegistration) {
               const doc = (await DocumentFile.findOne({ _id: vr._id })).toObject()
               delete doc._id
               receipts.push(await DocumentFile.create(doc))
@@ -454,8 +435,7 @@ router.post('/travel/underExamination', async (req, res) => {
 
 
 router.get('/travel/report', async (req, res) => {
-  const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-  const travel = await Travel.findOne({ _id: req.query.id, traveler: user._id, historic: false, state: 'refunded' })
+  const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user._id, historic: false, state: 'refunded' })
   if (travel) {
     const report = await pdf.generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');

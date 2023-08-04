@@ -49,21 +49,51 @@ app.use(
     store: MongoStore.create({ client: mongoose.connection.getClient() }),
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: false,
       sameSite: 'strict',
     },
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
+    name: i18n.t('headlines.title')
   }),
 )
 
-passport.serializeUser(function (user, done) {
-  done(null, user)
+passport.serializeUser(async (ldapUser, cb) => {
+  var user = await User.findOne({ uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
+  var email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
+  if (Array.isArray(email)) {
+    if (email.length > 0) {
+      email = email[0]
+    } else {
+      email = undefined
+    }
+  }
+  const newUser = {
+    uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE],
+    email: email,
+    name: ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE],
+  }
+  if (!user) {
+    user = new User(newUser)
+  } else {
+    Object.assign(user, newUser)
+  }
+  try {
+    await user.save()
+    cb(null, { _id: user._id })
+  } catch (error) {
+    cb(error)
+  }
 })
 
-passport.deserializeUser(function (user, done) {
-  done(null, user)
+passport.deserializeUser(async (sessionUser, cb) => {
+  const user = await User.findOne({ _id: sessionUser._id })
+  if (user) {
+    cb(null, user)
+  } else {
+    cb(new Error('No User found with id: ' + sessionUser._id))
+  }
 })
 
 app.use(passport.initialize())
@@ -93,9 +123,8 @@ app.use('/api', routes)
 
 const accesses = Object.keys(User.schema.tree.access)
 for (const access of accesses) {
-  app.use('/api/' + access, async (req, res, next) => {
-    const user = await User.findOne({ uid: req.user[process.env.LDAP_UID_ATTRIBUTE] })
-    if (user && user.access[access]) {
+  app.use('/api/' + access, (req, res, next) => {
+    if (req.user.access[access]) {
       next()
     } else {
       return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
@@ -104,5 +133,7 @@ for (const access of accesses) {
   const adminRoutes = require('./routes/' + access)
   app.use('/api/' + access, adminRoutes)
 }
+const uploadRoutes = require('./routes/upload')
+app.use('/upload', uploadRoutes)
 
 module.exports = app

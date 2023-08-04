@@ -1,32 +1,34 @@
 <template>
   <div style="min-height: 120px">
-    <div class="row justify-content-center gx-4 gy-2">
-      <div class="col-auto" v-for="travel of travels" :key="travel._id">
-        <TravelCard
-          v-if="travel"
-          :travel="travel"
-          :showTraveler="showTraveler"
-          :showDropdown="showDropdown"
-          @clicked="$emit('clicked', travel)"
-          @deleted="deleteTravel(travel._id)"
-          @edit="$emit('edit', travel)"></TravelCard>
+    <template v-if="hasTravels">
+      <div class="row justify-content-center gx-4 gy-2">
+        <div class="col-auto" v-for="travel of travels" :key="travel._id">
+          <TravelCard
+            v-if="travel"
+            :travel="travel"
+            :showTraveler="showTraveler"
+            :showDropdown="showDropdown"
+            @clicked="$emit('clicked', travel)"
+            @deleted="deleteTravel(travel._id)"
+            @edit="$emit('edit', travel)"></TravelCard>
+        </div>
       </div>
-    </div>
-    <div v-if="travels.length === 0" class="alert alert-light" role="alert">
-      {{ $t('alerts.noTravels.' + endpoint) }}
-    </div>
-    <div v-else-if="meta && meta.countPages > 1" class="mx-auto text-secondary" style="width: fit-content">
-      <span class="me-2 p-2" style="cursor: pointer" @click="getTravels(meta.page - 1)">&lt;</span>
-      <span
-        v-for="x of meta.countPages"
-        :class="'me-2 p-2' + (meta.page == x ? ' fs-5' : '')"
-        :key="x"
-        :style="meta.page == x ? '' : 'cursor: pointer;'"
-        @click="meta.page == x ? null : getTravels(x)"
-        >{{ x }}</span
-      >
-      <span class="p-2" style="cursor: pointer" @click="getTravels(meta.page + 1)">&gt;</span>
-    </div>
+      <div v-if="travels.length === 0" class="alert alert-light" role="alert">
+        {{ $t('alerts.noTravels.' + endpoint) }}
+      </div>
+      <div v-else-if="meta && meta.countPages > 1" class="mx-auto text-secondary" style="width: fit-content">
+        <span class="me-2 p-2" style="cursor: pointer" @click="getTravels(meta.page - 1)">&lt;</span>
+        <span
+          v-for="x of meta.countPages"
+          :class="'me-2 p-2' + (meta.page == x ? ' fs-5' : '')"
+          :key="x"
+          :style="meta.page == x ? '' : 'cursor: pointer;'"
+          @click="meta.page == x ? null : getTravels(x)"
+          >{{ x }}</span
+        >
+        <span class="p-2" style="cursor: pointer" @click="getTravels(meta.page + 1)">&gt;</span>
+      </div>
+    </template>
   </div>
 </template>
 

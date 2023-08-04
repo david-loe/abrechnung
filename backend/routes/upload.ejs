@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload</title>
+    <style>
+      #progress {
+        background-color: cornflowerblue;
+        animation-name: shrink;
+        animation-duration: <%= secondsLeft %>s;
+        animation-timing-function: linear;
+        height: 1vh;
+        border-radius: 3px;
+        width: 0%;
+      }
+      @keyframes shrink {
+        from {
+          width: <%= Math.round((secondsLeft * 100) / expireAfterSeconds) %>%;
+        }
+        to {
+          width: 0%;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: Helvetica, Arial, sans-serif">
+    <div style="width: 100%; border-radius: 3px; background-color: gainsboro">
+      <div id="progress"></div>
+    </div>
+    <div style="width: 100%; text-align: center">
+      <h1><%= text %></h1>
+    </div>
+    <form id="form" style="display: none">
+      <input type="file" id="upload" accept="image/png, image/jpeg, .pdf" multiple />
+    </form>
+    <script>
+      window.onclick = (event) => {
+        document.getElementById('upload').click()
+      }
+      async function fileEventToDocumentFiles(event) {
+        const files = []
+        if (event.target && event.target.files) {
+          for (const file of event.target.files) {
+            if (file.size < 16000000) {
+              if (file.type.indexOf('image') > -1) {
+                files.push({ data: await resizeImage(file, 1400), type: file.type, name: file.name })
+              } else {
+                files.push({ data: file, type: file.type, name: file.name })
+              }
+            } else {
+              alert('alerts.imageToBig ' + file.name)
+            }
+          }
+          event.target.value = ''
+          return files
+        }
+        return null
+      }
+
+      // From https://stackoverflow.com/a/52983833/13582326
+      function resizeImage(file, longestSide) {
+        return new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = function () {
+            // We create an image to receive the Data URI
+            var img = document.createElement('img')
+            // When the img "onload" is triggered we can resize the image.
+            img.onload = function () {
+              // We create a canvas and get its context.
+              var canvas = document.createElement('canvas')
+              var ctx = canvas.getContext('2d')
+              // We set the dimensions to the wanted size.
+              var max = img.height < img.width ? 'width' : 'height'
+              var min = max == 'width' ? 'height' : 'width'
+              if (img[max] > longestSide) {
+                canvas[max] = longestSide
+                canvas[min] = img[min] * (longestSide / img[max])
+              } else {
+                return resolve(file)
+              }
+              // We resize the image with the canvas method drawImage();
+              ctx.drawImage(this, 0, 0, canvas.width, canvas.height)
+              canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85)
+            }
+            // We put the Data URI in the image's src attribute
+            img.src = this.result
+          }
+        })
+      }
+      var fileInput = document.getElementById('upload')
+
+      fileInput.addEventListener('change', async function (event) {
+        const files = await fileEventToDocumentFiles(event)
+        if (files) {
+          const FD = new FormData()
+          for (var i = 0; i < files.length; i++) {
+            for (const [name, value] of Object.entries(files[i])) FD.append('files[' + i + '][' + name + ']', value)
+          }
+          const response = await fetch('<%- url %>', {
+            method: 'POST',
+            body: FD
+          })
+        }
+      })
+    </script>
+  </body>
+</html>

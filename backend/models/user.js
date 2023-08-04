@@ -14,14 +14,16 @@ const userSchema = new mongoose.Schema({
     lastCurrencies: [{ type: String, ref: 'Currency' }],
     lastCountries: [{ type: String, ref: 'Country' }]
   },
-  vehicleRegistration: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }]
+  vehicleRegistration: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }],
+  token: { type: mongoose.Schema.Types.ObjectId, ref: 'Token' }
 })
 
 function populate(doc) {
   return Promise.allSettled([
-    doc.populate({ path: 'settings.lastCurrencies', model: 'Currency' }),
-    doc.populate({ path: 'settings.lastCountries', model: 'Country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'vehicleRegistration', model: 'DocumentFile', select: { name: 1, type: 1 } })
+    doc.populate({ path: 'settings.lastCurrencies' }),
+    doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
+    doc.populate({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } }),
   ])
 }
 

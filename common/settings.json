@@ -24,5 +24,6 @@
   "languages": [
     { "flag": "🇩🇪", "key": "de" },
     { "flag": "🇬🇧", "key": "en" }
-  ]
+  ],
+  "uploadTokenExpireAfterSeconds": 600
 }
