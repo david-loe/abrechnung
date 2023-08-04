@@ -20,7 +20,9 @@ export default defineComponent({
   },
   watch: {
     text: function () {
-      this.tooltip.setContent({ '.tooltip-inner': this.text })
+      if (this.tooltip) {
+        this.tooltip.setContent({ '.tooltip-inner': this.text })
+      }
     }
   }
 })
