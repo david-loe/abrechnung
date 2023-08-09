@@ -5,6 +5,8 @@
 
 Reisekostenabrechnung inkl. automatischer Pauschalen Berechnung auch für internationale Reisen
 
+![Video](media/video/reisekostenabrechnung-DE-SMALL.mp4)
+
 ## Getting Started
 
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
