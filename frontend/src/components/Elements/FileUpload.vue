@@ -172,7 +172,7 @@ export default defineComponent({
     }
   },
   unmounted() {
-    clearInterval(this.fetchTokenInterval)
+    this.clear()
   }
 })
 </script>

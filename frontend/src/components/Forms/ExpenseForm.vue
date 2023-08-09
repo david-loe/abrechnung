@@ -24,6 +24,7 @@
       <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
       <InfoPoint :text="$t('info.receipts')" />
       <FileUpload
+        ref="fileUpload"
         id="expenseFormFile"
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
@@ -102,6 +103,9 @@ export default defineComponent({
   },
   methods: {
     clear() {
+      if (this.$refs.fileUpload) {
+        ;(this.$refs.fileUpload as typeof FileUpload).clear()
+      }
       this.loading = false
       this.formExpense = structuredClone(defaultExpense)
     },
@@ -119,6 +123,7 @@ export default defineComponent({
   },
   watch: {
     expense: function () {
+      this.clear()
       this.formExpense = this.input()
     }
   }

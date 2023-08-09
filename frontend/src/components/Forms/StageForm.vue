@@ -72,6 +72,7 @@
         </label>
         <InfoPoint :text="$t('info.vehicleRegistration')" />
         <FileUpload
+          ref="fileUpload"
           id="stageFormVehicleRegistration"
           v-model="$root.user.vehicleRegistration"
           @update:model-value="vehicleRegistrationChanged = true"
@@ -114,6 +115,7 @@
         </label>
         <InfoPoint :text="$t('info.receipts')" />
         <FileUpload
+          ref="fileUpload"
           id="stageFormFile"
           v-model="formStage.cost.receipts"
           :disabled="disabled"
@@ -245,6 +247,9 @@ export default defineComponent({
       }
     },
     clear() {
+      if (this.$refs.fileUpload) {
+        ;(this.$refs.fileUpload as typeof FileUpload).clear()
+      }
       this.loading = false
       this.formStage = structuredClone(defaultStage)
     },
@@ -278,6 +283,7 @@ export default defineComponent({
   },
   watch: {
     stage: function () {
+      this.clear()
       this.formStage = this.input()
     },
     'formStage.transport': function () {
