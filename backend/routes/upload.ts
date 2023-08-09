@@ -13,16 +13,21 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 router.get('/new', async (req, res) => {
   const user = await User.findOne({ _id: req.query.user })
-  if (user && user.token && user.token._id.equals(req.query.token)) {
+  if (user && user.token && user.token._id.equals(req.query.token as string)) {
     const template = fs.readFileSync('./routes/upload.ejs', { encoding: 'utf-8' })
     const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')
-    url.searchParams.append('user', req.query.user)
-    url.searchParams.append('token', req.query.token)
+    url.searchParams.append('user', req.query.user as string)
+    url.searchParams.append('token', req.query.token as string)
     const secondsLeft = Math.round(
       (new Date(user.token.createdAt).valueOf() + settings.uploadTokenExpireAfterSeconds * 1000 - new Date().valueOf()) / 1000
     )
     const text = i18n.t('labels.tapToUpload')
-    const renderedHTML = ejs.render(template, { url: url.href, expireAfterSeconds: settings.uploadTokenExpireAfterSeconds, secondsLeft, text })
+    const renderedHTML = ejs.render(template, {
+      url: url.href,
+      expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
+      secondsLeft,
+      text
+    })
     return res.send(renderedHTML)
   }
   return res.sendStatus(403)
@@ -30,23 +35,24 @@ router.get('/new', async (req, res) => {
 
 router.post('/new', fileHandler.any(), async (req, res) => {
   const user = await User.findOne({ _id: req.query.user })
-  if (user && user.token && user.token._id.equals(req.query.token)) {
+  if (user && user.token && user.token._id.equals(req.query.token as string)) {
     const token = new Token(user.token)
     if (req.body.files && req.files) {
       for (var i = 0; i < req.body.files.length; i++) {
         var buffer = null
-        for (const file of req.files) {
+        for (const file of req.files as Express.Multer.File[]) {
           if (file.fieldname == 'files[' + i + '][data]') {
             buffer = file.buffer
             break
           }
         }
         if (buffer) {
+          req.body.files[i].owner = user._id
           req.body.files[i].data = buffer
         }
       }
       for (const file of req.body.files) {
-        token.files.push(await (new DocumentFile(file).save()))
+        token.files.push((await new DocumentFile(file).save())._id)
       }
       token.markModified('files')
       await token.save()

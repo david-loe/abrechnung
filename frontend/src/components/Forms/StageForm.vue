@@ -77,8 +77,7 @@
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="true"
-          @deleteFile="(id) => $emit('deleteVehicleRegistration', id)"
-          @showFile="(id, winProxy) => $emit('showVehicleRegistration', id, winProxy)" />
+          :endpointPrefix="endpointPrefix" />
       </div>
     </template>
 
@@ -119,8 +118,7 @@
           v-model="formStage.cost.receipts"
           :disabled="disabled"
           :required="Boolean(formStage.cost.amount)"
-          @deleteFile="(id) => $emit('deleteReceipt', id, stage._id, 'stage')"
-          @showFile="(id, winProxy) => $emit('showReceipt', id, winProxy, stage._id, 'stage')" />
+          :endpointPrefix="endpointPrefix" />
       </div>
     </template>
 
@@ -186,17 +184,7 @@ const defaultStage: FormStage = {
 export default defineComponent({
   name: 'StageForm',
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
-  emits: [
-    'cancel',
-    'edit',
-    'add',
-    'deleted',
-    'deleteReceipt',
-    'showReceipt',
-    'deleteVehicleRegistration',
-    'showVehicleRegistration',
-    'postVehicleRegistration'
-  ],
+  emits: ['cancel', 'edit', 'add', 'deleted', 'postVehicleRegistration'],
   props: {
     stage: {
       type: Object as PropType<Partial<Stage>>,
@@ -209,7 +197,8 @@ export default defineComponent({
     disabled: { type: Boolean, default: false },
     travelStartDate: { type: [String, Date], required: true },
     travelEndDate: { type: [String, Date], required: true },
-    showVehicleRegistration: { type: Boolean, default: true }
+    showVehicleRegistration: { type: Boolean, default: true },
+    endpointPrefix: { type: String, default: '' }
   },
   data() {
     return {

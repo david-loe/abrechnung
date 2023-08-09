@@ -6,7 +6,7 @@ const LdapStrategy = require('passport-ldapauth')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const i18n = require('./i18n')
-const User = require('./models/user')
+import User from './models/user'
 
 const port = process.env.BACKEND_PORT
 const url = process.env.VITE_BACKEND_URL
@@ -136,4 +136,4 @@ for (const access of accesses) {
 const uploadRoutes = require('./routes/upload')
 app.use('/upload', uploadRoutes)
 
-module.exports = app
+export default app

@@ -1,6 +1,6 @@
 const helper = require('../helper')
 const router = require('express').Router()
-const DocumentFile = require('../models/documentFile')
+import DocumentFile from '../models/documentFile'
 const Travel = require('../models/travel')
 const i18n = require('../i18n')
 const multer = require('multer')
@@ -64,24 +64,14 @@ router.post('/travel/refunded', async (req, res) => {
   return helper.setter(Travel, '', false, check, cb)(req, res)
 })
 
-function getReceipt() {
-  return async (req, res) => {
-    const file = await DocumentFile.findOne({ _id: req.query.id })
-    if (file) {
-      res.setHeader('Content-Type', file.type);
-      res.setHeader('Content-Length', file.data.length);
-      return res.send(file.data)
-    } else {
-      return res.status(400).send({ message: 'No file found' })
-    }
-  }
-}
-
-router.get('/travel/stage/receipt', getReceipt())
-router.get('/travel/expense/receipt', getReceipt())
-
 function postRecord(recordType) {
   return async (req, res) => {
+    const travel = await Travel.findOne({ _id: req.body.travelId })
+    delete req.body.travelId
+    if (!travel || travel.historic || travel.state !== 'underExamination') {
+      return res.sendStatus(403)
+    }
+
     if (req.body.cost && req.body.cost.receipts && req.files) {
       for (var i = 0; i < req.body.cost.receipts.length; i++) {
         var buffer = null
@@ -92,15 +82,12 @@ function postRecord(recordType) {
           }
         }
         if (buffer) {
+          req.body.cost.receipts[i].owner = travel.traveler._id
           req.body.cost.receipts[i].data = buffer
         }
       }
     }
-    const travel = await Travel.findOne({ _id: req.body.travelId })
-    delete req.body.travelId
-    if (!travel || travel.historic || travel.state !== 'underExamination') {
-      return res.sendStatus(403)
-    }
+
     if (req.body._id && req.body._id !== '') {
       var found = false
       outer_loop:
@@ -198,48 +185,28 @@ function deleteRecord(recordType) {
 router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
-function deleteRecordReceipt(recordType) {
-  return async (req, res) => {
-    const travel = await Travel.findOne({ _id: req.query.travelId })
-    delete req.query.travelId
-    if (!travel || travel.historic || travel.state !== 'underExamination') {
-      return res.sendStatus(403)
-    }
-    if (req.query[recordType.replace(/s$/, '') + 'Id']) {
-      var found = false
-      outer_loop:
-      for (var i = 0; i < travel[recordType].length; i++) {
-        if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) {
-          if (travel[recordType][i].cost) {
-            for (var r = 0; r < travel[recordType][i].cost.receipts.length; r++) {
-              if (req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)) {
-                found = true
-                await DocumentFile.deleteOne({ _id: req.query.id })
-                travel[recordType][i].cost.receipts.splice(r, 1)
-                break outer_loop
-              }
-            }
-          }
-        }
-      }
-      if (!found) {
-        return res.sendStatus(403)
-      }
-    } else {
-      return res.status(400).send({ message: 'No ' + recordType.replace(/s$/, '') + ' found' })
-    }
-    travel.markModified(recordType)
-    try {
-      await travel.save()
-      res.send({ message: i18n.t('alerts.successDeleting') })
-    } catch (error) {
-      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-    }
+router.get('/documentFile', async (req, res) => {
+  const file = await DocumentFile.findOne({ _id: req.query.id })
+  if (file) {
+    res.setHeader('Content-Type', file.type);
+    res.setHeader('Content-Length', file.data.length);
+    return res.send(file.data)
+  } else {
+    return res.sendStatus(403)
   }
-}
+})
 
-router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
-router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
+router.delete('/documentFile', async (req, res) => {
+  const file = await DocumentFile.findOne({ _id: req.query.id })
+  if (file) {
+    await DocumentFile.deleteOne({ _id: file._id })
+    return res.send({ message: i18n.t('alerts.successDeleting') })
+  } else {
+    return res.sendStatus(403)
+  }
+})
+
+
 
 router.get('/travel/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' })

@@ -28,10 +28,6 @@
               @edit="postStage"
               @deleted="deleteStage"
               @cancel="hideModal"
-              @deleteReceipt="deleteReceipt"
-              @showReceipt="showReceipt"
-              @deleteVehicleRegistration="deleteVehicleRegistration"
-              @showVehicleRegistration="showVehicleRegistration"
               @postVehicleRegistration="postVehicleRegistration">
             </StageForm>
             <ExpenseForm
@@ -43,9 +39,7 @@
               @add="postExpense"
               @edit="postExpense"
               @deleted="deleteExpense"
-              @cancel="hideModal"
-              @deleteReceipt="deleteReceipt"
-              @showReceipt="showReceipt">
+              @cancel="hideModal">
             </ExpenseForm>
             <TravelApplyForm
               v-else-if="modalObjectType === 'travel'"
@@ -548,39 +542,6 @@ export default defineComponent({
       if (result) {
         await this.getTravel()
         this.hideModal()
-      }
-    },
-    async deleteReceipt(id: string, recordId: string, recordType: RecordType) {
-      const params: any = { id: id, travelId: this._id }
-      params[recordType + 'Id'] = recordId
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params, false)
-      if (result) {
-        await this.getTravel()
-      }
-    },
-    async showReceipt(id: string, windowProxy: Window, recordId: string, recordType: RecordType) {
-      const params: any = { id: id, travelId: this._id }
-      params[recordType + 'Id'] = recordId
-      const result = await this.$root.getter(this.endpointPrefix + 'travel/' + recordType + '/receipt', params, { responseType: 'blob' })
-      if (result) {
-        const fileURL = URL.createObjectURL(result)
-        windowProxy.location.assign(fileURL)
-      } else {
-        windowProxy.close()
-      }
-    },
-    async deleteVehicleRegistration(id: string) {
-      const params: any = { id: id }
-      await this.$root.deleter(this.endpointPrefix + 'user/vehicleRegistration', params)
-    },
-    async showVehicleRegistration(id: string, windowProxy: Window) {
-      const params: any = { id: id }
-      const result = await this.$root.getter(this.endpointPrefix + 'user/vehicleRegistration', params, { responseType: 'blob' })
-      if (result) {
-        const fileURL = URL.createObjectURL(result)
-        windowProxy.location.assign(fileURL)
-      } else {
-        windowProxy.close()
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {

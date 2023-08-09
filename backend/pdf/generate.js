@@ -5,7 +5,7 @@ const fs = require('fs')
 const i18n = require('../i18n')
 const scripts = require('../../common/scripts')
 const Travel = require('../models/travel')
-const DocumentFile = require('../models/documentFile')
+import DocumentFile from '../models/documentFile'
 const mongoose = require('mongoose')
 
 

@@ -1,6 +1,6 @@
 const i18n = require('./i18n')
 const Country = require('./models/country')
-const User = require('./models/user')
+import User from './models/user'
 const axios = require('axios')
 const settings = require('../common/settings')
 const scripts = require('../common/scripts')

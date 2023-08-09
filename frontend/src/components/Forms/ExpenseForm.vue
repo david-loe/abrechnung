@@ -28,8 +28,7 @@
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
         :required="true"
-        @deleteFile="(id) => $emit('deleteReceipt', id, expense._id, 'expense')"
-        @showFile="(id, winProxy) => $emit('showReceipt', id, winProxy, expense._id, 'expense')" />
+        :endpointPrefix="endpointPrefix" />
     </div>
 
     <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
@@ -82,7 +81,7 @@ const defaultExpense: FormExpense = {
 export default defineComponent({
   name: 'expenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
-  emits: ['cancel', 'edit', 'add', 'deleted', 'deleteReceipt', 'showReceipt'],
+  emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
       type: Object as PropType<Partial<Expense>>,
@@ -92,7 +91,8 @@ export default defineComponent({
       type: String as PropType<'add' | 'edit'>,
       required: true
     },
-    disabled: { type: Boolean, default: false }
+    disabled: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' }
   },
   data() {
     return {

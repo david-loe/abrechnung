@@ -76,7 +76,8 @@ export default defineComponent({
     },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    id: { type: String }
+    id: { type: String },
+    endpointPrefix: { type: String, default: '' }
   },
   data() {
     return {
@@ -87,21 +88,34 @@ export default defineComponent({
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds
     }
   },
-  emits: ['update:modelValue', 'deleteFile', 'showFile'],
+  emits: ['update:modelValue'],
   methods: {
-    showFile(index: number): void {
+    async showFile(index: number): Promise<void> {
       const windowProxy = window.open('', '_blank') as Window
       if (this.modelValue[index]._id) {
-        this.$emit('showFile', this.modelValue[index]._id, windowProxy)
+        const result = await this.$root.getter(
+          this.endpointPrefix + '/documentFile',
+          { id: this.modelValue[index]._id },
+          { responseType: 'blob' }
+        )
+        if (result) {
+          const fileURL = URL.createObjectURL(result)
+          windowProxy.location.assign(fileURL)
+        } else {
+          windowProxy.close()
+        }
       } else if (this.modelValue[index].data) {
         const fileURL = URL.createObjectURL(this.modelValue[index].data!)
         windowProxy.location.assign(fileURL)
       }
     },
-    deleteFile(index: number) {
+    async deleteFile(index: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (this.modelValue[index]._id) {
-          this.$emit('deleteFile', this.modelValue[index]._id)
+          const result = await this.$root.deleter(this.endpointPrefix + '/documentFile', { id: this.modelValue[index]._id }, false)
+          if (!result) {
+            return null
+          }
         }
         const files = this.modelValue
         files.splice(index, 1)
@@ -120,6 +134,7 @@ export default defineComponent({
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('user', this.$root.user._id)
         url.searchParams.append('token', this.token._id)
+        console.log(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
         this.fetchTokenInterval = setInterval(this.getTokenFiles, 5000)
       }
@@ -134,7 +149,14 @@ export default defineComponent({
       if (result && result.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
-          this.$emit('update:modelValue', this.modelValue.concat(token.files))
+          const files = this.modelValue
+          for (const file of token.files) {
+            ;(file as any).viaTokenUpload = true
+            file.data = new File((file.data as any).data, file.name, { type: file.type })
+            files.push(file)
+          }
+          console.log(files)
+          this.$emit('update:modelValue', files)
           this.clear()
         }
       } else {

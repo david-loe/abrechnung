@@ -8,7 +8,7 @@ const helper = require('../helper')
 const Travel = require('../models/travel')
 const Currency = require('../models/currency')
 const Country = require('../models/country')
-const DocumentFile = require('../models/documentFile')
+import DocumentFile from '../models/documentFile'
 const mail = require('../mail/mail')
 const pdf = require('../pdf/generate')
 
@@ -53,18 +53,6 @@ router.post('/user/settings', async (req, res) => {
   }
 })
 
-router.get('/user/vehicleRegistration', async (req, res) => {
-  for (const file of req.user.vehicleRegistration) {
-    if (req.query.id && file._id.equals(req.query.id)) {
-      var docFile = await DocumentFile.findOne({ _id: req.query.id })
-      res.setHeader('Content-Type', docFile.type);
-      res.setHeader('Content-Length', docFile.data.length);
-      return res.send(docFile.data)
-    }
-  }
-  return res.sendStatus(403)
-})
-
 router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => {
   if (req.body.vehicleRegistration && req.files) {
     for (var i = 0; i < req.body.vehicleRegistration.length; i++) {
@@ -76,6 +64,7 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
         }
       }
       if (buffer) {
+        req.body.vehicleRegistration[i].owner = req.user._id
         req.body.vehicleRegistration[i].data = buffer
       }
     }
@@ -103,23 +92,6 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
       return res.send({ message: i18n.t('alerts.successSaving'), result: result })
     } catch (error) {
       return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-    }
-  }
-  return res.sendStatus(403)
-})
-
-router.delete('/user/vehicleRegistration', async (req, res) => {
-  for (var i = 0; i < req.user.vehicleRegistration.length; i++) {
-    if (req.query.id && req.user.vehicleRegistration[i]._id.equals(req.query.id)) {
-      await DocumentFile.deleteOne({ _id: req.query.id })
-      req.user.vehicleRegistration.splice(i, 1)
-      req.user.markModified('vehicleRegistration')
-      try {
-        const result = await req.user.save()
-        return res.send({ message: i18n.t('alerts.successDeleting'), result: result })
-      } catch (error) {
-        return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-      }
     }
   }
   return res.sendStatus(403)
@@ -180,6 +152,7 @@ function postRecord(recordType) {
           }
         }
         if (buffer) {
+          req.body.cost.receipts[i].owner = req.user._id
           req.body.cost.receipts[i].data = buffer
         }
       }
@@ -286,86 +259,26 @@ function deleteRecord(recordType) {
 router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
-function getRecordReceipt(recordType) {
-
-  return async (req, res) => {
-    const travel = await Travel.findOne({ _id: req.query.travelId })
-    delete req.query.travelId
-    if (!travel || travel.historic || !travel.traveler._id.equals(req.user._id)) {
-      return res.sendStatus(403)
-    }
-    if (req.query[recordType.replace(/s$/, '') + 'Id']) { // e.g. stageId
-      var found = false
-      outer_loop:
-      for (var i = 0; i < travel[recordType].length; i++) {
-        if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) { // e.g. stageId
-          if (travel[recordType][i].cost) {
-            for (var r = 0; r < travel[recordType][i].cost.receipts.length; r++) {
-              if (req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)) {
-                found = true
-                var file = await DocumentFile.findOne({ _id: req.query.id })
-                res.setHeader('Content-Type', file.type);
-                res.setHeader('Content-Length', file.data.length);
-                return res.send(file.data)
-              }
-            }
-          }
-        }
-      }
-      if (!found) {
-        return res.sendStatus(403)
-      }
-    } else {
-      return res.status(400).send({ message: 'No stage found' })
-    }
+router.get('/documentFile', async (req, res) => {
+  const file = await DocumentFile.findOne({ _id: req.query.id })
+  if (file && req.user._id.equals(file.owner._id)) {
+    res.setHeader('Content-Type', file.type);
+    res.setHeader('Content-Length', file.data.length);
+    return res.send(file.data)
+  } else {
+    return res.sendStatus(403)
   }
-}
+})
 
-router.get('/travel/stage/receipt', getRecordReceipt('stages'))
-router.get('/travel/expense/receipt', getRecordReceipt('expenses'))
-
-function deleteRecordReceipt(recordType) {
-  return async (req, res) => {
-    const travel = await Travel.findOne({ _id: req.query.travelId })
-    delete req.query.travelId
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user._id)) {
-      return res.sendStatus(403)
-    }
-    if (req.query[recordType.replace(/s$/, '') + 'Id']) {
-      var found = false
-      outer_loop:
-      for (var i = 0; i < travel[recordType].length; i++) {
-        if (travel[recordType][i]._id.equals(req.query[recordType.replace(/s$/, '') + 'Id'])) {
-          if (travel[recordType][i].cost) {
-            for (var r = 0; r < travel[recordType][i].cost.receipts.length; r++) {
-              if (req.query.id && travel[recordType][i].cost.receipts[r]._id.equals(req.query.id)) {
-                found = true
-                await DocumentFile.deleteOne({ _id: req.query.id })
-                travel[recordType][i].cost.receipts.splice(r, 1)
-                break outer_loop
-              }
-            }
-          }
-        }
-      }
-      if (!found) {
-        return res.sendStatus(403)
-      }
-    } else {
-      return res.status(400).send({ message: 'No ' + recordType.replace(/s$/, '') + ' found' })
-    }
-    travel.markModified(recordType)
-    try {
-      await travel.save()
-      res.send({ message: i18n.t('alerts.successDeleting') })
-    } catch (error) {
-      res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
-    }
+router.delete('/documentFile', async (req, res) => {
+  const file = await DocumentFile.findOne({ _id: req.query.id })
+  if (file && req.user._id.equals(file.owner._id)) {
+    await DocumentFile.deleteOne({ _id: file._id })
+    return res.send({ message: i18n.t('alerts.successDeleting') })
+  } else {
+    return res.sendStatus(403)
   }
-}
-
-router.delete('/travel/stage/receipt', deleteRecordReceipt('stages'))
-router.delete('/travel/expense/receipt', deleteRecordReceipt('expenses'))
+})
 
 router.post('/travel/appliedFor', async (req, res) => {
   req.body = {

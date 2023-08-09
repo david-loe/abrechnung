@@ -1,4 +1,4 @@
-import settings from './settings.json'
+import { Types } from 'mongoose'
 
 export interface CountrySimple {
   name: {
@@ -50,11 +50,11 @@ export interface DocumentFile {
   data?: Blob
   type: 'image/jpeg' | 'image/png' | 'application/pdf'
   name: string
-  _id?: string
+  _id?: Types.ObjectId
 }
 
 export interface Token {
-  _id: string
+  _id: Types.ObjectId
   createdAt: string | Date
   files: DocumentFile[]
 }
@@ -63,7 +63,7 @@ export interface UserSimple {
   uid: string
   email: string
   name: string
-  _id: string
+  _id: Types.ObjectId
 }
 
 export interface User extends UserSimple {
@@ -78,6 +78,7 @@ export interface User extends UserSimple {
     lastCountries: CountrySimple[]
   }
   vehicleRegistration?: DocumentFile[]
+  token?: Token
 }
 
 export interface Money {
@@ -105,14 +106,14 @@ export interface Stage {
   transport: 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
   cost: Cost
   purpose: 'professional' | 'mixed' | 'private'
-  _id: string
+  _id: Types.ObjectId
 }
 
 export interface Expense {
   description: string
   cost: Cost
   purpose: 'professional' | 'mixed'
-  _id: string
+  _id: Types.ObjectId
 }
 
 export type RecordType = 'stage' | 'expense'
@@ -121,7 +122,7 @@ export type Record = Stage | Expense
 export interface Comment {
   text: string
   author: UserSimple
-  _id: string
+  _id: Types.ObjectId
 }
 
 export interface TravelSimple {
@@ -138,7 +139,7 @@ export interface TravelSimple {
   endDate: Date | string
   advance: Money
   progress: number
-  _id: string
+  _id: Types.ObjectId
   claimSpouseRefund?: boolean //settings.allowSpouseRefund
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }

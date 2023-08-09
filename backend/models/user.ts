@@ -1,6 +1,7 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import { Token, User } from '../../common/types'
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<User>({
   uid: { type: String, required: true, unique: true, index: true },
   email: { type: String },
   name: { type: String },
@@ -18,22 +19,22 @@ const userSchema = new mongoose.Schema({
   token: { type: mongoose.Schema.Types.ObjectId, ref: 'Token' }
 })
 
-function populate(doc) {
+function populate(doc: mongoose.Document) {
   return Promise.allSettled([
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } }),
+    doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })
   ])
 }
 
 userSchema.pre(/^find((?!Update).)*$/, function () {
-  populate(this)
+  populate(this as mongoose.Document)
 })
 
 userSchema.pre('save', async function (next) {
   await populate(this)
-  next();
+  next()
 })
 
-module.exports = mongoose.model('User', userSchema)
+export default mongoose.model<User>('User', userSchema)
