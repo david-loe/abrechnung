@@ -41,27 +41,28 @@
       </div>
     </div>
 
-    <!-- v-if="settings.allowSpouseRefund" -->
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
-      <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
-        {{ $t('labels.claimSpouseRefund') }}
-      </label>
-      <InfoPoint :text="$t('info.claimSpouseRefund')" />
-    </div>
+    <template v-if="settings.allowSpouseRefund">
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
+        <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
+          {{ $t('labels.claimSpouseRefund') }}
+        </label>
+        <InfoPoint :text="$t('info.claimSpouseRefund')" />
+      </div>
 
-    <div class="mb-2">
-      <label for="travelFormFellowTravelersNames" class="form-label me-2">
-        {{ $t('labels.fellowTravelersNames') }}<span v-if="formTravel.claimSpouseRefund" class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.fellowTravelersNames')" />
-      <input
-        type="text"
-        class="form-control"
-        id="travelFormFellowTravelersNames"
-        v-model="formTravel.fellowTravelersNames"
-        :required="formTravel.claimSpouseRefund" />
-    </div>
+      <div class="mb-2">
+        <label for="travelFormFellowTravelersNames" class="form-label me-2">
+          {{ $t('labels.fellowTravelersNames') }}<span v-if="formTravel.claimSpouseRefund" class="text-danger">*</span>
+        </label>
+        <InfoPoint :text="$t('info.fellowTravelersNames')" />
+        <input
+          type="text"
+          class="form-control"
+          id="travelFormFellowTravelersNames"
+          v-model="formTravel.fellowTravelersNames"
+          :required="formTravel.claimSpouseRefund" />
+      </div>
+    </template>
 
     <label for="travelFormAdvance" class="form-label me-2">
       {{ $t('labels.advance') }}
@@ -98,6 +99,7 @@ import InfoPoint from '../Elements/InfoPoint.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
 import DateInput from '../Elements/DateInput.vue'
 import { TravelSimple, Place } from '../../../../common/types'
+import settings from '../../../../common/settings.json'
 
 interface FormTravelSimple
   extends Omit<TravelSimple, 'destinationPlace' | 'traveler' | 'state' | 'editor' | 'comments' | 'progress' | '_id'> {
@@ -134,7 +136,8 @@ export default defineComponent({
   data() {
     return {
       formTravel: structuredClone(defaultTravel),
-      loading: false
+      loading: false,
+      settings
     }
   },
   methods: {
