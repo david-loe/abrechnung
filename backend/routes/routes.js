@@ -2,7 +2,7 @@ const router = require('express').Router()
 const multer = require('multer')
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 const User = require('../models/user')
-const Token = require('../models/token')
+import Token from '../models/token'
 const i18n = require('../i18n')
 const helper = require('../helper')
 const Travel = require('../models/travel')
