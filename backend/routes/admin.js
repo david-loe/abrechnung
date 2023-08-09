@@ -1,5 +1,5 @@
 const helper = require('../helper')
-const User = require('../models/user')
+import User from '../models/user'
 const router = require('express').Router()
 
 router.get('/user', helper.getter(User, 'user', 100))

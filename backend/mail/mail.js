@@ -2,7 +2,7 @@ const mailClient = require('./client')
 const i18n = require('../i18n')
 const ejs = require('ejs')
 const fs = require('fs')
-const User = require('../models/user')
+import User from '../models/user'
 
 function sendMail(recipients, subject, paragaph, button, lastParagraph) {
   if (mailClient == undefined || recipients.length === 0) {
