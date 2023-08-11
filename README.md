@@ -5,7 +5,7 @@
 
 Reisekostenabrechnung inkl. automatischer Pauschalen Berechnung auch für internationale Reisen
 
-![Video](media/video/reisekostenabrechnung-DE-SMALL.mp4)
+https://github.com/david-loe/reisekostenabrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-2ecab49b7bd2
 
 ## Getting Started
 
