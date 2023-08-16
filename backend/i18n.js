@@ -1,5 +1,5 @@
-const i18next = require("i18next")
-const fs = require('fs');
+import i18next from 'i18next'
+import fs from 'fs';
 
 /**
  * Load locale messages
@@ -34,5 +34,5 @@ i18next.init({
   }
 })
 
-module.exports = i18next
+export default i18next
 

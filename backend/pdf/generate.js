@@ -1,15 +1,15 @@
 
-const pdf_lib = require('pdf-lib')
-const pdf_fontkit = require('pdf-fontkit')
-const fs = require('fs')
-const i18n = require('../i18n')
-const scripts = require('../../common/scripts')
-const Travel = require('../models/travel')
+import pdf_lib from 'pdf-lib'
+import pdf_fontkit from 'pdf-fontkit'
+import fs from 'fs'
+import i18n from '../i18n'
+import { getDetailedMoneyString, getLumpSumsSum, getExpensesSum, getTravelTotal, dateTimeToString, datetoDateStringWithYear, datetoDateString } from '../../common/scriptsts'
+import Travel from '../models/travel'
 import DocumentFile from '../models/documentFile'
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 
-async function test() {
+export async function test() {
   await mongoose.connect(process.env.MONGO_URL, {})
   const travel = await Travel.findOne({ historic: false })
 
@@ -17,11 +17,11 @@ async function test() {
   mongoose.disconnect()
 }
 
-async function generateAndWriteToDisk(filePath, travel) {
+export async function generateAndWriteToDisk(filePath, travel) {
   fs.writeFile(filePath, await generateReport(travel), () => null);
 }
 
-async function generateReport(travel) {
+export async function generateReport(travel) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
@@ -130,17 +130,17 @@ function getReceiptMap(travel) {
 function drawSummary(page, newPageFn, travel, options = { font }) {
   const columns = []
   columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left })
-  columns.push({ key: 'sum', width: 65, alignment: pdf_lib.TextAlignment.Right, fn: (m) => scripts.getDetailedMoneyString(m, i18n.language, true) })
+  columns.push({ key: 'sum', width: 65, alignment: pdf_lib.TextAlignment.Right, fn: (m) => getDetailedMoneyString(m, i18n.language, true) })
 
   const summary = []
-  summary.push({ reference: i18n.t('labels.lumpSums'), sum: scripts.getLumpSumsSum(travel) })
-  summary.push({ reference: i18n.t('labels.expenses'), sum: scripts.getExpensesSum(travel) })
+  summary.push({ reference: i18n.t('labels.lumpSums'), sum: getLumpSumsSum(travel) })
+  summary.push({ reference: i18n.t('labels.expenses'), sum: getExpensesSum(travel) })
   if (travel.advance.amount > 0) {
     travel.advance.amount = -1 * travel.advance.amount
     summary.push({ reference: i18n.t('labels.advance'), sum: travel.advance })
     travel.advance.amount = -1 * travel.advance.amount
   }
-  summary.push({ reference: i18n.t('labels.total'), sum: scripts.getTravelTotal(travel) })
+  summary.push({ reference: i18n.t('labels.total'), sum: getTravelTotal(travel) })
 
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.summary'), {
@@ -158,14 +158,14 @@ function drawSummary(page, newPageFn, travel, options = { font }) {
 
 function drawStages(page, newPageFn, stages, receiptMap, options = { font }) {
   const columns = []
-  columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => scripts.dateTimeToString(d) })
-  columns.push({ key: 'arrival', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.arrival'), fn: (d) => scripts.dateTimeToString(d) })
+  columns.push({ key: 'departure', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.departure'), fn: (d) => dateTimeToString(d) })
+  columns.push({ key: 'arrival', width: 65, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.arrival'), fn: (d) => dateTimeToString(d) })
   columns.push({ key: 'startLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.startLocation'), fn: (p) => p.place + ', ' + p.country.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (p) => p.country._id })
   columns.push({ key: 'endLocation', width: 150, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.endLocation'), fn: (p) => p.place + ', ' + p.country.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (p) => p.country._id })
   columns.push({ key: 'transport', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.transport'), fn: (t) => i18n.t('labels.' + t) })
   columns.push({ key: 'distance', width: 65, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.distance') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
-  columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
+  columns.push({ key: 'cost', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => getDetailedMoneyString(m, i18n.language) })
   columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
 
   const fontSize = options.fontSize + 2
@@ -188,8 +188,8 @@ function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font })
   const columns = []
   columns.push({ key: 'description', width: 270, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
-  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => scripts.getDetailedMoneyString(m, i18n.language) })
-  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.invoiceDate'), fn: (c) => scripts.datetoDateStringWithYear(c.date) })
+  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.cost'), fn: (m) => getDetailedMoneyString(m, i18n.language) })
+  columns.push({ key: 'cost', width: 90, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.invoiceDate'), fn: (c) => datetoDateStringWithYear(c.date) })
   columns.push({ key: 'cost', width: 35, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.receiptNumber'), fn: (m) => m.receipts.map((r) => receiptMap[r._id].number) })
 
   const fontSize = options.fontSize + 2
@@ -207,12 +207,12 @@ function drawExpenses(page, newPageFn, expenses, receiptMap, options = { font })
 
 function drawDays(page, newPageFn, travel, options = { font }) {
   const columns = []
-  columns.push({ key: 'date', width: 70, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.date'), fn: (d) => scripts.datetoDateString(d) })
+  columns.push({ key: 'date', width: 70, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.date'), fn: (d) => datetoDateString(d) })
   columns.push({ key: 'country', width: 120, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.country'), fn: (c) => c.name[i18n.language], pseudoSuffix: 'mim', cb: drawFlag, cbValue: (c) => c._id })
   columns.push({ key: 'purpose', width: 50, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.purpose'), fn: (p) => i18n.t('labels.' + p) })
   columns.push({ key: 'cateringNoRefund', width: 80, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.cateringNoRefund'), fn: (c) => Object.keys(c).map((k) => c[k] ? i18n.t('labels.' + k) : '').join(' ') })
-  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.catering24\n'), fn: (r) => r.filter((r) => r.type.indexOf('catering') === 0).length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund, i18n.language) : '' })
-  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.overnight\n'), fn: (r) => r.filter((r) => r.type == 'overnight').length > 0 ? scripts.getDetailedMoneyString(r.filter((r) => r.type == 'overnight')[0].refund, i18n.language) : '' })
+  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.catering24\n'), fn: (r) => r.filter((r) => r.type.indexOf('catering') === 0).length > 0 ? getDetailedMoneyString(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund, i18n.language) : '' })
+  columns.push({ key: 'refunds', width: 80, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('lumpSums.overnight\n'), fn: (r) => r.filter((r) => r.type == 'overnight').length > 0 ? getDetailedMoneyString(r.filter((r) => r.type == 'overnight')[0].refund, i18n.language) : '' })
 
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.lumpSums') + (travel.claimSpouseRefund ? ' (' + i18n.t('labels.claimSpouseRefund') + ')' : ''), {
@@ -239,7 +239,7 @@ async function attachReceipts(pdfDoc, receiptMap, options = { font }) {
   Object.assign(opts, options)
 
   function drawNumber(page, receipt) {
-    const text = '#' + receipt.number + ' - ' + scripts.datetoDateStringWithYear(receipt.date)
+    const text = '#' + receipt.number + ' - ' + datetoDateStringWithYear(receipt.date)
     const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
     page.drawRectangle({
       x: 2,
@@ -555,11 +555,4 @@ function drawTable(page, newPageFn, data, columns, options = { font }) {
     color: opts.borderColor,
   })
   return y
-}
-
-
-module.exports = {
-  generateReport,
-  test,
-  generateAndWriteToDisk
 }

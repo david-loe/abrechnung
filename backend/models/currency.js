@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 const currencySchema = new mongoose.Schema({
   name: {
@@ -11,4 +11,4 @@ const currencySchema = new mongoose.Schema({
   flag: { type: String }
 })
 
-module.exports = mongoose.model('Currency', currencySchema)
+export default mongoose.model('Currency', currencySchema)

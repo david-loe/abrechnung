@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const settings = require('../../common/settings')
+import mongoose from 'mongoose'
+import settings from '../../common/settings.json'
 
 
 const countrySchema = new mongoose.Schema({
@@ -49,4 +49,4 @@ countrySchema.methods.getLumpSum = async function (date) {
   }
 }
 
-module.exports = mongoose.model('Country', countrySchema)
+export default mongoose.model('Country', countrySchema)

@@ -1,10 +1,10 @@
-const mailClient = require('./client')
-const i18n = require('../i18n')
-const ejs = require('ejs')
-const fs = require('fs')
+import mailClient from './client'
+import i18n from '../i18n'
+import ejs from 'ejs'
+import fs from 'fs'
 import User from '../models/user'
 
-function sendMail(recipients, subject, paragaph, button, lastParagraph) {
+export function sendMail(recipients, subject, paragaph, button, lastParagraph) {
   if (mailClient == undefined || recipients.length === 0) {
     return false
   }
@@ -35,7 +35,7 @@ function sendMail(recipients, subject, paragaph, button, lastParagraph) {
   })
 }
 
-async function sendNotificationMail(travel) {
+export async function sendNotificationMail(travel) {
   const interpolation = { traveler: travel.traveler.name }
 
   if (travel.comments.length > 0) {
@@ -67,5 +67,3 @@ async function sendNotificationMail(travel) {
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
-
-module.exports = { sendMail, sendNotificationMail }

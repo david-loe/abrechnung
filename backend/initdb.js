@@ -1,8 +1,8 @@
-const fs = require('fs');
-const helper = require('./helper')
-const { getFlagEmoji } = require('../common/scripts')
-const Currency = require('./models/currency')
-const Country = require('./models/country')
+import fs from 'fs';
+import { csvToObjects, parseRawLumpSums, addLumpSumsToCountries } from './helper'
+import { getFlagEmoji } from '../common/scriptsts'
+import Currency from './models/currency'
+import Country from './models/country'
 
 function loadLumpSums() {
   const lumpSums = []
@@ -11,7 +11,7 @@ function loadLumpSums() {
     if (matched && matched.length > 1) {
       const dataStr = fs.readFileSync('./data/' + file, 'utf8')
       const validFrom = new Date(matched[1])
-      const data = helper.parseRawLumpSums(dataStr)
+      const data = parseRawLumpSums(dataStr)
       lumpSums.push({ validFrom, data })
     }
   });
@@ -20,14 +20,14 @@ function loadLumpSums() {
 
 function loadCountries() {
   const dataStr = fs.readFileSync('./data/countries.tsv', 'utf8')
-  const result = helper.csvToObjects(dataStr)
+  const result = csvToObjects(dataStr)
   result.forEach(c => c.flag = getFlagEmoji(c.code))
   return result
 }
 
 function loadCurrencies() {
   const dataStr = fs.readFileSync('./data/currencies.tsv', 'utf8')
-  const result = helper.csvToObjects(dataStr)
+  const result = csvToObjects(dataStr)
   result.forEach(c => c.flag = getFlagEmoji(c.code))
   return result
 }
@@ -53,7 +53,7 @@ function addAllLumpSums() {
   const lumpSums = loadLumpSums()
   lumpSums.sort((a, b) => a.validFrom - b.validFrom)
   for (const lumpSum of lumpSums) {
-    helper.addLumpSumsToCountries(lumpSum.data, lumpSum.validFrom, 'de').then((result) => {
+    addLumpSumsToCountries(lumpSum.data, lumpSum.validFrom, 'de').then((result) => {
       console.log('Lump sum from ' + lumpSum.validFrom.toDateString() + ': ' + result.success.length + ' updated - ' + result.noUpdate.length + ' not updated - ' + result.noCountryFound.length + ' no country found')
       for (const notFound of result.noCountryFound) {
         console.log(notFound.country)
@@ -62,12 +62,10 @@ function addAllLumpSums() {
   }
 }
 
-function initDB() {
+export default function initDB() {
   initer(Currency, 'currencies', loadCurrencies()).then(() => {
     initer(Country, 'countries', loadCountries()).then(() => {
       addAllLumpSums()
     })
   })
 }
-
-initDB()

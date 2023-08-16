@@ -6,7 +6,6 @@
     "strict": true,
     "module": "nodenext",
     "target": "ES2020",
-    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "paths": {

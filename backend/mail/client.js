@@ -1,8 +1,8 @@
-const nodemailer = require("nodemailer")
+import nodemailer from 'nodemailer'
 
 var mailClient = undefined
 // Get SMTP credentials from ENV
-if (process.env.SMTP_HOST !== "") {
+if (process.env.SMTP_HOST !== '') {
   mailClient = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
@@ -13,4 +13,4 @@ if (process.env.SMTP_HOST !== "") {
     },
   });
 }
-module.exports = mailClient
+export default mailClient

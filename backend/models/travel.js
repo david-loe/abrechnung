@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
-const { getDayList, getDiffInDays } = require('../../common/scripts')
-const Country = require('./country')
-const Currency = require('./currency')
-const settings = require('../../common/settings')
-const helper = require('../helper')
+import mongoose from 'mongoose'
+import { getDayList, getDiffInDays } from '../../common/scriptsts'
+import Country from './country'
+import Currency from './currency'
+import settings from '../../common/settings.json'
+import { convertCurrency } from '../helper'
 
 
 function place(required = false) {
@@ -266,7 +266,7 @@ async function exchange(costObject, date) {
   var exchangeRate = null
 
   if (costObject.amount > 0 && costObject.currency._id !== settings.baseCurrency._id) {
-    exchangeRate = await helper.convertCurrency(date, costObject.amount, costObject.currency._id)
+    exchangeRate = await convertCurrency(date, costObject.amount, costObject.currency._id)
   }
   costObject.exchangeRate = exchangeRate
 
@@ -348,4 +348,4 @@ travelSchema.pre('save', async function (next) {
   next();
 });
 
-module.exports = mongoose.model('Travel', travelSchema)
+export default mongoose.model('Travel', travelSchema)

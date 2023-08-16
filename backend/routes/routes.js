@@ -1,15 +1,16 @@
-const router = require('express').Router()
-const multer = require('multer')
+import express from 'express'
+const router = express.Router()
+import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import Token from '../models/token'
-const i18n = require('../i18n')
-const helper = require('../helper')
-const Travel = require('../models/travel')
-const Currency = require('../models/currency')
-const Country = require('../models/country')
+import i18n from '../i18n'
+import { getter, setter, deleter } from '../helper'
+import Travel from '../models/travel'
+import Currency from '../models/currency'
+import Country from '../models/country'
 import DocumentFile from '../models/documentFile'
-const mail = require('../mail/mail')
-const pdf = require('../pdf/generate')
+import mail from '../mail/mail'
+import pdf from '../pdf/generate'
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -96,14 +97,14 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
   return res.sendStatus(403)
 })
 
-router.get('/currency', helper.getter(Currency, 'currency', 200))
+router.get('/currency', getter(Currency, 'currency', 200))
 router.get('/country', async (req, res) => {
   const select = {}
   if (!req.query.lumpSums) {
     select.lumpSums = 0
     select.lumpSumsFrom = 0
   }
-  return helper.getter(Country, 'country', 400, {}, select)(req, res)
+  return getter(Country, 'country', 400, {}, select)(req, res)
 })
 
 router.get('/travel', async (req, res) => {
@@ -118,10 +119,10 @@ router.get('/travel', async (req, res) => {
   if (!req.query.days) {
     select.days = 0
   }
-  return helper.getter(Travel, 'travel', 20, { traveler: req.user._id, historic: false }, select, sortFn)(req, res)
+  return getter(Travel, 'travel', 20, { traveler: req.user._id, historic: false }, select, sortFn)(req, res)
 })
 
-router.delete('/travel', helper.deleter(Travel, 'traveler'))
+router.delete('/travel', deleter(Travel, 'traveler'))
 
 router.post('/travel', async (req, res) => {
   req.body.editor = req.user._id
@@ -136,7 +137,7 @@ router.post('/travel', async (req, res) => {
   const check = async (oldObject) => {
     return oldObject.state !== 'refunded'
   }
-  return helper.setter(Travel, 'traveler', false, check)(req, res)
+  return setter(Travel, 'traveler', false, check)(req, res)
 })
 
 function postRecord(recordType) {
@@ -309,7 +310,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
   }
-  return helper.setter(Travel, 'traveler', true, check, mail.sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', true, check, mail.sendNotificationMail)(req, res)
 })
 
 router.post('/travel/underExamination', async (req, res) => {
@@ -342,7 +343,7 @@ router.post('/travel/underExamination', async (req, res) => {
       return false
     }
   }
-  return helper.setter(Travel, 'traveler', false, check, mail.sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', false, check, mail.sendNotificationMail)(req, res)
 })
 
 

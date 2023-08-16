@@ -1,12 +1,13 @@
-const helper = require('../helper')
-const router = require('express').Router()
+import { getter, setter } from '../helper'
+import express from 'express'
+const router = express.Router()
 import DocumentFile from '../models/documentFile'
-const Travel = require('../models/travel')
-const i18n = require('../i18n')
-const multer = require('multer')
+import Travel from '../models/travel'
+import i18n from '../i18n'
+import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
-const mail = require('../mail/mail')
-const pdf = require('../pdf/generate')
+import mail from '../mail/mail'
+import pdf from '../pdf/generate'
 
 
 router.get('/travel', async (req, res) => {
@@ -21,7 +22,7 @@ router.get('/travel', async (req, res) => {
   if (!req.query.days) {
     select.days = 0
   }
-  return helper.getter(Travel, 'travel', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
+  return getter(Travel, 'travel', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
 })
 
 router.get('/travel/refunded', async (req, res) => {
@@ -36,7 +37,7 @@ router.get('/travel/refunded', async (req, res) => {
   if (!req.query.days) {
     select.days = 0
   }
-  return helper.getter(Travel, 'travel', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
+  return getter(Travel, 'travel', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
 
 router.post('/travel/refunded', async (req, res) => {
@@ -61,7 +62,7 @@ router.post('/travel/refunded', async (req, res) => {
       await pdf.generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
     }
   }
-  return helper.setter(Travel, '', false, check, cb)(req, res)
+  return setter(Travel, '', false, check, cb)(req, res)
 })
 
 function postRecord(recordType) {

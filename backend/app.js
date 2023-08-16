@@ -1,12 +1,18 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-const passport = require('passport')
-const LdapStrategy = require('passport-ldapauth')
-const session = require('express-session')
-const MongoStore = require('connect-mongo')
-const i18n = require('./i18n')
+import express from 'express'
+import mongoose from 'mongoose'
+import cors from 'cors'
+import passport from 'passport'
+import LdapStrategy from 'passport-ldapauth'
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
+import initDB from './initdb'
+import i18n from './i18n'
 import User from './models/user'
+import routes from './routes/routes'
+import adminRoutes from './routes/admin'
+import approveRoutes from './routes/approve'
+import examineRoutes from './routes/examine'
+import uploadRoutes from './routes/upload'
 
 const port = process.env.BACKEND_PORT
 const url = process.env.VITE_BACKEND_URL
@@ -14,7 +20,7 @@ const url = process.env.VITE_BACKEND_URL
 const mongoClientPromise = mongoose.connect(process.env.MONGO_URL, {}).then(() => {
   console.log(i18n.t('alerts.db.success'))
 })
-require('./initdb')
+initDB()
 
 // Get LDAP credentials from ENV
 passport.use(
@@ -118,22 +124,25 @@ app.use('/api', async (req, res, next) => {
     return res.status(401).send({ message: i18n.t('alerts.request.unauthorized') })
   }
 })
-const routes = require('./routes/routes')
+
 app.use('/api', routes)
 
-const accesses = Object.keys(User.schema.tree.access)
-for (const access of accesses) {
-  app.use('/api/' + access, (req, res, next) => {
+function accessControl(access) {
+  return (req, res, next) => {
     if (req.user.access[access]) {
       next()
     } else {
       return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
     }
-  })
-  const adminRoutes = require('./routes/' + access)
-  app.use('/api/' + access, adminRoutes)
+  }
 }
-const uploadRoutes = require('./routes/upload')
+app.use('/api/admin', accessControl('admin'))
+app.use('/api/admin', adminRoutes)
+app.use('/api/approve', accessControl('approve'))
+app.use('/api/approve', approveRoutes)
+app.use('/api/examine', accessControl('examine'))
+app.use('/api/examine', examineRoutes)
+
 app.use('/upload', uploadRoutes)
 
 export default app

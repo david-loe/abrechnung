@@ -1,9 +1,10 @@
-const helper = require('../helper')
+import { getter, setter, deleter } from '../helper'
 import User from '../models/user'
-const router = require('express').Router()
+import express from 'express'
+const router = express.Router()
 
-router.get('/user', helper.getter(User, 'user', 100))
-router.post('/user', helper.setter(User, '', true))
-router.delete('/user', helper.deleter(User))
+router.get('/user', getter(User, 'user', 100))
+router.post('/user', setter(User, '', true))
+router.delete('/user', deleter(User))
 
 module.exports = router

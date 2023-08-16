@@ -1,11 +1,11 @@
-const i18n = require('./i18n')
-const Country = require('./models/country')
+import i18n from './i18n'
+import Country from './models/country'
 import User from './models/user'
-const axios = require('axios')
-const settings = require('../common/settings')
-const scripts = require('../common/scripts')
+import axios from 'axios'
+import settings from '../common/settings'
+import { datetimeToDateString } from '../common/scriptsts'
 
-function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null, cb = null) {
+export function getter(model, name, defaultLimit = 10, preConditions = {}, select = {}, sortFn = null, cb = null) {
   return async (req, res) => {
     const meta = {
       limit: defaultLimit,
@@ -69,7 +69,7 @@ function getter(model, name, defaultLimit = 10, preConditions = {}, select = {},
 }
 
 
-function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null, cb = null) {
+export function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = null, cb = null) {
   return async (req, res) => {
     for (const field of Object.keys(model.schema.tree)) {
       if (model.schema.tree[field].required && !'default' in model.schema.tree[field]) {
@@ -119,7 +119,7 @@ function setter(model, checkUserIdField = '', allowNew = true, checkOldObject = 
   }
 }
 
-function deleter(model, checkUserIdField = '', cb = null) {
+export function deleter(model, checkUserIdField = '', cb = null) {
   return async (req, res) => {
     if (req.query.id && req.query.id !== '') {
       if (checkUserIdField && checkUserIdField in model.schema.tree) {
@@ -150,7 +150,7 @@ function deleter(model, checkUserIdField = '', cb = null) {
  * @param {string} arraySeparator 
  * @returns Array of JS Objects
  */
-function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
+export function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
   var lines = csv.split("\n");
   var result = [];
   var headers = lines[0].split(separator);
@@ -177,7 +177,7 @@ function csvToObjects(csv, separator = '\t', arraySeparator = ', ') {
   return result
 }
 
-function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
+export function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
   var keys = []
   for (const obj of objects) {
     const oKeys = Object.keys(obj)
@@ -210,7 +210,7 @@ function objectsToCSV(objects, separator = '\t', arraySeparator = ', ') {
  * 
  * @returns {Array} LumpSums
  */
-function parseRawLumpSums(dataStr) {
+export function parseRawLumpSums(dataStr) {
   const general = /im Übrigen/i
   const spezialStart = /^–\s{2,}(.*)/i
   const data = csvToObjects(dataStr)
@@ -238,7 +238,7 @@ function parseRawLumpSums(dataStr) {
   return data
 }
 
-async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage = 'de') {
+export async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage = 'de') {
   const conditions = {}
   const noCountryFound = []
   const success = []
@@ -272,13 +272,13 @@ async function addLumpSumsToCountries(lumpSums, validFrom, countryNameLanguage =
   return { success, noUpdate, noCountryFound }
 }
 
-async function convertCurrency(date, amount, from, to = settings.baseCurrency._id) {
+export async function convertCurrency(date, amount, from, to = settings.baseCurrency._id) {
   from = from.toLowerCase()
   to = to.toLowerCase()
   if (new Date(date) - new Date() > 0) {
     date = new Date()
   }
-  const dateStr = scripts.datetimeToDateString(date)
+  const dateStr = datetimeToDateString(date)
   const baseURLs = ['https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/', 'https://raw.githubusercontent.com/fawazahmed0/currency-api/1/']
   const suffixs = ['.min.json', '.json']
   var rate = null
@@ -299,15 +299,4 @@ async function convertCurrency(date, amount, from, to = settings.baseCurrency._i
 
   amount = Math.round(amount * rate * 100) / 100
   return { date, rate, amount }
-}
-
-module.exports = {
-  getter,
-  setter,
-  deleter,
-  csvToObjects,
-  objectsToCSV,
-  parseRawLumpSums,
-  addLumpSumsToCountries,
-  convertCurrency
 }
