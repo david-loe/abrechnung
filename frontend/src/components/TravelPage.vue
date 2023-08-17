@@ -464,7 +464,7 @@ export default defineComponent({
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
         days: this.travel.days
       }
-      const result = await this.$root.setter('travel', travel)
+      const result = await this.$root.setter(this.endpointPrefix + 'travel', travel)
       if (result) {
         await this.getTravel()
       } else {

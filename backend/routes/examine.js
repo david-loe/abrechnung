@@ -65,6 +65,22 @@ router.post('/travel/refunded', async (req, res) => {
   return setter(Travel, '', false, check, cb)(req, res)
 })
 
+router.post('/travel', async (req, res) => {
+  req.body.editor = req.user._id
+  delete req.body.state
+  delete req.body.traveler
+  delete req.body.history
+  delete req.body.historic
+  delete req.body.stages
+  delete req.body.expenses
+  delete req.body.professionalShare
+
+  const check = async (oldObject) => {
+    return oldObject.state !== 'refunded'
+  }
+  return helper.setter(Travel, '', false, check)(req, res)
+})
+
 function postRecord(recordType) {
   return async (req, res) => {
     const travel = await Travel.findOne({ _id: req.body.travelId })
