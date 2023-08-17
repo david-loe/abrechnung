@@ -616,6 +616,7 @@ export default defineComponent({
       }
     },
     async getTravel() {
+      const oldTravel = this.travel
       this.travel = (
         await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, {
           id: this._id,
@@ -624,6 +625,17 @@ export default defineComponent({
           days: true
         })
       ).data
+      if (oldTravel.days && this.travel.days) {
+        for (const oldDay of oldTravel.days) {
+          if ((oldDay as Day).showSettings) {
+            for (const newDay of this.travel.days) {
+              if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
+                ;(newDay as Day).showSettings = true
+              }
+            }
+          }
+        }
+      }
       this.renderTable()
     },
     getMoneyString,
