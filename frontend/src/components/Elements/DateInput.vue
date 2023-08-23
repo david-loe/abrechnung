@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '../../../../common/scriptsts'
+import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '../../../../common/scripts.js'
 export default defineComponent({
   name: 'PlaceInput',
   data() {

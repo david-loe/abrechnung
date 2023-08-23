@@ -55,7 +55,7 @@ import { Modal } from 'bootstrap'
 import TravelCardList from './Elements/TravelCardList.vue'
 import TravelApplication from './Elements/TravelApplication.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
-import { TravelSimple } from '../../../common/types'
+import { TravelSimple } from '../../../common/types.js'
 
 export default defineComponent({
   name: 'MyTravelsPage',

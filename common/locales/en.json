@@ -115,7 +115,8 @@
     "travelDetails": "Travel details",
     "vehicleRegistration": "Vehicle Registration",
     "uploadFromPhone": "Upload from Phone",
-    "tapToUpload": "Tap to upload 👆"
+    "tapToUpload": "Tap to upload 👆",
+    "uploadLink": "Upload Link"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",

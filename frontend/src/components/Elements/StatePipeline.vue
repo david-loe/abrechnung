@@ -29,7 +29,7 @@
 import { defineComponent, PropType } from 'vue'
 import StateBadge from './StateBadge.vue'
 import { stateColors } from '../../../../common/settings.json'
-import { State } from '../../../../common/types'
+import { State } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StatePipeline',

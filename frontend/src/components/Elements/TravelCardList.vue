@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { TravelSimple } from '../../../../common/types'
+import { TravelSimple } from '../../../../common/types.js'
 import TravelCard from './TravelCard.vue'
 export default defineComponent({
   name: 'TravelCardList',

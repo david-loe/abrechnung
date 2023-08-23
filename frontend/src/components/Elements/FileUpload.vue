@@ -60,8 +60,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { DocumentFile, Token } from '../../../../common/types'
-import { fileEventToDocumentFiles } from '../../../../common/scriptsts'
+import { DocumentFile, Token } from '../../../../common/types.js'
+import { resizeImage } from '../../../../common/scripts.js'
+import { log } from '../../../../common/logger.js'
 import settings from '../../../../common/settings.json'
 import QRCode from 'qrcode'
 
@@ -83,7 +84,7 @@ export default defineComponent({
     return {
       token: undefined as Token | undefined,
       qr: undefined as string | undefined,
-      fetchTokenInterval: undefined as NodeJS.Timer | undefined,
+      fetchTokenInterval: undefined as NodeJS.Timeout | undefined,
       secondsLeft: settings.uploadTokenExpireAfterSeconds,
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds
     }
@@ -123,10 +124,29 @@ export default defineComponent({
       }
     },
     async changeFile(event: Event) {
-      const newFiles = await fileEventToDocumentFiles(event)
+      const newFiles = await this.fileEventToDocumentFiles(event)
       if (newFiles) {
         this.$emit('update:modelValue', this.modelValue.concat(newFiles))
       }
+    },
+    async fileEventToDocumentFiles(event: Event): Promise<DocumentFile[] | null> {
+      const files: DocumentFile[] = []
+      if (event.target && (event.target as HTMLInputElement).files) {
+        for (const file of (event.target as HTMLInputElement).files!) {
+          if (file.size < 16000000) {
+            if (file.type.indexOf('image') > -1) {
+              files.push({ data: await resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
+            } else {
+              files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
+            }
+          } else {
+            alert('alerts.imageToBig ' + file.name)
+          }
+        }
+        ;(event.target as HTMLInputElement).value = ''
+        return files
+      }
+      return null
     },
     async generateToken() {
       this.token = await this.$root.setter('user/token', {}, undefined, false)
@@ -134,7 +154,8 @@ export default defineComponent({
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('user', this.$root.user._id)
         url.searchParams.append('token', this.token._id)
-        console.log(url.href)
+        log(this.$t('labels.uploadLink') + ':')
+        log(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
         this.fetchTokenInterval = setInterval(this.getTokenFiles, 5000)
       }
@@ -149,13 +170,7 @@ export default defineComponent({
       if (result && result.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
-          const files = this.modelValue
-          for (const file of token.files) {
-            ;(file as any).viaTokenUpload = true
-            file.data = new File((file.data as any).data, file.name, { type: file.type })
-            files.push(file)
-          }
-          console.log(files)
+          const files = this.modelValue.concat(token.files)
           this.$emit('update:modelValue', files)
           this.clear()
         }

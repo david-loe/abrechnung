@@ -1,13 +1,13 @@
-import { getter, setter } from '../helper'
+import { getter, setter } from '../helper.js'
 import express from 'express'
 const router = express.Router()
-import DocumentFile from '../models/documentFile'
-import Travel from '../models/travel'
-import i18n from '../i18n'
+import DocumentFile from '../models/documentFile.js'
+import Travel from '../models/travel.js'
+import i18n from '../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
-import mail from '../mail/mail'
-import pdf from '../pdf/generate'
+import { sendNotificationMail } from '../mail/mail.js'
+import { generateReport, generateAndWriteToDisk } from '../pdf/generate.js'
 
 
 router.get('/travel', async (req, res) => {
@@ -57,9 +57,9 @@ router.post('/travel/refunded', async (req, res) => {
     }
   }
   const cb = async (travel) => {
-    mail.sendNotificationMail(travel)
+    sendNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      await pdf.generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
+      await generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
     }
   }
   return setter(Travel, '', false, check, cb)(req, res)
@@ -228,7 +228,7 @@ router.delete('/documentFile', async (req, res) => {
 router.get('/travel/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' })
   if (travel) {
-    const report = await pdf.generateReport(travel)
+    const report = await generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Length', report.length);
@@ -239,4 +239,4 @@ router.get('/travel/report', async (req, res) => {
 })
 
 
-module.exports = router
+export default router

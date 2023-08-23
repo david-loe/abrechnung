@@ -63,7 +63,7 @@ import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import DateInput from '../Elements/DateInput.vue'
-import { Expense } from '../../../../common/types'
+import { Expense } from '../../../../common/types.js'
 
 interface FormExpense extends Omit<Expense, '_id'> {
   _id?: string

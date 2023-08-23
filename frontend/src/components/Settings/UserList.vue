@@ -49,7 +49,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import UserForm from '../Forms/UserForm.vue'
-import { User } from '../../../../common/types'
+import { User } from '../../../../common/types.js'
 export default defineComponent({
   name: 'UserList',
   components: { UserForm },

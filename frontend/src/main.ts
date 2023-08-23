@@ -1,9 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { Alert } from './App.vue'
-import router from './router'
+import router from './router.js'
 
-import vSelect from './vue-select'
+import vSelect from './vue-select.js'
 import 'vue-select/dist/vue-select.css'
 import './vue-select.css'
 
@@ -11,8 +11,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
-import i18n from './i18n'
-import { CountrySimple, Currency, User } from '../../common/types'
+import i18n from './i18n.js'
+import { CountrySimple, Currency, User } from '../../common/types.js'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {

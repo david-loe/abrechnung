@@ -125,7 +125,8 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { CountrySimple, Currency, Locale, User } from '../../common/types'
+import { CountrySimple, Currency, Locale, User } from '../../common/types.js'
+import { log } from '../../common/logger.js'
 import { languages } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 
@@ -157,6 +158,8 @@ export default defineComponent({
         this.loadState = 'LOADING'
         this.loadingPromise = Promise.allSettled([this.getter('user'), this.getter('currency'), this.getter('country')]).then((result) => {
           this.user = (result[0] as PromiseFulfilledResult<any>).value.data
+          log(this.$t('labels.user') + ':')
+          log(this.user)
           if (Object.keys(this.user).length > 0) {
             this.$i18n.locale = this.user.settings.language
             this.auth = true

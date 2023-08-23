@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { Locale, Place } from './../../../../common/types'
+import { Locale, Place } from './../../../../common/types.js'
 
 export default defineComponent({
   name: 'PlaceElement',

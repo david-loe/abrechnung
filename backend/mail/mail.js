@@ -1,8 +1,8 @@
-import mailClient from './client'
-import i18n from '../i18n'
+import mailClient from './client.js'
+import i18n from '../i18n.js'
 import ejs from 'ejs'
 import fs from 'fs'
-import User from '../models/user'
+import User from '../models/user.js'
 
 export function sendMail(recipients, subject, paragaph, button, lastParagraph) {
   if (mailClient == undefined || recipients.length === 0) {

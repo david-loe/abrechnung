@@ -2,10 +2,10 @@
 import pdf_lib from 'pdf-lib'
 import pdf_fontkit from 'pdf-fontkit'
 import fs from 'fs'
-import i18n from '../i18n'
-import { getDetailedMoneyString, getLumpSumsSum, getExpensesSum, getTravelTotal, dateTimeToString, datetoDateStringWithYear, datetoDateString } from '../../common/scriptsts'
-import Travel from '../models/travel'
-import DocumentFile from '../models/documentFile'
+import i18n from '../i18n.js'
+import { getDetailedMoneyString, getLumpSumsSum, getExpensesSum, getTravelTotal, dateTimeToString, datetoDateStringWithYear, datetoDateString } from '../../common/scripts.js'
+import Travel from '../models/travel.js'
+import DocumentFile from '../models/documentFile.js'
 import mongoose from 'mongoose'
 
 

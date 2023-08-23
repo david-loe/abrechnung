@@ -115,7 +115,8 @@
     "travelDetails": "Reisedetails",
     "vehicleRegistration": "Fahrzeugschein",
     "uploadFromPhone": "Vom Handy hochladen",
-    "tapToUpload": "Zum Hochladen Tippen 👆"
+    "tapToUpload": "Zum Hochladen Tippen 👆",
+    "uploadLink": "Upload Link"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

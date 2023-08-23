@@ -2,6 +2,7 @@
   "name": "reisekostenabrechnung-backend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
@@ -27,13 +28,14 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^20.5.0",
     "ava": "^5.3.1",
-    "ts-node-dev": "^2.0.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "dev": "ts-node-dev server.ts",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --exec ts-node-esm ./server.ts",
     "build": "tsc",
     "start": "node dist/build/server.js",
-    "test": "npm run build && ava dist/build/test.mjs"
+    "test": "npm run build && ava dist/build/test.js"
   }
 }

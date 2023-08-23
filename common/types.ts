@@ -14,19 +14,21 @@ export interface CountrySimple {
   currency?: Currency
 }
 
-export interface Country extends CountrySimple {
-  lumpSums: {
-    validFrom: Date
+export interface CountryLumpSum {
+  validFrom: Date | string
+  catering24: number
+  catering8: number
+  overnight: number
+  spezials?: {
+    city: string
     catering24: number
     catering8: number
     overnight: number
-    spezials?: {
-      city: string
-      catering24: number
-      catering8: number
-      overnight: number
-    }[]
   }[]
+}
+
+export interface Country extends CountrySimple {
+  lumpSums: CountryLumpSum[]
   lumpSumsFrom?: string
 }
 
@@ -47,7 +49,8 @@ export interface Place {
 }
 
 export interface DocumentFile {
-  data?: Blob
+  data?: Types.Buffer
+  owner?: Types.ObjectId
   type: 'image/jpeg' | 'image/png' | 'application/pdf'
   name: string
   _id?: Types.ObjectId
@@ -55,7 +58,7 @@ export interface DocumentFile {
 
 export interface Token {
   _id: Types.ObjectId
-  createdAt: string | Date
+  createdAt: Date | string
   files: DocumentFile[]
 }
 
@@ -85,14 +88,14 @@ export interface Money {
   amount: number | null
   currency: Currency | string
   exchangeRate?: {
-    date: Date
+    date: Date | string
     rate: number
     amount: number
-  }
+  } | null
 }
 
 export interface Cost extends Money {
-  receipts: Array<DocumentFile>
+  receipts: DocumentFile[]
   date: Date | string
 }
 
@@ -101,7 +104,7 @@ export interface Stage {
   arrival: Date | string
   startLocation: Place
   endLocation: Place
-  midnightCountries?: { date: Date; country: CountrySimple }[]
+  midnightCountries?: { date: Date | string; country: CountrySimple }[]
   distance?: number | null
   transport: 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
   cost: Cost
@@ -144,29 +147,41 @@ export interface TravelSimple {
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
 
+export interface Refund {
+  type: 'overnight' | 'catering8' | 'catering24'
+  refund: Money
+}
+
+export interface TravelDay {
+  date: Date | string
+  country: CountrySimple
+  cateringNoRefund: {
+    breakfast: boolean
+    lunch: boolean
+    dinner: boolean
+  }
+  purpose: 'professional' | 'private'
+  refunds: Refund[]
+  _id: Types.ObjectId
+}
+
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
   professionalShare: number
-  history: Array<string>
+  history: Types.ObjectId[]
   historic: boolean
-  stages: Array<Stage>
-  expenses: Array<Expense>
-  days: {
-    date: Date
-    country: CountrySimple
-    cateringNoRefund: {
-      breakfast: boolean
-      lunch: boolean
-      dinner: boolean
-    }
-    purpose: 'professional' | 'private'
-    refunds: {
-      type: 'overnight' | 'catering8' | 'catering24'
-      refund: Money
-    }[]
-  }[]
+  stages: Stage[]
+  expenses: Expense[]
+  days: TravelDay[]
 }
 
 export type Locale = 'de' | 'en'
 
 export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+
+export interface Meta {
+  count: number
+  page: number
+  limit: number
+  countPages: number
+}

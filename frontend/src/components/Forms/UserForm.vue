@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { User } from '../../../../common/types'
+import { User } from '../../../../common/types.js'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id'> {
   name?: string

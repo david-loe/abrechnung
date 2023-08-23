@@ -33,8 +33,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue'
-import { CountrySimple } from '../../../../common/types'
-import { Locale } from '../../../../common/types'
+import { CountrySimple, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CountrySelector',

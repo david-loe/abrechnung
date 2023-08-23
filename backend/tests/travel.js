@@ -1,7 +1,7 @@
-import User from '../models/user'
-const Travel = require('../models/travel')
+import User from '../models/user.js'
+import Travel from '../models/travel.js'
 
-async function getTestTravel() {
+export async function getTestTravel() {
   const testUser = await User.findOne({})
 
   return new Travel({
@@ -51,11 +51,6 @@ async function testHistory(t) {
   travelWithHistory.deleteOne()
 }
 
-async function testLumpSumCalc(t) {
+export async function testLumpSumCalc(t) {
   const travel = await getTestTravel()
-}
-
-module.exports = {
-  testHistory,
-  testLumpSumCalc
 }

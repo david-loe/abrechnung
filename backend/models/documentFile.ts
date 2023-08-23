@@ -1,10 +1,12 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-const fileSchema = new mongoose.Schema({
+import { DocumentFile } from '../../common/types.js'
+
+const fileSchema = new Schema<DocumentFile>({
   data: { type: Buffer },
   type: { type: String, enum: ['image/jpeg', 'image/png', 'application/pdf'] },
   name: { type: String },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 })
 
-export default mongoose.model('DocumentFile', fileSchema)
+export default model<DocumentFile>('DocumentFile', fileSchema)

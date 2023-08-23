@@ -4,8 +4,10 @@
     "outDir": "dist",
     "allowJs": true,
     "strict": true,
-    "module": "nodenext",
+    "module": "ESNext",
     "target": "ES2020",
+    "moduleResolution": "NodeNext",
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "paths": {

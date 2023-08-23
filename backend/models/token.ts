@@ -1,13 +1,13 @@
-import mongoose from 'mongoose'
-import settings from '../../common/settings.json'
+import { Schema, model } from 'mongoose'
+import settings from '../../common/settings.json' assert { type: 'json' }
 
-const tokenSchema = new mongoose.Schema(
+const tokenSchema = new Schema(
   {
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }]
+    files: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }]
   },
   { timestamps: true }
 )
 
 tokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: settings.uploadTokenExpireAfterSeconds })
 
-export default mongoose.model('Token', tokenSchema)
+export default model('Token', tokenSchema)

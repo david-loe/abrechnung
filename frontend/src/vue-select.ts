@@ -2,7 +2,7 @@ import { h } from 'vue'
 import vSelect from 'vue-select'
 
 // Set the components prop default to return our fresh components
-;(vSelect.props.components as unknown as any).default = () => ({
+;(vSelect as unknown as any).props.components.default = () => ({
   Deselect: {
     render: () =>
       h('div', {

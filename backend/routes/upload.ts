@@ -1,12 +1,12 @@
-import Token from '../models/token'
+import Token from '../models/token.js'
 import express from 'express'
 import multer from 'multer'
-import DocumentFile from '../models/documentFile'
-import User from '../models/user'
+import DocumentFile from '../models/documentFile.js'
+import User from '../models/user.js'
 import ejs from 'ejs'
-import fs from 'fs'
-import settings from '../../common/settings.json'
-import i18n from '../i18n'
+import * as fs from 'fs'
+import settings from '../../common/settings.json' assert { type: 'json' }
+import i18n from '../i18n.js'
 
 const router = express.Router()
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -62,4 +62,4 @@ router.post('/new', fileHandler.any(), async (req, res) => {
   return res.sendStatus(403)
 })
 
-module.exports = router
+export default router

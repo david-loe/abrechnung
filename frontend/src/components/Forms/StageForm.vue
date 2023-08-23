@@ -157,8 +157,8 @@ import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
 import DateInput from '../Elements/DateInput.vue'
-import { getDayList, datetoDateString, datetimeToDateString } from '../../../../common/scriptsts'
-import { Stage, Place, CountrySimple } from '../../../../common/types'
+import { getDayList, datetoDateString, datetimeToDateString } from '../../../../common/scripts.js'
+import { Stage, Place, CountrySimple } from '../../../../common/types.js'
 import settings from '../../../../common/settings.json'
 
 interface FormStage extends Omit<Stage, 'startLocation' | 'endLocation' | 'midnightCountries' | '_id'> {

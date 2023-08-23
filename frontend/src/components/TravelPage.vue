@@ -401,15 +401,16 @@ import ExpenseForm from './Forms/ExpenseForm.vue'
 import InfoPoint from './Elements/InfoPoint.vue'
 import PlaceElement from './Elements/PlaceElement.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scriptsts'
-import { DocumentFile, Expense, Record, RecordType, Stage, Travel, TravelSimple } from '../../../common/types'
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.js'
+import { log } from '../../../common/logger.js'
+import { DocumentFile, Expense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple } from '../../../common/types.js'
 import { PropType } from 'vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
 type ModalObject = Record | TravelSimple | Gap | undefined
 type ModalObjectType = RecordType | 'travel'
-type Day = Travel['days'][0] & { showSettings?: boolean; _id: string }
+type Day = TravelDay & { showSettings?: boolean }
 export default defineComponent({
   name: 'TravelPage',
   data() {
@@ -636,6 +637,8 @@ export default defineComponent({
           }
         }
       }
+      log(this.$t('labels.travel') + ':')
+      log(this.travel)
       this.renderTable()
     },
     getMoneyString,

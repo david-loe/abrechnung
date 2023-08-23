@@ -2,15 +2,15 @@ import express from 'express'
 const router = express.Router()
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
-import Token from '../models/token'
-import i18n from '../i18n'
-import { getter, setter, deleter } from '../helper'
-import Travel from '../models/travel'
-import Currency from '../models/currency'
-import Country from '../models/country'
-import DocumentFile from '../models/documentFile'
-import mail from '../mail/mail'
-import pdf from '../pdf/generate'
+import Token from '../models/token.js'
+import i18n from '../i18n.js'
+import { getter, setter, deleter } from '../helper.js'
+import Travel from '../models/travel.js'
+import Currency from '../models/currency.js'
+import Country from '../models/country.js'
+import DocumentFile from '../models/documentFile.js'
+import { sendNotificationMail } from '../mail/mail.js'
+import { generateReport } from '../pdf/generate.js'
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -310,7 +310,7 @@ router.post('/travel/appliedFor', async (req, res) => {
   const check = async (oldObject) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
   }
-  return setter(Travel, 'traveler', true, check, mail.sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', true, check, sendNotificationMail)(req, res)
 })
 
 router.post('/travel/underExamination', async (req, res) => {
@@ -343,14 +343,14 @@ router.post('/travel/underExamination', async (req, res) => {
       return false
     }
   }
-  return setter(Travel, 'traveler', false, check, mail.sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', false, check, sendNotificationMail)(req, res)
 })
 
 
 router.get('/travel/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user._id, historic: false, state: 'refunded' })
   if (travel) {
-    const report = await pdf.generateReport(travel)
+    const report = await generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Length', report.length);
@@ -361,4 +361,4 @@ router.get('/travel/report', async (req, res) => {
 })
 
 
-module.exports = router
+export default router

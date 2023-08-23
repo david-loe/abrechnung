@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { Place } from '../../../../common/types'
+import { Place } from '../../../../common/types.js'
 import CountrySelector from './CountrySelector.vue'
 const defaultPlace = {
   country: null,

@@ -98,7 +98,7 @@ import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
 import DateInput from '../Elements/DateInput.vue'
-import { TravelSimple, Place } from '../../../../common/types'
+import { TravelSimple, Place } from '../../../../common/types.js'
 import settings from '../../../../common/settings.json'
 
 interface FormTravelSimple

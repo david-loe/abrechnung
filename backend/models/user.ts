@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
-import { Token, User } from '../../common/types'
+import { Schema, Document, model } from 'mongoose'
+import { Token, User } from '../../common/types.js'
 
-const userSchema = new mongoose.Schema<User>({
+const userSchema = new Schema<User>({
   uid: { type: String, required: true, unique: true, index: true },
   email: { type: String },
   name: { type: String },
@@ -15,11 +15,11 @@ const userSchema = new mongoose.Schema<User>({
     lastCurrencies: [{ type: String, ref: 'Currency' }],
     lastCountries: [{ type: String, ref: 'Country' }]
   },
-  vehicleRegistration: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentFile' }],
-  token: { type: mongoose.Schema.Types.ObjectId, ref: 'Token' }
+  vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
+  token: { type: Schema.Types.ObjectId, ref: 'Token' }
 })
 
-function populate(doc: mongoose.Document) {
+function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
@@ -29,7 +29,7 @@ function populate(doc: mongoose.Document) {
 }
 
 userSchema.pre(/^find((?!Update).)*$/, function () {
-  populate(this as mongoose.Document)
+  populate(this as Document)
 })
 
 userSchema.pre('save', async function (next) {
@@ -37,4 +37,4 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-export default mongoose.model<User>('User', userSchema)
+export default model<User>('User', userSchema)

@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n'
 import de from '../../common/locales/de.json'
 import en from '../../common/locales/en.json'
-import { Locale } from '../../common/types'
+import { Locale } from '../../common/types.js'
 
 type MessageSchema = typeof de
 

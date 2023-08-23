@@ -24,7 +24,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import TravelApply from '../Elements/TravelApplication.vue'
-import { TravelSimple } from '../../../../common/types'
+import { TravelSimple } from '../../../../common/types.js'
 export default defineComponent({
   name: 'InfoPoint',
   data() {

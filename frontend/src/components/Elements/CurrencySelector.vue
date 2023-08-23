@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue'
-import { Currency, Locale } from '../../../../common/types'
+import { Currency, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CurrencySelector',

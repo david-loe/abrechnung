@@ -7,7 +7,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { stateColors } from '../../../../common/settings.json'
-import { State } from '../../../../common/types'
+import { State } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StateBadge',

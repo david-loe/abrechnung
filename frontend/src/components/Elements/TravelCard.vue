@@ -57,8 +57,8 @@
 import { defineComponent, PropType } from 'vue'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { datetoDateString } from '../../../../common/scriptsts'
-import { TravelSimple } from '../../../../common/types'
+import { datetoDateString } from '../../../../common/scripts.js'
+import { TravelSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'TravelCard',

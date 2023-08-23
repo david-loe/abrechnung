@@ -1,6 +1,7 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
+import { Currency } from '../../common/types.js'
 
-const currencySchema = new mongoose.Schema({
+const currencySchema = new Schema<Currency>({
   name: {
     de: { type: String, required: true, trim: true },
     en: { type: String, required: true, trim: true }
@@ -11,4 +12,4 @@ const currencySchema = new mongoose.Schema({
   flag: { type: String }
 })
 
-export default mongoose.model('Currency', currencySchema)
+export default model<Currency>('Currency', currencySchema)

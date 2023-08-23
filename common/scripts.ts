@@ -1,7 +1,7 @@
-import { Currency, DocumentFile, Locale, Money, Place, Travel } from './types'
-import settings from './settings.json'
+import { Currency, DocumentFile, Locale, Money, Place, Travel } from './types.js'
+import settings from './settings.json' assert { type: 'json' }
 
-function getFlagEmoji(countryCode: string): string | null {
+export function getFlagEmoji(countryCode: string): string | null {
   const noFlag = ['XCD', 'XOF', 'XAF', 'ANG', 'XPF']
   if (noFlag.indexOf(countryCode) !== -1) {
     return null
@@ -26,7 +26,7 @@ function isValidDate(date: Date | string | number): Date | null {
   }
 }
 
-function datetimeToDateString(datetime: Date | string | number): string {
+export function datetimeToDateString(datetime: Date | string | number): string {
   const date = isValidDate(datetime)
   if (date) {
     return date.toISOString().slice(0, -14)
@@ -35,7 +35,7 @@ function datetimeToDateString(datetime: Date | string | number): string {
   }
 }
 
-function datetimeToDatetimeString(datetime: Date | string | number): string {
+export function datetimeToDatetimeString(datetime: Date | string | number): string {
   const date = isValidDate(datetime)
   if (date) {
     return date.toISOString().slice(0, -8)
@@ -44,7 +44,7 @@ function datetimeToDatetimeString(datetime: Date | string | number): string {
   }
 }
 
-function htmlInputStringToDateTime(dateTimeStr: string): Date | null {
+export function htmlInputStringToDateTime(dateTimeStr: string): Date | null {
   const date = isValidDate(dateTimeStr)
   if (date) {
     return new Date(date.valueOf() - date.getTimezoneOffset() * 60 * 1000)
@@ -53,17 +53,17 @@ function htmlInputStringToDateTime(dateTimeStr: string): Date | null {
   }
 }
 
-function datetimeToDate(datetime: Date | string | number): Date {
+export function datetimeToDate(datetime: Date | string | number): Date {
   return new Date(datetimeToDateString(datetime))
 }
 
-function getDiffInDays(startDate: Date | string | number, endDate: Date | string | number): number {
+export function getDiffInDays(startDate: Date | string | number, endDate: Date | string | number): number {
   const firstDay = datetimeToDate(startDate)
   const lastDay = datetimeToDate(endDate)
   return (lastDay.valueOf() - firstDay.valueOf()) / (1000 * 60 * 60 * 24)
 }
 
-function getDayList(startDate: Date | string | number, endDate: Date | string | number): Date[] {
+export function getDayList(startDate: Date | string | number, endDate: Date | string | number): Date[] {
   const days: Date[] = []
   for (var i = 0; i < getDiffInDays(startDate, endDate) + 1; i++) {
     days.push(new Date(datetimeToDate(startDate).valueOf() + i * 1000 * 60 * 60 * 24))
@@ -71,7 +71,7 @@ function getDayList(startDate: Date | string | number, endDate: Date | string | 
   return days
 }
 
-function getMoneyString(
+export function getMoneyString(
   money: Money,
   useExchangeRate: boolean = true,
   func: (x: number) => number = (x: number): number => x,
@@ -89,7 +89,7 @@ function getMoneyString(
   })
 }
 
-function getDetailedMoneyString(money: Money, locale: Locale, printZero = false): string {
+export function getDetailedMoneyString(money: Money, locale: Locale, printZero = false): string {
   if (!money || (money && (typeof money.amount !== 'number' || (!money.amount && !printZero)))) {
     return ''
   }
@@ -109,11 +109,11 @@ function getDetailedMoneyString(money: Money, locale: Locale, printZero = false)
   return str
 }
 
-function placeToString(place: Place, locale: Locale = 'de'): string {
+export function placeToString(place: Place, locale: Locale = 'de'): string {
   return place.place + ', ' + place.country.name[locale] + place.country.flag
 }
 
-function dateToTimeString(date: string | number | Date): string {
+export function dateToTimeString(date: string | number | Date): string {
   const dateObject = isValidDate(date)
   if (dateObject) {
     const hour = dateObject.getUTCHours().toString().padStart(2, '0')
@@ -124,7 +124,7 @@ function dateToTimeString(date: string | number | Date): string {
   }
 }
 
-function datetoDateString(date: string | number | Date): string {
+export function datetoDateString(date: string | number | Date): string {
   const dateObject = isValidDate(date)
   if (dateObject) {
     const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
@@ -135,11 +135,11 @@ function datetoDateString(date: string | number | Date): string {
   }
 }
 
-function dateTimeToString(datetime: string | number | Date): string {
+export function dateTimeToString(datetime: string | number | Date): string {
   return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
 }
 
-function datetoDateStringWithYear(date: string | number | Date): string {
+export function datetoDateStringWithYear(date: string | number | Date): string {
   const dateObject = isValidDate(date)
   if (dateObject) {
     const year = dateObject.getUTCFullYear().toString()
@@ -151,7 +151,7 @@ function datetoDateStringWithYear(date: string | number | Date): string {
   }
 }
 
-function getLumpSumsSum(travel: Travel): Money {
+export function getLumpSumsSum(travel: Travel): Money {
   var sum = 0
   for (const day of travel.days) {
     for (const refund of day.refunds) {
@@ -163,7 +163,7 @@ function getLumpSumsSum(travel: Travel): Money {
   return { amount: sum, currency: settings.baseCurrency }
 }
 
-function getExpensesSum(travel: Travel): Money {
+export function getExpensesSum(travel: Travel): Money {
   var sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount != null) {
@@ -186,7 +186,7 @@ function getExpensesSum(travel: Travel): Money {
   return { amount: sum, currency: settings.baseCurrency }
 }
 
-function getTravelTotal(travel: Travel): Money {
+export function getTravelTotal(travel: Travel): Money {
   var advance = 0
   if (travel.advance && travel.advance.amount != null) {
     advance = travel.advance.exchangeRate ? travel.advance.exchangeRate.amount : travel.advance.amount
@@ -194,28 +194,8 @@ function getTravelTotal(travel: Travel): Money {
   return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
 }
 
-async function fileEventToDocumentFiles(event: Event): Promise<DocumentFile[] | null> {
-  const files: DocumentFile[] = []
-  if (event.target && (event.target as HTMLInputElement).files) {
-    for (const file of (event.target as HTMLInputElement).files!) {
-      if (file.size < 16000000) {
-        if (file.type.indexOf('image') > -1) {
-          files.push({ data: await resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
-        } else {
-          files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
-        }
-      } else {
-        alert('alerts.imageToBig ' + file.name)
-      }
-    }
-    ;(event.target as HTMLInputElement).value = ''
-    return files
-  }
-  return null
-}
-
 // From https://stackoverflow.com/a/52983833/13582326
-function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
+export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
   return new Promise((resolve) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -244,24 +224,4 @@ function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
       img.src = this.result as string
     }
   })
-}
-
-export {
-  getFlagEmoji,
-  getDiffInDays,
-  getDayList,
-  datetimeToDateString,
-  datetimeToDatetimeString,
-  htmlInputStringToDateTime,
-  getMoneyString,
-  getDetailedMoneyString,
-  placeToString,
-  dateTimeToString,
-  dateToTimeString,
-  datetoDateString,
-  datetoDateStringWithYear,
-  getLumpSumsSum,
-  getExpensesSum,
-  getTravelTotal,
-  fileEventToDocumentFiles
 }

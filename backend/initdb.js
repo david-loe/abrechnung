@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { csvToObjects, parseRawLumpSums, addLumpSumsToCountries } from './helper'
-import { getFlagEmoji } from '../common/scriptsts'
-import Currency from './models/currency'
-import Country from './models/country'
+import { csvToObjects, parseRawLumpSums, addLumpSumsToCountries } from './helper.js'
+import { getFlagEmoji } from '../common/scripts.js'
+import Currency from './models/currency.js'
+import Country from './models/country.js'
 
 function loadLumpSums() {
   const lumpSums = []

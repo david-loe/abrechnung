@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
-import LoginPage from '../components/LoginPage.vue'
-import SettingsPage from '../components/SettingsPage.vue'
-import ApprovePage from '../components/ApprovePage.vue'
-import ExaminePage from '../components/ExaminePage.vue'
-import MyTravelsPage from '../components/MyTravelsPage.vue'
-import TravelPage from '../components/TravelPage.vue'
+import LoginPage from './components/LoginPage.vue'
+import SettingsPage from './components/SettingsPage.vue'
+import ApprovePage from './components/ApprovePage.vue'
+import ExaminePage from './components/ExaminePage.vue'
+import MyTravelsPage from './components/MyTravelsPage.vue'
+import TravelPage from './components/TravelPage.vue'
 import axios from 'axios'
 
 const routes = [

@@ -1,6 +1,6 @@
-import { getter, setter } from '../helper'
-import Travel from '../models/travel'
-import mail from '../mail/mail'
+import { getter, setter } from '../helper.js'
+import Travel from '../models/travel.js'
+import { sendNotificationMail } from '../mail/mail.js'
 import express from 'express'
 const router = express.Router()
 
@@ -34,10 +34,10 @@ function approve(state) {
                 return false
             }
         }
-        return setter(Travel, '', false, check, mail.sendNotificationMail)(req, res)
+        return setter(Travel, '', false, check, sendNotificationMail)(req, res)
     }
 }
 router.post('/travel/approved', approve('approved'))
 router.post('/travel/rejected', approve('rejected'))
 
-module.exports = router
+export default router
