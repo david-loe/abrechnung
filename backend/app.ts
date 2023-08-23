@@ -1,5 +1,5 @@
-import express from 'express'
-import mongoose from 'mongoose'
+import express, { NextFunction, Request, Response } from 'express'
+import mongoose, { ObjectId } from 'mongoose'
 import cors from 'cors'
 import passport from 'passport'
 import LdapStrategy from 'passport-ldapauth'
@@ -13,9 +13,8 @@ import adminRoutes from './routes/admin.js'
 import approveRoutes from './routes/approve.js'
 import examineRoutes from './routes/examine.js'
 import uploadRoutes from './routes/upload.js'
-
-const port = process.env.BACKEND_PORT
-const url = process.env.VITE_BACKEND_URL
+import { Access } from '../common/types.js'
+import { MongoClient } from 'mongodb'
 
 const mongoClientPromise = mongoose.connect(process.env.MONGO_URL, {}).then(() => {
   console.log(i18n.t('alerts.db.success'))
@@ -33,10 +32,10 @@ passport.use(
       searchFilter: process.env.LDAP_SEARCHFILTER,
       tlsOptions: {
         requestCert: process.env.LDAP_TLS_REQUESTCERT.toLowerCase() === 'true',
-        rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true',
-      },
-    },
-  }),
+        rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true'
+      }
+    }
+  })
 )
 
 const app = express()
@@ -46,26 +45,26 @@ app.use(express.urlencoded({ limit: '2mb', extended: true }))
 app.use(
   cors({
     credentials: true,
-    origin: process.env.VITE_FRONTEND_URL,
-  }),
+    origin: process.env.VITE_FRONTEND_URL
+  })
 )
 
 app.use(
   session({
-    store: MongoStore.create({ client: mongoose.connection.getClient() }),
+    store: MongoStore.create({ client: mongoose.connection.getClient() as unknown as MongoClient }),
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: false,
-      sameSite: 'strict',
+      sameSite: 'strict'
     },
     resave: true,
     saveUninitialized: false,
     name: i18n.t('headlines.title')
-  }),
+  })
 )
 
-passport.serializeUser(async (ldapUser, cb) => {
+passport.serializeUser(async (ldapUser: any, cb) => {
   var user = await User.findOne({ uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
   var email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
   if (Array.isArray(email)) {
@@ -78,7 +77,7 @@ passport.serializeUser(async (ldapUser, cb) => {
   const newUser = {
     uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE],
     email: email,
-    name: ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE],
+    name: ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]
   }
   if (!user) {
     user = new User(newUser)
@@ -93,7 +92,7 @@ passport.serializeUser(async (ldapUser, cb) => {
   }
 })
 
-passport.deserializeUser(async (sessionUser, cb) => {
+passport.deserializeUser(async (sessionUser: { _id: ObjectId }, cb) => {
   const user = await User.findOne({ _id: sessionUser._id })
   if (user) {
     cb(null, user)
@@ -127,9 +126,9 @@ app.use('/api', async (req, res, next) => {
 
 app.use('/api', routes)
 
-function accessControl(access) {
-  return (req, res, next) => {
-    if (req.user.access[access]) {
+function accessControl(access: Access) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.user!.access[access]) {
       next()
     } else {
       return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })

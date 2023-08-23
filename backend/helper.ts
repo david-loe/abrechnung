@@ -4,9 +4,8 @@ import axios from 'axios'
 import settings from '../common/settings.json' assert { type: 'json' }
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, SchemaTypeOptions } from 'mongoose'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { CountryLumpSum, Meta } from '../common/types.js'
-import { RequestWithUser } from './routes/types.js'
 import { log } from '../common/logger.js'
 
 export function getter(
@@ -18,7 +17,7 @@ export function getter(
   sortFn: ((a: any, b: any) => number) | null = null,
   cb: ((data: any) => any) | null = null
 ) {
-  return async (req: RequestWithUser, res: Response) => {
+  return async (req: Request, res: Response) => {
     const meta: Meta = {
       limit: defaultLimit,
       page: 1,
@@ -87,7 +86,7 @@ export function setter(
   checkOldObject: ((oldObject: any) => Promise<boolean>) | null = null,
   cb: ((data: any) => any) | null = null
 ) {
-  return async (req: RequestWithUser, res: Response) => {
+  return async (req: Request, res: Response) => {
     if (!req.body._id) {
       for (const field of Object.keys(model.schema.obj)) {
         const property = model.schema.obj[field]! as SchemaTypeOptions<any>
@@ -106,7 +105,7 @@ export function setter(
     } else if (req.body._id !== '') {
       var oldObject = await model.findOne({ _id: req.body._id })
       if (checkUserIdField && checkUserIdField in model.schema.obj) {
-        if (!oldObject || !oldObject[checkUserIdField]._id.equals(req.user._id)) {
+        if (!oldObject || !oldObject[checkUserIdField]._id.equals(req.user!._id)) {
           log(req.body)
           return res.sendStatus(403)
         }
@@ -141,10 +140,10 @@ export function setter(
 }
 
 export function deleter(model: Model<any>, checkUserIdField = '', cb: ((data: any) => any) | null = null) {
-  return async (req: RequestWithUser, res: Response) => {
+  return async (req: Request, res: Response) => {
     if (req.query.id && req.query.id !== '') {
       const doc = await model.findOne({ _id: req.query.id })
-      if (!doc || (checkUserIdField && checkUserIdField in model.schema.obj && !doc[checkUserIdField]._id.equals(req.user._id))) {
+      if (!doc || (checkUserIdField && checkUserIdField in model.schema.obj && !doc[checkUserIdField]._id.equals(req.user!._id))) {
         log(req.body)
         return res.sendStatus(403)
       }

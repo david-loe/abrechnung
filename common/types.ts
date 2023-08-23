@@ -69,11 +69,11 @@ export interface UserSimple {
   _id: Types.ObjectId
 }
 
+export type Access = 'examine' | 'approve' | 'admin'
+
 export interface User extends UserSimple {
   access: {
-    examine: boolean
-    approve: boolean
-    admin: boolean
+    [key in Access]: boolean
   }
   settings: {
     language: Locale
