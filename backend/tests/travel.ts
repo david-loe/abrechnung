@@ -1,7 +1,7 @@
 import User from '../models/user.js'
 import Travel from '../models/travel.js'
 
-export async function getTestTravel() {
+async function getTestTravel() {
   const testUser = await User.findOne({})
 
   return new Travel({
@@ -16,27 +16,28 @@ export async function getTestTravel() {
     endDate: new Date(new Date().valueOf() + 7 * 24 * 60 * 60 * 1000),
     advance: {
       amount: 100,
-      currency: 'EUR',
+      currency: 'EUR'
     },
     claimOvernightLumpSum: true,
-    stages: [{
-      departure: new Date(),
-      arrival: new Date(new Date().valueOf() + 3 * 60 * 60 * 1000),
-      transport: 'airplane',
-      startLocation: {
-        country: 'DE',
-        place: 'München'
-      },
-      endLocation: {
-        country: 'SE',
-        place: 'Malmö'
-      },
-    }]
+    stages: [
+      {
+        departure: new Date(),
+        arrival: new Date(new Date().valueOf() + 3 * 60 * 60 * 1000),
+        transport: 'airplane',
+        startLocation: {
+          country: 'DE',
+          place: 'München'
+        },
+        endLocation: {
+          country: 'SE',
+          place: 'Malmö'
+        }
+      }
+    ]
   })
 }
 
-
-async function testHistory(t) {
+export async function testHistory(t: any) {
   const travel = await (await getTestTravel()).save()
 
   await travel.saveToHistory()
@@ -51,6 +52,6 @@ async function testHistory(t) {
   travelWithHistory.deleteOne()
 }
 
-export async function testLumpSumCalc(t) {
+export async function testLumpSumCalc(t: any) {
   const travel = await getTestTravel()
 }
