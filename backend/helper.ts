@@ -7,6 +7,7 @@ import { Model, SchemaTypeOptions } from 'mongoose'
 import { Response } from 'express'
 import { CountryLumpSum, Meta } from '../common/types.js'
 import { RequestWithUser } from './routes/types.js'
+import { log } from '../common/logger.js'
 
 export function getter(
   model: Model<any>,
@@ -97,6 +98,7 @@ export function setter(
             (property.type === Number && req.body[field] === null) ||
             (Array.isArray(property) && req.body[field].length === 0)
           ) {
+            log(req.body)
             return res.status(400).send({ message: 'Missing ' + field })
           }
         }
@@ -105,11 +107,13 @@ export function setter(
       var oldObject = await model.findOne({ _id: req.body._id })
       if (checkUserIdField && checkUserIdField in model.schema.obj) {
         if (!oldObject || !oldObject[checkUserIdField]._id.equals(req.user._id)) {
+          log(req.body)
           return res.sendStatus(403)
         }
       }
       if (checkOldObject) {
         if (!(await checkOldObject(oldObject))) {
+          log(req.body)
           return res.sendStatus(403)
         }
       }
@@ -130,6 +134,7 @@ export function setter(
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
     } else {
+      log(req.body)
       return res.sendStatus(403)
     }
   }
@@ -140,6 +145,7 @@ export function deleter(model: Model<any>, checkUserIdField = '', cb: ((data: an
     if (req.query.id && req.query.id !== '') {
       const doc = await model.findOne({ _id: req.query.id })
       if (!doc || (checkUserIdField && checkUserIdField in model.schema.obj && !doc[checkUserIdField]._id.equals(req.user._id))) {
+        log(req.body)
         return res.sendStatus(403)
       }
       try {
