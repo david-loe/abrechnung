@@ -27,6 +27,7 @@
     "@types/express": "^4.17.17",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.5.0",
+    "@types/nodemailer": "^6.4.9",
     "ava": "^5.3.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",

@@ -125,6 +125,7 @@ export type Record = Stage | Expense
 export interface Comment {
   text: string
   author: UserSimple
+  toState: State
   _id: Types.ObjectId
 }
 

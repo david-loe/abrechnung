@@ -59,7 +59,17 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
       default: 'appliedFor'
     },
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    comments: [{ text: { type: String }, author: { type: Schema.Types.ObjectId, ref: 'User', required: true } }],
+    comments: [
+      {
+        text: { type: String },
+        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        toState: {
+          type: String,
+          required: true,
+          enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded']
+        }
+      }
+    ],
     reason: { type: String, required: true },
     destinationPlace: place(true),
     travelInsideOfEU: { type: Boolean, required: true },
@@ -388,7 +398,7 @@ travelSchema.methods.calculateRefundforOwnCar = function () {
 
 travelSchema.methods.addComment = function () {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, state: this.state })
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state })
     delete this.comment
   }
 }
