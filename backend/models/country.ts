@@ -1,4 +1,4 @@
-import { Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Schema, model } from 'mongoose'
 import settings from '../../common/settings.json' assert { type: 'json' }
 import { Country, CountryLumpSum } from '../../common/types.js'
 
@@ -60,3 +60,5 @@ countrySchema.methods.getLumpSum = async function (date: Date): Promise<CountryL
 }
 
 export default model<Country, CountryModel>('Country', countrySchema)
+
+export interface CountryDoc extends Methods, HydratedDocument<Country> {}

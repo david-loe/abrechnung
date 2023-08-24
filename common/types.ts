@@ -144,6 +144,7 @@ export interface TravelSimple {
   advance: Money
   progress: number
   _id: Types.ObjectId
+  createdAt?: Date | string
   claimSpouseRefund?: boolean //settings.allowSpouseRefund
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
@@ -170,7 +171,7 @@ export interface TravelDay {
 
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
-  professionalShare: number
+  professionalShare: number | null
   history: Types.ObjectId[]
   historic: boolean
   stages: Stage[]

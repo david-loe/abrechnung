@@ -1,10 +1,21 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
-import Country from './country.js'
+import Country, { CountryDoc } from './country.js'
 import Currency from './currency.js'
 import settings from '../../common/settings.json' assert { type: 'json' }
 import { convertCurrency } from '../helper.js'
-import { Money, Record, Refund, Travel, TravelDay, Currency as ICurrency, CountrySimple, Meal, SimplePurpose } from '../../common/types.js'
+import {
+  Money,
+  Record,
+  Refund,
+  Travel,
+  TravelDay,
+  Currency as ICurrency,
+  CountrySimple,
+  Meal,
+  SimplePurpose,
+  Comment
+} from '../../common/types.js'
 
 function place(required = false) {
   return {
@@ -35,9 +46,9 @@ function costObject(exchangeRate = true, receipts = true, required = false, defa
 interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
-  calculateDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[]
+  getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[]
   getBorderCrossings(): Promise<{ date: Date; country: any }[]>
-  addCountriesToDays(): Promise<void>
+  calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
   addOvernightRefunds(): Promise<void>
   calculateExchangeRates(): Promise<void>
@@ -190,7 +201,7 @@ travelSchema.methods.calculateProgress = function (this: TravelDoc) {
   }
 }
 
-travelSchema.methods.calculateDays = function (this: TravelDoc) {
+travelSchema.methods.getDays = function (this: TravelDoc) {
   if (this.stages.length > 0) {
     const days = getDayList(this.stages[0].departure, this.stages[this.stages.length - 1].arrival)
     const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[] = days.map(
@@ -256,9 +267,9 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
   }
 }
 
-travelSchema.methods.addCountriesToDays = async function (this: TravelDoc) {
+travelSchema.methods.calculateDays = async function (this: TravelDoc) {
   const borderCrossings = await this.getBorderCrossings()
-  const days = this.calculateDays()
+  const days = this.getDays()
   for (const borderX of borderCrossings) {
     borderX.country = await Country.findOne({ _id: borderX.country._id })
   }
@@ -275,7 +286,7 @@ travelSchema.methods.addCountriesToDays = async function (this: TravelDoc) {
   this.days = days as TravelDay[]
 }
 
-travelSchema.methods.addCateringRefunds = async function () {
+travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
   for (var i = 0; i < this.days.length; i++) {
     const day = this.days[i]
     if (day.purpose == 'professional') {
@@ -283,7 +294,7 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (i == 0 || i == this.days.length - 1) {
         result.type = 'catering8'
       }
-      var amount = (await day.country.getLumpSum(day.date))[result.type!]
+      var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date))[result.type!]
       var leftover = 1
       if (day.cateringNoRefund.breakfast) leftover -= settings.breakfastCateringLumpSumCut
       if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
@@ -302,12 +313,12 @@ travelSchema.methods.addCateringRefunds = async function () {
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount! *= 2
       }
-      day.refunds.push(result)
+      day.refunds.push(result as Refund)
     }
   }
 }
 
-travelSchema.methods.addOvernightRefunds = async function () {
+travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
   if (this.claimOvernightLumpSum) {
     var stageIndex = 0
     for (var i = 0; i < this.days.length; i++) {
@@ -316,7 +327,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
         if (i == this.days.length - 1) {
           break
         }
-        var midnight = day.date.valueOf() + 1000 * 24 * 60 * 60 - 1
+        var midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
         while (stageIndex < this.stages.length - 1 && midnight - new Date(this.stages[stageIndex].arrival).valueOf() > 0) {
           stageIndex++
         }
@@ -327,7 +338,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
           continue
         }
         const result: Partial<Refund> = { type: 'overnight' }
-        var amount = (await day.country.getLumpSum(day.date))[result.type!]
+        var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date))[result.type!]
         result.refund = {
           amount:
             Math.round(
@@ -340,7 +351,7 @@ travelSchema.methods.addOvernightRefunds = async function () {
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount! *= 2
         }
-        day.refunds.push(result)
+        day.refunds.push(result as Refund)
       }
     }
   }
@@ -357,7 +368,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   return costObject
 }
 
-travelSchema.methods.calculateExchangeRates = async function () {
+travelSchema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   const promiseList = []
   promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
   for (const stage of this.stages) {
@@ -373,19 +384,19 @@ travelSchema.methods.calculateExchangeRates = async function () {
   var i = 1
   for (const stage of this.stages) {
     if (results[i].status === 'fulfilled') {
-      stage.cost = (results[i] as PromiseFulfilledResult<Money>).value
+      Object.assign(stage.cost, (results[i] as PromiseFulfilledResult<Money>).value)
     }
     i++
   }
   for (const expense of this.expenses) {
     if (results[i].status === 'fulfilled') {
-      expense.cost = (results[i] as PromiseFulfilledResult<Money>).value
+      Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)
     }
     i++
   }
 }
 
-travelSchema.methods.calculateProfessionalShare = function () {
+travelSchema.methods.calculateProfessionalShare = function (this: TravelDoc) {
   if (this.days.length > 0) {
     var professionalDays = 0
     for (const day of this.days) {
@@ -399,39 +410,42 @@ travelSchema.methods.calculateProfessionalShare = function () {
   }
 }
 
-travelSchema.methods.calculateRefundforOwnCar = function () {
+travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
   for (const stage of this.stages) {
     if (stage.transport === 'ownCar') {
-      stage.cost = Object.assign(stage.cost, {
-        amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100,
-        currency: settings.baseCurrency
-      })
+      if (stage.distance) {
+        stage.cost = Object.assign(stage.cost, {
+          amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100,
+          currency: settings.baseCurrency
+        })
+      }
     }
   }
 }
 
-travelSchema.methods.addComment = function () {
+travelSchema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state })
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment)
     delete this.comment
   }
 }
 
-travelSchema.pre('validate', function () {
+travelSchema.pre('validate', function (this: TravelDoc) {
   this.addComment()
 })
 
-travelSchema.pre('save', async function (next) {
+travelSchema.pre('save', async function (this: TravelDoc, next) {
   await populate(this)
+
   this.calculateProgress()
-  this.calculateDays()
+  await this.calculateDays()
   this.calculateProfessionalShare()
   this.calculateRefundforOwnCar()
-  await this.addCountriesToDays()
   await this.addCateringRefunds()
   await this.addOvernightRefunds()
 
   await this.calculateExchangeRates()
+
   next()
 })
 
