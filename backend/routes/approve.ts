@@ -1,5 +1,5 @@
 import { getter, setter } from '../helper.js'
-import Travel from '../models/travel.js'
+import Travel, { TravelDoc } from '../models/travel.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import express, { Request, Response } from 'express'
 import { Travel as ITravel } from '../../common/types.js'
@@ -37,7 +37,7 @@ function approve(state: 'approved' | 'rejected') {
       comment: req.body.comment,
       _id: req.body._id
     }
-    const check = async (oldObject: any) => {
+    const check = async (oldObject: TravelDoc) => {
       if (oldObject.state === 'appliedFor') {
         if (state === 'approved') {
           await oldObject.saveToHistory()

@@ -70,7 +70,7 @@ export default defineComponent({
   name: 'FileUpload',
   props: {
     modelValue: {
-      type: Array as PropType<DocumentFile[]>,
+      type: Array as PropType<Partial<DocumentFile>[]>,
       default: function () {
         return []
       }
@@ -129,8 +129,8 @@ export default defineComponent({
         this.$emit('update:modelValue', this.modelValue.concat(newFiles))
       }
     },
-    async fileEventToDocumentFiles(event: Event): Promise<DocumentFile[] | null> {
-      const files: DocumentFile[] = []
+    async fileEventToDocumentFiles(event: Event): Promise<Partial<DocumentFile>[] | null> {
+      const files: Partial<DocumentFile>[] = []
       if (event.target && (event.target as HTMLInputElement).files) {
         for (const file of (event.target as HTMLInputElement).files!) {
           if (file.size < 16000000) {

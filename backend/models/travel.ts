@@ -1,10 +1,10 @@
-import { Schema, Document, Model, model } from 'mongoose'
+import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country from './country.js'
 import Currency from './currency.js'
 import settings from '../../common/settings.json' assert { type: 'json' }
 import { convertCurrency } from '../helper.js'
-import { Money, Record, Refund, Travel, TravelDay, Currency as ICurrency } from '../../common/types.js'
+import { Money, Record, Refund, Travel, TravelDay, Currency as ICurrency, CountrySimple, Meal, SimplePurpose } from '../../common/types.js'
 
 function place(required = false) {
   return {
@@ -35,7 +35,7 @@ function costObject(exchangeRate = true, receipts = true, required = false, defa
 interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
-  calculateDays(): void
+  calculateDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[]
   getBorderCrossings(): Promise<{ date: Date; country: any }[]>
   addCountriesToDays(): Promise<void>
   addCateringRefunds(): Promise<void>
@@ -146,11 +146,11 @@ function populate(doc: Document) {
   ])
 }
 
-travelSchema.pre(/^find((?!Update).)*$/, function () {
-  populate(this as Document)
+travelSchema.pre(/^find((?!Update).)*$/, function (this: TravelDoc) {
+  populate(this)
 })
 
-travelSchema.pre('deleteOne', { document: true, query: false }, function () {
+travelSchema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
   for (const historyId of this.history) {
     model('Travel').deleteOne({ _id: historyId }).exec()
   }
@@ -167,8 +167,8 @@ travelSchema.pre('deleteOne', { document: true, query: false }, function () {
   deleteReceipts(this.expenses)
 })
 
-travelSchema.methods.saveToHistory = async function () {
-  const doc = (await model('Travel').findOne({ _id: this._id }, { history: 0 })).toObject()
+travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
+  const doc: any = (await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }))!.toObject()
   delete doc._id
   doc.historic = true
   const old = await model('Travel').create(doc)
@@ -176,7 +176,7 @@ travelSchema.methods.saveToHistory = async function () {
   this.markModified('history')
 }
 
-travelSchema.methods.calculateProgress = function () {
+travelSchema.methods.calculateProgress = function (this: TravelDoc) {
   if (this.stages.length > 0) {
     var approvedLength = getDiffInDays(this.startDate, this.endDate) + 1
     var stageLength = getDiffInDays(this.stages[0].departure, this.stages[this.stages.length - 1].arrival) + 1
@@ -190,12 +190,14 @@ travelSchema.methods.calculateProgress = function () {
   }
 }
 
-travelSchema.methods.calculateDays = function () {
+travelSchema.methods.calculateDays = function (this: TravelDoc) {
   if (this.stages.length > 0) {
     const days = getDayList(this.stages[0].departure, this.stages[this.stages.length - 1].arrival)
-    const newDays: Partial<TravelDay>[] = days.map((d) => {
-      return { date: d }
-    })
+    const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[] = days.map(
+      (d) => {
+        return { date: d, refunds: [] }
+      }
+    )
     for (const oldDay of this.days) {
       for (const newDay of newDays) {
         if (new Date(oldDay.date).valueOf() - new Date(newDay.date!).valueOf() == 0) {
@@ -205,13 +207,13 @@ travelSchema.methods.calculateDays = function () {
         }
       }
     }
-    this.days = newDays
+    return newDays
   } else {
-    this.days = []
+    return []
   }
 }
 
-travelSchema.methods.getBorderCrossings = async function (): Promise<{ date: Date; country: any }[]> {
+travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Promise<{ date: Date; country: CountrySimple }[]> {
   if (this.stages.length > 0) {
     const startCountry = this.stages[0].startLocation.country
     const borderCrossings = [{ date: new Date(this.stages[0].departure), country: startCountry }]
@@ -222,17 +224,27 @@ travelSchema.methods.getBorderCrossings = async function (): Promise<{ date: Dat
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport) !== -1) {
-            borderCrossings.push(...stage.midnightCountries)
+            if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
           } else if ((stage.transport = 'airplane')) {
-            borderCrossings.push({
-              date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-              country: await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry })
-            })
+            const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry })
+            if (country) {
+              borderCrossings.push({
+                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                country
+              })
+            } else {
+              throw new Error('secoundNightOnAirplaneLumpSumCountry(' + settings.secoundNightOnAirplaneLumpSumCountry + ') not found')
+            }
           } else if ((stage.transport = 'shipOrFerry')) {
-            borderCrossings.push({
-              date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-              country: await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry })
-            })
+            const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry })
+            if (country) {
+              borderCrossings.push({
+                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                country
+              })
+            } else {
+              throw new Error('secoundNightOnShipOrFerryLumpSumCountry(' + settings.secoundNightOnShipOrFerryLumpSumCountry + ') not found')
+            }
           }
         }
         borderCrossings.push({ date: new Date(stage.arrival), country: stage.endLocation.country })
@@ -244,21 +256,23 @@ travelSchema.methods.getBorderCrossings = async function (): Promise<{ date: Dat
   }
 }
 
-travelSchema.methods.addCountriesToDays = async function () {
+travelSchema.methods.addCountriesToDays = async function (this: TravelDoc) {
   const borderCrossings = await this.getBorderCrossings()
+  const days = this.calculateDays()
   for (const borderX of borderCrossings) {
     borderX.country = await Country.findOne({ _id: borderX.country._id })
   }
   var bXIndex = 0
-  for (const day of this.days) {
+  for (const day of days) {
     while (
       bXIndex < borderCrossings.length - 1 &&
       day.date.valueOf() + 1000 * 24 * 60 * 60 - 1 - borderCrossings[bXIndex + 1].date.valueOf() > 0
     ) {
       bXIndex++
     }
-    day.country = borderCrossings[bXIndex].country
+    ;(day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
   }
+  this.days = days as TravelDay[]
 }
 
 travelSchema.methods.addCateringRefunds = async function () {
@@ -422,3 +436,5 @@ travelSchema.pre('save', async function (next) {
 })
 
 export default model<Travel, TravelModel>('Travel', travelSchema)
+
+export interface TravelDoc extends Methods, HydratedDocument<Travel> {}

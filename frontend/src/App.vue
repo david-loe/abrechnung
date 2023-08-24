@@ -125,7 +125,7 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { CountrySimple, Currency, Locale, User } from '../../common/types.js'
+import { Country, CountrySimple, Currency, Locale, User } from '../../common/types.js'
 import { log } from '../../common/logger.js'
 import { languages } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
@@ -143,8 +143,8 @@ export default defineComponent({
       alerts: [] as Alert[],
       auth: false,
       user: {} as User,
-      currencies: [],
-      countries: [],
+      currencies: [] as Currency[],
+      countries: [] as CountrySimple[],
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -157,15 +157,15 @@ export default defineComponent({
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
         this.loadingPromise = Promise.allSettled([this.getter('user'), this.getter('currency'), this.getter('country')]).then((result) => {
-          this.user = (result[0] as PromiseFulfilledResult<any>).value.data
+          this.user = (result[0] as PromiseFulfilledResult<{ data: User }>).value.data
           log(this.$t('labels.user') + ':')
           log(this.user)
           if (Object.keys(this.user).length > 0) {
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
-          this.currencies = (result[1] as PromiseFulfilledResult<any>).value.data
-          this.countries = (result[2] as PromiseFulfilledResult<any>).value.data
+          this.currencies = (result[1] as PromiseFulfilledResult<{ data: Currency[] }>).value.data
+          this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
           this.loadState = 'LOADED'
         })
         await this.loadingPromise

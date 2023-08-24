@@ -1,11 +1,12 @@
 import app from './app.js'
 import { User as IUser } from '../common/types.js'
+import { HydratedDocument } from 'mongoose'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 
 declare global {
   namespace Express {
-    interface User extends IUser {}
+    interface User extends HydratedDocument<IUser> {}
   }
   namespace NodeJS {
     interface ProcessEnv {

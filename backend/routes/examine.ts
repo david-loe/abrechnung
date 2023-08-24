@@ -2,13 +2,13 @@ import { getter, setter } from '../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../models/documentFile.js'
-import Travel from '../models/travel.js'
+import Travel, { TravelDoc } from '../models/travel.js'
 import i18n from '../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import { sendNotificationMail } from '../mail/mail.js'
 import { generateReport, generateAndWriteToDisk } from '../pdf/generate.js'
-import { Travel as ITravel, RecordType } from '../../common/types.js'
+import { Travel as ITravel } from '../../common/types.js'
 
 router.get('/travel', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
@@ -48,7 +48,7 @@ router.post('/travel/refunded', async (req, res) => {
     comment: req.body.comment,
     _id: req.body._id
   }
-  const check = async (oldObject: any) => {
+  const check = async (oldObject: TravelDoc) => {
     if (oldObject.state === 'underExamination') {
       await oldObject.saveToHistory()
       await oldObject.save()
@@ -76,7 +76,7 @@ router.post('/travel', async (req, res) => {
   delete req.body.expenses
   delete req.body.professionalShare
 
-  const check = async (oldObject: any) => {
+  const check = async (oldObject: TravelDoc) => {
     return oldObject.state !== 'refunded'
   }
   return setter(Travel, '', false, check)(req, res)

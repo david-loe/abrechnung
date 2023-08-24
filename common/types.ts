@@ -49,8 +49,8 @@ export interface Place {
 }
 
 export interface DocumentFile {
-  data?: Types.Buffer
-  owner?: Types.ObjectId
+  data: Types.Buffer
+  owner: Types.ObjectId
   type: 'image/jpeg' | 'image/png' | 'application/pdf'
   name: string
   _id?: Types.ObjectId
@@ -106,9 +106,9 @@ export interface Stage {
   endLocation: Place
   midnightCountries?: { date: Date | string; country: CountrySimple }[]
   distance?: number | null
-  transport: 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
+  transport: Transport
   cost: Cost
-  purpose: 'professional' | 'mixed' | 'private'
+  purpose: Purpose
   _id: Types.ObjectId
 }
 
@@ -148,20 +148,22 @@ export interface TravelSimple {
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
 
+export type LumpsumType = 'overnight' | 'catering8' | 'catering24'
+
 export interface Refund {
-  type: 'overnight' | 'catering8' | 'catering24'
+  type: LumpsumType
   refund: Money
 }
+
+export type Meal = 'breakfast' | 'lunch' | 'dinner'
 
 export interface TravelDay {
   date: Date | string
   country: CountrySimple
   cateringNoRefund: {
-    breakfast: boolean
-    lunch: boolean
-    dinner: boolean
+    [key in Meal]: boolean
   }
-  purpose: 'professional' | 'private'
+  purpose: SimplePurpose
   refunds: Refund[]
   _id: Types.ObjectId
 }
@@ -179,6 +181,12 @@ export interface Travel extends TravelSimple {
 export type Locale = 'de' | 'en'
 
 export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+
+export type Transport = 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
+
+export type SimplePurpose = 'professional' | 'private'
+
+export type Purpose = SimplePurpose | 'mixed'
 
 export interface Meta {
   count: number
