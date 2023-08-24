@@ -102,7 +102,8 @@ export function setter(
           }
         }
       }
-    } else if (req.body._id !== '') {
+    }
+    if (req.body._id && req.body._id !== '') {
       var oldObject = await model.findOne({ _id: req.body._id })
       if (checkUserIdField && checkUserIdField in model.schema.obj) {
         if (!oldObject || !oldObject[checkUserIdField]._id.equals(req.user!._id)) {
