@@ -14,7 +14,6 @@ const i18n = i18next.createInstance({
   lng: process.env.VITE_I18N_LOCALE || 'de',
   fallbackLng: process.env.VITE_I18N_FALLBACK_LOCALE || 'de',
   resources: loadLocaleMessages(),
-  // globalInjection: true,
   interpolation: {
     prefix: '{',
     suffix: '}',
@@ -22,5 +21,7 @@ const i18n = i18next.createInstance({
     nestingSuffix: "'}"
   }
 })
+
+await i18n.init()
 
 export default i18n
