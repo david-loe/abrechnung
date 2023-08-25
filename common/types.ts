@@ -164,7 +164,7 @@ export interface TravelDay {
   cateringNoRefund: {
     [key in Meal]: boolean
   }
-  purpose: SimplePurpose
+  purpose: PurposeSimple
   refunds: Refund[]
   _id: Types.ObjectId
 }
@@ -185,9 +185,9 @@ export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' 
 
 export type Transport = 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
 
-export type SimplePurpose = 'professional' | 'private'
+export type PurposeSimple = 'professional' | 'private'
 
-export type Purpose = SimplePurpose | 'mixed'
+export type Purpose = PurposeSimple | 'mixed'
 
 export interface Meta {
   count: number

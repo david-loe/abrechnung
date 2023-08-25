@@ -13,7 +13,7 @@ import {
   Currency as ICurrency,
   CountrySimple,
   Meal,
-  SimplePurpose,
+  PurposeSimple,
   Comment
 } from '../../common/types.js'
 
@@ -46,7 +46,7 @@ function costObject(exchangeRate = true, receipts = true, required = false, defa
 interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
-  getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[]
+  getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[]
   getBorderCrossings(): Promise<{ date: Date; country: any }[]>
   calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
@@ -204,7 +204,7 @@ travelSchema.methods.calculateProgress = function (this: TravelDoc) {
 travelSchema.methods.getDays = function (this: TravelDoc) {
   if (this.stages.length > 0) {
     const days = getDayList(this.stages[0].departure, this.stages[this.stages.length - 1].arrival)
-    const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: SimplePurpose; refunds: Refund[] }[] = days.map(
+    const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[] = days.map(
       (d) => {
         return { date: d, refunds: [] }
       }
