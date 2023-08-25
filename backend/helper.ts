@@ -249,14 +249,17 @@ function convertRawLumpSum(raw: {
   [key: string]: string | string[] | { [key: string]: string | string[] }[]
 }): Omit<CountryLumpSum, 'validFrom'> {
   const spezials: CountryLumpSum['spezials'] = []
-  for (const spezial of raw.spezials as { [key: string]: string | string[] }[]) {
-    spezials.push({
-      catering24: parseInt(spezial.catering24 as string, 10),
-      catering8: parseInt(spezial.catering8 as string, 10),
-      overnight: parseInt(spezial.overnight as string, 10),
-      city: spezial.city as string
-    })
+  if (raw.spezials) {
+    for (const spezial of raw.spezials as { [key: string]: string | string[] }[]) {
+      spezials.push({
+        catering24: parseInt(spezial.catering24 as string, 10),
+        catering8: parseInt(spezial.catering8 as string, 10),
+        overnight: parseInt(spezial.overnight as string, 10),
+        city: spezial.city as string
+      })
+    }
   }
+
   return {
     catering24: parseInt(raw.catering24 as string, 10),
     catering8: parseInt(raw.catering8 as string, 10),
