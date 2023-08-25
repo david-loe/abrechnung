@@ -1,7 +1,8 @@
 import test from 'ava'
-import { testHistory } from './tests/travel.js'
-import app from './app.js'
+import { testLogin, testGetUser, testGetUserToken, testPostUserToken, testDeleteUserToken } from './tests/user.js'
 
-console.log(app.name)
-
-test('Travel History', testHistory)
+test('Login', testLogin)
+test('GET /user', testGetUser)
+test('GET /user/token', testGetUserToken)
+test('POST /user/token', testPostUserToken)
+test('DELETE /user/token', testDeleteUserToken)

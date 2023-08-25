@@ -12,13 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set production mode in .env
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: 'NODE_ENV=development'
-          replace: 'NODE_ENV=production'
-          include: '.env'
       - name: Build the stack
-        run: docker-compose up -d --build
+        run: docker-compose up -d --build backend ldap
       - name: Run Tests
         run: docker-compose exec -T backend npm test

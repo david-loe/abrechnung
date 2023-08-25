@@ -16,7 +16,7 @@ import uploadRoutes from './routes/upload.js'
 import { Access } from '../common/types.js'
 import { MongoClient } from 'mongodb'
 
-const mongoClientPromise = mongoose.connect(process.env.MONGO_URL, {}).then(() => {
+mongoose.connect(process.env.MONGO_URL, {}).then(() => {
   console.log(i18n.t('alerts.db.success'))
 })
 initDB()
