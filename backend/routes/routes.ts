@@ -267,7 +267,7 @@ router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
 router.get('/documentFile', async (req, res) => {
-  const file = await DocumentFile.findOne({ _id: req.query.id })
+  const file = await DocumentFile.findOne({ _id: req.query.id }).lean()
   if (file && req.user!._id.equals(file.owner._id)) {
     res.setHeader('Content-Type', file.type)
     res.setHeader('Content-Length', file.data.length)
@@ -277,15 +277,7 @@ router.get('/documentFile', async (req, res) => {
   }
 })
 
-router.delete('/documentFile', async (req, res) => {
-  const file = await DocumentFile.findOne({ _id: req.query.id })
-  if (file && req.user!._id.equals(file.owner._id)) {
-    await DocumentFile.deleteOne({ _id: file._id })
-    return res.send({ message: i18n.t('alerts.successDeleting') })
-  } else {
-    return res.sendStatus(403)
-  }
-})
+router.delete('/documentFile', deleter(DocumentFile, 'owner'))
 
 router.post('/travel/appliedFor', async (req, res) => {
   req.body = {
@@ -342,7 +334,7 @@ router.post('/travel/underExamination', async (req, res) => {
           if (receipts.length == 0) {
             if (req.user!.vehicleRegistration) {
               for (const vr of req.user!.vehicleRegistration) {
-                const doc = (await DocumentFile.findOne({ _id: vr._id }))!.toObject()
+                const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
                 delete (doc as unknown as any)._id
                 receipts.push(await DocumentFile.create(doc))
               }
@@ -361,7 +353,7 @@ router.post('/travel/underExamination', async (req, res) => {
 })
 
 router.get('/travel/report', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user!._id, historic: false, state: 'refunded' })
+  const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user!._id, historic: false, state: 'refunded' }).lean()
   if (travel) {
     const report = await generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')

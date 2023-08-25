@@ -179,7 +179,7 @@ travelSchema.pre('deleteOne', { document: true, query: false }, function (this: 
 })
 
 travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
-  const doc: any = (await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }))!.toObject()
+  const doc: any = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
   doc.historic = true
   const old = await model('Travel').create(doc)
@@ -237,7 +237,7 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
           if (['ownCar', 'otherTransport'].indexOf(stage.transport) !== -1) {
             if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
           } else if ((stage.transport = 'airplane')) {
-            const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry })
+            const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
@@ -247,7 +247,7 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
               throw new Error('secoundNightOnAirplaneLumpSumCountry(' + settings.secoundNightOnAirplaneLumpSumCountry + ') not found')
             }
           } else if ((stage.transport = 'shipOrFerry')) {
-            const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry })
+            const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),

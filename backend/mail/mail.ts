@@ -78,10 +78,10 @@ export async function sendNotificationMail(travel: Travel) {
   const lastParagraph = interpolation.comment ? i18n.t('mail.' + travel.state + '.lastParagraph', interpolation) : ''
 
   if (travel.state === 'appliedFor') {
-    recipients = await User.find({ 'access.approve': true })
+    recipients = await User.find({ 'access.approve': true }).lean()
     button.link = process.env.VITE_FRONTEND_URL + '/approve/' + travel._id
   } else if (travel.state === 'underExamination') {
-    recipients = await User.find({ 'access.examine': true })
+    recipients = await User.find({ 'access.examine': true }).lean()
     button.link = process.env.VITE_FRONTEND_URL + '/examine/' + travel._id
   } else {
     // 'rejected', 'approved', 'refunded'

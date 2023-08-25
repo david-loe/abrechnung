@@ -34,7 +34,7 @@ export function getter(
     delete req.query.page
     if (req.query.id && req.query.id != '') {
       var conditions: any = Object.assign({ _id: req.query.id }, preConditions)
-      const result = await model.findOne(conditions, select)
+      const result = await model.findOne(conditions, select).lean()
       if (result != null) {
         res.send({ data: result })
       } else {

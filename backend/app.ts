@@ -108,13 +108,15 @@ app.post('/login', passport.authenticate('ldapauth', { session: true }), async (
   res.send({ status: 'ok' })
 })
 
-User.find({}).then(async (docs) => {
-  if (docs.length === 0) {
-    const admin = new User({ uid: process.env.ADMIN_UID, access: { admin: true } })
-    await admin.save()
-    console.log('Added Admin User')
-  }
-})
+User.find({})
+  .lean()
+  .then(async (docs) => {
+    if (docs.length === 0) {
+      const admin = new User({ uid: process.env.ADMIN_UID, access: { admin: true } })
+      await admin.save()
+      console.log('Added Admin User')
+    }
+  })
 
 app.use('/api', async (req, res, next) => {
   if (req.isAuthenticated()) {

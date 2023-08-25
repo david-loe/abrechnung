@@ -12,7 +12,7 @@ const router = express.Router()
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 router.get('/new', async (req, res) => {
-  const user = await User.findOne({ _id: req.query.user })
+  const user = await User.findOne({ _id: req.query.user }).lean()
   if (user && user.token && user.token._id.equals(req.query.token as string)) {
     const template = fs.readFileSync('./routes/upload.ejs', { encoding: 'utf-8' })
     const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')
@@ -34,7 +34,7 @@ router.get('/new', async (req, res) => {
 })
 
 router.post('/new', fileHandler.any(), async (req, res) => {
-  const user = await User.findOne({ _id: req.query.user })
+  const user = await User.findOne({ _id: req.query.user }).lean()
   if (user && user.token && user.token._id.equals(req.query.token as string)) {
     const token = new Token(user.token)
     if (req.body.files && req.files) {

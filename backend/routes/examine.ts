@@ -1,4 +1,4 @@
-import { getter, setter } from '../helper.js'
+import { deleter, getter, setter } from '../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../models/documentFile.js'
@@ -207,7 +207,7 @@ router.delete('/travel/stage', deleteRecord('stages'))
 router.delete('/travel/expense', deleteRecord('expenses'))
 
 router.get('/documentFile', async (req, res) => {
-  const file = await DocumentFile.findOne({ _id: req.query.id })
+  const file = await DocumentFile.findOne({ _id: req.query.id }).lean()
   if (file) {
     res.setHeader('Content-Type', file.type)
     res.setHeader('Content-Length', file.data!.length)
@@ -217,18 +217,10 @@ router.get('/documentFile', async (req, res) => {
   }
 })
 
-router.delete('/documentFile', async (req, res) => {
-  const file = await DocumentFile.findOne({ _id: req.query.id })
-  if (file) {
-    await DocumentFile.deleteOne({ _id: file._id })
-    return res.send({ message: i18n.t('alerts.successDeleting') })
-  } else {
-    return res.sendStatus(403)
-  }
-})
+router.delete('/documentFile', deleter(DocumentFile))
 
 router.get('/travel/report', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' })
+  const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
   if (travel) {
     const report = await generateReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf')

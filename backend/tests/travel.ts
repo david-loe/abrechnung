@@ -2,7 +2,7 @@ import User from '../models/user.js'
 import Travel from '../models/travel.js'
 
 async function getTestTravel() {
-  const testUser = await User.findOne({})
+  const testUser = await User.findOne({}).lean()
 
   return new Travel({
     name: 'Test',
