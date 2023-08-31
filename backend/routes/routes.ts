@@ -12,6 +12,7 @@ import DocumentFile from '../models/documentFile.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import { generateReport } from '../pdf/generate.js'
 import { Country as ICountry, Travel as ITravel } from '../../common/types.js'
+import { mongo } from 'mongoose'
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
@@ -85,8 +86,12 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
         }
         await DocumentFile.findOneAndUpdate({ _id: req.body.vehicleRegistration[i]._id }, req.body.vehicleRegistration[i])
       } else {
-        var result = await new DocumentFile(req.body.vehicleRegistration[i]).save()
-        req.body.vehicleRegistration[i] = result._id
+        try {
+          var result = await new DocumentFile(req.body.vehicleRegistration[i]).save()
+          req.body.vehicleRegistration[i] = result._id
+        } catch (error) {
+          return res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
+        }
       }
     }
     req.user!.vehicleRegistration = req.body.vehicleRegistration
@@ -270,8 +275,8 @@ router.get('/documentFile', async (req, res) => {
   const file = await DocumentFile.findOne({ _id: req.query.id }).lean()
   if (file && req.user!._id.equals(file.owner._id)) {
     res.setHeader('Content-Type', file.type)
-    res.setHeader('Content-Length', file.data.length)
-    return res.send(file.data)
+    res.setHeader('Content-Length', (file.data as any as mongo.Binary).length())
+    return res.send((file.data as any as mongo.Binary).buffer)
   } else {
     return res.sendStatus(403)
   }

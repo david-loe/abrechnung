@@ -13,7 +13,7 @@ import {
 } from '../../common/scripts.js'
 import Travel from '../models/travel.js'
 import DocumentFile from '../models/documentFile.js'
-import mongoose from 'mongoose'
+import mongoose, { mongo } from 'mongoose'
 import {
   Cost,
   CountrySimple,
@@ -479,7 +479,7 @@ async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: ReceiptMa
   }
   for (const receiptId in receiptMap) {
     const receipt = receiptMap[receiptId]
-    const data = (await DocumentFile.findOne({ _id: receipt._id }).lean())!.data
+    const data = ((await DocumentFile.findOne({ _id: receipt._id }).lean())!.data as any as mongo.Binary).buffer
     if (receipt.type == 'application/pdf') {
       const insertPDF = await pdf_lib.PDFDocument.load(data)
       const pages = await pdfDoc.copyPages(insertPDF, insertPDF.getPageIndices())

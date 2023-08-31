@@ -9,6 +9,7 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import { sendNotificationMail } from '../mail/mail.js'
 import { generateReport, generateAndWriteToDisk } from '../pdf/generate.js'
 import { Travel as ITravel } from '../../common/types.js'
+import { mongo } from 'mongoose'
 
 router.get('/travel', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
@@ -210,8 +211,8 @@ router.get('/documentFile', async (req, res) => {
   const file = await DocumentFile.findOne({ _id: req.query.id }).lean()
   if (file) {
     res.setHeader('Content-Type', file.type)
-    res.setHeader('Content-Length', file.data!.length)
-    return res.send(file.data)
+    res.setHeader('Content-Length', (file.data as any as mongo.Binary).length())
+    return res.send((file.data as any as mongo.Binary).buffer)
   } else {
     return res.sendStatus(403)
   }
