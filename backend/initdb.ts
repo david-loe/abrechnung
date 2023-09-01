@@ -4,6 +4,7 @@ import { getFlagEmoji } from '../common/scripts.js'
 import Currency from './models/currency.js'
 import Country from './models/country.js'
 import { Model } from 'mongoose'
+import User from './models/user.js'
 
 function loadLumpSums() {
   const lumpSums: { validFrom: Date; data: any }[] = []
@@ -33,52 +34,41 @@ function loadCurrencies() {
   return result
 }
 
-const initer = function (model: Model<any>, name: string, data: any[]) {
-  return new Promise<void>((resolve) => {
-    model
-      .find({})
-      .lean()
-      .then((docs) => {
-        if (docs.length === 0) {
-          model.insertMany(data).then((docs) => {
-            console.log('Added ' + docs.length + ' ' + name)
-            resolve()
-          })
-        } else {
-          console.log(docs.length + ' ' + name + ' exist')
-          resolve()
-        }
-      })
-  })
-}
-
-function addAllLumpSums() {
-  const lumpSums = loadLumpSums()
-  lumpSums.sort((a, b) => a.validFrom.valueOf() - b.validFrom.valueOf())
-  for (const lumpSum of lumpSums) {
-    addLumpSumsToCountries(lumpSum.data, lumpSum.validFrom, 'de').then((result) => {
-      console.log(
-        'Lump sum from ' +
-          lumpSum.validFrom.toDateString() +
-          ': ' +
-          result.success.length +
-          ' updated - ' +
-          result.noUpdate.length +
-          ' not updated - ' +
-          result.noCountryFound.length +
-          ' no country found'
-      )
-      for (const notFound of result.noCountryFound) {
-        console.log(notFound.country)
-      }
-    })
+async function initer(model: Model<any>, name: string, data: any[]) {
+  const docs = await model.find({}).lean()
+  if (docs.length === 0) {
+    const newDocs = await model.insertMany(data)
+    console.log('Added ' + newDocs.length + ' ' + name)
+  } else {
+    console.log(docs.length + ' ' + name + ' exist')
   }
 }
 
-export default function initDB() {
-  initer(Currency, 'currencies', loadCurrencies()).then(() => {
-    initer(Country, 'countries', loadCountries()).then(() => {
-      addAllLumpSums()
-    })
-  })
+async function addAllLumpSums() {
+  const lumpSums = loadLumpSums()
+  lumpSums.sort((a, b) => a.validFrom.valueOf() - b.validFrom.valueOf())
+  for (const lumpSum of lumpSums) {
+    const result = await addLumpSumsToCountries(lumpSum.data, lumpSum.validFrom, 'de')
+    console.log(
+      'Lump sum from ' +
+        lumpSum.validFrom.toDateString() +
+        ': ' +
+        result.success.length +
+        ' updated - ' +
+        result.noUpdate.length +
+        ' not updated - ' +
+        result.noCountryFound.length +
+        ' no country found'
+    )
+    for (const notFound of result.noCountryFound) {
+      console.log(notFound.country)
+    }
+  }
+}
+
+export default async function initDB() {
+  await initer(Currency, 'currencies', loadCurrencies())
+  await initer(Country, 'countries', loadCountries())
+  await initer(User, 'users', [{ uid: process.env.ADMIN_UID, access: { admin: true } }])
+  await addAllLumpSums()
 }

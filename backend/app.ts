@@ -16,10 +16,10 @@ import uploadRoutes from './routes/upload.js'
 import { Access } from '../common/types.js'
 import { MongoClient } from 'mongodb'
 
-mongoose.connect(process.env.MONGO_URL, {}).then(() => {
-  console.log(i18n.t('alerts.db.success'))
-})
-initDB()
+await mongoose.connect(process.env.MONGO_URL, {})
+console.log(i18n.t('alerts.db.success'))
+
+await initDB()
 
 // Get LDAP credentials from ENV
 passport.use(
@@ -107,16 +107,6 @@ app.use(passport.session())
 app.post('/login', passport.authenticate('ldapauth', { session: true }), async (req, res) => {
   res.send({ status: 'ok' })
 })
-
-User.find({})
-  .lean()
-  .then(async (docs) => {
-    if (docs.length === 0) {
-      const admin = new User({ uid: process.env.ADMIN_UID, access: { admin: true } })
-      await admin.save()
-      console.log('Added Admin User')
-    }
-  })
 
 app.use('/api', async (req, res, next) => {
   if (req.isAuthenticated()) {
