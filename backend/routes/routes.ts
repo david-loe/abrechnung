@@ -109,25 +109,29 @@ router.post('/user/vehicleRegistration', fileHandler.any(), async (req, res) => 
 router.get('/currency', getter(Currency, 'currency', 200))
 router.get('/country', async (req, res) => {
   const select: Partial<{ [key in keyof ICountry]: number }> = {}
-  if (!req.query.lumpSums) {
+  if (!req.query.addLumpSums) {
     select.lumpSums = 0
     select.lumpSumsFrom = 0
   }
+  delete req.query.addLumpSums
   return getter(Country, 'country', 400, {}, select)(req, res)
 })
 
 router.get('/travel', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.stages) {
+  if (!req.query.addStages) {
     select.stages = 0
   }
-  if (!req.query.expenses) {
+  delete req.query.addStages
+  if (!req.query.addExpenses) {
     select.expenses = 0
   }
-  if (!req.query.days) {
+  delete req.query.addExpenses
+  if (!req.query.addDays) {
     select.days = 0
   }
+  delete req.query.addDays
   return getter(Travel, 'travel', 20, { traveler: req.user!._id, historic: false }, select, sortFn)(req, res)
 })
 

@@ -621,9 +621,9 @@ export default defineComponent({
       this.travel = (
         await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, {
           id: this._id,
-          stages: true,
-          expenses: true,
-          days: true
+          addStages: true,
+          addExpenses: true,
+          addDays: true
         })
       ).data
       if (oldTravel.days && this.travel.days) {
