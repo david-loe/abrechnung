@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Stage, Travel, TravelSimple } from '../../../common/types.js'
+import { Expense, Stage, Travel, TravelSimple } from '../../../common/types.js'
 import createAgent, { loginApprove, loginUser } from './_agent.js'
 
 const agent = createAgent()
@@ -141,6 +141,28 @@ test.serial('POST /travel/stage', async (t) => {
   t.plan(stages.length + 0)
   for (const stage of stages) {
     const res = await agent.post('/api/travel/stage').send(Object.assign(stage, { travelId: travel._id }))
+    t.is(res.status, 200)
+  }
+})
+
+const expenses: Expense[] = [
+  //@ts-ignore
+  {
+    description: 'Konferenzkosten',
+    cost: {
+      amount: 82,
+      currency: 'TRY',
+      receipts: [],
+      date: new Date('2023-08-07T00:00:00.000Z')
+    },
+    purpose: 'professional'
+  }
+]
+
+test.serial('POST /travel/expense', async (t) => {
+  t.plan(expenses.length + 0)
+  for (const expense of expenses) {
+    const res = await agent.post('/api/travel/expense').send(Object.assign(expense, { travelId: travel._id }))
     t.is(res.status, 200)
   }
 })
