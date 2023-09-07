@@ -23,7 +23,7 @@ export async function loginExamine(agent: request.SuperAgentTest) {
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
   }
-  const user = { _id: userId, uid: 'zoidberg', access: { admin: false, examine: false, approve: true } }
+  const user = { _id: userId, uid: 'zoidberg', access: { examine: true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
   await agent.post('/login').send({ username: 'zoidberg', password: 'zoidberg' })
@@ -36,7 +36,7 @@ export async function loginApprove(agent: request.SuperAgentTest) {
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
   }
-  const user = { _id: userId, uid: 'hermes', access: { admin: false, examine: false, approve: true } }
+  const user = { _id: userId, uid: 'hermes', access: { approve: true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
   await agent.post('/login').send({ username: 'hermes', password: 'hermes' })

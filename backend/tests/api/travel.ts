@@ -1,6 +1,6 @@
 import test from 'ava'
 import { Expense, Stage, Travel, TravelSimple } from '../../../common/types.js'
-import createAgent, { loginApprove, loginUser } from './_agent.js'
+import createAgent, { loginApprove, loginExamine, loginUser } from './_agent.js'
 
 const agent = createAgent()
 await loginUser(agent)
@@ -165,6 +165,37 @@ test.serial('POST /travel/expense', async (t) => {
     const res = await agent.post('/api/travel/expense').send(Object.assign(expense, { travelId: travel._id }))
     t.is(res.status, 200)
   }
+})
+
+test.serial('POST /travel/underExamination', async (t) => {
+  t.plan(4)
+  const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
+  const res = await agent.post('/api/travel/underExamination').send({ _id: travel._id, comment })
+  t.is(res.status, 200)
+  t.is((res.body.result as Travel).state, 'underExamination')
+  t.is((res.body.result as Travel).history.length, 2)
+  t.like((res.body.result as Travel).comments[1], { text: comment, toState: 'underExamination' })
+})
+
+// EXAMINE
+
+test.serial('POST /examine/travel/refunded', async (t) => {
+  await loginExamine(agent)
+  t.plan(4)
+  const comment = '' // empty string should not create comment
+  const res = await agent.post('/api/examine/travel/refunded').send({ _id: travel._id, comment })
+  t.is(res.status, 200)
+  t.is((res.body.result as Travel).state, 'refunded')
+  t.is((res.body.result as Travel).history.length, 3)
+  t.is((res.body.result as Travel).comments.length, 2)
+})
+
+// REPORT
+
+test.serial('GET /travel/report', async (t) => {
+  await loginUser(agent)
+  const res = await agent.get('/api/travel/report').query({ id: travel._id })
+  t.is(res.status, 200)
 })
 
 test.after.always('DELETE /travel', async (t) => {
