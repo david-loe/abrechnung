@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the stack
-        run: docker-compose up -d --build backend ldap
+        run: docker-compose up -d --build backend ldap inbucket
       - name: Wait that backend initializes db
         run: sleep 15s
       - name: Run Tests
