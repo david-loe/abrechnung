@@ -1,6 +1,9 @@
 import test from 'ava'
-import agent from './_agent.js'
 import { User } from '../../../common/types.js'
+import createAgent, { loginUser } from './_agent.js'
+
+const agent = createAgent()
+await loginUser(agent)
 
 test('POST /login', async (t) => {
   const res = await agent.post('/login').send({ username: 'professor', password: 'professor' })

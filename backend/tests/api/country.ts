@@ -1,6 +1,9 @@
 import test from 'ava'
-import agent from './_agent.js'
 import { Country } from '../../../common/types.js'
+import createAgent, { loginUser } from './_agent.js'
+
+const agent = createAgent()
+await loginUser(agent)
 
 test('GET /country', async (t) => {
   const res = await agent.get('/api/country')
