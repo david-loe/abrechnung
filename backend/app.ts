@@ -74,10 +74,14 @@ passport.serializeUser(async (ldapUser: any, cb) => {
       email = undefined
     }
   }
+  var name = ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]
+  if (!name) {
+    name = ldapUser[process.env.LDAP_UID_ATTRIBUTE]
+  }
   const newUser = {
     uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE],
     email: email,
-    name: ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]
+    name: name
   }
   if (!user) {
     user = new User(newUser)

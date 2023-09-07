@@ -69,6 +69,20 @@ async function addAllLumpSums() {
 export default async function initDB() {
   await initer(Currency, 'currencies', loadCurrencies())
   await initer(Country, 'countries', loadCountries())
-  await initer(User, 'users', [{ uid: process.env.ADMIN_UID, access: { admin: true } }])
+
+  const admins = await User.find({ 'access.admin': true })
+  if (admins.length == 0) {
+    const admin = await User.findOne({ uid: process.env.ADMIN_UID })
+    if (admin) {
+      admin.access.admin = true
+      admin.markModified('access')
+      await admin.save()
+      console.log('Returned admin access to: ' + process.env.ADMIN_UID)
+    } else {
+      await new User({ uid: process.env.ADMIN_UID, access: { admin: true } }).save()
+      console.log('Added admin: ' + process.env.ADMIN_UID)
+    }
+  }
+
   await addAllLumpSums()
 }
