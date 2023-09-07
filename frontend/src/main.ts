@@ -24,8 +24,6 @@ if (/windows/i.test(navigator.userAgent)) {
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    $t: typeof i18n.global.t
-    $i18n: typeof i18n.global
     $router: typeof router
     $root: {
       getter: (endpoint: string, params?: {}, config?: {}) => Promise<any>
