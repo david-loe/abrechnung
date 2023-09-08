@@ -46,8 +46,14 @@
         </div>
       </div>
 
-      <div>
-        <StateBadge :state="travel.state"></StateBadge>
+      <div class="row">
+        <div class="col"><StateBadge :state="travel.state"></StateBadge></div>
+        <div v-if="travel.traveler._id !== travel.editor._id" class="col-auto">
+          <small class="ms-1">
+            <i class="bi bi-pencil-square"></i>
+            {{ travel.editor.name }}
+          </small>
+        </div>
       </div>
     </div>
   </div>
