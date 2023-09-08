@@ -10,6 +10,7 @@
   "lunchCateringLumpSumCut": 0.4,
   "dinnerCateringLumpSumCut": 0.4,
   "toleranceStageDatesToApprovedTravelDates": 3,
+  "maxTravelDayCount": 92,
   "baseCurrency": { "_id": "EUR", "symbol": "€", "name": { "de": "Euro", "en": "euro" }, "subunit": "Cent" },
   "allowSpouseRefund": true,
   "refundPerKM": 0.3,

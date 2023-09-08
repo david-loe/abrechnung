@@ -37,7 +37,7 @@
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label
         ><span class="text-danger">*</span>
-        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" required />
+        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" :max="getMaxDate()" required />
       </div>
     </div>
 
@@ -100,6 +100,7 @@ import PlaceInput from '../Elements/PlaceInput.vue'
 import DateInput from '../Elements/DateInput.vue'
 import { TravelSimple, Place } from '../../../../common/types.js'
 import settings from '../../../../common/settings.json'
+import { datetimeToDateString, isValidDate } from '../../../../common/scripts.js'
 
 interface FormTravelSimple
   extends Omit<TravelSimple, 'destinationPlace' | 'traveler' | 'state' | 'editor' | 'comments' | 'progress' | '_id'> {
@@ -152,6 +153,14 @@ export default defineComponent({
     input() {
       this.loading = false
       return Object.assign({}, structuredClone(defaultTravel), this.travel)
+    },
+    getMaxDate() {
+      const date = isValidDate(this.formTravel.startDate as string)
+      if (date) {
+        return datetimeToDateString(date.valueOf() + settings.maxTravelDayCount * 1000 * 60 * 60 * 24)
+      } else {
+        return ''
+      }
     }
   },
   beforeMount() {

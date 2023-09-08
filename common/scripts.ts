@@ -14,7 +14,7 @@ export function getFlagEmoji(countryCode: string): string | null {
   return String.fromCodePoint(...codePoints)
 }
 
-function isValidDate(date: Date | string | number): Date | null {
+export function isValidDate(date: Date | string | number): Date | null {
   if (date === null) {
     return null
   }
