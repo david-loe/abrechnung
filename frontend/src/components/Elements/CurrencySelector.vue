@@ -1,13 +1,13 @@
 <template>
   <v-select
     v-if="$root.currencies.length > 0"
-    :options="$root.currencies"
+    :options="$root.user.settings.lastCurrencies.concat($root.currencies)"
     :modelValue="modelValue"
-    @update:modelValue="(v: string) => $emit('update:modelValue', v)"
     :placeholder="$t('labels.currency')"
+    @update:modelValue="(v: Currency) => $emit('update:modelValue', v)"
+    @option:selected="$root.setLastCurrency"
     :filter="filter"
     :disabled="disabled"
-    :reduce="(cur: Currency) => cur._id"
     style="min-width: 200px">
     <template #option="{ name, _id, symbol, flag }: Currency">
       <div class="row align-items-center">
@@ -50,7 +50,7 @@ export default defineComponent({
   },
   components: {},
   props: {
-    modelValue: { type: [String, Object] as PropType<string | Currency> },
+    modelValue: { type: Object as PropType<Currency> },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false }
   },

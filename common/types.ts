@@ -86,7 +86,7 @@ export interface User extends UserSimple {
 
 export interface Money {
   amount: number | null
-  currency: Currency | string
+  currency: Currency
   exchangeRate?: {
     date: Date | string
     rate: number

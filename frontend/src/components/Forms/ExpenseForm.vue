@@ -64,6 +64,7 @@ import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import DateInput from '../Elements/DateInput.vue'
 import { Expense } from '../../../../common/types.js'
+import settings from '../../../../common/settings.json'
 
 interface FormExpense extends Omit<Expense, '_id'> {
   _id?: string
@@ -73,7 +74,7 @@ const defaultExpense: FormExpense = {
   description: '',
   cost: {
     amount: null,
-    currency: 'EUR',
+    currency: settings.baseCurrency,
     receipts: [],
     date: ''
   },

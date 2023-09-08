@@ -11,7 +11,7 @@
   "dinnerCateringLumpSumCut": 0.4,
   "toleranceStageDatesToApprovedTravelDates": 3,
   "maxTravelDayCount": 92,
-  "baseCurrency": { "_id": "EUR", "symbol": "€", "name": { "de": "Euro", "en": "euro" }, "subunit": "Cent" },
+  "baseCurrency": { "_id": "EUR", "symbol": "€", "name": { "de": "Euro", "en": "euro" }, "subunit": "Cent", "flag": "🇪🇺" },
   "allowSpouseRefund": true,
   "refundPerKM": 0.3,
   "version": 0,

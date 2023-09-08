@@ -86,7 +86,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     travelInsideOfEU: { type: Boolean, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    advance: costObject(true, false, false, 'EUR'),
+    advance: costObject(true, false, false, settings.baseCurrency._id),
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
     progress: { type: Number, min: 0, max: 100, default: 0 },

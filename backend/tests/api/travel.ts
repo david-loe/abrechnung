@@ -1,6 +1,7 @@
 import test from 'ava'
 import { Expense, Stage, Travel, TravelSimple } from '../../../common/types.js'
 import createAgent, { loginApprove, loginExamine, loginUser } from './_agent.js'
+import { setStrokingGrayscaleColor } from 'pdf-lib'
 
 const agent = createAgent()
 await loginUser(agent)
@@ -17,8 +18,8 @@ var travel: TravelSimple = {
   startDate: new Date('2023-08-24T00:00:00.000Z'),
   endDate: new Date('2023-09-02T00:00:00.000Z'),
   advance: {
-    amount: null,
-    currency: 'EUR',
+    amount: null, //@ts-ignore
+    currency: { _id: 'EUR' },
     exchangeRate: null
   }
 }
@@ -85,8 +86,8 @@ const stages: Stage[] = [
     midnightCountries: [],
     transport: 'airplane',
     cost: {
-      amount: 652,
-      currency: 'USD',
+      amount: 652, //@ts-ignore
+      currency: { _id: 'USD' },
       receipts: [],
       date: new Date('2023-08-04T00:00:00.000Z')
     },
@@ -108,8 +109,8 @@ const stages: Stage[] = [
     midnightCountries: [],
     transport: 'airplane', //@ts-ignore
     cost: {
-      amount: null,
-      currency: 'EUR'
+      amount: null, //@ts-ignore
+      currency: { _id: 'EUR' }
     },
     purpose: 'professional'
   },
@@ -129,8 +130,8 @@ const stages: Stage[] = [
     midnightCountries: [],
     transport: 'airplane', //@ts-ignore
     cost: {
-      amount: null,
-      currency: 'EUR'
+      amount: null, //@ts-ignore
+      currency: { _id: 'EUR' }
     },
     purpose: 'professional'
   }
@@ -150,8 +151,8 @@ const expenses: Expense[] = [
   {
     description: 'Konferenzkosten',
     cost: {
-      amount: 82,
-      currency: 'TRY',
+      amount: 82, //@ts-ignore
+      currency: { _id: 'TRY' },
       receipts: [],
       date: new Date('2023-08-07T00:00:00.000Z')
     },

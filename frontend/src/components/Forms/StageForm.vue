@@ -177,7 +177,7 @@ const defaultStage: FormStage = {
   transport: 'otherTransport',
   cost: {
     amount: null,
-    currency: 'EUR',
+    currency: settings.baseCurrency,
     receipts: [],
     date: ''
   },

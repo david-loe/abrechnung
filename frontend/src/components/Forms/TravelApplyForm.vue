@@ -117,7 +117,7 @@ const defaultTravel: FormTravelSimple = {
   claimSpouseRefund: false,
   advance: {
     amount: null,
-    currency: 'EUR'
+    currency: settings.baseCurrency
   }
 }
 export default defineComponent({

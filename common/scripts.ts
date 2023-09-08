@@ -85,7 +85,12 @@ export function getMoneyString(
   }
   return func(amount).toLocaleString(locale, {
     style: 'currency',
-    currency: useExchangeRate && money.exchangeRate ? 'EUR' : typeof money.currency === 'string' ? money.currency : money.currency._id // baseCurrency
+    currency:
+      useExchangeRate && money.exchangeRate
+        ? settings.baseCurrency._id
+        : typeof money.currency === 'string'
+        ? money.currency
+        : money.currency._id // baseCurrency
   })
 }
 
@@ -95,7 +100,7 @@ export function getDetailedMoneyString(money: Money, locale: Locale, printZero =
   }
   var str = money.amount!.toLocaleString(locale, {
     style: 'currency',
-    currency: (money.currency as Currency) ? (money.currency as Currency)._id : (money.currency as string)
+    currency: money.currency._id
   })
   if (money.exchangeRate && money.exchangeRate.rate) {
     str = str + ' * ' + money.exchangeRate.rate.toLocaleString(locale, { maximumFractionDigits: 4 }) + ' = '
@@ -103,7 +108,7 @@ export function getDetailedMoneyString(money: Money, locale: Locale, printZero =
       str +
       money.exchangeRate.amount.toLocaleString(locale, {
         style: 'currency',
-        currency: 'EUR' // baseCurrency
+        currency: settings.baseCurrency._id
       })
   }
   return str
