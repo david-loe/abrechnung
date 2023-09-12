@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <div class="ms-auto col-auto d-none d-md-block">
+      <div v-if="!disabled" class="ms-auto col-auto d-none d-md-block">
         <button v-if="!token" type="button" class="btn btn-light text-center" @click="generateToken">
           <i class="bi bi-qr-code-scan"></i>
           <span class="ms-1">{{ $t('labels.uploadFromPhone') }}</span>
