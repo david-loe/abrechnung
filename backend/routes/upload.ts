@@ -36,27 +36,29 @@ router.get('/new', async (req, res) => {
 router.post('/new', fileHandler.any(), async (req, res) => {
   const user = await User.findOne({ _id: req.query.user }).lean()
   if (user && user.token && user.token._id.equals(req.query.token as string)) {
-    const token = new Token(user.token)
-    if (req.body.files && req.files) {
-      for (var i = 0; i < req.body.files.length; i++) {
-        var buffer = null
-        for (const file of req.files as Express.Multer.File[]) {
-          if (file.fieldname == 'files[' + i + '][data]') {
-            buffer = file.buffer
-            break
+    const token = await Token.findOne({ _id: req.query.token })
+    if (token) {
+      if (req.body.files && req.files) {
+        for (var i = 0; i < req.body.files.length; i++) {
+          var buffer = null
+          for (const file of req.files as Express.Multer.File[]) {
+            if (file.fieldname == 'files[' + i + '][data]') {
+              buffer = file.buffer
+              break
+            }
+          }
+          if (buffer) {
+            req.body.files[i].owner = user._id
+            req.body.files[i].data = buffer
           }
         }
-        if (buffer) {
-          req.body.files[i].owner = user._id
-          req.body.files[i].data = buffer
+        for (const file of req.body.files) {
+          token.files.push((await new DocumentFile(file).save())._id)
         }
+        token.markModified('files')
+        await token.save()
+        return res.send('ok')
       }
-      for (const file of req.body.files) {
-        token.files.push((await new DocumentFile(file).save())._id)
-      }
-      token.markModified('files')
-      await token.save()
-      return res.send('ok')
     }
   }
   return res.sendStatus(403)

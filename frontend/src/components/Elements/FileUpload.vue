@@ -95,7 +95,7 @@ export default defineComponent({
       const windowProxy = window.open('', '_blank') as Window
       if (this.modelValue[index]._id) {
         const result = await this.$root.getter(
-          this.endpointPrefix + '/documentFile',
+          this.endpointPrefix + 'documentFile',
           { id: this.modelValue[index]._id },
           { responseType: 'blob' }
         )
@@ -113,7 +113,7 @@ export default defineComponent({
     async deleteFile(index: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (this.modelValue[index]._id) {
-          const result = await this.$root.deleter(this.endpointPrefix + '/documentFile', { id: this.modelValue[index]._id }, false)
+          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { id: this.modelValue[index]._id }, false)
           if (!result) {
             return null
           }
@@ -166,7 +166,7 @@ export default defineComponent({
           (new Date(this.token.createdAt).valueOf() + this.expireAfterSeconds * 1000 - new Date().valueOf()) / 1000
         )
       }
-      const result = await this.$root.getter('/user/token')
+      const result = await this.$root.getter('user/token')
       if (result && result.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
@@ -183,7 +183,7 @@ export default defineComponent({
       this.token = undefined
       this.qr = undefined
       this.secondsLeft = this.expireAfterSeconds
-      this.$root.deleter('/user/token', {}, false, false)
+      this.$root.deleter('user/token', {}, false, false)
     }
   },
   unmounted() {
