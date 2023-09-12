@@ -172,20 +172,30 @@ export function getExpensesSum(travel: Travel): Money {
   var sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount != null) {
+      var add = 0
       if (stage.cost.exchangeRate && typeof stage.cost.exchangeRate.amount == 'number') {
-        sum += stage.cost.exchangeRate.amount
+        add = stage.cost.exchangeRate.amount
       } else {
-        sum += stage.cost.amount
+        add = stage.cost.amount
       }
+      if (stage.purpose === 'mixed') {
+        add = add * travel.professionalShare!
+      }
+      sum += add
     }
   }
   for (const expense of travel.expenses) {
     if (expense.cost && expense.cost.amount != null) {
+      var add = 0
       if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
-        sum += expense.cost.exchangeRate.amount
+        add = expense.cost.exchangeRate.amount
       } else {
-        sum += expense.cost.amount
+        add = expense.cost.amount
       }
+      if (expense.purpose === 'mixed') {
+        add = add * travel.professionalShare!
+      }
+      sum += add
     }
   }
   return { amount: sum, currency: settings.baseCurrency }

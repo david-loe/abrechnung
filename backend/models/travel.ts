@@ -399,12 +399,19 @@ travelSchema.methods.calculateExchangeRates = async function (this: TravelDoc) {
 travelSchema.methods.calculateProfessionalShare = function (this: TravelDoc) {
   if (this.days.length > 0) {
     var professionalDays = 0
+    var calc = false
     for (const day of this.days) {
       if (day.purpose === 'professional') {
         professionalDays += 1
+      } else {
+        calc = true
       }
     }
-    this.professionalShare = professionalDays / this.days.length
+    if (calc) {
+      this.professionalShare = professionalDays / this.days.length
+    } else {
+      this.professionalShare = 1
+    }
   } else {
     this.professionalShare = null
   }

@@ -27,7 +27,6 @@ import {
   Purpose,
   PurposeSimple,
   Refund,
-  Stage,
   Transport,
   TravelDay
 } from '../../common/types.js'
@@ -108,8 +107,8 @@ export async function generateReport(travel: ITravel) {
   const receiptMap = getReceiptMap(travel)
 
   y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
-  y = drawStages(getLastPage(), newPage, travel.stages, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
-  y = drawExpenses(getLastPage(), newPage, travel.expenses, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawStages(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawExpenses(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
   await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16 })
@@ -242,8 +241,8 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
   return drawTable(page, newPageFn, summary, columns, tabelOptions)
 }
 
-function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, stages: Stage[], receiptMap: ReceiptMap, options: Options) {
-  if (stages.length == 0) {
+function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: ITravel, receiptMap: ReceiptMap, options: Options) {
+  if (travel.stages.length == 0) {
     return options.yStart
   }
   const columns: Column[] = []
@@ -294,7 +293,7 @@ function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, sta
     width: 50,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.purpose'),
-    fn: (p: Purpose) => i18n.t('labels.' + p)
+    fn: (p: Purpose) => i18n.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round(travel.professionalShare! * 100) + '%)' : '')
   })
   columns.push({
     key: 'cost',
@@ -321,17 +320,11 @@ function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, sta
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, stages, columns, options)
+  return drawTable(page, newPageFn, travel.stages, columns, options)
 }
 
-function drawExpenses(
-  page: pdf_lib.PDFPage,
-  newPageFn: () => pdf_lib.PDFPage,
-  expenses: Expense[],
-  receiptMap: ReceiptMap,
-  options: Options
-) {
-  if (expenses.length == 0) {
+function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: ITravel, receiptMap: ReceiptMap, options: Options) {
+  if (travel.expenses.length == 0) {
     return options.yStart
   }
   const columns: Column[] = []
@@ -341,7 +334,7 @@ function drawExpenses(
     width: 50,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.purpose'),
-    fn: (p: Expense['purpose']) => i18n.t('labels.' + p)
+    fn: (p: Expense['purpose']) => i18n.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round(travel.professionalShare! * 100) + '%)' : '')
   })
   columns.push({
     key: 'cost',
@@ -375,7 +368,7 @@ function drawExpenses(
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, expenses, columns, options)
+  return drawTable(page, newPageFn, travel.expenses, columns, options)
 }
 
 function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: ITravel, options: Options) {
@@ -489,7 +482,8 @@ async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: ReceiptMa
       }
     } else {
       if (receipt.type === 'image/jpeg') {
-        var image = await pdfDoc.embedJpg(data)
+        const zeroOffsetData = new Uint8Array(data, 0)
+        var image = await pdfDoc.embedJpg(zeroOffsetData)
       } else {
         // receipt.type === 'image/png'
         var image = await pdfDoc.embedPng(data)
