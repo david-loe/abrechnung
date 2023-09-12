@@ -135,7 +135,8 @@ export default defineComponent({
         for (const file of (event.target as HTMLInputElement).files!) {
           if (file.size < 16000000) {
             if (file.type.indexOf('image') > -1) {
-              files.push({ data: await resizeImage(file, 1400), type: file.type as DocumentFile['type'], name: file.name })
+              const resizedImage = await resizeImage(file, 1400)
+              files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })
             } else {
               files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
             }
