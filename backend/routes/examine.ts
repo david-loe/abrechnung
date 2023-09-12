@@ -14,15 +14,18 @@ import { mongo } from 'mongoose'
 router.get('/travel', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.stages) {
+  if (!req.query.addStages) {
     select.stages = 0
   }
-  if (!req.query.expenses) {
+  delete req.query.addStages
+  if (!req.query.addExpenses) {
     select.expenses = 0
   }
-  if (!req.query.days) {
+  delete req.query.addExpenses
+  if (!req.query.addDays) {
     select.days = 0
   }
+  delete req.query.addDays
   return getter(Travel, 'travel', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
 })
 
@@ -30,15 +33,18 @@ router.get('/travel/refunded', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf() // sort backwards
 
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.stages) {
+  if (!req.query.addStages) {
     select.stages = 0
   }
-  if (!req.query.expenses) {
+  delete req.query.addStages
+  if (!req.query.addExpenses) {
     select.expenses = 0
   }
-  if (!req.query.days) {
+  delete req.query.addExpenses
+  if (!req.query.addDays) {
     select.days = 0
   }
+  delete req.query.addDays
   return getter(Travel, 'travel', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
 
