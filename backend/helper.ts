@@ -145,7 +145,7 @@ export function deleter(model: Model<any>, checkUserIdField = '', cb: ((data: an
     if (req.query.id && req.query.id !== '') {
       const doc = await model.findOne({ _id: req.query.id })
       if (!doc || (checkUserIdField && checkUserIdField in model.schema.obj && !doc[checkUserIdField]._id.equals(req.user!._id))) {
-        log(req.body)
+        log(req.query)
         return res.sendStatus(403)
       }
       try {

@@ -30,7 +30,7 @@ export default defineComponent({
     return {}
   },
   props: {
-    modelValue: { type: [String, Date] as PropType<string | Date>, required: true },
+    modelValue: { type: [String, Date] as PropType<string | Date>, default: '' },
     withTime: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
