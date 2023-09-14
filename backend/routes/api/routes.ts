@@ -7,10 +7,12 @@ import { Country as ICountry } from '../../../common/types.js'
 import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
+import expenseReportRoutes from './expenseReport.js'
 
 router.use('/user', userRoutes)
 router.use('/travel', travelRoutes)
 router.use('/documentFile', documentFileRoutes)
+router.use('/expenseReport', expenseReportRoutes)
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {
