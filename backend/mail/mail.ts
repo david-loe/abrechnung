@@ -3,9 +3,9 @@ import i18n from '../i18n.js'
 import ejs from 'ejs'
 import fs from 'fs'
 import User from '../models/user.js'
-import { UserSimple, Travel } from '../../common/types.js'
+import { UserSimple, Travel, ExpenseReport } from '../../common/types.js'
 
-export function sendMail(
+function sendMail(
   recipients: UserSimple[],
   subject: string,
   paragaph: string,
@@ -57,7 +57,7 @@ export function sendMail(
   })
 }
 
-export async function sendNotificationMail(travel: Travel) {
+export async function sendTravelNotificationMail(travel: Travel) {
   const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name }
 
   if (travel.comments.length > 0) {
@@ -69,13 +69,13 @@ export async function sendNotificationMail(travel: Travel) {
   }
 
   var recipients = []
-  const subject = i18n.t('mail.' + travel.state + '.subject', interpolation)
-  const paragraph = i18n.t('mail.' + travel.state + '.paragraph', interpolation)
+  const subject = i18n.t('mail.travel.' + travel.state + '.subject', interpolation)
+  const paragraph = i18n.t('mail.travel.' + travel.state + '.paragraph', interpolation)
   const button = {
     text: i18n.t('labels.viewX', { X: i18n.t('labels.travel') }),
     link: ''
   }
-  const lastParagraph = interpolation.comment ? i18n.t('mail.' + travel.state + '.lastParagraph', interpolation) : ''
+  const lastParagraph = interpolation.comment ? i18n.t('mail.travel.' + travel.state + '.lastParagraph', interpolation) : ''
 
   if (travel.state === 'appliedFor') {
     recipients = await User.find({ 'access.approve': true }).lean()
@@ -87,6 +87,37 @@ export async function sendNotificationMail(travel: Travel) {
     // 'rejected', 'approved', 'refunded'
     recipients = [travel.traveler]
     button.link = process.env.VITE_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : '/' + travel._id)
+  }
+  sendMail(recipients, subject, paragraph, button, lastParagraph)
+}
+
+export async function sendExpenseReportNotificationMail(expenseReport: ExpenseReport) {
+  const interpolation: { expensePayer: string; comment?: string; commentator?: string } = { expensePayer: expenseReport.expensePayer.name }
+
+  if (expenseReport.comments.length > 0) {
+    const comment = expenseReport.comments[expenseReport.comments.length - 1]
+    if (comment.toState == expenseReport.state) {
+      interpolation.comment = comment.text
+      interpolation.commentator = comment.author.name
+    }
+  }
+
+  var recipients = []
+  const subject = i18n.t('mail.expenseReport.' + expenseReport.state + '.subject', interpolation)
+  const paragraph = i18n.t('mail.expenseReport.' + expenseReport.state + '.paragraph', interpolation)
+  const button = {
+    text: i18n.t('labels.viewX', { X: i18n.t('labels.expenseReport') }),
+    link: ''
+  }
+  const lastParagraph = interpolation.comment ? i18n.t('mail.expenseReport.' + expenseReport.state + '.lastParagraph', interpolation) : ''
+
+  if (expenseReport.state === 'underExamination') {
+    recipients = await User.find({ 'access.examine': true }).lean()
+    button.link = process.env.VITE_FRONTEND_URL + '/examine/' + expenseReport._id
+  } else {
+    // 'rejected', 'refunded'
+    recipients = [expenseReport.expensePayer]
+    button.link = process.env.VITE_FRONTEND_URL + '/travel' + (expenseReport.state === 'rejected' ? '' : '/' + expenseReport._id)
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

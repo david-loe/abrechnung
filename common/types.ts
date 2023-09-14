@@ -198,6 +198,7 @@ export interface ExpenseReportSimple {
   comments: ExpenseReportComment[]
   comment?: string
   createdAt?: Date | string
+  _id: Types.ObjectId
 }
 
 export interface ExpenseReport extends ExpenseReportSimple {

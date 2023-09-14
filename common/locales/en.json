@@ -116,7 +116,8 @@
     "vehicleRegistration": "Vehicle Registration",
     "uploadFromPhone": "Upload from Phone",
     "tapToUpload": "Tap to upload 👆",
-    "uploadLink": "Upload Link"
+    "uploadLink": "Upload Link",
+    "expenseReport": "Expense Report"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
@@ -162,30 +163,49 @@
     "hi": "Hi there,",
     "hiX": "Hi {X},",
     "regards": "Best Regards",
-    "rejected": {
-      "subject": "❌ Travel rejected",
-      "paragraph": "Your travel application got rejected.",
-      "lastParagraph": "{commentator} wrote: '{comment}'"
+    "travel": {
+      "rejected": {
+        "subject": "❌ Travel rejected",
+        "paragraph": "Your travel application got rejected.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "appliedFor": {
+        "subject": "🆕 New Travel",
+        "paragraph": "A new travel application from {traveler} just came in.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "approved": {
+        "subject": "✅ Travel approved",
+        "paragraph": "Your travel application got approved.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "underExamination": {
+        "subject": "🛂 Travel to examine",
+        "paragraph": "{traveler} has finished his travel expenses.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "refunded": {
+        "subject": "💲 Travel refunded",
+        "paragraph": "Your travel expenses get refunded.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      }
     },
-    "appliedFor": {
-      "subject": "🆕 New Travel",
-      "paragraph": "A new travel application from {traveler} just came in.",
-      "lastParagraph": "{commentator} wrote: '{comment}'"
-    },
-    "approved": {
-      "subject": "✅ Travel approved",
-      "paragraph": "Your travel application got approved.",
-      "lastParagraph": "{commentator} wrote: '{comment}'"
-    },
-    "underExamination": {
-      "subject": "🛂 Travel to examine",
-      "paragraph": "{traveler} has finished his travel expenses.",
-      "lastParagraph": "{commentator} wrote: '{comment}'"
-    },
-    "refunded": {
-      "subject": "💲 Travel refunded",
-      "paragraph": "Your travel expenses get refunded.",
-      "lastParagraph": "{commentator} wrote: '{comment}'"
+    "expenseReport": {
+      "rejected": {
+        "subject": "❌ Expense Report rejected",
+        "paragraph": "Your expense report got rejected.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "underExamination": {
+        "subject": "🛂 Expense Report to examine",
+        "paragraph": "{expensePayer} has finished his expense report.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      },
+      "refunded": {
+        "subject": "💲 Expense Report refunded",
+        "paragraph": "Your expense report gets refunded.",
+        "lastParagraph": "{commentator} wrote: '{comment}'"
+      }
     }
   },
   "login": {

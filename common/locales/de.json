@@ -116,7 +116,8 @@
     "vehicleRegistration": "Fahrzeugschein",
     "uploadFromPhone": "Vom Handy hochladen",
     "tapToUpload": "Zum Hochladen Tippen 👆",
-    "uploadLink": "Upload Link"
+    "uploadLink": "Upload Link",
+    "expenseReport": "Auslagenabrechnung"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
@@ -162,30 +163,49 @@
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "regards": "Beste Grüße",
-    "rejected": {
-      "subject": "❌ Reise abgelehnt",
-      "paragraph": "Dein Reiseantrag wurde abgelehnt.",
-      "lastParagraph": "{commentator} schrieb: '{comment}'"
+    "travel": {
+      "rejected": {
+        "subject": "❌ Reise abgelehnt",
+        "paragraph": "Dein Reiseantrag wurde abgelehnt.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "appliedFor": {
+        "subject": "🆕 Neue Reise",
+        "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "approved": {
+        "subject": "✅ Reise genehmigt",
+        "paragraph": "Dein Reiseantrag wurde genehmigt.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "underExamination": {
+        "subject": "🛂 Reise zu prüfen",
+        "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "refunded": {
+        "subject": "💲 Reisekosten erstattet",
+        "paragraph": "Deine Reisekosten werden erstattet.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      }
     },
-    "appliedFor": {
-      "subject": "🆕 Neue Reise",
-      "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
-      "lastParagraph": "{commentator} schrieb: '{comment}'"
-    },
-    "approved": {
-      "subject": "✅ Reise genehmigt",
-      "paragraph": "Dein Reiseantrag wurde genehmigt.",
-      "lastParagraph": "{commentator} schrieb: '{comment}'"
-    },
-    "underExamination": {
-      "subject": "🛂 Reise zu prüfen",
-      "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
-      "lastParagraph": "{commentator} schrieb: '{comment}'"
-    },
-    "refunded": {
-      "subject": "💲 Reisekosten erstattet",
-      "paragraph": "Deine Reisekosten werden erstattet.",
-      "lastParagraph": "{commentator} schrieb: '{comment}'"
+    "expenseReport": {
+      "rejected": {
+        "subject": "❌ Auslagen abgelehnt",
+        "paragraph": "Deine Auslagenabrechnung wurde abgelehnt.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "underExamination": {
+        "subject": "🛂 Auslagen zu prüfen",
+        "paragraph": "{expensePayer} hat die Auslagenabrechnung fertiggestellt.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      },
+      "refunded": {
+        "subject": "💲 Auslagen erstattet",
+        "paragraph": "Deine Auslagenabrechnung wird erstattet.",
+        "lastParagraph": "{commentator} schrieb: '{comment}'"
+      }
     }
   },
   "login": {

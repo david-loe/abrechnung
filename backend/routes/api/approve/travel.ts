@@ -1,6 +1,6 @@
 import { getter, setter } from '../../../helper.js'
 import Travel, { TravelDoc } from '../../../models/travel.js'
-import { sendNotificationMail } from '../../../mail/mail.js'
+import { sendTravelNotificationMail } from '../../../mail/mail.js'
 import express, { Request, Response } from 'express'
 import { Travel as ITravel } from '../../../../common/types.js'
 const router = express.Router()
@@ -48,7 +48,7 @@ function approve(state: 'approved' | 'rejected') {
         return false
       }
     }
-    return setter(Travel, '', false, check, sendNotificationMail)(req, res)
+    return setter(Travel, '', false, check, sendTravelNotificationMail)(req, res)
   }
 }
 router.post('/approved', approve('approved'))

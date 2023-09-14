@@ -6,7 +6,7 @@ import Travel, { TravelDoc } from '../../../models/travel.js'
 import i18n from '../../../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
-import { sendNotificationMail } from '../../../mail/mail.js'
+import { sendTravelNotificationMail } from '../../../mail/mail.js'
 import { generateReport, generateAndWriteToDisk } from '../../../pdf/generate.js'
 import { Travel as ITravel } from '../../../../common/types.js'
 
@@ -64,7 +64,7 @@ router.post('/refunded', async (req, res) => {
     }
   }
   const cb = async (travel: ITravel) => {
-    sendNotificationMail(travel)
+    sendTravelNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
     }

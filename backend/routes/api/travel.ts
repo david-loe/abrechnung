@@ -6,7 +6,7 @@ import i18n from '../../i18n.js'
 import { getter, setter, deleter } from '../../helper.js'
 import Travel, { TravelDoc } from '../../models/travel.js'
 import DocumentFile from '../../models/documentFile.js'
-import { sendNotificationMail } from '../../mail/mail.js'
+import { sendTravelNotificationMail } from '../../mail/mail.js'
 import { generateReport } from '../../pdf/generate.js'
 import { Travel as ITravel } from '../../../common/types.js'
 
@@ -203,7 +203,7 @@ router.post('/appliedFor', async (req, res) => {
   const check = async (oldObject: TravelDoc) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
   }
-  return setter(Travel, 'traveler', true, check, sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', true, check, sendTravelNotificationMail)(req, res)
 })
 
 router.post('/underExamination', async (req, res) => {
@@ -238,7 +238,7 @@ router.post('/underExamination', async (req, res) => {
       return false
     }
   }
-  return setter(Travel, 'traveler', false, check, sendNotificationMail)(req, res)
+  return setter(Travel, 'traveler', false, check, sendTravelNotificationMail)(req, res)
 })
 
 router.get('/report', async (req, res) => {
