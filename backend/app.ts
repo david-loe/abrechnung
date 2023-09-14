@@ -8,11 +8,11 @@ import MongoStore from 'connect-mongo'
 import initDB from './initdb.js'
 import i18n from './i18n.js'
 import User from './models/user.js'
-import routes from './routes/routes.js'
-import adminRoutes from './routes/admin.js'
-import approveRoutes from './routes/approve.js'
-import examineRoutes from './routes/examine.js'
-import uploadRoutes from './routes/upload.js'
+import routes from './routes/api/routes.js'
+import adminRoutes from './routes/api/admin/routes.js'
+import approveRoutes from './routes/api/approve/routes.js'
+import examineRoutes from './routes/api/examine/routes.js'
+import uploadRoutes from './routes/upload/routes.js'
 import { Access } from '../common/types.js'
 import { MongoClient } from 'mongodb'
 
@@ -120,8 +120,6 @@ app.use('/api', async (req, res, next) => {
   }
 })
 
-app.use('/api', routes)
-
 function accessControl(access: Access) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.user!.access[access]) {
@@ -131,13 +129,14 @@ function accessControl(access: Access) {
     }
   }
 }
+
+app.use('/api', routes)
+app.use('/upload', uploadRoutes)
 app.use('/api/admin', accessControl('admin'))
 app.use('/api/admin', adminRoutes)
 app.use('/api/approve', accessControl('approve'))
 app.use('/api/approve', approveRoutes)
 app.use('/api/examine', accessControl('examine'))
 app.use('/api/examine', examineRoutes)
-
-app.use('/upload', uploadRoutes)
 
 export default app

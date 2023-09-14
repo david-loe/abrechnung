@@ -1,17 +1,16 @@
-import { deleter, getter, setter } from '../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
-import DocumentFile from '../models/documentFile.js'
-import Travel, { TravelDoc } from '../models/travel.js'
-import i18n from '../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
-import { sendNotificationMail } from '../mail/mail.js'
-import { generateReport, generateAndWriteToDisk } from '../pdf/generate.js'
-import { Travel as ITravel } from '../../common/types.js'
-import { mongo } from 'mongoose'
+import i18n from '../../i18n.js'
+import { getter, setter, deleter } from '../../helper.js'
+import Travel, { TravelDoc } from '../../models/travel.js'
+import DocumentFile from '../../models/documentFile.js'
+import { sendNotificationMail } from '../../mail/mail.js'
+import { generateReport } from '../../pdf/generate.js'
+import { Travel as ITravel } from '../../../common/types.js'
 
-router.get('/travel', async (req, res) => {
+router.get('/', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
   if (!req.query.addStages) {
@@ -26,54 +25,12 @@ router.get('/travel', async (req, res) => {
     select.days = 0
   }
   delete req.query.addDays
-  return getter(Travel, 'travel', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
+  return getter(Travel, 'travel', 20, { traveler: req.user!._id, historic: false }, select, sortFn)(req, res)
 })
 
-router.get('/travel/refunded', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf() // sort backwards
+router.delete('/', deleter(Travel, 'traveler'))
 
-  const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.addStages) {
-    select.stages = 0
-  }
-  delete req.query.addStages
-  if (!req.query.addExpenses) {
-    select.expenses = 0
-  }
-  delete req.query.addExpenses
-  if (!req.query.addDays) {
-    select.days = 0
-  }
-  delete req.query.addDays
-  return getter(Travel, 'travel', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
-})
-
-router.post('/travel/refunded', async (req, res) => {
-  req.body = {
-    state: 'refunded',
-    editor: req.user!._id,
-    comment: req.body.comment,
-    _id: req.body._id
-  }
-  const check = async (oldObject: TravelDoc) => {
-    if (oldObject.state === 'underExamination') {
-      await oldObject.saveToHistory()
-      await oldObject.save()
-      return true
-    } else {
-      return false
-    }
-  }
-  const cb = async (travel: ITravel) => {
-    sendNotificationMail(travel)
-    if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      await generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
-    }
-  }
-  return setter(Travel, '', false, check, cb)(req, res)
-})
-
-router.post('/travel', async (req, res) => {
+router.post('/', async (req, res) => {
   req.body.editor = req.user!._id
   delete req.body.state
   delete req.body.traveler
@@ -86,17 +43,11 @@ router.post('/travel', async (req, res) => {
   const check = async (oldObject: TravelDoc) => {
     return oldObject.state !== 'refunded'
   }
-  return setter(Travel, '', false, check)(req, res)
+  return setter(Travel, 'traveler', false, check)(req, res)
 })
 
 function postRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
-    const travel = await Travel.findOne({ _id: req.body.travelId })
-    delete req.body.travelId
-    if (!travel || travel.historic || travel.state !== 'underExamination') {
-      return res.sendStatus(403)
-    }
-
     if (req.body.cost && req.body.cost.receipts && req.files) {
       for (var i = 0; i < req.body.cost.receipts.length; i++) {
         var buffer = null
@@ -107,12 +58,16 @@ function postRecord(recordType: 'stages' | 'expenses') {
           }
         }
         if (buffer) {
-          req.body.cost.receipts[i].owner = travel.traveler._id
+          req.body.cost.receipts[i].owner = req.user!._id
           req.body.cost.receipts[i].data = buffer
         }
       }
     }
-
+    const travel = await Travel.findOne({ _id: req.body.travelId })
+    delete req.body.travelId
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user!._id)) {
+      return res.sendStatus(403)
+    }
     if (req.body._id && req.body._id !== '') {
       var found = false
       outer_loop: for (const record of travel[recordType]) {
@@ -170,14 +125,14 @@ function postRecord(recordType: 'stages' | 'expenses') {
   }
 }
 
-router.post('/travel/stage', fileHandler.any(), postRecord('stages'))
-router.post('/travel/expense', fileHandler.any(), postRecord('expenses'))
+router.post('/stage', fileHandler.any(), postRecord('stages'))
+router.post('/expense', fileHandler.any(), postRecord('expenses'))
 
 function deleteRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
-    if (!travel || travel.historic || travel.state !== 'underExamination') {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user!._id)) {
       return res.sendStatus(403)
     }
     if (req.query.id && req.query.id !== '') {
@@ -210,27 +165,87 @@ function deleteRecord(recordType: 'stages' | 'expenses') {
   }
 }
 
-router.delete('/travel/stage', deleteRecord('stages'))
-router.delete('/travel/expense', deleteRecord('expenses'))
+router.delete('/stage', deleteRecord('stages'))
+router.delete('/expense', deleteRecord('expenses'))
 
-router.get('/documentFile', async (req, res) => {
-  const file = await DocumentFile.findOne({ _id: req.query.id }).lean()
-  if (file) {
-    res.setHeader('Content-Type', file.type)
-    res.setHeader('Content-Length', (file.data as any as mongo.Binary).length())
-    return res.send((file.data as any as mongo.Binary).buffer)
-  } else {
-    return res.sendStatus(403)
+router.post('/appliedFor', async (req, res) => {
+  req.body = {
+    state: 'appliedFor',
+    traveler: req.user!._id,
+    editor: req.user!._id,
+    comment: null,
+    _id: req.body._id,
+    name: req.body.name,
+    reason: req.body.reason,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    destinationPlace: req.body.destinationPlace,
+    travelInsideOfEU: req.body.travelInsideOfEU,
+    advance: req.body.advance,
+    claimSpouseRefund: req.body.claimSpouseRefund,
+    fellowTravelersNames: req.body.fellowTravelersNames
   }
+
+  if (!req.body.name) {
+    try {
+      var date = new Date(req.body.startDate)
+      req.body.name =
+        req.body.destinationPlace.place +
+        ' ' +
+        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: req.user!.settings.language }) +
+        ' ' +
+        date.getUTCFullYear()
+    } catch (error) {
+      return res.status(400).send(error)
+    }
+  }
+
+  const check = async (oldObject: TravelDoc) => {
+    return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
+  }
+  return setter(Travel, 'traveler', true, check, sendNotificationMail)(req, res)
 })
 
-router.delete('/documentFile', deleter(DocumentFile))
+router.post('/underExamination', async (req, res) => {
+  req.body = {
+    state: 'underExamination',
+    editor: req.user!._id,
+    comment: req.body.comment,
+    _id: req.body._id
+  }
 
-router.get('/travel/report', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
+  const check = async (oldObject: TravelDoc) => {
+    if (oldObject.state === 'approved') {
+      await oldObject.saveToHistory()
+      const receipts = []
+      for (const stage of oldObject.stages) {
+        if (stage.transport == 'ownCar') {
+          if (receipts.length == 0) {
+            if (req.user!.vehicleRegistration) {
+              for (const vr of req.user!.vehicleRegistration) {
+                const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
+                delete (doc as unknown as any)._id
+                receipts.push(await DocumentFile.create(doc))
+              }
+            }
+          }
+          stage.cost.receipts = receipts
+        }
+      }
+      await oldObject.save()
+      return true
+    } else {
+      return false
+    }
+  }
+  return setter(Travel, 'traveler', false, check, sendNotificationMail)(req, res)
+})
+
+router.get('/report', async (req, res) => {
+  const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user!._id, historic: false, state: 'refunded' }).lean()
   if (travel) {
     const report = await generateReport(travel)
-    res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf')
+    res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)
     return res.send(Buffer.from(report))
