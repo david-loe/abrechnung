@@ -119,22 +119,33 @@ export interface Expense {
   _id: Types.ObjectId
 }
 
+export interface TravelExpense extends Expense {
+  purpose: 'professional' | 'mixed'
+}
+
 export type RecordType = 'stage' | 'expense'
-export type Record = Stage | Expense
+export type Record = Stage | TravelExpense
 
 export interface Comment {
   text: string
   author: UserSimple
-  toState: State
   _id: Types.ObjectId
+}
+
+export interface TravelComment extends Comment {
+  toState: TravelState
+}
+
+export interface ExpenseReportComment extends Comment {
+  toState: ExpenseReportState
 }
 
 export interface TravelSimple {
   name: string
   traveler: UserSimple
-  state: State
+  state: TravelState
   editor: UserSimple
-  comments: Comment[]
+  comments: TravelComment[]
   comment?: string
   reason: string
   destinationPlace: Place
@@ -175,13 +186,30 @@ export interface Travel extends TravelSimple {
   history: Types.ObjectId[]
   historic: boolean
   stages: Stage[]
-  expenses: Expense[]
+  expenses: TravelExpense[]
   days: TravelDay[]
 }
 
+export interface ExpenseReportSimple {
+  name: string
+  expensePayer: UserSimple
+  state: ExpenseReportState
+  editor: UserSimple
+  comments: ExpenseReportComment[]
+  comment?: string
+  createdAt?: Date | string
+}
+
+export interface ExpenseReport extends ExpenseReportSimple {
+  history: Types.ObjectId[]
+  historic: boolean
+  expenses: Expense[]
+}
 export type Locale = 'de' | 'en'
 
-export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+export type TravelState = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+
+export type ExpenseReportState = 'rejected' | 'inWork' | 'underExamination' | 'refunded'
 
 export type Transport = 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
 

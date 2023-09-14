@@ -15,7 +15,7 @@
                 'background: linear-gradient(to right, ' +
                 stateColors[key].color +
                 ', ' +
-                stateColors[Object.keys(stateColors)[index + 1] as State].color +
+                stateColors[Object.keys(stateColors)[index + 1] as TravelState].color +
                 '); height: 5px; border: 0px'
               " />
           </div>
@@ -29,7 +29,7 @@
 import { defineComponent, PropType } from 'vue'
 import StateBadge from './StateBadge.vue'
 import { stateColors } from '../../../../common/settings.json'
-import { State } from '../../../../common/types.js'
+import { TravelState } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StatePipeline',
@@ -39,7 +39,7 @@ export default defineComponent({
     }
   },
   components: { StateBadge },
-  props: { state: { type: String as PropType<State> } },
+  props: { state: { type: String as PropType<TravelState> } },
   beforeMount() {},
   mounted() {}
 })

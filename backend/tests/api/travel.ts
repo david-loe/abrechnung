@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Expense, Stage, Travel, TravelSimple } from '../../../common/types.js'
+import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
 import createAgent, { loginApprove, loginExamine, loginUser } from './_agent.js'
 import { setStrokingGrayscaleColor } from 'pdf-lib'
 
@@ -146,7 +146,7 @@ test.serial('POST /travel/stage', async (t) => {
   }
 })
 
-const expenses: Expense[] = [
+const expenses: TravelExpense[] = [
   //@ts-ignore
   {
     description: 'Konferenzkosten',

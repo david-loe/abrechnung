@@ -34,7 +34,7 @@
             <ExpenseForm
               v-else-if="modalObjectType === 'expense'"
               ref="expenseForm"
-              :expense="(modalObject as Partial<Expense> | undefined)"
+              :expense="(modalObject as Partial<TravelExpense> | undefined)"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -287,15 +287,15 @@
               v-else-if="row.type === 'expense'"
               class="row align-items-center ps-lg-4 mb-1"
               style="cursor: pointer"
-              @click="showModal('edit', row.data as Expense, 'expense')">
+              @click="showModal('edit', row.data as TravelExpense, 'expense')">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i class="bi bi-coin"></i>
               </div>
               <div class="col-auto">
-                <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as Expense).description }}&nbsp;
-                <div class="text-secondary d-inline d-md-none">{{ getMoneyString((row.data as Expense).cost) }}</div>
+                <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as TravelExpense).description }}&nbsp;
+                <div class="text-secondary d-inline d-md-none">{{ getMoneyString((row.data as TravelExpense).cost) }}</div>
               </div>
-              <div class="col-auto text-secondary d-none d-md-block">{{ getMoneyString((row.data as Expense).cost) }}</div>
+              <div class="col-auto text-secondary d-none d-md-block">{{ getMoneyString((row.data as TravelExpense).cost) }}</div>
             </div>
             <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
@@ -405,7 +405,7 @@ import PlaceElement from './Elements/PlaceElement.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
 import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.js'
 import { log } from '../../../common/logger.js'
-import { DocumentFile, Expense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple } from '../../../common/types.js'
+import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple } from '../../../common/types.js'
 import { PropType } from 'vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -526,7 +526,7 @@ export default defineComponent({
         this.hideModal()
       }
     },
-    async postExpense(expense: Expense) {
+    async postExpense(expense: TravelExpense) {
       var headers = {}
       if (expense.cost.receipts) {
         headers = {

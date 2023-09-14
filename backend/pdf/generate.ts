@@ -17,7 +17,7 @@ import mongoose, { mongo } from 'mongoose'
 import {
   Cost,
   CountrySimple,
-  Expense,
+  TravelExpense,
   DocumentFile as IDocumentFile,
   Travel as ITravel,
   Locale,
@@ -334,7 +334,8 @@ function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, t
     width: 50,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.purpose'),
-    fn: (p: Expense['purpose']) => i18n.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round(travel.professionalShare! * 100) + '%)' : '')
+    fn: (p: TravelExpense['purpose']) =>
+      i18n.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round(travel.professionalShare! * 100) + '%)' : '')
   })
   columns.push({
     key: 'cost',

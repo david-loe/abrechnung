@@ -63,10 +63,10 @@ import CurrencySelector from '../Elements/CurrencySelector.vue'
 import InfoPoint from '../Elements/InfoPoint.vue'
 import FileUpload from '../Elements/FileUpload.vue'
 import DateInput from '../Elements/DateInput.vue'
-import { Expense } from '../../../../common/types.js'
+import { TravelExpense } from '../../../../common/types.js'
 import settings from '../../../../common/settings.json'
 
-interface FormExpense extends Omit<Expense, '_id'> {
+interface FormExpense extends Omit<TravelExpense, '_id'> {
   _id?: string
 }
 
@@ -86,7 +86,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<Expense>>,
+      type: Object as PropType<Partial<TravelExpense>>,
       default: () => structuredClone(defaultExpense)
     },
     mode: {

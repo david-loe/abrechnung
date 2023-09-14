@@ -1,9 +1,8 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
-import Currency from './currency.js'
 import settings from '../../common/settings.json' assert { type: 'json' }
-import { convertCurrency } from '../helper.js'
+import { convertCurrency, costObject } from '../helper.js'
 import {
   Money,
   Record,
@@ -14,7 +13,7 @@ import {
   CountrySimple,
   Meal,
   PurposeSimple,
-  Comment
+  TravelComment
 } from '../../common/types.js'
 
 function place(required = false) {
@@ -22,25 +21,6 @@ function place(required = false) {
     country: { type: String, ref: 'Country', required: required },
     place: { type: String, required: required }
   }
-}
-
-function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency: string | null = null) {
-  const costObject: any = {
-    amount: { type: Number, min: 0, required: required, default: null },
-    currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency }
-  }
-  if (exchangeRate) {
-    costObject.exchangeRate = {
-      date: { type: Date },
-      rate: { type: Number, min: 0 },
-      amount: { type: Number, min: 0 }
-    }
-  }
-  if (receipts) {
-    costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = { type: Date, required: required }
-  }
-  return costObject
 }
 
 interface Methods {
@@ -432,7 +412,7 @@ travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
 
 travelSchema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as TravelComment)
     delete this.comment
   }
 }
