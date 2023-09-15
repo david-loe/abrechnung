@@ -1,4 +1,4 @@
-import { Schema, Document, model } from 'mongoose'
+import { Schema, Document, model, Query } from 'mongoose'
 import { Token, User } from '../../common/types.js'
 
 const userSchema = new Schema<User>({
@@ -29,6 +29,14 @@ function populate(doc: Document) {
 }
 
 userSchema.pre(/^find((?!Update).)*$/, function () {
+  const projection = (this as Query<User, User>).projection()
+  const popInProj: boolean = projection && (projection.settings || projection.vehicleRegistration || projection.token)
+  if ((this as Query<User, User>).selectedExclusively() && popInProj) {
+    return
+  }
+  if ((this as Query<User, User>).selectedInclusively() && !popInProj) {
+    return
+  }
   populate(this as Document)
 })
 
