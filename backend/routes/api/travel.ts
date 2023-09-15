@@ -7,7 +7,7 @@ import { getter, setter, deleter } from '../../helper.js'
 import Travel, { TravelDoc } from '../../models/travel.js'
 import DocumentFile from '../../models/documentFile.js'
 import { sendTravelNotificationMail } from '../../mail/mail.js'
-import { generateReport } from '../../pdf/generate.js'
+import { generateTravelReport } from '../../pdf/travel.js'
 import { Travel as ITravel } from '../../../common/types.js'
 
 router.get('/', async (req, res) => {
@@ -244,7 +244,7 @@ router.post('/underExamination', async (req, res) => {
 router.get('/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user!._id, historic: false, state: 'refunded' }).lean()
   if (travel) {
-    const report = await generateReport(travel)
+    const report = await generateTravelReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

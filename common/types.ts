@@ -156,6 +156,7 @@ export interface TravelSimple {
   progress: number
   _id: Types.ObjectId
   createdAt?: Date | string
+  updatedAt?: Date | string
   claimSpouseRefund?: boolean //settings.allowSpouseRefund
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
@@ -198,6 +199,7 @@ export interface ExpenseReportSimple {
   comments: ExpenseReportComment[]
   comment?: string
   createdAt?: Date | string
+  updatedAt?: Date | string
   _id: Types.ObjectId
 }
 

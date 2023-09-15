@@ -7,7 +7,8 @@ import i18n from '../../../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import { sendTravelNotificationMail } from '../../../mail/mail.js'
-import { generateReport, generateAndWriteToDisk } from '../../../pdf/generate.js'
+import { generateTravelReport } from '../../../pdf/travel.js'
+import { writeToDisk } from '../../../pdf/helper.js'
 import { Travel as ITravel } from '../../../../common/types.js'
 
 router.get('/', async (req, res) => {
@@ -66,7 +67,7 @@ router.post('/refunded', async (req, res) => {
   const cb = async (travel: ITravel) => {
     sendTravelNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      await generateAndWriteToDisk('/reports/' + travel.traveler.name + ' - ' + travel.name + '.pdf', travel)
+      writeToDisk('/reports/travel/' + travel.traveler.name + ' - ' + travel.name + '.pdf', await generateTravelReport(travel))
     }
   }
   return setter(Travel, '', false, check, cb)(req, res)
@@ -215,7 +216,7 @@ router.delete('/expense', deleteRecord('expenses'))
 router.get('/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
   if (travel) {
-    const report = await generateReport(travel)
+    const report = await generateTravelReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf')
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

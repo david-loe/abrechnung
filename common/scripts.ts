@@ -1,4 +1,4 @@
-import { Currency, DocumentFile, Locale, Money, Place, Travel } from './types.js'
+import { ExpenseReport, Locale, Money, Place, Travel } from './types.js'
 import settings from './settings.json' assert { type: 'json' }
 
 export function getFlagEmoji(countryCode: string): string | null {
@@ -207,6 +207,20 @@ export function getTravelTotal(travel: Travel): Money {
     advance = travel.advance.exchangeRate ? travel.advance.exchangeRate.amount : travel.advance.amount
   }
   return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
+}
+
+export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
+  var sum = 0
+  for (const expense of expenseReport.expenses) {
+    if (expense.cost && expense.cost.amount != null) {
+      if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
+        sum += expense.cost.exchangeRate.amount
+      } else {
+        sum += expense.cost.amount
+      }
+    }
+  }
+  return { amount: sum, currency: settings.baseCurrency }
 }
 
 // From https://stackoverflow.com/a/52983833/13582326
