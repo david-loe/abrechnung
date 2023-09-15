@@ -51,7 +51,7 @@ export interface Place {
 export interface DocumentFile {
   data: Types.Buffer
   owner: Types.ObjectId
-  type: 'image/jpeg' | 'image/png' | 'application/pdf'
+  type: DocumentFileType
   name: string
   _id?: Types.ObjectId
 }
@@ -68,8 +68,6 @@ export interface UserSimple {
   name: string
   _id: Types.ObjectId
 }
-
-export type Access = 'examine' | 'approve' | 'admin'
 
 export interface User extends UserSimple {
   access: {
@@ -161,14 +159,10 @@ export interface TravelSimple {
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
 
-export type LumpsumType = 'overnight' | 'catering8' | 'catering24'
-
 export interface Refund {
   type: LumpsumType
   refund: Money
 }
-
-export type Meal = 'breakfast' | 'lunch' | 'dinner'
 
 export interface TravelDay {
   date: Date | string
@@ -208,13 +202,29 @@ export interface ExpenseReport extends ExpenseReportSimple {
   historic: boolean
   expenses: Expense[]
 }
-export type Locale = 'de' | 'en'
+export const locales = ['de', 'en'] as const
+export type Locale = (typeof locales)[number]
 
-export type TravelState = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+export const travelStates = ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'] as const
+export type TravelState = (typeof travelStates)[number]
 
-export type ExpenseReportState = 'rejected' | 'inWork' | 'underExamination' | 'refunded'
+export const expenseReportStates = ['rejected', 'inWork', 'underExamination', 'refunded'] as const
+export type ExpenseReportState = (typeof expenseReportStates)[number]
 
-export type Transport = 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
+export const transports = ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] as const
+export type Transport = (typeof transports)[number]
+
+export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
+export type DocumentFileType = (typeof documentFileTypes)[number]
+
+export const accesses = ['examine', 'approve', 'admin'] as const
+export type Access = (typeof accesses)[number]
+
+export const meals = ['breakfast', 'lunch', 'dinner'] as const
+export type Meal = (typeof meals)[number]
+
+export const lumpsumTypes = ['overnight', 'catering8', 'catering24'] as const
+export type LumpsumType = (typeof lumpsumTypes)[number]
 
 export type PurposeSimple = 'professional' | 'private'
 

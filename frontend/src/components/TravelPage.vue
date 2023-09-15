@@ -217,7 +217,7 @@
                     <div class="col-auto pe-1">
                       <InfoPoint :text="$t('info.cateringNoRefund')" />
                     </div>
-                    <div v-for="key of ['breakfast', 'lunch', 'dinner']" class="form-check col-auto" :key="key">
+                    <div v-for="key of meals" class="form-check col-auto" :key="key">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -405,7 +405,7 @@ import PlaceElement from './Elements/PlaceElement.vue'
 import TravelApplyForm from './Forms/TravelApplyForm.vue'
 import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.js'
 import { log } from '../../../common/logger.js'
-import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple } from '../../../common/types.js'
+import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple, meals } from '../../../common/types.js'
 import { PropType } from 'vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -427,7 +427,8 @@ export default defineComponent({
         data: Record | Day | Gap
       }[],
       configCateringRefund: false,
-      isReadOnly: false
+      isReadOnly: false,
+      meals
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },

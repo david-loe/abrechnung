@@ -38,7 +38,7 @@
 
     <label for="stageFormTransport" class="form-label"> {{ $t('labels.transport') }}<span class="text-danger">*</span> </label>
     <select class="form-select mb-3" v-model="formStage.transport" id="stageFormTransport" :disabled="disabled" required>
-      <option v-for="transport of ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport']" :value="transport" :key="transport">
+      <option v-for="transport of transports" :value="transport" :key="transport">
         {{ $t('labels.' + transport) }}
       </option>
     </select>
@@ -158,7 +158,7 @@ import FileUpload from '../Elements/FileUpload.vue'
 import PlaceInput from '../Elements/PlaceInput.vue'
 import DateInput from '../Elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../common/scripts.js'
-import { Stage, Place, CountrySimple } from '../../../../common/types.js'
+import { Stage, Place, CountrySimple, transports } from '../../../../common/types.js'
 import settings from '../../../../common/settings.json'
 
 interface FormStage extends Omit<Stage, 'startLocation' | 'endLocation' | 'midnightCountries' | '_id'> {
@@ -208,7 +208,8 @@ export default defineComponent({
       minDate: '' as string | Date,
       maxDate: '' as string | Date,
       loading: false,
-      vehicleRegistrationChanged: false
+      vehicleRegistrationChanged: false,
+      transports
     }
   },
   methods: {

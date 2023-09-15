@@ -13,7 +13,10 @@ import {
   CountrySimple,
   Meal,
   PurposeSimple,
-  TravelComment
+  TravelComment,
+  transports,
+  travelStates,
+  lumpsumTypes
 } from '../../common/types.js'
 
 function place(required = false) {
@@ -46,7 +49,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     state: {
       type: String,
       required: true,
-      enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'],
+      enum: travelStates,
       default: 'appliedFor'
     },
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -57,7 +60,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         toState: {
           type: String,
           required: true,
-          enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded']
+          enum: travelStates
         }
       }
     ],
@@ -80,7 +83,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         endLocation: place(true),
         midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
         distance: { type: Number, min: 0 },
-        transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'], required: true },
+        transport: { type: String, enum: transports, required: true },
         cost: costObject(true, true),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] }
       }
@@ -104,7 +107,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
         refunds: [
           {
-            type: { type: String, enum: ['overnight', 'catering8', 'catering24'], required: true },
+            type: { type: String, enum: lumpsumTypes, required: true },
             refund: costObject(true, false, true)
           }
         ]

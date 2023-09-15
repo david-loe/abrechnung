@@ -1,7 +1,7 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import settings from '../../common/settings.json' assert { type: 'json' }
 import { costObject, convertCurrency } from '../helper.js'
-import { Money, Currency as ICurrency, ExpenseReport, ExpenseReportComment } from '../../common/types.js'
+import { Money, Currency as ICurrency, ExpenseReport, ExpenseReportComment, expenseReportStates } from '../../common/types.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -18,7 +18,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
     state: {
       type: String,
       required: true,
-      enum: ['rejected', 'inWork', 'underExamination', 'refunded'],
+      enum: expenseReportStates,
       default: 'inWork'
     },
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -29,7 +29,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
         toState: {
           type: String,
           required: true,
-          enum: ['rejected', 'inWork', 'underExamination', 'refunded']
+          enum: expenseReportStates
         }
       }
     ],
