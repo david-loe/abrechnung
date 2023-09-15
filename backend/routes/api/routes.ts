@@ -8,6 +8,15 @@ import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
 import expenseReportRoutes from './expenseReport.js'
+import i18n from '../../i18n.js'
+
+router.use(async (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next()
+  } else {
+    return res.status(401).send({ message: i18n.t('alerts.request.unauthorized') })
+  }
+})
 
 router.use('/user', userRoutes)
 router.use('/travel', travelRoutes)

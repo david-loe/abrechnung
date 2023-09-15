@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
 import mongoose, { ObjectId } from 'mongoose'
 import cors from 'cors'
 import passport from 'passport'
@@ -13,7 +13,6 @@ import adminRoutes from './routes/api/admin/routes.js'
 import approveRoutes from './routes/api/approve/routes.js'
 import examineRoutes from './routes/api/examine/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
-import { Access } from '../common/types.js'
 import { MongoClient } from 'mongodb'
 
 await mongoose.connect(process.env.MONGO_URL, {})
@@ -112,31 +111,10 @@ app.post('/login', passport.authenticate('ldapauth', { session: true }), async (
   res.send({ status: 'ok' })
 })
 
-app.use('/api', async (req, res, next) => {
-  if (req.isAuthenticated()) {
-    next()
-  } else {
-    return res.status(401).send({ message: i18n.t('alerts.request.unauthorized') })
-  }
-})
-
-function accessControl(access: Access) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (req.user!.access[access]) {
-      next()
-    } else {
-      return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
-    }
-  }
-}
-
 app.use('/api', routes)
 app.use('/upload', uploadRoutes)
-app.use('/api/admin', accessControl('admin'))
 app.use('/api/admin', adminRoutes)
-app.use('/api/approve', accessControl('approve'))
 app.use('/api/approve', approveRoutes)
-app.use('/api/examine', accessControl('examine'))
 app.use('/api/examine', examineRoutes)
 
 export default app

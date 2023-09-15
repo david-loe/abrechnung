@@ -4,8 +4,8 @@ import axios from 'axios'
 import settings from '../common/settings.json' assert { type: 'json' }
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Schema, SchemaTypeOptions } from 'mongoose'
-import { Request, Response } from 'express'
-import { CountryLumpSum, Meta } from '../common/types.js'
+import { NextFunction, Request, Response } from 'express'
+import { Access, CountryLumpSum, Meta } from '../common/types.js'
 import { log } from '../common/logger.js'
 
 export function getter(
@@ -360,4 +360,14 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
     costObject.date = { type: Date, required: required }
   }
   return costObject
+}
+
+export function accessControl(access: Access) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.user!.access[access]) {
+      next()
+    } else {
+      return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
+    }
+  }
 }
