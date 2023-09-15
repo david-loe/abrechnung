@@ -18,6 +18,7 @@
   "stateColors": {
     "rejected": { "color": "#E8998D", "text": "black" },
     "appliedFor": { "color": "#cae5ff", "text": "black" },
+    "inWork": { "color": "#AAD0FF", "text": "black" },
     "approved": { "color": "#89bbfe", "text": "black" },
     "underExamination": { "color": "#6f8ab7", "text": "white" },
     "refunded": { "color": "#615d6c", "text": "white" }
