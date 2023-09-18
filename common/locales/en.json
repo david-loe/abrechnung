@@ -117,7 +117,9 @@
     "uploadFromPhone": "Upload from Phone",
     "tapToUpload": "Tap to upload 👆",
     "uploadLink": "Upload Link",
-    "expenseReport": "Expense Report"
+    "expenseReport": "Expense Report",
+    "examine/travel": "Examine Travels",
+    "examine/expenseReport": "Examine Expenses"
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",

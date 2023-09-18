@@ -217,7 +217,7 @@ export type Transport = (typeof transports)[number]
 export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
-export const accesses = ['examine', 'approve', 'admin'] as const
+export const accesses = ['examine/travel', 'examine/expenseReport', 'approve', 'admin'] as const
 export type Access = (typeof accesses)[number]
 
 export const meals = ['breakfast', 'lunch', 'dinner'] as const

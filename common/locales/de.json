@@ -117,7 +117,9 @@
     "uploadFromPhone": "Vom Handy hochladen",
     "tapToUpload": "Zum Hochladen Tippen 👆",
     "uploadLink": "Upload Link",
-    "expenseReport": "Auslagenabrechnung"
+    "expenseReport": "Auslagenabrechnung",
+    "examine/travel": "Reisen prüfen",
+    "examine/expenseReport": "Auslagen prüfen"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

@@ -1,6 +1,6 @@
 import test from 'ava'
 import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
-import createAgent, { loginApprove, loginExamine, loginUser } from './_agent.js'
+import createAgent, { loginApprove, loginExamineTravel, loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
 const agent = createAgent()
@@ -197,7 +197,7 @@ test.serial('POST /travel/underExamination', async (t) => {
 // EXAMINE
 
 test.serial('POST /examine/travel/refunded', async (t) => {
-  await loginExamine(agent)
+  await loginExamineTravel(agent)
   t.plan(4)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/api/examine/travel/refunded').send({ _id: travel._id, comment })

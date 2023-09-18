@@ -394,19 +394,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from './Elements/StatePipeline.vue'
-import ProgressCircle from './Elements/ProgressCircle.vue'
-import StageForm from './Forms/StageForm.vue'
-import ExpenseForm from './Forms/ExpenseForm.vue'
-import InfoPoint from './Elements/InfoPoint.vue'
-import PlaceElement from './Elements/PlaceElement.vue'
-import TravelApplyForm from './Forms/TravelApplyForm.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../common/scripts.js'
-import { log } from '../../../common/logger.js'
-import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple, meals } from '../../../common/types.js'
-import { PropType } from 'vue'
+import StatePipeline from '../Elements/StatePipeline.vue'
+import ProgressCircle from '../Elements/ProgressCircle.vue'
+import StageForm from '../Forms/StageForm.vue'
+import ExpenseForm from '../Forms/ExpenseForm.vue'
+import InfoPoint from '../Elements/InfoPoint.vue'
+import PlaceElement from '../Elements/PlaceElement.vue'
+import TravelApplyForm from '../Forms/TravelApplyForm.vue'
+import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../../common/scripts.js'
+import { log } from '../../../../common/logger.js'
+import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple, meals } from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -500,7 +499,7 @@ export default defineComponent({
     async refund() {
       const result = await this.$root.setter('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
       if (result) {
-        this.$router.push({ path: '/examine' })
+        this.$router.push({ path: '/examine/travel' })
       }
     },
     reportLink() {

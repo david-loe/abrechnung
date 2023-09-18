@@ -81,8 +81,8 @@ export async function sendTravelNotificationMail(travel: Travel) {
     recipients = await User.find({ 'access.approve': true }).lean()
     button.link = process.env.VITE_FRONTEND_URL + '/approve/' + travel._id
   } else if (travel.state === 'underExamination') {
-    recipients = await User.find({ 'access.examine': true }).lean()
-    button.link = process.env.VITE_FRONTEND_URL + '/examine/' + travel._id
+    recipients = await User.find({ 'access.examine/travel': true }).lean()
+    button.link = process.env.VITE_FRONTEND_URL + '/examine/travel/' + travel._id
   } else {
     // 'rejected', 'approved', 'refunded'
     recipients = [travel.traveler]
@@ -112,8 +112,8 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
   const lastParagraph = interpolation.comment ? i18n.t('mail.expenseReport.' + expenseReport.state + '.lastParagraph', interpolation) : ''
 
   if (expenseReport.state === 'underExamination') {
-    recipients = await User.find({ 'access.examine': true }).lean()
-    button.link = process.env.VITE_FRONTEND_URL + '/examine/' + expenseReport._id
+    recipients = await User.find({ 'access.examine/expenseReport': true }).lean()
+    button.link = process.env.VITE_FRONTEND_URL + '/examine/expenseReport/' + expenseReport._id
   } else {
     // 'rejected', 'refunded'
     recipients = [expenseReport.expensePayer]

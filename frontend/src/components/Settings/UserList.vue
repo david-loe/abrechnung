@@ -6,9 +6,11 @@
           <div class="col-auto me-auto">
             <span class="fs-6">
               {{ user.uid }}
-              <i v-if="user.access.approve" class="ms-4 bi bi-calendar-check"></i>
-              <i v-if="user.access.examine" class="ms-4 bi bi-pencil-square"></i>
-              <i v-if="user.access.admin" class="ms-4 bi bi-person-fill"></i>
+              <template v-for="access of accesses">
+                <span v-if="user.access[access]" class="ms-4">
+                  <i v-for="icon of accessIcons[access]" :class="'bi ' + icon"></i>
+                </span>
+              </template>
             </span>
           </div>
           <div class="col-auto">
@@ -49,7 +51,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import UserForm from '../Forms/UserForm.vue'
-import { User } from '../../../../common/types.js'
+import { User, accesses } from '../../../../common/types.js'
+import { accessIcons } from '../../../../common/settings.json'
 export default defineComponent({
   name: 'UserList',
   components: { UserForm },
@@ -58,7 +61,9 @@ export default defineComponent({
       users: [] as User[],
       userToEdit: undefined as User | undefined,
       userFormMode: 'add' as 'add' | 'edit',
-      showForm_: false
+      showForm_: false,
+      accesses,
+      accessIcons
     }
   },
   methods: {

@@ -362,9 +362,15 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
   return costObject
 }
 
-export function accessControl(access: Access) {
+export function accessControl(accesses: Access[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (req.user!.access[access]) {
+    var hasAccess = false
+    for (const access of accesses) {
+      if (req.user!.access[access]) {
+        hasAccess = true
+      }
+    }
+    if (hasAccess) {
       next()
     } else {
       return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })

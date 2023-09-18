@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/SettingsPage.vue'
-import ApprovePage from './components/ApprovePage.vue'
-import ExaminePage from './components/ExaminePage.vue'
+import ApprovePage from './components/travel/ApprovePage.vue'
+import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import MyTravelsPage from './components/MyTravelsPage.vue'
-import TravelPage from './components/TravelPage.vue'
+import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
 
 const routes = [
@@ -28,19 +28,19 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/examine',
+    path: '/examine/travel',
     name: 'Examine',
-    component: ExaminePage,
+    component: ExamineTravelPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/examine/:_id([0-9a-fA-F]{24})/:endpointSuffix?',
+    path: '/examine/travel/:_id([0-9a-fA-F]{24})/:endpointSuffix?',
     name: 'Examine Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/examine', title: 'labels.examine' }],
+      parentPages: [{ link: '/examine/travel', title: 'labels.examine/travel' }],
       endpointPrefix: 'examine/',
       endpointSuffix: route.params.endpointSuffix
     })

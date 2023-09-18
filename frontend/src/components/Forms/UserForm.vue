@@ -12,22 +12,13 @@
     </div>
 
     <div class="row mb-2">
-      <div class="col">
+      <div v-for="access of accesses" class="col" :key="access">
         <div class="form-check">
-          <label for="userFormApprove" class="form-check-label text-nowrap"> {{ $t('labels.approve') }}</label>
-          <input class="form-check-input" type="checkbox" id="userFormApprove" role="switch" v-model="formUser.access.approve" />
-        </div>
-      </div>
-      <div class="col">
-        <div class="form-check">
-          <label for="userFormExamine" class="form-check-label text-nowrap"> {{ $t('labels.examine') }}</label>
-          <input class="form-check-input" type="checkbox" id="userFormExamine" role="switch" v-model="formUser.access.examine" />
-        </div>
-      </div>
-      <div class="col">
-        <div class="form-check">
-          <label for="userFormAdmin" class="form-check-label text-nowrap"> {{ $t('labels.admin') }}</label>
-          <input class="form-check-input" type="checkbox" id="userFormAdmin" role="switch" v-model="formUser.access.admin" />
+          <label :for="'userForm' + access" class="form-check-label text-nowrap">
+            <i v-for="icon of accessIcons[access]" :class="'bi ' + icon"></i>
+            {{ $t('labels.' + access) }}
+          </label>
+          <input class="form-check-input" type="checkbox" :id="'userForm' + access" role="switch" v-model="formUser.access[access]" />
         </div>
       </div>
     </div>
@@ -46,7 +37,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { User } from '../../../../common/types.js'
+import { User, accesses } from '../../../../common/types.js'
+import { accessIcons } from '../../../../common/settings.json'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id'> {
   name?: string
@@ -58,7 +50,7 @@ const defaultUser: FormUser = {
   uid: '',
   access: {
     approve: false,
-    examine: false,
+    'examine/travel': false,
     admin: false
   },
   email: ''
@@ -79,7 +71,9 @@ export default defineComponent({
   data() {
     return {
       formUser: this.user,
-      loading: false
+      loading: false,
+      accesses,
+      accessIcons
     }
   },
   methods: {
