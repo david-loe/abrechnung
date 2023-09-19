@@ -1,6 +1,6 @@
 <template>
   <div v-if="travel._id">
-    <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
+    <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
     <table class="table">
       <tbody>
         <tr v-for="key of keys" :key="key">
@@ -47,10 +47,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import StatePipeline from './StatePipeline.vue'
+import StatePipeline from '../../elements/StatePipeline.vue'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../../common/scripts.js'
-import { TravelSimple } from '../../../../../common/types.js'
+import { TravelSimple, travelStates } from '../../../../../common/types.js'
 
 const keys = [
   'traveler',
@@ -67,7 +67,8 @@ export default defineComponent({
   name: 'TravelApply',
   data() {
     return {
-      keys
+      keys,
+      travelStates
     }
   },
   components: { StatePipeline, PlaceElement },

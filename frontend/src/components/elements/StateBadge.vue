@@ -7,7 +7,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { stateColors } from '../../../../common/settings.json'
-import { TravelState } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StateBadge',
@@ -16,7 +15,7 @@ export default defineComponent({
       stateColors
     }
   },
-  props: { state: { type: String as PropType<TravelState>, required: true } }
+  props: { state: { type: String as PropType<keyof typeof stateColors>, required: true } }
 })
 </script>
 

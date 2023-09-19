@@ -4,7 +4,7 @@
       <StateBadge :state="state" class="fs-6"></StateBadge>
     </div>
     <div v-else class="row align-items-center justify-content-around m-0 flex-nowrap">
-      <template v-for="(value, index) of travelStates">
+      <template v-for="(value, index) of states">
         <template v-if="value !== 'rejected'">
           <div class="col-auto p-0" :key="value">
             <StateBadge :state="value" :class="state === value ? 'fs-6' : 'fw-normal'"></StateBadge>
@@ -15,7 +15,7 @@
                 'background: linear-gradient(to right, ' +
                 stateColors[value].color +
                 ', ' +
-                stateColors[travelStates[index + 1]].color +
+                stateColors[states[index + 1]].color +
                 '); height: 5px; border: 0px'
               " />
           </div>
@@ -27,20 +27,21 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import StateBadge from '../../elements/StateBadge.vue'
-import { stateColors } from '../../../../../common/settings.json'
-import { TravelState, travelStates } from '../../../../../common/types.js'
+import StateBadge from './StateBadge.vue'
+import { stateColors } from '../../../../common/settings.json'
 
 export default defineComponent({
   name: 'StatePipeline',
   data() {
     return {
-      stateColors,
-      travelStates
+      stateColors
     }
   },
   components: { StateBadge },
-  props: { state: { type: String as PropType<TravelState> } },
+  props: {
+    state: { type: String as PropType<keyof typeof stateColors>, required: true },
+    states: { type: Array as PropType<readonly (keyof typeof stateColors)[]>, required: true }
+  },
   beforeMount() {},
   mounted() {}
 })

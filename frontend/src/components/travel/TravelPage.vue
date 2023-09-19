@@ -118,7 +118,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="travel.state"></StatePipeline>
+      <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
 
       <div class="row justify-content-center mb-5">
         <div class="col-auto">
@@ -396,7 +396,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from './elements/StatePipeline.vue'
+import StatePipeline from '../elements/StatePipeline.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StageForm from './forms/StageForm.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
@@ -405,7 +405,18 @@ import PlaceElement from '../elements/PlaceElement.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { DocumentFile, TravelExpense, Record, RecordType, Stage, Travel, TravelDay, TravelSimple, meals } from '../../../../common/types.js'
+import {
+  DocumentFile,
+  TravelExpense,
+  Record,
+  RecordType,
+  Stage,
+  Travel,
+  TravelDay,
+  TravelSimple,
+  meals,
+  travelStates
+} from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -427,7 +438,8 @@ export default defineComponent({
       }[],
       configCateringRefund: false,
       isReadOnly: false,
-      meals
+      meals,
+      travelStates
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },

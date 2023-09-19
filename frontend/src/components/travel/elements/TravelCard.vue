@@ -1,75 +1,54 @@
 <template>
-  <div class="card" style="width: 18rem; cursor: pointer" @click="$emit('clicked')">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <h5 class="card-title">{{ travel.name }}</h5>
-        </div>
-        <div class="col-auto">
-          <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
-        </div>
-        <div v-if="showDropdown" class="col-auto">
-          <div class="dropdown" @click="(e) => e.stopPropagation()">
-            <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
-              <i class="bi bi-three-dots-vertical"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <a
-                  :class="'dropdown-item' + (['underExamination', 'refunded'].indexOf(travel.state) != -1 ? ' disabled' : '')"
-                  href="#"
-                  @click=";['underExamination', 'refunded'].indexOf(travel.state) != -1 ? null : $emit('edit')">
-                  <span class="me-1"><i class="bi bi-pencil"></i></span>
-                  <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#" @click="$emit('deleted')">
-                  <span class="me-1"><i class="bi bi-trash"></i></span>
-                  <span>{{ $t('labels.delete') }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <CardElement
+    :state="travel.state"
+    :name="travel.name"
+    :user="travel.traveler"
+    :editor="travel.editor"
+    :showUser="showTraveler"
+    :showEditor="travel.traveler._id !== travel.editor._id"
+    :showDropdown="showDropdown"
+    @clicked="$emit('clicked')"
+    @deleted="$emit('deleted')">
+    <template #top-right>
+      <ProgressCircle v-if="['approved', 'underExamination'].indexOf(travel.state) !== -1" :progress="travel.progress"></ProgressCircle>
+    </template>
+    <template #dropdown-items>
+      <li>
+        <a
+          :class="'dropdown-item' + (['underExamination', 'refunded'].indexOf(travel.state) != -1 ? ' disabled' : '')"
+          href="#"
+          @click=";['underExamination', 'refunded'].indexOf(travel.state) != -1 ? null : $emit('edit')">
+          <span class="me-1"><i class="bi bi-pencil"></i></span>
+          <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
+        </a>
+      </li>
+      <li></li>
+    </template>
 
-      <span v-if="showTraveler" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{ travel.traveler.name }}</span>
-      <div class="row mb-2">
-        <div class="col-auto">
-          <span class="fs-6 fw-medium text-muted">
-            {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
-          </span>
-        </div>
-        <div v-if="travel.claimSpouseRefund" :title="$t('labels.claimSpouseRefund')" class="col-auto">
-          <i class="bi bi-person-plus-fill"></i>
-        </div>
+    <template #details>
+      <div class="col-auto">
+        <span class="fs-6 fw-medium text-muted">
+          {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
+        </span>
       </div>
-
-      <div class="row">
-        <div class="col"><StateBadge :state="travel.state"></StateBadge></div>
-        <div v-if="travel.traveler._id !== travel.editor._id" class="col-auto">
-          <small class="ms-1">
-            <i class="bi bi-pencil-square"></i>
-            {{ travel.editor.name }}
-          </small>
-        </div>
+      <div v-if="travel.claimSpouseRefund" :title="$t('labels.claimSpouseRefund')" class="col-auto">
+        <i class="bi bi-person-plus-fill"></i>
       </div>
-    </div>
-  </div>
+    </template>
+  </CardElement>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import CardElement from '../../elements/CardElement.vue'
 import ProgressCircle from '../../elements/ProgressCircle.vue'
-import StateBadge from '../../elements/StateBadge.vue'
 import { datetoDateString } from '../../../../../common/scripts.js'
 import { TravelSimple } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'TravelCard',
   emits: ['clicked', 'deleted', 'edit'],
-  components: { StateBadge, ProgressCircle },
+  components: { CardElement, ProgressCircle },
   props: {
     travel: { type: Object as PropType<TravelSimple>, required: true },
     showTraveler: { type: Boolean, default: false },
