@@ -31,7 +31,7 @@ export default defineComponent({
     async deleteTravel(id: string): Promise<void> {
       const result = await this.$root.deleter('travel', { id: id })
       if (result) {
-        this.$refs.list.getData()
+        ;(this.$refs.list as typeof PaginationList).getData()
       }
     }
   }

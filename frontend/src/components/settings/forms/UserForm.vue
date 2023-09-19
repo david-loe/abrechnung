@@ -44,7 +44,7 @@ interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: string
   settings?: User['settings']
   _id?: string
-  access?: Partial<User['access']>
+  access: Partial<User['access']>
 }
 
 const defaultUser: FormUser = {

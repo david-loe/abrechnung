@@ -10,16 +10,16 @@
         {{ $t('alerts.noData.' + endpoint) }}
       </div>
       <div v-else-if="meta && meta.countPages > 1" class="mx-auto text-secondary" style="width: fit-content">
-        <span class="me-2 p-2" style="cursor: pointer" @click="getTravels(meta.page - 1)">&lt;</span>
+        <span class="me-2 p-2" style="cursor: pointer" @click="getData(meta.page - 1)">&lt;</span>
         <span
           v-for="x of meta.countPages"
           :class="'me-2 p-2' + (meta.page == x ? ' fs-5' : '')"
           :key="x"
           :style="meta.page == x ? '' : 'cursor: pointer;'"
-          @click="meta.page == x ? null : getTravels(x)">
+          @click="meta.page == x ? null : getData(x)">
           {{ x }}
         </span>
-        <span class="p-2" style="cursor: pointer" @click="getTravels(meta.page + 1)">&gt;</span>
+        <span class="p-2" style="cursor: pointer" @click="getData(meta.page + 1)">&gt;</span>
       </div>
     </template>
   </div>

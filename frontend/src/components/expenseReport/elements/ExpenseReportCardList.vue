@@ -29,7 +29,7 @@ export default defineComponent({
     async deleteExpenseReport(id: string): Promise<void> {
       const result = await this.$root.deleter('expenseReport', { id: id })
       if (result) {
-        this.$refs.list.getData()
+        ;(this.$refs.list as typeof PaginationList).getData()
       }
     }
   }
