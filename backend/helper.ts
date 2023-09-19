@@ -119,7 +119,7 @@ export function setter(
       }
       try {
         Object.assign(oldObject, req.body)
-        const result = await oldObject.save()
+        const result = (await oldObject.save()).toObject()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
         if (cb) cb(result)
       } catch (error) {
@@ -127,7 +127,7 @@ export function setter(
       }
     } else if (allowNew) {
       try {
-        const result = await new model(req.body).save()
+        const result = (await new model(req.body).save()).toObject()
         res.send({ message: i18n.t('alerts.successSaving'), result: result })
         if (cb) cb(result)
       } catch (error) {
