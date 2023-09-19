@@ -3,7 +3,7 @@ import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
-import MyTravelsPage from './components/MyTravelsPage.vue'
+import HomePage from './components/HomePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
 
@@ -21,7 +21,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/approve/:_id([0-9a-fA-F]{24})?',
+    path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
     name: 'Approve',
     component: ApprovePage,
     meta: { requiresAuth: true },
@@ -49,12 +49,12 @@ const routes = [
     name: 'Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
-    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.myTravels' }] })
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
     path: '/',
-    name: 'MyTravels',
-    component: MyTravelsPage,
+    name: 'Home',
+    component: HomePage,
     meta: { requiresAuth: true }
   },
   {

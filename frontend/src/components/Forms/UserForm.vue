@@ -40,19 +40,16 @@ import { defineComponent, PropType } from 'vue'
 import { User, accesses } from '../../../../common/types.js'
 import { accessIcons } from '../../../../common/settings.json'
 
-interface FormUser extends Omit<User, 'settings' | 'name' | '_id'> {
+interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: string
   settings?: User['settings']
   _id?: string
+  access?: Partial<User['access']>
 }
 
 const defaultUser: FormUser = {
   uid: '',
-  access: {
-    approve: false,
-    'examine/travel': false,
-    admin: false
-  },
+  access: {},
   email: ''
 }
 export default defineComponent({

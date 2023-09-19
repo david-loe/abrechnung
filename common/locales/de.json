@@ -5,7 +5,7 @@
     "settings": "Einstellungen",
     "login": "Login",
     "logout": "Logout",
-    "myTravels": "Meine Reisen"
+    "home": "Home"
   },
   "labels": {
     "email": "Email Addresse",
@@ -119,7 +119,8 @@
     "uploadLink": "Upload Link",
     "expenseReport": "Auslagenabrechnung",
     "examine/travel": "Reisen prüfen",
-    "examine/expenseReport": "Auslagen prüfen"
+    "examine/expenseReport": "Auslagen prüfen",
+    "approve/travel": "Reisen genehmigen"
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",

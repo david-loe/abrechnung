@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="container">
-      <h1 class="mb-3">{{ $t('labels.approve') }}</h1>
+      <h1 class="mb-3">{{ $t('labels.approve/travel') }}</h1>
       <TravelCardList
         class="mb-5"
         ref="travelCardListRef"

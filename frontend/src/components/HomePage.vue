@@ -30,7 +30,7 @@
     <div class="container">
       <div class="row justify-content-between mb-3">
         <div class="col-auto">
-          <h1>{{ $t('headlines.myTravels') }}</h1>
+          <h1>{{ $t('headlines.home') }}</h1>
         </div>
         <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {})">
@@ -58,7 +58,7 @@ import TravelApplyForm from './Forms/TravelApplyForm.vue'
 import { TravelSimple } from '../../../common/types.js'
 
 export default defineComponent({
-  name: 'MyTravelsPage',
+  name: 'HomePage',
   components: { TravelCardList, TravelApplyForm, TravelApplication },
   props: [],
   data() {

@@ -12,7 +12,7 @@ test('POST /admin/user', async (t) => {
   const userId = (res.body.data as User)._id
   t.true((res.body.data as User).access.admin)
 
-  const user = { _id: userId, access: { admin: true, 'examine/travel': true, 'examine/expenseReport': true, approve: true } }
+  const user = { _id: userId, access: { admin: true, 'examine/travel': true, 'examine/expenseReport': true, 'approve/travel': true } }
   const res2 = await agent.post('/api/admin/user').send(user)
   t.is(res2.status, 200)
   t.like(res2.body.result, user)

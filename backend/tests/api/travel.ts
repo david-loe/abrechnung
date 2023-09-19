@@ -1,6 +1,6 @@
 import test from 'ava'
 import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
-import createAgent, { loginApprove, loginExamineTravel, loginUser } from './_agent.js'
+import createAgent, { loginApproveTravel, loginExamineTravel, loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
 const agent = createAgent()
@@ -45,7 +45,7 @@ test.serial('GET /travel', async (t) => {
 // APPROVE
 
 test.serial('GET /approve/travel', async (t) => {
-  await loginApprove(agent)
+  await loginApproveTravel(agent)
   t.plan(2)
   const res = await agent.get('/api/approve/travel')
   t.is(res.status, 200)

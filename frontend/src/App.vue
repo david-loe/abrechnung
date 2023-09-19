@@ -13,7 +13,7 @@
             <div>
               <router-link to="/" class="nav-link link-dark d-flex align-items-center">
                 <i class="fs-4 bi bi-card-list"></i>
-                <span class="ms-1 d-none d-md-block">{{ $t('headlines.myTravels') }}</span>
+                <span class="ms-1 d-none d-md-block">{{ $t('headlines.home') }}</span>
               </router-link>
             </div>
             <div v-for="access of accesses" :key="access">

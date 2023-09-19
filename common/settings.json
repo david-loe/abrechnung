@@ -25,7 +25,7 @@
   },
   "accessIcons": {
     "admin": ["bi-person-fill"],
-    "approve": ["bi-calendar-check"],
+    "approve/travel": ["bi-calendar-check"],
     "examine/travel": ["bi-airplane", "bi-pencil-square"],
     "examine/expenseReport": ["bi-coin", "bi-pencil-square"]
   },
