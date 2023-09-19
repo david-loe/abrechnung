@@ -14,6 +14,7 @@ import { Travel as ITravel } from '../../../../common/types.js'
 router.get('/', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
+  var preCondition: any = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
   if (!req.query.addStages) {
     select.stages = 0
   }
@@ -26,25 +27,18 @@ router.get('/', async (req, res) => {
     select.days = 0
   }
   delete req.query.addDays
-  return getter(Travel, 'travel', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
+  if (!req.query.addRefunded) {
+    preCondition = { state: 'underExamination', historic: false }
+  }
+  delete req.query.addRefunded
+  return getter(Travel, 'travel', 20, preCondition, select, sortFn)(req, res)
 })
 
 router.get('/refunded', async (req, res) => {
   const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf() // sort backwards
 
-  const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.addStages) {
-    select.stages = 0
-  }
-  delete req.query.addStages
-  if (!req.query.addExpenses) {
-    select.expenses = 0
-  }
-  delete req.query.addExpenses
-  if (!req.query.addDays) {
-    select.days = 0
-  }
-  delete req.query.addDays
+  const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0, stages: 0, expenses: 0, days: 0 }
+
   return getter(Travel, 'travel', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
 

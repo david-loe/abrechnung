@@ -34,15 +34,14 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/examine/travel/:_id([0-9a-fA-F]{24})/:endpointSuffix?',
+    path: '/examine/travel/:_id([0-9a-fA-F]{24})',
     name: 'Examine Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
       parentPages: [{ link: '/examine/travel', title: 'labels.examine/travel' }],
-      endpointPrefix: 'examine/',
-      endpointSuffix: route.params.endpointSuffix
+      endpointPrefix: 'examine/'
     })
   },
   {

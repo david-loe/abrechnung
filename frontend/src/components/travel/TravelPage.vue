@@ -437,8 +437,7 @@ export default defineComponent({
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
     },
-    endpointPrefix: { type: String, default: '' },
-    endpointSuffix: { type: String, default: '' }
+    endpointPrefix: { type: String, default: '' }
   },
   methods: {
     showModal(mode: ModalMode, object: ModalObject | Gap, type: ModalObjectType) {
@@ -620,14 +619,16 @@ export default defineComponent({
     },
     async getTravel() {
       const oldTravel = this.travel
-      this.travel = (
-        await this.$root.getter(this.endpointPrefix + 'travel' + this.endpointSuffix, {
-          id: this._id,
-          addStages: true,
-          addExpenses: true,
-          addDays: true
-        })
-      ).data
+      const params: any = {
+        id: this._id,
+        addStages: true,
+        addExpenses: true,
+        addDays: true
+      }
+      if (this.endpointPrefix === 'examine/') {
+        params.addRefunded = true
+      }
+      this.travel = (await this.$root.getter(this.endpointPrefix + 'travel', params)).data
       if (oldTravel.days && this.travel.days) {
         for (const oldDay of oldTravel.days) {
           if ((oldDay as Day).showSettings) {

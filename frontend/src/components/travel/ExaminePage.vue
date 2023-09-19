@@ -16,10 +16,7 @@
         {{ $t('labels.hideRefundedTravels') }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <TravelCardList
-        endpoint="examine/travel/refunded"
-        :showTraveler="true"
-        @clicked="(t) => $router.push('/examine/travel/' + t._id + '/%2Frefunded')">
+      <TravelCardList endpoint="examine/travel/refunded" :showTraveler="true" @clicked="(t) => $router.push('/examine/travel/' + t._id)">
       </TravelCardList>
     </template>
   </div>
