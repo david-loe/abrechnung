@@ -33,6 +33,9 @@ export default defineComponent({
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }
+    },
+    getData() {
+      ;(this.$refs.list as typeof PaginationList).getData()
     }
   }
 })

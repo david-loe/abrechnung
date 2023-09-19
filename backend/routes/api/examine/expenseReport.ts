@@ -14,20 +14,22 @@ import { generateExpenseReportReport } from '../../../pdf/expenseReport.js'
 router.get('/', async (req, res) => {
   const sortFn = (a: IExpenseReport, b: IExpenseReport) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
   const select: Partial<{ [key in keyof IExpenseReport]: number }> = { history: 0, historic: 0 }
+  var preCondition: any = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
   if (!req.query.addExpenses) {
     select.expenses = 0
   }
   delete req.query.addExpenses
-  return getter(ExpenseReport, 'expense report', 20, { state: 'underExamination', historic: false }, select, sortFn)(req, res)
+  if (!req.query.addRefunded) {
+    preCondition = { state: 'underExamination', historic: false }
+  }
+  delete req.query.addRefunded
+  return getter(ExpenseReport, 'expense report', 20, preCondition, select, sortFn)(req, res)
 })
 
 router.get('/refunded', async (req, res) => {
   const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf() // sort backwards
   const select: Partial<{ [key in keyof IExpenseReport]: number }> = { history: 0, historic: 0 }
-  if (!req.query.addExpenses) {
-    select.expenses = 0
-  }
-  delete req.query.addExpenses
+
   return getter(ExpenseReport, 'expense report', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
 

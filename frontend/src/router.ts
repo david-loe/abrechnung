@@ -7,6 +7,7 @@ import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue
 import HomePage from './components/HomePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
+import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 
 const routes = [
   {
@@ -50,6 +51,22 @@ const routes = [
     path: '/examine/expenseReport',
     component: ExamineExpenseReportPage,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/examine/expenseReport/:_id([0-9a-fA-F]{24})',
+    component: ExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/examine/expenseReport', title: 'labels.examine/expenseReport' }],
+      endpointPrefix: 'examine/'
+    })
+  },
+  {
+    path: '/expenseReport/:_id([0-9a-fA-F]{24})',
+    component: ExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
     path: '/',
