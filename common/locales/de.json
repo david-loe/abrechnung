@@ -124,7 +124,7 @@
   },
   "alerts": {
     "noStagesPresent": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
-    "noTravels": {
+    "noData": {
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!",
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",

@@ -124,7 +124,7 @@
   },
   "alerts": {
     "noStagesPresent": "There are no stages present jet.",
-    "noTravels": {
+    "noData": {
       "travel": "There are no travels. Add one!",
       "approve/travel": "There are no travels to approve",
       "approve/travel/approved": "There are no approved travels",
