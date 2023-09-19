@@ -151,15 +151,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../Elements/CurrencySelector.vue'
-import CountrySelector from '../Elements/CountrySelector.vue'
-import InfoPoint from '../Elements/InfoPoint.vue'
-import FileUpload from '../Elements/FileUpload.vue'
-import PlaceInput from '../Elements/PlaceInput.vue'
-import DateInput from '../Elements/DateInput.vue'
-import { getDayList, datetoDateString, datetimeToDateString } from '../../../../common/scripts.js'
-import { Stage, Place, CountrySimple, transports } from '../../../../common/types.js'
-import settings from '../../../../common/settings.json'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
+import CountrySelector from '../../elements/CountrySelector.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import FileUpload from '../../elements/FileUpload.vue'
+import PlaceInput from '../../elements/PlaceInput.vue'
+import DateInput from '../../elements/DateInput.vue'
+import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
+import { Stage, Place, CountrySimple, transports } from '../../../../../common/types.js'
+import settings from '../../../../../common/settings.json'
 
 interface FormStage extends Omit<Stage, 'startLocation' | 'endLocation' | 'midnightCountries' | '_id'> {
   startLocation?: Place

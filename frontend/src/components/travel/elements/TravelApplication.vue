@@ -48,9 +48,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import StatePipeline from './StatePipeline.vue'
-import PlaceElement from './PlaceElement.vue'
-import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../common/scripts.js'
-import { TravelSimple } from '../../../../common/types.js'
+import PlaceElement from '../../elements/PlaceElement.vue'
+import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../../common/scripts.js'
+import { TravelSimple } from '../../../../../common/types.js'
 
 const keys = [
   'traveler',

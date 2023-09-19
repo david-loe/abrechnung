@@ -27,9 +27,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import StateBadge from './StateBadge.vue'
-import { stateColors } from '../../../../common/settings.json'
-import { TravelState, travelStates } from '../../../../common/types.js'
+import StateBadge from '../../elements/StateBadge.vue'
+import { stateColors } from '../../../../../common/settings.json'
+import { TravelState, travelStates } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StatePipeline',

@@ -58,13 +58,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, toRaw } from 'vue'
-import CurrencySelector from '../Elements/CurrencySelector.vue'
-import InfoPoint from '../Elements/InfoPoint.vue'
-import FileUpload from '../Elements/FileUpload.vue'
-import DateInput from '../Elements/DateInput.vue'
-import { TravelExpense } from '../../../../common/types.js'
-import settings from '../../../../common/settings.json'
+import { defineComponent, PropType } from 'vue'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import FileUpload from '../../elements/FileUpload.vue'
+import DateInput from '../../elements/DateInput.vue'
+import { TravelExpense } from '../../../../../common/types.js'
+import settings from '../../../../../common/settings.json'
 
 interface FormExpense extends Omit<TravelExpense, '_id'> {
   _id?: string

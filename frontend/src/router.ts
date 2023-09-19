@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import LoginPage from './components/LoginPage.vue'
-import SettingsPage from './components/SettingsPage.vue'
+import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import HomePage from './components/HomePage.vue'

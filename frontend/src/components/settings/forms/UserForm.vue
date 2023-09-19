@@ -37,8 +37,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { User, accesses } from '../../../../common/types.js'
-import { accessIcons } from '../../../../common/settings.json'
+import { User, accesses } from '../../../../../common/types.js'
+import { accessIcons } from '../../../../../common/settings.json'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: string

@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import TravelCardList from '../Elements/TravelCardList.vue'
+import TravelCardList from './elements/TravelCardList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

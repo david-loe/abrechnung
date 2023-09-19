@@ -50,9 +50,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserForm from '../Forms/UserForm.vue'
-import { User, accesses } from '../../../../common/types.js'
-import { accessIcons } from '../../../../common/settings.json'
+import UserForm from '../forms/UserForm.vue'
+import { User, accesses } from '../../../../../common/types.js'
+import { accessIcons } from '../../../../../common/settings.json'
 export default defineComponent({
   name: 'UserList',
   components: { UserForm },

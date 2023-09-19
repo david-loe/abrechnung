@@ -94,13 +94,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../Elements/CurrencySelector.vue'
-import InfoPoint from '../Elements/InfoPoint.vue'
-import PlaceInput from '../Elements/PlaceInput.vue'
-import DateInput from '../Elements/DateInput.vue'
-import { TravelSimple, Place } from '../../../../common/types.js'
-import settings from '../../../../common/settings.json'
-import { datetimeToDateString, isValidDate } from '../../../../common/scripts.js'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import PlaceInput from '../../elements/PlaceInput.vue'
+import DateInput from '../../elements/DateInput.vue'
+import { TravelSimple, Place } from '../../../../../common/types.js'
+import settings from '../../../../../common/settings.json'
+import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 
 interface FormTravelSimple
   extends Omit<TravelSimple, 'destinationPlace' | 'traveler' | 'state' | 'editor' | 'comments' | 'progress' | '_id'> {

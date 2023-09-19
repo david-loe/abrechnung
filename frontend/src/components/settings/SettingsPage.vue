@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserList from './Settings/UserList.vue'
+import UserList from './elements/UserList.vue'
 export default defineComponent({
   name: 'SettingsPage',
   components: { UserList },

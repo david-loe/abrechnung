@@ -52,9 +52,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
-import TravelCardList from './Elements/TravelCardList.vue'
-import TravelApplication from './Elements/TravelApplication.vue'
-import TravelApplyForm from './Forms/TravelApplyForm.vue'
+import TravelCardList from './travel/elements/TravelCardList.vue'
+import TravelApplication from './travel/elements/TravelApplication.vue'
+import TravelApplyForm from './travel/forms/TravelApplyForm.vue'
 import { TravelSimple } from '../../../common/types.js'
 
 export default defineComponent({
