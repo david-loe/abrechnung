@@ -41,7 +41,7 @@ export default defineComponent({
     endpoint: { type: String, required: true }
   },
   methods: {
-    async getTravels(page?: number): Promise<void> {
+    async getData(page?: number): Promise<void> {
       if (page === 0 || page) {
         if (page < 1) {
           page = 1
@@ -59,7 +59,7 @@ export default defineComponent({
     }
   },
   async beforeMount() {
-    await this.getTravels()
+    await this.getData()
   }
 })
 </script>

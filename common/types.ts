@@ -113,7 +113,6 @@ export interface Stage {
 export interface Expense {
   description: string
   cost: Cost
-  purpose: 'professional' | 'mixed'
   _id: Types.ObjectId
 }
 

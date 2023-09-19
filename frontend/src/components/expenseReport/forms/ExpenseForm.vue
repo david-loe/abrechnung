@@ -32,12 +32,6 @@
         :endpointPrefix="endpointPrefix" />
     </div>
 
-    <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
-    <InfoPoint :text="$t('info.purpose')" />
-    <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
-      <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
-    </select>
-
     <div class="mb-1">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
@@ -63,10 +57,10 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { TravelExpense } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
+import { Expense } from '../../../../../common/types.js'
+import { baseCurrency } from '../../../../../common/settings.json'
 
-interface FormExpense extends Omit<TravelExpense, '_id'> {
+interface FormExpense extends Omit<Expense, '_id'> {
   _id?: string
 }
 
@@ -74,11 +68,10 @@ const defaultExpense: FormExpense = {
   description: '',
   cost: {
     amount: null,
-    currency: settings.baseCurrency,
+    currency: baseCurrency,
     receipts: [],
     date: ''
-  },
-  purpose: 'professional'
+  }
 }
 export default defineComponent({
   name: 'ExpenseForm',
@@ -86,7 +79,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<TravelExpense>>,
+      type: Object as PropType<Partial<Expense>>,
       default: () => structuredClone(defaultExpense)
     },
     mode: {

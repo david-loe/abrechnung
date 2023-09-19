@@ -3,6 +3,7 @@ import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
+import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import HomePage from './components/HomePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
@@ -10,32 +11,27 @@ import axios from 'axios'
 const routes = [
   {
     path: '/login',
-    name: 'Login',
     component: LoginPage,
     meta: { requiresAuth: false }
   },
   {
     path: '/settings',
-    name: 'Settings',
     component: SettingsPage,
     meta: { requiresAuth: true }
   },
   {
     path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
-    name: 'Approve',
     component: ApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
     path: '/examine/travel',
-    name: 'Examine',
     component: ExamineTravelPage,
     meta: { requiresAuth: true }
   },
   {
     path: '/examine/travel/:_id([0-9a-fA-F]{24})',
-    name: 'Examine Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
@@ -46,14 +42,17 @@ const routes = [
   },
   {
     path: '/travel/:_id([0-9a-fA-F]{24})',
-    name: 'Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
+    path: '/examine/expenseReport',
+    component: ExamineExpenseReportPage,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/',
-    name: 'Home',
     component: HomePage,
     meta: { requiresAuth: true }
   },

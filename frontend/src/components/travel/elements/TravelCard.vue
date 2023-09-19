@@ -22,7 +22,6 @@
           <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
         </a>
       </li>
-      <li></li>
     </template>
 
     <template #details>
