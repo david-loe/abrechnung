@@ -9,11 +9,11 @@
       @clicked="(t) => $router.push('/examine/travel/' + t._id)">
     </TravelCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-      {{ $t('labels.showRefundedTravels') }} <i class="bi bi-chevron-down"></i>
+      {{ $t('labels.showX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
       <button type="button" class="btn btn-light" @click="showRefunded = false">
-        {{ $t('labels.hideRefundedTravels') }} <i class="bi bi-chevron-up"></i>
+        {{ $t('labels.hideX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
       <TravelCardList endpoint="examine/travel/refunded" :showTraveler="true" @clicked="(t) => $router.push('/examine/travel/' + t._id)">

@@ -176,7 +176,7 @@
             </div>
           </div>
           <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">
-            {{ $t('alerts.noStagesPresent') }}
+            {{ $t('alerts.noData.stage') }}
           </div>
 
           <div

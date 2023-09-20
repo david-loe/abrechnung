@@ -89,7 +89,7 @@
 
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
-          <div class="row g-1 mb-2">
+          <div class="row g-1 mb-3">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
@@ -99,7 +99,7 @@
             </div>
           </div>
           <div v-if="expenseReport.expenses.length == 0" class="alert alert-light" role="alert">
-            {{ $t('alerts.noExpensesPresent') }}
+            {{ $t('alerts.noData.expense') }}
           </div>
           <table v-else class="table">
             <thead>

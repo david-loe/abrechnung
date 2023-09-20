@@ -8,11 +8,11 @@
       @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
     </ExpenseReportCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-      {{ $t('labels.showRefundedExpenseReports') }} <i class="bi bi-chevron-down"></i>
+      {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
       <button type="button" class="btn btn-light" @click="showRefunded = false">
-        {{ $t('labels.hideRefundedExpenseReports') }} <i class="bi bi-chevron-up"></i>
+        {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
       <ExpenseReportCardList
