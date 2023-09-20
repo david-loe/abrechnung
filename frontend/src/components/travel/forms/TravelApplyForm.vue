@@ -2,7 +2,7 @@
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="mb-2">
       <label for="travelFormName" class="form-label">
-        {{ $t('labels.name') }}
+        {{ $t('labels.travelName') }}
       </label>
       <input type="text" class="form-control" id="travelFormName" v-model="formTravel.name" />
     </div>

@@ -26,7 +26,7 @@ import { defineComponent, PropType } from 'vue'
 import TravelApply from '../elements/TravelApplication.vue'
 import { TravelSimple } from '../../../../../common/types.js'
 export default defineComponent({
-  name: 'InfoPoint',
+  name: 'TravelApproveForm',
   data() {
     return {
       comment: '',

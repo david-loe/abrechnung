@@ -14,6 +14,7 @@
       "examine/expenseReport/refunded": "There are no reimbursed expenses.",
       "examine/travel": "There are no travels to examine",
       "examine/travel/refunded": "There are no refunded travels",
+      "expenseReport": "You have not added an expense report yet. Create your first expense report!",
       "expense": "There are no expenses jet. Add one!",
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
@@ -114,7 +115,9 @@
     "midnight": "12AM",
     "midnightCountries": "Countries reached by midnight",
     "mixed": "Mixed",
-    "name": "Travel name",
+    "name": "Name",
+    "expenseReportName": "Expense report name",
+    "travelName": "Travel name",
     "newX": "New {X}",
     "otherTransport": "Other transport ✈🚆🚖",
     "ownCar": "Own car 🚘",

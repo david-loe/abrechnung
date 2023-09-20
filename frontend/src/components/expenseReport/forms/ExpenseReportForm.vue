@@ -1,8 +1,8 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-    <div class="mb-2">
+    <div class="mb-3">
       <label for="expenseReportFormName" class="form-label">
-        {{ $t('labels.name') }}
+        {{ $t('labels.expenseReportName') }}
       </label>
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>

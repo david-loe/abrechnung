@@ -14,6 +14,7 @@
       "examine/expenseReport/refunded": "Es gibt keine erstatteten Auslagen.",
       "examine/travel": "Es gibt keine Reisen zu prüfen.",
       "examine/travel/refunded": "Es gibt keine erstatteten Reisen.",
+      "expenseReport": "Du hast noch keine Auslagenabrechnung hinzugefügt. Erstelle deine erste Auslagenabrechnung!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
@@ -114,7 +115,9 @@
     "midnight": "24 Uhr",
     "midnightCountries": "Erreichte Länder um Mitternacht",
     "mixed": "Gemischt",
-    "name": "Name der Reise",
+    "name": "Name",
+    "expenseReportName": "Name der Auslagenabrechnung",
+    "travelName": "Name der Reise",
     "newX": "{X} - Neu",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
