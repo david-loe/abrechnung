@@ -207,7 +207,7 @@ export type Locale = (typeof locales)[number]
 export const travelStates = ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'] as const
 export type TravelState = (typeof travelStates)[number]
 
-export const expenseReportStates = ['rejected', 'inWork', 'underExamination', 'refunded'] as const
+export const expenseReportStates = ['inWork', 'underExamination', 'refunded'] as const
 export type ExpenseReportState = (typeof expenseReportStates)[number]
 
 export const transports = ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] as const

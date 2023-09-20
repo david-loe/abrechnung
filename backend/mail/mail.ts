@@ -115,9 +115,9 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
     recipients = await User.find({ 'access.examine/expenseReport': true }).lean()
     button.link = process.env.VITE_FRONTEND_URL + '/examine/expenseReport/' + expenseReport._id
   } else {
-    // 'rejected', 'refunded'
+    // 'refunded'
     recipients = [expenseReport.expensePayer]
-    button.link = process.env.VITE_FRONTEND_URL + '/travel' + (expenseReport.state === 'rejected' ? '' : '/' + expenseReport._id)
+    button.link = process.env.VITE_FRONTEND_URL + '/expenseReport' + '/' + expenseReport._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
