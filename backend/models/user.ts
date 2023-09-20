@@ -6,8 +6,9 @@ const userSchema = new Schema<User>({
   email: { type: String },
   name: { type: String },
   access: {
-    examine: { type: Boolean, default: false },
-    approve: { type: Boolean, default: false },
+    'examine/expenseReport': { type: Boolean, default: false },
+    'examine/travel': { type: Boolean, default: false },
+    'approve/travel': { type: Boolean, default: false },
     admin: { type: Boolean, default: false }
   },
   settings: {

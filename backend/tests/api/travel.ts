@@ -1,7 +1,7 @@
 import test from 'ava'
-import { Expense, Stage, Travel, TravelSimple } from '../../../common/types.js'
-import createAgent, { loginApprove, loginExamine, loginUser } from './_agent.js'
-import { setStrokingGrayscaleColor } from 'pdf-lib'
+import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
+import createAgent, { loginApproveTravel, loginExamineTravel, loginUser } from './_agent.js'
+import { objectToFormFields } from './_helper.js'
 
 const agent = createAgent()
 await loginUser(agent)
@@ -45,7 +45,7 @@ test.serial('GET /travel', async (t) => {
 // APPROVE
 
 test.serial('GET /approve/travel', async (t) => {
-  await loginApprove(agent)
+  await loginApproveTravel(agent)
   t.plan(2)
   const res = await agent.get('/api/approve/travel')
   t.is(res.status, 200)
@@ -87,8 +87,8 @@ const stages: Stage[] = [
     transport: 'airplane',
     cost: {
       amount: 652, //@ts-ignore
-      currency: { _id: 'USD' },
-      receipts: [],
+      currency: { _id: 'USD' }, //@ts-ignore
+      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
       date: new Date('2023-08-04T00:00:00.000Z')
     },
     purpose: 'professional'
@@ -141,19 +141,27 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent)
   t.plan(stages.length + 0)
   for (const stage of stages) {
-    const res = await agent.post('/api/travel/stage').send(Object.assign(stage, { travelId: travel._id }))
+    var req = agent.post('/api/travel/stage')
+    for (const entry of objectToFormFields(stage)) {
+      if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
+        req = req.attach(entry.field, entry.val)
+      } else {
+        req = req.field(entry.field, entry.val)
+      }
+    }
+    const res = await req.field('travelId', travel._id.toString())
     t.is(res.status, 200)
   }
 })
 
-const expenses: Expense[] = [
+const expenses: TravelExpense[] = [
   //@ts-ignore
   {
     description: 'Konferenzkosten',
     cost: {
       amount: 82, //@ts-ignore
-      currency: { _id: 'TRY' },
-      receipts: [],
+      currency: { _id: 'TRY' }, //@ts-ignore
+      receipts: [{ name: 'Photo.png', type: 'image/png', data: 'tests/files/dummy.png' }],
       date: new Date('2023-08-07T00:00:00.000Z')
     },
     purpose: 'professional'
@@ -163,7 +171,15 @@ const expenses: Expense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    const res = await agent.post('/api/travel/expense').send(Object.assign(expense, { travelId: travel._id }))
+    var req = agent.post('/api/travel/expense')
+    for (const entry of objectToFormFields(expense)) {
+      if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
+        req = req.attach(entry.field, entry.val)
+      } else {
+        req = req.field(entry.field, entry.val)
+      }
+    }
+    const res = await req.field('travelId', travel._id.toString())
     t.is(res.status, 200)
   }
 })
@@ -181,7 +197,7 @@ test.serial('POST /travel/underExamination', async (t) => {
 // EXAMINE
 
 test.serial('POST /examine/travel/refunded', async (t) => {
-  await loginExamine(agent)
+  await loginExamineTravel(agent)
   t.plan(4)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/api/examine/travel/refunded').send({ _id: travel._id, comment })

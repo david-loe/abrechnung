@@ -51,7 +51,7 @@ export interface Place {
 export interface DocumentFile {
   data: Types.Buffer
   owner: Types.ObjectId
-  type: 'image/jpeg' | 'image/png' | 'application/pdf'
+  type: DocumentFileType
   name: string
   _id?: Types.ObjectId
 }
@@ -68,8 +68,6 @@ export interface UserSimple {
   name: string
   _id: Types.ObjectId
 }
-
-export type Access = 'examine' | 'approve' | 'admin'
 
 export interface User extends UserSimple {
   access: {
@@ -115,26 +113,36 @@ export interface Stage {
 export interface Expense {
   description: string
   cost: Cost
-  purpose: 'professional' | 'mixed'
   _id: Types.ObjectId
 }
 
+export interface TravelExpense extends Expense {
+  purpose: 'professional' | 'mixed'
+}
+
 export type RecordType = 'stage' | 'expense'
-export type Record = Stage | Expense
+export type Record = Stage | TravelExpense
 
 export interface Comment {
   text: string
   author: UserSimple
-  toState: State
   _id: Types.ObjectId
+}
+
+export interface TravelComment extends Comment {
+  toState: TravelState
+}
+
+export interface ExpenseReportComment extends Comment {
+  toState: ExpenseReportState
 }
 
 export interface TravelSimple {
   name: string
   traveler: UserSimple
-  state: State
+  state: TravelState
   editor: UserSimple
-  comments: Comment[]
+  comments: TravelComment[]
   comment?: string
   reason: string
   destinationPlace: Place
@@ -145,18 +153,15 @@ export interface TravelSimple {
   progress: number
   _id: Types.ObjectId
   createdAt?: Date | string
+  updatedAt?: Date | string
   claimSpouseRefund?: boolean //settings.allowSpouseRefund
   fellowTravelersNames?: string //settings.allowSpouseRefund
 }
-
-export type LumpsumType = 'overnight' | 'catering8' | 'catering24'
 
 export interface Refund {
   type: LumpsumType
   refund: Money
 }
-
-export type Meal = 'breakfast' | 'lunch' | 'dinner'
 
 export interface TravelDay {
   date: Date | string
@@ -175,15 +180,50 @@ export interface Travel extends TravelSimple {
   history: Types.ObjectId[]
   historic: boolean
   stages: Stage[]
-  expenses: Expense[]
+  expenses: TravelExpense[]
   days: TravelDay[]
 }
 
-export type Locale = 'de' | 'en'
+export interface ExpenseReportSimple {
+  name: string
+  expensePayer: UserSimple
+  state: ExpenseReportState
+  editor: UserSimple
+  comments: ExpenseReportComment[]
+  comment?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  _id: Types.ObjectId
+}
 
-export type State = 'rejected' | 'appliedFor' | 'approved' | 'underExamination' | 'refunded'
+export interface ExpenseReport extends ExpenseReportSimple {
+  history: Types.ObjectId[]
+  historic: boolean
+  expenses: Expense[]
+}
+export const locales = ['de', 'en'] as const
+export type Locale = (typeof locales)[number]
 
-export type Transport = 'ownCar' | 'airplane' | 'shipOrFerry' | 'otherTransport'
+export const travelStates = ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'] as const
+export type TravelState = (typeof travelStates)[number]
+
+export const expenseReportStates = ['inWork', 'underExamination', 'refunded'] as const
+export type ExpenseReportState = (typeof expenseReportStates)[number]
+
+export const transports = ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] as const
+export type Transport = (typeof transports)[number]
+
+export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
+export type DocumentFileType = (typeof documentFileTypes)[number]
+
+export const accesses = ['examine/travel', 'examine/expenseReport', 'approve/travel', 'admin'] as const
+export type Access = (typeof accesses)[number]
+
+export const meals = ['breakfast', 'lunch', 'dinner'] as const
+export type Meal = (typeof meals)[number]
+
+export const lumpsumTypes = ['overnight', 'catering8', 'catering24'] as const
+export type LumpsumType = (typeof lumpsumTypes)[number]
 
 export type PurposeSimple = 'professional' | 'private'
 

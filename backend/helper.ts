@@ -3,9 +3,9 @@ import Country from './models/country.js'
 import axios from 'axios'
 import settings from '../common/settings.json' assert { type: 'json' }
 import { datetimeToDateString } from '../common/scripts.js'
-import { Model, SchemaTypeOptions } from 'mongoose'
-import { Request, Response } from 'express'
-import { CountryLumpSum, Meta } from '../common/types.js'
+import { Model, Schema, SchemaTypeOptions } from 'mongoose'
+import { NextFunction, Request, Response } from 'express'
+import { Access, CountryLumpSum, Meta } from '../common/types.js'
 import { log } from '../common/logger.js'
 
 export function getter(
@@ -341,4 +341,39 @@ export async function convertCurrency(
 
   amount = Math.round(amount * rate * 100) / 100
   return { date: convertionDate, rate, amount }
+}
+
+export function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency: string | null = null) {
+  const costObject: any = {
+    amount: { type: Number, min: 0, required: required, default: null },
+    currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency }
+  }
+  if (exchangeRate) {
+    costObject.exchangeRate = {
+      date: { type: Date },
+      rate: { type: Number, min: 0 },
+      amount: { type: Number, min: 0 }
+    }
+  }
+  if (receipts) {
+    costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
+    costObject.date = { type: Date, required: required }
+  }
+  return costObject
+}
+
+export function accessControl(accesses: Access[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    var hasAccess = false
+    for (const access of accesses) {
+      if (req.user!.access[access]) {
+        hasAccess = true
+      }
+    }
+    if (hasAccess) {
+      next()
+    } else {
+      return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
+    }
+  }
 }

@@ -1,9 +1,8 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
-import Currency from './currency.js'
 import settings from '../../common/settings.json' assert { type: 'json' }
-import { convertCurrency } from '../helper.js'
+import { convertCurrency, costObject } from '../helper.js'
 import {
   Money,
   Record,
@@ -14,7 +13,10 @@ import {
   CountrySimple,
   Meal,
   PurposeSimple,
-  Comment
+  TravelComment,
+  transports,
+  travelStates,
+  lumpsumTypes
 } from '../../common/types.js'
 
 function place(required = false) {
@@ -22,25 +24,6 @@ function place(required = false) {
     country: { type: String, ref: 'Country', required: required },
     place: { type: String, required: required }
   }
-}
-
-function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency: string | null = null) {
-  const costObject: any = {
-    amount: { type: Number, min: 0, required: required, default: null },
-    currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency }
-  }
-  if (exchangeRate) {
-    costObject.exchangeRate = {
-      date: { type: Date },
-      rate: { type: Number, min: 0 },
-      amount: { type: Number, min: 0 }
-    }
-  }
-  if (receipts) {
-    costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = { type: Date, required: required }
-  }
-  return costObject
 }
 
 interface Methods {
@@ -66,7 +49,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     state: {
       type: String,
       required: true,
-      enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'],
+      enum: travelStates,
       default: 'appliedFor'
     },
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -77,7 +60,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         toState: {
           type: String,
           required: true,
-          enum: ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded']
+          enum: travelStates
         }
       }
     ],
@@ -100,7 +83,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         endLocation: place(true),
         midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
         distance: { type: Number, min: 0 },
-        transport: { type: String, enum: ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'], required: true },
+        transport: { type: String, enum: transports, required: true },
         cost: costObject(true, true),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] }
       }
@@ -124,7 +107,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
         refunds: [
           {
-            type: { type: String, enum: ['overnight', 'catering8', 'catering24'], required: true },
+            type: { type: String, enum: lumpsumTypes, required: true },
             refund: costObject(true, false, true)
           }
         ]
@@ -432,7 +415,7 @@ travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
 
 travelSchema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as TravelComment)
     delete this.comment
   }
 }

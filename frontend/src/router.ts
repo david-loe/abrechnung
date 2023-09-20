@@ -1,61 +1,76 @@
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import LoginPage from './components/LoginPage.vue'
-import SettingsPage from './components/SettingsPage.vue'
-import ApprovePage from './components/ApprovePage.vue'
-import ExaminePage from './components/ExaminePage.vue'
-import MyTravelsPage from './components/MyTravelsPage.vue'
-import TravelPage from './components/TravelPage.vue'
+import SettingsPage from './components/settings/SettingsPage.vue'
+import ApprovePage from './components/travel/ApprovePage.vue'
+import ExamineTravelPage from './components/travel/ExaminePage.vue'
+import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
+import HomePage from './components/HomePage.vue'
+import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
+import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 
 const routes = [
   {
     path: '/login',
-    name: 'Login',
     component: LoginPage,
     meta: { requiresAuth: false }
   },
   {
     path: '/settings',
-    name: 'Settings',
     component: SettingsPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/approve/:_id([0-9a-fA-F]{24})?',
-    name: 'Approve',
+    path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
     component: ApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/examine',
-    name: 'Examine',
-    component: ExaminePage,
+    path: '/examine/travel',
+    component: ExamineTravelPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/examine/:_id([0-9a-fA-F]{24})/:endpointSuffix?',
-    name: 'Examine Travel',
+    path: '/examine/travel/:_id([0-9a-fA-F]{24})',
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/examine', title: 'labels.examine' }],
-      endpointPrefix: 'examine/',
-      endpointSuffix: route.params.endpointSuffix
+      parentPages: [{ link: '/examine/travel', title: 'labels.examine/travel' }],
+      endpointPrefix: 'examine/'
     })
   },
   {
     path: '/travel/:_id([0-9a-fA-F]{24})',
-    name: 'Travel',
     component: TravelPage,
     meta: { requiresAuth: true },
-    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.myTravels' }] })
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
+  },
+  {
+    path: '/examine/expenseReport',
+    component: ExamineExpenseReportPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/examine/expenseReport/:_id([0-9a-fA-F]{24})',
+    component: ExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/examine/expenseReport', title: 'labels.examine/expenseReport' }],
+      endpointPrefix: 'examine/'
+    })
+  },
+  {
+    path: '/expenseReport/:_id([0-9a-fA-F]{24})',
+    component: ExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
     path: '/',
-    name: 'MyTravels',
-    component: MyTravelsPage,
+    component: HomePage,
     meta: { requiresAuth: true }
   },
   {

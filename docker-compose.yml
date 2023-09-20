@@ -9,7 +9,8 @@ services:
     volumes:
       - ./backend:/app
       - ./common:/common:ro
-      # - ./reports:/reports #BACKEND_SAVE_REPORTS_ON_DISK
+      # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
+      # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:

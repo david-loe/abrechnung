@@ -9,60 +9,58 @@
               <span class="fs-4 ms-2 d-none d-md-block">{{ $t('headlines.title') }}</span>
             </a>
           </div>
-          <div>
-            <router-link v-if="auth" to="/" class="nav-link link-dark d-flex align-items-center">
-              <i class="fs-4 bi bi-card-list"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('headlines.myTravels') }}</span>
-            </router-link>
-          </div>
-          <div>
-            <router-link v-if="auth && user.access.approve" to="/approve" class="nav-link link-dark d-flex align-items-center">
-              <i class="fs-4 bi bi-calendar-check"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('labels.approve') }}</span>
-            </router-link>
-          </div>
-          <div>
-            <router-link v-if="auth && user.access.examine" to="/examine" class="nav-link link-dark d-flex align-items-center">
-              <i class="fs-4 bi bi-pencil-square"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('labels.examine') }}</span>
-            </router-link>
-          </div>
-          <div v-if="auth" class="dropdown">
-            <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
-              <i class="fs-4 bi bi-person-circle"></i>
-              <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushSettings">
-                  <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">
-                    {{ lang.flag }}
-                  </option>
-                </select>
-              </li>
-              <template v-if="user.access.admin">
+          <template v-if="auth">
+            <div>
+              <router-link to="/" class="nav-link link-dark d-flex align-items-center">
+                <i class="fs-4 bi bi-card-list"></i>
+                <span class="ms-1 d-none d-md-block">{{ $t('headlines.home') }}</span>
+              </router-link>
+            </div>
+            <div v-for="access of accesses" :key="access">
+              <template v-if="access !== 'admin' && user.access[access]">
+                <router-link :to="'/' + access" class="nav-link link-dark d-flex align-items-center">
+                  <i v-for="icon of accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
+                  <span class="ms-1 d-none d-md-block">{{ $t('labels.' + access) }}</span>
+                </router-link>
+              </template>
+            </div>
+            <div class="dropdown">
+              <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
+                <i class="fs-4 bi bi-person-circle"></i>
+                <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushSettings">
+                    <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">
+                      {{ lang.flag }}
+                    </option>
+                  </select>
+                </li>
+                <template v-if="user.access.admin">
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <router-link to="/settings" class="d-flex align-items-center dropdown-item">
+                      <i class="fs-4 bi bi-gear"></i>
+                      <span class="ms-1">{{ $t('headlines.settings') }}</span>
+                    </router-link>
+                  </li>
+                </template>
+
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <router-link to="/settings" class="d-flex align-items-center dropdown-item">
-                    <i class="fs-4 bi bi-gear"></i>
-                    <span class="ms-1">{{ $t('headlines.settings') }}</span>
-                  </router-link>
+                  <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
+                    <i class="fs-4 bi bi-box-arrow-left"></i>
+                    <span class="ms-1">{{ $t('headlines.logout') }}</span>
+                  </a>
                 </li>
-              </template>
-
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li>
-                <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
-                  <i class="fs-4 bi bi-box-arrow-left"></i>
-                  <span class="ms-1">{{ $t('headlines.logout') }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
+              </ul>
+            </div>
+          </template>
           <div v-else>
             <router-link to="/login" class="nav-link link-dark d-flex align-items-center">
               <i class="fs-4 bi bi-box-arrow-in-right"></i>
@@ -125,9 +123,9 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { Country, CountrySimple, Currency, Locale, User } from '../../common/types.js'
+import { Country, CountrySimple, Currency, Locale, User, accesses } from '../../common/types.js'
 import { log } from '../../common/logger.js'
-import { languages } from '../../common/settings.json'
+import { languages, accessIcons } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 
 export interface Alert {
@@ -149,6 +147,8 @@ export default defineComponent({
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       languages,
+      accessIcons,
+      accesses,
       TwemojiCountryFlags
     }
   },
