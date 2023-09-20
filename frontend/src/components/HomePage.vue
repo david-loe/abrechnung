@@ -4,7 +4,7 @@
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.modalObjectType') }) }}</h5>
+            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.' + modalObjectType) }) }}</h5>
             <h5 v-else-if="modalObject" class="modal-title">{{ modalObject.name }}</h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
@@ -52,6 +52,7 @@
           </button>
         </div>
       </div>
+      <h3>{{ $t('labels.travel') }}</h3>
       <TravelCardList
         class="mb-5"
         ref="travelList"
@@ -59,6 +60,7 @@
         :showDropdown="true"
         @clicked="(t) => clickTravelCard(t)"
         @edit="(t) => showModal('edit', t, 'travel')"></TravelCardList>
+      <h3>{{ $t('labels.expenseReport') }}</h3>
       <ExpenseReportCardList
         ref="expenseReportList"
         endpoint="expenseReport"
@@ -135,6 +137,7 @@ export default defineComponent({
           ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
         }
         this.hideModal()
+        this.$router.push('/expenseReport/' + result._id)
       }
     },
     async deleteTravel(id: string) {
