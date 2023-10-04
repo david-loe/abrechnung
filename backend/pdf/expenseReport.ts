@@ -127,10 +127,10 @@ function drawExpenses(
     return options.yStart
   }
   const columns: Column[] = []
-  columns.push({ key: 'description', width: 350, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
+  columns.push({ key: 'description', width: 400, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({
     key: 'cost',
-    width: 150,
+    width: 160,
     alignment: pdf_lib.TextAlignment.Right,
     title: i18n.t('labels.cost'),
     fn: (m: Cost) => getDetailedMoneyString(m, i18n.language as Locale)

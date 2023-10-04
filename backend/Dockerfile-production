@@ -1,8 +1,6 @@
 FROM node:18-alpine
 
 RUN mkdir /reports
-RUN mkdir /reports/travel
-RUN mkdir /reports/expenseReport
 
 WORKDIR /build
 

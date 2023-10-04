@@ -6,8 +6,31 @@ import DocumentFile from '../models/documentFile.js'
 import { mongo } from 'mongoose'
 import { Cost, DocumentFile as IDocumentFile, Locale, Place } from '../../common/types.js'
 
-export function writeToDisk(filePath: fs.PathOrFileDescriptor, pdfBytes: Uint8Array) {
-  fs.writeFile(filePath, pdfBytes, () => null)
+export function writeToDisk(filePath: string, pdfBytes: Uint8Array) {
+  // create folders
+  var root = ''
+  var folderPath = filePath
+  if (folderPath[0] === '/') {
+    root = '/'
+    folderPath = folderPath.slice(1)
+  }
+  const folders = folderPath.split('/').slice(0, -1) // remove last item (file)
+  folders.reduce(
+    (acc, folder) => {
+      const cfolderPath = acc + folder + '/'
+      if (!fs.existsSync(cfolderPath)) {
+        fs.mkdirSync(cfolderPath)
+      }
+      return cfolderPath
+    },
+    root // first 'acc', important
+  )
+
+  fs.writeFile(filePath, pdfBytes, (err) => {
+    if (err) {
+      console.error(err)
+    }
+  })
 }
 
 export interface Options {

@@ -53,7 +53,7 @@ router.post('/refunded', async (req, res) => {
     sendExpenseReportNotificationMail(expenseReport)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
-        '/reports/expenseReport' + expenseReport.expensePayer.name + ' - ' + expenseReport.name + '.pdf',
+        '/reports/expenseReport/' + expenseReport.expensePayer.name + ' - ' + expenseReport.name + '.pdf',
         await generateExpenseReportReport(expenseReport)
       )
     }
