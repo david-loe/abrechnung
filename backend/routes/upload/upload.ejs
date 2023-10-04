@@ -29,7 +29,7 @@
       <div id="progress"></div>
     </div>
     <div style="width: 100%; text-align: center">
-      <h1><%= text %></h1>
+      <h1 id="text"><%= text.tapToUpload %></h1>
     </div>
     <form id="form" style="display: none">
       <input type="file" id="upload" accept="image/png, image/jpeg, .pdf" multiple />
@@ -94,6 +94,8 @@
       fileInput.addEventListener('change', async function (event) {
         const files = await fileEventToDocumentFiles(event)
         if (files) {
+          document.getElementById('progress').remove()
+          document.getElementById('text').innerHTML = '<%= text.uploading %>'
           const FD = new FormData()
           for (var i = 0; i < files.length; i++) {
             for (const [name, value] of Object.entries(files[i])) FD.append('files[' + i + '][' + name + ']', value)
@@ -102,6 +104,11 @@
             method: 'POST',
             body: FD
           })
+          if (response.ok) {
+            document.getElementById('text').innerHTML = '<%= text.success %>'
+          } else {
+            document.getElementById('text').innerHTML = '<%= text.error %>'
+          }
         }
       })
     </script>
