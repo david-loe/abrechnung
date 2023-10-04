@@ -82,7 +82,7 @@ export default defineComponent({
         this.modalTravel.comment = comment
         const result = await this.$root.setter('approve/travel/' + decision, this.modalTravel)
         if (result) {
-          ;(this.$refs.travelCardListRef as typeof TravelCardList).getTravels()
+          ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
         }
       }
