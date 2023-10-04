@@ -26,6 +26,7 @@
                 ref="travelApplyForm"></TravelApplyForm>
             </template>
             <ExpenseReportForm
+              v-else
               :mode="(modalMode as 'add' | 'edit')"
               :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
               @cancel="hideModal()"
