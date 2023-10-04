@@ -14,8 +14,8 @@
       "examine/expenseReport/refunded": "There are no reimbursed expenses.",
       "examine/travel": "There are no travels to examine",
       "examine/travel/refunded": "There are no refunded travels",
-      "expenseReport": "You have not added an expense report yet. Create your first expense report!",
       "expense": "There are no expenses jet. Add one!",
+      "expenseReport": "You have not added an expense report yet. Create your first expense report!",
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
     },
@@ -89,8 +89,8 @@
     "done": "Done",
     "downloadX": "Download {X}",
     "edit": "Edit",
-    "editX": "Edit {X}",
     "editor": "Editor",
+    "editX": "Edit {X}",
     "email": "Email address",
     "endDate": "End date",
     "endLocation": "End",
@@ -101,6 +101,7 @@
     "expense": "Expense",
     "expensePayer": "Expense Payer",
     "expenseReport": "Expense Report",
+    "expenseReportName": "Expense report name",
     "expenses": "Expenses",
     "fellowTravelersNames": "Name of all fellow travelers",
     "filter": "Filter",
@@ -116,8 +117,6 @@
     "midnightCountries": "Countries reached by midnight",
     "mixed": "Mixed",
     "name": "Name",
-    "expenseReportName": "Expense report name",
-    "travelName": "Travel name",
     "newX": "New {X}",
     "otherTransport": "Other transport ✈🚆🚖",
     "ownCar": "Own car 🚘",
@@ -160,8 +159,9 @@
     "transport": "Transport",
     "travel": "Travel",
     "travelDetails": "Travel details",
-    "travelInsideOfEU": "Travel inside of the EU",
     "traveler": "Traveler",
+    "travelInsideOfEU": "Travel inside of the EU",
+    "travelName": "Travel name",
     "typeToSearch": "Type to search...",
     "uid": "UID",
     "uploadFromPhone": "Upload from Phone",
@@ -248,6 +248,11 @@
     "9": "Oct",
     "10": "Nov",
     "11": "Dec"
+  },
+  "report": {
+    "advance": {
+      "approvedXY": "Approved on {X} by {Y}."
+    }
   },
   "settings": {},
   "states": {

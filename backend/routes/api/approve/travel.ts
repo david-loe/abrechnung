@@ -2,7 +2,9 @@ import { getter, setter } from '../../../helper.js'
 import Travel, { TravelDoc } from '../../../models/travel.js'
 import { sendTravelNotificationMail } from '../../../mail/mail.js'
 import express, { Request, Response } from 'express'
-import { Travel as ITravel } from '../../../../common/types.js'
+import { Travel as ITravel, TravelSimple as ITravelSimple } from '../../../../common/types.js'
+import { writeToDisk } from '../../../pdf/helper.js'
+import { generateAdvanceReport } from '../../../pdf/advance.js'
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -29,29 +31,42 @@ router.get('/approved', async (req, res) => {
   )(req, res)
 })
 
-function approve(state: 'approved' | 'rejected') {
-  return async (req: Request, res: Response) => {
-    req.body = {
-      state: state,
-      editor: req.user!._id,
-      comment: req.body.comment,
-      _id: req.body._id
-    }
-    const check = async (oldObject: TravelDoc) => {
-      if (oldObject.state === 'appliedFor') {
-        if (state === 'approved') {
-          await oldObject.saveToHistory()
-          await oldObject.save()
-        }
-        return true
-      } else {
-        return false
-      }
-    }
-    return setter(Travel, '', false, check, sendTravelNotificationMail)(req, res)
+router.post('/approved', async (req: Request, res: Response) => {
+  req.body = {
+    state: 'approved',
+    editor: req.user!._id,
+    comment: req.body.comment,
+    _id: req.body._id
   }
-}
-router.post('/approved', approve('approved'))
-router.post('/rejected', approve('rejected'))
+  const check = async (oldObject: TravelDoc) => {
+    if (oldObject.state === 'appliedFor') {
+      await oldObject.saveToHistory()
+      await oldObject.save()
+      return true
+    } else {
+      return false
+    }
+  }
+  const cb = async (travel: ITravelSimple) => {
+    sendTravelNotificationMail(travel)
+    if (travel.advance.amount !== null && travel.advance.amount > 0 && process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+      await writeToDisk('/reports/advance/' + travel.traveler.name + ' - ' + travel.name + '.pdf', await generateAdvanceReport(travel))
+    }
+  }
+  return setter(Travel, '', false, check, cb)(req, res)
+})
+
+router.post('/rejected', async (req: Request, res: Response) => {
+  req.body = {
+    state: 'rejected',
+    editor: req.user!._id,
+    comment: req.body.comment,
+    _id: req.body._id
+  }
+  const check = async (oldObject: TravelDoc) => {
+    return oldObject.state === 'appliedFor'
+  }
+  return setter(Travel, '', false, check, sendTravelNotificationMail)(req, res)
+})
 
 export default router

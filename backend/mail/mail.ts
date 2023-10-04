@@ -3,7 +3,7 @@ import i18n from '../i18n.js'
 import ejs from 'ejs'
 import fs from 'fs'
 import User from '../models/user.js'
-import { UserSimple, Travel, ExpenseReport } from '../../common/types.js'
+import { UserSimple, ExpenseReport, TravelSimple } from '../../common/types.js'
 
 function sendMail(
   recipients: UserSimple[],
@@ -57,7 +57,7 @@ function sendMail(
   })
 }
 
-export async function sendTravelNotificationMail(travel: Travel) {
+export async function sendTravelNotificationMail(travel: TravelSimple) {
   const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name }
 
   if (travel.comments.length > 0) {

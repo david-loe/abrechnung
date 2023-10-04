@@ -11,6 +11,7 @@ services:
       - ./common:/common:ro
       # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
       # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
+      # - ./reports/advance:/reports/advance #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:

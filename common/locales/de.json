@@ -14,8 +14,8 @@
       "examine/expenseReport/refunded": "Es gibt keine erstatteten Auslagen.",
       "examine/travel": "Es gibt keine Reisen zu prüfen.",
       "examine/travel/refunded": "Es gibt keine erstatteten Reisen.",
-      "expenseReport": "Du hast noch keine Auslagenabrechnung hinzugefügt. Erstelle deine erste Auslagenabrechnung!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
+      "expenseReport": "Du hast noch keine Auslagenabrechnung hinzugefügt. Erstelle deine erste Auslagenabrechnung!",
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
     },
@@ -89,8 +89,8 @@
     "done": "Erledigt",
     "downloadX": "{X} herunterladen",
     "edit": "Bearbeiten",
-    "editX": "{X} bearbeiten",
     "editor": "Bearbeiter",
+    "editX": "{X} bearbeiten",
     "email": "Email Addresse",
     "endDate": "Enddatum",
     "endLocation": "Nach",
@@ -101,6 +101,7 @@
     "expense": "Auslage",
     "expensePayer": "Auslagenzahler",
     "expenseReport": "Auslagenabrechnung",
+    "expenseReportName": "Name der Auslagenabrechnung",
     "expenses": "Auslagen",
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "filter": "Filter",
@@ -116,8 +117,6 @@
     "midnightCountries": "Erreichte Länder um Mitternacht",
     "mixed": "Gemischt",
     "name": "Name",
-    "expenseReportName": "Name der Auslagenabrechnung",
-    "travelName": "Name der Reise",
     "newX": "{X} - Neu",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
@@ -160,8 +159,9 @@
     "transport": "Verkehrsmittel",
     "travel": "Reise",
     "travelDetails": "Reisedetails",
-    "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "traveler": "Reisender",
+    "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
+    "travelName": "Name der Reise",
     "typeToSearch": "Tippe um zu Suchen...",
     "uid": "UID",
     "uploadFromPhone": "Vom Handy hochladen",
@@ -248,6 +248,11 @@
     "9": "Okt",
     "10": "Nov",
     "11": "Dez"
+  },
+  "report": {
+    "advance": {
+      "approvedXY": "Am {X} durch {Y} genehmigt."
+    }
   },
   "settings": {},
   "states": {
