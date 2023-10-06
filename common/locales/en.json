@@ -190,6 +190,28 @@
     "overnight\n": "Overnight lump sum"
   },
   "mail": {
+    "healthCareCost": {
+      "refunded": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs got refunded by the insurance.",
+        "subject": "💲 Health Care Costs refunded"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs got rejected.",
+        "subject": "❌ Health Care Costs rejected"
+      },
+      "underExamination": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "{expensePayer} has submit his health care costs.",
+        "subject": "🛂 Health Care Costs to examine"
+      },
+      "underExaminationByInsurance": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs have been send to the insurence for a refund. In the meantime you will get the total amount paid to your account.",
+        "subject": "🔜 Health Care Costs at insurance"
+      }
+    },
     "expenseReport": {
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",

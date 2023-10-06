@@ -190,6 +190,28 @@
     "overnight\n": "Übernachtungs\npauschale"
   },
   "mail": {
+    "healthCareCost": {
+      "refunded": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Gesundheitskosten wurden von der Versicherung erstattet.",
+        "subject": "💲 Gesundheitskosten erstattet"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Gesundheitskosten wurden abgelehnt.",
+        "subject": "❌ Health Care Costs rejected"
+      },
+      "underExamination": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "{expensePayer} hat Gesundheitskosten eingereicht.",
+        "subject": "🛂 Gesundheitskosten zu prüfen"
+      },
+      "underExaminationByInsurance": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Gesundheitskosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischzeit den gesamt Betrag auf dein Konto ausgezahlt.",
+        "subject": "🔜 Gesundheitskosten an Versicherung"
+      }
+    },
     "expenseReport": {
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

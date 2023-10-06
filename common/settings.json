@@ -21,13 +21,16 @@
     "inWork": { "color": "#AAD0FF", "text": "black" },
     "approved": { "color": "#89bbfe", "text": "black" },
     "underExamination": { "color": "#6f8ab7", "text": "white" },
+    "underExaminationByInsurance": { "color": "#687492", "text": "white" },
     "refunded": { "color": "#615d6c", "text": "white" }
   },
   "accessIcons": {
     "admin": ["bi-person-fill"],
     "approve/travel": ["bi-calendar-check"],
     "examine/travel": ["bi-airplane", "bi-pencil-square"],
-    "examine/expenseReport": ["bi-coin", "bi-pencil-square"]
+    "examine/expenseReport": ["bi-coin", "bi-pencil-square"],
+    "examine/healthCareCost": ["bi-hospital", "bi-pencil-square"],
+    "confirm/healthCareCost": ["bi-hospital", "bi-check-square"]
   },
   "languages": [
     { "flag": "🇩🇪", "key": "de" },
