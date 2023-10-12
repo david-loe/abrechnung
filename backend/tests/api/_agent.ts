@@ -42,6 +42,19 @@ export async function loginExamineExpenseReport(agent: request.SuperAgentTest) {
   await agent.post('/login').send({ username: 'leela', password: 'leela' })
 }
 
+export async function loginExmineHealthCareCost(agent: request.SuperAgentTest) {
+  await loginAdmin(agent)
+  const res = await agent.get('/api/admin/user').query({ uid: 'amy' })
+  var userId = undefined
+  if (res.body.data.length > 0) {
+    userId = (res.body.data as User[])[0]._id
+  }
+  const user = { _id: userId, uid: 'amy', access: { 'examine/healthCareCost': true } }
+  await agent.post('/api/admin/user').send(user)
+  await agent.post('/api/logout')
+  await agent.post('/login').send({ username: 'amy', password: 'amy' })
+}
+
 export async function loginApproveTravel(agent: request.SuperAgentTest) {
   await loginAdmin(agent)
   const res = await agent.get('/api/admin/user').query({ uid: 'hermes' })
