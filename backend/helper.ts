@@ -1,9 +1,10 @@
 import i18n from './i18n.js'
 import Country from './models/country.js'
+import DocumentFile from './models/documentFile.js'
 import axios from 'axios'
 import settings from '../common/settings.json' assert { type: 'json' }
 import { datetimeToDateString } from '../common/scripts.js'
-import { Model, Schema, SchemaTypeOptions } from 'mongoose'
+import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
 import { Access, CountryLumpSum, Meta } from '../common/types.js'
 import { log } from '../common/logger.js'
@@ -375,5 +376,66 @@ export function accessControl(accesses: Access[]) {
     } else {
       return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
     }
+  }
+}
+
+export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!owner) {
+      owner = req.user!._id
+    }
+    var pathExists = true
+    var tmpCheckObj = req.body
+    for (const prop of pathToFiles) {
+      if (tmpCheckObj[prop]) {
+        tmpCheckObj = tmpCheckObj[prop]
+      } else {
+        pathExists = false
+        break
+      }
+    }
+    if (pathExists && Array.isArray(tmpCheckObj) && req.files) {
+      const reqDocuments = tmpCheckObj
+      const multerFileName = (i: number) => {
+        var str = pathToFiles.length > 0 ? pathToFiles[0] : ''
+        for (var j = 1; j < pathToFiles.length; j++) {
+          str += '[' + pathToFiles[j] + ']'
+        }
+        str += '[' + i + '][data]'
+        return str
+      }
+      var iR = 0 // index reduction
+      for (var i = 0; i < reqDocuments.length; i++) {
+        if (!reqDocuments[i]._id) {
+          var buffer = null
+          for (const file of req.files as Express.Multer.File[]) {
+            if (file.fieldname == multerFileName(i + iR)) {
+              buffer = file.buffer
+              break
+            }
+          }
+          if (buffer) {
+            reqDocuments[i].owner = owner
+            reqDocuments[i].data = buffer
+            reqDocuments[i] = await new DocumentFile(reqDocuments[i]).save()
+          } else {
+            reqDocuments.splice(i, 1)
+            i -= 1
+            iR += 1
+            continue
+          }
+        } else {
+          const documentFile = await DocumentFile.findOne({ _id: reqDocuments[i]._id }, { owner: 1 }).lean()
+          if (!documentFile || (checkOwner && !documentFile.owner.equals(owner))) {
+            reqDocuments.splice(i, 1)
+            i -= 1
+            iR += 1
+            continue
+          }
+        }
+        reqDocuments[i] = reqDocuments[i]._id
+      }
+    }
+    next()
   }
 }

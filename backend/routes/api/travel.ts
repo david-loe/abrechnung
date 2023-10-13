@@ -3,7 +3,7 @@ const router = express.Router()
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import i18n from '../../i18n.js'
-import { getter, setter, deleter } from '../../helper.js'
+import { getter, setter, deleter, documentFileHandler } from '../../helper.js'
 import Travel, { TravelDoc } from '../../models/travel.js'
 import DocumentFile from '../../models/documentFile.js'
 import { sendTravelNotificationMail } from '../../mail/mail.js'
@@ -48,21 +48,6 @@ router.post('/', async (req, res) => {
 
 function postRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
-    if (req.body.cost && req.body.cost.receipts && req.files) {
-      for (var i = 0; i < req.body.cost.receipts.length; i++) {
-        var buffer = null
-        for (const file of req.files as Express.Multer.File[]) {
-          if (file.fieldname == 'cost[receipts][' + i + '][data]') {
-            buffer = file.buffer
-            break
-          }
-        }
-        if (buffer) {
-          req.body.cost.receipts[i].owner = req.user!._id
-          req.body.cost.receipts[i].data = buffer
-        }
-      }
-    }
     const travel = await Travel.findOne({ _id: req.body.travelId })
     delete req.body.travelId
     if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user!._id)) {
@@ -70,28 +55,8 @@ function postRecord(recordType: 'stages' | 'expenses') {
     }
     if (req.body._id && req.body._id !== '') {
       var found = false
-      outer_loop: for (const record of travel[recordType]) {
+      for (const record of travel[recordType]) {
         if (record._id.equals(req.body._id)) {
-          if (req.body.cost && req.body.cost.receipts && req.files) {
-            for (var i = 0; i < req.body.cost.receipts.length; i++) {
-              if (req.body.cost.receipts[i]._id) {
-                var foundReceipt = false
-                for (const oldReceipt of record.cost.receipts) {
-                  if (oldReceipt._id!.equals(req.body.cost.receipts[i]._id)) {
-                    foundReceipt = true
-                  }
-                }
-                if (!foundReceipt) {
-                  break outer_loop
-                }
-                await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
-              } else {
-                var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-                req.body.cost.receipts[i] = result._id
-              }
-            }
-            travel.markModified(recordType + '.cost.receipts')
-          }
           found = true
           Object.assign(record, req.body)
           break
@@ -101,13 +66,6 @@ function postRecord(recordType: 'stages' | 'expenses') {
         return res.sendStatus(403)
       }
     } else {
-      if (req.body.cost && req.body.cost.receipts && req.files) {
-        for (var i = 0; i < req.body.cost.receipts.length; i++) {
-          var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-          req.body.cost.receipts[i] = result._id
-        }
-        travel.markModified(recordType + '.cost.receipts')
-      }
       travel[recordType].push(req.body)
     }
     if (recordType === 'stages') {
@@ -125,8 +83,8 @@ function postRecord(recordType: 'stages' | 'expenses') {
   }
 }
 
-router.post('/stage', fileHandler.any(), postRecord('stages'))
-router.post('/expense', fileHandler.any(), postRecord('expenses'))
+router.post('/stage', [fileHandler.any(), documentFileHandler(['cost', 'receipts'], true)], postRecord('stages'))
+router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receipts'], true)], postRecord('expenses'))
 
 function deleteRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {

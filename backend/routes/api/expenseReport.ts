@@ -3,7 +3,7 @@ const router = express.Router()
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import i18n from '../../i18n.js'
-import { getter, setter, deleter } from '../../helper.js'
+import { getter, setter, deleter, documentFileHandler } from '../../helper.js'
 import ExpenseReport, { ExpenseReportDoc } from '../../models/expenseReport.js'
 import DocumentFile from '../../models/documentFile.js'
 import { sendExpenseReportNotificationMail } from '../../mail/mail.js'
@@ -22,22 +22,7 @@ router.get('/', async (req, res) => {
 
 router.delete('/', deleter(ExpenseReport, 'expensePayer'))
 
-router.post('/expense', fileHandler.any(), async (req: Request, res: Response) => {
-  if (req.body.cost && req.body.cost.receipts && req.files) {
-    for (var i = 0; i < req.body.cost.receipts.length; i++) {
-      var buffer = null
-      for (const file of req.files as Express.Multer.File[]) {
-        if (file.fieldname == 'cost[receipts][' + i + '][data]') {
-          buffer = file.buffer
-          break
-        }
-      }
-      if (buffer) {
-        req.body.cost.receipts[i].owner = req.user!._id
-        req.body.cost.receipts[i].data = buffer
-      }
-    }
-  }
+router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receipts'], true)], async (req: Request, res: Response) => {
   const expenseReport = await ExpenseReport.findOne({ _id: req.body.expenseReportId })
   delete req.body.expenseReportId
   if (
@@ -52,26 +37,6 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
     var found = false
     outer_loop: for (const expense of expenseReport.expenses) {
       if (expense._id.equals(req.body._id)) {
-        if (req.body.cost && req.body.cost.receipts && req.files) {
-          for (var i = 0; i < req.body.cost.receipts.length; i++) {
-            if (req.body.cost.receipts[i]._id) {
-              var foundReceipt = false
-              for (const oldReceipt of expense.cost.receipts) {
-                if (oldReceipt._id!.equals(req.body.cost.receipts[i]._id)) {
-                  foundReceipt = true
-                }
-              }
-              if (!foundReceipt) {
-                break outer_loop
-              }
-              await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
-            } else {
-              var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-              req.body.cost.receipts[i] = result._id
-            }
-          }
-          expenseReport.markModified('expenses.cost.receipts')
-        }
         found = true
         Object.assign(expense, req.body)
         break
@@ -81,13 +46,6 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
       return res.sendStatus(403)
     }
   } else {
-    if (req.body.cost && req.body.cost.receipts && req.files) {
-      for (var i = 0; i < req.body.cost.receipts.length; i++) {
-        var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-        req.body.cost.receipts[i] = result._id
-      }
-      expenseReport.markModified('expenses.cost.receipts')
-    }
     expenseReport.expenses.push(req.body)
   }
   expenseReport.expenses.sort((a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf())
