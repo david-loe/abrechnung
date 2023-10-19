@@ -25,7 +25,7 @@
         class="mb-5"
         ref="travelCardListRef"
         endpoint="approve/travel"
-        :showTraveler="true"
+        :showUser="true"
         @clicked="(t) => showModal(t)"></TravelCardList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
@@ -35,7 +35,7 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelCardList endpoint="approve/travel/approved" :showTraveler="true" @clicked="(t) => showModal(t)"> </TravelCardList>
+        <TravelCardList endpoint="approve/travel/approved" :showUser="true" @clicked="(t) => showModal(t)"> </TravelCardList>
       </template>
     </div>
   </div>
