@@ -190,13 +190,14 @@ router.post('/underExamination', async (req, res) => {
 
 router.get('/report', async (req, res) => {
   const healthCareCost = await HealthCareCost.findOne({
-    _id: req.query.id,
-    applicant: req.user!._id,
-    historic: false,
-    state: 'refunded'
+    $and: [
+      { _id: req.query.id, applicant: req.user!._id, historic: false },
+      { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }
+    ]
   }).lean()
   if (healthCareCost) {
     const report = await generateHealthCareCostReport(healthCareCost)
+
     res.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

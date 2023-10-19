@@ -32,7 +32,6 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   y = drawExpenses(getLastPage(), newPage, healthCareCost, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
   await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16 })
-
   return await pdfDoc.save()
 }
 

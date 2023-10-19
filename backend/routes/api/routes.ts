@@ -8,6 +8,7 @@ import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
 import expenseReportRoutes from './expenseReport.js'
+import healthCareCostRoutes from './healthCareCost.js'
 import i18n from '../../i18n.js'
 
 router.use(async (req, res, next) => {
@@ -22,6 +23,7 @@ router.use('/user', userRoutes)
 router.use('/travel', travelRoutes)
 router.use('/documentFile', documentFileRoutes)
 router.use('/expenseReport', expenseReportRoutes)
+router.use('/healthCareCost', healthCareCostRoutes)
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {

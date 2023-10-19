@@ -15,6 +15,8 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
   {
     name: { type: String },
     applicant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    patient: { type: String, trim: true, required: true },
+    insurance: { type: String, trim: true, required: true },
     state: {
       type: String,
       required: true,
