@@ -31,7 +31,8 @@ router.get('/new', async (req, res) => {
       url: url.href,
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
-      text
+      text,
+      language: i18n.language
     })
     return res.send(renderedHTML)
   }

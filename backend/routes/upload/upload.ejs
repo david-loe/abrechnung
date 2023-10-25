@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= language %>">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Upload</title>
     <style>
+      #button {
+        font-size: 2rem;
+        border-radius: 0.5rem;
+        background-color: rgba(100, 149, 237, 0.2);
+        border-color: rgba(100, 149, 237, 0.35);
+        border-width: 0.2rem;
+        padding: 0.5rem;
+      }
       #progress {
-        background-color: cornflowerblue;
+        background-color: rgb(100, 149, 237);
         animation-name: shrink;
         animation-duration: <%= secondsLeft %>s;
         animation-timing-function: linear;
@@ -28,14 +36,15 @@
     <div style="width: 100%; border-radius: 3px; background-color: gainsboro">
       <div id="progress"></div>
     </div>
+    <div style="height: 25vh"></div>
     <div style="width: 100%; text-align: center">
-      <h1 id="text"><%= text.tapToUpload %></h1>
+      <button id="button" role="button"><%= text.tapToUpload %></button>
+      <form id="form" style="display: none">
+        <input type="file" id="upload" accept="image/png, image/jpeg, .pdf" multiple />
+      </form>
     </div>
-    <form id="form" style="display: none">
-      <input type="file" id="upload" accept="image/png, image/jpeg, .pdf" multiple />
-    </form>
     <script>
-      window.onclick = (event) => {
+      document.getElementById('button').onclick = (event) => {
         document.getElementById('upload').click()
       }
       async function fileEventToDocumentFiles(event) {
