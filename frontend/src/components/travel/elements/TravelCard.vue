@@ -4,7 +4,7 @@
     :name="travel.name"
     :user="travel.traveler"
     :editor="travel.editor"
-    :showUser="showTraveler"
+    :showUser="showUser"
     :showEditor="travel.traveler._id !== travel.editor._id"
     :showDropdown="showDropdown"
     @clicked="$emit('clicked')"
@@ -50,7 +50,7 @@ export default defineComponent({
   components: { CardElement, ProgressCircle },
   props: {
     travel: { type: Object as PropType<TravelSimple>, required: true },
-    showTraveler: { type: Boolean, default: false },
+    showUser: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
   methods: {

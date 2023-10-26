@@ -1,13 +1,12 @@
 <template>
   <PaginationList :endpoint="endpoint" ref="list">
     <template #entry="{ entry }">
-      <TravelCard
-        :travel="entry"
+      <HealthCareCostCard
+        :healthCareCost="entry"
         :showUser="showUser"
         :showDropdown="showDropdown"
         @clicked="$emit('clicked', entry)"
-        @deleted="deleteTravel(entry._id)"
-        @edit="$emit('edit', entry)"></TravelCard>
+        @deleted="deleteHealthCareCost(entry._id)"></HealthCareCostCard>
     </template>
   </PaginationList>
 </template>
@@ -15,21 +14,20 @@
 <script lang="ts">
 import PaginationList from '../../elements/PaginationList.vue'
 import { defineComponent } from 'vue'
-import { TravelSimple } from '../../../../../common/types.js'
-import TravelCard from './TravelCard.vue'
+import HealthCareCostCard from './HealthCareCostCard.vue'
 
 export default defineComponent({
-  name: 'TravelCardList',
-  emits: ['clicked', 'edit'],
-  components: { TravelCard, PaginationList },
+  name: 'HealthCareCostCardList',
+  emits: ['clicked'],
+  components: { HealthCareCostCard, PaginationList },
   props: {
     endpoint: { type: String, required: true },
     showUser: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
   methods: {
-    async deleteTravel(id: string): Promise<void> {
-      const result = await this.$root.deleter('travel', { id: id })
+    async deleteHealthCareCost(id: string): Promise<void> {
+      const result = await this.$root.deleter('healthCareCost', { id: id })
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }

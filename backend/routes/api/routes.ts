@@ -8,6 +8,11 @@ import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
 import expenseReportRoutes from './expenseReport.js'
+import healthCareCostRoutes from './healthCareCost.js'
+import adminRoutes from './admin/routes.js'
+import approveRoutes from './approve/routes.js'
+import examineRoutes from './examine/routes.js'
+import confirmRoutes from './confirm/routes.js'
 import i18n from '../../i18n.js'
 
 router.use(async (req, res, next) => {
@@ -22,6 +27,11 @@ router.use('/user', userRoutes)
 router.use('/travel', travelRoutes)
 router.use('/documentFile', documentFileRoutes)
 router.use('/expenseReport', expenseReportRoutes)
+router.use('/healthCareCost', healthCareCostRoutes)
+router.use('/admin', adminRoutes)
+router.use('/approve', approveRoutes)
+router.use('/examine', examineRoutes)
+router.use('/confirm', confirmRoutes)
 
 router.delete('/logout', function (req, res) {
   req.logout(function (err) {

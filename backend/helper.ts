@@ -369,12 +369,13 @@ export function accessControl(accesses: Access[]) {
     for (const access of accesses) {
       if (req.user!.access[access]) {
         hasAccess = true
+        break
       }
     }
     if (hasAccess) {
       next()
     } else {
-      return res.status(403).send({ message: i18n.t('alerts.request.unauthorized') })
+      return res.status(405).send({ message: i18n.t('alerts.request.unauthorized') })
     }
   }
 }

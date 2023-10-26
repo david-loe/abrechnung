@@ -16,20 +16,20 @@ export async function loginAdmin(agent: request.SuperAgentTest) {
   await agent.post('/login').send({ username: 'professor', password: 'professor' })
 }
 
-export async function loginExamineTravel(agent: request.SuperAgentTest) {
+export async function loginTravel(agent: request.SuperAgentTest) {
   await loginAdmin(agent)
   const res = await agent.get('/api/admin/user').query({ uid: 'zoidberg' })
   var userId = undefined
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
   }
-  const user = { _id: userId, uid: 'zoidberg', access: { 'examine/travel': true } }
+  const user = { _id: userId, uid: 'zoidberg', access: { 'examine/travel': true, 'approve/travel': true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
   await agent.post('/login').send({ username: 'zoidberg', password: 'zoidberg' })
 }
 
-export async function loginExamineExpenseReport(agent: request.SuperAgentTest) {
+export async function loginExpenseReport(agent: request.SuperAgentTest) {
   await loginAdmin(agent)
   const res = await agent.get('/api/admin/user').query({ uid: 'leela' })
   var userId = undefined
@@ -42,15 +42,15 @@ export async function loginExamineExpenseReport(agent: request.SuperAgentTest) {
   await agent.post('/login').send({ username: 'leela', password: 'leela' })
 }
 
-export async function loginApproveTravel(agent: request.SuperAgentTest) {
+export async function loginHealthCareCost(agent: request.SuperAgentTest) {
   await loginAdmin(agent)
-  const res = await agent.get('/api/admin/user').query({ uid: 'hermes' })
+  const res = await agent.get('/api/admin/user').query({ uid: 'bender' })
   var userId = undefined
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
   }
-  const user = { _id: userId, uid: 'hermes', access: { 'approve/travel': true } }
+  const user = { _id: userId, uid: 'bender', access: { 'examine/healthCareCost': true, 'confirm/healthCareCost': true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'hermes', password: 'hermes' })
+  await agent.post('/login').send({ username: 'bender', password: 'bender' })
 }

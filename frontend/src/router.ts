@@ -4,6 +4,9 @@ import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
+import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
+import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
+import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
 import HomePage from './components/HomePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import axios from 'axios'
@@ -65,6 +68,42 @@ const routes = [
   {
     path: '/expenseReport/:_id([0-9a-fA-F]{24})',
     component: ExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
+  },
+  {
+    path: '/confirm/healthCareCost',
+    component: ConfirmHealthCareCostPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/confirm/healthCareCost/:_id([0-9a-fA-F]{24})',
+    component: HealthCareCostPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/confirm/healthCareCost', title: 'labels.confirm/healthCareCost' }],
+      endpointPrefix: 'confirm/'
+    })
+  },
+  {
+    path: '/examine/healthCareCost',
+    component: ExamineHealthCareCostPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/examine/healthCareCost/:_id([0-9a-fA-F]{24})',
+    component: HealthCareCostPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/examine/healthCareCost', title: 'labels.examine/healthCareCost' }],
+      endpointPrefix: 'examine/'
+    })
+  },
+  {
+    path: '/healthCareCost/:_id([0-9a-fA-F]{24})',
+    component: HealthCareCostPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },

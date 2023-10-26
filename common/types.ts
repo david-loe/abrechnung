@@ -77,6 +77,7 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
+    insurance?: string
   }
   vehicleRegistration?: DocumentFile[]
   token?: Token
@@ -92,7 +93,12 @@ export interface Money {
   } | null
 }
 
-export interface Cost extends Money {
+export interface MoneyPlus extends Money {
+  receipts?: DocumentFile[]
+  date?: Date | string
+}
+
+export interface Cost extends MoneyPlus {
   receipts: DocumentFile[]
   date: Date | string
 }
@@ -135,6 +141,10 @@ export interface TravelComment extends Comment {
 
 export interface ExpenseReportComment extends Comment {
   toState: ExpenseReportState
+}
+
+export interface HealthCareCostComment extends Comment {
+  toState: HealthCareCostState
 }
 
 export interface TravelSimple {
@@ -201,6 +211,28 @@ export interface ExpenseReport extends ExpenseReportSimple {
   historic: boolean
   expenses: Expense[]
 }
+
+export interface HealthCareCostSimple {
+  name: string
+  applicant: UserSimple
+  patientName: string
+  insurance: string
+  refundSum: MoneyPlus
+  state: HealthCareCostState
+  editor: UserSimple
+  comments: HealthCareCostComment[]
+  comment?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  _id: Types.ObjectId
+}
+
+export interface HealthCareCost extends HealthCareCostSimple {
+  history: Types.ObjectId[]
+  historic: boolean
+  expenses: Expense[]
+}
+
 export const locales = ['de', 'en'] as const
 export type Locale = (typeof locales)[number]
 
@@ -210,13 +242,23 @@ export type TravelState = (typeof travelStates)[number]
 export const expenseReportStates = ['inWork', 'underExamination', 'refunded'] as const
 export type ExpenseReportState = (typeof expenseReportStates)[number]
 
+export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
+export type HealthCareCostState = (typeof healthCareCostStates)[number]
+
 export const transports = ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] as const
 export type Transport = (typeof transports)[number]
 
 export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
-export const accesses = ['examine/travel', 'examine/expenseReport', 'approve/travel', 'admin'] as const
+export const accesses = [
+  'examine/travel',
+  'examine/expenseReport',
+  'examine/healthCareCost',
+  'confirm/healthCareCost',
+  'approve/travel',
+  'admin'
+] as const
 export type Access = (typeof accesses)[number]
 
 export const meals = ['breakfast', 'lunch', 'dinner'] as const

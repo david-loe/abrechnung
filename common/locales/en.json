@@ -10,12 +10,17 @@
     "noData": {
       "approve/travel": "There are no travels to approve",
       "approve/travel/approved": "There are no approved travels",
+      "confirm/healthCareCost": "There are no health care costs yet to be confirmed.",
+      "confirm/healthCareCost/refunded": "There are no confirmed health care costs",
       "examine/expenseReport": "There are no expenses to examine.",
       "examine/expenseReport/refunded": "There are no reimbursed expenses.",
+      "examine/healthCareCost": "There are no health care costs to examine",
+      "examine/healthCareCost/underExaminationByInsurance": "There are no health care costs under examination by health insurances.",
       "examine/travel": "There are no travels to examine",
       "examine/travel/refunded": "There are no refunded travels",
       "expense": "There are no expenses jet. Add one!",
       "expenseReport": "You have not added an expense report yet. Create your first expense report!",
+      "healthCareCost": "You have not submitted any health care costs yet.",
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
     },
@@ -44,6 +49,7 @@
     "destinationPlace": "Specify here the place that is the destination of your trip.",
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
+    "patientName": "Enter the name of the person for whom the costs were incurred.",
     "professionalShare": "If your travel is partly for personal purposes, enter the professional share here.",
     "purpose": "Specify which purpose this stage served.",
     "reason": "Briefly state the reason for your trip here.",
@@ -57,6 +63,7 @@
     "advance": "Advance",
     "airplane": "Airplane ✈",
     "amount": "Amount",
+    "applicant": "Applicant",
     "applyForX": "Apply for {X}",
     "approve": "Approve",
     "approve/travel": "Approve Travels",
@@ -72,6 +79,8 @@
     "comment": "Comment",
     "comments": "Comments",
     "configCateringRefund": "Config catering refund",
+    "confirm": "Confirm",
+    "confirm/healthCareCost": "Confirm Health Care Costs",
     "cost": "Cost",
     "country": "Country",
     "createdBy": "Created by",
@@ -97,6 +106,7 @@
     "error": "Error ❌",
     "examine": "Examine",
     "examine/expenseReport": "Examine Expenses",
+    "examine/healthCareCost": "Examine Health Care Costs",
     "examine/travel": "Examine Travels",
     "expandAll": "Expand all",
     "expense": "Expense",
@@ -107,9 +117,12 @@
     "fellowTravelersNames": "Name of all fellow travelers",
     "filter": "Filter",
     "from": "From",
+    "healthCareCost": "Health care cost",
+    "healthCareCostName": "Health care cost name",
     "hideX": "Hide {X}",
     "image": "Image",
     "import": "Import",
+    "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
     "location": "Location",
     "lumpSums": "Lump sums",
@@ -122,7 +135,9 @@
     "otherTransport": "Other transport ✈🚆🚖",
     "ownCar": "Own car 🚘",
     "password": "Password",
+    "patientName": "Patient name",
     "place": "Place",
+    "preciseServiceDescription": "Precise service description",
     "private": "Private",
     "professional": "Professional",
     "professionalShare": "Professional share",
@@ -136,7 +151,9 @@
     "receipts": "Receipts",
     "refund": "Refund",
     "refundedExpenseReports": "refunded expense reports",
+    "refundedHealthCareCosts": "Refunded health care costs",
     "refundedTravels": "refunded travels",
+    "refundSum": "Amount refunded by insurance",
     "reject": "Reject",
     "report": "Report",
     "route": "Route",
@@ -152,11 +169,13 @@
     "startLocation": "Start",
     "state": "State",
     "stay": "Stay",
+    "submitX": "Submit {X}",
     "success": "Sucess ✅",
     "summary": "Summary",
     "tapToUpload": "Tap here to upload 👆",
     "to": "To",
     "toExamination": "To Examination",
+    "toExaminationByInsurance": "To examination by health insurance",
     "total": "Total",
     "transport": "Transport",
     "travel": "Travel",
@@ -166,6 +185,7 @@
     "travelName": "Travel name",
     "typeToSearch": "Type to search...",
     "uid": "UID",
+    "underExaminationByInsuranceHealthCareCosts": "Health care costs under examination by health insurances",
     "uploadFromPhone": "Upload from Phone",
     "uploading": "Uploading 🔄",
     "uploadLink": "Upload Link",
@@ -207,6 +227,28 @@
         "subject": "🛂 Expense Report to examine"
       }
     },
+    "healthCareCost": {
+      "refunded": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs got reimbursed in the amount of {refundSum} by the insurance.",
+        "subject": "💲 Health Care Costs refunded"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs got rejected.",
+        "subject": "❌ Health Care Costs rejected"
+      },
+      "underExamination": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "{applicant} has submit his health care costs.",
+        "subject": "🛂 Health Care Costs to examine"
+      },
+      "underExaminationByInsurance": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs have been send to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
+        "subject": "🔜 Health Care Costs at insurance"
+      }
+    },
     "hi": "Hi there,",
     "hiX": "Hi {X},",
     "regards": "Best Regards",
@@ -236,6 +278,10 @@
         "paragraph": "{traveler} has finished his travel expenses.",
         "subject": "🛂 Travel to examine"
       }
+    },
+    "underExaminationByInsurance": {
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits advanced by {applicant}.\nI request reimbursement for these.",
+      "subject": "Reimbursement Health Care Costs"
     }
   },
   "monthsShort": {

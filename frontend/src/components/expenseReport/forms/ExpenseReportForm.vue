@@ -20,10 +20,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import PlaceInput from '../../elements/PlaceInput.vue'
-import DateInput from '../../elements/DateInput.vue'
 import { ExpenseReportSimple, Place } from '../../../../../common/types.js'
 import settings from '../../../../../common/settings.json'
 
@@ -36,7 +32,7 @@ const defaultExpenseReport: FormExpenseReport = {
 }
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput },
+  components: {},
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {

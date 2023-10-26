@@ -10,12 +10,17 @@
     "noData": {
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
+      "confirm/healthCareCost": "Es gibt keine Krankenkosten die noch zu bestätigen sind.",
+      "confirm/healthCareCost/refunded": "Es gibt keine bestätigten Krankenkosten",
       "examine/expenseReport": "Es gibt keine Auslagen zu prüfen.",
       "examine/expenseReport/refunded": "Es gibt keine erstatteten Auslagen.",
+      "examine/healthCareCost": "Es gibt keine Krankenkosten zu prüfen",
+      "examine/healthCareCost/underExaminationByInsurance": "Es liegen keine Krankenkosten bei den Krankenkassen.",
       "examine/travel": "Es gibt keine Reisen zu prüfen.",
       "examine/travel/refunded": "Es gibt keine erstatteten Reisen.",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "expenseReport": "Du hast noch keine Auslagenabrechnung hinzugefügt. Erstelle deine erste Auslagenabrechnung!",
+      "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
     },
@@ -44,6 +49,7 @@
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
+    "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
     "professionalShare": "Wenn deine Reise teilweise auch private Zwecke erfüllt, gib hier den beruflichen Anteil an.",
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
     "reason": "Gib hier kurz den Grund deiner Reise an.",
@@ -57,6 +63,7 @@
     "advance": "Vorschuss",
     "airplane": "Flugzeug ✈",
     "amount": "Betrag",
+    "applicant": "Antragsteller",
     "applyForX": "{X} beantragen",
     "approve": "Genehmigen",
     "approve/travel": "Reisen genehmigen",
@@ -72,6 +79,8 @@
     "comment": "Kommentar",
     "comments": "Kommentare",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
+    "confirm": "Bestätigen",
+    "confirm/healthCareCost": "Krankenkosten bestätigen",
     "cost": "Kosten",
     "country": "Land",
     "createdBy": "Erstellt von",
@@ -97,6 +106,7 @@
     "error": "Fehler ❌",
     "examine": "Prüfen",
     "examine/expenseReport": "Auslagen prüfen",
+    "examine/healthCareCost": "Krankenkosten prüfen",
     "examine/travel": "Reisen prüfen",
     "expandAll": "Alle ausklappen",
     "expense": "Auslage",
@@ -107,9 +117,12 @@
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "filter": "Filter",
     "from": "Von",
+    "healthCareCost": "Krankenkosten",
+    "healthCareCostName": "Name der Krankenkostenabrechnung",
     "hideX": "{X} ausblenden",
     "image": "Bild",
     "import": "Importieren",
+    "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "location": "Ort",
     "lumpSums": "Pauschalen",
@@ -122,7 +135,9 @@
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
     "password": "Passwort",
+    "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
+    "preciseServiceDescription": "Genaue Leistungsbeschreibung",
     "private": "Privat",
     "professional": "Dienstlich",
     "professionalShare": "Beruflicher Anteil",
@@ -136,7 +151,9 @@
     "receipts": "Belege",
     "refund": "Erstatten",
     "refundedExpenseReports": "Erstattete Auslagen",
+    "refundedHealthCareCosts": "Erstattete Krankenkosten",
     "refundedTravels": "Erstattete Reisen",
+    "refundSum": "Durch Versicherung erstatteter Betrag",
     "reject": "Ablehnen",
     "report": "Bericht",
     "route": "Strecke",
@@ -152,11 +169,13 @@
     "startLocation": "Von",
     "state": "Status",
     "stay": "Aufenthalt",
+    "submitX": "{X} einreichen",
     "success": "Erfolgreich ✅",
     "summary": "Zusammenfassung",
     "tapToUpload": "Zum Hochladen hier tippen 👆",
     "to": "Bis",
     "toExamination": "Zum Prüfen",
+    "toExaminationByInsurance": "Zum Prüfen durch Krankenkasse",
     "total": "Gesamt",
     "transport": "Verkehrsmittel",
     "travel": "Reise",
@@ -166,6 +185,7 @@
     "travelName": "Name der Reise",
     "typeToSearch": "Tippe um zu Suchen...",
     "uid": "UID",
+    "underExaminationByInsuranceHealthCareCosts": "Krankenkosten in Prüfung bei Krankenkassen",
     "uploadFromPhone": "Vom Handy hochladen",
     "uploading": "Wird hochgeladen 🔄",
     "uploadLink": "Upload Link",
@@ -207,6 +227,28 @@
         "subject": "🛂 Auslagen zu prüfen"
       }
     },
+    "healthCareCost": {
+      "refunded": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
+        "subject": "💲 Krankenkosten erstattet"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Krankenkosten wurden abgelehnt.",
+        "subject": "❌ Health Care Costs rejected"
+      },
+      "underExamination": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "{applicant} hat Krankenkosten eingereicht.",
+        "subject": "🛂 Krankenkosten zu prüfen"
+      },
+      "underExaminationByInsurance": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischzeit den gesamt Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die original Belege solange auf, bis du die Bearbeitungs- bzw. Erstattungs-meldung der Krankenkasse bekommen hast.",
+        "subject": "🔜 Krankenkosten an Versicherung"
+      }
+    },
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "regards": "Beste Grüße",
@@ -236,6 +278,10 @@
         "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
+    },
+    "underExaminationByInsurance": {
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {applicant} vorgestreckten Leistungen.\nIch bitten um die Erstattung dieser.",
+      "subject": "Erstattung Krankenkosten"
     }
   },
   "monthsShort": {
@@ -264,7 +310,8 @@
     "inWork": "in Arbeit",
     "refunded": "Erstattet",
     "rejected": "Abgelehnt",
-    "underExamination": "Wird Geprüft"
+    "underExamination": "Wird Geprüft",
+    "underExaminationByInsurance": "Prüfung durch Krankenkasse"
   },
   "weekdays": {
     "0": "Sonntag",

@@ -35,7 +35,7 @@ router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receip
   }
   if (req.body._id && req.body._id !== '') {
     var found = false
-    outer_loop: for (const expense of expenseReport.expenses) {
+    for (const expense of expenseReport.expenses) {
       if (expense._id.equals(req.body._id)) {
         found = true
         Object.assign(expense, req.body)

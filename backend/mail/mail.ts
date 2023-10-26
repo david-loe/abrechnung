@@ -3,7 +3,8 @@ import i18n from '../i18n.js'
 import ejs from 'ejs'
 import fs from 'fs'
 import User from '../models/user.js'
-import { UserSimple, ExpenseReport, TravelSimple } from '../../common/types.js'
+import { UserSimple, ExpenseReport, TravelSimple, HealthCareCost } from '../../common/types.js'
+import { getMoneyString } from '../../common/scripts.js'
 
 function sendMail(
   recipients: UserSimple[],
@@ -118,6 +119,40 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
     // 'refunded'
     recipients = [expenseReport.expensePayer]
     button.link = process.env.VITE_FRONTEND_URL + '/expenseReport' + '/' + expenseReport._id
+  }
+  sendMail(recipients, subject, paragraph, button, lastParagraph)
+}
+
+export async function sendHealthCareCostNotificationMail(healthCareCost: HealthCareCost) {
+  const interpolation: { applicant: string; comment?: string; commentator?: string; refundSum?: string } = {
+    applicant: healthCareCost.applicant.name,
+    refundSum: getMoneyString(healthCareCost.refundSum)
+  }
+
+  if (healthCareCost.comments.length > 0) {
+    const comment = healthCareCost.comments[healthCareCost.comments.length - 1]
+    if (comment.toState == healthCareCost.state) {
+      interpolation.comment = comment.text
+      interpolation.commentator = comment.author.name
+    }
+  }
+
+  var recipients = []
+  const subject = i18n.t('mail.healthCareCost.' + healthCareCost.state + '.subject', interpolation)
+  const paragraph = i18n.t('mail.healthCareCost.' + healthCareCost.state + '.paragraph', interpolation)
+  const button = {
+    text: i18n.t('labels.viewX', { X: i18n.t('labels.healthCareCost') }),
+    link: ''
+  }
+  const lastParagraph = interpolation.comment ? i18n.t('mail.healthCareCost.' + healthCareCost.state + '.lastParagraph', interpolation) : ''
+
+  if (healthCareCost.state === 'underExamination') {
+    recipients = await User.find({ 'access.examine/healthCareCost': true }).lean()
+    button.link = process.env.VITE_FRONTEND_URL + '/examine/healthCareCost/' + healthCareCost._id
+  } else {
+    // 'refunded' and 'underExaminationByInsurance'
+    recipients = [healthCareCost.applicant]
+    button.link = process.env.VITE_FRONTEND_URL + '/healthCareCost' + '/' + healthCareCost._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
