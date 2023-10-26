@@ -77,6 +77,16 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/confirm/healthCareCost/:_id([0-9a-fA-F]{24})',
+    component: HealthCareCostPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({
+      _id: route.params._id,
+      parentPages: [{ link: '/confirm/healthCareCost', title: 'labels.confirm/healthCareCost' }],
+      endpointPrefix: 'confirm/'
+    })
+  },
+  {
     path: '/examine/healthCareCost',
     component: ExamineHealthCareCostPage,
     meta: { requiresAuth: true }

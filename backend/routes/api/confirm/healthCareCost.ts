@@ -16,10 +16,10 @@ router.get('/', async (req, res) => {
     select.expenses = 0
   }
   delete req.query.addExpenses
-  if (!req.query.addByInsurance) {
+  if (!req.query.addRefunded) {
     preCondition = { state: 'underExaminationByInsurance', historic: false }
   }
-  delete req.query.addByInsurance
+  delete req.query.addRefunded
   return getter(HealthCareCost, 'expense report', 20, preCondition, select, sortFn)(req, res)
 })
 
@@ -39,7 +39,7 @@ router.post('/refunded', async (req, res) => {
     _id: req.body._id
   }
   const check = async (oldObject: HealthCareCostDoc) => {
-    if (oldObject.state === 'underExaminationByInsurance') {
+    if (oldObject.state === 'underExaminationByInsurance' && req.body.refundSum && req.body.refundSum.amount > 0) {
       await oldObject.saveToHistory()
       await oldObject.save()
       return true

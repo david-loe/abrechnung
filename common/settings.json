@@ -1,40 +1,147 @@
 {
-  "fallBackLumpSumCountry": "LU",
-  "secoundNightOnAirplaneLumpSumCountry": "AT",
-  "secoundNightOnShipOrFerryLumpSumCountry": "LU",
-  "factorOvernightLumpSum": 0.5,
-  "factorOvernightLumpSumExceptions": ["DE"],
-  "factorCateringLumpSum": 1,
-  "factorCateringLumpSumExceptions": [],
-  "breakfastCateringLumpSumCut": 0.2,
-  "lunchCateringLumpSumCut": 0.4,
-  "dinnerCateringLumpSumCut": 0.4,
-  "toleranceStageDatesToApprovedTravelDates": 3,
-  "maxTravelDayCount": 92,
-  "baseCurrency": { "_id": "EUR", "symbol": "€", "name": { "de": "Euro", "en": "euro" }, "subunit": "Cent", "flag": "🇪🇺" },
-  "allowSpouseRefund": true,
-  "refundPerKM": 0.3,
-  "version": 0,
-  "stateColors": {
-    "rejected": { "color": "#E8998D", "text": "black" },
-    "appliedFor": { "color": "#cae5ff", "text": "black" },
-    "inWork": { "color": "#AAD0FF", "text": "black" },
-    "approved": { "color": "#89bbfe", "text": "black" },
-    "underExamination": { "color": "#6f8ab7", "text": "white" },
-    "underExaminationByInsurance": { "color": "#687492", "text": "white" },
-    "refunded": { "color": "#615d6c", "text": "white" }
-  },
   "accessIcons": {
     "admin": ["bi-person-fill"],
     "approve/travel": ["bi-calendar-check"],
-    "examine/travel": ["bi-airplane", "bi-pencil-square"],
+    "confirm/healthCareCost": ["bi-check-square", "bi-hospital"],
     "examine/expenseReport": ["bi-coin", "bi-pencil-square"],
     "examine/healthCareCost": ["bi-hospital", "bi-pencil-square"],
-    "confirm/healthCareCost": ["bi-hospital", "bi-check-square"]
+    "examine/travel": ["bi-airplane", "bi-pencil-square"]
   },
-  "languages": [
-    { "flag": "🇩🇪", "key": "de" },
-    { "flag": "🇬🇧", "key": "en" }
+  "allowSpouseRefund": true,
+  "baseCurrency": {
+    "_id": "EUR",
+    "flag": "🇪🇺",
+    "name": {
+      "de": "Euro",
+      "en": "euro"
+    },
+    "subunit": "Cent",
+    "symbol": "€"
+  },
+  "breakfastCateringLumpSumCut": 0.2,
+  "dinnerCateringLumpSumCut": 0.4,
+  "factorCateringLumpSum": 1,
+  "factorCateringLumpSumExceptions": [],
+  "factorOvernightLumpSum": 0.5,
+  "factorOvernightLumpSumExceptions": ["DE"],
+  "fallBackLumpSumCountry": "LU",
+  "healthInsurances": [
+    { "name": "AOK Baden-Württemberg", "contactPerson": "", "mail": "" },
+    { "name": "AOK Bremen/Bremerhaven", "contactPerson": "", "mail": "" },
+    { "name": "AOK Niedersachsen", "contactPerson": "", "mail": "" },
+    { "name": "AOK Nordwest", "contactPerson": "", "mail": "" },
+    { "name": "AOK Rheinland-Pfalz/Saarland", "contactPerson": "", "mail": "" },
+    { "name": "AOK Sachsen-Anhalt", "contactPerson": "", "mail": "" },
+    { "name": "Audi BKK", "contactPerson": "", "mail": "" },
+    { "name": "BAHN-BKK", "contactPerson": "", "mail": "" },
+    { "name": "BARMER", "contactPerson": "", "mail": "" },
+    { "name": "BERGISCHE Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "Bertelsmann BKK", "contactPerson": "", "mail": "" },
+    { "name": "BIG direkt gesund", "contactPerson": "", "mail": "" },
+    { "name": "BKK Akzo Nobel Bayern", "contactPerson": "", "mail": "" },
+    { "name": "BKK Diakonie", "contactPerson": "", "mail": "" },
+    { "name": "BKK DürkoppAdler", "contactPerson": "", "mail": "" },
+    { "name": "BKK EUREGIO", "contactPerson": "", "mail": "" },
+    { "name": "BKK exklusiv", "contactPerson": "", "mail": "" },
+    { "name": "BKK Faber-Castell & Partner", "contactPerson": "", "mail": "" },
+    { "name": "BKK firmus", "contactPerson": "", "mail": "" },
+    { "name": "BKK Freudenberg", "contactPerson": "", "mail": "" },
+    { "name": "BKK GILDEMEISTER SEIDENSTICKER", "contactPerson": "", "mail": "" },
+    { "name": "BKK HERKULES", "contactPerson": "", "mail": "" },
+    { "name": "BKK Linde", "contactPerson": "", "mail": "" },
+    { "name": "bkk melitta hmr", "contactPerson": "", "mail": "" },
+    { "name": "BKK PFAFF", "contactPerson": "", "mail": "" },
+    { "name": "BKK Pfalz", "contactPerson": "", "mail": "" },
+    { "name": "BKK ProVita", "contactPerson": "", "mail": "" },
+    { "name": "BKK Public", "contactPerson": "", "mail": "" },
+    { "name": "BKK SBH", "contactPerson": "", "mail": "" },
+    { "name": "BKK Scheufelen", "contactPerson": "", "mail": "" },
+    { "name": "BKK Technoform", "contactPerson": "", "mail": "" },
+    { "name": "BKK Textilgruppe Hof", "contactPerson": "", "mail": "" },
+    { "name": "BKK VBU", "contactPerson": "", "mail": "" },
+    { "name": "BKK VDN", "contactPerson": "", "mail": "" },
+    { "name": "BKK VerbundPlus", "contactPerson": "", "mail": "" },
+    { "name": "BKK Werra-Meissner", "contactPerson": "", "mail": "" },
+    { "name": "BKK WIRTSCHAFT & FINANZEN", "contactPerson": "", "mail": "" },
+    { "name": "BKK ZF & Partner", "contactPerson": "", "mail": "" },
+    { "name": "BKK24", "contactPerson": "", "mail": "" },
+    { "name": "Bosch BKK", "contactPerson": "", "mail": "" },
+    { "name": "Continentale BKK", "contactPerson": "", "mail": "" },
+    { "name": "DAK Gesundheit", "contactPerson": "", "mail": "" },
+    { "name": "Debeka BKK", "contactPerson": "", "mail": "" },
+    { "name": "energie-BKK", "contactPerson": "", "mail": "" },
+    { "name": "Heimat Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "HEK - Hanseatische Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "hkk Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "IKK - Die Innovationskasse", "contactPerson": "", "mail": "" },
+    { "name": "IKK Brandenburg und Berlin", "contactPerson": "", "mail": "" },
+    { "name": "IKK classic", "contactPerson": "", "mail": "" },
+    { "name": "IKK gesund plus", "contactPerson": "", "mail": "" },
+    { "name": "IKK Südwest", "contactPerson": "", "mail": "" },
+    { "name": "KKH Kaufmännische Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "KNAPPSCHAFT", "contactPerson": "", "mail": "" },
+    { "name": "Landwirtschaftliche Krankenkasse - LKK", "contactPerson": "", "mail": "" },
+    { "name": "mhplus Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "Mobil Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "Novitas BKK", "contactPerson": "", "mail": "" },
+    { "name": "Pronova BKK", "contactPerson": "", "mail": "" },
+    { "name": "R+V Betriebskrankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "Salus BKK", "contactPerson": "", "mail": "" },
+    { "name": "SBK", "contactPerson": "", "mail": "" },
+    { "name": "SECURVITA Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "SKD BKK", "contactPerson": "", "mail": "" },
+    { "name": "Techniker Krankenkasse (TK)", "contactPerson": "", "mail": "" },
+    { "name": "TUI BKK", "contactPerson": "", "mail": "" },
+    { "name": "VIACTIV Krankenkasse", "contactPerson": "", "mail": "" },
+    { "name": "vivida bkk", "contactPerson": "", "mail": "" },
+    { "name": "WMF BKK", "contactPerson": "", "mail": "" }
   ],
-  "uploadTokenExpireAfterSeconds": 600
+  "languages": [
+    {
+      "flag": "🇩🇪",
+      "key": "de"
+    },
+    {
+      "flag": "🇬🇧",
+      "key": "en"
+    }
+  ],
+  "lunchCateringLumpSumCut": 0.4,
+  "maxTravelDayCount": 92,
+  "refundPerKM": 0.3,
+  "secoundNightOnAirplaneLumpSumCountry": "AT",
+  "secoundNightOnShipOrFerryLumpSumCountry": "LU",
+  "stateColors": {
+    "appliedFor": {
+      "color": "#cae5ff",
+      "text": "black"
+    },
+    "approved": {
+      "color": "#89bbfe",
+      "text": "black"
+    },
+    "inWork": {
+      "color": "#AAD0FF",
+      "text": "black"
+    },
+    "refunded": {
+      "color": "#615d6c",
+      "text": "white"
+    },
+    "rejected": {
+      "color": "#E8998D",
+      "text": "black"
+    },
+    "underExamination": {
+      "color": "#6f8ab7",
+      "text": "white"
+    },
+    "underExaminationByInsurance": {
+      "color": "#687492",
+      "text": "white"
+    }
+  },
+  "toleranceStageDatesToApprovedTravelDates": 3,
+  "uploadTokenExpireAfterSeconds": 600,
+  "version": 0
 }

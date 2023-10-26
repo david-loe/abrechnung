@@ -9,9 +9,6 @@ import initDB from './initdb.js'
 import i18n from './i18n.js'
 import User from './models/user.js'
 import routes from './routes/api/routes.js'
-import adminRoutes from './routes/api/admin/routes.js'
-import approveRoutes from './routes/api/approve/routes.js'
-import examineRoutes from './routes/api/examine/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
 
@@ -113,8 +110,5 @@ app.post('/login', passport.authenticate('ldapauth', { session: true }), async (
 
 app.use('/api', routes)
 app.use('/upload', uploadRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/approve', approveRoutes)
-app.use('/api/examine', examineRoutes)
 
 export default app

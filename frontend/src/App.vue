@@ -31,7 +31,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushSettings">
+                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushUserSettings">
                     <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">
                       {{ lang.flag }}
                     </option>
@@ -275,7 +275,7 @@ export default defineComponent({
         }
       }, 5000)
     },
-    async pushSettings() {
+    async pushUserSettings() {
       this.user.settings.language = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', this.user.settings, {
@@ -298,7 +298,7 @@ export default defineComponent({
       if (length > 3) {
         this.user.settings.lastCurrencies.pop()
       }
-      this.pushSettings()
+      this.pushUserSettings()
     },
     setLastCountry(country: CountrySimple) {
       const index = this.user.settings.lastCountries.indexOf(country)
@@ -309,7 +309,7 @@ export default defineComponent({
       if (length > 3) {
         this.user.settings.lastCountries.pop()
       }
-      this.pushSettings()
+      this.pushUserSettings()
     }
   }
 })

@@ -6,6 +6,21 @@
       </label>
       <input type="text" class="form-control" id="healthCareCostFormName" v-model="formHealthCareCost.name" />
     </div>
+    <div class="mb-3">
+      <label for="healthCareCostFormPatient" class="form-label"> {{ $t('labels.patientName') }}<span class="text-danger">*</span> </label>
+      <input type="text" class="form-control" id="healthCareCostFormPatient" v-model="formHealthCareCost.patientName" required />
+    </div>
+    <div class="mb-3">
+      <label for="healthCareCostFormInsurance" class="form-label"> {{ $t('labels.insurance') }}<span class="text-danger">*</span> </label>
+      <select
+        class="form-select"
+        id="healthCareCostFormInsurance"
+        v-model="$root.user.settings.insurance"
+        @update:model-value="insuranceChanged = true"
+        required>
+        <option v-for="insurance of settings.healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
+      </select>
+    </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
@@ -27,12 +42,14 @@ import DateInput from '../../elements/DateInput.vue'
 import { HealthCareCostSimple, Place } from '../../../../../common/types.js'
 import settings from '../../../../../common/settings.json'
 
-interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'expensePayer' | 'state' | 'editor' | 'comments' | '_id'> {
+interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'applicant' | 'state' | 'editor' | 'comments' | '_id'> {
   destinationPlace?: Place
 }
 
 const defaultHealthCareCost: FormHealthCareCost = {
-  name: ''
+  name: '',
+  patientName: '',
+  insurance: ''
 }
 export default defineComponent({
   name: 'HealthCareCostForm',
@@ -52,7 +69,8 @@ export default defineComponent({
     return {
       formHealthCareCost: structuredClone(defaultHealthCareCost),
       loading: false,
-      settings
+      settings,
+      insuranceChanged: false
     }
   },
   methods: {
@@ -62,6 +80,10 @@ export default defineComponent({
     },
     output() {
       this.loading = true
+      if (this.insuranceChanged) {
+        this.$root.pushUserSettings()
+      }
+      this.formHealthCareCost.insurance = this.$root.user.settings.insurance!
       return this.formHealthCareCost
     },
     input() {

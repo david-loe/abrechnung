@@ -9,7 +9,7 @@ await loginUser(agent)
 //@ts-ignore
 var healthCareCost: HealthCareCostSimple = {
   name: 'Broken leg',
-  patient: 'Ben Logas',
+  patientName: 'Ben Logas',
   insurance: 'AOK'
 }
 

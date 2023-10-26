@@ -8,6 +8,9 @@
     "errorSaving": "Error while saving",
     "loginFailed": "Failed to login!",
     "noData": {
+      "examine/healthCareCost": "There are no health care costs to examine",
+      "confirm/healthCareCost/refunded": "There are no confirmed health care costs",
+      "healthCareCost": "You have not submitted any health care costs yet.",
       "approve/travel": "There are no travels to approve",
       "approve/travel/approved": "There are no approved travels",
       "examine/expenseReport": "There are no expenses to examine.",
@@ -52,6 +55,18 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "examine/healthCareCost": "Examine Health Care Costs",
+    "confirm/healthCareCost": "Confirm Health Care Costs",
+    "refundedHealthCareCosts": "Refunded health care costs",
+    "healthCareCost": "Health care cost",
+    "healthCareCostName": "Health care cost name",
+    "patientName": "Patient name",
+    "insurance": "Health insurance",
+    "preciseServiceDescription": "Precise service description",
+    "toExaminationByInsurance": "To examination by health insurance",
+    "confirm": "Confirm",
+    "refundSum": "Amount refunded by insurance",
+    "applicant": "Applicant",
     "addX": "Add {X}",
     "admin": "Administrator",
     "advance": "Advance",
@@ -190,6 +205,10 @@
     "overnight\n": "Overnight lump sum"
   },
   "mail": {
+    "underExaminationByInsurance": {
+      "subject": "Reimbursement Health Care Costs",
+      "body": "Good day {contactPerson},\n\nIn the attachment is a summary of benefits advanced by {applicant}.\nI request reimbursement for these."
+    },
     "healthCareCost": {
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
@@ -208,7 +227,7 @@
       },
       "underExaminationByInsurance": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your health care costs have been send to the insurence for a refund. In the meantime you will get the total amount paid to your account.",
+        "paragraph": "Your health care costs have been send to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
         "subject": "🔜 Health Care Costs at insurance"
       }
     },

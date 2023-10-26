@@ -30,13 +30,11 @@
 
     <div class="row mb-3">
       <div class="col-auto">
-        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}</label
-        ><span class="text-danger">*</span>
+        <label for="startDateInput" class="form-label">{{ $t('labels.from') }}<span class="text-danger">*</span></label>
         <DateInput id="startDateInput" v-model="formTravel.startDate" :min="new Date()" required />
       </div>
       <div class="col-auto">
-        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}</label
-        ><span class="text-danger">*</span>
+        <label for="endDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
         <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" :max="getMaxDate()" required />
       </div>
     </div>

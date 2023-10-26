@@ -77,6 +77,7 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
+    insurance?: string
   }
   vehicleRegistration?: DocumentFile[]
   token?: Token
@@ -209,9 +210,9 @@ export interface ExpenseReport extends ExpenseReportSimple {
 export interface HealthCareCostSimple {
   name: string
   applicant: UserSimple
-  patient: string
+  patientName: string
   insurance: string
-  refundSum?: Money
+  refundSum: Money
   state: HealthCareCostState
   editor: UserSimple
   comments: HealthCareCostComment[]

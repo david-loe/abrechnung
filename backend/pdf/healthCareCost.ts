@@ -56,10 +56,20 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
     color: opts.textColor
   })
 
-  // Isurance + Patient
+  // Isurance + patientName
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
-    i18n.t('labels.insurance') + ': ' + healthCareCost.insurance + '    ' + i18n.t('labels.patient') + ': ' + healthCareCost.patient,
+    i18n.t('labels.insurance') +
+      ': ' +
+      healthCareCost.insurance +
+      '      ' +
+      i18n.t('labels.applicant') +
+      ': ' +
+      healthCareCost.applicant.name +
+      '      ' +
+      i18n.t('labels.patientName') +
+      ': ' +
+      healthCareCost.patientName,
     {
       x: opts.xStart,
       y: y,
@@ -69,32 +79,15 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
     }
   )
 
-  // Dates + professionalShare
-  var text =
-    i18n.t('labels.from') +
-    ': ' +
-    new Date(healthCareCost.expenses[0].cost.date).toLocaleDateString(i18n.language) +
-    '    ' +
-    i18n.t('labels.to') +
-    ': ' +
-    new Date(healthCareCost.expenses[healthCareCost.expenses.length - 1].cost.date).toLocaleDateString(i18n.language)
-  var y = y - opts.fontSize * 1.5
-  page.drawText(text, {
-    x: opts.xStart,
-    y: y,
-    size: opts.fontSize,
-    font: opts.font,
-    color: opts.textColor
-  })
   return y
 }
 
 function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, healthCareCost: HealthCareCost, options: Options) {
   const columns: Column[] = []
-  columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
+  columns.push({ key: 'reference', width: 200, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
     key: 'sum',
-    width: 65,
+    width: 85,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'sum',
     fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
@@ -102,6 +95,9 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, he
 
   const summary = []
   summary.push({ reference: i18n.t('labels.total'), sum: getHealthCareCostTotal(healthCareCost) })
+  if (healthCareCost.state === 'refunded') {
+    summary.push({ reference: i18n.t('labels.refundSum'), sum: healthCareCost.refundSum })
+  }
 
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.summary'), {

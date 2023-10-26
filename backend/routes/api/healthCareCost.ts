@@ -148,7 +148,7 @@ router.post('/inWork', async (req, res) => {
     editor: req.user!._id,
     _id: req.body._id,
     name: req.body.name,
-    patient: req.body.patient,
+    patientName: req.body.patientName,
     insurance: req.body.insurance
   }
 
@@ -156,7 +156,7 @@ router.post('/inWork', async (req, res) => {
     try {
       var date = new Date()
       req.body.name =
-        req.body.patient +
+        req.body.patientName +
         ' ' +
         i18n.t('monthsShort.' + date.getUTCMonth(), { lng: req.user!.settings.language }) +
         ' ' +

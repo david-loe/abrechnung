@@ -15,7 +15,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
   {
     name: { type: String },
     applicant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    patient: { type: String, trim: true, required: true },
+    patientName: { type: String, trim: true, required: true },
     insurance: { type: String, trim: true, required: true },
     state: {
       type: String,
@@ -50,6 +50,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
 
 function populate(doc: Document) {
   return Promise.allSettled([
+    doc.populate({ path: 'refundSum.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'applicant', select: { name: 1, email: 1 } }),

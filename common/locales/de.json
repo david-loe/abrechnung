@@ -8,6 +8,9 @@
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "noData": {
+      "examine/healthCareCost": "Es gibt keine Krankenkosten zu prüfen",
+      "confirm/healthCareCost/refunded": "Es gibt keine bestätigten Krankenkosten",
+      "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
       "examine/expenseReport": "Es gibt keine Auslagen zu prüfen.",
@@ -52,6 +55,18 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "examine/healthCareCost": "Krankenkosten prüfen",
+    "confirm/healthCareCost": "Krankenkosten bestätigen",
+    "refundedHealthCareCosts": "Erstattete Krankenkosten",
+    "healthCareCost": "Krankenkosten",
+    "healthCareCostName": "Name der Krankenkostenabrechnung",
+    "patientName": "Name des Leistungsempfängers",
+    "insurance": "Versicherung",
+    "preciseServiceDescription": "Genaue Leistungsbeschreibung",
+    "toExaminationByInsurance": "Zum Prüfen durch Krankenkasse",
+    "confirm": "Bestätigen",
+    "refundSum": "Durch Versicherung erstatteter Betrag",
+    "applicant": "Antragsteller",
     "addX": "{X} hinzufügen",
     "admin": "Administrator",
     "advance": "Vorschuss",
@@ -190,6 +205,10 @@
     "overnight\n": "Übernachtungs\npauschale"
   },
   "mail": {
+    "underExaminationByInsurance": {
+      "subject": "Erstattung Gesundheitskosten",
+      "body": "Guten Tag {contactPerson},\n\nIm Anhang befindet sich einer Übersicht der von {applicant} vorgestreckten Leistungen.\nIch bitten um die Erstattung dieser."
+    },
     "healthCareCost": {
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -286,7 +305,8 @@
     "inWork": "in Arbeit",
     "refunded": "Erstattet",
     "rejected": "Abgelehnt",
-    "underExamination": "Wird Geprüft"
+    "underExamination": "Wird Geprüft",
+    "underExaminationByInsurance": "Prüfung durch Krankenkasse"
   },
   "weekdays": {
     "0": "Sonntag",

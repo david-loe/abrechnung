@@ -51,7 +51,7 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state !== 'refunded'">
+                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
@@ -69,9 +69,9 @@
                 </template>
                 <li>
                   <a
-                    :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')"
+                    :class="'dropdown-item' + (isReadOnly && endpointPrefix !== '' ? ' disabled' : '')"
                     href="#"
-                    @click="isReadOnly && endpointPrefix === 'examine/' ? null : deleteHealthCareCost()">
+                    @click="isReadOnly && endpointPrefix !== '' ? null : deleteHealthCareCost()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ $t('labels.delete') }}</span>
                   </a>
@@ -80,7 +80,7 @@
             </div>
           </div>
         </div>
-        <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
+        <div v-if="endpointPrefix !== ''" class="text-secondary">
           {{ healthCareCost.applicant.name }}
         </div>
       </div>
@@ -129,6 +129,10 @@
                       <th>{{ $t('labels.total') }}</th>
                       <td class="text-end">{{ getMoneyString(getHealthCareCostTotal(healthCareCost)) }}</td>
                     </tr>
+                    <tr>
+                      <th>{{ $t('labels.refundSum') }}</th>
+                      <td class="text-end">{{ getMoneyString(healthCareCost.refundSum) }}</td>
+                    </tr>
                   </tbody>
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
@@ -146,8 +150,12 @@
                     id="comment"
                     rows="1"
                     v-model="healthCareCost.comment"
-                    :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
+                    :disabled="
+                      (isReadOnly && endpointPrefix === '') ||
+                      (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
+                    "></textarea>
                 </div>
+
                 <button
                   v-if="healthCareCost.state === 'inWork'"
                   class="btn btn-primary"
@@ -157,17 +165,41 @@
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
                 <a
-                  v-if="healthCareCost.state === 'refunded'"
+                  v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'"
                   class="btn btn-primary"
                   :href="reportLink()"
                   :download="healthCareCost.name + '.pdf'">
                   <i class="bi bi-download"></i>
                   <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                 </a>
-                <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success" @click="refund()">
-                  <i class="bi bi-coin"></i>
-                  <span class="ms-1">{{ $t('labels.refund') }}</span>
-                </button>
+                <a
+                  v-else-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'"
+                  class="btn btn-primary"
+                  :href="mailToInsuranceLink(healthCareCost)"
+                  @click="toExaminationByInsurance()">
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="ms-1">{{ $t('labels.toExaminationByInsurance') }}</span>
+                </a>
+                <form
+                  v-if="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance'"
+                  @submit.prevent="refund()">
+                  <label for="refundSum" class="form-label me-2"> {{ $t('labels.refundSum') }}<span class="text-danger">*</span> </label>
+                  <div id="refundSum" class="input-group mb-3">
+                    <input
+                      style="min-width: 100px"
+                      type="number"
+                      class="form-control"
+                      step="0.01"
+                      v-model="healthCareCost.refundSum!.amount"
+                      min="0"
+                      required />
+                    <CurrencySelector v-model="healthCareCost.refundSum!.currency" :required="true"></CurrencySelector>
+                  </div>
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-coin"></i>
+                    <span class="ms-1">{{ $t('labels.confirm') }}</span>
+                  </button>
+                </form>
               </div>
             </div>
           </div>
@@ -181,10 +213,12 @@
 import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
 import StatePipeline from '../elements/StatePipeline.vue'
+import CurrencySelector from '../elements/CurrencySelector.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 import { getMoneyString, datetoDateString, getHealthCareCostTotal } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
 import { HealthCareCost, healthCareCostStates, Expense } from '../../../../common/types.js'
+import settings from '../../../../common/settings.json'
 
 type ModalMode = 'add' | 'edit'
 
@@ -200,7 +234,7 @@ export default defineComponent({
       healthCareCostStates
     }
   },
-  components: { StatePipeline, ExpenseForm },
+  components: { StatePipeline, ExpenseForm, CurrencySelector },
   props: {
     _id: { type: String },
     parentPages: {
@@ -229,7 +263,7 @@ export default defineComponent({
     async deleteHealthCareCost() {
       const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { id: this._id })
       if (result) {
-        this.$router.push({ path: '/' })
+        this.$router.push({ path: this.parentPages[0].link })
       }
     },
     async toExamination() {
@@ -238,16 +272,46 @@ export default defineComponent({
         comment: this.healthCareCost.comment
       })
       if (result) {
-        this.$router.push({ path: '/' })
+        this.$router.push({ path: this.parentPages[0].link })
       }
     },
-    async refund() {
-      const result = await this.$root.setter('examine/healthCareCost/refunded', {
+    async toExaminationByInsurance() {
+      const result = await this.$root.setter('examine/healthCareCost/underExaminationByInsurance', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
       if (result) {
-        this.$router.push({ path: '/examine/healthCareCost' })
+        this.getHealthCareCost()
+      }
+    },
+    mailToInsuranceLink(healthCareCost: HealthCareCost): string {
+      for (const insurance of settings.healthInsurances) {
+        if (insurance.name === healthCareCost.insurance) {
+          return (
+            'mailto:' +
+            insurance.mail +
+            '?subject=' +
+            encodeURIComponent(this.$t('mail.underExaminationByInsurance.subject')) +
+            '&body=' +
+            encodeURIComponent(
+              this.$t('mail.underExaminationByInsurance.body', {
+                contactPerson: insurance.contactPerson,
+                applicant: healthCareCost.applicant.name
+              })
+            )
+          )
+        }
+      }
+      return ''
+    },
+    async refund() {
+      const result = await this.$root.setter('confirm/healthCareCost/refunded', {
+        _id: this.healthCareCost._id,
+        comment: this.healthCareCost.comment,
+        refundSum: this.healthCareCost.refundSum
+      })
+      if (result) {
+        this.$router.push({ path: this.parentPages[0].link })
       }
     },
     reportLink() {
@@ -280,6 +344,8 @@ export default defineComponent({
         addExpenses: true
       }
       if (this.endpointPrefix === 'examine/') {
+        params.addByInsurance = true
+      } else if (this.endpointPrefix === 'confirm/') {
         params.addRefunded = true
       }
       this.healthCareCost = (await this.$root.getter(this.endpointPrefix + 'healthCareCost', params)).data
@@ -298,7 +364,7 @@ export default defineComponent({
     } catch (e) {
       return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
-    this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.healthCareCost.state) !== -1
+    this.isReadOnly = ['underExamination', 'underExaminationByInsurance', 'refunded'].indexOf(this.healthCareCost.state) !== -1
   },
   mounted() {
     const modalEl = document.getElementById('modal')
