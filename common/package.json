@@ -1,5 +1,5 @@
 {
-  "name": "reisekostenabrechnung-common",
+  "name": "abrechnung-common",
   "version": "0.1.0",
   "private": true,
   "type": "module"

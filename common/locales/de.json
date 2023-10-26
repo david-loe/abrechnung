@@ -33,12 +33,12 @@
     "wrongPassword": "Falsches Passwort"
   },
   "headlines": {
-    "emoji": "✈",
+    "emoji": "🧾",
     "home": "Home",
     "login": "Login",
     "logout": "Logout",
     "settings": "Einstellungen",
-    "title": "reisekostenabrechnung"
+    "title": "abrechnung"
   },
   "info": {
     "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wieviel du benötigst.",
@@ -275,7 +275,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{traveler} hat die Reisekostenabrechnung fertiggestellt.",
+        "paragraph": "{traveler} hat die abrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
     },

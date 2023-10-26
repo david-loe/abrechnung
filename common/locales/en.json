@@ -33,12 +33,12 @@
     "wrongPassword": "Wrong Password"
   },
   "headlines": {
-    "emoji": "✈",
+    "emoji": "🧾",
     "home": "Home",
     "login": "Login",
     "logout": "Logout",
     "settings": "Settings",
-    "title": "reisekostenabrechnung"
+    "title": "abrechnung"
   },
   "info": {
     "advance": "If you need an advance (e.g. for the plane tickets), specify here how much you need.",
@@ -132,7 +132,7 @@
     "mixed": "Mixed",
     "name": "Name",
     "newX": "New {X}",
-    "otherTransport": "Other transport ✈🚆🚖",
+    "otherTransport": "Other transport 🚆🚖",
     "ownCar": "Own car 🚘",
     "password": "Password",
     "patientName": "Patient name",

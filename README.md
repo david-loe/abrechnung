@@ -1,11 +1,11 @@
-# reisekostenabrechnung
+# abrechnung
 
-[![Production Build](https://github.com/david-loe/reisekostenabrechnung/actions/workflows/production-build.yml/badge.svg)](https://github.com/david-loe/reisekostenabrechnung/actions/workflows/production-build.yml)
-[![Backend Test](https://github.com/david-loe/reisekostenabrechnung/actions/workflows/backend-test.yml/badge.svg)](https://github.com/david-loe/reisekostenabrechnung/actions/workflows/backend-test.yml)
+[![Production Build](https://github.com/david-loe/abrechnung/actions/workflows/production-build.yml/badge.svg)](https://github.com/david-loe/abrechnung/actions/workflows/production-build.yml)
+[![Backend Test](https://github.com/david-loe/abrechnung/actions/workflows/backend-test.yml/badge.svg)](https://github.com/david-loe/abrechnung/actions/workflows/backend-test.yml)
 
-Reisekostenabrechnung inkl. automatischer Pauschalen Berechnung auch für internationale Reisen
+abrechnung inkl. automatischer Pauschalen Berechnung auch für internationale Reisen
 
-https://github.com/david-loe/reisekostenabrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-2ecab49b7bd2
+https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-2ecab49b7bd2
 
 ## Getting Started
 

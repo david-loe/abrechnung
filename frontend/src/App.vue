@@ -5,7 +5,7 @@
         <div class="d-flex flex-row align-items-center nav">
           <div class="me-auto">
             <a href="/" class="nav-link link-dark d-flex align-items-center">
-              <i class="fs-1 bi bi-airplane"></i>
+              <i class="fs-1 bi bi-receipt"></i>
               <span class="fs-4 ms-2 d-none d-md-block">{{ $t('headlines.title') }}</span>
             </a>
           </div>
@@ -111,7 +111,7 @@
       <div class="container">
         <div class="d-flex align-items-center">
           <a href="/" class="text-decoration-none link-dark lh-1">
-            <i class="fs-3 bi bi-airplane"></i>
+            <i class="fs-3 bi bi-receipt"></i>
           </a>
           <span class="ps-2 text-muted">© {{ new Date().getFullYear() }} {{ $t('headlines.title') }}</span>
         </div>
