@@ -7,6 +7,7 @@ import HealthCareCost, { HealthCareCostDoc } from '../../../models/healthCareCos
 import { sendHealthCareCostNotificationMail } from '../../../mail/mail.js'
 import { HealthCareCost as IHealthCareCost } from '../../../../common/types.js'
 import { generateHealthCareCostReport } from '../../../pdf/healthCareCost.js'
+import { writeToDisk } from '../../../pdf/helper.js'
 
 router.get('/', async (req, res) => {
   const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
@@ -53,7 +54,16 @@ router.post(
         return false
       }
     }
-    return setter(HealthCareCost, '', false, check, sendHealthCareCostNotificationMail)(req, res)
+    const cb = async (healthCareCost: IHealthCareCost) => {
+      sendHealthCareCostNotificationMail(healthCareCost)
+      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+        await writeToDisk(
+          '/reports/healthCareCost/confirmed/' + healthCareCost.applicant.name + ' - ' + healthCareCost.name + '.pdf',
+          await generateHealthCareCostReport(healthCareCost)
+        )
+      }
+    }
+    return setter(HealthCareCost, '', false, check, cb)(req, res)
   }
 )
 
