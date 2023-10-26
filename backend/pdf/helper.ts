@@ -68,6 +68,7 @@ export interface Column {
 interface ReceiptMapEntry extends IDocumentFile {
   number: number
   date: Date
+  noNumberPrint?: boolean
 }
 export interface ReceiptMap {
   [key: string]: ReceiptMapEntry
@@ -96,6 +97,9 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
   )
 
   function drawNumber(page: pdf_lib.PDFPage, receipt: ReceiptMapEntry) {
+    if (receipt.noNumberPrint) {
+      return
+    }
     const text = '#' + receipt.number + ' - ' + datetoDateStringWithYear(receipt.date)
     const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
     page.drawRectangle({
@@ -116,7 +120,12 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
   }
   for (const receiptId in receiptMap) {
     const receipt = receiptMap[receiptId]
-    const data = ((await DocumentFile.findOne({ _id: receipt._id }).lean())!.data as any as mongo.Binary).buffer
+    const doc = await DocumentFile.findOne({ _id: receipt._id }).lean()
+    if (!doc) {
+      console.error('No DocumentFile found for id: ' + receipt._id)
+      continue
+    }
+    const data = (doc.data as any as mongo.Binary).buffer
     if (receipt.type == 'application/pdf') {
       const insertPDF = await pdf_lib.PDFDocument.load(data)
       const pages = await pdfDoc.copyPages(insertPDF, insertPDF.getPageIndices())

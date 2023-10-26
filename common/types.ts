@@ -93,7 +93,12 @@ export interface Money {
   } | null
 }
 
-export interface Cost extends Money {
+export interface MoneyPlus extends Money {
+  receipts?: DocumentFile[]
+  date?: Date | string
+}
+
+export interface Cost extends MoneyPlus {
   receipts: DocumentFile[]
   date: Date | string
 }
@@ -212,7 +217,7 @@ export interface HealthCareCostSimple {
   applicant: UserSimple
   patientName: string
   insurance: string
-  refundSum: Money
+  refundSum: MoneyPlus
   state: HealthCareCostState
   editor: UserSimple
   comments: HealthCareCostComment[]

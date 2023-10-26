@@ -4,6 +4,7 @@ import ejs from 'ejs'
 import fs from 'fs'
 import User from '../models/user.js'
 import { UserSimple, ExpenseReport, TravelSimple, HealthCareCost } from '../../common/types.js'
+import { getMoneyString } from '../../common/scripts.js'
 
 function sendMail(
   recipients: UserSimple[],
@@ -123,7 +124,10 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
 }
 
 export async function sendHealthCareCostNotificationMail(healthCareCost: HealthCareCost) {
-  const interpolation: { applicant: string; comment?: string; commentator?: string } = { applicant: healthCareCost.applicant.name }
+  const interpolation: { applicant: string; comment?: string; commentator?: string; refundSum?: string } = {
+    applicant: healthCareCost.applicant.name,
+    refundSum: getMoneyString(healthCareCost.refundSum)
+  }
 
   if (healthCareCost.comments.length > 0) {
     const comment = healthCareCost.comments[healthCareCost.comments.length - 1]

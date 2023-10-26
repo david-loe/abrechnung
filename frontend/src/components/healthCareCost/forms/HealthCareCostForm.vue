@@ -7,7 +7,10 @@
       <input type="text" class="form-control" id="healthCareCostFormName" v-model="formHealthCareCost.name" />
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormPatient" class="form-label"> {{ $t('labels.patientName') }}<span class="text-danger">*</span> </label>
+      <label for="healthCareCostFormPatient" class="form-label me-2">
+        {{ $t('labels.patientName') }}<span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.patientName')" />
       <input type="text" class="form-control" id="healthCareCostFormPatient" v-model="formHealthCareCost.patientName" required />
     </div>
     <div class="mb-3">
@@ -35,14 +38,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
-import PlaceInput from '../../elements/PlaceInput.vue'
-import DateInput from '../../elements/DateInput.vue'
 import { HealthCareCostSimple, Place } from '../../../../../common/types.js'
 import settings from '../../../../../common/settings.json'
 
-interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'applicant' | 'state' | 'editor' | 'comments' | '_id'> {
+interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'applicant' | 'state' | 'editor' | 'comments' | '_id' | 'refundSum'> {
   destinationPlace?: Place
 }
 
@@ -53,7 +53,7 @@ const defaultHealthCareCost: FormHealthCareCost = {
 }
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput },
+  components: { InfoPoint },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {

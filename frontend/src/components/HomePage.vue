@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="container">
-      <div class="row mb-3">
+      <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('headlines.home') }}</h1>
         </div>
@@ -61,20 +61,21 @@
         <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'healthCareCost')">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.healthCareCost') }) }}</span>
+            <span class="ms-1">{{ $t('labels.submitX', { X: $t('labels.healthCareCost') }) }}</span>
           </button>
         </div>
       </div>
       <h3>{{ $t('labels.travel') }}</h3>
       <TravelCardList
-        class="mb-5"
+        class="mb-4"
         ref="travelList"
         endpoint="travel"
         :showDropdown="true"
         @clicked="(t) => clickTravelCard(t)"
         @edit="(t) => showModal('edit', t, 'travel')"></TravelCardList>
-      <h3>{{ $t('labels.expenseReport') }}</h3>
+      <h3>{{ $t('labels.expenses') }}</h3>
       <ExpenseReportCardList
+        class="mb-4"
         ref="expenseReportList"
         endpoint="expenseReport"
         :showDropdown="true"

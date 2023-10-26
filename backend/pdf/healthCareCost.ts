@@ -31,7 +31,14 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   y = drawSummary(getLastPage(), newPage, healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
   y = drawExpenses(getLastPage(), newPage, healthCareCost, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
-  await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16 })
+  const confirmReceiptsMap: ReceiptMap = {}
+  if (healthCareCost.refundSum.receipts && healthCareCost.refundSum.receipts.length > 0) {
+    for (const receipt of healthCareCost.refundSum.receipts) {
+      confirmReceiptsMap[receipt._id!.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
+    }
+  }
+
+  await attachReceipts(pdfDoc, Object.assign(confirmReceiptsMap, receiptMap), { font: font, edge: edge / 2, fontSize: 16 })
   return await pdfDoc.save()
 }
 

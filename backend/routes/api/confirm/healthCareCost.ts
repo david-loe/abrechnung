@@ -1,5 +1,7 @@
-import { getter, setter } from '../../../helper.js'
+import { documentFileHandler, getter, setter } from '../../../helper.js'
 import express, { Request, Response } from 'express'
+import multer from 'multer'
+const fileHandler = multer({ limits: { fileSize: 16000000 } })
 const router = express.Router()
 import HealthCareCost, { HealthCareCostDoc } from '../../../models/healthCareCost.js'
 import { sendHealthCareCostNotificationMail } from '../../../mail/mail.js'
@@ -30,25 +32,30 @@ router.get('/refunded', async (req, res) => {
   return getter(HealthCareCost, 'expense report', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
 
-router.post('/refunded', async (req, res) => {
-  req.body = {
-    state: 'refunded',
-    refundSum: req.body.refundSum,
-    editor: req.user!._id,
-    comment: req.body.comment,
-    _id: req.body._id
-  }
-  const check = async (oldObject: HealthCareCostDoc) => {
-    if (oldObject.state === 'underExaminationByInsurance' && req.body.refundSum && req.body.refundSum.amount > 0) {
-      await oldObject.saveToHistory()
-      await oldObject.save()
-      return true
-    } else {
-      return false
+router.post(
+  '/refunded',
+  [fileHandler.any(), documentFileHandler(['refundSum', 'receipts'], false)],
+  async (req: Request, res: Response) => {
+    req.body = {
+      state: 'refunded',
+      refundSum: req.body.refundSum,
+      editor: req.user!._id,
+      comment: req.body.comment,
+      _id: req.body._id
     }
+    console.log(req.body.refundSum)
+    const check = async (oldObject: HealthCareCostDoc) => {
+      if (oldObject.state === 'underExaminationByInsurance' && req.body.refundSum && req.body.refundSum.amount > 0) {
+        await oldObject.saveToHistory()
+        await oldObject.save()
+        return true
+      } else {
+        return false
+      }
+    }
+    return setter(HealthCareCost, '', false, check, sendHealthCareCostNotificationMail)(req, res)
   }
-  return setter(HealthCareCost, '', false, check, sendHealthCareCostNotificationMail)(req, res)
-})
+)
 
 router.get('/report', async (req, res) => {
   const healthCareCost = await HealthCareCost.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()

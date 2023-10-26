@@ -1,4 +1,4 @@
-import { getter, setter } from '../../../helper.js'
+import { documentFileHandler, getter, setter } from '../../../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../../../models/documentFile.js'
@@ -70,46 +70,12 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
     return res.sendStatus(403)
   }
 
-  if (req.body.cost && req.body.cost.receipts && req.files) {
-    for (var i = 0; i < req.body.cost.receipts.length; i++) {
-      var buffer = null
-      for (const file of req.files as Express.Multer.File[]) {
-        if (file.fieldname == 'cost[receipts][' + i + '][data]') {
-          buffer = file.buffer
-          break
-        }
-      }
-      if (buffer) {
-        req.body.cost.receipts[i].owner = healthCareCost.applicant._id
-        req.body.cost.receipts[i].data = buffer
-      }
-    }
-  }
+  await documentFileHandler(['cost', 'receipts'], false, healthCareCost.applicant._id)(req, res, () => null)
 
   if (req.body._id && req.body._id !== '') {
     var found = false
-    outer_loop: for (const expense of healthCareCost.expenses) {
+    for (const expense of healthCareCost.expenses) {
       if (expense._id.equals(req.body._id)) {
-        if (req.body.cost && req.body.cost.receipts && req.files) {
-          for (var i = 0; i < req.body.cost.receipts.length; i++) {
-            if (req.body.cost.receipts[i]._id) {
-              var foundReceipt = false
-              for (const oldReceipt of expense.cost.receipts) {
-                if (oldReceipt._id!.equals(req.body.cost.receipts[i]._id)) {
-                  foundReceipt = true
-                }
-              }
-              if (!foundReceipt) {
-                break outer_loop
-              }
-              await DocumentFile.findOneAndUpdate({ _id: req.body.cost.receipts[i]._id }, req.body.cost.receipts[i])
-            } else {
-              var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-              req.body.cost.receipts[i] = result._id
-            }
-          }
-          healthCareCost.markModified('expenses.cost.receipts')
-        }
         found = true
         Object.assign(expense, req.body)
         break
@@ -119,13 +85,6 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
       return res.sendStatus(403)
     }
   } else {
-    if (req.body.cost && req.body.cost.receipts && req.files) {
-      for (var i = 0; i < req.body.cost.receipts.length; i++) {
-        var result = await new DocumentFile(req.body.cost.receipts[i]).save()
-        req.body.cost.receipts[i] = result._id
-      }
-      healthCareCost.markModified('expenses.cost.receipts')
-    }
     healthCareCost.expenses.push(req.body)
   }
   healthCareCost.expenses.sort((a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf())

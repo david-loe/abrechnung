@@ -8,11 +8,11 @@
       @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
     </HealthCareCostCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-      {{ $t('labels.showX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
+      {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
       <button type="button" class="btn btn-light" @click="showRefunded = false">
-        {{ $t('labels.hideX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
+        {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
       <HealthCareCostCardList

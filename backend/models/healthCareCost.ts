@@ -23,7 +23,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
       enum: healthCareCostStates,
       default: 'inWork'
     },
-    refundSum: costObject(true, false, false, settings.baseCurrency._id),
+    refundSum: costObject(true, true, false, settings.baseCurrency._id),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
       {
@@ -51,6 +51,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'refundSum.currency' }),
+    doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'applicant', select: { name: 1, email: 1 } }),
