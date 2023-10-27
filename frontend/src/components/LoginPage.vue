@@ -1,9 +1,9 @@
 <template>
   <div class="text-center" id="loginPage">
-    <form class="form-signin" @submit.prevent="login()">
-      <i class="bi bi-receipt" style="font-size: 8rem"></i>
-      <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
+    <i class="bi bi-receipt" style="font-size: 8rem"></i>
+    <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
 
+    <form v-if="useLDAP" class="form-signin" @submit.prevent="login()">
       <div class="form-floating">
         <input
           type="text"
@@ -28,9 +28,15 @@
           required />
         <label for="password">{{ $t('labels.password') }}</label>
       </div>
-
       <button class="w-100 btn btn-lg btn-primary" type="submit">{{ $t('labels.signIn') }}</button>
     </form>
+
+    <div v-if="useMicrosoft">
+      <a class="btn btn-lg btn-primary" :href="microsoftLink">
+        <i class="bi bi-microsoft me-1"></i>
+        {{ $t('labels.signInX', { X: 'Microsoft' }) }}
+      </a>
+    </div>
   </div>
 </template>
 
@@ -43,14 +49,17 @@ export default defineComponent({
   data() {
     return {
       password: '',
-      username: ''
+      username: '',
+      useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true',
+      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true',
+      microsoftLink: import.meta.env.VITE_BACKEND_URL + '/auth/microsoft'
     }
   },
   methods: {
     async login() {
       try {
         const res = await axios.post(
-          import.meta.env.VITE_BACKEND_URL + '/login',
+          import.meta.env.VITE_BACKEND_URL + '/auth/ldapauth',
           {
             username: this.username,
             password: this.password
@@ -69,6 +78,7 @@ export default defineComponent({
   },
   beforeMount() {
     this.$root.loadState = 'LOADED'
+    console.log(import.meta.env)
   }
 })
 </script>

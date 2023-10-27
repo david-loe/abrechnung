@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "axios": "^1.5.1",
+    "axios": "^1.6.0",
     "body-parser": "^1.20.2",
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
@@ -19,6 +19,7 @@
     "nodemailer": "^6.9.7",
     "passport": "^0.5.3",
     "passport-ldapauth": "^3.0.1",
+    "passport-microsoft": "^1.0.0",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1"
   },
@@ -31,6 +32,7 @@
     "@types/node": "^20.8.9",
     "@types/nodemailer": "^6.4.13",
     "@types/passport": "^1.0.14",
+    "@types/passport-microsoft": "^1.0.2",
     "@types/supertest": "^2.0.15",
     "ava": "^5.3.1",
     "nodemon": "^3.0.1",

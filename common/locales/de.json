@@ -59,6 +59,7 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "signInX": "Mit {X} anmelden",
     "addX": "{X} hinzufügen",
     "admin": "Administrator",
     "advance": "Vorschuss",

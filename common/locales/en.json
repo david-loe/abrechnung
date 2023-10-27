@@ -59,6 +59,7 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "signInX": "Sign in with {X}",
     "addX": "Add {X}",
     "admin": "Administrator",
     "advance": "Advance",
