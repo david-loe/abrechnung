@@ -81,7 +81,7 @@ export default defineComponent({
     output() {
       this.loading = true
       if (this.insuranceChanged) {
-        this.$root.pushUserSettings()
+        this.$root.pushUserSettings(this.$root.user.settings)
       }
       this.formHealthCareCost.insurance = this.$root.user.settings.insurance!
       return this.formHealthCareCost

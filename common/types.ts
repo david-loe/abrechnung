@@ -78,6 +78,7 @@ export interface User extends UserSimple {
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
     insurance?: string
+    organisation?: string
   }
   vehicleRegistration?: DocumentFile[]
   token?: Token

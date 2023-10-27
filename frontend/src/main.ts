@@ -33,7 +33,7 @@ declare module '@vue/runtime-core' {
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
       load: () => Promise<void>
-      pushUserSettings: () => Promise<void>
+      pushUserSettings: (settings: User['settings']) => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
       currencies: Currency[]
       countries: CountrySimple[]
