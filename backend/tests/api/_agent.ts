@@ -8,12 +8,12 @@ export default function createAgent() {
 
 export async function loginUser(agent: request.SuperAgentTest) {
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'fry', password: 'fry' })
+  await agent.post('/auth/ldapauth').send({ username: 'fry', password: 'fry' })
 }
 
 export async function loginAdmin(agent: request.SuperAgentTest) {
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'professor', password: 'professor' })
+  await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
 }
 
 export async function loginTravel(agent: request.SuperAgentTest) {
@@ -26,7 +26,7 @@ export async function loginTravel(agent: request.SuperAgentTest) {
   const user = { _id: userId, uid: 'zoidberg', access: { 'examine/travel': true, 'approve/travel': true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'zoidberg', password: 'zoidberg' })
+  await agent.post('/auth/ldapauth').send({ username: 'zoidberg', password: 'zoidberg' })
 }
 
 export async function loginExpenseReport(agent: request.SuperAgentTest) {
@@ -39,7 +39,7 @@ export async function loginExpenseReport(agent: request.SuperAgentTest) {
   const user = { _id: userId, uid: 'leela', access: { 'examine/expenseReport': true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'leela', password: 'leela' })
+  await agent.post('/auth/ldapauth').send({ username: 'leela', password: 'leela' })
 }
 
 export async function loginHealthCareCost(agent: request.SuperAgentTest) {
@@ -52,5 +52,5 @@ export async function loginHealthCareCost(agent: request.SuperAgentTest) {
   const user = { _id: userId, uid: 'bender', access: { 'examine/healthCareCost': true, 'confirm/healthCareCost': true } }
   await agent.post('/api/admin/user').send(user)
   await agent.post('/api/logout')
-  await agent.post('/login').send({ username: 'bender', password: 'bender' })
+  await agent.post('/auth/ldapauth').send({ username: 'bender', password: 'bender' })
 }

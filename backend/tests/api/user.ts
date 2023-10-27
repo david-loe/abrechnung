@@ -6,8 +6,8 @@ import { objectToFormFields } from './_helper.js'
 const agent = createAgent()
 await loginUser(agent)
 
-test('POST /login', async (t) => {
-  const res = await agent.post('/login').send({ username: 'professor', password: 'professor' })
+test('POST /auth/ldapauth', async (t) => {
+  const res = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
   t.is(res.status, 200)
 })
 
