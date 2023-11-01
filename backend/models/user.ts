@@ -7,8 +7,11 @@ for (const access of accesses) {
 }
 
 const userSchema = new Schema<User>({
-  uid: { type: String, required: true, unique: true, index: true },
-  email: { type: String },
+  fk: {
+    microsoft: { type: String, index: true, unique: true, sparse: true },
+    ldapauth: { type: String, index: true, unique: true, sparse: true }
+  },
+  email: { type: String, unique: true, index: true, required: true },
   name: { type: String },
   access: accessObject,
   settings: {

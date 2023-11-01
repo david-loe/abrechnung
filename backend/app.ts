@@ -1,5 +1,5 @@
 import express from 'express'
-import mongoose, { ObjectId } from 'mongoose'
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose'
 import cors from 'cors'
 import passport from 'passport'
 import LdapStrategy from 'passport-ldapauth'
@@ -22,6 +22,15 @@ await initDB()
 const useLDAP = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
 const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
 
+function addAdminIfNone(user: HydratedDocument<IUser>) {
+  User.find({ 'access.admin': true }).then((docs) => {
+    if (docs.length == 0) {
+      user.access.admin = true
+      user.markModified('access')
+      user.save()
+    }
+  })
+}
 // Get LDAP credentials from ENV
 if (useLDAP) {
   passport.use(
@@ -40,7 +49,7 @@ if (useLDAP) {
         }
       },
       async function (ldapUser: any, cb: (error: any, user?: any) => void) {
-        var user = await User.findOne({ uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
+        var user = await User.findOne({ 'fk.ldapauth': ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
         var email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
         if (Array.isArray(email)) {
           if (email.length > 0) {
@@ -49,12 +58,15 @@ if (useLDAP) {
             email = undefined
           }
         }
+        if (!user && email) {
+          user = await User.findOne({ email: email })
+        }
         var name = ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]
         if (!name) {
           name = ldapUser[process.env.LDAP_UID_ATTRIBUTE]
         }
         const newUser = {
-          uid: ldapUser[process.env.LDAP_UID_ATTRIBUTE],
+          fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
           email: email,
           name: name
         }
@@ -65,6 +77,7 @@ if (useLDAP) {
         }
         try {
           await user.save()
+          addAdminIfNone(user)
           cb(null, user)
         } catch (error) {
           cb(error)
@@ -72,6 +85,29 @@ if (useLDAP) {
       }
     )
   )
+}
+
+interface msProfile {
+  provider: 'microsoft'
+  name: { familyName: string; givenName: string }
+  id: string
+  displayName: string
+  emails: { type: string; value: string }[]
+  _raw: string
+  _json: {
+    '@odata.context': string
+    businessPhones: string[]
+    displayName: string
+    givenName: string
+    jobTitle: string | null
+    mail: string
+    mobilePhone: string | null
+    officeLocation: string | null
+    preferredLanguage: string | null
+    surname: string
+    userPrincipalName: string
+    id: string
+  }
 }
 
 if (useMicrosoft) {
@@ -84,9 +120,33 @@ if (useMicrosoft) {
         tenant: process.env.MS_AZURE_TENANT,
         scope: ['user.read']
       },
-      async function (accessToken: string, refreshToken: string, profile: any, verified: (error: any, user?: Express.User) => void) {
-        // TODO MS profile to User mapping
-        console.log(profile)
+      async function (accessToken: string, refreshToken: string, profile: msProfile, verified: (error: any, user?: Express.User) => void) {
+        var user = await User.findOne({ 'fk.microsoft': profile._json.id })
+        var email = profile._json.mail
+        if (!user && email) {
+          user = await User.findOne({ email: email })
+        }
+        var name = profile._json.displayName
+        if (!name) {
+          name = email
+        }
+        const newUser = {
+          fk: { microsoft: profile._json.id },
+          email: email,
+          name: name
+        }
+        if (!user) {
+          user = new User(newUser)
+        } else {
+          Object.assign(user, newUser)
+        }
+        try {
+          await user.save()
+          verified(null, user)
+          addAdminIfNone(user)
+        } catch (error) {
+          verified(error)
+        }
       }
     )
   )
@@ -142,7 +202,9 @@ if (useLDAP) {
 
 if (useMicrosoft) {
   app.get('/auth/microsoft', passport.authenticate('microsoft'))
-  app.get('/auth/microsoft/callback', passport.authenticate('microsoft'))
+  app.get('/auth/microsoft/callback', passport.authenticate('microsoft'), (req, res) => {
+    res.redirect(process.env.VITE_FRONTEND_URL)
+  })
 }
 
 app.use('/api', routes)

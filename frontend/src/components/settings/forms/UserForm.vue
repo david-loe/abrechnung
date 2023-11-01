@@ -2,8 +2,12 @@
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="row mb-2">
       <div class="col">
-        <label for="userFormUid" class="form-label"> {{ $t('labels.uid') }}<span class="text-danger">*</span> </label>
-        <input type="text" class="form-control" id="userFormUid" v-model="formUser.uid" required :disabled="mode === 'edit'" />
+        <label for="userFormFkLdapauth" class="form-label"> {{ $t('labels.fkLdapauth') }} </label>
+        <input type="text" class="form-control" id="userFormFkLdapauth" v-model="formUser.fk.ldapauth" :disabled="mode === 'edit'" />
+      </div>
+      <div class="col">
+        <label for="userFormFkMicrosoft" class="form-label"> {{ $t('labels.fkMicrosoft') }} </label>
+        <input type="text" class="form-control" id="userFormFkMicrosoft" v-model="formUser.fk.microsoft" :disabled="mode === 'edit'" />
       </div>
       <div class="col">
         <label for="userFormMail" class="form-label"> {{ $t('labels.email') }}<span class="text-danger">*</span> </label>
@@ -48,7 +52,7 @@ interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
 }
 
 const defaultUser: FormUser = {
-  uid: '',
+  fk: {},
   access: {},
   email: ''
 }

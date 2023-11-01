@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <ul class="list-group mb-3" style="max-height: 400px; overflow-y: scroll">
-      <li v-for="user of users" :key="user.uid" class="list-group-item">
+      <li v-for="user of users" :key="user._id" class="list-group-item">
         <div class="row align-items-center">
           <div class="col-auto me-auto">
             <span class="fs-6">
-              {{ user.uid }}
+              {{ user.email }}
               <template v-for="access of accesses">
                 <span v-if="user.access[access]" class="ms-4">
                   <i v-for="icon of accessIcons[access]" :class="'bi ' + icon"></i>
