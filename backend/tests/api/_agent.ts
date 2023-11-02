@@ -16,7 +16,12 @@ async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof u
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
   }
-  const user = { _id: userId, fk: { ldapauth: users[userKey].username }, access: users[userKey].access }
+  const user = {
+    _id: userId,
+    fk: { ldapauth: users[userKey].username },
+    access: users[userKey].access,
+    email: users[userKey].username + '@planetexpress.com'
+  }
   await agent.post('/api/admin/user').send(user)
 }
 
