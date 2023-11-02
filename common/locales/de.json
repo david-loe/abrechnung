@@ -7,6 +7,7 @@
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "loginFailed": "Anmeldung fehlgeschlagen!",
+    "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "noData": {
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
@@ -132,6 +133,7 @@
     "mixed": "Gemischt",
     "name": "Name",
     "newX": "{X} - Neu",
+    "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
     "password": "Passwort",

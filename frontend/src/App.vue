@@ -31,7 +31,11 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="pushUserSettings">
+                  <select
+                    class="form-select mx-auto"
+                    v-model="$i18n.locale"
+                    style="max-width: 68px"
+                    @change="pushUserSettings(user.settings)">
                     <option v-for="lang of languages" :key="lang.key" :value="lang.key" :title="$t('languages.' + lang.key)">
                       {{ lang.flag }}
                     </option>
@@ -106,6 +110,18 @@
       </div>
       <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
     </div>
+    <div class="modal fade" id="userSettingsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ $t('headlines.settings') }}</h5>
+          </div>
+          <div v-if="user.settings" class="modal-body">
+            <UserSettingsForm :settings="user.settings" :showCancel="false" @edit="pushUserSettings" />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <footer class="py-3 border-top">
       <div class="container">
@@ -123,10 +139,12 @@
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { Country, CountrySimple, Currency, Locale, User, accesses } from '../../common/types.js'
+import { Modal } from 'bootstrap'
+import { CountrySimple, Currency, Locale, User, accesses } from '../../common/types.js'
 import { log } from '../../common/logger.js'
 import { languages, accessIcons } from '../../common/settings.json'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
+import UserSettingsForm from './components/settings/forms/UserSettingsForm.vue'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -138,6 +156,7 @@ export interface Alert {
 export default defineComponent({
   data() {
     return {
+      userSettingsModal: undefined as Modal | undefined,
       alerts: [] as Alert[],
       auth: false,
       user: {} as User,
@@ -152,6 +171,7 @@ export default defineComponent({
       TwemojiCountryFlags
     }
   },
+  components: { UserSettingsForm },
   methods: {
     async load() {
       if (this.loadState === 'UNLOADED') {
@@ -164,6 +184,7 @@ export default defineComponent({
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
+          this.checkUserSettings(this.user.settings)
           this.currencies = (result[1] as PromiseFulfilledResult<{ data: Currency[] }>).value.data
           this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
           this.loadState = 'LOADED'
@@ -275,12 +296,13 @@ export default defineComponent({
         }
       }, 5000)
     },
-    async pushUserSettings() {
-      this.user.settings.language = this.$i18n.locale as Locale
+    async pushUserSettings(settings: User['settings']) {
+      settings.language = this.$i18n.locale as Locale
       try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', this.user.settings, {
+        await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', settings, {
           withCredentials: true
         })
+        this.checkUserSettings(settings)
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push('login')
@@ -298,7 +320,7 @@ export default defineComponent({
       if (length > 3) {
         this.user.settings.lastCurrencies.pop()
       }
-      this.pushUserSettings()
+      this.pushUserSettings(this.user.settings)
     },
     setLastCountry(country: CountrySimple) {
       const index = this.user.settings.lastCountries.indexOf(country)
@@ -309,7 +331,20 @@ export default defineComponent({
       if (length > 3) {
         this.user.settings.lastCountries.pop()
       }
-      this.pushUserSettings()
+      this.pushUserSettings(this.user.settings)
+    },
+    checkUserSettings(settings: User['settings']) {
+      if (!settings.insurance || !settings.organisation) {
+        if (this.userSettingsModal) this.userSettingsModal.show()
+      } else {
+        if (this.userSettingsModal) this.userSettingsModal.hide()
+      }
+    }
+  },
+  mounted() {
+    const modalEL = document.getElementById('userSettingsModal')
+    if (modalEL) {
+      this.userSettingsModal = new Modal(modalEL, {})
     }
   }
 })

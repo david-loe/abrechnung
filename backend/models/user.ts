@@ -15,7 +15,8 @@ const userSchema = new Schema<User>({
     language: { type: String, default: 'de' },
     lastCurrencies: [{ type: String, ref: 'Currency' }],
     lastCountries: [{ type: String, ref: 'Country' }],
-    insurance: { type: String, trim: true }
+    insurance: { type: String, trim: true },
+    organisation: { type: String, trim: true }
   },
   vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
