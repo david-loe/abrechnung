@@ -15,6 +15,9 @@ async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof u
   var userId = undefined
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
+  } else {
+    await loginUser(agent, userKey)
+    await loginUser(agent, 'admin')
   }
   const user = {
     _id: userId,
@@ -30,7 +33,7 @@ export default async function createAgent() {
   // sign in first with 'professor' to make him admin
   await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
   for (const userKey in users) {
-    await createUser(agent, userKey as keyof typeof users)
+    if (userKey !== 'admin') await createUser(agent, userKey as keyof typeof users)
   }
   return agent
 }
