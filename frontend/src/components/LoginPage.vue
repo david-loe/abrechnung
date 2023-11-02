@@ -78,7 +78,6 @@ export default defineComponent({
   },
   beforeMount() {
     this.$root.loadState = 'LOADED'
-    console.log(import.meta.env)
   }
 })
 </script>

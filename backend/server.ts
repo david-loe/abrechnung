@@ -29,7 +29,8 @@ declare global {
       readonly LDAP_TLS_REJECTUNAUTHORIZED: 'TRUE' | 'FALSE'
       readonly LDAP_MAIL_ATTRIBUTE: string
       readonly LDAP_UID_ATTRIBUTE: string
-      readonly LDAP_DISPLAYNAME_ATTRIBUTE: string
+      readonly LDAP_SURNAME_ATTRIBUTE: string
+      readonly LDAP_GIVENNAME_ATTRIBUTE: string
       readonly SMTP_HOST: string
       readonly SMTP_PORT: string
       readonly SMTP_SECURE: 'TRUE' | 'FALSE'

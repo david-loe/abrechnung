@@ -53,7 +53,13 @@ router.post('/refunded', async (req, res) => {
     sendExpenseReportNotificationMail(expenseReport)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
-        '/reports/expenseReport/' + expenseReport.expensePayer.name + ' - ' + expenseReport.name + '.pdf',
+        '/reports/expenseReport/' +
+          expenseReport.expensePayer.name.familyName +
+          ' ' +
+          expenseReport.expensePayer.name.givenName[0] +
+          ' - ' +
+          expenseReport.name +
+          '.pdf',
         await generateExpenseReportReport(expenseReport)
       )
     }
@@ -134,7 +140,16 @@ router.get('/report', async (req, res) => {
   const expenseReport = await ExpenseReport.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
   if (expenseReport) {
     const report = await generateExpenseReportReport(expenseReport)
-    res.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.expensePayer.name + ' - ' + expenseReport.name + '.pdf')
+    res.setHeader(
+      'Content-disposition',
+      'attachment; filename=' +
+        expenseReport.expensePayer.name.familyName +
+        ' ' +
+        expenseReport.expensePayer.name.givenName[0] +
+        ' - ' +
+        expenseReport.name +
+        '.pdf'
+    )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)
     return res.send(Buffer.from(report))

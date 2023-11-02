@@ -114,7 +114,7 @@
           </div>
         </div>
         <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
-          {{ travel.traveler.name }}
+          {{ travel.traveler.name.givenName + ' ' + travel.traveler.name.familyName }}
         </div>
       </div>
 
@@ -354,7 +354,7 @@
                 <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
-                      <span class="fw-bold">{{ comment.author.name + ': ' }}</span>
+                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
                       <span>{{ comment.text }}</span>
                     </p>
                   </small>

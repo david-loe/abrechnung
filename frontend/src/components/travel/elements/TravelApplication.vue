@@ -91,13 +91,13 @@ export default defineComponent({
           if (this.travel.traveler._id == this.travel.editor._id) {
             return ''
           }
-          return this.travel[key].name
+          return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
         case 'traveler':
-          return this.travel[key].name
+          return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
         case 'comments':
           if (this.travel.comments.length > 0) {
             const c = this.travel.comments[this.travel.comments.length - 1]
-            return c.author.name + ': "' + c.text + '"'
+            return c.author.name.givenName + ': "' + c.text + '"'
           } else {
             return ''
           }

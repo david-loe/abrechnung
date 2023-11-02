@@ -58,7 +58,13 @@ router.post(
       sendHealthCareCostNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
-          '/reports/healthCareCost/confirmed/' + healthCareCost.applicant.name + ' - ' + healthCareCost.name + '.pdf',
+          '/reports/healthCareCost/confirmed/' +
+            healthCareCost.applicant.name.familyName +
+            ' ' +
+            healthCareCost.applicant.name.givenName[0] +
+            ' - ' +
+            healthCareCost.name +
+            '.pdf',
           await generateHealthCareCostReport(healthCareCost)
         )
       }
@@ -71,7 +77,16 @@ router.get('/report', async (req, res) => {
   const healthCareCost = await HealthCareCost.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
   if (healthCareCost) {
     const report = await generateHealthCareCostReport(healthCareCost)
-    res.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.applicant.name + ' - ' + healthCareCost.name + '.pdf')
+    res.setHeader(
+      'Content-disposition',
+      'attachment; filename=' +
+        healthCareCost.applicant.name.familyName +
+        ' ' +
+        healthCareCost.applicant.name.givenName[0] +
+        ' - ' +
+        healthCareCost.name +
+        '.pdf'
+    )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)
     return res.send(Buffer.from(report))

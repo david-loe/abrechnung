@@ -12,7 +12,7 @@ import User from './models/user.js'
 import routes from './routes/api/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
-import { User as IUser } from '../common/types.js'
+import { User as IUser, UserSimple } from '../common/types.js'
 
 await mongoose.connect(process.env.MONGO_URL, {})
 console.log(i18n.t('alerts.db.success'))
@@ -22,6 +22,9 @@ await initDB()
 const useLDAP = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
 const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
 
+interface NewUser extends Omit<UserSimple, '_id'> {
+  fk?: IUser['fk']
+}
 function addAdminIfNone(user: HydratedDocument<IUser>) {
   User.find({ 'access.admin': true }).then((docs) => {
     if (docs.length == 0) {
@@ -61,18 +64,16 @@ if (useLDAP) {
         if (!user && email) {
           user = await User.findOne({ email: email })
         }
-        var name = ldapUser[process.env.LDAP_DISPLAYNAME_ATTRIBUTE]
-        if (!name) {
-          name = ldapUser[process.env.LDAP_UID_ATTRIBUTE]
-        }
-        const newUser = {
+        const newUser: NewUser = {
           fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
           email: email,
-          name: name
+          name: { familyName: ldapUser[process.env.LDAP_SURNAME_ATTRIBUTE], givenName: ldapUser[process.env.LDAP_GIVENNAME_ATTRIBUTE] }
         }
         if (!user) {
           user = new User(newUser)
         } else {
+          Object.assign(user.fk, newUser.fk)
+          delete newUser.fk
           Object.assign(user, newUser)
         }
         try {
@@ -126,18 +127,16 @@ if (useMicrosoft) {
         if (!user && email) {
           user = await User.findOne({ email: email })
         }
-        var name = profile._json.displayName
-        if (!name) {
-          name = email
-        }
-        const newUser = {
+        const newUser: NewUser = {
           fk: { microsoft: profile._json.id },
           email: email,
-          name: name
+          name: { familyName: profile._json.surname, givenName: profile._json.givenName }
         }
         if (!user) {
           user = new User(newUser)
         } else {
+          Object.assign(user.fk, newUser.fk)
+          delete newUser.fk
           Object.assign(user, newUser)
         }
         try {

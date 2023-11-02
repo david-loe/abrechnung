@@ -56,7 +56,12 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   // Traveler
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
-    i18n.t('labels.traveler') + ': ' + travel.traveler.name + (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
+    i18n.t('labels.traveler') +
+      ': ' +
+      travel.traveler.name.givenName +
+      ' ' +
+      travel.traveler.name.familyName +
+      (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
     {
       x: opts.xStart,
       y: y,
@@ -126,7 +131,10 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
   const y = drawTable(page, newPageFn, summary, columns, tabelOptions) - 16
 
   page.drawText(
-    i18n.t('report.advance.approvedXY', { X: (travel.updatedAt as Date).toLocaleDateString(i18n.language), Y: travel.editor.name }),
+    i18n.t('report.advance.approvedXY', {
+      X: (travel.updatedAt as Date).toLocaleDateString(i18n.language),
+      Y: travel.editor.name.givenName + ' ' + travel.editor.name.familyName
+    }),
     {
       x: options.xStart,
       y: y - fontSize,

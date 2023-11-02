@@ -50,7 +50,10 @@ router.post('/approved', async (req: Request, res: Response) => {
   const cb = async (travel: ITravelSimple) => {
     sendTravelNotificationMail(travel)
     if (travel.advance.amount !== null && travel.advance.amount > 0 && process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      await writeToDisk('/reports/advance/' + travel.traveler.name + ' - ' + travel.name + '.pdf', await generateAdvanceReport(travel))
+      await writeToDisk(
+        '/reports/advance/' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf',
+        await generateAdvanceReport(travel)
+      )
     }
   }
   return setter(Travel, '', false, check, cb)(req, res)

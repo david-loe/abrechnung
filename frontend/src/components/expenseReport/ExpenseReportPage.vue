@@ -81,7 +81,7 @@
           </div>
         </div>
         <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
-          {{ expenseReport.expensePayer.name }}
+          {{ expenseReport.expensePayer.name.givenName + ' ' + expenseReport.expensePayer.name.familyName }}
         </div>
       </div>
 
@@ -134,7 +134,7 @@
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
-                      <span class="fw-bold">{{ comment.author.name + ': ' }}</span>
+                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
                       <span>{{ comment.text }}</span>
                     </p>
                   </small>

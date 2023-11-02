@@ -64,7 +64,7 @@ export interface Token {
 
 export interface UserSimple {
   email: string
-  name: string
+  name: { givenName: string; familyName: string }
   _id: Types.ObjectId
 }
 

@@ -12,7 +12,7 @@ const userSchema = new Schema<User>({
     ldapauth: { type: String, index: true, unique: true, sparse: true }
   },
   email: { type: String, unique: true, index: true, required: true },
-  name: { type: String },
+  name: { givenName: { type: String, trim: true }, familyName: { type: String, trim: true } },
   access: accessObject,
   settings: {
     language: { type: String, default: 'de' },
