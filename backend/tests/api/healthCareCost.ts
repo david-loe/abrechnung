@@ -1,10 +1,10 @@
 import test from 'ava'
 import { Expense, HealthCareCost, HealthCareCostSimple } from '../../../common/types.js'
-import createAgent, { loginHealthCareCost, loginUser } from './_agent.js'
+import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
-const agent = createAgent()
-await loginUser(agent)
+const agent = await createAgent()
+await loginUser(agent, 'user')
 
 //@ts-ignore
 var healthCareCost: HealthCareCostSimple = {
@@ -87,7 +87,7 @@ test.serial('POST /healthCareCost/underExamination', async (t) => {
 // EXAMINE
 
 test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t) => {
-  await loginHealthCareCost(agent)
+  await loginUser(agent, 'healthCareCost')
   t.plan(4)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/api/examine/healthCareCost/underExaminationByInsurance').send({ _id: healthCareCost._id, comment })
@@ -101,13 +101,13 @@ test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t
 
 test.serial('GET /healthCareCost/report', async (t) => {
   t.timeout(20000) // 20 seconds
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.get('/api/healthCareCost/report').query({ id: healthCareCost._id })
   t.is(res.status, 200)
 })
 
 test.after.always('DELETE /healthCareCost', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.delete('/api/healthCareCost').query({ id: healthCareCost._id })
   t.is(res.status, 200)
 })

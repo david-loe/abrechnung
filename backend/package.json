@@ -45,7 +45,7 @@
     "build": "tsc",
     "start": "node dist/build/server.js",
     "test": "npm run test$NODE_ENV",
-    "testproduction": "npm run build && ava dist/build/tests/**/*",
-    "testdevelopment": "npm run build && ava dist/app/tests/**/*"
+    "testproduction": "npm run build && ava --serial  dist/build/tests/**/*",
+    "testdevelopment": "npm run build && ava --serial  dist/app/tests/**/*"
   }
 }
