@@ -13,9 +13,9 @@
             <hr
               :style="
                 'background: linear-gradient(to right, ' +
-                stateColors[value].color +
+                $root.settings.stateColors[value].color +
                 ', ' +
-                stateColors[states[index + 1]].color +
+                $root.settings.stateColors[states[index + 1]].color +
                 '); height: 5px; border: 0px'
               " />
           </div>
@@ -28,19 +28,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import StateBadge from './StateBadge.vue'
-import { stateColors } from '../../../../common/settings.json'
+import { Settings } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StatePipeline',
-  data() {
-    return {
-      stateColors
-    }
-  },
   components: { StateBadge },
   props: {
-    state: { type: String as PropType<keyof typeof stateColors>, required: true },
-    states: { type: Array as PropType<readonly (keyof typeof stateColors)[]>, required: true }
+    state: { type: String as PropType<keyof Settings['stateColors']>, required: true },
+    states: { type: Array as PropType<readonly (keyof Settings['stateColors'])[]>, required: true }
   },
   beforeMount() {},
   mounted() {}

@@ -21,7 +21,7 @@
         v-model="$root.user.settings.insurance"
         @update:model-value="insuranceChanged = true"
         required>
-        <option v-for="insurance of settings.healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
+        <option v-for="insurance of $root.healthInsurances" :value="insurance._id" :key="insurance._id">{{ insurance.name }}</option>
       </select>
     </div>
     <div class="mb-2">
@@ -40,7 +40,6 @@
 import { defineComponent, PropType } from 'vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import { HealthCareCostSimple, Place } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
 
 interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'applicant' | 'state' | 'editor' | 'comments' | '_id' | 'refundSum'> {
   destinationPlace?: Place
@@ -69,7 +68,6 @@ export default defineComponent({
     return {
       formHealthCareCost: structuredClone(defaultHealthCareCost),
       loading: false,
-      settings,
       insuranceChanged: false
     }
   },

@@ -231,7 +231,6 @@ import ExpenseForm from './forms/ExpenseForm.vue'
 import { getMoneyString, datetoDateString, getHealthCareCostTotal } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
 import { HealthCareCost, healthCareCostStates, Expense } from '../../../../common/types.js'
-import settings from '../../../../common/settings.json'
 
 type ModalMode = 'add' | 'edit'
 
@@ -298,24 +297,19 @@ export default defineComponent({
       }
     },
     mailToInsuranceLink(healthCareCost: HealthCareCost): string {
-      for (const insurance of settings.healthInsurances) {
-        if (insurance.name === healthCareCost.insurance) {
-          return (
-            'mailto:' +
-            insurance.mail +
-            '?subject=' +
-            encodeURIComponent(this.$t('mail.underExaminationByInsurance.subject')) +
-            '&body=' +
-            encodeURIComponent(
-              this.$t('mail.underExaminationByInsurance.body', {
-                insuranceName: insurance.name,
-                applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
-              })
-            )
-          )
-        }
-      }
-      return ''
+      return (
+        'mailto:' +
+        healthCareCost.insurance.mail +
+        '?subject=' +
+        encodeURIComponent(this.$t('mail.underExaminationByInsurance.subject')) +
+        '&body=' +
+        encodeURIComponent(
+          this.$t('mail.underExaminationByInsurance.body', {
+            insuranceName: insurance.name,
+            applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
+          })
+        )
+      )
     },
     async refund() {
       var headers = {}

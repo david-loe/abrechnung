@@ -1,10 +1,13 @@
+import Settings from './models/settings.js'
 import fs from 'fs'
+import settings from './data/settings.json' assert { type: 'json' }
+import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
 import { csvToObjects, parseRawLumpSums, addLumpSumsToCountries } from './helper.js'
 import { getFlagEmoji } from '../common/scripts.js'
 import Currency from './models/currency.js'
 import Country from './models/country.js'
+import HealthInsurances from './models/user/healthInsurance.js'
 import { Model } from 'mongoose'
-import User from './models/user.js'
 
 function loadLumpSums() {
   const lumpSums: { validFrom: Date; data: any }[] = []
@@ -69,6 +72,8 @@ async function addAllLumpSums() {
 export default async function initDB() {
   await initer(Currency, 'currencies', loadCurrencies())
   await initer(Country, 'countries', loadCountries())
+  await initer(Settings, 'settings', [settings])
+  await initer(HealthInsurances, 'health insurances', [healthInsurances])
 
   await addAllLumpSums()
 }

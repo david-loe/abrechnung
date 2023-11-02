@@ -97,27 +97,8 @@ import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { TravelSimple, Place } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
 import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 
-interface FormTravelSimple
-  extends Omit<TravelSimple, 'destinationPlace' | 'traveler' | 'state' | 'editor' | 'comments' | 'progress' | '_id'> {
-  destinationPlace?: Place
-}
-
-const defaultTravel: FormTravelSimple = {
-  name: '',
-  reason: '',
-  startDate: '',
-  endDate: '',
-  destinationPlace: undefined,
-  travelInsideOfEU: false,
-  claimSpouseRefund: false,
-  advance: {
-    amount: null,
-    currency: settings.baseCurrency
-  }
-}
 export default defineComponent({
   name: 'TravelApplyForm',
   components: { CurrencySelector, InfoPoint, PlaceInput, DateInput },
@@ -125,7 +106,7 @@ export default defineComponent({
   props: {
     travel: {
       type: Object as PropType<Partial<TravelSimple>>,
-      default: () => structuredClone(defaultTravel)
+      default: () => this.default()
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -134,15 +115,30 @@ export default defineComponent({
   },
   data() {
     return {
-      formTravel: structuredClone(defaultTravel),
+      formTravel: this.default(),
       loading: false,
       settings
     }
   },
   methods: {
+    default() {
+      return {
+        name: '',
+        reason: '',
+        startDate: '',
+        endDate: '',
+        destinationPlace: undefined,
+        travelInsideOfEU: false,
+        claimSpouseRefund: false,
+        advance: {
+          amount: null,
+          currency: settings.baseCurrency
+        }
+      }
+    },
     clear() {
       this.loading = false
-      this.formTravel = structuredClone(defaultTravel)
+      this.formTravel = this.default()
     },
     output() {
       this.loading = true
@@ -150,7 +146,7 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultTravel), this.travel)
+      return Object.assign({}, this.default(), this.travel)
     },
     getMaxDate() {
       const date = isValidDate(this.formTravel.startDate as string)

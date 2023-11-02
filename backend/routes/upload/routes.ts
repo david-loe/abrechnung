@@ -4,7 +4,7 @@ import multer from 'multer'
 import User from '../../models/user.js'
 import ejs from 'ejs'
 import * as fs from 'fs'
-import settings from '../../../common/settings.json' assert { type: 'json' }
+import Settings from '../../models/settings.js'
 import i18n from '../../i18n.js'
 import { documentFileHandler } from '../../helper.js'
 
@@ -12,6 +12,7 @@ const router = express.Router()
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 router.get('/new', async (req, res) => {
+  const settings = (await Settings.findOne().lean())!
   const user = await User.findOne({ _id: req.query.user }).lean()
   if (user && user.token && user.token._id.equals(req.query.token as string)) {
     const template = fs.readFileSync('./routes/upload/upload.ejs', { encoding: 'utf-8' })

@@ -1,8 +1,8 @@
 import i18n from './i18n.js'
 import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'
+import Settings from './models/settings.js'
 import axios from 'axios'
-import settings from '../common/settings.json' assert { type: 'json' }
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
@@ -308,12 +308,17 @@ export async function addLumpSumsToCountries(
   return { success, noUpdate, noCountryFound }
 }
 
+const settings = (await Settings.findOne().lean())!
+
 export async function convertCurrency(
   date: Date | string | number,
   amount: number,
   from: string,
   to: string = settings.baseCurrency._id
 ): Promise<{ date: Date; rate: number; amount: number } | null> {
+  if (from === to) {
+    return null
+  }
   from = from.toUpperCase()
   to = to.toUpperCase()
   const convertionDate = new Date(date)

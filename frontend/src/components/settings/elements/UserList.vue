@@ -8,7 +8,7 @@
               {{ user.email }}
               <template v-for="access of accesses">
                 <span v-if="user.access[access]" class="ms-4">
-                  <i v-for="icon of accessIcons[access]" :class="'bi ' + icon"></i>
+                  <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
                 </span>
               </template>
             </span>
@@ -52,7 +52,6 @@
 import { defineComponent } from 'vue'
 import UserForm from '../forms/UserForm.vue'
 import { User, accesses } from '../../../../../common/types.js'
-import { accessIcons } from '../../../../../common/settings.json'
 export default defineComponent({
   name: 'UserList',
   components: { UserForm },
@@ -62,8 +61,7 @@ export default defineComponent({
       userToEdit: undefined as User | undefined,
       userFormMode: 'add' as 'add' | 'edit',
       showForm_: false,
-      accesses,
-      accessIcons
+      accesses
     }
   },
   methods: {

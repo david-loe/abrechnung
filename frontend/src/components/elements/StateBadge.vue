@@ -1,21 +1,18 @@
 <template>
-  <span :class="'badge text-' + stateColors[state].text" :style="'background-color: ' + stateColors[state].color + ';'"
+  <span
+    :class="'badge text-' + $root.settings.stateColors[state].text"
+    :style="'background-color: ' + $root.settings.stateColors[state].color + ';'"
     >{{ $t('states.' + state) }}
   </span>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { stateColors } from '../../../../common/settings.json'
+import { Settings } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'StateBadge',
-  data() {
-    return {
-      stateColors
-    }
-  },
-  props: { state: { type: String as PropType<keyof typeof stateColors>, required: true } }
+  props: { state: { type: String as PropType<keyof Settings['stateColors']>, required: true } }
 })
 </script>
 

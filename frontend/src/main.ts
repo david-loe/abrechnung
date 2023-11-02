@@ -12,7 +12,7 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import i18n from './i18n.js'
-import { CountrySimple, Currency, User } from '../../common/types.js'
+import { CountrySimple, Currency, HealthInsurance, Organistation, Settings, User } from '../../common/types.js'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {
@@ -38,6 +38,9 @@ declare module '@vue/runtime-core' {
       currencies: Currency[]
       countries: CountrySimple[]
       user: User
+      settings: Settings
+      healthIsurances: HealthInsurance[]
+      organisations: Organistation[]
     }
   }
 }

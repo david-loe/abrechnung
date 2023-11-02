@@ -7,13 +7,13 @@
         {{ $t('labels.organisation') }}<span class="text-danger">*</span>
       </label>
       <select class="form-select" id="userSettingsFormOrganisation" v-model="formUserSettings.organisation" required>
-        <option v-for="organisation of organisations" :value="organisation" :key="organisation">{{ organisation }}</option>
+        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation">{{ organisation }}</option>
       </select>
     </div>
     <div class="mb-3">
       <label for="userSettingsFormInsurance" class="form-label"> {{ $t('labels.insurance') }}<span class="text-danger">*</span> </label>
       <select class="form-select" id="userSettingsFormInsurance" v-model="formUserSettings.insurance" required>
-        <option v-for="insurance of healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
+        <option v-for="insurance of $root.healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
       </select>
     </div>
     <div class="mb-2">
@@ -32,7 +32,6 @@
 import { defineComponent, PropType } from 'vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import { User } from '../../../../../common/types.js'
-import { healthInsurances, organisations } from '../../../../../common/settings.json'
 
 const defaultSettings: Partial<User['settings']> = {
   insurance: '',
@@ -55,9 +54,7 @@ export default defineComponent({
   data() {
     return {
       formUserSettings: structuredClone(defaultSettings),
-      loading: false,
-      healthInsurances,
-      organisations
+      loading: false
     }
   },
   methods: {

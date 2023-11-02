@@ -63,7 +63,6 @@ import { defineComponent, PropType } from 'vue'
 import { DocumentFile, Token } from '../../../../common/types.js'
 import { resizeImage } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import settings from '../../../../common/settings.json'
 import QRCode from 'qrcode'
 
 export default defineComponent({
@@ -85,8 +84,8 @@ export default defineComponent({
       token: undefined as Token | undefined,
       qr: undefined as string | undefined,
       fetchTokenInterval: undefined as NodeJS.Timeout | undefined,
-      secondsLeft: settings.uploadTokenExpireAfterSeconds,
-      expireAfterSeconds: settings.uploadTokenExpireAfterSeconds
+      secondsLeft: this.$root.settings.uploadTokenExpireAfterSeconds,
+      expireAfterSeconds: this.$root.settings.uploadTokenExpireAfterSeconds
     }
   },
   emits: ['update:modelValue'],

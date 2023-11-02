@@ -1,5 +1,10 @@
 import express from 'express'
 import mongoose, { HydratedDocument, ObjectId } from 'mongoose'
+
+console.log('here')
+await mongoose.connect(process.env.MONGO_URL)
+console.log(i18n.t('alerts.db.success'))
+
 import cors from 'cors'
 import passport from 'passport'
 import LdapStrategy from 'passport-ldapauth'
@@ -13,9 +18,6 @@ import routes from './routes/api/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
 import { User as IUser, UserSimple } from '../common/types.js'
-
-await mongoose.connect(process.env.MONGO_URL, {})
-console.log(i18n.t('alerts.db.success'))
 
 await initDB()
 

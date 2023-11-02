@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose'
-import settings from '../../common/settings.json' assert { type: 'json' }
+import Settings from './settings.js'
+const settings = (await Settings.findOne().lean())!
 
 const tokenSchema = new Schema(
   {

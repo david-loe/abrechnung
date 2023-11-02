@@ -1,5 +1,5 @@
 import { HydratedDocument, Model, Schema, model } from 'mongoose'
-import settings from '../../common/settings.json' assert { type: 'json' }
+import Settings from './settings.js'
 import { Country, CountryLumpSum } from '../../common/types.js'
 
 interface Methods {
@@ -43,6 +43,7 @@ countrySchema.methods.getLumpSum = async function (date: Date): Promise<CountryL
   if (this.lumpSumsFrom) {
     return (await model('Country').findOne({ _id: this.lumpSumsFrom })).getLumpSum(date)
   } else if (this.lumpSums.length == 0) {
+    const settings = (await Settings.findOne().lean())!
     return (await model('Country').findOne({ _id: settings.fallBackLumpSumCountry })).getLumpSum(date)
   } else {
     var nearest = 0
