@@ -3,7 +3,10 @@ import app from '../../app.js'
 import { User } from '../../../common/types.js'
 
 export default function createAgent() {
-  return request.agent(app)
+  const agent = request.agent(app)
+  // sign in first with 'professor' to make him admin
+  agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
+  return agent
 }
 
 export async function loginUser(agent: request.SuperAgentTest) {
