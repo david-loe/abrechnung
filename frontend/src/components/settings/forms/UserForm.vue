@@ -45,7 +45,7 @@ import { User, accesses } from '../../../../../common/types.js'
 import { accessIcons } from '../../../../../common/settings.json'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
-  name?: string
+  name?: User['name']
   settings?: User['settings']
   _id?: string
   access: Partial<User['access']>
