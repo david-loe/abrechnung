@@ -26,7 +26,9 @@
         </div>
       </div>
 
-      <span v-if="showUser && user" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{ user.name }}</span>
+      <span v-if="showUser && user" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{
+        user.name.givenName + ' ' + user.name.familyName
+      }}</span>
       <div class="row mb-2">
         <slot name="details"></slot>
       </div>
@@ -36,7 +38,7 @@
         <div v-if="showEditor" class="col-auto">
           <small class="ms-1">
             <i class="bi bi-pencil-square"></i>
-            {{ editor.name }}
+            {{ editor.name.givenName }}
           </small>
         </div>
       </div>

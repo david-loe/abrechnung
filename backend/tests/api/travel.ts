@@ -1,10 +1,10 @@
 import test from 'ava'
 import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
-import createAgent, { loginTravel, loginUser } from './_agent.js'
+import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
-const agent = createAgent()
-await loginUser(agent)
+const agent = await createAgent()
+await loginUser(agent, 'user')
 
 var travel: TravelSimple = {
   name: 'Ankara Aug 2023',
@@ -45,7 +45,7 @@ test.serial('GET /travel', async (t) => {
 // APPROVE
 
 test.serial('GET /approve/travel', async (t) => {
-  await loginTravel(agent)
+  await loginUser(agent, 'travel')
   t.plan(2)
   const res = await agent.get('/api/approve/travel')
   t.is(res.status, 200)
@@ -138,7 +138,7 @@ const stages: Stage[] = [
 ]
 
 test.serial('POST /travel/stage', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
     var req = agent.post('/api/travel/stage')
@@ -197,7 +197,7 @@ test.serial('POST /travel/underExamination', async (t) => {
 // EXAMINE
 
 test.serial('POST /examine/travel/refunded', async (t) => {
-  await loginTravel(agent)
+  await loginUser(agent, 'travel')
   t.plan(4)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/api/examine/travel/refunded').send({ _id: travel._id, comment })
@@ -210,13 +210,13 @@ test.serial('POST /examine/travel/refunded', async (t) => {
 // REPORT
 
 test.serial('GET /travel/report', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.get('/api/travel/report').query({ id: travel._id })
   t.is(res.status, 200)
 })
 
 test.after.always('DELETE /travel', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.delete('/api/travel').query({ id: travel._id })
   t.is(res.status, 200)
 })

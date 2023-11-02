@@ -63,13 +63,16 @@ export interface Token {
 }
 
 export interface UserSimple {
-  uid: string
   email: string
-  name: string
+  name: { givenName: string; familyName: string }
   _id: Types.ObjectId
 }
 
 export interface User extends UserSimple {
+  fk: {
+    microsoft?: string
+    ldapauth?: string
+  }
   access: {
     [key in Access]: boolean
   }

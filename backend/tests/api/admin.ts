@@ -1,9 +1,9 @@
 import test from 'ava'
 import { User } from '../../../common/types.js'
-import createAgent, { loginAdmin } from './_agent.js'
+import createAgent, { loginUser } from './_agent.js'
 
-const agent = createAgent()
-await loginAdmin(agent)
+const agent = await createAgent()
+await loginUser(agent, 'admin')
 
 test('POST /admin/user', async (t) => {
   t.plan(4)

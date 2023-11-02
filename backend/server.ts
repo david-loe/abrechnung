@@ -15,6 +15,11 @@ declare global {
       readonly VITE_FRONTEND_URL: string
       readonly VITE_BACKEND_URL: string
       readonly COOKIE_SECRET: string
+      readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
+      readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
+      readonly MS_AZURE_CLIENT_ID: string
+      readonly MS_AZURE_CLIENT_SECRET: string
+      readonly MS_AZURE_TENANT: string
       readonly LDAP_URL: string
       readonly LDAP_BINDDN: string
       readonly LDAP_BINDCREDENTIALS: string
@@ -24,7 +29,8 @@ declare global {
       readonly LDAP_TLS_REJECTUNAUTHORIZED: 'TRUE' | 'FALSE'
       readonly LDAP_MAIL_ATTRIBUTE: string
       readonly LDAP_UID_ATTRIBUTE: string
-      readonly LDAP_DISPLAYNAME_ATTRIBUTE: string
+      readonly LDAP_SURNAME_ATTRIBUTE: string
+      readonly LDAP_GIVENNAME_ATTRIBUTE: string
       readonly SMTP_HOST: string
       readonly SMTP_PORT: string
       readonly SMTP_SECURE: 'TRUE' | 'FALSE'

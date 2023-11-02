@@ -18,7 +18,7 @@ function sendMail(
   }
   var salutation = i18n.t('mail.hi')
   if (recipients.length === 1) {
-    salutation = i18n.t('mail.hiX', { X: recipients[0].name })
+    salutation = i18n.t('mail.hiX', { X: recipients[0].name.givenName })
   }
   const regards = i18n.t('mail.regards')
   const app = { name: i18n.t('headlines.title') + ' ' + i18n.t('headlines.emoji'), url: process.env.VITE_FRONTEND_URL }
@@ -59,13 +59,13 @@ function sendMail(
 }
 
 export async function sendTravelNotificationMail(travel: TravelSimple) {
-  const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name }
+  const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name.givenName }
 
   if (travel.comments.length > 0) {
     const comment = travel.comments[travel.comments.length - 1]
     if (comment.toState == travel.state) {
       interpolation.comment = comment.text
-      interpolation.commentator = comment.author.name
+      interpolation.commentator = comment.author.name.givenName
     }
   }
 
@@ -93,13 +93,15 @@ export async function sendTravelNotificationMail(travel: TravelSimple) {
 }
 
 export async function sendExpenseReportNotificationMail(expenseReport: ExpenseReport) {
-  const interpolation: { expensePayer: string; comment?: string; commentator?: string } = { expensePayer: expenseReport.expensePayer.name }
+  const interpolation: { expensePayer: string; comment?: string; commentator?: string } = {
+    expensePayer: expenseReport.expensePayer.name.givenName
+  }
 
   if (expenseReport.comments.length > 0) {
     const comment = expenseReport.comments[expenseReport.comments.length - 1]
     if (comment.toState == expenseReport.state) {
       interpolation.comment = comment.text
-      interpolation.commentator = comment.author.name
+      interpolation.commentator = comment.author.name.givenName
     }
   }
 
@@ -125,7 +127,7 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
 
 export async function sendHealthCareCostNotificationMail(healthCareCost: HealthCareCost) {
   const interpolation: { applicant: string; comment?: string; commentator?: string; refundSum?: string } = {
-    applicant: healthCareCost.applicant.name,
+    applicant: healthCareCost.applicant.name.givenName,
     refundSum: getMoneyString(healthCareCost.refundSum)
   }
 
@@ -133,7 +135,7 @@ export async function sendHealthCareCostNotificationMail(healthCareCost: HealthC
     const comment = healthCareCost.comments[healthCareCost.comments.length - 1]
     if (comment.toState == healthCareCost.state) {
       interpolation.comment = comment.text
-      interpolation.commentator = comment.author.name
+      interpolation.commentator = comment.author.name.givenName
     }
   }
 

@@ -59,13 +59,16 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
 
   // Traveler
   var y = y - opts.fontSize * 1.5 * 1.5
-  page.drawText(i18n.t('labels.expensePayer') + ': ' + expenseReport.expensePayer.name, {
-    x: opts.xStart,
-    y: y,
-    size: opts.fontSize,
-    font: opts.font,
-    color: opts.textColor
-  })
+  page.drawText(
+    i18n.t('labels.expensePayer') + ': ' + expenseReport.expensePayer.name.givenName + ' ' + expenseReport.expensePayer.name.familyName,
+    {
+      x: opts.xStart,
+      y: y,
+      size: opts.fontSize,
+      font: opts.font,
+      color: opts.textColor
+    }
+  )
 
   // Dates + professionalShare
   var text =

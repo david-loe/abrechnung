@@ -27,7 +27,7 @@
             <div class="dropdown">
               <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
                 <i class="fs-4 bi bi-person-circle"></i>
-                <span class="ms-1 d-none d-md-block">{{ user.name }}</span>
+                <span class="ms-1 d-none d-md-block">{{ user.name.givenName }}</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>

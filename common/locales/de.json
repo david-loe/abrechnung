@@ -59,6 +59,7 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "signInX": "Mit {X} anmelden",
     "addX": "{X} hinzufügen",
     "admin": "Administrator",
     "advance": "Vorschuss",
@@ -186,7 +187,8 @@
     "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "travelName": "Name der Reise",
     "typeToSearch": "Tippe um zu Suchen...",
-    "uid": "UID",
+    "fkLdapauth": "LDAP UID",
+    "fkMicrosoft": "Microsoft ID",
     "underExaminationByInsuranceHealthCareCosts": "Krankenkosten in Prüfung bei Krankenkassen",
     "uploadFromPhone": "Vom Handy hochladen",
     "uploading": "Wird hochgeladen 🔄",

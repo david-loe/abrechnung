@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_BACKEND_URL: string
   readonly VITE_FRONTEND_URL: string
   readonly MODE: 'development' | 'production'
+  readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
+  readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
 }
 
 interface ImportMeta {

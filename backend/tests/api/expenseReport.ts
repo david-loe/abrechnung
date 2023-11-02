@@ -1,10 +1,10 @@
 import test from 'ava'
 import { Expense, ExpenseReport, ExpenseReportSimple } from '../../../common/types.js'
-import createAgent, { loginExpenseReport, loginUser } from './_agent.js'
+import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
-const agent = createAgent()
-await loginUser(agent)
+const agent = await createAgent()
+await loginUser(agent, 'user')
 
 //@ts-ignore
 var expenseReport: ExpenseReportSimple = {
@@ -85,7 +85,7 @@ test.serial('POST /expenseReport/underExamination', async (t) => {
 // EXAMINE
 
 test.serial('POST /examine/expenseReport/refunded', async (t) => {
-  await loginExpenseReport(agent)
+  await loginUser(agent, 'expenseReport')
   t.plan(4)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/api/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
@@ -98,13 +98,13 @@ test.serial('POST /examine/expenseReport/refunded', async (t) => {
 // REPORT
 
 test.serial('GET /expenseReport/report', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.get('/api/expenseReport/report').query({ id: expenseReport._id })
   t.is(res.status, 200)
 })
 
 test.after.always('DELETE /expenseReport', async (t) => {
-  await loginUser(agent)
+  await loginUser(agent, 'user')
   const res = await agent.delete('/api/expenseReport').query({ id: expenseReport._id })
   t.is(res.status, 200)
 })

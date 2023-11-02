@@ -61,7 +61,10 @@ router.post('/refunded', async (req, res) => {
   const cb = async (travel: ITravel) => {
     sendTravelNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      writeToDisk('/reports/travel/' + travel.traveler.name + ' - ' + travel.name + '.pdf', await generateTravelReport(travel))
+      writeToDisk(
+        '/reports/travel/' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf',
+        await generateTravelReport(travel)
+      )
     }
   }
   return setter(Travel, '', false, check, cb)(req, res)
@@ -170,7 +173,10 @@ router.get('/report', async (req, res) => {
   const travel = await Travel.findOne({ _id: req.query.id, historic: false, state: 'refunded' }).lean()
   if (travel) {
     const report = await generateTravelReport(travel)
-    res.setHeader('Content-disposition', 'attachment; filename=' + travel.traveler.name + ' - ' + travel.name + '.pdf')
+    res.setHeader(
+      'Content-disposition',
+      'attachment; filename=' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf'
+    )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)
     return res.send(Buffer.from(report))

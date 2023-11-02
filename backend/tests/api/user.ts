@@ -3,11 +3,11 @@ import { User } from '../../../common/types.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
-const agent = createAgent()
-await loginUser(agent)
+const agent = await createAgent()
+await loginUser(agent, 'user')
 
-test('POST /login', async (t) => {
-  const res = await agent.post('/login').send({ username: 'professor', password: 'professor' })
+test('POST /auth/ldapauth', async (t) => {
+  const res = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
   t.is(res.status, 200)
 })
 

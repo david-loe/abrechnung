@@ -72,7 +72,9 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
       '      ' +
       i18n.t('labels.applicant') +
       ': ' +
-      healthCareCost.applicant.name +
+      healthCareCost.applicant.name.givenName +
+      ' ' +
+      healthCareCost.applicant.name.familyName +
       '      ' +
       i18n.t('labels.patientName') +
       ': ' +

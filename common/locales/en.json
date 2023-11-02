@@ -59,6 +59,7 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "signInX": "Sign in with {X}",
     "addX": "Add {X}",
     "admin": "Administrator",
     "advance": "Advance",
@@ -186,7 +187,8 @@
     "travelInsideOfEU": "Travel inside of the EU",
     "travelName": "Travel name",
     "typeToSearch": "Type to search...",
-    "uid": "UID",
+    "fkLdapauth": "LDAP UID",
+    "fkMicrosoft": "Microsoft ID",
     "underExaminationByInsuranceHealthCareCosts": "Health care costs under examination by health insurances",
     "uploadFromPhone": "Upload from Phone",
     "uploading": "Uploading 🔄",
