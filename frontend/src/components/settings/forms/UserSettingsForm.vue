@@ -1,5 +1,7 @@
 <template>
   <form class="container" @submit.prevent="$emit('edit', output())">
+    <div class="alert alert-primary" role="alert"><i class="bi bi-info-square-fill me-2"></i>{{ $t('alerts.fillOut') }}</div>
+
     <div class="mb-3">
       <label for="userSettingsFormOrganisation" class="form-label">
         {{ $t('labels.organisation') }}<span class="text-danger">*</span>
@@ -19,7 +21,7 @@
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ $t('labels.save') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
+      <button v-if="showCancel" type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
     </div>
@@ -44,6 +46,10 @@ export default defineComponent({
     settings: {
       type: Object as PropType<Partial<User['settings']>>,
       required: true
+    },
+    showCancel: {
+      type: Boolean,
+      default: true
     }
   },
   data() {

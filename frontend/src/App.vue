@@ -117,7 +117,7 @@
             <h5 class="modal-title">{{ $t('headlines.settings') }}</h5>
           </div>
           <div v-if="user.settings" class="modal-body">
-            <UserSettingsForm :settings="user.settings" @edit="pushUserSettings" />
+            <UserSettingsForm :settings="user.settings" :showCancel="false" @edit="pushUserSettings" />
           </div>
         </div>
       </div>
