@@ -2,8 +2,8 @@ import express from 'express'
 const router = express.Router()
 import userRoutes from './user.js'
 import Settings from '../../../models/settings.js'
-import HealthInsurance from '../../../models/user/healthInsurance.js'
-import Organisation from '../../../models/user/organisation.js'
+import HealthInsurance from '../../../models/healthInsurance.js'
+import Organisation from '../../../models/organisation.js'
 import { accessControl, setter } from '../../../helper.js'
 
 router.use(accessControl(['admin']))

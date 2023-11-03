@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { HydratedDocument, Document, Schema, model } from 'mongoose'
 import {
   Access,
   accesses,
@@ -48,6 +48,14 @@ const SettingsSchema = new Schema<Settings>({
   toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
   uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
   version: { type: Number, min: 0, required: true }
+})
+
+function populate(doc: Document) {
+  return Promise.allSettled([doc.populate({ path: 'baseCurrency' })])
+}
+
+SettingsSchema.pre(/^find((?!Update).)*$/, function (this: HydratedDocument<Settings>) {
+  populate(this)
 })
 
 export default model('Settings', SettingsSchema)

@@ -1,12 +1,11 @@
 import i18n from './i18n.js'
-import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'
 import Settings from './models/settings.js'
 import axios from 'axios'
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
-import { Access, CountryLumpSum, Meta } from '../common/types.js'
+import { Access, Meta } from '../common/types.js'
 import { log } from '../common/logger.js'
 import fs from 'fs'
 
@@ -163,35 +162,6 @@ export function deleter(model: Model<any>, checkUserIdField = '', cb: ((data: an
   }
 }
 
-/**
- * @returns Array of JS Objects
- */
-export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', '): { [key: string]: string | string[] }[] {
-  var lines = csv.split('\n')
-  var result = []
-  var headers = lines[0].split(separator)
-  for (var i = 1; i < lines.length; i++) {
-    var obj: { [key: string]: string | string[] } = {}
-    if (lines[i] === '') {
-      break
-    }
-    var currentline = lines[i].split(separator)
-    for (var j = 0; j < headers.length; j++) {
-      // search for [] to identify arrays
-      const match = currentline[j].match(/^\[(.*)\]$/)
-      if (match === null) {
-        if (currentline[j] !== '') {
-          obj[headers[j]] = currentline[j]
-        }
-      } else {
-        obj[headers[j]] = match[1].split(arraySeparator)
-      }
-    }
-    result.push(obj)
-  }
-  return result
-}
-
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
   var keys: string[] = []
   for (const obj of objects) {
@@ -219,96 +189,8 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
   return str
 }
 
-export function parseRawLumpSums(dataStr: string) {
-  const general = /im Übrigen/i
-  const spezialStart = /^–\s{2,}(.*)/i
-  const data: { [key: string]: string | string[] | { [key: string]: string | string[] }[] }[] = csvToObjects(dataStr)
-  var spezials = []
-  for (var i = data.length - 1; i >= 0; i--) {
-    const matched = (data[i].country as string).match(spezialStart)
-    if (matched && matched.length > 1) {
-      data[i].city = matched[1]
-      delete data[i].country
-      spezials.push(data[i])
-      data.splice(i, 1)
-    } else if (spezials.length > 0) {
-      for (var j = spezials.length - 1; j >= 0; j--) {
-        if (general.test(spezials[j].city as string)) {
-          delete spezials[j].city
-          Object.assign(data[i], spezials[j])
-          spezials.splice(j, 1)
-          break
-        }
-      }
-      data[i].spezials = spezials as { [key: string]: string | string[] }[]
-      spezials = []
-    }
-  }
-  return data
-}
-
-function convertRawLumpSum(raw: {
-  [key: string]: string | string[] | { [key: string]: string | string[] }[]
-}): Omit<CountryLumpSum, 'validFrom'> {
-  const spezials: CountryLumpSum['spezials'] = []
-  if (raw.spezials) {
-    for (const spezial of raw.spezials as { [key: string]: string | string[] }[]) {
-      spezials.push({
-        catering24: parseInt(spezial.catering24 as string, 10),
-        catering8: parseInt(spezial.catering8 as string, 10),
-        overnight: parseInt(spezial.overnight as string, 10),
-        city: spezial.city as string
-      })
-    }
-  }
-
-  return {
-    catering24: parseInt(raw.catering24 as string, 10),
-    catering8: parseInt(raw.catering8 as string, 10),
-    overnight: parseInt(raw.overnight as string, 10),
-    spezials
-  }
-}
-
-export async function addLumpSumsToCountries(
-  lumpSums: { [key: string]: string | string[] | { [key: string]: string | string[] }[] }[],
-  validFrom: Date,
-  countryNameLanguage = 'de'
-) {
-  const conditions: any = {}
-  const noCountryFound = []
-  const success = []
-  const noUpdate = []
-  for (const lumpSum of lumpSums) {
-    conditions.$or = [{}, {}]
-    conditions.$or[0]['name.' + countryNameLanguage] = lumpSum.country
-    conditions.$or[1]['alias.' + countryNameLanguage] = lumpSum.country
-
-    const country = await Country.findOne(conditions)
-    if (country) {
-      var newData = true
-      for (const countrylumpSums of country.lumpSums) {
-        if (countrylumpSums.validFrom >= validFrom) {
-          newData = false
-          break
-        }
-      }
-      if (newData) {
-        const newLumpSum: CountryLumpSum = Object.assign({ validFrom }, convertRawLumpSum(lumpSum))
-        country.lumpSums.push(newLumpSum)
-        country.markModified('lumpSums')
-        success.push(await country.save())
-      } else {
-        noUpdate.push(country)
-      }
-    } else {
-      noCountryFound.push(lumpSum)
-    }
-  }
-  return { success, noUpdate, noCountryFound }
-}
-
 const settings = (await Settings.findOne().lean())!
+// const settings = { baseCurrency: { _id: 'EUR' } }
 
 export async function convertCurrency(
   date: Date | string | number,

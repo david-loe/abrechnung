@@ -1,16 +1,24 @@
 import test from 'ava'
-import { Expense, HealthCareCost, HealthCareCostSimple } from '../../../common/types.js'
+import { Expense, HealthCareCost, HealthCareCostSimple, HealthInsurance } from '../../../common/types.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
+var insurance: Partial<HealthInsurance> = {}
+
+test.serial('GET /healthInsurances', async (t) => {
+  const res = await agent.get('/api/healthInsurances')
+  insurance = res.body.data[0]
+  t.is(res.status, 200)
+})
+
 //@ts-ignore
 var healthCareCost: HealthCareCostSimple = {
   name: 'Broken leg',
   patientName: 'Ben Logas',
-  insurance: 'AOK'
+  insurance: insurance as HealthInsurance
 }
 
 test.serial('POST /healthCareCost/inWork', async (t) => {

@@ -197,8 +197,8 @@ export default defineComponent({
           this.currencies = (result[1] as PromiseFulfilledResult<{ data: Currency[] }>).value.data
           this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
           this.settings = (result[3] as PromiseFulfilledResult<{ data: Settings[] }>).value.data[0]
-          this.healthInsurances = (result[3] as PromiseFulfilledResult<{ data: HealthInsurance[] }>).value.data
-          this.organisations = (result[3] as PromiseFulfilledResult<{ data: Organistation[] }>).value.data
+          this.healthInsurances = (result[4] as PromiseFulfilledResult<{ data: HealthInsurance[] }>).value.data
+          this.organisations = (result[5] as PromiseFulfilledResult<{ data: Organistation[] }>).value.data
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -346,7 +346,7 @@ export default defineComponent({
       this.pushUserSettings(this.user.settings)
     },
     checkUserSettings(settings: User['settings']) {
-      if (!settings.insurance || !settings.organisation) {
+      if (!settings.insurance || (this.organisations.length > 0 && !settings.organisation)) {
         if (this.userSettingsModal) this.userSettingsModal.show()
       } else {
         if (this.userSettingsModal) this.userSettingsModal.hide()

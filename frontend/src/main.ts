@@ -39,7 +39,7 @@ declare module '@vue/runtime-core' {
       countries: CountrySimple[]
       user: User
       settings: Settings
-      healthIsurances: HealthInsurance[]
+      healthInsurances: HealthInsurance[]
       organisations: Organistation[]
     }
   }

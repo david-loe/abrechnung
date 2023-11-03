@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <template v-if="settings.allowSpouseRefund">
+    <template v-if="$root.settings.allowSpouseRefund">
       <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
         <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
@@ -116,8 +116,7 @@ export default defineComponent({
   data() {
     return {
       formTravel: this.default(),
-      loading: false,
-      settings
+      loading: false
     }
   },
   methods: {
@@ -132,7 +131,7 @@ export default defineComponent({
         claimSpouseRefund: false,
         advance: {
           amount: null,
-          currency: settings.baseCurrency
+          currency: this.$root.settings.baseCurrency
         }
       }
     },
@@ -151,7 +150,7 @@ export default defineComponent({
     getMaxDate() {
       const date = isValidDate(this.formTravel.startDate as string)
       if (date) {
-        return datetimeToDateString(date.valueOf() + settings.maxTravelDayCount * 1000 * 60 * 60 * 24)
+        return datetimeToDateString(date.valueOf() + this.$root.settings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       } else {
         return ''
       }

@@ -299,13 +299,13 @@ export default defineComponent({
     mailToInsuranceLink(healthCareCost: HealthCareCost): string {
       return (
         'mailto:' +
-        healthCareCost.insurance.mail +
+        healthCareCost.insurance.email +
         '?subject=' +
         encodeURIComponent(this.$t('mail.underExaminationByInsurance.subject')) +
         '&body=' +
         encodeURIComponent(
           this.$t('mail.underExaminationByInsurance.body', {
-            insuranceName: insurance.name,
+            insuranceName: healthCareCost.insurance.name,
             applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
           })
         )
