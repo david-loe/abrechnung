@@ -19,7 +19,7 @@
       </div>
     </template>
     <div class="mb-2">
-      <button type="button" class="btn btn-primary me-2" :disabled="!Boolean(model)" @click="object = {}">
+      <button type="button" class="btn btn-primary" :disabled="!Boolean(model)" @click="object = {}">
         {{ $t('labels.new') }}
       </button>
     </div>
@@ -40,6 +40,10 @@
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ $t('labels.save') }}
+      </button>
+      <button type="button" class="btn btn-danger me-2" :disabled="loading || !Boolean(object) || !Boolean(object._id)" @click="deleteIt">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+        {{ $t('labels.delete') }}
       </button>
       <button type="button" class="btn btn-light" @click="clear">
         {{ $t('labels.cancel') }}
@@ -89,6 +93,13 @@ export default defineComponent({
           this.objects = res
         }
       }
+    },
+    async deleteIt() {
+      this.loading = true
+      if (this.object || this.object._id) {
+        await this.$root.deleter('admin/' + this.model, { id: this.object._id })
+      }
+      this.clear()
     }
   }
 })
