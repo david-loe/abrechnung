@@ -2,7 +2,9 @@
   "alerts": {
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "db": {
-      "success": "Erfolgreich mit der Datenbank verbunden."
+      "success": "Erfolgreich mit der Datenbank verbunden.",
+      "updatedSettings": "Einstellungen wurden aktualisiert",
+      "createdSettings": "Einstellungen wurden vom Standard erstellt"
     },
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",

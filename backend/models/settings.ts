@@ -1,3 +1,4 @@
+import '../db.js'
 import { HydratedDocument, Document, Schema, model } from 'mongoose'
 import {
   Access,
@@ -47,7 +48,7 @@ const SettingsSchema = new Schema<Settings>({
   stateColors: stateColors,
   toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
   uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
-  version: { type: Number, min: 0, required: true }
+  version: { type: String, required: true }
 })
 
 function populate(doc: Document) {

@@ -25,15 +25,23 @@ async function connectDB() {
 }
 
 async function initDB() {
-  await initer(Settings, 'settings', [settings])
-  await initer(Currency, 'currencies', currencies)
-  await initer(Country, 'countries', countries)
+  const DBsettings = await Settings.findOne().lean()
+  if (DBsettings) {
+    DBsettings.version = settings.version
+    await Settings.findOneAndUpdate(undefined, Object.assign({}, settings, DBsettings)).lean()
+    console.log(i18n.t('alerts.db.updatedSettings'))
+  } else {
+    await new Settings(settings).save()
+    console.log(i18n.t('alerts.db.createdSettings'))
+  }
+  await initer<any>(Currency, 'currencies', currencies)
+  await initer<any>(Country, 'countries', countries)
   await initer(HealthInsurances, 'health insurances', healthInsurances)
 
   await addAllLumpSums()
 }
 
-async function initer(model: Model<any>, name: string, data: any[]) {
+async function initer<T>(model: Model<T>, name: string, data: T[]) {
   const docs = await model.find().lean()
   if (docs.length === 0) {
     const newDocs = await model.insertMany(data)

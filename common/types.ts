@@ -19,7 +19,7 @@ export interface Settings {
   stateColors: { [key in TravelState | HealthCareCostState | ExpenseReportState]: { color: string; text: string } }
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
-  version: number
+  version: string
 }
 
 export interface CountrySimple {
@@ -62,7 +62,7 @@ export interface Currency {
   _id: string
   subunit?: string
   symbol?: string
-  flag?: string
+  flag?: string | null
 }
 
 export interface Place {
