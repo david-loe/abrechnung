@@ -1,5 +1,27 @@
 import { Types } from 'mongoose'
 
+export interface Settings {
+  accessIcons: { [key in Access]: string[] }
+  allowSpouseRefund: boolean
+  baseCurrency: Currency
+  breakfastCateringLumpSumCut: number
+  lunchCateringLumpSumCut: number
+  dinnerCateringLumpSumCut: number
+  factorCateringLumpSum: number
+  factorCateringLumpSumExceptions: string[]
+  factorOvernightLumpSum: number
+  factorOvernightLumpSumExceptions: string[]
+  fallBackLumpSumCountry: string
+  maxTravelDayCount: number
+  refundPerKM: number
+  secoundNightOnAirplaneLumpSumCountry: string
+  secoundNightOnShipOrFerryLumpSumCountry: string
+  stateColors: { [key in TravelState | HealthCareCostState | ExpenseReportState]: { color: string; text: string } }
+  toleranceStageDatesToApprovedTravelDates: number
+  uploadTokenExpireAfterSeconds: number
+  version: string
+}
+
 export interface CountrySimple {
   name: {
     de: string
@@ -40,7 +62,7 @@ export interface Currency {
   _id: string
   subunit?: string
   symbol?: string
-  flag?: string
+  flag?: string | null
 }
 
 export interface Place {
@@ -68,6 +90,18 @@ export interface UserSimple {
   _id: Types.ObjectId
 }
 
+export interface HealthInsurance {
+  name: string
+  email: string
+  _id: Types.ObjectId
+}
+
+export interface Organistation {
+  name: string
+  subfolderPath?: string
+  _id: Types.ObjectId
+}
+
 export interface User extends UserSimple {
   fk: {
     microsoft?: string
@@ -80,8 +114,8 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    insurance?: string
-    organisation?: string
+    insurance?: HealthInsurance
+    organisation?: Organistation
   }
   vehicleRegistration?: DocumentFile[]
   token?: Token
@@ -220,7 +254,7 @@ export interface HealthCareCostSimple {
   name: string
   applicant: UserSimple
   patientName: string
-  insurance: string
+  insurance: HealthInsurance
   refundSum: MoneyPlus
   state: HealthCareCostState
   editor: UserSimple

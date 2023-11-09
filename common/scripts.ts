@@ -1,5 +1,17 @@
 import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel } from './types.js'
-import settings from './settings.json' assert { type: 'json' }
+
+const settings = {
+  baseCurrency: {
+    _id: 'EUR',
+    flag: '🇪🇺',
+    name: {
+      de: 'Euro',
+      en: 'euro'
+    },
+    subunit: 'Cent',
+    symbol: '€'
+  }
+}
 
 export function getFlagEmoji(countryCode: string): string | null {
   const noFlag = ['XCD', 'XOF', 'XAF', 'ANG', 'XPF']

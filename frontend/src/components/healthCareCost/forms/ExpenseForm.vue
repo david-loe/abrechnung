@@ -60,29 +60,14 @@ import InfoPoint from '../../elements/InfoPoint.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { Expense } from '../../../../../common/types.js'
-import { baseCurrency } from '../../../../../common/settings.json'
 
-interface FormExpense extends Omit<Expense, '_id'> {
-  _id?: string
-}
-
-const defaultExpense: FormExpense = {
-  description: '',
-  cost: {
-    amount: null,
-    currency: baseCurrency,
-    receipts: [],
-    date: ''
-  }
-}
 export default defineComponent({
   name: 'ExpenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<Expense>>,
-      default: () => structuredClone(defaultExpense)
+      type: Object as PropType<Partial<Expense>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -93,17 +78,28 @@ export default defineComponent({
   },
   data() {
     return {
-      formExpense: structuredClone(defaultExpense),
+      formExpense: this.default(),
       loading: false
     }
   },
   methods: {
+    default() {
+      return {
+        description: '',
+        cost: {
+          amount: null,
+          currency: this.$root.settings.baseCurrency,
+          receipts: [],
+          date: ''
+        }
+      }
+    },
     clear() {
       if (this.$refs.fileUpload) {
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
       this.loading = false
-      this.formExpense = structuredClone(defaultExpense)
+      this.formExpense = this.default()
     },
     output() {
       this.loading = true
@@ -111,7 +107,7 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultExpense), this.expense)
+      return Object.assign({}, this.default(), this.expense)
     }
   },
   beforeMount() {

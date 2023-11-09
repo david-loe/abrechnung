@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Expense, HealthCareCost, HealthCareCostSimple } from '../../../common/types.js'
+import { Expense, HealthCareCost, HealthCareCostSimple, HealthInsurance } from '../../../common/types.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
@@ -9,9 +9,14 @@ await loginUser(agent, 'user')
 //@ts-ignore
 var healthCareCost: HealthCareCostSimple = {
   name: 'Broken leg',
-  patientName: 'Ben Logas',
-  insurance: 'AOK'
+  patientName: 'Ben Logas'
 }
+
+test.serial('GET /healthInsurance', async (t) => {
+  const res = await agent.get('/api/healthInsurance')
+  healthCareCost.insurance = res.body.data[0]
+  t.is(res.status, 200)
+})
 
 test.serial('POST /healthCareCost/inWork', async (t) => {
   const res = await agent.post('/api/healthCareCost/inWork').send(healthCareCost)

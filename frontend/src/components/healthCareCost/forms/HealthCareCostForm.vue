@@ -21,7 +21,7 @@
         v-model="$root.user.settings.insurance"
         @update:model-value="insuranceChanged = true"
         required>
-        <option v-for="insurance of settings.healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
+        <option v-for="insurance of $root.healthInsurances" :value="insurance" :key="insurance._id">{{ insurance.name }}</option>
       </select>
     </div>
     <div class="mb-2">
@@ -40,25 +40,14 @@
 import { defineComponent, PropType } from 'vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import { HealthCareCostSimple, Place } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
 
-interface FormHealthCareCost extends Omit<HealthCareCostSimple, 'applicant' | 'state' | 'editor' | 'comments' | '_id' | 'refundSum'> {
-  destinationPlace?: Place
-}
-
-const defaultHealthCareCost: FormHealthCareCost = {
-  name: '',
-  patientName: '',
-  insurance: ''
-}
 export default defineComponent({
   name: 'HealthCareCostForm',
   components: { InfoPoint },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {
-      type: Object as PropType<Partial<HealthCareCostSimple>>,
-      default: () => structuredClone(defaultHealthCareCost)
+      type: Object as PropType<Partial<HealthCareCostSimple>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -67,16 +56,22 @@ export default defineComponent({
   },
   data() {
     return {
-      formHealthCareCost: structuredClone(defaultHealthCareCost),
+      formHealthCareCost: this.default(),
       loading: false,
-      settings,
       insuranceChanged: false
     }
   },
   methods: {
+    default() {
+      return {
+        name: '',
+        patientName: '',
+        insurance: ''
+      }
+    },
     clear() {
       this.loading = false
-      this.formHealthCareCost = structuredClone(defaultHealthCareCost)
+      this.formHealthCareCost = this.default()
     },
     output() {
       this.loading = true
@@ -88,7 +83,7 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultHealthCareCost), this.healthCareCost)
+      return Object.assign({}, this.default(), this.healthCareCost)
     }
   },
   beforeMount() {

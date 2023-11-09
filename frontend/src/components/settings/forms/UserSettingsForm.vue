@@ -2,18 +2,20 @@
   <form class="container" @submit.prevent="$emit('edit', output())">
     <div class="alert alert-primary" role="alert"><i class="bi bi-info-square-fill me-2"></i>{{ $t('alerts.fillOut') }}</div>
 
-    <div class="mb-3">
+    <div v-if="$root.organisations.length > 0" class="mb-3">
       <label for="userSettingsFormOrganisation" class="form-label">
         {{ $t('labels.organisation') }}<span class="text-danger">*</span>
       </label>
       <select class="form-select" id="userSettingsFormOrganisation" v-model="formUserSettings.organisation" required>
-        <option v-for="organisation of organisations" :value="organisation" :key="organisation">{{ organisation }}</option>
+        <option v-for="organisation of $root.organisations" :value="organisation._id" :key="organisation._id">
+          {{ organisation.name }}
+        </option>
       </select>
     </div>
     <div class="mb-3">
       <label for="userSettingsFormInsurance" class="form-label"> {{ $t('labels.insurance') }}<span class="text-danger">*</span> </label>
       <select class="form-select" id="userSettingsFormInsurance" v-model="formUserSettings.insurance" required>
-        <option v-for="insurance of healthInsurances" :value="insurance.name" :key="insurance.name">{{ insurance.name }}</option>
+        <option v-for="insurance of $root.healthInsurances" :value="insurance._id" :key="insurance._id">{{ insurance.name }}</option>
       </select>
     </div>
     <div class="mb-2">
@@ -32,11 +34,10 @@
 import { defineComponent, PropType } from 'vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import { User } from '../../../../../common/types.js'
-import { healthInsurances, organisations } from '../../../../../common/settings.json'
 
-const defaultSettings: Partial<User['settings']> = {
-  insurance: '',
-  organisation: ''
+const defaultSettings: { insurance: null | string; organisation: null | string } = {
+  insurance: null,
+  organisation: null
 }
 export default defineComponent({
   name: 'UserSettingsForm',
@@ -55,9 +56,7 @@ export default defineComponent({
   data() {
     return {
       formUserSettings: structuredClone(defaultSettings),
-      loading: false,
-      healthInsurances,
-      organisations
+      loading: false
     }
   },
   methods: {
@@ -71,7 +70,14 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultSettings), this.settings)
+      const input = Object.assign({}, structuredClone(defaultSettings), this.settings)
+      if(input.insurance && input.insurance._id){
+        input.insurance = input.insurance._id as any
+      }
+      if(input.organisation && input.organisation._id){
+        input.organisation = input.organisation._id as any
+      }
+      return input
     }
   },
   beforeMount() {

@@ -64,30 +64,14 @@ import InfoPoint from '../../elements/InfoPoint.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { TravelExpense } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
 
-interface FormExpense extends Omit<TravelExpense, '_id'> {
-  _id?: string
-}
-
-const defaultExpense: FormExpense = {
-  description: '',
-  cost: {
-    amount: null,
-    currency: settings.baseCurrency,
-    receipts: [],
-    date: ''
-  },
-  purpose: 'professional'
-}
 export default defineComponent({
   name: 'ExpenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<TravelExpense>>,
-      default: () => structuredClone(defaultExpense)
+      type: Object as PropType<Partial<TravelExpense>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -98,17 +82,29 @@ export default defineComponent({
   },
   data() {
     return {
-      formExpense: structuredClone(defaultExpense),
+      formExpense: this.default(),
       loading: false
     }
   },
   methods: {
+    default() {
+      return {
+        description: '',
+        cost: {
+          amount: null,
+          currency: this.$root.settings.baseCurrency,
+          receipts: [],
+          date: ''
+        },
+        purpose: 'professional'
+      }
+    },
     clear() {
       if (this.$refs.fileUpload) {
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
       this.loading = false
-      this.formExpense = structuredClone(defaultExpense)
+      this.formExpense = this.default()
     },
     output() {
       this.loading = true
@@ -116,7 +112,7 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultExpense), this.expense)
+      return Object.assign({}, this.default(), this.expense)
     }
   },
   beforeMount() {

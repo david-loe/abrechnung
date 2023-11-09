@@ -50,8 +50,7 @@
 import { defineComponent, PropType } from 'vue'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { UserSimple } from '../../../../common/types.js'
-import { stateColors } from '../../../../common/settings.json'
+import { Settings, UserSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CardElement',
@@ -59,7 +58,7 @@ export default defineComponent({
   components: { StateBadge, ProgressCircle },
   props: {
     name: { type: String, required: true },
-    state: { type: String as PropType<keyof typeof stateColors>, required: true },
+    state: { type: String as PropType<keyof Settings['stateColors']>, required: true },
     user: { type: Object as PropType<UserSimple>, required: true },
     editor: { type: Object as PropType<UserSimple>, required: true },
     showUser: { type: Boolean, default: false },

@@ -1,7 +1,7 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
-import settings from '../../common/settings.json' assert { type: 'json' }
+import Settings from './settings.js'
 import { convertCurrency, costObject } from '../helper.js'
 import {
   Money,
@@ -18,6 +18,8 @@ import {
   travelStates,
   lumpsumTypes
 } from '../../common/types.js'
+
+const settings = (await Settings.findOne().lean())!
 
 function place(required = false) {
   return {

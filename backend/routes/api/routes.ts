@@ -3,6 +3,9 @@ const router = express.Router()
 import { getter } from '../../helper.js'
 import Currency from '../../models/currency.js'
 import Country from '../../models/country.js'
+import Settings from '../../models/settings.js'
+import HealthInsurance from '../../models/healthInsurance.js'
+import Organisation from '../../models/organisation.js'
 import { Country as ICountry } from '../../../common/types.js'
 import userRoutes from './user.js'
 import travelRoutes from './travel.js'
@@ -42,6 +45,9 @@ router.delete('/logout', function (req, res) {
   res.send({ status: 'ok' })
 })
 
+router.get('/settings', getter(Settings, 'settings', 1))
+router.get('/healthInsurance', getter(HealthInsurance, 'health insurance', 200))
+router.get('/organisation', getter(Organisation, 'organisation', 50))
 router.get('/currency', getter(Currency, 'currency', 500))
 router.get('/country', async (req, res) => {
   const select: Partial<{ [key in keyof ICountry]: number }> = {}

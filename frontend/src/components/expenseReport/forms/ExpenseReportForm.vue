@@ -21,7 +21,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { ExpenseReportSimple, Place } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
 
 interface FormExpenseReport extends Omit<ExpenseReportSimple, 'expensePayer' | 'state' | 'editor' | 'comments' | '_id'> {
   destinationPlace?: Place
@@ -47,8 +46,7 @@ export default defineComponent({
   data() {
     return {
       formExpenseReport: structuredClone(defaultExpenseReport),
-      loading: false,
-      settings
+      loading: false
     }
   },
   methods: {

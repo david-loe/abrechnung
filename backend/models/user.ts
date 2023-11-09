@@ -18,8 +18,8 @@ const userSchema = new Schema<User>({
     language: { type: String, default: 'de' },
     lastCurrencies: [{ type: String, ref: 'Currency' }],
     lastCountries: [{ type: String, ref: 'Country' }],
-    insurance: { type: String, trim: true },
-    organisation: { type: String, trim: true }
+    insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
+    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
   },
   vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
@@ -27,6 +27,8 @@ const userSchema = new Schema<User>({
 
 function populate(doc: Document) {
   return Promise.allSettled([
+    doc.populate({ path: 'settings.insurance' }),
+    doc.populate({ path: 'settings.organisation' }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),

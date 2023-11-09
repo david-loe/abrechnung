@@ -1,7 +1,9 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
-import settings from '../../common/settings.json' assert { type: 'json' }
+import Settings from './settings.js'
 import { costObject, convertCurrency } from '../helper.js'
 import { Money, Currency as ICurrency, HealthCareCost, HealthCareCostComment, healthCareCostStates } from '../../common/types.js'
+
+const settings = (await Settings.findOne().lean())!
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -16,7 +18,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
     name: { type: String },
     applicant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     patientName: { type: String, trim: true, required: true },
-    insurance: { type: String, trim: true, required: true },
+    insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
     state: {
       type: String,
       required: true,
@@ -50,6 +52,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
 
 function populate(doc: Document) {
   return Promise.allSettled([
+    doc.populate({ path: 'insurance' }),
     doc.populate({ path: 'refundSum.currency' }),
     doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),

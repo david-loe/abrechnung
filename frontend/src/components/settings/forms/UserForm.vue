@@ -19,7 +19,7 @@
       <div v-for="access of accesses" class="col" :key="access">
         <div class="form-check">
           <label :for="'userForm' + access" class="form-check-label text-nowrap">
-            <i v-for="icon of accessIcons[access]" :class="'bi ' + icon"></i>
+            <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
             {{ $t('labels.' + access) }}
           </label>
           <input class="form-check-input" type="checkbox" :id="'userForm' + access" role="switch" v-model="formUser.access[access]" />
@@ -42,7 +42,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
-import { accessIcons } from '../../../../../common/settings.json'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: User['name']
@@ -73,8 +72,7 @@ export default defineComponent({
     return {
       formUser: this.user,
       loading: false,
-      accesses,
-      accessIcons
+      accesses
     }
   },
   methods: {

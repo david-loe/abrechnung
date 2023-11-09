@@ -1,5 +1,4 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
-import settings from '../../common/settings.json' assert { type: 'json' }
 import { costObject, convertCurrency } from '../helper.js'
 import { Money, Currency as ICurrency, ExpenseReport, ExpenseReportComment, expenseReportStates } from '../../common/types.js'
 
@@ -84,7 +83,7 @@ expenseReportSchema.methods.saveToHistory = async function (this: ExpenseReportD
 async function exchange(costObject: Money, date: string | number | Date) {
   var exchangeRate = null
 
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== settings.baseCurrency._id) {
+  if (costObject.amount !== null && costObject.amount > 0) {
     exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate

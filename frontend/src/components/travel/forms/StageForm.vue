@@ -158,39 +158,15 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { Stage, Place, CountrySimple, transports } from '../../../../../common/types.js'
-import settings from '../../../../../common/settings.json'
+import { Stage, transports } from '../../../../../common/types.js'
 
-interface FormStage extends Omit<Stage, 'startLocation' | 'endLocation' | 'midnightCountries' | '_id'> {
-  startLocation?: Place
-  endLocation?: Place
-  midnightCountries: { date: Date; country?: CountrySimple }[]
-  _id?: string
-}
-const defaultStage: FormStage = {
-  departure: '',
-  arrival: '',
-  startLocation: undefined,
-  endLocation: undefined,
-  midnightCountries: [],
-  distance: null,
-  transport: 'otherTransport',
-  cost: {
-    amount: null,
-    currency: settings.baseCurrency,
-    receipts: [],
-    date: ''
-  },
-  purpose: 'professional'
-}
 export default defineComponent({
   name: 'StageForm',
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted', 'postVehicleRegistration'],
   props: {
     stage: {
-      type: Object as PropType<Partial<Stage>>,
-      default: () => structuredClone(defaultStage)
+      type: Object as PropType<Partial<Stage>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -204,7 +180,7 @@ export default defineComponent({
   },
   data() {
     return {
-      formStage: structuredClone(defaultStage),
+      formStage: this.default(),
       minDate: '' as string | Date,
       maxDate: '' as string | Date,
       loading: false,
@@ -213,6 +189,24 @@ export default defineComponent({
     }
   },
   methods: {
+    default() {
+      return {
+        departure: '',
+        arrival: '',
+        startLocation: undefined,
+        endLocation: undefined,
+        midnightCountries: [],
+        distance: null,
+        transport: 'otherTransport',
+        cost: {
+          amount: null,
+          currency: this.$root.settings.baseCurrency,
+          receipts: [],
+          date: ''
+        },
+        purpose: 'professional'
+      }
+    },
     showMidnightCountries() {
       return (
         ['ownCar', 'otherTransport'].indexOf(this.formStage.transport) !== -1 &&
@@ -252,7 +246,7 @@ export default defineComponent({
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
       this.loading = false
-      this.formStage = structuredClone(defaultStage)
+      this.formStage = this.default()
     },
     output() {
       if (this.vehicleRegistrationChanged) {
@@ -266,16 +260,18 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      //toleranceStageDatesToApprovedTravelDates
+
       this.minDate = new Date(
-        new Date(this.travelStartDate).valueOf() - settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+        new Date(this.travelStartDate).valueOf() - this.$root.settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
       )
 
       this.maxDate = new Date(
-        new Date(this.travelEndDate).valueOf() + (settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 - 1
+        new Date(this.travelEndDate).valueOf() +
+          (this.$root.settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
+          1
       )
 
-      return Object.assign({}, structuredClone(defaultStage), this.stage)
+      return Object.assign({}, this.default(), this.stage)
     },
     datetoDateString
   },

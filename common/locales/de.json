@@ -2,7 +2,9 @@
   "alerts": {
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "db": {
-      "success": "Erfolgreich mit der Datenbank verbunden."
+      "success": "Erfolgreich mit der Datenbank verbunden.",
+      "updatedSettings": "Einstellungen wurden aktualisiert",
+      "createdSettings": "Einstellungen wurden vom Standard erstellt"
     },
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
@@ -59,6 +61,11 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "model": "Modell",
+    "models": "Modelle",
+    "new": "Neu",
+    "object": "Objekt",
+    "settings": "Einstellungen",
     "signInX": "Mit {X} anmelden",
     "addX": "{X} hinzufügen",
     "admin": "Administrator",
@@ -125,6 +132,7 @@
     "image": "Bild",
     "import": "Importieren",
     "insurance": "Versicherung",
+    "healthInsurance": "Krankenversicherung",
     "invoiceDate": "Rechnungsdatum",
     "location": "Ort",
     "lumpSums": "Pauschalen",
