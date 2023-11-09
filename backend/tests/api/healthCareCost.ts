@@ -8,8 +8,8 @@ await loginUser(agent, 'user')
 
 var insurance: any = {}
 
-test.serial('GET /healthInsurances', async (t) => {
-  const res = await agent.get('/api/healthInsurances')
+test.serial('GET /healthInsurance', async (t) => {
+  const res = await agent.get('/api/healthInsurance')
   insurance = res.body.data[0]
   t.is(res.status, 200)
 })
