@@ -8,6 +8,7 @@ import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
 import { Access, CountryLumpSum, Meta } from '../common/types.js'
 import { log } from '../common/logger.js'
+import fs from 'fs'
 
 export function getter(
   model: Model<any>,
@@ -313,34 +314,35 @@ export async function convertCurrency(
   from: string,
   to: string = settings.baseCurrency._id
 ): Promise<{ date: Date; rate: number; amount: number } | null> {
-  from = from.toLowerCase()
-  to = to.toLowerCase()
+  from = from.toUpperCase()
+  to = to.toUpperCase()
   const convertionDate = new Date(date)
   if (convertionDate.valueOf() - new Date().valueOf() > 0) {
     date = new Date()
   }
   const dateStr = datetimeToDateString(convertionDate)
-  const baseURLs = [
-    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/',
-    'https://raw.githubusercontent.com/fawazahmed0/currency-api/1/'
-  ]
-  const suffixs = ['.min.json', '.json']
-  var rate = null
-  outerloop: for (const baseURL of baseURLs) {
-    for (const suffix of suffixs) {
-      const url = baseURL + dateStr + '/currencies/' + from + '/' + to + suffix
-      const res = await axios.get(url)
-      if (res.status === 200) {
-        rate = res.data[to]
-        break outerloop
-      }
+  const filePath = './data/exchange-rates/' + dateStr + '.json'
+  var data: any = undefined
+  console.log(filePath)
+  if (fs.existsSync(filePath)) {
+    const dataStr = fs.readFileSync(filePath, 'utf8')
+    data = JSON.parse(dataStr)
+  } else {
+    const url = 'http://data.fixer.io/api/' + dateStr + '?access_key=' + process.env.FIXER_API_KEY + '&base=' + to
+    const res = await axios.get(url)
+    if (res.status === 200) {
+      data = res.data
+      fs.writeFileSync(filePath, JSON.stringify(data), 'utf-8')
     }
   }
-  if (rate == null) {
+  var rate = null
+  if (data) {
+    rate = data.rates[from]
+  }
+  if (!rate) {
     return null
   }
-
-  amount = Math.round(amount * rate * 100) / 100
+  amount = Math.round((amount / rate) * 100) / 100
   return { date: convertionDate, rate, amount }
 }
 

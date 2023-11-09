@@ -11,6 +11,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       readonly NODE_ENV: 'development' | 'production'
+      readonly FIXER_API_KEY: string
       readonly ADMIN_UID: string
       readonly VITE_FRONTEND_URL: string
       readonly VITE_BACKEND_URL: string

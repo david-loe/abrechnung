@@ -4,6 +4,7 @@
 [![Backend Test](https://github.com/david-loe/abrechnung/actions/workflows/backend-test.yml/badge.svg)](https://github.com/david-loe/abrechnung/actions/workflows/backend-test.yml)
 
 **abrechnung 🧾** ist eine Web App die:
+
 - Reisekosten- (inkl. automatischer Pauschalen Berechnung auch für internationale Reisen),
 - Auslagen-,
 - Krankenkosten- und
@@ -20,7 +21,7 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 
 ## Wechselkurse
 
-[Free Currency Rates API](https://github.com/fawazahmed0/currency-api)
+[fixer](https://fixer.io/)
 
 ## Getting Started
 
