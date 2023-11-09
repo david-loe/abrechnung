@@ -61,6 +61,11 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "model": "Model",
+    "models": "Models",
+    "object": "Object",
+    "new": "New",
+    "settings": "Settings",
     "signInX": "Sign in with {X}",
     "addX": "Add {X}",
     "admin": "Administrator",
@@ -127,6 +132,7 @@
     "image": "Image",
     "import": "Import",
     "insurance": "Health insurance",
+    "healthInsurance": "Health insurance",
     "invoiceDate": "Date of invoice",
     "location": "Location",
     "lumpSums": "Lump sums",

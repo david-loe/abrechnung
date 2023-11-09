@@ -348,8 +348,6 @@ export default defineComponent({
       this.pushUserSettings(this.user.settings)
     },
     checkUserSettings(settings: User['settings']) {
-      console.log(this.organisations)
-      console.log(settings)
       if (!settings.insurance || (this.organisations.length > 0 && !settings.organisation)) {
         if (this.userSettingsModal) this.userSettingsModal.show()
       } else {
