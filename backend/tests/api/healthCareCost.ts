@@ -6,20 +6,17 @@ import { objectToFormFields } from './_helper.js'
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-var insurance: any = {}
-
-test.serial('GET /healthInsurance', async (t) => {
-  const res = await agent.get('/api/healthInsurance')
-  insurance = res.body.data[0]
-  t.is(res.status, 200)
-})
-
 //@ts-ignore
 var healthCareCost: HealthCareCostSimple = {
   name: 'Broken leg',
-  patientName: 'Ben Logas',
-  insurance: insurance as HealthInsurance
+  patientName: 'Ben Logas'
 }
+
+test.serial('GET /healthInsurance', async (t) => {
+  const res = await agent.get('/api/healthInsurance')
+  healthCareCost.insurance = res.body.data[0]
+  t.is(res.status, 200)
+})
 
 test.serial('POST /healthCareCost/inWork', async (t) => {
   const res = await agent.post('/api/healthCareCost/inWork').send(healthCareCost)
