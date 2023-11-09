@@ -5,15 +5,20 @@
       <h2>{{ $t('labels.user') }}</h2>
       <UserList></UserList>
     </div>
+    <div class="container mb-3">
+      <h2>{{ $t('labels.models') }}</h2>
+      <ModelsForm></ModelsForm>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import UserList from './elements/UserList.vue'
+import ModelsForm from './forms/ModelsForm.vue'
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList },
+  components: { UserList, ModelsForm },
   props: [],
   data() {
     return {}
