@@ -78,7 +78,7 @@
         {{
           mode === 'add'
             ? $t('labels.applyForX', { X: $t('labels.travel') })
-            : travel.state === 'rejected' || travel.state === 'approved'
+            : travel && (travel.state === 'rejected' || travel.state === 'approved')
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
@@ -105,8 +105,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: {
-      type: Object as PropType<Partial<TravelSimple>>,
-      default: () => this.default()
+      type: Object as PropType<Partial<TravelSimple>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,

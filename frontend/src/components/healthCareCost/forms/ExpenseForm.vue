@@ -67,8 +67,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<Expense>>,
-      default: () => this.default()
+      type: Object as PropType<Partial<Expense>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,

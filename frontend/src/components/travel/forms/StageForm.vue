@@ -158,7 +158,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { Stage, Place, CountrySimple, transports } from '../../../../../common/types.js'
+import { Stage, transports } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',
@@ -166,8 +166,7 @@ export default defineComponent({
   emits: ['cancel', 'edit', 'add', 'deleted', 'postVehicleRegistration'],
   props: {
     stage: {
-      type: Object as PropType<Partial<Stage>>,
-      default: () => this.default()
+      type: Object as PropType<Partial<Stage>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -261,13 +260,15 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      //toleranceStageDatesToApprovedTravelDates
+
       this.minDate = new Date(
-        new Date(this.travelStartDate).valueOf() - settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+        new Date(this.travelStartDate).valueOf() - this.$root.settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
       )
 
       this.maxDate = new Date(
-        new Date(this.travelEndDate).valueOf() + (settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 - 1
+        new Date(this.travelEndDate).valueOf() +
+          (this.$root.settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
+          1
       )
 
       return Object.assign({}, this.default(), this.stage)

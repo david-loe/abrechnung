@@ -6,7 +6,7 @@ import { objectToFormFields } from './_helper.js'
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-var insurance: Partial<HealthInsurance> = {}
+var insurance: any = {}
 
 test.serial('GET /healthInsurances', async (t) => {
   const res = await agent.get('/api/healthInsurances')

@@ -59,18 +59,13 @@ import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { Expense } from '../../../../../common/types.js'
 
-interface FormExpense extends Omit<Expense, '_id'> {
-  _id?: string
-}
-
 export default defineComponent({
   name: 'ExpenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
   emits: ['cancel', 'edit', 'add', 'deleted'],
   props: {
     expense: {
-      type: Object as PropType<Partial<Expense>>,
-      default: () => this.default()
+      type: Object as PropType<Partial<Expense>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
