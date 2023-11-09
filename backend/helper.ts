@@ -323,7 +323,6 @@ export async function convertCurrency(
   const dateStr = datetimeToDateString(convertionDate)
   const filePath = './data/exchange-rates/' + dateStr + '.json'
   var data: any = undefined
-  console.log(filePath)
   if (fs.existsSync(filePath)) {
     const dataStr = fs.readFileSync(filePath, 'utf8')
     data = JSON.parse(dataStr)
@@ -331,8 +330,14 @@ export async function convertCurrency(
     const url = 'http://data.fixer.io/api/' + dateStr + '?access_key=' + process.env.FIXER_API_KEY + '&base=' + to
     const res = await axios.get(url)
     if (res.status === 200) {
-      data = res.data
-      fs.writeFileSync(filePath, JSON.stringify(data), 'utf-8')
+      if (res.data.success) {
+        data = res.data
+        fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
+          if (error) {
+            console.error(error)
+          }
+        })
+      }
     }
   }
   var rate = null

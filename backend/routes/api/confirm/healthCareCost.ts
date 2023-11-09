@@ -44,7 +44,6 @@ router.post(
       comment: req.body.comment,
       _id: req.body._id
     }
-    console.log(req.body.refundSum)
     const check = async (oldObject: HealthCareCostDoc) => {
       if (oldObject.state === 'underExaminationByInsurance' && req.body.refundSum && req.body.refundSum.amount > 0) {
         await oldObject.saveToHistory()
