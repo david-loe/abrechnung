@@ -117,7 +117,10 @@
             <h5 class="modal-title">{{ $t('headlines.settings') }}</h5>
           </div>
           <div v-if="user.settings" class="modal-body">
-            <UserSettingsForm :settings="user.settings" :showCancel="false" @edit="pushUserSettings" />
+            <UserSettingsForm
+              :settings="user.settings"
+              :showCancel="false"
+              @edit="(settings) => pushUserSettings(settings).then(() => checkUserSettings(settings))" />
           </div>
         </div>
       </div>
@@ -163,8 +166,8 @@ export default defineComponent({
       currencies: [] as Currency[],
       countries: [] as CountrySimple[],
       settings: {} as Settings,
-      healthInsurances: {} as HealthInsurance[],
-      organisations: {} as Organistation[],
+      healthInsurances: [] as HealthInsurance[],
+      organisations: [] as Organistation[],
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -193,12 +196,12 @@ export default defineComponent({
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
-          this.checkUserSettings(this.user.settings)
           this.currencies = (result[1] as PromiseFulfilledResult<{ data: Currency[] }>).value.data
           this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
           this.settings = (result[3] as PromiseFulfilledResult<{ data: Settings[] }>).value.data[0]
           this.healthInsurances = (result[4] as PromiseFulfilledResult<{ data: HealthInsurance[] }>).value.data
           this.organisations = (result[5] as PromiseFulfilledResult<{ data: Organistation[] }>).value.data
+          this.checkUserSettings(this.user.settings)
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -314,7 +317,6 @@ export default defineComponent({
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', settings, {
           withCredentials: true
         })
-        this.checkUserSettings(settings)
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push('login')
@@ -346,6 +348,8 @@ export default defineComponent({
       this.pushUserSettings(this.user.settings)
     },
     checkUserSettings(settings: User['settings']) {
+      console.log(this.organisations)
+      console.log(settings)
       if (!settings.insurance || (this.organisations.length > 0 && !settings.organisation)) {
         if (this.userSettingsModal) this.userSettingsModal.show()
       } else {

@@ -70,7 +70,14 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultSettings), this.settings)
+      const input = Object.assign({}, structuredClone(defaultSettings), this.settings)
+      if(input.insurance && input.insurance._id){
+        input.insurance = input.insurance._id as any
+      }
+      if(input.organisation && input.organisation._id){
+        input.organisation = input.organisation._id as any
+      }
+      return input
     }
   },
   beforeMount() {
