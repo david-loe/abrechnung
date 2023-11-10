@@ -222,7 +222,7 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
     color: opts.textColor
   })
 
-  var filename = 'airplane'
+  var filename = 'receipt'
   if (opts.fontSize > 24) {
     filename = filename + '36'
   } else if (opts.fontSize > 12) {
@@ -230,7 +230,7 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
   } else {
     filename = filename + '12'
   }
-  const logoBytes = fs.readFileSync('./pdf/airplanes/' + filename + '.png')
+  const logoBytes = fs.readFileSync('./pdf/receipt/' + filename + '.png')
   const logo = await page.doc.embedPng(logoBytes)
 
   page.drawImage(logo, {
