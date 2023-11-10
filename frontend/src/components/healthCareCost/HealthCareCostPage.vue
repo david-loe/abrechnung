@@ -249,7 +249,7 @@ import FileUpload from '../elements/FileUpload.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense } from '../../../../common/types.js'
+import { HealthCareCost, healthCareCostStates, Expense, UserSimple } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 

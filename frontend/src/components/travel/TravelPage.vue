@@ -448,7 +448,8 @@ import {
   TravelDay,
   TravelSimple,
   meals,
-  travelStates
+  travelStates,
+  UserSimple
 } from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
