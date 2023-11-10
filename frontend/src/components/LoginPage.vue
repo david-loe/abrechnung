@@ -31,7 +31,7 @@
       <button class="w-100 btn btn-lg btn-primary" type="submit">{{ $t('labels.signIn') }}</button>
     </form>
 
-    <div v-if="useMicrosoft">
+    <div v-if="useMicrosoft" class="mt-4">
       <a class="btn btn-lg btn-primary" :href="microsoftLink()">
         <i class="bi bi-microsoft me-1"></i>
         {{ $t('labels.signInX', { X: 'Microsoft' }) }}

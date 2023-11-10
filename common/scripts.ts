@@ -18,9 +18,9 @@ export function mailToLink(recipients: string[], subject?: string, body?: string
   const params = new URLSearchParams()
   if (cc && cc.length > 0) params.append('cc', cc.join(';'))
   if (bcc && bcc.length > 0) params.append('bcc', bcc.join(';'))
-  if (subject && subject.length > 0) params.append('subject', encodeURIComponent(subject))
-  if (body && body.length > 0) params.append('body', encodeURIComponent(body))
-  return 'mailto:' + recipients.join(';') + params
+  if (subject && subject.length > 0) params.append('subject', subject)
+  if (body && body.length > 0) params.append('body', body)
+  return 'mailto:' + recipients.join(';') + '?' + params
 }
 
 export function msTeamsToLink(recipients: string[], message?: string, topicName?: string): string {
@@ -28,7 +28,7 @@ export function msTeamsToLink(recipients: string[], message?: string, topicName?
   params.append('users', recipients.join(','))
   if (topicName && topicName.length > 0) params.append('topicName', encodeURIComponent(topicName))
   if (message && message.length > 0) params.append('message', encodeURIComponent(message))
-  return 'https://teams.microsoft.com/l/chat/0/0' + params
+  return 'https://teams.microsoft.com/l/chat/0/0' + '?' + params
 }
 
 export function getFlagEmoji(countryCode: string): string | null {

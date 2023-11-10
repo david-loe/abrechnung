@@ -68,7 +68,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
   page.drawText(
     i18n.t('labels.insurance') +
       ': ' +
-      healthCareCost.insurance +
+      healthCareCost.insurance.name +
       '      ' +
       i18n.t('labels.applicant') +
       ': ' +
