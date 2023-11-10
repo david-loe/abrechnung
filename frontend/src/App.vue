@@ -132,7 +132,9 @@
           <a href="/" class="text-decoration-none link-dark lh-1">
             <i class="fs-3 bi bi-receipt"></i>
           </a>
-          <span class="ps-2 text-muted">© {{ new Date().getFullYear() }} {{ $t('headlines.title') }}</span>
+          <span class="ps-2 text-muted">
+            © {{ new Date().getFullYear() }} {{ $t('headlines.title') }} <small v-if="settings.version">v{{ settings.version }}</small>
+          </span>
         </div>
       </div>
     </footer>

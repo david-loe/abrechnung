@@ -32,7 +32,7 @@
     </form>
 
     <div v-if="useMicrosoft">
-      <a class="btn btn-lg btn-primary" :href="microsoftLink">
+      <a class="btn btn-lg btn-primary" :href="microsoftLink()">
         <i class="bi bi-microsoft me-1"></i>
         {{ $t('labels.signInX', { X: 'Microsoft' }) }}
       </a>
@@ -51,8 +51,7 @@ export default defineComponent({
       password: '',
       username: '',
       useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true',
-      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true',
-      microsoftLink: import.meta.env.VITE_BACKEND_URL + '/auth/microsoft'
+      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
     }
   },
   methods: {
@@ -74,6 +73,13 @@ export default defineComponent({
         this.password = ''
         this.$root.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
       }
+    },
+    microsoftLink() {
+      return (
+        import.meta.env.VITE_BACKEND_URL +
+        '/auth/microsoft' +
+        (this.$route.query.redirect ? '?redirect=' + (this.$route.query.redirect as string) : '')
+      )
     }
   },
   beforeMount() {

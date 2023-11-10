@@ -162,6 +162,7 @@ if (useLDAP) {
 }
 
 if (useMicrosoft) {
+  // TODO: https://github.com/jaredhanson/passport-oauth2/issues/96#issuecomment-403538004
   router.get('/auth/microsoft', passport.authenticate('microsoft'))
   router.get('/auth/microsoft/callback', passport.authenticate('microsoft'), (req, res) => {
     res.redirect(process.env.VITE_FRONTEND_URL)
