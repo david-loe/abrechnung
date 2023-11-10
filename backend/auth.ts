@@ -162,9 +162,21 @@ if (useLDAP) {
 }
 
 if (useMicrosoft) {
-  // TODO: https://github.com/jaredhanson/passport-oauth2/issues/96#issuecomment-403538004
-  router.get('/auth/microsoft', passport.authenticate('microsoft'))
+  router.get('/auth/microsoft', (req, res, next) => {
+    const redirect = req.query.redirect
+    const state = req.query.redirect ? Buffer.from(JSON.stringify({ redirect })).toString('base64') : undefined
+    passport.authenticate('microsoft', { state: state })(req, res, next)
+  })
   router.get('/auth/microsoft/callback', passport.authenticate('microsoft'), (req, res) => {
+    try {
+      const state = req.query.state as string
+      const { redirect } = JSON.parse(Buffer.from(state, 'base64').toString())
+      if (typeof redirect === 'string' && redirect.startsWith('/')) {
+        return res.redirect(process.env.VITE_FRONTEND_URL + redirect)
+      }
+    } catch {
+      // just redirect normally below
+    }
     res.redirect(process.env.VITE_FRONTEND_URL)
   })
 }
