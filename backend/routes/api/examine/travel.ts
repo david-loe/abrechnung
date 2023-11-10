@@ -12,7 +12,7 @@ import { writeToDisk } from '../../../pdf/helper.js'
 import { Travel as ITravel } from '../../../../common/types.js'
 
 router.get('/', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
+  const sortFn = (a: ITravel, b: ITravel) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
   var preCondition: any = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
   if (!req.query.addStages) {
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/refunded', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf() // sort backwards
+  const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf() // sort backwards
 
   const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0, stages: 0, expenses: 0, days: 0 }
 

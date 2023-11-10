@@ -8,7 +8,7 @@ import { generateAdvanceReport } from '../../../pdf/advance.js'
 const router = express.Router()
 
 router.get('/', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
+  const sortFn = (a: ITravel, b: ITravel) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
   return getter(
     Travel,
     'travel',
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/approved', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf() // sort backwards
+  const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf() // sort backwards
   return getter(
     Travel,
     'travel',
