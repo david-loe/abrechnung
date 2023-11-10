@@ -31,14 +31,33 @@
       </div>
     </div>
     <div class="container" v-if="expenseReport._id">
-      <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
-            <router-link :to="page.link">{{ $t(page.title) }}</router-link>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">{{ expenseReport.name }}</li>
-        </ol>
-      </nav>
+      <div class="row">
+        <div class="col">
+          <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
+                <router-link :to="page.link">{{ $t(page.title) }}</router-link>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">{{ expenseReport.name }}</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-auto">
+          <div class="dropdown">
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ $t('labels.help') }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
+              </li>
+              <li>
+                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
@@ -182,9 +201,9 @@ import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getExpenseReportTotal } from '../../../../common/scripts.js'
+import { getMoneyString, datetoDateString, getExpenseReportTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { ExpenseReport, expenseReportStates, Expense } from '../../../../common/types.js'
+import { ExpenseReport, expenseReportStates, Expense, UserSimple } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
@@ -197,7 +216,9 @@ export default defineComponent({
       modalExpense: undefined as Expense | undefined,
       modalMode: 'add' as ModalMode,
       isReadOnly: false,
-      expenseReportStates
+      expenseReportStates,
+      mailToLink: '',
+      msTeamsToLink: ''
     }
   },
   components: { StatePipeline, ExpenseForm },
@@ -287,6 +308,10 @@ export default defineComponent({
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },
+    async getExaminerMails() {
+      const examiner = (await this.$root.getter('expenseReport/examiner')).data as UserSimple[]
+      return examiner.map((x) => x.email)
+    },
     getMoneyString,
     datetoDateString,
     getExpenseReportTotal
@@ -299,6 +324,9 @@ export default defineComponent({
       return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.expenseReport.state) !== -1
+    const mails = await this.getExaminerMails()
+    this.mailToLink = mailToLink(mails)
+    this.msTeamsToLink = msTeamsToLink(mails)
   },
   mounted() {
     const modalEl = document.getElementById('modal')

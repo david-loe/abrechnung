@@ -5,6 +5,7 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import i18n from '../../i18n.js'
 import { getter, setter, deleter, documentFileHandler } from '../../helper.js'
 import Travel, { TravelDoc } from '../../models/travel.js'
+import User from '../../models/user.js'
 import DocumentFile from '../../models/documentFile.js'
 import { sendTravelNotificationMail } from '../../mail/mail.js'
 import { generateTravelReport } from '../../pdf/travel.js'
@@ -211,5 +212,7 @@ router.get('/report', async (req, res) => {
     res.status(400).send({ message: 'No travel found' })
   }
 })
+
+router.get('/examiner', getter(User, 'examiner', 5, { 'access.examine/travel': true }, { name: 1, email: 1 }))
 
 export default router

@@ -1,5 +1,6 @@
 import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel } from './types.js'
 
+// TODO: Resolve this to settings from DB
 const settings = {
   baseCurrency: {
     _id: 'EUR',
@@ -11,6 +12,23 @@ const settings = {
     subunit: 'Cent',
     symbol: '€'
   }
+}
+
+export function mailToLink(recipients: string[], subject?: string, body?: string, cc?: string[], bcc?: string[]): string {
+  const params = new URLSearchParams()
+  if (cc && cc.length > 0) params.append('cc', cc.join(';'))
+  if (bcc && bcc.length > 0) params.append('bcc', bcc.join(';'))
+  if (subject && subject.length > 0) params.append('subject', encodeURIComponent(subject))
+  if (body && body.length > 0) params.append('body', encodeURIComponent(body))
+  return 'mailto:' + recipients.join(';') + params
+}
+
+export function msTeamsToLink(recipients: string[], message?: string, topicName?: string): string {
+  const params = new URLSearchParams()
+  params.append('users', recipients.join(','))
+  if (topicName && topicName.length > 0) params.append('topicName', encodeURIComponent(topicName))
+  if (message && message.length > 0) params.append('message', encodeURIComponent(message))
+  return 'https://teams.microsoft.com/l/chat/0/0' + params
 }
 
 export function getFlagEmoji(countryCode: string): string | null {

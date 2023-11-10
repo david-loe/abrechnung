@@ -31,14 +31,33 @@
       </div>
     </div>
     <div class="container" v-if="healthCareCost._id">
-      <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
-            <router-link :to="page.link">{{ $t(page.title) }}</router-link>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">{{ healthCareCost.name }}</li>
-        </ol>
-      </nav>
+      <div class="row">
+        <div class="col">
+          <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
+                <router-link :to="page.link">{{ $t(page.title) }}</router-link>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">{{ healthCareCost.name }}</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-auto">
+          <div class="dropdown">
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ $t('labels.help') }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
+              </li>
+              <li>
+                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
@@ -228,7 +247,7 @@ import StatePipeline from '../elements/StatePipeline.vue'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getHealthCareCostTotal } from '../../../../common/scripts.js'
+import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
 import { HealthCareCost, healthCareCostStates, Expense } from '../../../../common/types.js'
 
@@ -243,7 +262,9 @@ export default defineComponent({
       modalExpense: undefined as Expense | undefined,
       modalMode: 'add' as ModalMode,
       isReadOnly: false,
-      healthCareCostStates
+      healthCareCostStates,
+      mailToLink: '',
+      msTeamsToLink: ''
     }
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload },
@@ -297,18 +318,13 @@ export default defineComponent({
       }
     },
     mailToInsuranceLink(healthCareCost: HealthCareCost): string {
-      return (
-        'mailto:' +
-        healthCareCost.insurance.email +
-        '?subject=' +
-        encodeURIComponent(this.$t('mail.underExaminationByInsurance.subject')) +
-        '&body=' +
-        encodeURIComponent(
-          this.$t('mail.underExaminationByInsurance.body', {
-            insuranceName: healthCareCost.insurance.name,
-            applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
-          })
-        )
+      return mailToLink(
+        [healthCareCost.insurance.email],
+        this.$t('mail.underExaminationByInsurance.subject'),
+        this.$t('mail.underExaminationByInsurance.body', {
+          insuranceName: healthCareCost.insurance.name,
+          applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
+        })
       )
     },
     async refund() {
@@ -370,6 +386,10 @@ export default defineComponent({
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },
+    async getExaminerMails() {
+      const examiner = (await this.$root.getter('healthCareCost/examiner')).data as UserSimple[]
+      return examiner.map((x) => x.email)
+    },
     getMoneyString,
     datetoDateString,
     getHealthCareCostTotal
@@ -382,6 +402,9 @@ export default defineComponent({
       return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
     this.isReadOnly = ['underExamination', 'underExaminationByInsurance', 'refunded'].indexOf(this.healthCareCost.state) !== -1
+    const mails = await this.getExaminerMails()
+    this.mailToLink = mailToLink(mails)
+    this.msTeamsToLink = msTeamsToLink(mails)
   },
   mounted() {
     const modalEl = document.getElementById('modal')

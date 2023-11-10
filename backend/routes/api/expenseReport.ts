@@ -6,6 +6,7 @@ import i18n from '../../i18n.js'
 import { getter, setter, deleter, documentFileHandler } from '../../helper.js'
 import ExpenseReport, { ExpenseReportDoc } from '../../models/expenseReport.js'
 import DocumentFile from '../../models/documentFile.js'
+import User from '../../models/user.js'
 import { sendExpenseReportNotificationMail } from '../../mail/mail.js'
 import { ExpenseReport as IExpenseReport } from '../../../common/types.js'
 import { generateExpenseReportReport } from '../../pdf/expenseReport.js'
@@ -161,5 +162,7 @@ router.get('/report', async (req, res) => {
     res.status(400).send({ message: 'No expenseReport found' })
   }
 })
+
+router.get('/examiner', getter(User, 'examiner', 5, { 'access.examine/expenseReport': true }, { name: 1, email: 1 }))
 
 export default router

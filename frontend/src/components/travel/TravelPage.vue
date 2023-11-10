@@ -55,14 +55,33 @@
       </div>
     </div>
     <div class="container" v-if="travel._id">
-      <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
-            <router-link :to="page.link">{{ $t(page.title) }}</router-link>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
-        </ol>
-      </nav>
+      <div class="row">
+        <div class="col">
+          <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
+                <router-link :to="page.link">{{ $t(page.title) }}</router-link>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-auto">
+          <div class="dropdown">
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ $t('labels.help') }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
+              </li>
+              <li>
+                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
@@ -323,9 +342,15 @@
                     <!-- baseCurrency -->
                     <tr>
                       <td>
-                        <small>{{ $t('labels.lumpSums') }}</small>
+                        <small>
+                          {{ $t('labels.lumpSums') }}
+                          <small v-if="travel.claimSpouseRefund">
+                            <br />
+                            {{ $t('labels.includingSpouseRefund') }}
+                          </small>
+                        </small>
                       </td>
-                      <td class="text-end">
+                      <td class="text-end align-top">
                         <small>{{ getMoneyString(getLumpSumsSum(travel)) }}</small>
                       </td>
                     </tr>
@@ -403,7 +428,15 @@ import ExpenseForm from './forms/ExpenseForm.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
-import { getMoneyString, datetoDateString, getLumpSumsSum, getExpensesSum, getTravelTotal } from '../../../../common/scripts.js'
+import {
+  getMoneyString,
+  datetoDateString,
+  getLumpSumsSum,
+  getExpensesSum,
+  getTravelTotal,
+  mailToLink,
+  msTeamsToLink
+} from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
 import {
   DocumentFile,
@@ -439,7 +472,9 @@ export default defineComponent({
       configCateringRefund: false,
       isReadOnly: false,
       meals,
-      travelStates
+      travelStates,
+      mailToLink: '',
+      msTeamsToLink: ''
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
@@ -656,6 +691,10 @@ export default defineComponent({
       log(this.travel)
       this.renderTable()
     },
+    async getExaminerMails() {
+      const examiner = (await this.$root.getter('travel/examiner')).data as UserSimple[]
+      return examiner.map((x) => x.email)
+    },
     getMoneyString,
     datetoDateString,
     getLumpSumsSum,
@@ -670,6 +709,9 @@ export default defineComponent({
       return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
     }
     this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
+    const mails = await this.getExaminerMails()
+    this.mailToLink = mailToLink(mails)
+    this.msTeamsToLink = msTeamsToLink(mails)
   },
   mounted() {
     const modalEl = document.getElementById('modal')
