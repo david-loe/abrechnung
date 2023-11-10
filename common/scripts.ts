@@ -115,7 +115,7 @@ export function getDetailedMoneyString(money: Money, locale: Locale, printZero =
     currency: money.currency._id
   })
   if (money.exchangeRate && money.exchangeRate.rate) {
-    str = str + ' * ' + money.exchangeRate.rate.toLocaleString(locale, { maximumFractionDigits: 4 }) + ' = '
+    str = str + ' / ' + money.exchangeRate.rate.toLocaleString(locale, { maximumFractionDigits: 4 }) + ' = '
     str =
       str +
       money.exchangeRate.amount.toLocaleString(locale, {
