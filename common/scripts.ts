@@ -15,20 +15,38 @@ const settings = {
 }
 
 export function mailToLink(recipients: string[], subject?: string, body?: string, cc?: string[], bcc?: string[]): string {
-  const params = new URLSearchParams()
-  if (cc && cc.length > 0) params.append('cc', cc.join(';'))
-  if (bcc && bcc.length > 0) params.append('bcc', bcc.join(';'))
-  if (subject && subject.length > 0) params.append('subject', encodeURIComponent(subject))
-  if (body && body.length > 0) params.append('body', encodeURIComponent(body))
-  return 'mailto:' + recipients.join(';') + '?' + params
+  var paramString = ''
+  function addParam(param: string, value: string) {
+    if (value.length > 0) {
+      if (paramString.length > 0) {
+        paramString += '&' + param + '=' + value
+      } else {
+        paramString += '?' + param + '=' + value
+      }
+    }
+  }
+  if (cc) addParam('cc', cc.join(';'))
+  if (bcc) addParam('bcc', bcc.join(';'))
+  if (subject) addParam('subject', encodeURIComponent(subject))
+  if (body) addParam('body', encodeURIComponent(body))
+  return 'mailto:' + recipients.join(';') + paramString
 }
 
 export function msTeamsToLink(recipients: string[], message?: string, topicName?: string): string {
-  const params = new URLSearchParams()
-  params.append('users', recipients.join(','))
-  if (topicName && topicName.length > 0) params.append('topicName', encodeURIComponent(topicName))
-  if (message && message.length > 0) params.append('message', encodeURIComponent(message))
-  return 'https://teams.microsoft.com/l/chat/0/0' + '?' + params
+  var paramString = ''
+  function addParam(param: string, value: string) {
+    if (value.length > 0) {
+      if (paramString.length > 0) {
+        paramString += '&' + param + '=' + value
+      } else {
+        paramString += '?' + param + '=' + value
+      }
+    }
+  }
+  addParam('users', recipients.join(','))
+  if (topicName) addParam('topicName', encodeURIComponent(topicName))
+  if (message) addParam('message', encodeURIComponent(message))
+  return 'https://teams.microsoft.com/l/chat/0/0' + paramString
 }
 
 export function getFlagEmoji(countryCode: string): string | null {
