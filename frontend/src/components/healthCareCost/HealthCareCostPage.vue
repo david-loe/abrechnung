@@ -186,14 +186,16 @@
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <a
-                  v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'"
-                  class="btn btn-primary"
-                  :href="reportLink()"
-                  :download="healthCareCost.name + '.pdf'">
-                  <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
-                </a>
+                <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
+                  <a class="btn btn-primary" :href="reportLink()" :download="healthCareCost.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
+                  </a>
+                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2" :href="mailToInsuranceLink(healthCareCost)">
+                    <i class="bi bi-envelope"></i>
+                    <span class="ms-1">{{ $t('labels.mailToInsurance') }}</span>
+                  </a>
+                </template>
                 <a
                   v-else-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'"
                   class="btn btn-primary"
