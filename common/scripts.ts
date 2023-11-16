@@ -18,8 +18,8 @@ export function mailToLink(recipients: string[], subject?: string, body?: string
   const params = new URLSearchParams()
   if (cc && cc.length > 0) params.append('cc', cc.join(';'))
   if (bcc && bcc.length > 0) params.append('bcc', bcc.join(';'))
-  if (subject && subject.length > 0) params.append('subject', subject)
-  if (body && body.length > 0) params.append('body', body)
+  if (subject && subject.length > 0) params.append('subject', encodeURIComponent(subject))
+  if (body && body.length > 0) params.append('body', encodeURIComponent(body))
   return 'mailto:' + recipients.join(';') + '?' + params
 }
 
