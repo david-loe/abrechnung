@@ -18,6 +18,12 @@ test.serial('GET /healthInsurance', async (t) => {
   t.is(res.status, 200)
 })
 
+test.serial('GET /organisation', async (t) => {
+  const res = await agent.get('/api/organisation')
+  healthCareCost.organisation = res.body.data[0]
+  t.is(res.status, 200)
+})
+
 test.serial('POST /healthCareCost/inWork', async (t) => {
   const res = await agent.post('/api/healthCareCost/inWork').send(healthCareCost)
   healthCareCost = res.body.result

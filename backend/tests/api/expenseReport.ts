@@ -11,6 +11,12 @@ var expenseReport: ExpenseReportSimple = {
   name: 'Expenses from last Month'
 }
 
+test.serial('GET /organisation', async (t) => {
+  const res = await agent.get('/api/organisation')
+  expenseReport.organisation = res.body.data[0]
+  t.is(res.status, 200)
+})
+
 test.serial('POST /expenseReport/inWork', async (t) => {
   const res = await agent.post('/api/expenseReport/inWork').send(expenseReport)
   expenseReport = res.body.result

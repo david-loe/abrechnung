@@ -24,6 +24,12 @@ var travel: TravelSimple = {
   }
 }
 
+test.serial('GET /organisation', async (t) => {
+  const res = await agent.get('/api/organisation')
+  travel.organisation = res.body.data[0]
+  t.is(res.status, 200)
+})
+
 test.serial('POST /travel/appliedFor', async (t) => {
   const res = await agent.post('/api/travel/appliedFor').send(travel)
   travel = res.body.result
