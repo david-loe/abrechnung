@@ -6,6 +6,22 @@
       </label>
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
+    <div class="mb-3">
+      <label for="healthCareCostFormOrganisation" class="form-label me-2">
+        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.organisation')" />
+      <select
+        class="form-select"
+        id="healthCareCostFormOrganisation"
+        v-model="$root.user.settings.organisation"
+        @update:model-value="settingsChanged = true"
+        required>
+        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
+          {{ organisation.name }}
+        </option>
+      </select>
+    </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
@@ -20,23 +36,16 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { ExpenseReportSimple, Place } from '../../../../../common/types.js'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import { ExpenseReportSimple } from '../../../../../common/types.js'
 
-interface FormExpenseReport extends Omit<ExpenseReportSimple, 'expensePayer' | 'state' | 'editor' | 'comments' | '_id'> {
-  destinationPlace?: Place
-}
-
-const defaultExpenseReport: FormExpenseReport = {
-  name: ''
-}
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: {},
+  components: { InfoPoint },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {
-      type: Object as PropType<Partial<ExpenseReportSimple>>,
-      default: () => structuredClone(defaultExpenseReport)
+      type: Object as PropType<Partial<ExpenseReportSimple>>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -45,22 +54,31 @@ export default defineComponent({
   },
   data() {
     return {
-      formExpenseReport: structuredClone(defaultExpenseReport),
-      loading: false
+      formExpenseReport: this.default(),
+      loading: false,
+      settingsChanged: false
     }
   },
   methods: {
+    default() {
+      return { name: '' }
+    },
     clear() {
       this.loading = false
-      this.formExpenseReport = structuredClone(defaultExpenseReport)
+      this.formExpenseReport = this.default()
+      this.settingsChanged = false
     },
     output() {
       this.loading = true
+      if (this.settingsChanged) {
+        this.$root.pushUserSettings(this.$root.user.settings)
+      }
+      this.formExpenseReport.organisation = this.$root.user.settings.organisation
       return this.formExpenseReport
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultExpenseReport), this.expenseReport)
+      return Object.assign({}, this.default(), this.expenseReport)
     }
   },
   beforeMount() {

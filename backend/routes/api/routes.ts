@@ -47,7 +47,7 @@ router.delete('/logout', function (req, res) {
 
 router.get('/settings', getter(Settings, 'settings', 1))
 router.get('/healthInsurance', getter(HealthInsurance, 'health insurance', 200))
-router.get('/organisation', getter(Organisation, 'organisation', 50))
+router.get('/organisation', getter(Organisation, 'organisation', 50, {}, { name: 1 }))
 router.get('/currency', getter(Currency, 'currency', 500))
 router.get('/country', async (req, res) => {
   const select: Partial<{ [key in keyof ICountry]: number }> = {}

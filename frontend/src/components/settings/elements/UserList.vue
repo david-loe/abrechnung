@@ -6,6 +6,7 @@
           <div class="col-auto me-auto">
             <span class="fs-6">
               {{ user.email }}
+              <span v-if="user.settings.organisation" class="ms-2 text-muted"> {{ user.settings.organisation.name }}</span>
               <template v-for="access of accesses">
                 <span v-if="user.access[access]" class="ms-4">
                   <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>

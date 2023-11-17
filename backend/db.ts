@@ -3,13 +3,15 @@ import healthInsurances from './data/healthInsurances.json' assert { type: 'json
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
 import iLumpSums from './data/lumpSums.json' assert { type: 'json' }
+import organisations from './data/organisations.json' assert { type: 'json' }
 import Settings from './models/settings.js'
 import Currency from './models/currency.js'
 import Country from './models/country.js'
-import HealthInsurances from './models/healthInsurance.js'
+import HealthInsurance from './models/healthInsurance.js'
 import mongoose, { Model } from 'mongoose'
 import i18n from './i18n.js'
 import { CountryLumpSum } from '../common/types.js'
+import Organisation from './models/organisation.js'
 
 await connectDB()
 
@@ -27,6 +29,9 @@ async function connectDB() {
 async function initDB() {
   const DBsettings = await Settings.findOne().lean()
   if (DBsettings) {
+    if (DBsettings.version !== settings.version) {
+      DBsettings.migrateFrom = DBsettings.version
+    }
     DBsettings.version = settings.version
     await Settings.findOneAndUpdate(undefined, Object.assign({}, settings, DBsettings)).lean()
     console.log(i18n.t('alerts.db.updatedSettings'))
@@ -36,9 +41,9 @@ async function initDB() {
   }
   await initer<any>(Currency, 'currencies', currencies)
   await initer<any>(Country, 'countries', countries)
-  await initer(HealthInsurances, 'health insurances', healthInsurances)
-
   await addAllLumpSums()
+  initer(HealthInsurance, 'health insurances', healthInsurances)
+  initer<any>(Organisation, 'organisation', organisations)
 }
 
 async function initer<T>(model: Model<T>, name: string, data: T[]) {

@@ -3,6 +3,7 @@
     :state="expenseReport.state"
     :name="expenseReport.name"
     :user="expenseReport.expensePayer"
+    :organisation="expenseReport.organisation"
     :editor="expenseReport.editor"
     :showUser="showUser"
     :showEditor="'refunded' === expenseReport.state"

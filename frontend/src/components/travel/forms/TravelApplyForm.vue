@@ -72,6 +72,23 @@
       <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
     </div>
 
+    <div class="mb-3">
+      <label for="healthCareCostFormOrganisation" class="form-label me-2">
+        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.organisation')" />
+      <select
+        class="form-select"
+        id="healthCareCostFormOrganisation"
+        v-model="$root.user.settings.organisation"
+        @update:model-value="settingsChanged = true"
+        required>
+        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
+          {{ organisation.name }}
+        </option>
+      </select>
+    </div>
+
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
@@ -115,7 +132,8 @@ export default defineComponent({
   data() {
     return {
       formTravel: this.default(),
-      loading: false
+      loading: false,
+      settingsChanged: false
     }
   },
   methods: {
@@ -137,9 +155,14 @@ export default defineComponent({
     clear() {
       this.loading = false
       this.formTravel = this.default()
+      this.settingsChanged = false
     },
     output() {
       this.loading = true
+      if (this.settingsChanged) {
+        this.$root.pushUserSettings(this.$root.user.settings)
+      }
+      this.formTravel.organisation = this.$root.user.settings.organisation
       return this.formTravel
     },
     input() {

@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
-import App from './App.vue'
-import { Alert } from './App.vue'
+import App, { Alert } from './App.vue'
 import router from './router.js'
 
 import vSelect from './vue-select.js'
@@ -12,7 +11,7 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import i18n from './i18n.js'
-import { CountrySimple, Currency, HealthInsurance, Organistation, Settings, User } from '../../common/types.js'
+import { CountrySimple, Currency, HealthInsurance, OrganisationSimple, Settings, User } from '../../common/types.js'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {
@@ -40,7 +39,7 @@ declare module '@vue/runtime-core' {
       user: User
       settings: Settings
       healthInsurances: HealthInsurance[]
-      organisations: Organistation[]
+      organisations: OrganisationSimple[]
     }
   }
 }

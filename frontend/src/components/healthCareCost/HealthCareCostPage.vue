@@ -100,7 +100,13 @@
           </div>
         </div>
         <div v-if="endpointPrefix !== ''" class="text-secondary">
-          {{ healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName }}
+          {{
+            healthCareCost.applicant.name.givenName +
+            ' ' +
+            healthCareCost.applicant.name.familyName +
+            ' - ' +
+            healthCareCost.organisation.name
+          }}
         </div>
       </div>
 
@@ -249,9 +255,9 @@ import StatePipeline from '../elements/StatePipeline.vue'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink, getById } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense, UserSimple } from '../../../../common/types.js'
+import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
@@ -266,7 +272,8 @@ export default defineComponent({
       isReadOnly: false,
       healthCareCostStates,
       mailToLink: '',
-      msTeamsToLink: ''
+      msTeamsToLink: '',
+      organisations: [] as Organisation[]
     }
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload },
@@ -320,12 +327,14 @@ export default defineComponent({
       }
     },
     mailToInsuranceLink(healthCareCost: HealthCareCost): string {
+      const orga = getById(healthCareCost.organisation._id, this.organisations)
       return mailToLink(
         [healthCareCost.insurance.email],
-        this.$t('mail.underExaminationByInsurance.subject'),
+        this.$t('mail.underExaminationByInsurance.subject', { companyNumber: orga?.companyNumber }),
         this.$t('mail.underExaminationByInsurance.body', {
           insuranceName: healthCareCost.insurance.name,
-          applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName
+          applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName,
+          bankDetails: orga?.bankDetails
         })
       )
     },
@@ -398,6 +407,9 @@ export default defineComponent({
   },
   async beforeMount() {
     await this.$root.load()
+    if (this.endpointPrefix === 'examine/') {
+      this.organisations = (await this.$root.getter('examine/healthCareCost/organisation')).data
+    }
     try {
       await this.getHealthCareCost()
     } catch (e) {

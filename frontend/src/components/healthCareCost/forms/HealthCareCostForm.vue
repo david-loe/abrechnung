@@ -14,14 +14,33 @@
       <input type="text" class="form-control" id="healthCareCostFormPatient" v-model="formHealthCareCost.patientName" required />
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormInsurance" class="form-label"> {{ $t('labels.insurance') }}<span class="text-danger">*</span> </label>
+      <label for="healthCareCostFormInsurance" class="form-label me-2">
+        {{ $t('labels.insurance') }}<span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.insurance')" />
       <select
         class="form-select"
         id="healthCareCostFormInsurance"
         v-model="$root.user.settings.insurance"
-        @update:model-value="insuranceChanged = true"
+        @update:model-value="settingsChanged = true"
         required>
         <option v-for="insurance of $root.healthInsurances" :value="insurance" :key="insurance._id">{{ insurance.name }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="healthCareCostFormOrganisation" class="form-label me-2">
+        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="$t('info.organisation')" />
+      <select
+        class="form-select"
+        id="healthCareCostFormOrganisation"
+        v-model="$root.user.settings.organisation"
+        @update:model-value="settingsChanged = true"
+        required>
+        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
+          {{ organisation.name }}
+        </option>
       </select>
     </div>
     <div class="mb-2">
@@ -58,27 +77,28 @@ export default defineComponent({
     return {
       formHealthCareCost: this.default(),
       loading: false,
-      insuranceChanged: false
+      settingsChanged: false
     }
   },
   methods: {
     default() {
       return {
         name: '',
-        patientName: '',
-        insurance: ''
+        patientName: ''
       }
     },
     clear() {
       this.loading = false
       this.formHealthCareCost = this.default()
+      this.settingsChanged = false
     },
     output() {
       this.loading = true
-      if (this.insuranceChanged) {
+      if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
-      this.formHealthCareCost.insurance = this.$root.user.settings.insurance!
+      this.formHealthCareCost.organisation = this.$root.user.settings.organisation
+      this.formHealthCareCost.insurance = this.$root.user.settings.insurance
       return this.formHealthCareCost
     },
     input() {

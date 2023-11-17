@@ -133,7 +133,7 @@
           </div>
         </div>
         <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
-          {{ travel.traveler.name.givenName + ' ' + travel.traveler.name.familyName }}
+          {{ travel.traveler.name.givenName + ' ' + travel.traveler.name.familyName + ' - ' + travel.organisation.name }}
         </div>
       </div>
 

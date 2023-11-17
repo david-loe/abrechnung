@@ -48,7 +48,8 @@ const SettingsSchema = new Schema<Settings>({
   stateColors: stateColors,
   toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
   uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
-  version: { type: String, required: true }
+  version: { type: String, required: true },
+  migrateFrom: { type: String }
 })
 
 function populate(doc: Document) {

@@ -4,6 +4,7 @@ import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 const router = express.Router()
 import HealthCareCost, { HealthCareCostDoc } from '../../../models/healthCareCost.js'
+import Organisation from '../../../models/organisation.js'
 import { sendHealthCareCostNotificationMail } from '../../../mail/mail.js'
 import { HealthCareCost as IHealthCareCost } from '../../../../common/types.js'
 import { generateHealthCareCostReport } from '../../../pdf/healthCareCost.js'
@@ -54,10 +55,13 @@ router.post(
       }
     }
     const cb = async (healthCareCost: IHealthCareCost) => {
+      const org = await Organisation.findOne({ _id: healthCareCost.organisation._id })
+      const subfolder = org ? org.subfolderPath : ''
       sendHealthCareCostNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
           '/reports/healthCareCost/confirmed/' +
+            subfolder +
             healthCareCost.applicant.name.familyName +
             ' ' +
             healthCareCost.applicant.name.givenName[0] +

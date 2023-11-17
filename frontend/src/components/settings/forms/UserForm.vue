@@ -15,7 +15,28 @@
       </div>
     </div>
 
-    <div class="row mb-2">
+    <div class="row mb-3">
+      <div class="col">
+        <label for="userSettingsFormOrganisation" class="form-label me-2">
+          {{ $t('labels.organisation') }}
+        </label>
+        <select class="form-select" id="userSettingsFormOrganisation" v-model="formUser.settings.organisation">
+          <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
+            {{ organisation.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="userSettingsFormInsurance" class="form-label me-2">
+          {{ $t('labels.insurance') }}
+        </label>
+        <select class="form-select" id="userSettingsFormInsurance" v-model="formUser.settings.insurance">
+          <option v-for="insurance of $root.healthInsurances" :value="insurance" :key="insurance._id">{{ insurance.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
       <div v-for="access of accesses" class="col" :key="access">
         <div class="form-check">
           <label :for="'userForm' + access" class="form-check-label text-nowrap">
@@ -50,18 +71,12 @@ interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   access: Partial<User['access']>
 }
 
-const defaultUser: FormUser = {
-  fk: {},
-  access: {},
-  email: ''
-}
 export default defineComponent({
   components: {},
   name: 'UserForm',
   props: {
     user: {
-      type: Object as PropType<FormUser>,
-      default: () => structuredClone(defaultUser)
+      type: Object as PropType<FormUser>
     },
     mode: {
       type: String as PropType<'add' | 'edit'>,
@@ -70,15 +85,23 @@ export default defineComponent({
   },
   data() {
     return {
-      formUser: this.user,
+      formUser: this.input(),
       loading: false,
       accesses
     }
   },
   methods: {
+    default() {
+      return {
+        fk: {},
+        access: {},
+        settings: {},
+        email: ''
+      }
+    },
     clear() {
       this.loading = false
-      this.formUser = structuredClone(defaultUser)
+      this.formUser = this.default()
     },
     output() {
       this.loading = true
@@ -86,7 +109,7 @@ export default defineComponent({
     },
     input() {
       this.loading = false
-      return Object.assign({}, structuredClone(defaultUser), this.user)
+      return Object.assign({}, this.default(), this.user)
     }
   },
   beforeMount() {},

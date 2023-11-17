@@ -14,6 +14,15 @@ const settings = {
   }
 }
 
+export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
+  for (const item of array) {
+    if (item._id === id) {
+      return item
+    }
+  }
+  return null
+}
+
 export function mailToLink(recipients: string[], subject?: string, body?: string, cc?: string[], bcc?: string[]): string {
   var paramString = ''
   function addParam(param: string, value: string) {

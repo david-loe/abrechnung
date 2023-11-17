@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../../../models/documentFile.js'
 import ExpenseReport, { ExpenseReportDoc } from '../../../models/expenseReport.js'
+import Organisation from '../../../models/organisation.js'
 import i18n from '../../../i18n.js'
 import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -50,10 +51,13 @@ router.post('/refunded', async (req, res) => {
     }
   }
   const cb = async (expenseReport: IExpenseReport) => {
+    const org = await Organisation.findOne({ _id: expenseReport.organisation._id })
+    const subfolder = org ? org.subfolderPath : ''
     sendExpenseReportNotificationMail(expenseReport)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
         '/reports/expenseReport/' +
+          subfolder +
           expenseReport.expensePayer.name.familyName +
           ' ' +
           expenseReport.expensePayer.name.givenName[0] +

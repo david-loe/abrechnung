@@ -28,7 +28,7 @@ const userSchema = new Schema<User>({
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'settings.insurance' }),
-    doc.populate({ path: 'settings.organisation' }),
+    doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),

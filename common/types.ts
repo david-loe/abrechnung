@@ -20,6 +20,7 @@ export interface Settings {
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
   version: string
+  migrateFrom?: string
 }
 
 export interface CountrySimple {
@@ -96,10 +97,15 @@ export interface HealthInsurance {
   _id: Types.ObjectId
 }
 
-export interface Organistation {
+export interface OrganisationSimple {
   name: string
-  subfolderPath?: string
   _id: Types.ObjectId
+}
+
+export interface Organisation extends OrganisationSimple {
+  subfolderPath: string
+  bankDetails?: string
+  companyNumber?: string
 }
 
 export interface User extends UserSimple {
@@ -115,7 +121,7 @@ export interface User extends UserSimple {
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
     insurance?: HealthInsurance
-    organisation?: Organistation
+    organisation?: Organisation
   }
   vehicleRegistration?: DocumentFile[]
   token?: Token
@@ -188,6 +194,7 @@ export interface HealthCareCostComment extends Comment {
 export interface TravelSimple {
   name: string
   traveler: UserSimple
+  organisation: OrganisationSimple
   state: TravelState
   editor: UserSimple
   comments: TravelComment[]
@@ -235,6 +242,7 @@ export interface Travel extends TravelSimple {
 export interface ExpenseReportSimple {
   name: string
   expensePayer: UserSimple
+  organisation: OrganisationSimple
   state: ExpenseReportState
   editor: UserSimple
   comments: ExpenseReportComment[]
@@ -253,6 +261,7 @@ export interface ExpenseReport extends ExpenseReportSimple {
 export interface HealthCareCostSimple {
   name: string
   applicant: UserSimple
+  organisation: OrganisationSimple
   patientName: string
   insurance: HealthInsurance
   refundSum: MoneyPlus

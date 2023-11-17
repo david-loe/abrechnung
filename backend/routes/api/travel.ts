@@ -131,6 +131,7 @@ router.post('/appliedFor', async (req, res) => {
   req.body = {
     state: 'appliedFor',
     traveler: req.user!._id,
+    organisation: req.body.organisation,
     editor: req.user!._id,
     comment: null,
     _id: req.body._id,

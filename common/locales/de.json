@@ -44,6 +44,8 @@
     "title": "abrechnung"
   },
   "info": {
+    "organisation": "Wähle die Organisation bei der du angestellt bist.",
+    "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
     "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wieviel du benötigst.",
     "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
@@ -295,8 +297,8 @@
       }
     },
     "underExaminationByInsurance": {
-      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {applicant} vorgestreckten Leistungen.\nIch bitten um die Erstattung dieser.",
-      "subject": "Erstattung Krankenkosten"
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {applicant} vorgestreckten Leistungen.\nIch bitten um die Erstattung dieser:\n{bankDetails}",
+      "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     }
   },
   "monthsShort": {

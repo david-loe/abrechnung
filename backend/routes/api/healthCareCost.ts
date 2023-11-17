@@ -108,7 +108,8 @@ router.post('/inWork', async (req, res) => {
     _id: req.body._id,
     name: req.body.name,
     patientName: req.body.patientName,
-    insurance: req.body.insurance
+    insurance: req.body.insurance,
+    organisation: req.body.organisation
   }
 
   if (!req.body.name) {

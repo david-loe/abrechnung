@@ -2,6 +2,7 @@ import { documentFileHandler, getter, setter } from '../../../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../../../models/documentFile.js'
+import Organisation from '../../../models/organisation.js'
 import Travel, { TravelDoc } from '../../../models/travel.js'
 import i18n from '../../../i18n.js'
 import multer from 'multer'
@@ -59,10 +60,19 @@ router.post('/refunded', async (req, res) => {
     }
   }
   const cb = async (travel: ITravel) => {
+    const org = await Organisation.findOne({ _id: travel.organisation._id })
+    const subfolder = org ? org.subfolderPath : ''
     sendTravelNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       writeToDisk(
-        '/reports/travel/' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf',
+        '/reports/travel/' +
+          subfolder +
+          travel.traveler.name.familyName +
+          ' ' +
+          travel.traveler.name.givenName[0] +
+          ' - ' +
+          travel.name +
+          '.pdf',
         await generateTravelReport(travel)
       )
     }

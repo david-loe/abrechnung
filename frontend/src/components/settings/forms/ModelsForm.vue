@@ -3,8 +3,8 @@
     <div class="mb-3">
       <label for="modelSelect" class="form-label"> {{ $t('labels.model') }}<span class="text-danger">*</span> </label>
       <select class="form-select" v-model="model" id="modelSelect" @change="get" required>
-        <option v-for="modelS of models" :value="modelS" :key="modelS">
-          {{ $t('labels.' + modelS) }}
+        <option v-for="modelS of models" :value="modelS" :key="modelS.name">
+          {{ $t('labels.' + modelS.name) }}
         </option>
       </select>
     </div>
@@ -64,8 +64,14 @@ export default defineComponent({
   data() {
     return {
       loading: false,
-      models: ['country', 'currency', 'organisation', 'healthInsurance', 'settings'],
-      model: null as string | null,
+      models: [
+        { name: 'country' },
+        { name: 'currency' },
+        { name: 'organisation', GET: 'admin/organisation' },
+        { name: 'healthInsurance' },
+        { name: 'settings' }
+      ],
+      model: null as { name: string; GET?: string } | null,
       object: null as any | null,
       objects: null as any[] | null
     }
@@ -79,14 +85,16 @@ export default defineComponent({
     },
     async save() {
       this.loading = true
-      await this.$root.setter('admin/' + this.model, this.object)
+      if (this.model) {
+        await this.$root.setter('admin/' + this.model.name, this.object)
+      }
       this.clear()
     },
     async get() {
       this.object = null
       this.objects = null
       if (this.model) {
-        const res = (await this.$root.getter(this.model)).data
+        const res = (await this.$root.getter(this.model.GET ? this.model.GET : this.model.name)).data
         if (res.length == 1) {
           this.object = res[0]
         } else {

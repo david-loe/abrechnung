@@ -145,7 +145,17 @@
 import axios from 'axios'
 import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
-import { CountrySimple, Currency, Locale, User, accesses, locales, Settings, HealthInsurance, Organistation } from '../../common/types.js'
+import {
+  CountrySimple,
+  Currency,
+  Locale,
+  User,
+  accesses,
+  locales,
+  Settings,
+  HealthInsurance,
+  OrganisationSimple
+} from '../../common/types.js'
 import { log } from '../../common/logger.js'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 import UserSettingsForm from './components/settings/forms/UserSettingsForm.vue'
@@ -169,7 +179,7 @@ export default defineComponent({
       countries: [] as CountrySimple[],
       settings: {} as Settings,
       healthInsurances: [] as HealthInsurance[],
-      organisations: [] as Organistation[],
+      organisations: [] as OrganisationSimple[],
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -202,7 +212,7 @@ export default defineComponent({
           this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
           this.settings = (result[3] as PromiseFulfilledResult<{ data: Settings[] }>).value.data[0]
           this.healthInsurances = (result[4] as PromiseFulfilledResult<{ data: HealthInsurance[] }>).value.data
-          this.organisations = (result[5] as PromiseFulfilledResult<{ data: Organistation[] }>).value.data
+          this.organisations = (result[5] as PromiseFulfilledResult<{ data: OrganisationSimple[] }>).value.data
           this.checkUserSettings(this.user.settings)
           this.loadState = 'LOADED'
         })

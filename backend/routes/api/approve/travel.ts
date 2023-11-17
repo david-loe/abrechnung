@@ -5,6 +5,7 @@ import express, { Request, Response } from 'express'
 import { Travel as ITravel, TravelSimple as ITravelSimple } from '../../../../common/types.js'
 import { writeToDisk } from '../../../pdf/helper.js'
 import { generateAdvanceReport } from '../../../pdf/advance.js'
+import Organisation from '../../../models/organisation.js'
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -48,10 +49,19 @@ router.post('/approved', async (req: Request, res: Response) => {
     }
   }
   const cb = async (travel: ITravelSimple) => {
+    const org = await Organisation.findOne({ _id: travel.organisation._id })
+    const subfolder = org ? org.subfolderPath : ''
     sendTravelNotificationMail(travel)
     if (travel.advance.amount !== null && travel.advance.amount > 0 && process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
-        '/reports/advance/' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf',
+        '/reports/advance/' +
+          subfolder +
+          travel.traveler.name.familyName +
+          ' ' +
+          travel.traveler.name.givenName[0] +
+          ' - ' +
+          travel.name +
+          '.pdf',
         await generateAdvanceReport(travel)
       )
     }

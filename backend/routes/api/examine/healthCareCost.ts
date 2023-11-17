@@ -2,6 +2,7 @@ import { documentFileHandler, getter, setter } from '../../../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../../../models/documentFile.js'
+import Organisation from '../../../models/organisation.js'
 import HealthCareCost, { HealthCareCostDoc } from '../../../models/healthCareCost.js'
 import i18n from '../../../i18n.js'
 import multer from 'multer'
@@ -52,10 +53,13 @@ router.post('/underExaminationByInsurance', async (req, res) => {
     }
   }
   const cb = async (healthCareCost: IHealthCareCost) => {
+    const org = await Organisation.findOne({ _id: healthCareCost.organisation._id })
+    const subfolder = org ? org.subfolderPath : ''
     sendHealthCareCostNotificationMail(healthCareCost)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
         '/reports/healthCareCost/' +
+          subfolder +
           healthCareCost.applicant.name.familyName +
           ' ' +
           healthCareCost.applicant.name.givenName[0] +
@@ -159,5 +163,7 @@ router.get('/report', async (req, res) => {
     res.status(400).send({ message: 'No healthCareCost found' })
   }
 })
+
+router.get('/organisation', getter(Organisation, 'organisation', 50))
 
 export default router

@@ -100,7 +100,13 @@
           </div>
         </div>
         <div v-if="endpointPrefix === 'examine/'" class="text-secondary">
-          {{ expenseReport.expensePayer.name.givenName + ' ' + expenseReport.expensePayer.name.familyName }}
+          {{
+            expenseReport.expensePayer.name.givenName +
+            ' ' +
+            expenseReport.expensePayer.name.familyName +
+            ' - ' +
+            expenseReport.organisation.name
+          }}
         </div>
       </div>
 

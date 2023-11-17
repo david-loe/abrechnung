@@ -3,6 +3,7 @@
     :state="healthCareCost.state"
     :name="healthCareCost.name"
     :user="healthCareCost.applicant"
+    :organisation="healthCareCost.organisation"
     :editor="healthCareCost.editor"
     :showUser="showUser"
     :showEditor="'refunded' === healthCareCost.state || 'underExaminationByInsurance' === healthCareCost.state"

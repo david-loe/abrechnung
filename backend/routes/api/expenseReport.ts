@@ -104,6 +104,7 @@ router.post('/inWork', async (req, res) => {
   req.body = {
     state: 'inWork',
     expensePayer: req.user!._id,
+    organisation: req.body.organisation,
     editor: req.user!._id,
     _id: req.body._id,
     name: req.body.name

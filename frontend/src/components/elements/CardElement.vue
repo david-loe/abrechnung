@@ -26,9 +26,9 @@
         </div>
       </div>
 
-      <span v-if="showUser && user" class="card-subtitle mb-1 fs-6 fw-medium text-muted">{{
-        user.name.givenName + ' ' + user.name.familyName
-      }}</span>
+      <span v-if="showUser && user" class="card-subtitle mb-1 fs-6 fw-medium text-muted">
+        {{ user.name.givenName + ' ' + user.name.familyName + ' - ' + organisation.name }}
+      </span>
       <div class="row mb-2">
         <slot name="details"></slot>
       </div>
@@ -50,7 +50,7 @@
 import { defineComponent, PropType } from 'vue'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { Settings, UserSimple } from '../../../../common/types.js'
+import { Settings, UserSimple, OrganisationSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CardElement',
@@ -60,6 +60,7 @@ export default defineComponent({
     name: { type: String, required: true },
     state: { type: String as PropType<keyof Settings['stateColors']>, required: true },
     user: { type: Object as PropType<UserSimple>, required: true },
+    organisation: { type: Object as PropType<OrganisationSimple>, required: true },
     editor: { type: Object as PropType<UserSimple>, required: true },
     showUser: { type: Boolean, default: false },
     showEditor: { type: Boolean, default: false },

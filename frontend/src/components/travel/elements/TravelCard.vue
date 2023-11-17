@@ -3,6 +3,7 @@
     :state="travel.state"
     :name="travel.name"
     :user="travel.traveler"
+    :organisation="travel.organisation"
     :editor="travel.editor"
     :showUser="showUser"
     :showEditor="travel.traveler._id !== travel.editor._id"

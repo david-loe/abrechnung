@@ -44,6 +44,8 @@
     "title": "abrechnung"
   },
   "info": {
+    "organisation": "Select the organisation where you are employed.",
+    "insurance": "Select your health insurance company, which will be asked to reimburse your health costs.",
     "advance": "If you need an advance (e.g. for the plane tickets), specify here how much you need.",
     "cateringNoRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "claimOvernightLumpSum": "You can either claim overnight per diems and account for the actual cost of overnight accommodations.",
@@ -295,8 +297,8 @@
       }
     },
     "underExaminationByInsurance": {
-      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits advanced by {applicant}.\nI request reimbursement for these.",
-      "subject": "Reimbursement Health Care Costs"
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits advanced by {applicant}.\nI request reimbursement for these:\n{bankDetails}",
+      "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     }
   },
   "monthsShort": {
