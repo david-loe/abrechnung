@@ -20,7 +20,7 @@ export interface Settings {
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
   version: string
-  migrateFrom?: string
+  migrateFrom?: string | null
 }
 
 export interface CountrySimple {
@@ -33,8 +33,8 @@ export interface CountrySimple {
     en?: string
   }
   _id: string
-  flag?: string
-  currency?: Currency
+  flag?: string | null
+  currency?: Currency | null
 }
 
 export interface CountryLumpSum {
@@ -52,7 +52,7 @@ export interface CountryLumpSum {
 
 export interface Country extends CountrySimple {
   lumpSums: CountryLumpSum[]
-  lumpSumsFrom?: string
+  lumpSumsFrom?: string | null
 }
 
 export interface Currency {
@@ -61,8 +61,8 @@ export interface Currency {
     en: string
   }
   _id: string
-  subunit?: string
-  symbol?: string
+  subunit?: string | null
+  symbol?: string | null
   flag?: string | null
 }
 
@@ -104,14 +104,14 @@ export interface OrganisationSimple {
 
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
-  bankDetails?: string
-  companyNumber?: string
+  bankDetails?: string | null
+  companyNumber?: string | null
 }
 
 export interface User extends UserSimple {
   fk: {
-    microsoft?: string
-    ldapauth?: string
+    microsoft?: string | null
+    ldapauth?: string | null
   }
   access: {
     [key in Access]: boolean
@@ -120,11 +120,11 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    insurance?: HealthInsurance
-    organisation?: Organisation
+    insurance?: HealthInsurance | null
+    organisation?: Organisation | null
   }
-  vehicleRegistration?: DocumentFile[]
-  token?: Token
+  vehicleRegistration?: DocumentFile[] | null
+  token?: Token | null
 }
 
 export interface Money {
@@ -138,8 +138,8 @@ export interface Money {
 }
 
 export interface MoneyPlus extends Money {
-  receipts?: DocumentFile[]
-  date?: Date | string
+  receipts?: DocumentFile[] | null
+  date?: Date | string | null
 }
 
 export interface Cost extends MoneyPlus {
@@ -152,7 +152,7 @@ export interface Stage {
   arrival: Date | string
   startLocation: Place
   endLocation: Place
-  midnightCountries?: { date: Date | string; country: CountrySimple }[]
+  midnightCountries?: { date: Date | string; country: CountrySimple }[] | null
   distance?: number | null
   transport: Transport
   cost: Cost
@@ -198,7 +198,7 @@ export interface TravelSimple {
   state: TravelState
   editor: UserSimple
   comments: TravelComment[]
-  comment?: string
+  comment?: string | null
   reason: string
   destinationPlace: Place
   travelInsideOfEU: boolean
@@ -207,10 +207,10 @@ export interface TravelSimple {
   advance: Money
   progress: number
   _id: Types.ObjectId
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  claimSpouseRefund?: boolean //settings.allowSpouseRefund
-  fellowTravelersNames?: string //settings.allowSpouseRefund
+  createdAt: Date | string
+  updatedAt: Date | string
+  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
+  fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
 
 export interface Refund {
@@ -246,9 +246,9 @@ export interface ExpenseReportSimple {
   state: ExpenseReportState
   editor: UserSimple
   comments: ExpenseReportComment[]
-  comment?: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  comment?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
   _id: Types.ObjectId
 }
 
@@ -268,9 +268,9 @@ export interface HealthCareCostSimple {
   state: HealthCareCostState
   editor: UserSimple
   comments: HealthCareCostComment[]
-  comment?: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  comment?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
   _id: Types.ObjectId
 }
 

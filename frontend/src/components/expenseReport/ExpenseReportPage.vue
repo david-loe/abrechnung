@@ -170,7 +170,7 @@
                     class="form-control"
                     id="comment"
                     rows="1"
-                    v-model="expenseReport.comment"
+                    v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
                 <button

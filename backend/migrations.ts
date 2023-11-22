@@ -16,7 +16,7 @@ async function migrate(from: string) {
       console.log('Appy migration from v0.3.0')
       var randomOrg = await Organisation.findOne()
       if (!randomOrg) {
-        randomOrg = await new Organisation({ name: 'My Organisation' }).save()
+        randomOrg = (await new Organisation({ name: 'My Organisation' }).save()).toObject()
       }
       const travels = await Travel.find()
       const healthCareCosts = await HealthCareCost.find()

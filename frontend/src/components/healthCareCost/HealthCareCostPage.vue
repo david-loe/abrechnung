@@ -177,7 +177,7 @@
                     class="form-control"
                     id="comment"
                     rows="1"
-                    v-model="healthCareCost.comment"
+                    v-model="(healthCareCost.comment as string | undefined)"
                     :disabled="
                       (isReadOnly && endpointPrefix === '') ||
                       (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
@@ -231,7 +231,7 @@
                     <FileUpload
                       ref="fileUpload"
                       id="expenseFormFile"
-                      v-model="healthCareCost.refundSum.receipts"
+                      v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
                       :endpointPrefix="endpointPrefix" />
                   </div>
                   <button type="submit" class="btn btn-success">
@@ -257,7 +257,7 @@ import FileUpload from '../elements/FileUpload.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink, getById } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation } from '../../../../common/types.js'
+import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation, DocumentFile } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 

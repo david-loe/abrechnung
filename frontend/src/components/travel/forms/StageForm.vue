@@ -78,7 +78,7 @@
         <FileUpload
           ref="fileUpload"
           id="stageFormVehicleRegistration"
-          v-model="$root.user.vehicleRegistration"
+          v-model="($root.user.vehicleRegistration as DocumentFile[]| undefined)"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="true"
