@@ -427,26 +427,42 @@ travelSchema.methods.addComment = function (this: TravelDoc) {
 }
 
 travelSchema.methods.validateDates = function (this: TravelDoc) {
-  const conflicts: { stageA: Stage; stageB: Stage }[] = []
-  for (const stageA of this.stages) {
-    for (const stageB of this.stages) {
-      if (stageA !== stageB) {
-        if (stageA.departure.valueOf() < stageB.departure.valueOf()) {
-          if (stageA.arrival.valueOf() <= stageB.departure.valueOf()) {
+  const conflicts = new Set<string>()
+  for (var i = 0; i < this.stages.length; i++) {
+    for (var j = 0; j < this.stages.length; j++) {
+      if (i !== j) {
+        if (this.stages[i].departure.valueOf() < this.stages[j].departure.valueOf()) {
+          if (this.stages[i].arrival.valueOf() <= this.stages[j].departure.valueOf()) {
             continue
           } else {
-            conflicts.push({ stageA, stageB })
+            if (this.stages[i].arrival.valueOf() <= this.stages[j].arrival.valueOf()) {
+              // end of [i] inside of [j]
+              conflicts.add('stages.' + i + '.arrival')
+              conflicts.add('stages.' + j + '.departure')
+            } else {
+              // [j] inside of [i]
+              conflicts.add('stages.' + j + '.arrival')
+              conflicts.add('stages.' + j + '.departure')
+            }
           }
-        } else if (stageA.departure.valueOf() < stageB.arrival.valueOf()) {
-          conflicts.push({ stageA, stageB })
+        } else if (this.stages[i].departure.valueOf() < this.stages[j].arrival.valueOf()) {
+          if (this.stages[i].arrival.valueOf() <= this.stages[j].arrival.valueOf()) {
+            // [i] inside of [j]
+            conflicts.add('stages.' + i + '.arrival')
+            conflicts.add('stages.' + i + '.departure')
+          } else {
+            // end of [j] inside of [i]
+            conflicts.add('stages.' + j + '.arrival')
+            conflicts.add('stages.' + i + '.departure')
+          }
         } else {
           continue
         }
       }
     }
   }
-  if (conflicts.length > 0) {
-    throw new Error.ValidatorError({ message: 'Overlapping Stages', path: 'stages', value: conflicts })
+  for (const conflict of conflicts) {
+    this.invalidate(conflict, 'Overlapping stages')
   }
 }
 
