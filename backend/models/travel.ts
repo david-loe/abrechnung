@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
+import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
 import Settings from './settings.js'
@@ -16,7 +16,8 @@ import {
   TravelComment,
   transports,
   travelStates,
-  lumpsumTypes
+  lumpsumTypes,
+  Stage
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -40,6 +41,7 @@ interface Methods {
   calculateProfessionalShare(): void
   calculateRefundforOwnCar(): void
   addComment(): void
+  validateDates(): void
 }
 
 type TravelModel = Model<Travel, {}, Methods>
@@ -424,8 +426,33 @@ travelSchema.methods.addComment = function (this: TravelDoc) {
   }
 }
 
+travelSchema.methods.validateDates = function (this: TravelDoc) {
+  const conflicts: { stageA: Stage; stageB: Stage }[] = []
+  for (const stageA of this.stages) {
+    for (const stageB of this.stages) {
+      if (stageA !== stageB) {
+        if (stageA.departure.valueOf() < stageB.departure.valueOf()) {
+          if (stageA.arrival.valueOf() <= stageB.departure.valueOf()) {
+            continue
+          } else {
+            conflicts.push({ stageA, stageB })
+          }
+        } else if (stageA.departure.valueOf() < stageB.arrival.valueOf()) {
+          conflicts.push({ stageA, stageB })
+        } else {
+          continue
+        }
+      }
+    }
+  }
+  if (conflicts.length > 0) {
+    throw new Error.ValidatorError({ message: 'Overlapping Stages', path: 'stages', value: conflicts })
+  }
+}
+
 travelSchema.pre('validate', function (this: TravelDoc) {
   this.addComment()
+  this.validateDates()
 })
 
 travelSchema.pre('save', async function (this: TravelDoc, next) {

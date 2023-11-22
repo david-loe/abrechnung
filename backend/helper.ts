@@ -252,7 +252,14 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
   }
   if (receipts) {
     costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = { type: Date, required: required }
+    costObject.date = {
+      type: Date,
+      validate: {
+        validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(),
+        message: '{PATH} cannot be in the future.'
+      },
+      required: required
+    }
   }
   return costObject
 }
