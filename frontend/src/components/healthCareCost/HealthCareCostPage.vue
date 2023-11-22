@@ -334,7 +334,9 @@ export default defineComponent({
         this.$t('mail.underExaminationByInsurance.body', {
           insuranceName: healthCareCost.insurance.name,
           applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName,
-          bankDetails: orga?.bankDetails
+          bankDetails: orga?.bankDetails,
+          organisationName: orga?.name,
+          amount: getMoneyString(getHealthCareCostTotal(healthCareCost))
         })
       )
     },

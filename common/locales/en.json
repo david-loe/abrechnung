@@ -297,7 +297,7 @@
       }
     },
     "underExaminationByInsurance": {
-      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits advanced by {applicant}.\nI request reimbursement for these:\n{bankDetails}",
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {applicant}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     }
   },
