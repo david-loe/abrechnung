@@ -11,7 +11,7 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import i18n from './i18n.js'
-import { CountrySimple, Currency, HealthInsurance, OrganisationSimple, Settings, User } from '../../common/types.js'
+import { CountrySimple, Currency, GETResponse, HealthInsurance, OrganisationSimple, Settings, User } from '../../common/types.js'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {
@@ -25,9 +25,9 @@ declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $router: typeof router
     $root: {
-      getter: (endpoint: string, params?: {}, config?: {}) => Promise<any>
+      getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
       setter: (endpoint: string, data: any, config?: {}, showAlert?: Boolean) => Promise<any>
-      deleter: (endpoint: string, params: {}, ask?: Boolean, showAlert?: Boolean) => Promise<boolean>
+      deleter: (endpoint: string, params: { [key: string]: any; id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean>
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void

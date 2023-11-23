@@ -278,7 +278,7 @@ export default defineComponent({
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload },
   props: {
-    _id: { type: String },
+    _id: { type: String, required: true },
     parentPages: {
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
@@ -394,14 +394,20 @@ export default defineComponent({
       } else if (this.endpointPrefix === 'confirm/') {
         params.addRefunded = true
       }
-      this.healthCareCost = (await this.$root.getter(this.endpointPrefix + 'healthCareCost', params)).data
+      const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
+      if (result) {
+        this.healthCareCost = result.data
+      }
 
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },
     async getExaminerMails() {
-      const examiner = (await this.$root.getter('healthCareCost/examiner')).data as UserSimple[]
-      return examiner.map((x) => x.email)
+      const result = (await this.$root.getter<UserSimple[]>('healthCareCost/examiner')).ok
+      if (result) {
+        return result.data.map((x) => x.email)
+      }
+      return []
     },
     getMoneyString,
     datetoDateString,
@@ -410,7 +416,10 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     if (this.endpointPrefix === 'examine/') {
-      this.organisations = (await this.$root.getter('examine/healthCareCost/organisation')).data
+      const result = (await this.$root.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
+      if (result) {
+        this.organisations = result.data
+      }
     }
     try {
       await this.getHealthCareCost()

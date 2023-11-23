@@ -154,7 +154,8 @@ import {
   locales,
   Settings,
   HealthInsurance,
-  OrganisationSimple
+  OrganisationSimple,
+  GETResponse
 } from '../../common/types.js'
 import { log } from '../../common/logger.js'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
@@ -194,25 +195,26 @@ export default defineComponent({
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
         this.loadingPromise = Promise.allSettled([
-          this.getter('user'),
-          this.getter('currency'),
-          this.getter('country'),
-          this.getter('settings'),
-          this.getter('healthInsurance'),
-          this.getter('organisation')
+          this.getter<User>('user'),
+          this.getter<Currency[]>('currency'),
+          this.getter<CountrySimple[]>('country'),
+          this.getter<Settings[]>('settings'),
+          this.getter<HealthInsurance[]>('healthInsurance'),
+          this.getter<OrganisationSimple[]>('organisation')
         ]).then((result) => {
-          this.user = (result[0] as PromiseFulfilledResult<{ data: User }>).value.data
+          this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
           log(this.$t('labels.user') + ':')
           log(this.user)
-          if (Object.keys(this.user).length > 0) {
+          if (this.user._id) {
             this.$i18n.locale = this.user.settings.language
             this.auth = true
           }
-          this.currencies = (result[1] as PromiseFulfilledResult<{ data: Currency[] }>).value.data
-          this.countries = (result[2] as PromiseFulfilledResult<{ data: CountrySimple[] }>).value.data
-          this.settings = (result[3] as PromiseFulfilledResult<{ data: Settings[] }>).value.data[0]
-          this.healthInsurances = (result[4] as PromiseFulfilledResult<{ data: HealthInsurance[] }>).value.data
-          this.organisations = (result[5] as PromiseFulfilledResult<{ data: OrganisationSimple[] }>).value.data
+          this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
+          this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
+          this.settings =
+            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data[0] : ({} as Settings)) : ({} as Settings)
+          this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
+          this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
           this.checkUserSettings(this.user.settings)
           this.loadState = 'LOADED'
         })
@@ -235,7 +237,7 @@ export default defineComponent({
         console.log(error.response.data)
       }
     },
-    async getter(endpoint: string, params = {}, config = {}) {
+    async getter<T>(endpoint: string, params: any = {}, config: any = {}): Promise<{ ok?: GETResponse<T>; error?: any }> {
       try {
         const res = await axios.get(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -247,17 +249,18 @@ export default defineComponent({
             config
           )
         )
-        if (res.status === 200) {
-          return res.data
+        if (config.responseType === 'blob') {
+          return { ok: { data: res.data, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } }
         }
+        return { ok: res.data }
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
-          return null
         }
+        return { error: error }
       }
     },
     async setter(endpoint: string, data: any, config = {}, showAlert = true) {
@@ -286,7 +289,7 @@ export default defineComponent({
         }
       }
     },
-    async deleter(endpoint: string, params = {}, ask = true, showAlert = true): Promise<boolean> {
+    async deleter(endpoint: string, params: { [key: string]: any; id: string }, ask = true, showAlert = true): Promise<boolean> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false

@@ -489,12 +489,13 @@ export default defineComponent({
       meals,
       travelStates,
       mailToLink: '',
-      msTeamsToLink: ''
+      msTeamsToLink: '',
+      error: undefined as any
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
   props: {
-    _id: { type: String },
+    _id: { type: String, required: true },
     parentPages: {
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
@@ -690,25 +691,32 @@ export default defineComponent({
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
-      this.travel = (await this.$root.getter(this.endpointPrefix + 'travel', params)).data
-      if (oldTravel.days && this.travel.days) {
-        for (const oldDay of oldTravel.days) {
-          if ((oldDay as Day).showSettings) {
-            for (const newDay of this.travel.days) {
-              if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
-                ;(newDay as Day).showSettings = true
+      const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
+      if (res) {
+        this.travel = res.data
+        if (oldTravel.days && this.travel.days) {
+          for (const oldDay of oldTravel.days) {
+            if ((oldDay as Day).showSettings) {
+              for (const newDay of this.travel.days) {
+                if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
+                  ;(newDay as Day).showSettings = true
+                }
               }
             }
           }
         }
       }
+
       log(this.$t('labels.travel') + ':')
       log(this.travel)
       this.renderTable()
     },
     async getExaminerMails() {
-      const examiner = (await this.$root.getter('travel/examiner')).data as UserSimple[]
-      return examiner.map((x) => x.email)
+      const result = (await this.$root.getter<UserSimple[]>('travel/examiner')).ok
+      if (result) {
+        return result.data.map((x) => x.email)
+      }
+      return []
     },
     getMoneyString,
     datetoDateString,

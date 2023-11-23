@@ -324,3 +324,8 @@ export interface Meta {
   limit: number
   countPages: number
 }
+
+export interface GETResponse<T> {
+  data: T
+  meta: Meta
+}

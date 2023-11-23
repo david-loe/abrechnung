@@ -94,7 +94,7 @@ export default defineComponent({
       this.approveTravelModal = new Modal(modalEl, {})
     }
     if (this._id) {
-      const result = await this.$root.getter('approve/travel', { id: this._id })
+      const result = (await this.$root.getter<TravelSimple>('approve/travel', { id: this._id })).ok
       if (result) {
         this.showModal(result.data)
       }
