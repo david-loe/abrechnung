@@ -152,7 +152,7 @@ export default defineComponent({
       this.modalObject = undefined
     },
     async applyForTravel(travel: TravelSimple) {
-      const result = await this.$root.setter('travel/appliedFor', travel)
+      const result = (await this.$root.setter<TravelSimple>('travel/appliedFor', travel)).ok
       if (result) {
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()
@@ -161,7 +161,7 @@ export default defineComponent({
       }
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = await this.$root.setter('expenseReport/inWork', expenseReport)
+      const result = (await this.$root.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
       if (result) {
         if (this.$refs.expenseReportList) {
           ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
@@ -171,7 +171,7 @@ export default defineComponent({
       }
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      const result = await this.$root.setter('healthCareCost/inWork', healthCareCost)
+      const result = (await this.$root.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
       if (result) {
         if (this.$refs.healthCareCostList) {
           ;(this.$refs.healthCareCostList as typeof HealthCareCostCardList).getData()

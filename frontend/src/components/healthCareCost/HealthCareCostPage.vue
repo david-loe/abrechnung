@@ -309,20 +309,20 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('healthCareCost/underExamination', {
+      const result = await this.$root.setter<HealthCareCost>('healthCareCost/underExamination', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
     async toExaminationByInsurance() {
-      const result = await this.$root.setter('examine/healthCareCost/underExaminationByInsurance', {
+      const result = await this.$root.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
-      if (result) {
+      if (result.ok) {
         this.getHealthCareCost()
       }
     },
@@ -347,7 +347,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter(
+      const result = await this.$root.setter<HealthCareCost>(
         'confirm/healthCareCost/refunded',
         {
           _id: this.healthCareCost._id,
@@ -356,7 +356,7 @@ export default defineComponent({
         },
         { headers }
       )
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
@@ -371,8 +371,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).healthCareCostId = this.healthCareCost._id
-      const result = await this.$root.setter(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
+      if (result.ok) {
         await this.getHealthCareCost()
         this.hideModal()
       }

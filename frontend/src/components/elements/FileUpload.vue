@@ -147,7 +147,7 @@ export default defineComponent({
       return null
     },
     async generateToken() {
-      this.token = await this.$root.setter('user/token', {}, undefined, false)
+      this.token = (await this.$root.setter<Token>('user/token', {}, undefined, false)).ok
       if (this.token) {
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('user', this.$root.user._id)

@@ -260,20 +260,20 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('expenseReport/underExamination', {
+      const result = await this.$root.setter<ExpenseReport>('expenseReport/underExamination', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: '/' })
       }
     },
     async refund() {
-      const result = await this.$root.setter('examine/expenseReport/refunded', {
+      const result = await this.$root.setter<ExpenseReport>('examine/expenseReport/refunded', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: '/examine/expenseReport' })
       }
     },
@@ -288,8 +288,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).expenseReportId = this.expenseReport._id
-      const result = await this.$root.setter(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
+      if (result.ok) {
         await this.getExpenseReport()
         this.hideModal()
       }

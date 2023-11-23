@@ -329,3 +329,8 @@ export interface GETResponse<T> {
   data: T
   meta: Meta
 }
+
+export interface SETResponse<T> {
+  message: string
+  result: T
+}

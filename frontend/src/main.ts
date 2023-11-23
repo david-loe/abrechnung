@@ -26,7 +26,7 @@ declare module '@vue/runtime-core' {
     $router: typeof router
     $root: {
       getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
-      setter: (endpoint: string, data: any, config?: {}, showAlert?: Boolean) => Promise<any>
+      setter: <T>(endpoint: string, data: any, config?: {}, showAlert?: Boolean) => Promise<{ ok?: T; error?: any }>
       deleter: (endpoint: string, params: { [key: string]: any; id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean>
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void

@@ -80,8 +80,8 @@ export default defineComponent({
     async approveTravel(decision: 'approved' | 'rejected', comment?: string) {
       if (this.modalTravel) {
         this.modalTravel.comment = comment
-        const result = await this.$root.setter('approve/travel/' + decision, this.modalTravel)
-        if (result) {
+        const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, this.modalTravel)
+        if (result.ok) {
           ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
         }

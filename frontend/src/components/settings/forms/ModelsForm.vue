@@ -86,7 +86,7 @@ export default defineComponent({
     async save() {
       this.loading = true
       if (this.model) {
-        await this.$root.setter('admin/' + this.model.name, this.object)
+        await this.$root.setter<any>('admin/' + this.model.name, this.object)
       }
       this.clear()
     },

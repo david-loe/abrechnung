@@ -463,7 +463,8 @@ import {
   TravelSimple,
   meals,
   travelStates,
-  UserSimple
+  UserSimple,
+  User
 } from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -529,21 +530,23 @@ export default defineComponent({
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
         days: this.travel.days
       }
-      const result = await this.$root.setter(this.endpointPrefix + 'travel', travel)
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
+      if (result.ok) {
         await this.getTravel()
       } else {
         await this.getTravel()
       }
     },
     async applyForTravel(travel: Travel) {
-      const result = await this.$root.setter('travel/appliedFor', travel)
-      if (result && confirm(this.$t('alerts.warningReapply'))) {
-        await this.getTravel()
-        this.hideModal()
-        this.$router.push({ path: '/' })
-      } else {
-        await this.getTravel()
+      if (confirm(this.$t('alerts.warningReapply'))) {
+        const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
+        if (result.ok) {
+          await this.getTravel()
+          this.hideModal()
+          this.$router.push({ path: '/' })
+        } else {
+          await this.getTravel()
+        }
       }
     },
     async deleteTravel() {
@@ -553,14 +556,14 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
-      if (result) {
+      const result = await this.$root.setter<Travel>('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
+      if (result.ok) {
         this.$router.push({ path: '/' })
       }
     },
     async refund() {
-      const result = await this.$root.setter('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
-      if (result) {
+      const result = await this.$root.setter<Travel>('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
+      if (result.ok) {
         this.$router.push({ path: '/examine/travel' })
       }
     },
@@ -575,8 +578,8 @@ export default defineComponent({
         }
       }
       ;(stage as any).travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointPrefix + 'travel/stage', stage, { headers })
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers })
+      if (result.ok) {
         await this.getTravel()
         this.hideModal()
       }
@@ -596,8 +599,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers })
+      if (result.ok) {
         await this.getTravel()
         this.hideModal()
       }
@@ -610,7 +613,7 @@ export default defineComponent({
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
-      const result = await this.$root.setter(
+      const result = await this.$root.setter<User>(
         this.endpointPrefix + 'user/vehicleRegistration',
         { vehicleRegistration },
         {
@@ -619,8 +622,8 @@ export default defineComponent({
           }
         }
       )
-      if (result) {
-        this.$root.user = result
+      if (result.ok) {
+        this.$root.user = result.ok
       }
     },
     getStageIcon(stage: Stage) {

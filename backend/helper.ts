@@ -5,7 +5,7 @@ import axios from 'axios'
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
-import { Access, GETResponse, Meta } from '../common/types.js'
+import { Access, GETResponse, Meta, SETResponse } from '../common/types.js'
 import { log } from '../common/logger.js'
 import fs from 'fs'
 
@@ -124,17 +124,17 @@ export function setter(
       }
       try {
         Object.assign(oldObject, req.body)
-        const result = (await oldObject.save()).toObject()
-        res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if (cb) cb(result)
+        const result: SETResponse<any> = { message: i18n.t('alerts.successSaving'), result: (await oldObject.save()).toObject() }
+        res.send(result)
+        if (cb) cb(result.result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
     } else if (allowNew) {
       try {
-        const result = (await new model(req.body).save()).toObject()
-        res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if (cb) cb(result)
+        const result: SETResponse<any> = { message: i18n.t('alerts.successSaving'), result: (await new model(req.body).save()).toObject() }
+        res.send(result)
+        if (cb) cb(result.result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }

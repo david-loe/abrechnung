@@ -155,7 +155,8 @@ import {
   Settings,
   HealthInsurance,
   OrganisationSimple,
-  GETResponse
+  GETResponse,
+  SETResponse
 } from '../../common/types.js'
 import { log } from '../../common/logger.js'
 import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
@@ -263,7 +264,7 @@ export default defineComponent({
         return { error: error }
       }
     },
-    async setter(endpoint: string, data: any, config = {}, showAlert = true) {
+    async setter<T>(endpoint: string, data: any, config = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -275,18 +276,16 @@ export default defineComponent({
             config
           )
         )
-        if (res.status === 200) {
-          if (showAlert) this.addAlert({ message: '', title: res.data.message, type: 'success' })
-          return res.data.result
-        }
+        if (showAlert) this.addAlert({ message: '', title: (res.data as SETResponse<T>).message, type: 'success' })
+        return { ok: (res.data as SETResponse<T>).result }
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
-          return null
         }
+        return { error }
       }
     },
     async deleter(endpoint: string, params: { [key: string]: any; id: string }, ask = true, showAlert = true): Promise<boolean> {

@@ -72,8 +72,8 @@ export default defineComponent({
       this.showForm_ = true
     },
     async postUser(user: User) {
-      const result = await this.$root.setter('admin/user', user)
-      if (result) {
+      const result = await this.$root.setter<User>('admin/user', user)
+      if (result.ok) {
         this.getUsers()
         ;(this.$refs.userform as typeof UserForm).clear()
         this.showForm_ = false
