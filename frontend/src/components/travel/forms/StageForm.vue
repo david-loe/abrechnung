@@ -63,6 +63,10 @@
     <template v-if="formStage.transport == 'ownCar'">
       <div class="mb-3">
         <label for="stageFormDistance" class="form-label"> {{ $t('labels.distance') }}<span class="text-danger">*</span> </label>
+        <a class="btn btn-link btn-sm ms-3" v-if="getGoogleMapsLink()" :href="getGoogleMapsLink()" target="_blank">
+          {{ $t('labels.toX', { X: 'Google Maps' }) }}
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
         <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled" required />
       </div>
       <div class="mb-3" v-if="showVehicleRegistration">
@@ -158,7 +162,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { Stage, transports } from '../../../../../common/types.js'
+import { Place, Stage, transports } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',
@@ -193,8 +197,8 @@ export default defineComponent({
       return {
         departure: '',
         arrival: '',
-        startLocation: undefined,
-        endLocation: undefined,
+        startLocation: undefined as Place | undefined,
+        endLocation: undefined as Place | undefined,
         midnightCountries: [],
         distance: null,
         transport: 'otherTransport',
@@ -239,6 +243,21 @@ export default defineComponent({
         this.formStage.midnightCountries = newMidnightCountries
       } else {
         this.formStage.midnightCountries = []
+      }
+    },
+    getGoogleMapsLink() {
+      if (
+        this.formStage.startLocation?.place &&
+        this.formStage.startLocation?.country &&
+        this.formStage.endLocation?.place &&
+        this.formStage.endLocation?.country
+      ) {
+        return (
+          'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=' +
+          encodeURIComponent(this.formStage.startLocation.place + ',' + this.formStage.startLocation.country.name.en) +
+          '&destination=' +
+          encodeURIComponent(this.formStage.endLocation.place + ',' + this.formStage.endLocation.country.name.en)
+        )
       }
     },
     clear() {
