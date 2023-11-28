@@ -55,7 +55,7 @@
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
     "patientName": "Enter the name of the person for whom the costs were incurred.",
-    "professionalShare": "If your travel is partly for personal purposes, enter the professional share here.",
+    "professionalShare": "A business trip may also have private components, but these may not account for 50% or more.",
     "purpose": "Specify which purpose this stage served.",
     "reason": "Briefly state the reason for your trip here.",
     "receipts": "Upload the corresponding receipts here.",

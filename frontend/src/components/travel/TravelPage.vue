@@ -154,6 +154,15 @@
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
           </div>
         </div>
+        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
+          <label class="form-check-label me-2" for="travelProfessionalShare">
+            {{ $t('labels.professionalShare') + ':' }}
+          </label>
+          <span id="travelProfessionalShare" :class="travel.professionalShare <= 0.5 ? 'text-danger' : ''">
+            {{ Math.round(travel.professionalShare * 100) + '%' }}</span
+          >
+          <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />
+        </div>
       </div>
 
       <div class="row row justify-content-between">
@@ -206,7 +215,12 @@
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
                 <h5 class="m-0">
-                  {{ datetoDateString((row.data as Day).date) }}
+                  <small
+                    v-if="(row.data as Day).purpose === 'private'"
+                    :title="$t('labels.private')"
+                    style="margin-left: -1.25rem; margin-right: 0.156rem">
+                    <i class="bi bi-file-person"></i> </small
+                  >{{ datetoDateString((row.data as Day).date) }}
                 </h5>
               </div>
               <div class="col">
