@@ -525,6 +525,7 @@ export default defineComponent({
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
       this.modalObject = undefined
+      this.error = undefined
     },
     async postTravelSettings() {
       const travel = {
@@ -586,6 +587,11 @@ export default defineComponent({
         this.hideModal()
       } else if (result.error) {
         this.error = result.error?.error
+        ;(this.$refs.stageForm as typeof StageForm).loading = false
+        const modalEl = document.getElementById('modal')
+        if (modalEl) {
+          modalEl.scrollTo({ top: 0, behavior: 'smooth' })
+        }
       }
     },
     async deleteStage(id: string) {
