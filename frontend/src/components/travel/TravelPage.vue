@@ -15,6 +15,7 @@
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
           <div v-if="travel._id" class="modal-body">
+            <ErrorBanner :error="error"></ErrorBanner>
             <StageForm
               v-if="modalObjectType === 'stage'"
               ref="stageForm"
@@ -442,6 +443,7 @@ import ExpenseForm from './forms/ExpenseForm.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
+import ErrorBanner from '../elements/ErrorBanner.vue'
 import {
   getMoneyString,
   datetoDateString,
@@ -494,7 +496,7 @@ export default defineComponent({
       error: undefined as any
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
   props: {
     _id: { type: String, required: true },
     parentPages: {
@@ -582,6 +584,8 @@ export default defineComponent({
       if (result.ok) {
         await this.getTravel()
         this.hideModal()
+      } else if (result.error) {
+        this.error = result.error?.error
       }
     },
     async deleteStage(id: string) {

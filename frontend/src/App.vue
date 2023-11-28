@@ -285,7 +285,7 @@ export default defineComponent({
           console.log(error.response.data)
           this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
         }
-        return { error }
+        return { error: error.response.data }
       }
     },
     async deleter(endpoint: string, params: { [key: string]: any; id: string }, ask = true, showAlert = true): Promise<boolean> {
