@@ -42,6 +42,7 @@ interface Methods {
   calculateRefundforOwnCar(): void
   addComment(): void
   validateDates(): void
+  validateCountries(): void
 }
 
 type TravelModel = Model<Travel, {}, Methods>
@@ -462,13 +463,27 @@ travelSchema.methods.validateDates = function (this: TravelDoc) {
     }
   }
   for (const conflict of conflicts) {
-    this.invalidate(conflict, 'Overlapping stages')
+    this.invalidate(conflict, 'stagesOverlapping')
+  }
+}
+
+travelSchema.methods.validateCountries = function (this: TravelDoc) {
+  const conflicts = []
+  for (var i = 1; i < this.stages.length; i++) {
+    if (this.stages[i - 1].endLocation.country._id !== this.stages[i].startLocation.country._id) {
+      conflicts.push('stages.' + (i - 1) + '.endLocation.country')
+      conflicts.push('stages.' + i + '.startLocation.country')
+    }
+  }
+  for (const conflict of conflicts) {
+    this.invalidate(conflict, 'countryChangeBetweenStages')
   }
 }
 
 travelSchema.pre('validate', function (this: TravelDoc) {
   this.addComment()
   this.validateDates()
+  this.validateCountries()
 })
 
 travelSchema.pre('save', async function (this: TravelDoc, next) {
