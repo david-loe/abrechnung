@@ -116,13 +116,13 @@ export function setter(
           return res.sendStatus(403)
         }
       }
-      if (checkOldObject) {
-        if (!(await checkOldObject(oldObject))) {
-          log(req.body)
-          return res.sendStatus(403)
-        }
-      }
       try {
+        if (checkOldObject) {
+          if (!(await checkOldObject(oldObject))) {
+            log(req.body)
+            return res.sendStatus(403)
+          }
+        }
         Object.assign(oldObject, req.body)
         const result: SETResponse<any> = { message: i18n.t('alerts.successSaving'), result: (await oldObject.save()).toObject() }
         res.send(result)
@@ -260,7 +260,7 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
       type: Date,
       validate: {
         validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(),
-        message: '{PATH} cannot be in the future.'
+        message: 'futureNotAllowed'
       },
       required: required
     }
