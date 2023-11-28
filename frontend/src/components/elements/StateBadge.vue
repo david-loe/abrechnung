@@ -1,8 +1,12 @@
 <template>
   <span
+    v-if="$root.settings.stateColors"
     :class="'badge text-' + $root.settings.stateColors[state].text"
     :style="'background-color: ' + $root.settings.stateColors[state].color + ';'"
     >{{ $t('states.' + state) }}
+  </span>
+  <span v-else class="badge text">
+    {{ $t('states.' + state) }}
   </span>
 </template>
 
@@ -13,7 +17,7 @@ import { Settings } from '../../../../common/types.js'
 export default defineComponent({
   name: 'StateBadge',
   props: { state: { type: String as PropType<keyof Settings['stateColors']>, required: true } },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

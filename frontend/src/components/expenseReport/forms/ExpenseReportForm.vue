@@ -81,7 +81,7 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.expenseReport)
     }
   },
-  beforeMount() {
+  created() {
     this.formExpenseReport = this.input()
   },
   watch: {

@@ -716,7 +716,7 @@ export default defineComponent({
     getExpensesSum,
     getTravelTotal
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
     try {
       await this.getTravel()

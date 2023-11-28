@@ -84,7 +84,7 @@ export default defineComponent({
       return input
     }
   },
-  beforeMount() {
+  created() {
     this.formUserSettings = this.input()
   },
   watch: {

@@ -87,7 +87,7 @@ export default defineComponent({
       }
     }
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
     this.users = (await this.$root.getter('admin/user')).data
   }

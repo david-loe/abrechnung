@@ -38,7 +38,7 @@ export default defineComponent({
     }
   },
   methods: {},
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

@@ -100,7 +100,7 @@ export default defineComponent({
       }
     }
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

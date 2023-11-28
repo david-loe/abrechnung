@@ -24,7 +24,7 @@ export default defineComponent({
     return {}
   },
   methods: {},
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

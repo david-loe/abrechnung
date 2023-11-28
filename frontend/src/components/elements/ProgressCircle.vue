@@ -25,7 +25,7 @@ export default defineComponent({
       this.dashoffset = 100 - this.progress
     }
   },
-  beforeMount() {
+  created() {
     this.calc()
   },
   watch: {

@@ -82,7 +82,7 @@ export default defineComponent({
       )
     }
   },
-  beforeMount() {
+  created() {
     this.$root.loadState = 'LOADED'
   }
 })

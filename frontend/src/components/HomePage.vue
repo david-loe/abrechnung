@@ -196,7 +196,7 @@ export default defineComponent({
       this.modal = new Modal(modalEL, {})
     }
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

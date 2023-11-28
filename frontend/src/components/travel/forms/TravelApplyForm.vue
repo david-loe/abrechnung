@@ -178,7 +178,7 @@ export default defineComponent({
       }
     }
   },
-  beforeMount() {
+  created() {
     this.formTravel = this.input()
   },
   watch: {

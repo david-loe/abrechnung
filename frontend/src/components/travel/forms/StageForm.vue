@@ -294,7 +294,7 @@ export default defineComponent({
     },
     datetoDateString
   },
-  beforeMount() {
+  created() {
     this.formStage = this.input()
   },
   watch: {

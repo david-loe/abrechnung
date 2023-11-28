@@ -112,7 +112,7 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.user)
     }
   },
-  beforeMount() {},
+  created() {},
   watch: {
     user: function () {
       this.formUser = this.input()

@@ -58,7 +58,7 @@ export default defineComponent({
       this.hasMeta = true
     }
   },
-  async beforeMount() {
+  async created() {
     await this.getData()
   }
 })

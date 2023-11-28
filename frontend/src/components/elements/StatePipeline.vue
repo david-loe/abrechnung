@@ -38,7 +38,7 @@ export default defineComponent({
     states: { type: Array as PropType<readonly (keyof Settings['stateColors'])[]>, required: true }
   },
   mounted() {},
-  async beforeMount() {
+  async created() {
     await this.$root.load()
   }
 })

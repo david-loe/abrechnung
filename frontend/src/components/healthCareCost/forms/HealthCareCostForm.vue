@@ -106,7 +106,7 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.healthCareCost)
     }
   },
-  beforeMount() {
+  created() {
     this.formHealthCareCost = this.input()
   },
   watch: {

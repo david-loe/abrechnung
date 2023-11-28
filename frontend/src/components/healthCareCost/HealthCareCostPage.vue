@@ -407,7 +407,7 @@ export default defineComponent({
     datetoDateString,
     getHealthCareCostTotal
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
     if (this.endpointPrefix === 'examine/') {
       this.organisations = (await this.$root.getter('examine/healthCareCost/organisation')).data

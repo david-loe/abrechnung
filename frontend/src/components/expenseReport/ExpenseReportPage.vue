@@ -322,7 +322,7 @@ export default defineComponent({
     datetoDateString,
     getExpenseReportTotal
   },
-  async beforeMount() {
+  async created() {
     await this.$root.load()
     try {
       await this.getExpenseReport()
