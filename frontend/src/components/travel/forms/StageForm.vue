@@ -162,7 +162,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { Place, Stage, transports } from '../../../../../common/types.js'
+import { DocumentFile, Place, Stage, transports } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',
