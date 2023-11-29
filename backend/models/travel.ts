@@ -16,8 +16,7 @@ import {
   TravelComment,
   transports,
   travelStates,
-  lumpsumTypes,
-  Stage
+  lumpsumTypes
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!

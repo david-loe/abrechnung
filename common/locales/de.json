@@ -1,7 +1,7 @@
 {
   "alerts": {
     "ValidationError": "Valdierungsfehler",
-    "stagesOverlapping": "Etappen überschneiden sich",
+    "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
