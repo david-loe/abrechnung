@@ -48,12 +48,12 @@ countrySchema.methods.getLumpSum = async function (date: Date): Promise<CountryL
   } else {
     var nearest = 0
     for (var i = 0; i < this.lumpSums.length; i++) {
-      var diff = date.valueOf() - this.lumpSums[i].validFrom.valueOf()
-      if (diff >= 0 && diff < date.valueOf() - this.lumpSums[nearest].validFrom.valueOf()) {
+      var diff = date.valueOf() - (this.lumpSums[i].validFrom as Date).valueOf()
+      if (diff >= 0 && diff < date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf()) {
         nearest = i
       }
     }
-    if (date.valueOf() - this.lumpSums[nearest].validFrom.valueOf() < 0) {
+    if (date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf() < 0) {
       throw Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
     }
     return this.lumpSums[nearest]

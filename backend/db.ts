@@ -33,7 +33,9 @@ async function initDB() {
       DBsettings.migrateFrom = DBsettings.version
     }
     DBsettings.version = settings.version
-    await Settings.findOneAndUpdate(undefined, Object.assign({}, settings, DBsettings)).lean()
+    const mergedSettings = Object.assign({}, settings, DBsettings)
+    await Settings.findOneAndDelete()
+    await new Settings(mergedSettings).save()
     console.log(i18n.t('alerts.db.updatedSettings'))
   } else {
     await new Settings(settings).save()

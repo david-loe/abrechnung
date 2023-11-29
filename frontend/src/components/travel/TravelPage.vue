@@ -15,6 +15,7 @@
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
           <div v-if="travel._id" class="modal-body">
+            <ErrorBanner :error="error"></ErrorBanner>
             <StageForm
               v-if="modalObjectType === 'stage'"
               ref="stageForm"
@@ -442,6 +443,7 @@ import ExpenseForm from './forms/ExpenseForm.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
+import ErrorBanner from '../elements/ErrorBanner.vue'
 import {
   getMoneyString,
   datetoDateString,
@@ -463,7 +465,8 @@ import {
   TravelSimple,
   meals,
   travelStates,
-  UserSimple
+  UserSimple,
+  User
 } from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -489,12 +492,13 @@ export default defineComponent({
       meals,
       travelStates,
       mailToLink: '',
-      msTeamsToLink: ''
+      msTeamsToLink: '',
+      error: undefined as any
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
   props: {
-    _id: { type: String },
+    _id: { type: String, required: true },
     parentPages: {
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
@@ -521,6 +525,7 @@ export default defineComponent({
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
       this.modalObject = undefined
+      this.error = undefined
     },
     async postTravelSettings() {
       const travel = {
@@ -528,21 +533,23 @@ export default defineComponent({
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
         days: this.travel.days
       }
-      const result = await this.$root.setter(this.endpointPrefix + 'travel', travel)
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
+      if (result.ok) {
         await this.getTravel()
       } else {
         await this.getTravel()
       }
     },
     async applyForTravel(travel: Travel) {
-      const result = await this.$root.setter('travel/appliedFor', travel)
-      if (result && confirm(this.$t('alerts.warningReapply'))) {
-        await this.getTravel()
-        this.hideModal()
-        this.$router.push({ path: '/' })
-      } else {
-        await this.getTravel()
+      if (confirm(this.$t('alerts.warningReapply'))) {
+        const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
+        if (result.ok) {
+          await this.getTravel()
+          this.hideModal()
+          this.$router.push({ path: '/' })
+        } else {
+          await this.getTravel()
+        }
       }
     },
     async deleteTravel() {
@@ -552,14 +559,14 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
-      if (result) {
+      const result = await this.$root.setter<Travel>('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
+      if (result.ok) {
         this.$router.push({ path: '/' })
       }
     },
     async refund() {
-      const result = await this.$root.setter('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
-      if (result) {
+      const result = await this.$root.setter<Travel>('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
+      if (result.ok) {
         this.$router.push({ path: '/examine/travel' })
       }
     },
@@ -574,10 +581,17 @@ export default defineComponent({
         }
       }
       ;(stage as any).travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointPrefix + 'travel/stage', stage, { headers })
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers })
+      if (result.ok) {
         await this.getTravel()
         this.hideModal()
+      } else if (result.error) {
+        this.error = result.error?.error
+        ;(this.$refs.stageForm as typeof StageForm).loading = false
+        const modalEl = document.getElementById('modal')
+        if (modalEl) {
+          modalEl.scrollTo({ top: 0, behavior: 'smooth' })
+        }
       }
     },
     async deleteStage(id: string) {
@@ -595,8 +609,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).travelId = this.travel._id
-      const result = await this.$root.setter(this.endpointPrefix + 'travel/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers })
+      if (result.ok) {
         await this.getTravel()
         this.hideModal()
       }
@@ -609,7 +623,7 @@ export default defineComponent({
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
-      const result = await this.$root.setter(
+      const result = await this.$root.setter<User>(
         this.endpointPrefix + 'user/vehicleRegistration',
         { vehicleRegistration },
         {
@@ -618,8 +632,8 @@ export default defineComponent({
           }
         }
       )
-      if (result) {
-        this.$root.user = result
+      if (result.ok) {
+        this.$root.user = result.ok
       }
     },
     getStageIcon(stage: Stage) {
@@ -690,25 +704,32 @@ export default defineComponent({
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
-      this.travel = (await this.$root.getter(this.endpointPrefix + 'travel', params)).data
-      if (oldTravel.days && this.travel.days) {
-        for (const oldDay of oldTravel.days) {
-          if ((oldDay as Day).showSettings) {
-            for (const newDay of this.travel.days) {
-              if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
-                ;(newDay as Day).showSettings = true
+      const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
+      if (res) {
+        this.travel = res.data
+        if (oldTravel.days && this.travel.days) {
+          for (const oldDay of oldTravel.days) {
+            if ((oldDay as Day).showSettings) {
+              for (const newDay of this.travel.days) {
+                if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
+                  ;(newDay as Day).showSettings = true
+                }
               }
             }
           }
         }
       }
+
       log(this.$t('labels.travel') + ':')
       log(this.travel)
       this.renderTable()
     },
     async getExaminerMails() {
-      const examiner = (await this.$root.getter('travel/examiner')).data as UserSimple[]
-      return examiner.map((x) => x.email)
+      const result = (await this.$root.getter<UserSimple[]>('travel/examiner')).ok
+      if (result) {
+        return result.data.map((x) => x.email)
+      }
+      return []
     },
     getMoneyString,
     datetoDateString,

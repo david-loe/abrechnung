@@ -170,7 +170,7 @@
                     class="form-control"
                     id="comment"
                     rows="1"
-                    v-model="expenseReport.comment"
+                    v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
                 <button
@@ -229,7 +229,7 @@ export default defineComponent({
   },
   components: { StatePipeline, ExpenseForm },
   props: {
-    _id: { type: String },
+    _id: { type: String, required: true },
     parentPages: {
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
@@ -260,20 +260,20 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('expenseReport/underExamination', {
+      const result = await this.$root.setter<ExpenseReport>('expenseReport/underExamination', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: '/' })
       }
     },
     async refund() {
-      const result = await this.$root.setter('examine/expenseReport/refunded', {
+      const result = await this.$root.setter<ExpenseReport>('examine/expenseReport/refunded', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: '/examine/expenseReport' })
       }
     },
@@ -288,8 +288,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).expenseReportId = this.expenseReport._id
-      const result = await this.$root.setter(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
+      if (result.ok) {
         await this.getExpenseReport()
         this.hideModal()
       }
@@ -309,14 +309,19 @@ export default defineComponent({
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
-      this.expenseReport = (await this.$root.getter(this.endpointPrefix + 'expenseReport', params)).data
-
+      const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
+      if (result) {
+        this.expenseReport = result.data
+      }
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },
     async getExaminerMails() {
-      const examiner = (await this.$root.getter('expenseReport/examiner')).data as UserSimple[]
-      return examiner.map((x) => x.email)
+      const result = (await this.$root.getter<UserSimple[]>('expenseReport/examiner')).ok
+      if (result) {
+        return result.data.map((x) => x.email)
+      }
+      return []
     },
     getMoneyString,
     datetoDateString,

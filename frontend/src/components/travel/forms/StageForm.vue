@@ -78,7 +78,7 @@
         <FileUpload
           ref="fileUpload"
           id="stageFormVehicleRegistration"
-          v-model="$root.user.vehicleRegistration"
+          v-model="($root.user.vehicleRegistration as DocumentFile[]| undefined)"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="true"
@@ -162,7 +162,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { Place, Stage, transports } from '../../../../../common/types.js'
+import { DocumentFile, Place, Stage, transports } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',

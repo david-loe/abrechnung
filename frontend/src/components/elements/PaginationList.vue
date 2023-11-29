@@ -51,11 +51,13 @@ export default defineComponent({
       } else if (this.hasMeta) {
         page = this.meta.page
       }
-      var result = await this.$root.getter(this.endpoint, { page })
-      this.data = result.data
-      this.hasData = true
-      this.meta = result.meta
-      this.hasMeta = true
+      var result = (await this.$root.getter<any[]>(this.endpoint, { page })).ok
+      if (result) {
+        this.data = result.data
+        this.hasData = true
+        this.meta = result.meta
+        this.hasMeta = true
+      }
     }
   },
   async created() {

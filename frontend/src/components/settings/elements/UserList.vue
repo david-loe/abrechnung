@@ -72,9 +72,9 @@ export default defineComponent({
       this.showForm_ = true
     },
     async postUser(user: User) {
-      const result = await this.$root.setter('admin/user', user)
-      if (result) {
-        this.users = (await this.$root.getter('admin/user')).data
+      const result = await this.$root.setter<User>('admin/user', user)
+      if (result.ok) {
+        this.getUsers()
         ;(this.$refs.userform as typeof UserForm).clear()
         this.showForm_ = false
       }
@@ -83,13 +83,19 @@ export default defineComponent({
     async deleteUser(user: User) {
       const result = await this.$root.deleter('admin/user', { id: user._id })
       if (result) {
-        this.users = (await this.$root.getter('admin/user')).data
+        this.getUsers()
+      }
+    },
+    async getUsers() {
+      const result = (await this.$root.getter<User[]>('admin/user')).ok
+      if (result) {
+        this.users = result.data
       }
     }
   },
   async created() {
     await this.$root.load()
-    this.users = (await this.$root.getter('admin/user')).data
+    this.getUsers()
   }
 })
 </script>

@@ -177,7 +177,7 @@
                     class="form-control"
                     id="comment"
                     rows="1"
-                    v-model="healthCareCost.comment"
+                    v-model="(healthCareCost.comment as string | undefined)"
                     :disabled="
                       (isReadOnly && endpointPrefix === '') ||
                       (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
@@ -231,7 +231,7 @@
                     <FileUpload
                       ref="fileUpload"
                       id="expenseFormFile"
-                      v-model="healthCareCost.refundSum.receipts"
+                      v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
                       :endpointPrefix="endpointPrefix" />
                   </div>
                   <button type="submit" class="btn btn-success">
@@ -257,7 +257,7 @@ import FileUpload from '../elements/FileUpload.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink, getById } from '../../../../common/scripts.js'
 import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation } from '../../../../common/types.js'
+import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation, DocumentFile } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
@@ -278,7 +278,7 @@ export default defineComponent({
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload },
   props: {
-    _id: { type: String },
+    _id: { type: String, required: true },
     parentPages: {
       type: Array as PropType<{ link: string; title: string }[]>,
       required: true
@@ -309,20 +309,20 @@ export default defineComponent({
       }
     },
     async toExamination() {
-      const result = await this.$root.setter('healthCareCost/underExamination', {
+      const result = await this.$root.setter<HealthCareCost>('healthCareCost/underExamination', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
     async toExaminationByInsurance() {
-      const result = await this.$root.setter('examine/healthCareCost/underExaminationByInsurance', {
+      const result = await this.$root.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
-      if (result) {
+      if (result.ok) {
         this.getHealthCareCost()
       }
     },
@@ -347,7 +347,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter(
+      const result = await this.$root.setter<HealthCareCost>(
         'confirm/healthCareCost/refunded',
         {
           _id: this.healthCareCost._id,
@@ -356,7 +356,7 @@ export default defineComponent({
         },
         { headers }
       )
-      if (result) {
+      if (result.ok) {
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
@@ -371,8 +371,8 @@ export default defineComponent({
         }
       }
       ;(expense as any).healthCareCostId = this.healthCareCost._id
-      const result = await this.$root.setter(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
-      if (result) {
+      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
+      if (result.ok) {
         await this.getHealthCareCost()
         this.hideModal()
       }
@@ -394,14 +394,20 @@ export default defineComponent({
       } else if (this.endpointPrefix === 'confirm/') {
         params.addRefunded = true
       }
-      this.healthCareCost = (await this.$root.getter(this.endpointPrefix + 'healthCareCost', params)).data
+      const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
+      if (result) {
+        this.healthCareCost = result.data
+      }
 
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },
     async getExaminerMails() {
-      const examiner = (await this.$root.getter('healthCareCost/examiner')).data as UserSimple[]
-      return examiner.map((x) => x.email)
+      const result = (await this.$root.getter<UserSimple[]>('healthCareCost/examiner')).ok
+      if (result) {
+        return result.data.map((x) => x.email)
+      }
+      return []
     },
     getMoneyString,
     datetoDateString,
@@ -410,7 +416,10 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     if (this.endpointPrefix === 'examine/') {
-      this.organisations = (await this.$root.getter('examine/healthCareCost/organisation')).data
+      const result = (await this.$root.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
+      if (result) {
+        this.organisations = result.data
+      }
     }
     try {
       await this.getHealthCareCost()

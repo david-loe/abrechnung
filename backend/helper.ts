@@ -5,7 +5,7 @@ import axios from 'axios'
 import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
-import { Access, Meta } from '../common/types.js'
+import { Access, GETResponse, Meta, SETResponse } from '../common/types.js'
 import { log } from '../common/logger.js'
 import fs from 'fs'
 
@@ -35,11 +35,14 @@ export function getter(
     delete req.query.page
     if (req.query.id && req.query.id != '') {
       var conditions: any = Object.assign({ _id: req.query.id }, preConditions)
-      const result = await model.findOne(conditions, select).lean()
-      if (result != null) {
-        res.send({ data: result })
+      const result1 = await model.findOne(conditions, select).lean()
+      if (result1 != null) {
+        meta.count = 1
+        meta.countPages = 1
+        let response: GETResponse<any> = { data: result1, meta }
+        res.send(response)
       } else {
-        res.status(204).send({ message: 'No ' + name + ' with id ' + req.query.id })
+        res.status(404).send({ message: 'No ' + name + ' with id ' + req.query.id })
       }
     } else {
       var conditions: any = {}
@@ -71,10 +74,11 @@ export function getter(
           result.sort(sortFn)
         }
         const data = result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page)
-        res.send({ meta, data })
+        let response: GETResponse<any[]> = { meta, data }
+        res.send(response)
         if (cb) cb(data)
       } else {
-        res.status(204).send({ message: 'No content' })
+        res.status(404).send({ message: 'No content' })
       }
     }
   }
@@ -112,25 +116,25 @@ export function setter(
           return res.sendStatus(403)
         }
       }
-      if (checkOldObject) {
-        if (!(await checkOldObject(oldObject))) {
-          log(req.body)
-          return res.sendStatus(403)
-        }
-      }
       try {
+        if (checkOldObject) {
+          if (!(await checkOldObject(oldObject))) {
+            log(req.body)
+            return res.sendStatus(403)
+          }
+        }
         Object.assign(oldObject, req.body)
-        const result = (await oldObject.save()).toObject()
-        res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if (cb) cb(result)
+        const result: SETResponse<any> = { message: i18n.t('alerts.successSaving'), result: (await oldObject.save()).toObject() }
+        res.send(result)
+        if (cb) cb(result.result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
     } else if (allowNew) {
       try {
-        const result = (await new model(req.body).save()).toObject()
-        res.send({ message: i18n.t('alerts.successSaving'), result: result })
-        if (cb) cb(result)
+        const result: SETResponse<any> = { message: i18n.t('alerts.successSaving'), result: (await new model(req.body).save()).toObject() }
+        res.send(result)
+        if (cb) cb(result.result)
       } catch (error) {
         res.status(400).send({ message: i18n.t('alerts.errorSaving'), error: error })
       }
@@ -252,7 +256,14 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
   }
   if (receipts) {
     costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = { type: Date, required: required }
+    costObject.date = {
+      type: Date,
+      validate: {
+        validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(),
+        message: 'futureNotAllowed'
+      },
+      required: required
+    }
   }
   return costObject
 }

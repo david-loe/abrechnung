@@ -86,7 +86,7 @@ export default defineComponent({
     async save() {
       this.loading = true
       if (this.model) {
-        await this.$root.setter('admin/' + this.model.name, this.object)
+        await this.$root.setter<any>('admin/' + this.model.name, this.object)
       }
       this.clear()
     },
@@ -94,11 +94,13 @@ export default defineComponent({
       this.object = null
       this.objects = null
       if (this.model) {
-        const res = (await this.$root.getter(this.model.GET ? this.model.GET : this.model.name)).data
-        if (res.length == 1) {
-          this.object = res[0]
-        } else {
-          this.objects = res
+        const res = (await this.$root.getter<any[]>(this.model.GET ? this.model.GET : this.model.name)).ok
+        if (res) {
+          if (res.data.length == 1) {
+            this.object = res.data[0]
+          } else {
+            this.objects = res.data
+          }
         }
       }
     },

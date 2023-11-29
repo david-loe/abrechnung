@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
+import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
 import { getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
 import Settings from './settings.js'
@@ -40,6 +40,8 @@ interface Methods {
   calculateProfessionalShare(): void
   calculateRefundforOwnCar(): void
   addComment(): void
+  validateDates(): void
+  validateCountries(): void
 }
 
 type TravelModel = Model<Travel, {}, Methods>
@@ -424,8 +426,63 @@ travelSchema.methods.addComment = function (this: TravelDoc) {
   }
 }
 
+travelSchema.methods.validateDates = function (this: TravelDoc) {
+  const conflicts = new Set<string>()
+  for (var i = 0; i < this.stages.length; i++) {
+    for (var j = 0; j < this.stages.length; j++) {
+      if (i !== j) {
+        if (this.stages[i].departure.valueOf() < this.stages[j].departure.valueOf()) {
+          if (this.stages[i].arrival.valueOf() <= this.stages[j].departure.valueOf()) {
+            continue
+          } else {
+            if (this.stages[i].arrival.valueOf() <= this.stages[j].arrival.valueOf()) {
+              // end of [i] inside of [j]
+              conflicts.add('stages.' + i + '.arrival')
+              conflicts.add('stages.' + j + '.departure')
+            } else {
+              // [j] inside of [i]
+              conflicts.add('stages.' + j + '.arrival')
+              conflicts.add('stages.' + j + '.departure')
+            }
+          }
+        } else if (this.stages[i].departure.valueOf() < this.stages[j].arrival.valueOf()) {
+          if (this.stages[i].arrival.valueOf() <= this.stages[j].arrival.valueOf()) {
+            // [i] inside of [j]
+            conflicts.add('stages.' + i + '.arrival')
+            conflicts.add('stages.' + i + '.departure')
+          } else {
+            // end of [j] inside of [i]
+            conflicts.add('stages.' + j + '.arrival')
+            conflicts.add('stages.' + i + '.departure')
+          }
+        } else {
+          continue
+        }
+      }
+    }
+  }
+  for (const conflict of conflicts) {
+    this.invalidate(conflict, 'stagesOverlapping')
+  }
+}
+
+travelSchema.methods.validateCountries = function (this: TravelDoc) {
+  const conflicts = []
+  for (var i = 1; i < this.stages.length; i++) {
+    if (this.stages[i - 1].endLocation.country._id !== this.stages[i].startLocation.country._id) {
+      conflicts.push('stages.' + (i - 1) + '.endLocation.country')
+      conflicts.push('stages.' + i + '.startLocation.country')
+    }
+  }
+  for (const conflict of conflicts) {
+    this.invalidate(conflict, 'countryChangeBetweenStages')
+  }
+}
+
 travelSchema.pre('validate', function (this: TravelDoc) {
   this.addComment()
+  this.validateDates()
+  this.validateCountries()
 })
 
 travelSchema.pre('save', async function (this: TravelDoc, next) {
