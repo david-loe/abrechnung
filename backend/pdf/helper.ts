@@ -28,7 +28,21 @@ export function writeToDisk(filePath: string, pdfBytes: Uint8Array) {
 
   fs.writeFile(filePath, pdfBytes, (err) => {
     if (err) {
-      console.error(err)
+      // Second try after 10 seconds
+      setTimeout(function () {
+        fs.writeFile(filePath, pdfBytes, (err) => {
+          if (err) {
+            // Third try after another 10 seconds
+            setTimeout(function () {
+              fs.writeFile(filePath, pdfBytes, (err) => {
+                if (err) {
+                  console.error(err)
+                }
+              })
+            }, 10000)
+          }
+        })
+      }, 10000)
     }
   })
 }
