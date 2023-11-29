@@ -27,7 +27,11 @@
   "fallBackLumpSumCountry": "LU",
   "lunchCateringLumpSumCut": 0.4,
   "maxTravelDayCount": 92,
-  "refundPerKM": 0.3,
+  "distanceRefunds": {
+    "car": 0.3,
+    "motorcycle": 0.2,
+    "halfCar": 0.15
+  },
   "secoundNightOnAirplaneLumpSumCountry": "AT",
   "secoundNightOnShipOrFerryLumpSumCountry": "LU",
   "stateColors": {

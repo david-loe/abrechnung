@@ -16,7 +16,8 @@ import {
   TravelComment,
   transports,
   travelStates,
-  lumpsumTypes
+  lumpsumTypes,
+  distanceRefundTypes
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -88,6 +89,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         endLocation: place(true),
         midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
         distance: { type: Number, min: 0 },
+        distanceRefundType: { type: String, enum: distanceRefundTypes },
         transport: { type: String, enum: transports, required: true },
         cost: costObject(true, true),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] }
@@ -409,9 +411,9 @@ travelSchema.methods.calculateProfessionalShare = function (this: TravelDoc) {
 travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
   for (const stage of this.stages) {
     if (stage.transport === 'ownCar') {
-      if (stage.distance) {
+      if (stage.distance && stage.distanceRefundType) {
         stage.cost = Object.assign(stage.cost, {
-          amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100,
+          amount: Math.round(stage.distance * settings.distanceRefunds[stage.distanceRefundType] * 100) / 100,
           currency: settings.baseCurrency
         })
       }
