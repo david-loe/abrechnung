@@ -38,6 +38,7 @@ import {
   drawPlace,
   getReceiptMap
 } from './helper.js'
+import Settings from '../models/settings.js'
 
 export async function generateTravelReport(travel: Travel) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -64,7 +65,7 @@ export async function generateTravelReport(travel: Travel) {
   const receiptMap = Object.assign(result.map, getReceiptMap(travel.expenses, result.number).map)
 
   y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
-  y = drawStages(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = await drawStages(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawExpenses(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
   y = drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
 
@@ -182,7 +183,14 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
   return drawTable(page, newPageFn, summary, columns, tabelOptions)
 }
 
-function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, receiptMap: ReceiptMap, options: Options) {
+async function drawStages(
+  page: pdf_lib.PDFPage,
+  newPageFn: () => pdf_lib.PDFPage,
+  travel: Travel,
+  receiptMap: ReceiptMap,
+  options: Options
+) {
+  const settings = (await Settings.findOne().lean())!
   if (travel.stages.length == 0) {
     return options.yStart
   }
@@ -226,7 +234,15 @@ function drawStages(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tra
     width: 90,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.transport'),
-    fn: (t: Transport) => i18n.t('labels.' + t)
+    fn: (t: Transport) =>
+      t.type === 'ownCar'
+        ? i18n.t('distanceRefundTypes.' + t.distanceRefundType) +
+          ' (' +
+          settings.distanceRefunds[t.distanceRefundType] +
+          ' ' +
+          (settings.baseCurrency.symbol ? settings.baseCurrency.symbol : settings.baseCurrency._id) +
+          '/km)'
+        : i18n.t('labels.' + t.type)
   })
   columns.push({ key: 'distance', width: 65, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.distance') })
   columns.push({

@@ -1,10 +1,7 @@
 {
   "alerts": {
-    "ValidationError": "Valdierungsfehler",
-    "stagesOverlapping": "Etappen überschneiden sich zeitlich",
-    "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
-    "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
+    "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "db": {
       "createdSettings": "Einstellungen wurden vom Standard erstellt",
       "success": "Erfolgreich mit der Datenbank verbunden.",
@@ -13,6 +10,7 @@
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
+    "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "noData": {
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
@@ -34,10 +32,17 @@
     "request": {
       "unauthorized": "Nicht autorisiert!"
     },
+    "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "successDeleting": "Gelöscht",
     "successSaving": "Gespeichert",
+    "ValidationError": "Valdierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"
+  },
+  "distanceRefundTypes": {
+    "car": "Auto 🚗",
+    "halfCar": "Weg zur Arbeit 🚗",
+    "motorcycle": "Motorrad 🛵"
   },
   "headlines": {
     "emoji": "🧾",
@@ -48,8 +53,6 @@
     "title": "abrechnung"
   },
   "info": {
-    "organisation": "Wähle die Organisation bei der du angestellt bist.",
-    "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
     "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wieviel du benötigst.",
     "cateringNoRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen und die tatsächlichen Kosten für Übernachtungen abrechnen.",
@@ -57,7 +60,9 @@
     "cost": "Trage hier die Kosten ein.",
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
+    "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
+    "organisation": "Wähle die Organisation bei der du angestellt bist.",
     "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
     "professionalShare": "Eine Dienstreise darf auch private Anteile haben, der berufliche Anteil muss aber über 50% liegen.",
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
@@ -104,6 +109,7 @@
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
     "distance": "Entfernung [km]",
+    "distanceRefundType": "Entfernungspauschale",
     "done": "Erledigt",
     "downloadX": "{X} herunterladen",
     "edit": "Bearbeiten",

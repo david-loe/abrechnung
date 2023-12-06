@@ -37,8 +37,8 @@
     </div>
 
     <label for="stageFormTransport" class="form-label"> {{ $t('labels.transport') }}<span class="text-danger">*</span> </label>
-    <select class="form-select mb-3" v-model="formStage.transport" id="stageFormTransport" :disabled="disabled" required>
-      <option v-for="transport of transports" :value="transport" :key="transport">
+    <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required>
+      <option v-for="transport of transportTypes" :value="transport" :key="transport">
         {{ $t('labels.' + transport) }}
       </option>
     </select>
@@ -60,14 +60,40 @@
       </div>
     </template>
 
-    <template v-if="formStage.transport == 'ownCar'">
+    <template v-if="formStage.transport.type == 'ownCar'">
+      <div class="mb-3">
+        <label for="stageFormTransport" class="form-label"> {{ $t('labels.distanceRefundType') }}<span class="text-danger">*</span> </label>
+        <select
+          class="form-select mb-3"
+          v-model="formStage.transport.distanceRefundType"
+          id="stageFormTransport"
+          :disabled="disabled"
+          required>
+          <option v-for="distanceRefundType of distanceRefundTypes" :value="distanceRefundType" :key="distanceRefundType">
+            {{
+              $t('distanceRefundTypes.' + distanceRefundType) +
+              ' (' +
+              $root.settings.distanceRefunds[distanceRefundType] +
+              ' ' +
+              ($root.settings.baseCurrency.symbol ? $root.settings.baseCurrency.symbol : $root.settings.baseCurrency._id) +
+              '/km)'
+            }}
+          </option>
+        </select>
+      </div>
       <div class="mb-3">
         <label for="stageFormDistance" class="form-label"> {{ $t('labels.distance') }}<span class="text-danger">*</span> </label>
         <a class="btn btn-link btn-sm ms-3" v-if="getGoogleMapsLink()" :href="getGoogleMapsLink()" target="_blank">
           {{ $t('labels.toX', { X: 'Google Maps' }) }}
           <i class="bi bi-box-arrow-up-right"></i>
         </a>
-        <input type="number" class="form-control" v-model="formStage.distance" id="stageFormDistance" :disabled="disabled" required />
+        <input
+          type="number"
+          class="form-control"
+          v-model="formStage.transport.distance"
+          id="stageFormDistance"
+          :disabled="disabled"
+          required />
       </div>
       <div class="mb-3" v-if="showVehicleRegistration">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
@@ -86,7 +112,7 @@
       </div>
     </template>
 
-    <template v-if="formStage.transport !== 'ownCar'">
+    <template v-if="formStage.transport.type !== 'ownCar'">
       <div class="row mb-2">
         <div class="col">
           <label for="stageFormCost" class="form-label me-2">
@@ -112,7 +138,11 @@
       </div>
     </template>
 
-    <template v-if="formStage.transport !== 'ownCar' || (formStage.transport == 'ownCar' && formStage.cost.receipts.length > 0)">
+    <template
+      v-if="
+        formStage.transport.type !== 'ownCar' ||
+        (formStage.transport.type == 'ownCar' && formStage.cost.receipts && formStage.cost.receipts.length > 0)
+      ">
       <div class="mb-3">
         <label for="stageFormFile" class="form-label me-2">
           {{ $t('labels.receipts') }}<span v-if="formStage.cost.amount" class="text-danger">*</span>
@@ -162,7 +192,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { DocumentFile, Place, Stage, transports } from '../../../../../common/types.js'
+import { distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',
@@ -189,7 +219,8 @@ export default defineComponent({
       maxDate: '' as string | Date,
       loading: false,
       vehicleRegistrationChanged: false,
-      transports
+      transportTypes,
+      distanceRefundTypes
     }
   },
   methods: {
@@ -200,8 +231,7 @@ export default defineComponent({
         startLocation: undefined as Place | undefined,
         endLocation: undefined as Place | undefined,
         midnightCountries: [],
-        distance: null,
-        transport: 'otherTransport',
+        transport: { type: 'otherTransport', distance: null, distanceRefundType: distanceRefundTypes[0] },
         cost: {
           amount: null,
           currency: this.$root.settings.baseCurrency,
@@ -213,7 +243,7 @@ export default defineComponent({
     },
     showMidnightCountries() {
       return (
-        ['ownCar', 'otherTransport'].indexOf(this.formStage.transport) !== -1 &&
+        ['ownCar', 'otherTransport'].indexOf(this.formStage.transport.type) !== -1 &&
         this.formStage.startLocation &&
         this.formStage.endLocation &&
         this.formStage.startLocation.country &&
@@ -302,7 +332,7 @@ export default defineComponent({
       this.clear()
       this.formStage = this.input()
     },
-    'formStage.transport': function () {
+    'formStage.transport.type': function () {
       this.calcMidnightCountries()
     },
     'formStage.startLocation.country': function () {

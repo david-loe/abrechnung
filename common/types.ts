@@ -153,8 +153,6 @@ export interface Stage {
   startLocation: Place
   endLocation: Place
   midnightCountries?: { date: Date | string; country: CountrySimple }[] | null
-  distance?: number | null
-  distanceRefundType?: DistanceRefundType | null
   transport: Transport
   cost: Cost
   purpose: Purpose
@@ -213,6 +211,14 @@ export interface TravelSimple {
   claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
   fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
+
+export type Transport =
+  | { type: (typeof transportTypesButOwnCar)[number] }
+  | {
+      type: 'ownCar'
+      distance: number
+      distanceRefundType: DistanceRefundType
+    }
 
 export interface Refund {
   type: LumpsumType
@@ -293,8 +299,9 @@ export type ExpenseReportState = (typeof expenseReportStates)[number]
 export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
 export type HealthCareCostState = (typeof healthCareCostStates)[number]
 
-export const transports = ['ownCar', 'airplane', 'shipOrFerry', 'otherTransport'] as const
-export type Transport = (typeof transports)[number]
+const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const
+export const transportTypes = ['ownCar', ...transportTypesButOwnCar] as const
+export type TransportType = (typeof transportTypes)[number]
 
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
