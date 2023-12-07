@@ -90,7 +90,7 @@ const stages: Stage[] = [
       place: 'Ankara'
     },
     midnightCountries: [],
-    transport: 'airplane',
+    transport: { type: 'airplane' },
     cost: {
       amount: 652, //@ts-ignore
       currency: { _id: 'USD' }, //@ts-ignore
@@ -113,7 +113,7 @@ const stages: Stage[] = [
       place: 'Sofia'
     },
     midnightCountries: [],
-    transport: 'airplane', //@ts-ignore
+    transport: { type: 'airplane' }, //@ts-ignore
     cost: {
       amount: null, //@ts-ignore
       currency: { _id: 'EUR' }
@@ -134,7 +134,7 @@ const stages: Stage[] = [
       place: 'Frankfurt'
     },
     midnightCountries: [],
-    transport: 'airplane', //@ts-ignore
+    transport: { type: 'airplane' }, //@ts-ignore
     cost: {
       amount: null, //@ts-ignore
       currency: { _id: 'EUR' }
