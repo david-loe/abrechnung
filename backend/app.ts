@@ -1,4 +1,4 @@
-import './db.js'
+import { connectDB } from './db.js'
 import './migrations.js'
 import express from 'express'
 import mongoose from 'mongoose'
@@ -10,6 +10,8 @@ import routes from './routes/api/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
 import auth from './auth.js'
+
+await connectDB()
 
 const app = express()
 
