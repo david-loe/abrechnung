@@ -4,6 +4,8 @@ import HealthCareCost from './models/healthCareCost.js'
 import ExpenseReport from './models/expenseReport.js'
 import User from './models/user.js'
 import Settings from './models/settings.js'
+import mongoose from 'mongoose'
+import { distanceRefundTypes } from '../common/types.js'
 
 const settings = await Settings.findOne()
 if (settings?.migrateFrom) {
@@ -66,6 +68,20 @@ async function migrate(from: string) {
           }
         }
       }
+    case '0.3.2':
+      console.log('Appy migration from v0.3.2')
+      const allTravels = (await mongoose.connection.asPromise()).collection('travels').find()
+      for await (const travel of allTravels) {
+        for (const stage of travel.stages) {
+          stage.transport = {
+            type: stage.transport,
+            distance: stage.distance,
+            distanceRefundType: stage.transport === 'ownCar' ? distanceRefundTypes[0] : null
+          }
+        }
+        mongoose.connection.collection('travels').updateOne({ _id: travel._id }, { $set: { stages: travel.stages } })
+      }
+
     default:
       if (settings) {
         settings.migrateFrom = undefined

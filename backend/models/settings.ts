@@ -9,7 +9,9 @@ import {
   travelStates,
   healthCareCostStates,
   expenseReportStates,
-  Settings
+  Settings,
+  DistanceRefundType,
+  distanceRefundTypes
 } from '../../common/types.js'
 
 const accessIcons: { [key in Access]?: any } = {}
@@ -29,6 +31,11 @@ for (const state of expenseReportStates) {
   stateColors[state] = color
 }
 
+const distanceRefunds: { [key in DistanceRefundType]?: any } = {}
+for (const refund of distanceRefundTypes) {
+  distanceRefunds[refund] = { type: Number, min: 0, required: true }
+}
+
 const SettingsSchema = new Schema<Settings>({
   accessIcons: accessIcons,
   allowSpouseRefund: { type: Boolean, required: true },
@@ -42,7 +49,7 @@ const SettingsSchema = new Schema<Settings>({
   factorOvernightLumpSumExceptions: [{ type: String, ref: 'Country' }],
   fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
   maxTravelDayCount: { type: Number, min: 0, required: true },
-  refundPerKM: { type: Number, min: 0, required: true },
+  distanceRefunds: distanceRefunds,
   secoundNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
   secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
   stateColors: stateColors,

@@ -638,13 +638,13 @@ export default defineComponent({
     },
     getStageIcon(stage: Stage) {
       var icon = null
-      if (stage.transport == 'ownCar') {
+      if (stage.transport.type == 'ownCar') {
         icon = 'bi bi-car-front'
-      } else if (stage.transport == 'airplane') {
+      } else if (stage.transport.type == 'airplane') {
         icon = 'bi bi-airplane'
-      } else if (stage.transport == 'shipOrFerry') {
+      } else if (stage.transport.type == 'shipOrFerry') {
         icon = 'bi bi-water'
-      } else if (stage.transport == 'otherTransport') {
+      } else if (stage.transport.type == 'otherTransport') {
         icon = 'bi bi-train-front'
       }
       return icon

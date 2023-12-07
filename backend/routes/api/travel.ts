@@ -179,7 +179,7 @@ router.post('/underExamination', async (req, res) => {
       await oldObject.saveToHistory()
       const receipts = []
       for (const stage of oldObject.stages) {
-        if (stage.transport == 'ownCar') {
+        if (stage.transport.type == 'ownCar') {
           if (receipts.length == 0) {
             if (req.user!.vehicleRegistration) {
               for (const vr of req.user!.vehicleRegistration) {

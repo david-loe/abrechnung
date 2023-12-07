@@ -14,9 +14,10 @@ import {
   Meal,
   PurposeSimple,
   TravelComment,
-  transports,
+  transportTypes,
   travelStates,
-  lumpsumTypes
+  lumpsumTypes,
+  distanceRefundTypes
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -87,8 +88,11 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         startLocation: place(true),
         endLocation: place(true),
         midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
-        distance: { type: Number, min: 0 },
-        transport: { type: String, enum: transports, required: true },
+        transport: {
+          distance: { type: Number, min: 0 },
+          distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
+          type: { type: String, enum: transportTypes, required: true }
+        },
         cost: costObject(true, true),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] }
       }
@@ -223,9 +227,9 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
       if (stage.startLocation && stage.endLocation && stage.startLocation.country._id != stage.endLocation.country._id) {
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
-          if (['ownCar', 'otherTransport'].indexOf(stage.transport) !== -1) {
+          if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
             if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
-          } else if ((stage.transport = 'airplane')) {
+          } else if (stage.transport.type === 'airplane') {
             const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
@@ -235,7 +239,7 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
             } else {
               throw new Error('secoundNightOnAirplaneLumpSumCountry(' + settings.secoundNightOnAirplaneLumpSumCountry + ') not found')
             }
-          } else if ((stage.transport = 'shipOrFerry')) {
+          } else if (stage.transport.type === 'shipOrFerry') {
             const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
@@ -408,10 +412,10 @@ travelSchema.methods.calculateProfessionalShare = function (this: TravelDoc) {
 
 travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
   for (const stage of this.stages) {
-    if (stage.transport === 'ownCar') {
-      if (stage.distance) {
+    if (stage.transport.type === 'ownCar') {
+      if (stage.transport.distance && stage.transport.distanceRefundType) {
         stage.cost = Object.assign(stage.cost, {
-          amount: Math.round(stage.distance * settings.refundPerKM * 100) / 100,
+          amount: Math.round(stage.transport.distance * settings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
           currency: settings.baseCurrency
         })
       }
