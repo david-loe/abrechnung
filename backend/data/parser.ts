@@ -167,11 +167,12 @@ async function fixTableSpezialties(dataStr: string): Promise<string> {
   var result = dataStr.replace(/^\t+\n/gm, '')
 
   // Remove line breaks inside quotes
-  const escapedCells = result.matchAll(/".*(\n).*"/dgm)
-  for await (const match of escapedCells) {
-    if ((match as any).indicies) {
-      const m = (match as any).indicies[1]
-      result = result.slice(0, m[0]) + result.slice(m[1])
+  const lineBreaks = /".*(\n).*"/dgm
+  var match: RegExpExecArray | null
+  while ((match = lineBreaks.exec(result)) !== null) {
+    if (match.indices) {
+      const m = match.indices[1]
+      result = result.slice(0, m[0]) + ' ' + result.slice(m[1])
     }
   }
   //Remove quotes
