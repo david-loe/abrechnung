@@ -12,6 +12,7 @@ import mongoose, { Model } from 'mongoose'
 import i18n from './i18n.js'
 import { CountryLumpSum } from '../common/types.js'
 import Organisation from './models/organisation.js'
+import { LumpSumsJSON } from './data/parser.js'
 
 await connectDB()
 
@@ -43,7 +44,7 @@ async function initDB() {
   }
   await initer<any>(Currency, 'currencies', currencies)
   await initer<any>(Country, 'countries', countries)
-  await addAllLumpSums()
+  //await addLumpSumsToCountries(iLumpSums)
   initer(HealthInsurance, 'health insurances', healthInsurances)
   initer<any>(Organisation, 'organisation', organisations)
 }
@@ -58,78 +59,28 @@ async function initer<T>(model: Model<T>, name: string, data: T[]) {
   }
 }
 
-async function addAllLumpSums() {
-  iLumpSums.sort((a, b) => new Date(a.validFrom).valueOf() - new Date(b.validFrom).valueOf())
-  for (const lumpSum of iLumpSums) {
-    const result = await addLumpSumsToCountries(lumpSum.data, new Date(lumpSum.validFrom), 'de')
-    console.log(
-      'Lump sum from ' +
-        lumpSum.validFrom +
-        ': ' +
-        result.success.length +
-        ' updated - ' +
-        result.noUpdate.length +
-        ' not updated - ' +
-        result.noCountryFound.length +
-        ' no country found'
-    )
-    for (const notFound of result.noCountryFound) {
-      console.log(notFound.country)
-    }
-  }
-}
-
-export async function addLumpSumsToCountries(lumpSums: (typeof iLumpSums)[0]['data'], validFrom: Date, countryNameLanguage = 'de') {
-  const conditions: any = {}
-  const noCountryFound = []
-  const success = []
-  const noUpdate = []
-  for (const lumpSum of lumpSums) {
-    conditions.$or = [{}, {}]
-    conditions.$or[0]['name.' + countryNameLanguage] = lumpSum.country
-    conditions.$or[1]['alias.' + countryNameLanguage] = lumpSum.country
-
-    const country = await Country.findOne(conditions)
-    if (country) {
-      var newData = true
-      for (const countrylumpSums of country.lumpSums) {
-        if ((countrylumpSums.validFrom as Date).valueOf() >= validFrom.valueOf()) {
-          newData = false
-          break
+export async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
+  lumpSumsJSON.sort((a, b) => a.validFrom - b.validFrom)
+  for (const lumpSums of lumpSumsJSON) {
+    for (const lumpSum of lumpSums.data) {
+      const country = await Country.findOne({ _id: lumpSum.countryCode })
+      if (country) {
+        var newData = true
+        for (const countrylumpSums of country.lumpSums) {
+          if ((countrylumpSums.validFrom as Date).valueOf() >= lumpSums.validFrom) {
+            newData = false
+            break
+          }
         }
-      }
-      if (newData) {
-        const newLumpSum: CountryLumpSum = Object.assign({ validFrom }, convertRawLumpSum(lumpSum))
-        country.lumpSums.push(newLumpSum)
-        country.markModified('lumpSums')
-        success.push(await country.save())
+        if (newData) {
+          const newLumpSum: CountryLumpSum = Object.assign({ validFrom: new Date(lumpSums.validFrom) }, lumpSum)
+          country.lumpSums.push(newLumpSum)
+          country.markModified('lumpSums')
+          country.save()
+        }
       } else {
-        noUpdate.push(country)
+        throw Error('No Country with id "' + lumpSum.countryCode + '" found')
       }
-    } else {
-      noCountryFound.push(lumpSum)
     }
-  }
-  return { success, noUpdate, noCountryFound }
-}
-
-function convertRawLumpSum(raw: (typeof iLumpSums)[0]['data'][0]): Omit<CountryLumpSum, 'validFrom'> {
-  const spezials: CountryLumpSum['spezials'] = []
-  if (raw.spezials) {
-    for (const spezial of raw.spezials as { [key: string]: string | string[] }[]) {
-      spezials.push({
-        catering24: parseInt(spezial.catering24 as string, 10),
-        catering8: parseInt(spezial.catering8 as string, 10),
-        overnight: parseInt(spezial.overnight as string, 10),
-        city: spezial.city as string
-      })
-    }
-  }
-
-  return {
-    catering24: parseInt(raw.catering24 as string, 10),
-    catering8: parseInt(raw.catering8 as string, 10),
-    overnight: parseInt(raw.overnight as string, 10),
-    spezials
   }
 }

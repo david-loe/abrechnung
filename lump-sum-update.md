@@ -8,4 +8,4 @@
 country	catering24	catering8	overnight
 ```
 
-4. run `docker-compose exec -T backend npm parse-lumpsums`
+4. run `docker compose exec -T backend npm run parse-lumpsums`
