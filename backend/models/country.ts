@@ -14,8 +14,8 @@ const countrySchema = new Schema<Country, CountryModel, Methods>({
     en: { type: String, required: true, trim: true }
   },
   alias: {
-    de: { type: String, trim: true },
-    en: { type: String, trim: true }
+    de: [{ type: String, trim: true }],
+    en: [{ type: String, trim: true }]
   },
   _id: { type: String, required: true, trim: true, alias: 'code' },
   flag: { type: String },

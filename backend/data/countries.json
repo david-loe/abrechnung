@@ -307,7 +307,11 @@
             "de": "Belarus",
             "en": "Belarus"
         },
-        "alias.de": "Weißrussland",
+        "alias": {
+            "de": [
+                "Weißrussland"
+            ]
+        },
         "code": "BY",
         "currency": "BYN",
         "flag": "🇧🇾"
@@ -345,7 +349,11 @@
             "de": "Demokratische Republik Kongo",
             "en": "Democratic Republic of the Congo"
         },
-        "alias.de": "Kongo, Demokratische Republik",
+        "alias": {
+            "de": [
+                "Kongo, Demokratische Republik"
+            ]
+        },
         "code": "CD",
         "currency": "CDF",
         "flag": "🇨🇩"
@@ -364,7 +372,11 @@
             "de": "Kongo",
             "en": "Congo"
         },
-        "alias.de": "Kongo, Republik",
+        "alias": {
+            "de": [
+                "Kongo, Republik"
+            ]
+        },
         "code": "CG",
         "currency": "XAF",
         "flag": "🇨🇬"
@@ -383,7 +395,11 @@
             "de": "Côte d’Ivoire",
             "en": "Côte d’Ivoire"
         },
-        "alias.de": "Elfenbeinküste",
+        "alias": {
+            "de": [
+                "Elfenbeinküste"
+            ]
+        },
         "code": "CI",
         "currency": "XOF",
         "flag": "🇨🇮"
@@ -465,7 +481,11 @@
             "de": "Cabo Verde",
             "en": "Cabo Verde"
         },
-        "alias.de": "Kap Verde",
+        "alias": {
+            "de": [
+                "Kap Verde"
+            ]
+        },
         "code": "CV",
         "currency": "CVE",
         "flag": "🇨🇻"
@@ -504,7 +524,11 @@
             "de": "Tschechien",
             "en": "Czechia"
         },
-        "alias.de": "Tschechische Republik",
+        "alias": {
+            "de": [
+                "Tschechische Republik"
+            ]
+        },
         "code": "CZ",
         "currency": "CZK",
         "flag": "🇨🇿"
@@ -1096,7 +1120,11 @@
             "de": "Nordkorea",
             "en": "North Korea"
         },
-        "alias.de": "Korea, Demokratische Volksrepublik",
+        "alias": {
+            "de": [
+                "Korea, Demokratische Volksrepublik"
+            ]
+        },
         "code": "KP",
         "currency": "KPW",
         "flag": "🇰🇵"
@@ -1106,7 +1134,11 @@
             "de": "Südkorea",
             "en": "South Korea"
         },
-        "alias.de": "Korea, Republik",
+        "alias": {
+            "de": [
+                "Korea, Republik"
+            ]
+        },
         "code": "KR",
         "currency": "KRW",
         "flag": "🇰🇷"
@@ -1262,7 +1294,11 @@
             "de": "Moldau",
             "en": "Moldova"
         },
-        "alias.de": "Moldau, Republik",
+        "alias": {
+            "de": [
+                "Moldau, Republik"
+            ]
+        },
         "code": "MD",
         "currency": "MDL",
         "flag": "🇲🇩"
@@ -1300,7 +1336,11 @@
             "de": "Marshallinseln",
             "en": "Marshall Islands"
         },
-        "alias.de": "Marshall Inseln",
+        "alias": {
+            "de": [
+                "Marshall Inseln"
+            ]
+        },
         "code": "MH",
         "currency": "USD",
         "flag": "🇲🇭"
@@ -1736,7 +1776,11 @@
             "de": "Russland",
             "en": "Russia"
         },
-        "alias.de": "Russische Föderation",
+        "alias": {
+            "de": [
+                "Russische Föderation"
+            ]
+        },
         "code": "RU",
         "currency": "RUB",
         "flag": "🇷🇺"
@@ -1838,7 +1882,11 @@
             "de": "Slowakei",
             "en": "Slovakia"
         },
-        "alias.de": "Slowakische Republik",
+        "alias": {
+            "de": [
+                "Slowakische Republik"
+            ]
+        },
         "code": "SK",
         "currency": "EUR",
         "flag": "🇸🇰"
@@ -1903,7 +1951,11 @@
             "de": "São Tomé und Príncipe",
             "en": "São Tomé and Príncipe"
         },
-        "alias.de": "São Tomé – Príncipe",
+        "alias": {
+            "de": [
+                "São Tomé – Príncipe"
+            ]
+        },
         "code": "ST",
         "currency": "STN",
         "flag": "🇸🇹"
@@ -2115,7 +2167,11 @@
             "de": "Vereinigtes Königreich",
             "en": "United Kingdom"
         },
-        "alias.de": "Vereinigte Königreich Großbritannien und Nordirland",
+        "alias": {
+            "de": [
+                "Vereinigte Königreich Großbritannien und Nordirland"
+            ]
+        },
         "code": "GB",
         "currency": "GBP",
         "flag": "🇬🇧"
@@ -2135,7 +2191,11 @@
             "de": "Vereinigte Staaten",
             "en": "United States"
         },
-        "alias.de": "Vereinigten Staaten von Amerika",
+        "alias": {
+            "de": [
+                "Vereinigte Staaten von Amerika (USA)"
+            ]
+        },
         "code": "US",
         "currency": "USD",
         "flag": "🇺🇸"
@@ -2163,7 +2223,11 @@
             "de": "Vatikanstadt",
             "en": "Vatican City State"
         },
-        "alias.de": "Vatikanstaat",
+        "alias": {
+            "de": [
+                "Vatikanstaat"
+            ]
+        },
         "code": "VA",
         "currency": "EUR",
         "flag": "🇻🇦"

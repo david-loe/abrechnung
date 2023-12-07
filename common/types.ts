@@ -29,8 +29,8 @@ export interface CountrySimple {
     en: string
   }
   alias?: {
-    de: string
-    en?: string
+    de: string[]
+    en?: string[]
   }
   _id: string
   flag?: string | null
