@@ -16,7 +16,7 @@ import { LumpSumsJSON } from './data/parser.js'
 
 await connectDB()
 
-async function connectDB() {
+export async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
     await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
@@ -27,7 +27,11 @@ async function connectDB() {
   }
 }
 
-async function initDB() {
+export function disconnectDB() {
+  return mongoose.disconnect()
+}
+
+export async function initDB() {
   const DBsettings = await Settings.findOne().lean()
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
@@ -44,7 +48,7 @@ async function initDB() {
   }
   await initer<any>(Currency, 'currencies', currencies)
   await initer<any>(Country, 'countries', countries)
-  //await addLumpSumsToCountries(iLumpSums)
+  await addLumpSumsToCountries(iLumpSums)
   initer(HealthInsurance, 'health insurances', healthInsurances)
   initer<any>(Organisation, 'organisation', organisations)
 }
@@ -59,9 +63,10 @@ async function initer<T>(model: Model<T>, name: string, data: T[]) {
   }
 }
 
-export async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
+async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
   lumpSumsJSON.sort((a, b) => a.validFrom - b.validFrom)
   for (const lumpSums of lumpSumsJSON) {
+    var count = 0
     for (const lumpSum of lumpSums.data) {
       const country = await Country.findOne({ _id: lumpSum.countryCode })
       if (country) {
@@ -77,10 +82,14 @@ export async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
           country.lumpSums.push(newLumpSum)
           country.markModified('lumpSums')
           country.save()
+          count++
         }
       } else {
         throw Error('No Country with id "' + lumpSum.countryCode + '" found')
       }
+    }
+    if (count > 0) {
+      console.log('Added ' + count + ' lump sums for ' + new Date(lumpSums.validFrom))
     }
   }
 }

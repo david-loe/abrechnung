@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { readdir } from 'node:fs/promises'
 import { CountryLumpSum } from '../../common/types.js'
 import Country from '../models/country.js'
 
@@ -36,7 +37,8 @@ function assertAreRawLumpSums(data: any[]): asserts data is RawLumpSum[] {
 
 export async function parseLumpSumsFiles() {
   const lumpSums: LumpSumsJSON = []
-  fs.readdirSync('./data').forEach(async function (file) {
+  const files = await readdir('./data')
+  for (const file of files) {
     const matched = file.match(/lumpSums_(\d{4}-\d{2}-\d{2})\.tsv/i)
     if (matched && matched.length > 1) {
       const dataStr = fs.readFileSync('./data/' + file, 'utf8')
@@ -44,8 +46,8 @@ export async function parseLumpSumsFiles() {
       const data = await parseRawLumpSums(dataStr)
       lumpSums.push({ validFrom, data })
     }
-  })
-  if (!fs.existsSync('./data/lumpSums.json')) fs.writeFileSync('./data/lumpSums.json', JSON.stringify(lumpSums), 'utf-8')
+  }
+  fs.writeFileSync('./data/lumpSums.json', JSON.stringify(lumpSums, undefined, 2), 'utf-8')
   return lumpSums
 }
 
@@ -178,6 +180,5 @@ async function fixTableSpezialties(dataStr: string): Promise<string> {
   //Remove quotes
   var result = result.replace(/"/gm, '')
 
-  console.log(result)
   return result
 }

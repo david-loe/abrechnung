@@ -9,3 +9,9 @@ country	catering24	catering8	overnight
 ```
 
 4. run `docker compose exec -T backend npm run parse-lumpsums`
+
+## Lump Sums for Germany
+
+Keep in mind that the lump sums for germany are not included in the puplications of the `Bundesministerium der Finanzen`.
+
+To Update the lump sums of germany add a line manualy to the corresponding lump sum file.
