@@ -14,7 +14,9 @@ import { CountryLumpSum } from '../common/types.js'
 import Organisation from './models/organisation.js'
 import { LumpSumsJSON } from './data/parser.js'
 
-export async function connectDB() {
+await connectDB()
+
+async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
     await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
@@ -25,7 +27,7 @@ export async function connectDB() {
   }
 }
 
-export async function initDB() {
+async function initDB() {
   const DBsettings = await Settings.findOne().lean()
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
@@ -57,7 +59,7 @@ async function initer<T>(model: Model<T>, name: string, data: T[]) {
   }
 }
 
-async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
+export async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
   lumpSumsJSON.sort((a, b) => a.validFrom - b.validFrom)
   for (const lumpSums of lumpSumsJSON) {
     for (const lumpSum of lumpSums.data) {

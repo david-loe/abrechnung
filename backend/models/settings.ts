@@ -1,4 +1,4 @@
-import { connectDB } from '../db.js'
+import '../db.js'
 import { HydratedDocument, Document, Schema, model } from 'mongoose'
 import {
   Access,
@@ -13,8 +13,6 @@ import {
   DistanceRefundType,
   distanceRefundTypes
 } from '../../common/types.js'
-
-await connectDB()
 
 const accessIcons: { [key in Access]?: any } = {}
 for (const access of accesses) {
