@@ -55,9 +55,11 @@ export default defineComponent({
           return name
         }
         if (option.alias && option.alias[this.$i18n.locale as Locale]) {
-          const alias = option.alias[this.$i18n.locale as Locale]!.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
-          if (alias) {
-            return alias
+          for (const alias of option.alias[this.$i18n.locale as Locale]!) {
+            const result = alias.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+            if (result) {
+              return result
+            }
           }
         }
 

@@ -6,6 +6,7 @@ import User from './models/user.js'
 import Settings from './models/settings.js'
 import mongoose from 'mongoose'
 import { distanceRefundTypes } from '../common/types.js'
+import { initDB } from './db.js'
 
 const settings = await Settings.findOne()
 if (settings?.migrateFrom) {
@@ -82,6 +83,10 @@ async function migrate(from: string) {
         mongoose.connection.collection('travels').updateOne({ _id: travel._id }, { $set: { stages: travel.stages } })
       }
 
+    case '0.3.3':
+      console.log('Appy migration from v0.3.3')
+      await mongoose.connection.collection('countries').drop()
+      initDB()
     default:
       if (settings) {
         settings.migrateFrom = undefined

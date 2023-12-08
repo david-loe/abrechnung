@@ -1,1397 +1,3083 @@
 [
-    {
-        "validFrom": "2023-01-01T00:00:00.000Z",
-        "data": [
-            {
-                "country": "Afghanistan",
-                "catering24": "30",
-                "catering8": "20",
-                "overnight": "95"
-            },
-            {
-                "country": "Ägypten",
-                "catering24": "50",
-                "catering8": "33",
-                "overnight": "112"
-            },
-            {
-                "country": "Äthiopien",
-                "catering24": "39",
-                "catering8": "26",
-                "overnight": "130"
-            },
-            {
-                "country": "Äquatorialguinea",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "166"
-            },
-            {
-                "country": "Albanien",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "112"
-            },
-            {
-                "country": "Algerien",
-                "catering24": "47",
-                "catering8": "32",
-                "overnight": "120"
-            },
-            {
-                "country": "Andorra",
-                "catering24": "41",
-                "catering8": "28",
-                "overnight": "91"
-            },
-            {
-                "country": "Angola",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "299"
-            },
-            {
-                "country": "Argentinien",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "113"
-            },
-            {
-                "country": "Armenien",
-                "catering24": "24",
-                "catering8": "16",
-                "overnight": "59"
-            },
-            {
-                "country": "Aserbaidschan",
-                "catering24": "44",
-                "catering8": "29",
-                "overnight": "88"
-            },
-            {
-                "country": "Australien",
-                "catering24": "51",
-                "catering8": "34",
-                "overnight": "158",
-                "spezials": [
-                    {
-                        "catering24": "68",
-                        "catering8": "45",
-                        "overnight": "184",
-                        "city": "Sydney"
-                    },
-                    {
-                        "catering24": "51",
-                        "catering8": "34",
-                        "overnight": "158",
-                        "city": "Canberra"
-                    }
-                ]
-            },
-            {
-                "country": "Bahrain",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "153"
-            },
-            {
-                "country": "Bangladesch",
-                "catering24": "50",
-                "catering8": "33",
-                "overnight": "165"
-            },
-            {
-                "country": "Barbados",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "165"
-            },
-            {
-                "country": "Belgien",
-                "catering24": "59",
-                "catering8": "40",
-                "overnight": "141"
-            },
-            {
-                "country": "Benin",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "115"
-            },
-            {
-                "country": "Bolivien",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "108"
-            },
-            {
-                "country": "Bosnien und Herzegowina",
-                "catering24": "23",
-                "catering8": "16",
-                "overnight": "75"
-            },
-            {
-                "country": "Botsuana",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "176"
-            },
-            {
-                "country": "Brasilien",
-                "catering24": "51",
-                "catering8": "34",
-                "overnight": "84",
-                "spezials": [
-                    {
-                        "catering24": "53",
-                        "catering8": "36",
-                        "overnight": "132",
-                        "city": "Sao Paulo"
-                    },
-                    {
-                        "catering24": "57",
-                        "catering8": "38",
-                        "overnight": "145",
-                        "city": "Rio de Janeiro"
-                    },
-                    {
-                        "catering24": "57",
-                        "catering8": "38",
-                        "overnight": "127",
-                        "city": "Brasilia"
-                    }
-                ]
-            },
-            {
-                "country": "Brunei",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "106"
-            },
-            {
-                "country": "Bulgarien",
-                "catering24": "22",
-                "catering8": "15",
-                "overnight": "115"
-            },
-            {
-                "country": "Burkina Faso",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "174"
-            },
-            {
-                "country": "Burundi",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "138"
-            },
-            {
-                "country": "Chile",
-                "catering24": "44",
-                "catering8": "29",
-                "overnight": "154"
-            },
-            {
-                "country": "China",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "112",
-                "spezials": [
-                    {
-                        "catering24": "58",
-                        "catering8": "39",
-                        "overnight": "217",
-                        "city": "Shanghai"
-                    },
-                    {
-                        "catering24": "30",
-                        "catering8": "20",
-                        "overnight": "185",
-                        "city": "Peking"
-                    },
-                    {
-                        "catering24": "36",
-                        "catering8": "24",
-                        "overnight": "150",
-                        "city": "Kanton"
-                    },
-                    {
-                        "catering24": "74",
-                        "catering8": "49",
-                        "overnight": "145",
-                        "city": "Hongkong"
-                    },
-                    {
-                        "catering24": "41",
-                        "catering8": "28",
-                        "overnight": "131",
-                        "city": "Chengdu"
-                    }
-                ]
-            },
-            {
-                "country": "Costa Rica",
-                "catering24": "47",
-                "catering8": "32",
-                "overnight": "93"
-            },
-            {
-                "country": "Côte d’Ivoire",
-                "catering24": "59",
-                "catering8": "40",
-                "overnight": "166"
-            },
-            {
-                "country": "Dänemark",
-                "catering24": "75",
-                "catering8": "50",
-                "overnight": "183"
-            },
-            {
-                "country": "Dominikanische Republik",
-                "catering24": "45",
-                "catering8": "30",
-                "overnight": "147"
-            },
-            {
-                "country": "Dschibuti",
-                "catering24": "65",
-                "catering8": "44",
-                "overnight": "305"
-            },
-            {
-                "country": "Ecuador",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "103"
-            },
-            {
-                "country": "El Salvador",
-                "catering24": "65",
-                "catering8": "44",
-                "overnight": "161"
-            },
-            {
-                "country": "Eritrea",
-                "catering24": "50",
-                "catering8": "33",
-                "overnight": "91"
-            },
-            {
-                "country": "Estland",
-                "catering24": "29",
-                "catering8": "20",
-                "overnight": "85"
-            },
-            {
-                "country": "Fidschi",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "69"
-            },
-            {
-                "country": "Finnland",
-                "catering24": "50",
-                "catering8": "33",
-                "overnight": "136"
-            },
-            {
-                "country": "Frankreich",
-                "catering24": "53",
-                "catering8": "36",
-                "overnight": "105",
-                "spezials": [
-                    {
-                        "catering24": "58",
-                        "catering8": "39",
-                        "overnight": "159",
-                        "city": "Paris sowie die Departments 77, 78, 91 bis 95"
-                    }
-                ]
-            },
-            {
-                "country": "Gabun",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "183"
-            },
-            {
-                "country": "Gambia",
-                "catering24": "40",
-                "catering8": "27",
-                "overnight": "161"
-            },
-            {
-                "country": "Georgien",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "88"
-            },
-            {
-                "country": "Ghana",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "148"
-            },
-            {
-                "country": "Griechenland",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "150",
-                "spezials": [
-                    {
-                        "catering24": "40",
-                        "catering8": "27",
-                        "overnight": "139",
-                        "city": "Athen"
-                    }
-                ]
-            },
-            {
-                "country": "Guatemala",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "90"
-            },
-            {
-                "country": "Guinea",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "118"
-            },
-            {
-                "country": "Guinea-Bissau",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "113"
-            },
-            {
-                "country": "Haiti",
-                "catering24": "58",
-                "catering8": "39",
-                "overnight": "130"
-            },
-            {
-                "country": "Honduras",
-                "catering24": "57",
-                "catering8": "38",
-                "overnight": "198"
-            },
-            {
-                "country": "Indien",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "85",
-                "spezials": [
-                    {
-                        "catering24": "38",
-                        "catering8": "25",
-                        "overnight": "185",
-                        "city": "Neu Delhi"
-                    },
-                    {
-                        "catering24": "50",
-                        "catering8": "33",
-                        "overnight": "146",
-                        "city": "Mumbai"
-                    },
-                    {
-                        "catering24": "35",
-                        "catering8": "24",
-                        "overnight": "145",
-                        "city": "Kalkutta"
-                    },
-                    {
-                        "catering24": "32",
-                        "catering8": "21",
-                        "overnight": "85",
-                        "city": "Chennai"
-                    },
-                    {
-                        "catering24": "42",
-                        "catering8": "28",
-                        "overnight": "155",
-                        "city": "Bangalore"
-                    }
-                ]
-            },
-            {
-                "country": "Indonesien",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "134"
-            },
-            {
-                "country": "Iran",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "196"
-            },
-            {
-                "country": "Irland",
-                "catering24": "58",
-                "catering8": "39",
-                "overnight": "129"
-            },
-            {
-                "country": "Island",
-                "catering24": "62",
-                "catering8": "41",
-                "overnight": "187"
-            },
-            {
-                "country": "Israel",
-                "catering24": "66",
-                "catering8": "44",
-                "overnight": "190"
-            },
-            {
-                "country": "Italien",
-                "catering24": "40",
-                "catering8": "27",
-                "overnight": "135",
-                "spezials": [
-                    {
-                        "catering24": "40",
-                        "catering8": "27",
-                        "overnight": "135",
-                        "city": "Rom"
-                    },
-                    {
-                        "catering24": "45",
-                        "catering8": "30",
-                        "overnight": "158",
-                        "city": "Mailand"
-                    }
-                ]
-            },
-            {
-                "country": "Jamaika",
-                "catering24": "57",
-                "catering8": "38",
-                "overnight": "138"
-            },
-            {
-                "country": "Japan",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "190",
-                "spezials": [
-                    {
-                        "catering24": "66",
-                        "catering8": "44",
-                        "overnight": "233",
-                        "city": "Tokio"
-                    }
-                ]
-            },
-            {
-                "country": "Jemen",
-                "catering24": "24",
-                "catering8": "16",
-                "overnight": "95"
-            },
-            {
-                "country": "Jordanien",
-                "catering24": "57",
-                "catering8": "38",
-                "overnight": "134"
-            },
-            {
-                "country": "Kambodscha",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "94"
-            },
-            {
-                "country": "Kamerun",
-                "catering24": "50",
-                "catering8": "33",
-                "overnight": "180"
-            },
-            {
-                "country": "Kanada",
-                "catering24": "47",
-                "catering8": "32",
-                "overnight": "134",
-                "spezials": [
-                    {
-                        "catering24": "50",
-                        "catering8": "33",
-                        "overnight": "140",
-                        "city": "Vancouver"
-                    },
-                    {
-                        "catering24": "51",
-                        "catering8": "34",
-                        "overnight": "161",
-                        "city": "Toronto"
-                    },
-                    {
-                        "catering24": "47",
-                        "catering8": "32",
-                        "overnight": "142",
-                        "city": "Ottawa"
-                    }
-                ]
-            },
-            {
-                "country": "Kap Verde",
-                "catering24": "30",
-                "catering8": "20",
-                "overnight": "105"
-            },
-            {
-                "country": "Kasachstan",
-                "catering24": "45",
-                "catering8": "30",
-                "overnight": "111"
-            },
-            {
-                "country": "Katar",
-                "catering24": "56",
-                "catering8": "37",
-                "overnight": "149"
-            },
-            {
-                "country": "Kenia",
-                "catering24": "51",
-                "catering8": "34",
-                "overnight": "219"
-            },
-            {
-                "country": "Kirgisistan",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "74"
-            },
-            {
-                "country": "Kolumbien",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "115"
-            },
-            {
-                "country": "Kongo, Republik",
-                "catering24": "62",
-                "catering8": "41",
-                "overnight": "215"
-            },
-            {
-                "country": "Kongo, Demokratische Republik",
-                "catering24": "70",
-                "catering8": "47",
-                "overnight": "190"
-            },
-            {
-                "country": "Korea, Demokratische Volksrepublik",
-                "catering24": "28",
-                "catering8": "19",
-                "overnight": "92"
-            },
-            {
-                "country": "Korea, Republik",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "108"
-            },
-            {
-                "country": "Kosovo",
-                "catering24": "24",
-                "catering8": "16",
-                "overnight": "71"
-            },
-            {
-                "country": "Kroatien",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "107"
-            },
-            {
-                "country": "Kuba",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "228"
-            },
-            {
-                "country": "Kuwait",
-                "catering24": "56",
-                "catering8": "37",
-                "overnight": "241"
-            },
-            {
-                "country": "Laos",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "96"
-            },
-            {
-                "country": "Lesotho",
-                "catering24": "28",
-                "catering8": "19",
-                "overnight": "104"
-            },
-            {
-                "country": "Lettland",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "76"
-            },
-            {
-                "country": "Libanon",
-                "catering24": "59",
-                "catering8": "40",
-                "overnight": "123"
-            },
-            {
-                "country": "Libyen",
-                "catering24": "63",
-                "catering8": "42",
-                "overnight": "135"
-            },
-            {
-                "country": "Liechtenstein",
-                "catering24": "56",
-                "catering8": "37",
-                "overnight": "190"
-            },
-            {
-                "country": "Litauen",
-                "catering24": "26",
-                "catering8": "17",
-                "overnight": "109"
-            },
-            {
-                "country": "Luxemburg",
-                "catering24": "63",
-                "catering8": "42",
-                "overnight": "139"
-            },
-            {
-                "country": "Madagaskar",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "87"
-            },
-            {
-                "country": "Malawi",
-                "catering24": "41",
-                "catering8": "28",
-                "overnight": "109"
-            },
-            {
-                "country": "Malaysia",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "86"
-            },
-            {
-                "country": "Malediven",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "170"
-            },
-            {
-                "country": "Mali",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "120"
-            },
-            {
-                "country": "Malta",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "114"
-            },
-            {
-                "country": "Marokko",
-                "catering24": "42",
-                "catering8": "28",
-                "overnight": "129"
-            },
-            {
-                "country": "Marshall Inseln",
-                "catering24": "63",
-                "catering8": "42",
-                "overnight": "102"
-            },
-            {
-                "country": "Mauretanien",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "86"
-            },
-            {
-                "country": "Mauritius",
-                "catering24": "54",
-                "catering8": "36",
-                "overnight": "220"
-            },
-            {
-                "country": "Mexiko",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "177"
-            },
-            {
-                "country": "Moldau, Republik",
-                "catering24": "26",
-                "catering8": "17",
-                "overnight": "73"
-            },
-            {
-                "country": "Monaco",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "187"
-            },
-            {
-                "country": "Mongolei",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "92"
-            },
-            {
-                "country": "Montenegro",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "85"
-            },
-            {
-                "country": "Mosambik",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "146"
-            },
-            {
-                "country": "Myanmar",
-                "catering24": "35",
-                "catering8": "24",
-                "overnight": "155"
-            },
-            {
-                "country": "Namibia",
-                "catering24": "30",
-                "catering8": "20",
-                "overnight": "112"
-            },
-            {
-                "country": "Nepal",
-                "catering24": "36",
-                "catering8": "24",
-                "overnight": "126"
-            },
-            {
-                "country": "Neuseeland",
-                "catering24": "56",
-                "catering8": "37",
-                "overnight": "153"
-            },
-            {
-                "country": "Nicaragua",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "105"
-            },
-            {
-                "country": "Niederlande",
-                "catering24": "47",
-                "catering8": "32",
-                "overnight": "122"
-            },
-            {
-                "country": "Niger",
-                "catering24": "42",
-                "catering8": "28",
-                "overnight": "131"
-            },
-            {
-                "country": "Nigeria",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "182"
-            },
-            {
-                "country": "Nordmazedonien",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "89"
-            },
-            {
-                "country": "Norwegen",
-                "catering24": "80",
-                "catering8": "53",
-                "overnight": "182"
-            },
-            {
-                "country": "Österreich",
-                "catering24": "40",
-                "catering8": "27",
-                "overnight": "108"
-            },
-            {
-                "country": "Oman",
-                "catering24": "64",
-                "catering8": "43",
-                "overnight": "141"
-            },
-            {
-                "country": "Pakistan",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "122",
-                "spezials": [
-                    {
-                        "catering24": "23",
-                        "catering8": "16",
-                        "overnight": "238",
-                        "city": "Islamabad"
-                    }
-                ]
-            },
-            {
-                "country": "Palau",
-                "catering24": "51",
-                "catering8": "34",
-                "overnight": "179"
-            },
-            {
-                "country": "Panama",
-                "catering24": "41",
-                "catering8": "28",
-                "overnight": "82"
-            },
-            {
-                "country": "Papua-Neuguinea",
-                "catering24": "59",
-                "catering8": "40",
-                "overnight": "159"
-            },
-            {
-                "country": "Paraguay",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "108"
-            },
-            {
-                "country": "Peru",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "143"
-            },
-            {
-                "country": "Philippinen",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "116"
-            },
-            {
-                "country": "Polen",
-                "catering24": "29",
-                "catering8": "20",
-                "overnight": "60",
-                "spezials": [
-                    {
-                        "catering24": "29",
-                        "catering8": "20",
-                        "overnight": "109",
-                        "city": "Warschau"
-                    },
-                    {
-                        "catering24": "27",
-                        "catering8": "18",
-                        "overnight": "86",
-                        "city": "Krakau"
-                    },
-                    {
-                        "catering24": "30",
-                        "catering8": "20",
-                        "overnight": "84",
-                        "city": "Danzig"
-                    },
-                    {
-                        "catering24": "33",
-                        "catering8": "22",
-                        "overnight": "117",
-                        "city": "Breslau"
-                    }
-                ]
-            },
-            {
-                "country": "Portugal",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "111"
-            },
-            {
-                "country": "Ruanda",
-                "catering24": "44",
-                "catering8": "29",
-                "overnight": "117"
-            },
-            {
-                "country": "Rumänien",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "89",
-                "spezials": [
-                    {
-                        "catering24": "32",
-                        "catering8": "21",
-                        "overnight": "92",
-                        "city": "Bukarest"
-                    }
-                ]
-            },
-            {
-                "country": "Russische Föderation",
-                "catering24": "24",
-                "catering8": "16",
-                "overnight": "58",
-                "spezials": [
-                    {
-                        "catering24": "26",
-                        "catering8": "17",
-                        "overnight": "114",
-                        "city": "St. Petersburg"
-                    },
-                    {
-                        "catering24": "30",
-                        "catering8": "20",
-                        "overnight": "110",
-                        "city": "Moskau"
-                    },
-                    {
-                        "catering24": "28",
-                        "catering8": "19",
-                        "overnight": "84",
-                        "city": "Jekaterinburg"
-                    }
-                ]
-            },
-            {
-                "country": "Sambia",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "105"
-            },
-            {
-                "country": "Samoa",
-                "catering24": "39",
-                "catering8": "26",
-                "overnight": "105"
-            },
-            {
-                "country": "San Marino",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "79"
-            },
-            {
-                "country": "São Tomé – Príncipe",
-                "catering24": "47",
-                "catering8": "32",
-                "overnight": "80"
-            },
-            {
-                "country": "Saudi-Arabien",
-                "catering24": "56",
-                "catering8": "37",
-                "overnight": "181",
-                "spezials": [
-                    {
-                        "catering24": "56",
-                        "catering8": "37",
-                        "overnight": "186",
-                        "city": "Riad"
-                    },
-                    {
-                        "catering24": "57",
-                        "catering8": "38",
-                        "overnight": "181",
-                        "city": "Djidda"
-                    }
-                ]
-            },
-            {
-                "country": "Schweden",
-                "catering24": "66",
-                "catering8": "44",
-                "overnight": "140"
-            },
-            {
-                "country": "Schweiz",
-                "catering24": "64",
-                "catering8": "43",
-                "overnight": "180",
-                "spezials": [
-                    {
-                        "catering24": "66",
-                        "catering8": "44",
-                        "overnight": "186",
-                        "city": "Genf"
-                    }
-                ]
-            },
-            {
-                "country": "Senegal",
-                "catering24": "42",
-                "catering8": "28",
-                "overnight": "190"
-            },
-            {
-                "country": "Serbien",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "97"
-            },
-            {
-                "country": "Sierra Leone",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "161"
-            },
-            {
-                "country": "Simbabwe",
-                "catering24": "45",
-                "catering8": "30",
-                "overnight": "140"
-            },
-            {
-                "country": "Singapur",
-                "catering24": "54",
-                "catering8": "36",
-                "overnight": "197"
-            },
-            {
-                "country": "Slowakische Republik",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "121"
-            },
-            {
-                "country": "Slowenien",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "126"
-            },
-            {
-                "country": "Spanien",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "115",
-                "spezials": [
-                    {
-                        "catering24": "35",
-                        "catering8": "24",
-                        "overnight": "121",
-                        "city": "Palma de Mallorca"
-                    },
-                    {
-                        "catering24": "40",
-                        "catering8": "27",
-                        "overnight": "118",
-                        "city": "Madrid"
-                    },
-                    {
-                        "catering24": "40",
-                        "catering8": "27",
-                        "overnight": "115",
-                        "city": "Kanarische Inseln"
-                    },
-                    {
-                        "catering24": "34",
-                        "catering8": "23",
-                        "overnight": "118",
-                        "city": "Barcelona"
-                    }
-                ]
-            },
-            {
-                "country": "Sri Lanka",
-                "catering24": "42",
-                "catering8": "28",
-                "overnight": "100"
-            },
-            {
-                "country": "Sudan",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "195"
-            },
-            {
-                "country": "Südafrika",
-                "catering24": "29",
-                "catering8": "20",
-                "overnight": "109",
-                "spezials": [
-                    {
-                        "catering24": "36",
-                        "catering8": "24",
-                        "overnight": "129",
-                        "city": "Johannesburg"
-                    },
-                    {
-                        "catering24": "33",
-                        "catering8": "22",
-                        "overnight": "130",
-                        "city": "Kapstadt"
-                    }
-                ]
-            },
-            {
-                "country": "Südsudan",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "150"
-            },
-            {
-                "country": "Syrien",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "140"
-            },
-            {
-                "country": "Tadschikistan",
-                "catering24": "27",
-                "catering8": "18",
-                "overnight": "118"
-            },
-            {
-                "country": "Taiwan",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "143"
-            },
-            {
-                "country": "Tansania",
-                "catering24": "44",
-                "catering8": "29",
-                "overnight": "97"
-            },
-            {
-                "country": "Thailand",
-                "catering24": "38",
-                "catering8": "25",
-                "overnight": "110"
-            },
-            {
-                "country": "Togo",
-                "catering24": "39",
-                "catering8": "26",
-                "overnight": "118"
-            },
-            {
-                "country": "Tonga",
-                "catering24": "39",
-                "catering8": "26",
-                "overnight": "94"
-            },
-            {
-                "country": "Trinidad und Tobago",
-                "catering24": "45",
-                "catering8": "30",
-                "overnight": "177"
-            },
-            {
-                "country": "Tschad",
-                "catering24": "64",
-                "catering8": "43",
-                "overnight": "163"
-            },
-            {
-                "country": "Tschechische Republik",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "77"
-            },
-            {
-                "country": "Türkei",
-                "catering24": "17",
-                "catering8": "12",
-                "overnight": "95",
-                "spezials": [
-                    {
-                        "catering24": "29",
-                        "catering8": "20",
-                        "overnight": "55",
-                        "city": "Izmir"
-                    },
-                    {
-                        "catering24": "26",
-                        "catering8": "17",
-                        "overnight": "120",
-                        "city": "Istanbul"
-                    }
-                ]
-            },
-            {
-                "country": "Tunesien",
-                "catering24": "40",
-                "catering8": "27",
-                "overnight": "115"
-            },
-            {
-                "country": "Turkmenistan",
-                "catering24": "33",
-                "catering8": "22",
-                "overnight": "108"
-            },
-            {
-                "country": "Uganda",
-                "catering24": "41",
-                "catering8": "28",
-                "overnight": "143"
-            },
-            {
-                "country": "Ukraine",
-                "catering24": "26",
-                "catering8": "17",
-                "overnight": "98"
-            },
-            {
-                "country": "Ungarn",
-                "catering24": "32",
-                "catering8": "21",
-                "overnight": "85"
-            },
-            {
-                "country": "Uruguay",
-                "catering24": "48",
-                "catering8": "32",
-                "overnight": "90"
-            },
-            {
-                "country": "Usbekistan",
-                "catering24": "34",
-                "catering8": "23",
-                "overnight": "104"
-            },
-            {
-                "country": "Vatikanstaat",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "160"
-            },
-            {
-                "country": "Venezuela",
-                "catering24": "45",
-                "catering8": "30",
-                "overnight": "127"
-            },
-            {
-                "country": "Vereinigte Arabische Emirate",
-                "catering24": "65",
-                "catering8": "44",
-                "overnight": "156"
-            },
-            {
-                "country": "Vereinigten Staaten von Amerika",
-                "catering24": "59",
-                "catering8": "40",
-                "overnight": "182",
-                "spezials": [
-                    {
-                        "catering24": "66",
-                        "catering8": "44",
-                        "overnight": "203",
-                        "city": "Washington, D. C."
-                    },
-                    {
-                        "catering24": "59",
-                        "catering8": "40",
-                        "overnight": "327",
-                        "city": "San Francisco"
-                    },
-                    {
-                        "catering24": "66",
-                        "catering8": "44",
-                        "overnight": "308",
-                        "city": "New York City"
-                    },
-                    {
-                        "catering24": "65",
-                        "catering8": "44",
-                        "overnight": "256",
-                        "city": "Miami"
-                    },
-                    {
-                        "catering24": "64",
-                        "catering8": "43",
-                        "overnight": "262",
-                        "city": "Los Angeles"
-                    },
-                    {
-                        "catering24": "62",
-                        "catering8": "41",
-                        "overnight": "204",
-                        "city": "Houston"
-                    },
-                    {
-                        "catering24": "65",
-                        "catering8": "44",
-                        "overnight": "233",
-                        "city": "Chicago"
-                    },
-                    {
-                        "catering24": "63",
-                        "catering8": "42",
-                        "overnight": "333",
-                        "city": "Boston"
-                    },
-                    {
-                        "catering24": "77",
-                        "catering8": "52",
-                        "overnight": "182",
-                        "city": "Atlanta"
-                    }
-                ]
-            },
-            {
-                "country": "Vereinigte Königreich Großbritannien und Nordirland",
-                "catering24": "52",
-                "catering8": "35",
-                "overnight": "99",
-                "spezials": [
-                    {
-                        "catering24": "66",
-                        "catering8": "44",
-                        "overnight": "163",
-                        "city": "London"
-                    }
-                ]
-            },
-            {
-                "country": "Vietnam",
-                "catering24": "41",
-                "catering8": "28",
-                "overnight": "86"
-            },
-            {
-                "country": "Weißrussland",
-                "catering24": "20",
-                "catering8": "13",
-                "overnight": "98"
-            },
-            {
-                "country": "Zentralafrikanische Republik",
-                "catering24": "46",
-                "catering8": "31",
-                "overnight": "74"
-            },
-            {
-                "country": "Zypern",
-                "catering24": "42",
-                "catering8": "28",
-                "overnight": "125"
-            },
-            {
-                "country": "Deutschland",
-                "catering24": "28",
-                "catering8": "14",
-                "overnight": "20"
-            }
-        ]
-    }
+  {
+    "validFrom": 1672531200000,
+    "data": [
+      {
+        "catering24": 30,
+        "catering8": 20,
+        "overnight": 95,
+        "spezials": [],
+        "countryCode": "AF"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "EG"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 130,
+        "spezials": [],
+        "countryCode": "ET"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 166,
+        "spezials": [],
+        "countryCode": "GQ"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "AL"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 120,
+        "spezials": [],
+        "countryCode": "DZ"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 91,
+        "spezials": [],
+        "countryCode": "AD"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 299,
+        "spezials": [],
+        "countryCode": "AO"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 113,
+        "spezials": [],
+        "countryCode": "AR"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 59,
+        "spezials": [],
+        "countryCode": "AM"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 88,
+        "spezials": [],
+        "countryCode": "AZ"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 158,
+        "spezials": [
+          {
+            "catering24": 68,
+            "catering8": 45,
+            "overnight": 184,
+            "city": "Sydney"
+          },
+          {
+            "catering24": 51,
+            "catering8": 34,
+            "overnight": 158,
+            "city": "Canberra"
+          }
+        ],
+        "countryCode": "AU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 153,
+        "spezials": [],
+        "countryCode": "BH"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 165,
+        "spezials": [],
+        "countryCode": "BD"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 165,
+        "spezials": [],
+        "countryCode": "BB"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 141,
+        "spezials": [],
+        "countryCode": "BE"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "BJ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "BO"
+      },
+      {
+        "catering24": 23,
+        "catering8": 16,
+        "overnight": 75,
+        "spezials": [],
+        "countryCode": "BA"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 176,
+        "spezials": [],
+        "countryCode": "BW"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 84,
+        "spezials": [
+          {
+            "catering24": 53,
+            "catering8": 36,
+            "overnight": 132,
+            "city": "Sao Paulo"
+          },
+          {
+            "catering24": 57,
+            "catering8": 38,
+            "overnight": 145,
+            "city": "Rio de Janeiro"
+          },
+          {
+            "catering24": 57,
+            "catering8": 38,
+            "overnight": 127,
+            "city": "Brasilia"
+          }
+        ],
+        "countryCode": "BR"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 106,
+        "spezials": [],
+        "countryCode": "BN"
+      },
+      {
+        "catering24": 22,
+        "catering8": 15,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "BG"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 174,
+        "spezials": [],
+        "countryCode": "BF"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 138,
+        "spezials": [],
+        "countryCode": "BI"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 154,
+        "spezials": [],
+        "countryCode": "CL"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 112,
+        "spezials": [
+          {
+            "catering24": 58,
+            "catering8": 39,
+            "overnight": 217,
+            "city": "Shanghai"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 185,
+            "city": "Peking"
+          },
+          {
+            "catering24": 36,
+            "catering8": 24,
+            "overnight": 150,
+            "city": "Kanton"
+          },
+          {
+            "catering24": 74,
+            "catering8": 49,
+            "overnight": 145,
+            "city": "Hongkong"
+          },
+          {
+            "catering24": 41,
+            "catering8": 28,
+            "overnight": 131,
+            "city": "Chengdu"
+          }
+        ],
+        "countryCode": "CN"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 93,
+        "spezials": [],
+        "countryCode": "CR"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 166,
+        "spezials": [],
+        "countryCode": "CI"
+      },
+      {
+        "catering24": 75,
+        "catering8": 50,
+        "overnight": 183,
+        "spezials": [],
+        "countryCode": "DK"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 147,
+        "spezials": [],
+        "countryCode": "DO"
+      },
+      {
+        "catering24": 65,
+        "catering8": 44,
+        "overnight": 305,
+        "spezials": [],
+        "countryCode": "DJ"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 103,
+        "spezials": [],
+        "countryCode": "EC"
+      },
+      {
+        "catering24": 65,
+        "catering8": 44,
+        "overnight": 161,
+        "spezials": [],
+        "countryCode": "SV"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 91,
+        "spezials": [],
+        "countryCode": "ER"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "EE"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 69,
+        "spezials": [],
+        "countryCode": "FJ"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 136,
+        "spezials": [],
+        "countryCode": "FI"
+      },
+      {
+        "catering24": 53,
+        "catering8": 36,
+        "overnight": 105,
+        "spezials": [
+          {
+            "catering24": 58,
+            "catering8": 39,
+            "overnight": 159,
+            "city": "Paris sowie die Departments 77, 78, 91 bis 95"
+          }
+        ],
+        "countryCode": "FR"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 183,
+        "spezials": [],
+        "countryCode": "GA"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 161,
+        "spezials": [],
+        "countryCode": "GM"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 88,
+        "spezials": [],
+        "countryCode": "GE"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 148,
+        "spezials": [],
+        "countryCode": "GH"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 150,
+        "spezials": [
+          {
+            "catering24": 40,
+            "catering8": 27,
+            "overnight": 139,
+            "city": "Athen"
+          }
+        ],
+        "countryCode": "GR"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 90,
+        "spezials": [],
+        "countryCode": "GT"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 118,
+        "spezials": [],
+        "countryCode": "GN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 113,
+        "spezials": [],
+        "countryCode": "GW"
+      },
+      {
+        "catering24": 58,
+        "catering8": 39,
+        "overnight": 130,
+        "spezials": [],
+        "countryCode": "HT"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 198,
+        "spezials": [],
+        "countryCode": "HN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [
+          {
+            "catering24": 38,
+            "catering8": 25,
+            "overnight": 185,
+            "city": "Neu Delhi"
+          },
+          {
+            "catering24": 50,
+            "catering8": 33,
+            "overnight": 146,
+            "city": "Mumbai"
+          },
+          {
+            "catering24": 35,
+            "catering8": 24,
+            "overnight": 145,
+            "city": "Kalkutta"
+          },
+          {
+            "catering24": 32,
+            "catering8": 21,
+            "overnight": 85,
+            "city": "Chennai"
+          },
+          {
+            "catering24": 42,
+            "catering8": 28,
+            "overnight": 155,
+            "city": "Bangalore"
+          }
+        ],
+        "countryCode": "IN"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 134,
+        "spezials": [],
+        "countryCode": "ID"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 196,
+        "spezials": [],
+        "countryCode": "IR"
+      },
+      {
+        "catering24": 58,
+        "catering8": 39,
+        "overnight": 129,
+        "spezials": [],
+        "countryCode": "IE"
+      },
+      {
+        "catering24": 62,
+        "catering8": 41,
+        "overnight": 187,
+        "spezials": [],
+        "countryCode": "IS"
+      },
+      {
+        "catering24": 66,
+        "catering8": 44,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "IL"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 135,
+        "spezials": [
+          {
+            "catering24": 40,
+            "catering8": 27,
+            "overnight": 135,
+            "city": "Rom"
+          },
+          {
+            "catering24": 45,
+            "catering8": 30,
+            "overnight": 158,
+            "city": "Mailand"
+          }
+        ],
+        "countryCode": "IT"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 138,
+        "spezials": [],
+        "countryCode": "JM"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 190,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 233,
+            "city": "Tokio"
+          }
+        ],
+        "countryCode": "JP"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 95,
+        "spezials": [],
+        "countryCode": "YE"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 134,
+        "spezials": [],
+        "countryCode": "JO"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 94,
+        "spezials": [],
+        "countryCode": "KH"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 180,
+        "spezials": [],
+        "countryCode": "CM"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 134,
+        "spezials": [
+          {
+            "catering24": 50,
+            "catering8": 33,
+            "overnight": 140,
+            "city": "Vancouver"
+          },
+          {
+            "catering24": 51,
+            "catering8": 34,
+            "overnight": 161,
+            "city": "Toronto"
+          },
+          {
+            "catering24": 47,
+            "catering8": 32,
+            "overnight": 142,
+            "city": "Ottawa"
+          }
+        ],
+        "countryCode": "CA"
+      },
+      {
+        "catering24": 30,
+        "catering8": 20,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "CV"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 111,
+        "spezials": [],
+        "countryCode": "KZ"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 149,
+        "spezials": [],
+        "countryCode": "QA"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 219,
+        "spezials": [],
+        "countryCode": "KE"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 74,
+        "spezials": [],
+        "countryCode": "KG"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "CO"
+      },
+      {
+        "catering24": 62,
+        "catering8": 41,
+        "overnight": 215,
+        "spezials": [],
+        "countryCode": "CG"
+      },
+      {
+        "catering24": 70,
+        "catering8": 47,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "CD"
+      },
+      {
+        "catering24": 28,
+        "catering8": 19,
+        "overnight": 92,
+        "spezials": [],
+        "countryCode": "KP"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "KR"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 71,
+        "spezials": [],
+        "countryCode": "XK"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 107,
+        "spezials": [],
+        "countryCode": "HR"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 228,
+        "spezials": [],
+        "countryCode": "CU"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 241,
+        "spezials": [],
+        "countryCode": "KW"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 96,
+        "spezials": [],
+        "countryCode": "LA"
+      },
+      {
+        "catering24": 28,
+        "catering8": 19,
+        "overnight": 104,
+        "spezials": [],
+        "countryCode": "LS"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 76,
+        "spezials": [],
+        "countryCode": "LV"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 123,
+        "spezials": [],
+        "countryCode": "LB"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 135,
+        "spezials": [],
+        "countryCode": "LY"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "LI"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 109,
+        "spezials": [],
+        "countryCode": "LT"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 139,
+        "spezials": [],
+        "countryCode": "LU"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 87,
+        "spezials": [],
+        "countryCode": "MG"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 109,
+        "spezials": [],
+        "countryCode": "MW"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "MY"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 170,
+        "spezials": [],
+        "countryCode": "MV"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 120,
+        "spezials": [],
+        "countryCode": "ML"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 114,
+        "spezials": [],
+        "countryCode": "MT"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 129,
+        "spezials": [],
+        "countryCode": "MA"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 102,
+        "spezials": [],
+        "countryCode": "MH"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "MR"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 220,
+        "spezials": [],
+        "countryCode": "MU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 177,
+        "spezials": [],
+        "countryCode": "MX"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 73,
+        "spezials": [],
+        "countryCode": "MD"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 187,
+        "spezials": [],
+        "countryCode": "MC"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 92,
+        "spezials": [],
+        "countryCode": "MN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "ME"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 146,
+        "spezials": [],
+        "countryCode": "MZ"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 155,
+        "spezials": [],
+        "countryCode": "MM"
+      },
+      {
+        "catering24": 30,
+        "catering8": 20,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "NA"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 126,
+        "spezials": [],
+        "countryCode": "NP"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 153,
+        "spezials": [],
+        "countryCode": "NZ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "NI"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 122,
+        "spezials": [],
+        "countryCode": "NL"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 131,
+        "spezials": [],
+        "countryCode": "NE"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 182,
+        "spezials": [],
+        "countryCode": "NG"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 89,
+        "spezials": [],
+        "countryCode": "MK"
+      },
+      {
+        "catering24": 80,
+        "catering8": 53,
+        "overnight": 182,
+        "spezials": [],
+        "countryCode": "NO"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "AT"
+      },
+      {
+        "catering24": 64,
+        "catering8": 43,
+        "overnight": 141,
+        "spezials": [],
+        "countryCode": "OM"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 122,
+        "spezials": [
+          {
+            "catering24": 23,
+            "catering8": 16,
+            "overnight": 238,
+            "city": "Islamabad"
+          }
+        ],
+        "countryCode": "PK"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 179,
+        "spezials": [],
+        "countryCode": "PW"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 82,
+        "spezials": [],
+        "countryCode": "PA"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 159,
+        "spezials": [],
+        "countryCode": "PG"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "PY"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "PE"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 116,
+        "spezials": [],
+        "countryCode": "PH"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 60,
+        "spezials": [
+          {
+            "catering24": 29,
+            "catering8": 20,
+            "overnight": 109,
+            "city": "Warschau"
+          },
+          {
+            "catering24": 27,
+            "catering8": 18,
+            "overnight": 86,
+            "city": "Krakau"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 84,
+            "city": "Danzig"
+          },
+          {
+            "catering24": 33,
+            "catering8": 22,
+            "overnight": 117,
+            "city": "Breslau"
+          }
+        ],
+        "countryCode": "PL"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 111,
+        "spezials": [],
+        "countryCode": "PT"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 117,
+        "spezials": [],
+        "countryCode": "RW"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 89,
+        "spezials": [
+          {
+            "catering24": 32,
+            "catering8": 21,
+            "overnight": 92,
+            "city": "Bukarest"
+          }
+        ],
+        "countryCode": "RO"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 58,
+        "spezials": [
+          {
+            "catering24": 26,
+            "catering8": 17,
+            "overnight": 114,
+            "city": "St. Petersburg"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 110,
+            "city": "Moskau"
+          },
+          {
+            "catering24": 28,
+            "catering8": 19,
+            "overnight": 84,
+            "city": "Jekaterinburg"
+          }
+        ],
+        "countryCode": "RU"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "ZM"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "WS"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 79,
+        "spezials": [],
+        "countryCode": "SM"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 80,
+        "spezials": [],
+        "countryCode": "ST"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 181,
+        "spezials": [
+          {
+            "catering24": 56,
+            "catering8": 37,
+            "overnight": 186,
+            "city": "Riad"
+          },
+          {
+            "catering24": 57,
+            "catering8": 38,
+            "overnight": 181,
+            "city": "Djidda"
+          }
+        ],
+        "countryCode": "SA"
+      },
+      {
+        "catering24": 66,
+        "catering8": 44,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "SE"
+      },
+      {
+        "catering24": 64,
+        "catering8": 43,
+        "overnight": 180,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 186,
+            "city": "Genf"
+          }
+        ],
+        "countryCode": "CH"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "SN"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 97,
+        "spezials": [],
+        "countryCode": "RS"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 161,
+        "spezials": [],
+        "countryCode": "SL"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "ZW"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 197,
+        "spezials": [],
+        "countryCode": "SG"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 121,
+        "spezials": [],
+        "countryCode": "SK"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 126,
+        "spezials": [],
+        "countryCode": "SI"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 115,
+        "spezials": [
+          {
+            "catering24": 35,
+            "catering8": 24,
+            "overnight": 121,
+            "city": "Palma de Mallorca"
+          },
+          {
+            "catering24": 40,
+            "catering8": 27,
+            "overnight": 118,
+            "city": "Madrid"
+          },
+          {
+            "catering24": 40,
+            "catering8": 27,
+            "overnight": 115,
+            "city": "Kanarische Inseln"
+          },
+          {
+            "catering24": 34,
+            "catering8": 23,
+            "overnight": 118,
+            "city": "Barcelona"
+          }
+        ],
+        "countryCode": "ES"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 100,
+        "spezials": [],
+        "countryCode": "LK"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 195,
+        "spezials": [],
+        "countryCode": "SD"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 109,
+        "spezials": [
+          {
+            "catering24": 36,
+            "catering8": 24,
+            "overnight": 129,
+            "city": "Johannesburg"
+          },
+          {
+            "catering24": 33,
+            "catering8": 22,
+            "overnight": 130,
+            "city": "Kapstadt"
+          }
+        ],
+        "countryCode": "ZA"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 150,
+        "spezials": [],
+        "countryCode": "SS"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "SY"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 118,
+        "spezials": [],
+        "countryCode": "TJ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "TW"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 97,
+        "spezials": [],
+        "countryCode": "TZ"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 110,
+        "spezials": [],
+        "countryCode": "TH"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 118,
+        "spezials": [],
+        "countryCode": "TG"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 94,
+        "spezials": [],
+        "countryCode": "TO"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 177,
+        "spezials": [],
+        "countryCode": "TT"
+      },
+      {
+        "catering24": 64,
+        "catering8": 43,
+        "overnight": 163,
+        "spezials": [],
+        "countryCode": "TD"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 77,
+        "spezials": [],
+        "countryCode": "CZ"
+      },
+      {
+        "catering24": 17,
+        "catering8": 12,
+        "overnight": 95,
+        "spezials": [
+          {
+            "catering24": 29,
+            "catering8": 20,
+            "overnight": 55,
+            "city": "Izmir"
+          },
+          {
+            "catering24": 26,
+            "catering8": 17,
+            "overnight": 120,
+            "city": "Istanbul"
+          }
+        ],
+        "countryCode": "TR"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "TN"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "TM"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "UG"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 98,
+        "spezials": [],
+        "countryCode": "UA"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "HU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 90,
+        "spezials": [],
+        "countryCode": "UY"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 104,
+        "spezials": [],
+        "countryCode": "UZ"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 160,
+        "spezials": [],
+        "countryCode": "VA"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 127,
+        "spezials": [],
+        "countryCode": "VE"
+      },
+      {
+        "catering24": 65,
+        "catering8": 44,
+        "overnight": 156,
+        "spezials": [],
+        "countryCode": "AE"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 182,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 203,
+            "city": "Washington, D. C."
+          },
+          {
+            "catering24": 59,
+            "catering8": 40,
+            "overnight": 327,
+            "city": "San Francisco"
+          },
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 308,
+            "city": "New York City"
+          },
+          {
+            "catering24": 65,
+            "catering8": 44,
+            "overnight": 256,
+            "city": "Miami"
+          },
+          {
+            "catering24": 64,
+            "catering8": 43,
+            "overnight": 262,
+            "city": "Los Angeles"
+          },
+          {
+            "catering24": 62,
+            "catering8": 41,
+            "overnight": 204,
+            "city": "Houston"
+          },
+          {
+            "catering24": 65,
+            "catering8": 44,
+            "overnight": 233,
+            "city": "Chicago"
+          },
+          {
+            "catering24": 63,
+            "catering8": 42,
+            "overnight": 333,
+            "city": "Boston"
+          },
+          {
+            "catering24": 77,
+            "catering8": 52,
+            "overnight": 182,
+            "city": "Atlanta"
+          }
+        ],
+        "countryCode": "US"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 99,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 163,
+            "city": "London"
+          }
+        ],
+        "countryCode": "GB"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "VN"
+      },
+      {
+        "catering24": 20,
+        "catering8": 13,
+        "overnight": 98,
+        "spezials": [],
+        "countryCode": "BY"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 74,
+        "spezials": [],
+        "countryCode": "CF"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 125,
+        "spezials": [],
+        "countryCode": "CY"
+      },
+      {
+        "catering24": 28,
+        "catering8": 14,
+        "overnight": 20,
+        "spezials": [],
+        "countryCode": "DE"
+      }
+    ]
+  },
+  {
+    "validFrom": 1704067200000,
+    "data": [
+      {
+        "catering24": 30,
+        "catering8": 20,
+        "overnight": 95,
+        "spezials": [],
+        "countryCode": "AF"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "EG"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 130,
+        "spezials": [],
+        "countryCode": "ET"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 166,
+        "spezials": [],
+        "countryCode": "GQ"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "AL"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 120,
+        "spezials": [],
+        "countryCode": "DZ"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 91,
+        "spezials": [],
+        "countryCode": "AD"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 299,
+        "spezials": [],
+        "countryCode": "AO"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 113,
+        "spezials": [],
+        "countryCode": "AR"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 59,
+        "spezials": [],
+        "countryCode": "AM"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 88,
+        "spezials": [],
+        "countryCode": "AZ"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 173,
+        "spezials": [
+          {
+            "catering24": 57,
+            "catering8": 38,
+            "overnight": 173,
+            "city": "Sydney"
+          },
+          {
+            "catering24": 74,
+            "catering8": 49,
+            "overnight": 186,
+            "city": "Canberra"
+          }
+        ],
+        "countryCode": "AU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 153,
+        "spezials": [],
+        "countryCode": "BH"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 165,
+        "spezials": [],
+        "countryCode": "BD"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 206,
+        "spezials": [],
+        "countryCode": "BB"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 141,
+        "spezials": [],
+        "countryCode": "BE"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "BJ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "BO"
+      },
+      {
+        "catering24": 23,
+        "catering8": 16,
+        "overnight": 75,
+        "spezials": [],
+        "countryCode": "BA"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 176,
+        "spezials": [],
+        "countryCode": "BW"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 88,
+        "spezials": [
+          {
+            "catering24": 46,
+            "catering8": 31,
+            "overnight": 151,
+            "city": "Sao Paulo"
+          },
+          {
+            "catering24": 69,
+            "catering8": 46,
+            "overnight": 140,
+            "city": "Rio de Janeiro"
+          },
+          {
+            "catering24": 51,
+            "catering8": 34,
+            "overnight": 88,
+            "city": "Brasilia"
+          }
+        ],
+        "countryCode": "BR"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 106,
+        "spezials": [],
+        "countryCode": "BN"
+      },
+      {
+        "catering24": 22,
+        "catering8": 15,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "BG"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 174,
+        "spezials": [],
+        "countryCode": "BF"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 138,
+        "spezials": [],
+        "countryCode": "BI"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 154,
+        "spezials": [],
+        "countryCode": "CL"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 112,
+        "spezials": [
+          {
+            "catering24": 58,
+            "catering8": 39,
+            "overnight": 217,
+            "city": "Shanghai"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 185,
+            "city": "Peking"
+          },
+          {
+            "catering24": 36,
+            "catering8": 24,
+            "overnight": 150,
+            "city": "Kanton"
+          },
+          {
+            "catering24": 71,
+            "catering8": 48,
+            "overnight": 169,
+            "city": "Hongkong"
+          },
+          {
+            "catering24": 41,
+            "catering8": 28,
+            "overnight": 131,
+            "city": "Chengdu"
+          }
+        ],
+        "countryCode": "CN"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 93,
+        "spezials": [],
+        "countryCode": "CR"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 166,
+        "spezials": [],
+        "countryCode": "CI"
+      },
+      {
+        "catering24": 75,
+        "catering8": 50,
+        "overnight": 183,
+        "spezials": [],
+        "countryCode": "DK"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 167,
+        "spezials": [],
+        "countryCode": "DO"
+      },
+      {
+        "catering24": 77,
+        "catering8": 52,
+        "overnight": 255,
+        "spezials": [],
+        "countryCode": "DJ"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 103,
+        "spezials": [],
+        "countryCode": "EC"
+      },
+      {
+        "catering24": 65,
+        "catering8": 44,
+        "overnight": 161,
+        "spezials": [],
+        "countryCode": "SV"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 91,
+        "spezials": [],
+        "countryCode": "ER"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "EE"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 183,
+        "spezials": [],
+        "countryCode": "FJ"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 171,
+        "spezials": [],
+        "countryCode": "FI"
+      },
+      {
+        "catering24": 53,
+        "catering8": 36,
+        "overnight": 105,
+        "spezials": [
+          {
+            "catering24": 58,
+            "catering8": 39,
+            "overnight": 159,
+            "city": "Paris sowie die Departments 77, 78, 91 bis 95"
+          }
+        ],
+        "countryCode": "FR"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 183,
+        "spezials": [],
+        "countryCode": "GA"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 161,
+        "spezials": [],
+        "countryCode": "GM"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 87,
+        "spezials": [],
+        "countryCode": "GE"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 148,
+        "spezials": [],
+        "countryCode": "GH"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 150,
+        "spezials": [
+          {
+            "catering24": 40,
+            "catering8": 27,
+            "overnight": 139,
+            "city": "Athen"
+          }
+        ],
+        "countryCode": "GR"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 90,
+        "spezials": [],
+        "countryCode": "GT"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "GN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 113,
+        "spezials": [],
+        "countryCode": "GW"
+      },
+      {
+        "catering24": 58,
+        "catering8": 39,
+        "overnight": 130,
+        "spezials": [],
+        "countryCode": "HT"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 198,
+        "spezials": [],
+        "countryCode": "HN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [
+          {
+            "catering24": 38,
+            "catering8": 25,
+            "overnight": 185,
+            "city": "Neu Delhi"
+          },
+          {
+            "catering24": 50,
+            "catering8": 33,
+            "overnight": 146,
+            "city": "Mumbai"
+          },
+          {
+            "catering24": 35,
+            "catering8": 24,
+            "overnight": 145,
+            "city": "Kalkutta"
+          },
+          {
+            "catering24": 32,
+            "catering8": 21,
+            "overnight": 85,
+            "city": "Chennai"
+          }
+        ],
+        "countryCode": "IN"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 134,
+        "spezials": [],
+        "countryCode": "ID"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 196,
+        "spezials": [],
+        "countryCode": "IR"
+      },
+      {
+        "catering24": 58,
+        "catering8": 39,
+        "overnight": 129,
+        "spezials": [],
+        "countryCode": "IE"
+      },
+      {
+        "catering24": 62,
+        "catering8": 41,
+        "overnight": 187,
+        "spezials": [],
+        "countryCode": "IS"
+      },
+      {
+        "catering24": 66,
+        "catering8": 44,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "IL"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 150,
+        "spezials": [
+          {
+            "catering24": 48,
+            "catering8": 32,
+            "overnight": 150,
+            "city": "Rom"
+          },
+          {
+            "catering24": 42,
+            "catering8": 28,
+            "overnight": 191,
+            "city": "Mailand"
+          }
+        ],
+        "countryCode": "IT"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 171,
+        "spezials": [],
+        "countryCode": "JM"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 190,
+        "spezials": [
+          {
+            "catering24": 50,
+            "catering8": 33,
+            "overnight": 285,
+            "city": "Tokio"
+          }
+        ],
+        "countryCode": "JP"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 95,
+        "spezials": [],
+        "countryCode": "YE"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 134,
+        "spezials": [],
+        "countryCode": "JO"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 94,
+        "spezials": [],
+        "countryCode": "KH"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 275,
+        "spezials": [],
+        "countryCode": "CM"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 214,
+        "spezials": [
+          {
+            "catering24": 63,
+            "catering8": 42,
+            "overnight": 304,
+            "city": "Vancouver"
+          },
+          {
+            "catering24": 54,
+            "catering8": 36,
+            "overnight": 392,
+            "city": "Toronto"
+          },
+          {
+            "catering24": 62,
+            "catering8": 41,
+            "overnight": 214,
+            "city": "Ottawa"
+          }
+        ],
+        "countryCode": "CA"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 90,
+        "spezials": [],
+        "countryCode": "CV"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 111,
+        "spezials": [],
+        "countryCode": "KZ"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 149,
+        "spezials": [],
+        "countryCode": "QA"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 219,
+        "spezials": [],
+        "countryCode": "KE"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 74,
+        "spezials": [],
+        "countryCode": "KG"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 115,
+        "spezials": [],
+        "countryCode": "CO"
+      },
+      {
+        "catering24": 62,
+        "catering8": 41,
+        "overnight": 215,
+        "spezials": [],
+        "countryCode": "CG"
+      },
+      {
+        "catering24": 70,
+        "catering8": 47,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "CD"
+      },
+      {
+        "catering24": 28,
+        "catering8": 19,
+        "overnight": 92,
+        "spezials": [],
+        "countryCode": "KP"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "KR"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 71,
+        "spezials": [],
+        "countryCode": "XK"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 107,
+        "spezials": [],
+        "countryCode": "HR"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 170,
+        "spezials": [],
+        "countryCode": "CU"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 241,
+        "spezials": [],
+        "countryCode": "KW"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 71,
+        "spezials": [],
+        "countryCode": "LA"
+      },
+      {
+        "catering24": 28,
+        "catering8": 19,
+        "overnight": 104,
+        "spezials": [],
+        "countryCode": "LS"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 76,
+        "spezials": [],
+        "countryCode": "LV"
+      },
+      {
+        "catering24": 69,
+        "catering8": 46,
+        "overnight": 146,
+        "spezials": [],
+        "countryCode": "LB"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 135,
+        "spezials": [],
+        "countryCode": "LY"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "LI"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 109,
+        "spezials": [],
+        "countryCode": "LT"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 139,
+        "spezials": [],
+        "countryCode": "LU"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 116,
+        "spezials": [],
+        "countryCode": "MG"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 109,
+        "spezials": [],
+        "countryCode": "MW"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "MY"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 170,
+        "spezials": [],
+        "countryCode": "MV"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 120,
+        "spezials": [],
+        "countryCode": "ML"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 114,
+        "spezials": [],
+        "countryCode": "MT"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 87,
+        "spezials": [],
+        "countryCode": "MA"
+      },
+      {
+        "catering24": 63,
+        "catering8": 42,
+        "overnight": 102,
+        "spezials": [],
+        "countryCode": "MH"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "MR"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 172,
+        "spezials": [],
+        "countryCode": "MU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 177,
+        "spezials": [],
+        "countryCode": "MX"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 73,
+        "spezials": [],
+        "countryCode": "MD"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 187,
+        "spezials": [],
+        "countryCode": "MC"
+      },
+      {
+        "catering24": 23,
+        "catering8": 16,
+        "overnight": 92,
+        "spezials": [],
+        "countryCode": "MN"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "ME"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 208,
+        "spezials": [],
+        "countryCode": "MZ"
+      },
+      {
+        "catering24": 35,
+        "catering8": 24,
+        "overnight": 155,
+        "spezials": [],
+        "countryCode": "MM"
+      },
+      {
+        "catering24": 30,
+        "catering8": 20,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "NA"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 126,
+        "spezials": [],
+        "countryCode": "NP"
+      },
+      {
+        "catering24": 58,
+        "catering8": 39,
+        "overnight": 148,
+        "spezials": [],
+        "countryCode": "NZ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "NI"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 122,
+        "spezials": [],
+        "countryCode": "NL"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 131,
+        "spezials": [],
+        "countryCode": "NE"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 182,
+        "spezials": [],
+        "countryCode": "NG"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 89,
+        "spezials": [],
+        "countryCode": "MK"
+      },
+      {
+        "catering24": 75,
+        "catering8": 50,
+        "overnight": 139,
+        "spezials": [],
+        "countryCode": "NO"
+      },
+      {
+        "catering24": 50,
+        "catering8": 33,
+        "overnight": 117,
+        "spezials": [],
+        "countryCode": "AT"
+      },
+      {
+        "catering24": 64,
+        "catering8": 43,
+        "overnight": 141,
+        "spezials": [],
+        "countryCode": "OM"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 122,
+        "spezials": [
+          {
+            "catering24": 23,
+            "catering8": 16,
+            "overnight": 238,
+            "city": "Islamabad"
+          }
+        ],
+        "countryCode": "PK"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 179,
+        "spezials": [],
+        "countryCode": "PW"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 82,
+        "spezials": [],
+        "countryCode": "PA"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 159,
+        "spezials": [],
+        "countryCode": "PG"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 124,
+        "spezials": [],
+        "countryCode": "PY"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "PE"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "PH"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 60,
+        "spezials": [
+          {
+            "catering24": 29,
+            "catering8": 20,
+            "overnight": 109,
+            "city": "Warschau"
+          },
+          {
+            "catering24": 27,
+            "catering8": 18,
+            "overnight": 86,
+            "city": "Krakau"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 84,
+            "city": "Danzig"
+          },
+          {
+            "catering24": 33,
+            "catering8": 22,
+            "overnight": 117,
+            "city": "Breslau"
+          }
+        ],
+        "countryCode": "PL"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 111,
+        "spezials": [],
+        "countryCode": "PT"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 117,
+        "spezials": [],
+        "countryCode": "RW"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 89,
+        "spezials": [
+          {
+            "catering24": 32,
+            "catering8": 21,
+            "overnight": 92,
+            "city": "Bukarest"
+          }
+        ],
+        "countryCode": "RO"
+      },
+      {
+        "catering24": 24,
+        "catering8": 16,
+        "overnight": 58,
+        "spezials": [
+          {
+            "catering24": 26,
+            "catering8": 17,
+            "overnight": 114,
+            "city": "St. Petersburg"
+          },
+          {
+            "catering24": 30,
+            "catering8": 20,
+            "overnight": 110,
+            "city": "Moskau"
+          },
+          {
+            "catering24": 28,
+            "catering8": 19,
+            "overnight": 84,
+            "city": "Jekaterinburg"
+          }
+        ],
+        "countryCode": "RU"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "ZM"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 105,
+        "spezials": [],
+        "countryCode": "WS"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 79,
+        "spezials": [],
+        "countryCode": "SM"
+      },
+      {
+        "catering24": 47,
+        "catering8": 32,
+        "overnight": 80,
+        "spezials": [],
+        "countryCode": "ST"
+      },
+      {
+        "catering24": 56,
+        "catering8": 37,
+        "overnight": 181,
+        "spezials": [
+          {
+            "catering24": 56,
+            "catering8": 37,
+            "overnight": 186,
+            "city": "Riad"
+          },
+          {
+            "catering24": 57,
+            "catering8": 38,
+            "overnight": 181,
+            "city": "Djidda"
+          }
+        ],
+        "countryCode": "SA"
+      },
+      {
+        "catering24": 66,
+        "catering8": 44,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "SE"
+      },
+      {
+        "catering24": 64,
+        "catering8": 43,
+        "overnight": 180,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 186,
+            "city": "Genf"
+          }
+        ],
+        "countryCode": "CH"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 190,
+        "spezials": [],
+        "countryCode": "SN"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 97,
+        "spezials": [],
+        "countryCode": "RS"
+      },
+      {
+        "catering24": 57,
+        "catering8": 38,
+        "overnight": 145,
+        "spezials": [],
+        "countryCode": "SL"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "ZW"
+      },
+      {
+        "catering24": 54,
+        "catering8": 36,
+        "overnight": 197,
+        "spezials": [],
+        "countryCode": "SG"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 121,
+        "spezials": [],
+        "countryCode": "SK"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 126,
+        "spezials": [],
+        "countryCode": "SI"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 103,
+        "spezials": [
+          {
+            "catering24": 44,
+            "catering8": 29,
+            "overnight": 142,
+            "city": "Palma de Mallorca"
+          },
+          {
+            "catering24": 42,
+            "catering8": 28,
+            "overnight": 131,
+            "city": "Madrid"
+          },
+          {
+            "catering24": 36,
+            "catering8": 24,
+            "overnight": 103,
+            "city": "Kanarische Inseln"
+          },
+          {
+            "catering24": 34,
+            "catering8": 23,
+            "overnight": 144,
+            "city": "Barcelona"
+          }
+        ],
+        "countryCode": "ES"
+      },
+      {
+        "catering24": 36,
+        "catering8": 24,
+        "overnight": 112,
+        "spezials": [],
+        "countryCode": "LK"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 195,
+        "spezials": [],
+        "countryCode": "SD"
+      },
+      {
+        "catering24": 29,
+        "catering8": 20,
+        "overnight": 109,
+        "spezials": [
+          {
+            "catering24": 36,
+            "catering8": 24,
+            "overnight": 129,
+            "city": "Johannesburg"
+          },
+          {
+            "catering24": 33,
+            "catering8": 22,
+            "overnight": 130,
+            "city": "Kapstadt"
+          }
+        ],
+        "countryCode": "ZA"
+      },
+      {
+        "catering24": 51,
+        "catering8": 34,
+        "overnight": 159,
+        "spezials": [],
+        "countryCode": "SS"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 140,
+        "spezials": [],
+        "countryCode": "SY"
+      },
+      {
+        "catering24": 27,
+        "catering8": 18,
+        "overnight": 118,
+        "spezials": [],
+        "countryCode": "TJ"
+      },
+      {
+        "catering24": 46,
+        "catering8": 31,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "TW"
+      },
+      {
+        "catering24": 44,
+        "catering8": 29,
+        "overnight": 97,
+        "spezials": [],
+        "countryCode": "TZ"
+      },
+      {
+        "catering24": 38,
+        "catering8": 25,
+        "overnight": 110,
+        "spezials": [],
+        "countryCode": "TH"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 118,
+        "spezials": [],
+        "countryCode": "TG"
+      },
+      {
+        "catering24": 39,
+        "catering8": 26,
+        "overnight": 94,
+        "spezials": [],
+        "countryCode": "TO"
+      },
+      {
+        "catering24": 66,
+        "catering8": 44,
+        "overnight": 203,
+        "spezials": [],
+        "countryCode": "TT"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 155,
+        "spezials": [],
+        "countryCode": "TD"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 77,
+        "spezials": [],
+        "countryCode": "CZ"
+      },
+      {
+        "catering24": 17,
+        "catering8": 12,
+        "overnight": 95,
+        "spezials": [
+          {
+            "catering24": 29,
+            "catering8": 20,
+            "overnight": 55,
+            "city": "Izmir"
+          },
+          {
+            "catering24": 26,
+            "catering8": 17,
+            "overnight": 120,
+            "city": "Istanbul"
+          }
+        ],
+        "countryCode": "TR"
+      },
+      {
+        "catering24": 40,
+        "catering8": 27,
+        "overnight": 144,
+        "spezials": [],
+        "countryCode": "TN"
+      },
+      {
+        "catering24": 33,
+        "catering8": 22,
+        "overnight": 108,
+        "spezials": [],
+        "countryCode": "TM"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 143,
+        "spezials": [],
+        "countryCode": "UG"
+      },
+      {
+        "catering24": 26,
+        "catering8": 17,
+        "overnight": 98,
+        "spezials": [],
+        "countryCode": "UA"
+      },
+      {
+        "catering24": 32,
+        "catering8": 21,
+        "overnight": 85,
+        "spezials": [],
+        "countryCode": "HU"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 90,
+        "spezials": [],
+        "countryCode": "UY"
+      },
+      {
+        "catering24": 34,
+        "catering8": 23,
+        "overnight": 104,
+        "spezials": [],
+        "countryCode": "UZ"
+      },
+      {
+        "catering24": 48,
+        "catering8": 32,
+        "overnight": 150,
+        "spezials": [],
+        "countryCode": "VA"
+      },
+      {
+        "catering24": 45,
+        "catering8": 30,
+        "overnight": 127,
+        "spezials": [],
+        "countryCode": "VE"
+      },
+      {
+        "catering24": 65,
+        "catering8": 44,
+        "overnight": 156,
+        "spezials": [],
+        "countryCode": "AE"
+      },
+      {
+        "catering24": 59,
+        "catering8": 40,
+        "overnight": 182,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 203,
+            "city": "Washington, D. C."
+          },
+          {
+            "catering24": 59,
+            "catering8": 40,
+            "overnight": 327,
+            "city": "San Francisco"
+          },
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 308,
+            "city": "New York City"
+          },
+          {
+            "catering24": 65,
+            "catering8": 44,
+            "overnight": 256,
+            "city": "Miami"
+          },
+          {
+            "catering24": 64,
+            "catering8": 43,
+            "overnight": 262,
+            "city": "Los Angeles"
+          },
+          {
+            "catering24": 62,
+            "catering8": 41,
+            "overnight": 204,
+            "city": "Houston"
+          },
+          {
+            "catering24": 65,
+            "catering8": 44,
+            "overnight": 233,
+            "city": "Chicago"
+          },
+          {
+            "catering24": 63,
+            "catering8": 42,
+            "overnight": 333,
+            "city": "Boston"
+          },
+          {
+            "catering24": 77,
+            "catering8": 52,
+            "overnight": 182,
+            "city": "Atlanta"
+          }
+        ],
+        "countryCode": "US"
+      },
+      {
+        "catering24": 52,
+        "catering8": 35,
+        "overnight": 99,
+        "spezials": [
+          {
+            "catering24": 66,
+            "catering8": 44,
+            "overnight": 163,
+            "city": "London"
+          }
+        ],
+        "countryCode": "GB"
+      },
+      {
+        "catering24": 41,
+        "catering8": 28,
+        "overnight": 86,
+        "spezials": [],
+        "countryCode": "VN"
+      },
+      {
+        "catering24": 20,
+        "catering8": 13,
+        "overnight": 98,
+        "spezials": [],
+        "countryCode": "BY"
+      },
+      {
+        "catering24": 53,
+        "catering8": 36,
+        "overnight": 210,
+        "spezials": [],
+        "countryCode": "CF"
+      },
+      {
+        "catering24": 42,
+        "catering8": 28,
+        "overnight": 125,
+        "spezials": [],
+        "countryCode": "CY"
+      }
+    ]
+  }
 ]
