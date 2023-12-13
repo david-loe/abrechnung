@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly MODE: 'development' | 'production'
   readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
   readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
+  readonly VITE_AUTH_USE_MAGIC_LOGIN: 'TRUE' | 'FALSE'
 }
 
 interface ImportMeta {

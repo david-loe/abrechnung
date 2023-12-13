@@ -112,6 +112,7 @@ export interface User extends UserSimple {
   fk: {
     microsoft?: string | null
     ldapauth?: string | null
+    magiclogin?: string | null
   }
   access: {
     [key in Access]: boolean
@@ -310,6 +311,7 @@ export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] 
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export const accesses = [
+  'user',
   'examine/travel',
   'examine/expenseReport',
   'examine/healthCareCost',

@@ -1,17 +1,44 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="row mb-2">
-      <div class="col">
-        <label for="userFormFkLdapauth" class="form-label"> {{ $t('labels.fkLdapauth') }} </label>
+      <div v-if="useLDAP" class="col">
+        <label for="userFormFkLdapauth" class="form-label"> LDAP UID </label>
         <input type="text" class="form-control" id="userFormFkLdapauth" v-model="formUser.fk.ldapauth" :disabled="mode === 'edit'" />
       </div>
-      <div class="col">
-        <label for="userFormFkMicrosoft" class="form-label"> {{ $t('labels.fkMicrosoft') }} </label>
+      <div v-if="useMicrosoft" class="col">
+        <label for="userFormFkMicrosoft" class="form-label"> Microsoft ID </label>
         <input type="text" class="form-control" id="userFormFkMicrosoft" v-model="formUser.fk.microsoft" :disabled="mode === 'edit'" />
+      </div>
+      <div v-if="useMagicLogin" class="col">
+        <label for="userFormFkMagiclogin" class="form-label"> Magic Login </label>
+        <input type="email" class="form-control" id="userFormFkMagiclogin" v-model="formUser.fk.magiclogin" :disabled="mode === 'edit'" />
       </div>
       <div class="col">
         <label for="userFormMail" class="form-label"> {{ $t('labels.email') }}<span class="text-danger">*</span> </label>
-        <input type="text" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="mode === 'edit'" />
+        <input type="email" class="form-control" id="userFormMail" v-model="formUser.email" required :disabled="mode === 'edit'" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <label for="userFormFkGivenName" class="form-label"> {{ $t('labels.givenName') }}<span class="text-danger">*</span> </label>
+        <input
+          type="email"
+          class="form-control"
+          id="userFormFkGivenName"
+          v-model="formUser.name.givenName"
+          required
+          :disabled="mode === 'edit'" />
+      </div>
+      <div class="col">
+        <label for="userFormFamilyName" class="form-label"> {{ $t('labels.familyName') }}<span class="text-danger">*</span> </label>
+        <input
+          type="email"
+          class="form-control"
+          id="userFormFamilyName"
+          v-model="formUser.name.familyName"
+          required
+          :disabled="mode === 'edit'" />
       </div>
     </div>
 
@@ -41,7 +68,7 @@
         <div class="form-check">
           <label :for="'userForm' + access" class="form-check-label text-nowrap">
             <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
-            {{ $t('labels.' + access) }}
+            {{ $t('accesses.' + access) }}
           </label>
           <input class="form-check-input" type="checkbox" :id="'userForm' + access" role="switch" v-model="formUser.access[access]" />
         </div>
@@ -85,6 +112,9 @@ export default defineComponent({
   },
   data() {
     return {
+      useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true',
+      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true',
+      useMagicLogin: import.meta.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true',
       formUser: this.input(),
       loading: false,
       accesses
@@ -94,7 +124,7 @@ export default defineComponent({
     default() {
       return {
         fk: {},
-        access: {},
+        access: { user: true },
         settings: {},
         email: ''
       }
@@ -116,6 +146,9 @@ export default defineComponent({
   watch: {
     user: function () {
       this.formUser = this.input()
+    },
+    'formUser.fk.magiclogin': function () {
+      this.formUser.email = this.formUser.fk.magiclogin
     }
   }
 })

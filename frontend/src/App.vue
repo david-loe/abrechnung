@@ -10,17 +10,11 @@
             </a>
           </div>
           <template v-if="auth">
-            <div>
-              <router-link to="/" class="nav-link link-dark d-flex align-items-center">
-                <i class="fs-4 bi bi-card-list"></i>
-                <span class="ms-1 d-none d-md-block">{{ $t('headlines.home') }}</span>
-              </router-link>
-            </div>
             <div v-for="access of accesses" :key="access">
               <template v-if="access !== 'admin' && user.access[access]">
                 <router-link :to="'/' + access" class="nav-link link-dark d-flex align-items-center">
                   <i v-for="icon of $root.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
-                  <span class="ms-1 d-none d-md-block">{{ $t('labels.' + access) }}</span>
+                  <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
                 </router-link>
               </template>
             </div>

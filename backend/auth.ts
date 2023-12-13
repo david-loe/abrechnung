@@ -1,14 +1,18 @@
 import passport from 'passport'
 import LdapStrategy from 'passport-ldapauth'
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
+import { default as MagicLoginStrategy } from 'passport-magic-login'
 import User from './models/user.js'
 import { UserSimple, User as IUser } from '../common/types.js'
 import { HydratedDocument, ObjectId } from 'mongoose'
 import express from 'express'
+import { sendMail } from './mail/mail.js'
+import i18n from './i18n.js'
 const router = express.Router()
 
 const useLDAP = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
 const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
+const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
 
 interface NewUser extends Omit<UserSimple, '_id'> {
   fk?: IUser['fk']
@@ -74,6 +78,10 @@ if (useLDAP) {
       }
     )
   )
+
+  router.post('/auth/ldapauth', passport.authenticate('ldapauth', { session: true }), async (req, res) => {
+    res.send({ status: 'ok' })
+  })
 }
 
 interface msProfile {
@@ -137,31 +145,7 @@ if (useMicrosoft) {
       }
     )
   )
-}
 
-passport.serializeUser(async (user: IUser, cb) => {
-  cb(null, { _id: user._id })
-})
-
-passport.deserializeUser(async (sessionUser: { _id: ObjectId }, cb) => {
-  const user = await User.findOne({ _id: sessionUser._id })
-  if (user) {
-    cb(null, user)
-  } else {
-    cb(new Error('No User found with id: ' + sessionUser._id))
-  }
-})
-
-router.use(passport.initialize())
-router.use(passport.session())
-
-if (useLDAP) {
-  router.post('/auth/ldapauth', passport.authenticate('ldapauth', { session: true }), async (req, res) => {
-    res.send({ status: 'ok' })
-  })
-}
-
-if (useMicrosoft) {
   router.get('/auth/microsoft', (req, res, next) => {
     const redirect = req.query.redirect
     const state = req.query.redirect ? Buffer.from(JSON.stringify({ redirect })).toString('base64') : undefined
@@ -180,5 +164,66 @@ if (useMicrosoft) {
     res.redirect(process.env.VITE_FRONTEND_URL)
   })
 }
+
+if (useMagicLogin) {
+  const magicLogin = new MagicLoginStrategy.default({
+    secret: process.env.MAGIC_LOGIN_SECRET,
+    callbackUrl: process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback',
+    sendMagicLink: async (destination, href) => {
+      var user = await User.findOne({ 'fk.magiclogin': destination }).lean()
+      if (user) {
+        sendMail(
+          [user],
+          'Login abrechnung🧾',
+          i18n.t('mail.magiclogin.paragraph'),
+          { text: i18n.t('mail.magiclogin.buttonText'), link: href },
+          ''
+        )
+      } else {
+        throw Error('No magiclogin user found for e-mail: ' + destination)
+      }
+    },
+    verify: async function (payload, callback) {
+      var user = await User.findOne({ 'fk.magiclogin': payload.destination }).lean()
+      if (user) {
+        callback(null, user)
+      } else {
+        callback(Error('No magiclogin user found for e-mail: ' + payload.destination))
+      }
+    },
+    jwtOptions: {
+      expiresIn: '30m'
+    }
+  })
+  passport.use(magicLogin)
+
+  router.post('/auth/magiclogin', async (req, res) => {
+    var user = await User.findOne({ 'fk.magiclogin': req.body.destination }).lean()
+    if (user) {
+      magicLogin.send(req, res)
+    } else {
+      res.status(400).send({ message: 'No magiclogin user found for e-mail: ' + req.body.destination })
+    }
+  })
+  router.get('/auth/magiclogin/callback', passport.authenticate('magiclogin'), (req, res) => {
+    res.redirect(process.env.VITE_FRONTEND_URL)
+  })
+}
+
+passport.serializeUser(async (user: IUser, cb) => {
+  cb(null, { _id: user._id })
+})
+
+passport.deserializeUser(async (sessionUser: { _id: ObjectId }, cb) => {
+  const user = await User.findOne({ _id: sessionUser._id })
+  if (user) {
+    cb(null, user)
+  } else {
+    cb(new Error('No User found with id: ' + sessionUser._id))
+  }
+})
+
+router.use(passport.initialize())
+router.use(passport.session())
 
 export default router

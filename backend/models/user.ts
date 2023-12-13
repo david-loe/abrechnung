@@ -9,10 +9,11 @@ for (const access of accesses) {
 const userSchema = new Schema<User>({
   fk: {
     microsoft: { type: String, index: true, unique: true, sparse: true },
-    ldapauth: { type: String, index: true, unique: true, sparse: true }
+    ldapauth: { type: String, index: true, unique: true, sparse: true },
+    magiclogin: { type: String, index: true, unique: true, sparse: true }
   },
   email: { type: String, unique: true, index: true, required: true },
-  name: { givenName: { type: String, trim: true }, familyName: { type: String, trim: true } },
+  name: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
   access: accessObject,
   settings: {
     language: { type: String, default: 'de' },

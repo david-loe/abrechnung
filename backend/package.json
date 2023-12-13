@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-backend",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -19,6 +19,7 @@
     "nodemailer": "^6.9.7",
     "passport": "^0.5.3",
     "passport-ldapauth": "^3.0.1",
+    "passport-magic-login": "^1.2.2",
     "passport-microsoft": "^1.0.0",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1"
