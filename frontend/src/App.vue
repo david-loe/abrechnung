@@ -96,7 +96,12 @@
             </strong>
             {{ alert.message }}
             <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
-              <div :class="'progress-bar bg-' + alert.type" role="progressbar" id="alert-progress" aria-label="Danger example"></div>
+              <div
+                :class="'progress-bar bg-' + alert.type"
+                role="progressbar"
+                id="alert-progress"
+                aria-label="Danger example"
+                :style="'animation-duration: ' + (alert.ttl ? alert.ttl : 5000) + 'ms;'"></div>
             </div>
             <button type="button" class="btn-close" @click="alerts.splice(index, 1)"></button>
           </div>
@@ -162,6 +167,7 @@ export interface Alert {
   title: string
   message?: string
   id?: number
+  ttl?: number
 }
 
 export default defineComponent({
@@ -310,14 +316,17 @@ export default defineComponent({
     addAlert(alert: Alert) {
       alert = Object.assign(alert, { id: Math.random() })
       this.alerts.push(alert)
-      setTimeout(() => {
-        const index = this.alerts.findIndex((al) => {
-          return al.id === alert.id
-        })
-        if (index !== -1) {
-          this.alerts.splice(index, 1)
-        }
-      }, 5000)
+      setTimeout(
+        () => {
+          const index = this.alerts.findIndex((al) => {
+            return al.id === alert.id
+          })
+          if (index !== -1) {
+            this.alerts.splice(index, 1)
+          }
+        },
+        alert.ttl ? alert.ttl : 5000
+      )
     },
     async pushUserSettings(settings: User['settings']) {
       settings.language = this.$i18n.locale as Locale
@@ -423,7 +432,6 @@ footer {
 
 #alert-progress {
   animation-name: run;
-  animation-duration: 5s;
   animation-timing-function: linear;
 }
 
