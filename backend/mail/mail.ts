@@ -6,7 +6,7 @@ import User from '../models/user.js'
 import { UserSimple, ExpenseReport, TravelSimple, HealthCareCost } from '../../common/types.js'
 import { getMoneyString } from '../../common/scripts.js'
 
-function sendMail(
+export function sendMail(
   recipients: UserSimple[],
   subject: string,
   paragaph: string,

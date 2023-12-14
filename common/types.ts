@@ -112,10 +112,12 @@ export interface User extends UserSimple {
   fk: {
     microsoft?: string | null
     ldapauth?: string | null
+    magiclogin?: string | null
   }
   access: {
     [key in Access]: boolean
   }
+  loseAccessAt?: Date | string | null
   settings: {
     language: Locale
     lastCurrencies: Currency[]
@@ -310,11 +312,12 @@ export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] 
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export const accesses = [
+  'user',
+  'approve/travel',
   'examine/travel',
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
-  'approve/travel',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]

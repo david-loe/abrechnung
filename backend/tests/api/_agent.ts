@@ -3,11 +3,15 @@ import app from '../../app.js'
 import { User } from '../../../common/types.js'
 
 const users = {
-  user: { username: 'fry', password: 'fry', access: {} },
-  admin: { username: 'professor', password: 'professor', access: { admin: true } },
-  travel: { username: 'zoidberg', password: 'zoidberg', access: { 'examine/travel': true, 'approve/travel': true } },
-  expenseReport: { username: 'leela', password: 'leela', access: { 'examine/expenseReport': true } },
-  healthCareCost: { username: 'bender', password: 'bender', access: { 'examine/healthCareCost': true, 'confirm/healthCareCost': true } }
+  user: { username: 'fry', password: 'fry', access: { user: true } },
+  admin: { username: 'professor', password: 'professor', access: { user: true, admin: true } },
+  travel: { username: 'zoidberg', password: 'zoidberg', access: { user: true, 'examine/travel': true, 'approve/travel': true } },
+  expenseReport: { username: 'leela', password: 'leela', access: { user: true, 'examine/expenseReport': true } },
+  healthCareCost: {
+    username: 'bender',
+    password: 'bender',
+    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true }
+  }
 }
 
 async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {

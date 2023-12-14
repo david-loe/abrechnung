@@ -18,6 +18,8 @@ declare global {
       readonly COOKIE_SECRET: string
       readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
       readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
+      readonly VITE_AUTH_USE_MAGIC_LOGIN: 'TRUE' | 'FALSE'
+      readonly MAGIC_LOGIN_SECRET: string
       readonly MS_AZURE_CLIENT_ID: string
       readonly MS_AZURE_CLIENT_SECRET: string
       readonly MS_AZURE_TENANT: string

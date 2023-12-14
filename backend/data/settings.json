@@ -1,5 +1,6 @@
 {
   "accessIcons": {
+    "user": ["bi-card-list"],
     "admin": ["bi-person-fill"],
     "approve/travel": ["bi-calendar-check"],
     "confirm/healthCareCost": ["bi-hospital", "bi-check-square"],
@@ -66,5 +67,5 @@
   },
   "toleranceStageDatesToApprovedTravelDates": 3,
   "uploadTokenExpireAfterSeconds": 600,
-  "version": "0.3.4"
+  "version": "0.3.5"
 }

@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,23 +16,24 @@
     "bootstrap-icons": "^1.11.2",
     "qrcode": "^1.5.3",
     "vue": "^3.2.26",
-    "vue-i18n": "^9.7.0",
+    "vue-i18n": "^9.8.0",
     "vue-router": "^4.2.5",
-    "vue-select": "^4.0.0-beta.6"
+    "vue-select": "^4.0.0-beta.6",
+    "vue3-easy-data-table": "^1.5.47"
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^3.3.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.9.4",
+    "@types/node": "^20.10.4",
     "@types/qrcode": "^1.5.5",
     "@types/vue-select": "^3.16.8",
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@vitejs/plugin-vue": "^4.5.2",
     "@vue/compiler-sfc": "^3.0.0",
-    "eslint": "^8.54.0",
-    "eslint-plugin-vue": "^9.18.1",
-    "typescript": "^5.3.2",
-    "vite": "^4.5.0",
-    "vue-tsc": "^1.8.22"
+    "eslint": "^8.55.0",
+    "eslint-plugin-vue": "^9.19.2",
+    "typescript": "^5.3.3",
+    "vite": "^4.5.1",
+    "vue-tsc": "^1.8.25"
   },
   "eslintConfig": {
     "root": true,

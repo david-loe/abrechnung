@@ -6,6 +6,11 @@ import vSelect from './vue-select.js'
 import 'vue-select/dist/vue-select.css'
 import './vue-select.css'
 
+// @ts-ignore
+import Vue3EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
+import './vue3-easy-data-table.css'
+
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -44,4 +49,4 @@ declare module '@vue/runtime-core' {
   }
 }
 
-createApp(App).component('vSelect', vSelect).use(i18n).use(router).mount('#app')
+createApp(App).component('vSelect', vSelect).component('EasyDataTable', Vue3EasyDataTable).use(i18n).use(router).mount('#app')

@@ -87,6 +87,10 @@ async function migrate(from: string) {
       console.log('Appy migration from v0.3.3')
       await mongoose.connection.collection('countries').drop()
       initDB()
+    case '0.3.4':
+      console.log('Appy migration from v0.3.4')
+      mongoose.connection.collection('users').updateMany({}, { $set: { 'access.user': true } })
+      mongoose.connection.collection('settings').updateMany({}, { $set: { 'accessIcons.user': ['bi-card-list'] } })
     default:
       if (settings) {
         settings.migrateFrom = undefined

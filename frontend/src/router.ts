@@ -108,13 +108,13 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
-    path: '/',
+    path: '/user',
     component: HomePage,
     meta: { requiresAuth: true }
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    redirect: '/user'
   }
 ]
 
