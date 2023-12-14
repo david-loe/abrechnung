@@ -35,7 +35,7 @@
       </form>
     </div>
     <div v-else-if="strategy === 'magiclogin'">
-      <form v-if="useLDAP" class="form-signin" @submit.prevent="requestMagicLogin()">
+      <form v-if="useMagicLogin" class="form-signin" @submit.prevent="requestMagicLogin()">
         <div class="form-floating">
           <input
             type="email"
