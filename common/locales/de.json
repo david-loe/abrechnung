@@ -1,6 +1,14 @@
 {
+  "accesses": {
+    "admin": "Administrator",
+    "approve/travel": "Reisen genehmigen",
+    "confirm/healthCareCost": "Krankenkosten bestätigen",
+    "examine/expenseReport": "Auslagen prüfen",
+    "examine/healthCareCost": "Krankenkosten prüfen",
+    "examine/travel": "Reisen prüfen",
+    "user": "Home"
+  },
   "alerts": {
-    "mailSend": "E-mail wurde versandt.",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "db": {
@@ -13,6 +21,7 @@
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "loginFailed": "Anmeldung fehlgeschlagen!",
+    "mailSend": "E-mail wurde versandt.",
     "noData": {
       "approve/travel": "Es gibt keine Reisen zu genehmigen.",
       "approve/travel/approved": "Es gibt keine genehmigten Reisen.",
@@ -62,6 +71,7 @@
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
+    "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu abrechnung🧾 haben soll.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
     "organisation": "Wähle die Organisation bei der du angestellt bist.",
     "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
@@ -72,19 +82,7 @@
     "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?",
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
-  "accesses": {
-    "approve/travel": "Reisen genehmigen",
-    "confirm/healthCareCost": "Krankenkosten bestätigen",
-    "examine/expenseReport": "Auslagen prüfen",
-    "examine/healthCareCost": "Krankenkosten prüfen",
-    "examine/travel": "Reisen prüfen",
-    "admin": "Administrator",
-    "user": "Home"
-  },
   "labels": {
-    "givenName": "Vorname",
-    "familyName": "Nachname",
-    "sendMail": "E-Mail senden",
     "addX": "{X} hinzufügen",
     "advance": "Vorschuss",
     "airplane": "Flugzeug ✈",
@@ -136,9 +134,11 @@
     "expenseReport": "Auslagenabrechnung",
     "expenseReportName": "Name der Auslagenabrechnung",
     "expenses": "Auslagen",
+    "familyName": "Nachname",
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "filter": "Filter",
     "from": "Von",
+    "givenName": "Vorname",
     "healthCareCost": "Krankenkosten",
     "healthCareCostName": "Name der Krankenkostenabrechnung",
     "healthInsurance": "Krankenversicherung",
@@ -150,6 +150,7 @@
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "location": "Ort",
+    "loseAccessAt": "Ablaufdatum",
     "lumpSums": "Pauschalen",
     "lunch": "Mittagessen",
     "mailToInsurance": "E-Mail an Versicherung",
@@ -191,6 +192,7 @@
     "save": "Speichern",
     "saveX": "{X} speichern",
     "search": "Suchen",
+    "sendMail": "E-Mail senden",
     "settings": "Einstellungen",
     "shipOrFerry": "Schiff oder Fähre 🚢",
     "showX": "{X} anzeigen",
@@ -243,10 +245,6 @@
     "overnight\n": "Übernachtungs\npauschale"
   },
   "mail": {
-    "magiclogin": {
-      "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen.",
-      "buttonText": "Weiter zu abrechnung🧾"
-    },
     "expenseReport": {
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -288,6 +286,10 @@
     },
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
+    "magiclogin": {
+      "buttonText": "Weiter zu abrechnung🧾",
+      "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen."
+    },
     "regards": "Beste Grüße",
     "travel": {
       "appliedFor": {

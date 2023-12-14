@@ -2,7 +2,7 @@ import passport from 'passport'
 import LdapStrategy from 'passport-ldapauth'
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
 import { default as MagicLoginStrategy } from 'passport-magic-login'
-import User from './models/user.js'
+import User, { UserDoc } from './models/user.js'
 import { UserSimple, User as IUser } from '../common/types.js'
 import { HydratedDocument, ObjectId } from 'mongoose'
 import express from 'express'
@@ -201,8 +201,8 @@ if (useMagicLogin) {
   passport.use(magicLogin)
 
   router.post('/auth/magiclogin', async (req, res) => {
-    var user = await User.findOne({ 'fk.magiclogin': req.body.destination }).lean()
-    if (user) {
+    var user = await User.findOne({ 'fk.magiclogin': req.body.destination })
+    if (user && (await (user as UserDoc).isActive())) {
       magicLogin.send(req, res)
     } else {
       res.status(400).send({ message: 'No magiclogin user found for e-mail: ' + req.body.destination })

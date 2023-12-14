@@ -3,6 +3,7 @@ const router = express.Router()
 import { getter } from '../../helper.js'
 import Currency from '../../models/currency.js'
 import Country from '../../models/country.js'
+import { UserDoc } from '../../models/user.js'
 import Settings from '../../models/settings.js'
 import HealthInsurance from '../../models/healthInsurance.js'
 import Organisation from '../../models/organisation.js'
@@ -19,10 +20,8 @@ import confirmRoutes from './confirm/routes.js'
 import i18n from '../../i18n.js'
 
 router.use(async (req, res, next) => {
-  if (req.isAuthenticated()) {
-    if (req.user.access.user) {
-      next()
-    }
+  if (req.isAuthenticated() && (await (req.user as UserDoc).isActive())) {
+    next()
   } else {
     return res.status(401).send({ message: i18n.t('alerts.request.unauthorized') })
   }

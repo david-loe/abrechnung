@@ -70,12 +70,10 @@
     </div>
 
     <div v-if="useMagicLogin" class="mt-4">
-      <template v-if="!magicLoginSend">
-        <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
-          <i class="bi bi-envelope-fill me-1"></i>
-          {{ $t('labels.signInX', { X: 'E-Mail' }) }}
-        </button>
-      </template>
+      <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
+        <i class="bi bi-envelope-fill me-1"></i>
+        {{ $t('labels.signInX', { X: 'E-Mail' }) }}
+      </button>
     </div>
   </div>
 </template>
@@ -128,7 +126,7 @@ export default defineComponent({
         })
         if (res.status === 200) {
           this.magicLoginSend = true
-          this.$root.addAlert({ message: this.$t('alerts.mailSend'), title: '', type: 'success' })
+          this.$root.addAlert({ message: this.$t('alerts.mailSend'), title: '', type: 'success', ttl: 10000 })
         }
       } catch (error) {
         this.passwordLDAP = ''

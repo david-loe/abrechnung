@@ -1,4 +1,4 @@
-import { Schema, Document, model, Query } from 'mongoose'
+import { Schema, Document, model, Query, HydratedDocument, Model } from 'mongoose'
 import { Access, Token, User, accesses } from '../../common/types.js'
 
 const accessObject: { [key in Access]?: any } = {}
@@ -6,7 +6,13 @@ for (const access of accesses) {
   accessObject[access] = { type: Boolean, default: false }
 }
 
-const userSchema = new Schema<User>({
+interface Methods {
+  isActive(): Promise<boolean>
+}
+
+type UserModel = Model<User, {}, Methods>
+
+const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
     microsoft: { type: String, index: true, unique: true, sparse: true },
     ldapauth: { type: String, index: true, unique: true, sparse: true },
@@ -15,6 +21,7 @@ const userSchema = new Schema<User>({
   email: { type: String, unique: true, index: true, required: true },
   name: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
   access: accessObject,
+  loseAccessAt: { type: Date },
   settings: {
     language: { type: String, default: 'de' },
     lastCurrencies: [{ type: String, ref: 'Currency' }],
@@ -54,4 +61,20 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
+userSchema.methods.isActive = async function (this: UserDoc) {
+  if (this.access.user) {
+    if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() - new Date().valueOf() < 0)) {
+      return true
+    } else {
+      for (const access of accesses) {
+        this.access[access] = false
+      }
+      await this.save()
+    }
+  }
+  return false
+}
+
 export default model<User>('User', userSchema)
+
+export interface UserDoc extends Methods, HydratedDocument<User> {}

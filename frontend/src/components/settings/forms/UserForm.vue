@@ -75,6 +75,9 @@
       </div>
     </div>
 
+    <label for="invoiceDateInput" class="form-label">{{ $t('labels.loseAccessAt') }}</label>
+    <DateInput id="invoiceDateInput" v-model="formUser.loseAccessAt" :with-time="true" />
+
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
@@ -90,6 +93,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
+import DateInput from '../../elements/DateInput.vue'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: User['name']
@@ -99,7 +103,7 @@ interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
 }
 
 export default defineComponent({
-  components: {},
+  components: { DateInput },
   name: 'UserForm',
   props: {
     user: {
@@ -126,7 +130,9 @@ export default defineComponent({
         fk: {},
         access: { user: true },
         settings: {},
-        email: ''
+        name: { givenName: null, familyName: null },
+        email: null,
+        loseAccessAt: null
       }
     },
     clear() {
