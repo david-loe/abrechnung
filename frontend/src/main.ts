@@ -6,6 +6,7 @@ import vSelect from './vue-select.js'
 import 'vue-select/dist/vue-select.css'
 import './vue-select.css'
 
+// @ts-ignore
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import './vue3-easy-data-table.css'
