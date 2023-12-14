@@ -16,6 +16,7 @@ const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() 
 
 interface NewUser extends Omit<UserSimple, '_id'> {
   fk?: IUser['fk']
+  access?: { user: IUser['access']['user'] }
 }
 function addAdminIfNone(user: HydratedDocument<IUser>) {
   User.find({ 'access.admin': true }).then((docs) => {
@@ -59,7 +60,8 @@ if (useLDAP) {
         const newUser: NewUser = {
           fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
           email: email,
-          name: { familyName: ldapUser[process.env.LDAP_SURNAME_ATTRIBUTE], givenName: ldapUser[process.env.LDAP_GIVENNAME_ATTRIBUTE] }
+          name: { familyName: ldapUser[process.env.LDAP_SURNAME_ATTRIBUTE], givenName: ldapUser[process.env.LDAP_GIVENNAME_ATTRIBUTE] },
+          access: { user: true }
         }
         if (!user) {
           user = new User(newUser)
@@ -126,7 +128,8 @@ if (useMicrosoft) {
         const newUser: NewUser = {
           fk: { microsoft: profile._json.id },
           email: email,
-          name: { familyName: profile._json.surname, givenName: profile._json.givenName }
+          name: { familyName: profile._json.surname, givenName: profile._json.givenName },
+          access: { user: true }
         }
         if (!user) {
           user = new User(newUser)
