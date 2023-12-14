@@ -42,7 +42,7 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './data/exchange-rates/*' --exec ts-node-esm ./server.ts",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './data/exchange-rates/*' --exec node --loader ts-node/esm ./server.ts",
     "build": "tsc",
     "start": "node dist/build/server.js",
     "test": "npm run test:$NODE_ENV",
