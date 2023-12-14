@@ -20,7 +20,9 @@ import i18n from '../../i18n.js'
 
 router.use(async (req, res, next) => {
   if (req.isAuthenticated()) {
-    next()
+    if (req.user.access.user) {
+      next()
+    }
   } else {
     return res.status(401).send({ message: i18n.t('alerts.request.unauthorized') })
   }
