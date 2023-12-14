@@ -68,6 +68,8 @@ if (useLDAP) {
         } else {
           Object.assign(user.fk, newUser.fk)
           delete newUser.fk
+          Object.assign(user.access, newUser.access)
+          delete newUser.access
           Object.assign(user, newUser)
         }
         try {
@@ -136,6 +138,8 @@ if (useMicrosoft) {
         } else {
           Object.assign(user.fk, newUser.fk)
           delete newUser.fk
+          Object.assign(user.access, newUser.access)
+          delete newUser.access
           Object.assign(user, newUser)
         }
         try {
