@@ -74,9 +74,15 @@
         </div>
       </div>
     </div>
-
-    <label for="invoiceDateInput" class="form-label">{{ $t('labels.loseAccessAt') }}</label>
-    <DateInput id="invoiceDateInput" v-model="formUser.loseAccessAt" :with-time="true" />
+    <div class="mb-3">
+      <div class="row">
+        <div class="col-auto">
+          <label for="invoiceDateInput" class="form-label me-2">{{ $t('labels.loseAccessAt') }}</label>
+          <InfoPoint :text="$t('info.loseAccessAt')" />
+          <DateInput id="invoiceDateInput" v-model="formUser.loseAccessAt" />
+        </div>
+      </div>
+    </div>
 
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
@@ -94,6 +100,7 @@
 import { defineComponent, PropType } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
 import DateInput from '../../elements/DateInput.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
 
 interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
   name?: User['name']
@@ -103,7 +110,7 @@ interface FormUser extends Omit<User, 'settings' | 'name' | '_id' | 'access'> {
 }
 
 export default defineComponent({
-  components: { DateInput },
+  components: { DateInput, InfoPoint },
   name: 'UserForm',
   props: {
     user: {
