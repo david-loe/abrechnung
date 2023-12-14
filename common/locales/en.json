@@ -83,6 +83,7 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "access": "Access",
     "addX": "Add {X}",
     "advance": "Advance",
     "airplane": "Airplane ✈",

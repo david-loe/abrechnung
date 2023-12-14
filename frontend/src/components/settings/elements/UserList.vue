@@ -1,38 +1,43 @@
 <template>
   <div class="container">
-    <ul class="list-group mb-3" style="max-height: 400px; overflow-y: scroll">
-      <li v-for="user of users" :key="user._id" class="list-group-item">
-        <div class="row align-items-center">
-          <div class="col-auto me-auto">
-            <span class="fs-6">
-              {{ user.email }}
-              <span v-if="user.settings.organisation" class="ms-2 text-muted"> {{ user.settings.organisation.name }}</span>
-              <template v-for="access of accesses">
-                <span v-if="user.access[access]" class="ms-4">
-                  <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
-                </span>
-              </template>
-            </span>
+    <EasyDataTable
+      class="mb-3"
+      :rows-items="[5, 15, 25]"
+      :rows-per-page="5"
+      sort-by="name"
+      :items="users"
+      :headers="[
+        { text: $t('labels.name'), value: 'name' },
+        { text: 'E-Mail', value: 'email' },
+        { text: $t('labels.organisation'), value: 'settings.organisation.name', sortable: true },
+        { text: $t('labels.access'), value: 'access' },
+        { value: 'buttons' }
+      ]">
+      <template #item-name="{ name }">
+        {{ name.givenName + ' ' + name.familyName }}
+      </template>
+      <template #item-access="user">
+        <template v-for="access of accesses">
+          <span v-if="user.access[access]" class="ms-3">
+            <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
+          </span>
+        </template>
+      </template>
+      <template #item-buttons="user">
+        <button type="button" class="btn btn-light" @click="showForm('edit', user)">
+          <div class="d-none d-md-block">
+            <i class="bi bi-pencil"></i>
           </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-light" @click="showForm('edit', user)">
-              <div class="d-none d-md-block">
-                <i class="bi bi-pencil"></i>
-                <span class="ps-1">{{ $t('labels.edit') }}</span>
-              </div>
-              <i class="bi bi-pencil d-block d-md-none"></i>
-            </button>
-            <button type="button" class="btn btn-danger ms-2" @click="deleteUser(user)">
-              <div class="d-none d-md-block">
-                <i class="bi bi-trash"></i>
-                <span class="ps-1">{{ $t('labels.delete') }}</span>
-              </div>
-              <i class="bi bi-trash d-block d-md-none"></i>
-            </button>
+          <i class="bi bi-pencil d-block d-md-none"></i>
+        </button>
+        <button type="button" class="btn btn-danger ms-2" @click="deleteUser(user)">
+          <div class="d-none d-md-block">
+            <i class="bi bi-trash"></i>
           </div>
-        </div>
-      </li>
-    </ul>
+          <i class="bi bi-trash d-block d-md-none"></i>
+        </button>
+      </template>
+    </EasyDataTable>
     <UserForm
       v-if="showForm_"
       :user="userToEdit"

@@ -83,6 +83,7 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "access": "Zugriffsrechte",
     "addX": "{X} hinzufügen",
     "advance": "Vorschuss",
     "airplane": "Flugzeug ✈",
