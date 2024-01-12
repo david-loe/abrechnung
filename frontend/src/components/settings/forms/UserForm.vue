@@ -23,7 +23,7 @@
       <div class="col">
         <label for="userFormFkGivenName" class="form-label"> {{ $t('labels.givenName') }}<span class="text-danger">*</span> </label>
         <input
-          type="email"
+          type="text"
           class="form-control"
           id="userFormFkGivenName"
           v-model="formUser.name.givenName"
@@ -33,7 +33,7 @@
       <div class="col">
         <label for="userFormFamilyName" class="form-label"> {{ $t('labels.familyName') }}<span class="text-danger">*</span> </label>
         <input
-          type="email"
+          type="text"
           class="form-control"
           id="userFormFamilyName"
           v-model="formUser.name.familyName"
