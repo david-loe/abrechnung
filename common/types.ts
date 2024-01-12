@@ -19,6 +19,8 @@ export interface Settings {
   stateColors: { [key in TravelState | HealthCareCostState | ExpenseReportState]: { color: string; text: string } }
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
+  allowTravelApplicationForThePast: boolean
+  vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   version: string
   migrateFrom?: string | null
 }
