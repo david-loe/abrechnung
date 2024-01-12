@@ -40,7 +40,7 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/examine/travel', title: 'labels.examine/travel' }],
+      parentPages: [{ link: '/examine/travel', title: 'accesses.examine/travel' }],
       endpointPrefix: 'examine/'
     })
   },
@@ -61,7 +61,7 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/examine/expenseReport', title: 'labels.examine/expenseReport' }],
+      parentPages: [{ link: '/examine/expenseReport', title: 'accesses.examine/expenseReport' }],
       endpointPrefix: 'examine/'
     })
   },
@@ -82,7 +82,7 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/confirm/healthCareCost', title: 'labels.confirm/healthCareCost' }],
+      parentPages: [{ link: '/confirm/healthCareCost', title: 'accesses.confirm/healthCareCost' }],
       endpointPrefix: 'confirm/'
     })
   },
@@ -97,7 +97,7 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({
       _id: route.params._id,
-      parentPages: [{ link: '/examine/healthCareCost', title: 'labels.examine/healthCareCost' }],
+      parentPages: [{ link: '/examine/healthCareCost', title: 'accesses.examine/healthCareCost' }],
       endpointPrefix: 'examine/'
     })
   },

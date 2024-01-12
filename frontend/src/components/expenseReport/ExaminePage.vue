@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="mb-3">{{ $t('labels.examine/expenseReport') }}</h1>
+    <h1 class="mb-3">{{ $t('accesses.examine/expenseReport') }}</h1>
     <ExpenseReportCardList
       class="mb-5"
       endpoint="examine/expenseReport"

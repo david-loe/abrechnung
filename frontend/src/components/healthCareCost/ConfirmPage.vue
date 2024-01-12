@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="mb-3">{{ $t('labels.confirm/healthCareCost') }}</h1>
+    <h1 class="mb-3">{{ $t('accesses.confirm/healthCareCost') }}</h1>
     <HealthCareCostCardList
       class="mb-5"
       endpoint="confirm/healthCareCost"
