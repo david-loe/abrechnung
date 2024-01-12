@@ -95,10 +95,10 @@
           :disabled="disabled"
           required />
       </div>
-      <div class="mb-3" v-if="showVehicleRegistration">
+      <div class="mb-3" v-if="showVehicleRegistration && $root.settings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
           {{ $t('labels.vehicleRegistration') }}
-          <span class="text-danger">*</span>
+          <span v-if="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'" class="text-danger">*</span>
         </label>
         <InfoPoint :text="$t('info.vehicleRegistration')" />
         <FileUpload
@@ -107,7 +107,7 @@
           v-model="($root.user.vehicleRegistration as DocumentFile[]| undefined)"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
-          :required="true"
+          :required="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'"
           :endpointPrefix="endpointPrefix" />
       </div>
     </template>
