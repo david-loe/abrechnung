@@ -286,10 +286,11 @@ export function accessControl(accesses: Access[]) {
 }
 
 export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!owner) {
       owner = req.user!._id
     }
+    owner = owner.toString()
     var pathExists = true
     var tmpCheckObj = req.body
     for (const prop of pathToFiles) {
@@ -343,5 +344,15 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
       }
     }
     next()
+  })
+}
+
+function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) {
+  return async function (req: Request, res: Response, next: NextFunction) {
+    try {
+      await fn(req, res, next)
+    } catch (e) {
+      next(e)
+    }
   }
 }
