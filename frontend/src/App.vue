@@ -127,12 +127,19 @@
 
     <footer class="py-3 border-top">
       <div class="container">
-        <div class="d-flex align-items-center">
-          <a href="/" class="text-decoration-none link-dark lh-1">
-            <i class="fs-3 bi bi-receipt"></i>
-          </a>
+        <div class="d-flex align-items-center lh-1">
+          <i class="fs-3 bi bi-receipt"></i>
+
           <span class="ps-2 text-muted">
-            © {{ new Date().getFullYear() }} {{ $t('headlines.title') }} <small v-if="settings.version">v{{ settings.version }}</small>
+            © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
+            <small v-if="settings.version"
+              ><a
+                class="text-decoration-none link-dark"
+                target="_blank"
+                :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + settings.version"
+                >v{{ settings.version }}</a
+              ></small
+            >
           </span>
         </div>
       </div>
@@ -417,7 +424,7 @@ footer {
   width: 100%;
   height: 60px;
   /* Set the fixed height of the footer here */
-  z-index: -999;
+  /* z-index: -999; */
 }
 
 @keyframes run {
