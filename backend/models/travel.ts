@@ -25,7 +25,8 @@ const settings = (await Settings.findOne().lean())!
 function place(required = false) {
   return {
     country: { type: String, ref: 'Country', required: required },
-    place: { type: String, required: required }
+    place: { type: String, required: required },
+    special: { type: String }
   }
 }
 
@@ -33,7 +34,7 @@ interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
   getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[]
-  getBorderCrossings(): Promise<{ date: Date; country: any }[]>
+  getBorderCrossings(): Promise<{ date: Date; country: CountrySimple, special?: string }[]>
   calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
   addOvernightRefunds(): Promise<void>
@@ -108,6 +109,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
       {
         date: { type: Date, required: true },
         country: { type: String, ref: 'Country', required: true },
+        special: { type: String },
         cateringNoRefund: {
           breakfast: { type: Boolean, default: false },
           lunch: { type: Boolean, default: false },
@@ -217,10 +219,10 @@ travelSchema.methods.getDays = function (this: TravelDoc) {
   }
 }
 
-travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Promise<{ date: Date; country: CountrySimple }[]> {
+travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Promise<{ date: Date; country: CountrySimple, special?: string }[]> {
   if (this.stages.length > 0) {
     const startCountry = this.stages[0].startLocation.country
-    const borderCrossings = [{ date: new Date(this.stages[0].departure), country: startCountry }]
+    const borderCrossings: { date: Date; country: CountrySimple, special?: string }[] = [{ date: new Date(this.stages[0].departure), country: startCountry }]
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
       // Country Change
@@ -251,7 +253,7 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
             }
           }
         }
-        borderCrossings.push({ date: new Date(stage.arrival), country: stage.endLocation.country })
+        borderCrossings.push({ date: new Date(stage.arrival), country: stage.endLocation.country, special: stage.endLocation.special })
       }
     }
     return borderCrossings
@@ -264,7 +266,12 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
   const borderCrossings = await this.getBorderCrossings()
   const days = this.getDays()
   for (const borderX of borderCrossings) {
-    borderX.country = await Country.findOne({ _id: borderX.country._id })
+    const dbCountry = await Country.findOne({ _id: borderX.country._id })
+    if (dbCountry) {
+      borderX.country = dbCountry
+    } else {
+      throw new Error('No Country found with _id: ' + borderX.country._id)
+    }
   }
   var bXIndex = 0
   for (const day of days) {
@@ -274,7 +281,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     ) {
       bXIndex++
     }
-    ;(day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
+    ; (day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
+      ; (day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
   }
   this.days = days as TravelDay[]
 }
@@ -287,7 +295,7 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
       if (i == 0 || i == this.days.length - 1) {
         result.type = 'catering8'
       }
-      var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date))[result.type!]
+      var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date, day.special))[result.type!]
       var leftover = 1
       if (day.cateringNoRefund.breakfast) leftover -= settings.breakfastCateringLumpSumCut
       if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
@@ -297,9 +305,9 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
         amount:
           Math.round(
             amount *
-              leftover *
-              ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
-              100
+            leftover *
+            ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
+            100
           ) / 100,
         currency: settings.baseCurrency
       }
@@ -331,13 +339,13 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
           continue
         }
         const result: Partial<Refund> = { type: 'overnight' }
-        var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date))[result.type!]
+        var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date, day.special))[result.type!]
         result.refund = {
           amount:
             Math.round(
               amount *
-                (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
-                100
+              (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
+              100
             ) / 100,
           currency: settings.baseCurrency
         }
@@ -506,4 +514,4 @@ travelSchema.pre('save', async function (this: TravelDoc, next) {
 
 export default model<Travel, TravelModel>('Travel', travelSchema)
 
-export interface TravelDoc extends Methods, HydratedDocument<Travel> {}
+export interface TravelDoc extends Methods, HydratedDocument<Travel> { }

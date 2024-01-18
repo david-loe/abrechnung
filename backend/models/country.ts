@@ -1,9 +1,9 @@
 import { HydratedDocument, Model, Schema, model } from 'mongoose'
 import Settings from './settings.js'
-import { Country, CountryLumpSum } from '../../common/types.js'
+import { Country, LumpSum } from '../../common/types.js'
 
 interface Methods {
-  getLumpSum(date: Date): Promise<CountryLumpSum>
+  getLumpSum(date: Date, special?: string): Promise<LumpSum>
 }
 
 type CountryModel = Model<Country, {}, Methods>
@@ -39,7 +39,7 @@ const countrySchema = new Schema<Country, CountryModel, Methods>({
   currency: { type: String, ref: 'Currency' }
 })
 
-countrySchema.methods.getLumpSum = async function (date: Date): Promise<CountryLumpSum> {
+countrySchema.methods.getLumpSum = async function (date: Date, special: string | undefined = undefined): Promise<LumpSum> {
   if (this.lumpSumsFrom) {
     return (await model('Country').findOne({ _id: this.lumpSumsFrom })).getLumpSum(date)
   } else if (this.lumpSums.length == 0) {
@@ -56,10 +56,17 @@ countrySchema.methods.getLumpSum = async function (date: Date): Promise<CountryL
     if (date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf() < 0) {
       throw Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
     }
+    if (special && this.lumpSums[nearest].spezials) {
+      for (const lumpSumSpecial of this.lumpSums[nearest].spezials!) {
+        if (lumpSumSpecial.city === special) {
+          return lumpSumSpecial
+        }
+      }
+    }
     return this.lumpSums[nearest]
   }
 }
 
 export default model<Country, CountryModel>('Country', countrySchema)
 
-export interface CountryDoc extends Methods, HydratedDocument<Country> {}
+export interface CountryDoc extends Methods, HydratedDocument<Country> { }

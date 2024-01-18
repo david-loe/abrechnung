@@ -189,6 +189,7 @@ export default defineComponent({
       settings: {} as Settings,
       healthInsurances: [] as HealthInsurance[],
       organisations: [] as OrganisationSimple[],
+      specialLumpSums: {} as { [key: string]: string[] },
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -208,7 +209,8 @@ export default defineComponent({
           this.getter<CountrySimple[]>('country'),
           this.getter<Settings[]>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
-          this.getter<OrganisationSimple[]>('organisation')
+          this.getter<OrganisationSimple[]>('organisation'),
+          this.getter<{ [key: string]: string[] }>('specialLumpSums')
         ]).then((result) => {
           this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
           log(this.$t('labels.user') + ':')
@@ -223,6 +225,7 @@ export default defineComponent({
             result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data[0] : ({} as Settings)) : ({} as Settings)
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
           this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
+          this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}
           this.checkUserSettings(this.user.settings)
           this.loadState = 'LOADED'
         })

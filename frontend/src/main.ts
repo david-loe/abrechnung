@@ -45,6 +45,7 @@ declare module '@vue/runtime-core' {
       settings: Settings
       healthInsurances: HealthInsurance[]
       organisations: OrganisationSimple[]
+      specialLumpSums: { [key: string]: string[] }
     }
   }
 }

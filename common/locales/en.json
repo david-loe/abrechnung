@@ -79,6 +79,7 @@
     "purpose": "Specify which purpose this stage served.",
     "reason": "Briefly state the reason for your trip here.",
     "receipts": "Upload the corresponding receipts here.",
+    "special": "Select a city here IF one from the selection applies. There are special lump sums for some cities.",
     "travelInsideOfEU": "Is your trip a cross-country trip within the EU?",
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
@@ -97,6 +98,7 @@
     "by": "by",
     "cancel": "Cancel",
     "cateringNoRefund": "Catering refund cut",
+    "city": "City",
     "claimOvernightLumpSum": "Claim overnight lump sum",
     "claimSpouseRefund": "Refund Spouse",
     "collapseAll": "Collapse all",

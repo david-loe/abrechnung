@@ -59,5 +59,25 @@ router.get('/country', async (req, res) => {
   delete req.query.addLumpSums
   return getter(Country, 'country', 500, {}, select)(req, res)
 })
+router.get('/specialLumpSums', async (req, res) => {
+  const allCountries = await Country.find().lean()
+  const specialCountries: { [key: string]: string[] } = {}
+  for (const c of allCountries) {
+    const specials: string[] = []
+    for (const lumpSum of c.lumpSums) {
+      if (lumpSum.spezials) {
+        for (const special of lumpSum.spezials) {
+          if (specials.indexOf(special.city) === -1) {
+            specials.push(special.city)
+          }
+        }
+      }
+    }
+    if (specials.length > 0) {
+      specialCountries[c._id] = specials
+    }
+  }
+  res.send({ data: specialCountries })
+})
 
 export default router
