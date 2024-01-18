@@ -233,7 +233,7 @@
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
                         <i class="bi bi-sun"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -241,7 +241,7 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag">
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
                         <i class="bi bi-moon"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>

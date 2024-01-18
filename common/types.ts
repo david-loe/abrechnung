@@ -39,17 +39,11 @@ export interface CountrySimple {
   currency?: Currency | null
 }
 
-export interface CountryLumpSum {
+export interface CountryLumpSum extends LumpSum {
   validFrom: Date | string
-  catering24: number
-  catering8: number
-  overnight: number
-  spezials?: {
+  spezials?: ({
     city: string
-    catering24: number
-    catering8: number
-    overnight: number
-  }[]
+  } & LumpSum)[]
 }
 
 export interface Country extends CountrySimple {
@@ -71,6 +65,7 @@ export interface Currency {
 export interface Place {
   place: string
   country: CountrySimple
+  special?: string
 }
 
 export interface DocumentFile {
@@ -219,10 +214,10 @@ export interface TravelSimple {
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | {
-      type: 'ownCar'
-      distance: number
-      distanceRefundType: DistanceRefundType
-    }
+    type: 'ownCar'
+    distance: number
+    distanceRefundType: DistanceRefundType
+  }
 
 export interface Refund {
   type: LumpsumType
@@ -232,6 +227,7 @@ export interface Refund {
 export interface TravelDay {
   date: Date | string
   country: CountrySimple
+  special?: string
   cateringNoRefund: {
     [key in Meal]: boolean
   }
@@ -329,6 +325,7 @@ export type Meal = (typeof meals)[number]
 
 export const lumpsumTypes = ['overnight', 'catering8', 'catering24'] as const
 export type LumpsumType = (typeof lumpsumTypes)[number]
+export type LumpSum = { [key in LumpsumType]: number }
 
 export type PurposeSimple = 'professional' | 'private'
 

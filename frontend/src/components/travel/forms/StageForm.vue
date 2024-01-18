@@ -28,11 +28,23 @@
     <div class="row mb-3">
       <div class="col">
         <label for="stageFormStartLocation" class="form-label"> {{ $t('labels.startLocation') }}<span class="text-danger">*</span> </label>
-        <PlaceInput id="stageFormStartLocation" v-model="formStage.startLocation" :disabled="disabled" :required="true"> </PlaceInput>
+        <PlaceInput
+          id="stageFormStartLocation"
+          v-model="formStage.startLocation"
+          :disabled="disabled"
+          :required="true"
+          :withSpecialLumpSumInput="true">
+        </PlaceInput>
       </div>
       <div class="col">
         <label for="stageFormEndLocation" class="form-label"> {{ $t('labels.endLocation') }}<span class="text-danger">*</span> </label>
-        <PlaceInput id="stageFormEndLocation" v-model="formStage.endLocation" :disabled="disabled" :required="true"> </PlaceInput>
+        <PlaceInput
+          id="stageFormEndLocation"
+          v-model="formStage.endLocation"
+          :disabled="disabled"
+          :required="true"
+          :withSpecialLumpSumInput="true">
+        </PlaceInput>
       </div>
     </div>
 

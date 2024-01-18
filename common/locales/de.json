@@ -79,6 +79,7 @@
     "purpose": "Gib hier an welchem Zweck diese Etappe diente.",
     "reason": "Gib hier kurz den Grund deiner Reise an.",
     "receipts": "Lade hier die entsprechenden Belege hoch.",
+    "special": "Wähle hier eine Stadt aus FALLS eine aus der Auswahl zutrifft. Für einige Städte gibt es nämlich spezielle Pauschalen.",
     "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?",
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
@@ -97,6 +98,7 @@
     "by": "von",
     "cancel": "Abbrechen",
     "cateringNoRefund": "Verpflegungs pauschalen Kürzung",
+    "city": "Stadt",
     "claimOvernightLumpSum": "Übernachtungspauschalen beanspruchen",
     "claimSpouseRefund": "Ehepartner mitabrechnen",
     "collapseAll": "Alle einklappen",
