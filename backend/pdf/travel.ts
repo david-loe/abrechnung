@@ -99,11 +99,11 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.traveler') +
-      ': ' +
-      travel.traveler.name.givenName +
-      ' ' +
-      travel.traveler.name.familyName +
-      (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
+    ': ' +
+    travel.traveler.name.givenName +
+    ' ' +
+    travel.traveler.name.familyName +
+    (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
     {
       x: opts.xStart,
       y: y,
@@ -237,11 +237,11 @@ async function drawStages(
     fn: (t: Transport) =>
       t.type === 'ownCar'
         ? i18n.t('distanceRefundTypes.' + t.distanceRefundType) +
-          ' (' +
-          settings.distanceRefunds[t.distanceRefundType] +
-          ' ' +
-          (settings.baseCurrency.symbol ? settings.baseCurrency.symbol : settings.baseCurrency._id) +
-          '/km)'
+        ' (' +
+        settings.distanceRefunds[t.distanceRefundType] +
+        ' ' +
+        (settings.baseCurrency.symbol ? settings.baseCurrency.symbol : settings.baseCurrency._id) +
+        '/km)'
         : i18n.t('labels.' + t.type)
   })
   columns.push({ key: 'distance', width: 65, alignment: pdf_lib.TextAlignment.Right, title: i18n.t('labels.distance') })
@@ -350,6 +350,13 @@ function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, trave
     pseudoSuffix: 'mim',
     cb: drawFlag,
     cbValue: (c: CountrySimple) => c._id
+  })
+  columns.push({
+    key: 'special',
+    width: 80,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: i18n.t('labels.city'),
+    fn: (s?: string) => s ? s : ''
   })
   columns.push({
     key: 'purpose',
