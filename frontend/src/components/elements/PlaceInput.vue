@@ -5,13 +5,13 @@
         type="text"
         class="form-control"
         :value="modelValue.place"
-        @input="$emit('update:modelValue', Object.assign({}, modelValue, { place: ($event.target as HTMLInputElement).value }))"
+        @input="update({ place: ($event.target as HTMLInputElement).value })"
         :placeholder="$t('labels.place')"
         :disabled="disabled"
         :required="required" />
       <CountrySelector
         :modelValue="modelValue.country"
-        @update:modelValue="(v) => $emit('update:modelValue', Object.assign({}, modelValue, { country: v }))"
+        @update:modelValue="(v) => update({ country: v })"
         :disabled="disabled"
         :required="required"></CountrySelector>
     </div>
@@ -20,7 +20,7 @@
       <InfoPoint :text="$t('info.special')" />
       <select
         class="form-select form-select-sm"
-        @change="$emit('update:modelValue', Object.assign({}, modelValue, { special: ($event.target as HTMLInputElement).value }))"
+        @change="update({ special: ($event.target as HTMLInputElement).value })"
         :disabled="disabled">
         <option value=""></option>
         <option
@@ -44,7 +44,7 @@ import InfoPoint from './InfoPoint.vue'
 const defaultPlace = {
   country: null,
   place: null,
-  special: null
+  special: undefined
 }
 export default defineComponent({
   name: 'PlaceInput',
@@ -60,14 +60,22 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
+    update(update: Partial<Place>) {
+      this.$emit('update:modelValue', Object.assign({}, this.modelValue, update))
+    },
     matchSpecials() {
       if (this.modelValue.country && this.$root.specialLumpSums[this.modelValue.country._id]) {
+        if (this.modelValue.special && this.$root.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1) {
+          this.update({ special: undefined })
+        }
         for (const special of this.$root.specialLumpSums[this.modelValue.country._id]) {
           if (special === this.modelValue.place) {
-            this.modelValue.special = special
+            this.update({ special: special })
             break
           }
         }
+      } else {
+        this.update({ special: undefined })
       }
     }
   },
