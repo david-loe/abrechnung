@@ -15,7 +15,7 @@
         :disabled="disabled"
         :required="required"></CountrySelector>
     </div>
-    <div class="mt-2" v-if="modelValue.country && $root.specialLumpSums[modelValue.country._id]">
+    <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && $root.specialLumpSums[modelValue.country._id]">
       <label class="form-label me-2">{{ $t('labels.city') }}</label>
       <InfoPoint :text="$t('info.special')" />
       <select
@@ -64,18 +64,20 @@ export default defineComponent({
       this.$emit('update:modelValue', Object.assign({}, this.modelValue, update))
     },
     matchSpecials() {
-      if (this.modelValue.country && this.$root.specialLumpSums[this.modelValue.country._id]) {
-        if (this.modelValue.special && this.$root.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1) {
+      if (this.withSpecialLumpSumInput) {
+        if (this.modelValue.country && this.$root.specialLumpSums[this.modelValue.country._id]) {
+          if (this.modelValue.special && this.$root.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1) {
+            this.update({ special: undefined })
+          }
+          for (const special of this.$root.specialLumpSums[this.modelValue.country._id]) {
+            if (special === this.modelValue.place) {
+              this.update({ special: special })
+              break
+            }
+          }
+        } else {
           this.update({ special: undefined })
         }
-        for (const special of this.$root.specialLumpSums[this.modelValue.country._id]) {
-          if (special === this.modelValue.place) {
-            this.update({ special: special })
-            break
-          }
-        }
-      } else {
-        this.update({ special: undefined })
       }
     }
   },
