@@ -15,7 +15,7 @@ if (settings?.migrateFrom) {
 
 async function migrate(from: string) {
   switch (from) {
-    case '0.3.0':
+    case '0.3.0': {
       console.log('Appy migration from v0.3.0')
       var randomOrg = await Organisation.findOne()
       if (!randomOrg) {
@@ -69,7 +69,8 @@ async function migrate(from: string) {
           }
         }
       }
-    case '0.3.2':
+    }
+    case '0.3.2': {
       console.log('Appy migration from v0.3.2')
       const allTravels = (await mongoose.connection.asPromise()).collection('travels').find()
       for await (const travel of allTravels) {
@@ -82,15 +83,33 @@ async function migrate(from: string) {
         }
         mongoose.connection.collection('travels').updateOne({ _id: travel._id }, { $set: { stages: travel.stages } })
       }
-
-    case '0.3.3':
+    }
+    case '0.3.3': {
       console.log('Appy migration from v0.3.3')
       await mongoose.connection.collection('countries').drop()
       initDB()
-    case '0.3.4':
+    }
+    case '0.3.4': {
       console.log('Appy migration from v0.3.4')
       mongoose.connection.collection('users').updateMany({}, { $set: { 'access.user': true } })
       mongoose.connection.collection('settings').updateMany({}, { $set: { 'accessIcons.user': ['bi-card-list'] } })
+    }
+    case '0.3.5': {
+      console.log('Appy migration from v0.3.5')
+      const travels = await Travel.find()
+      for (const travel of travels) {
+        if (travel.state === 'refunded' || travel.state === 'underExamination') {
+          travel.lastPlaceOfWork = travel.stages[travel.stages.length - 1].endLocation
+        } else {
+          travel.lastPlaceOfWork = travel.destinationPlace
+        }
+        try {
+          await travel.save()
+        } catch (error: any) {
+          console.error('Failed migrating travel: ' + travel._id, Object.values(error.errors).map((val: any) => val.message))
+        }
+      }
+    }
     default:
       if (settings) {
         settings.migrateFrom = undefined

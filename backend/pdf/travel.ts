@@ -124,7 +124,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
     })
   )
 
-  // Dates + professionalShare
+  // Dates + professionalShare + lastPlaceOfWork
   var text =
     i18n.t('labels.from') +
     ': ' +
@@ -136,14 +136,16 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   if (travel.professionalShare !== 1) {
     text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare! * 100) + '%'
   }
+
   var y = y - opts.fontSize * 1.5
-  page.drawText(text, {
-    x: opts.xStart,
-    y: y,
-    size: opts.fontSize,
-    font: opts.font,
-    color: opts.textColor
-  })
+  drawPlace(
+    page,
+    travel.lastPlaceOfWork,
+    Object.assign(opts, {
+      yStart: y,
+      prefix: text + '    ' + i18n.t('labels.lastPlaceOfWork') + ': '
+    })
+  )
   return y
 }
 
