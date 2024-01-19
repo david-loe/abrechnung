@@ -755,7 +755,7 @@ export default defineComponent({
       return []
     },
     getLastPaceOfWorkList(travel: Travel) {
-      const list: Place[] = []
+      const list: Omit<Place, 'place'>[] = []
       function add(place: Place, list: Place[]) {
         var found = false
         for (const entry of list) {
@@ -765,7 +765,13 @@ export default defineComponent({
           }
         }
         if (!found) {
-          list.push(place)
+          const adding: Omit<Place, 'place'> = {
+            country: place.country
+          }
+          if (place.special) {
+            adding['special'] = place.special
+          }
+          list.push(adding)
         }
       }
       for (const stage of travel.stages) {
