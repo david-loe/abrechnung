@@ -99,9 +99,11 @@ async function migrate(from: string) {
       const travels = await Travel.find()
       for (const travel of travels) {
         if (travel.state === 'refunded' || travel.state === 'underExamination') {
-          travel.lastPlaceOfWork = travel.stages[travel.stages.length - 1].endLocation
+          //@ts-ignore
+          travel.lastPlaceOfWork = { country: travel.stages[travel.stages.length - 1].endLocation.country }
         } else {
-          travel.lastPlaceOfWork = travel.destinationPlace
+          //@ts-ignore
+          travel.lastPlaceOfWork = { country: travel.destinationPlace.country }
         }
         try {
           await travel.save()
