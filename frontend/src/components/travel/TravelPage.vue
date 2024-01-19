@@ -756,7 +756,7 @@ export default defineComponent({
     },
     getLastPaceOfWorkList(travel: Travel) {
       const list: Omit<Place, 'place'>[] = []
-      function add(place: Place, list: Place[]) {
+      function add(place: Place, list: Omit<Place, 'place'>[]) {
         var found = false
         for (const entry of list) {
           if (entry.country._id === place.country._id && entry.special === place.special) {
