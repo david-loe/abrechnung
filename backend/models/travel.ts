@@ -1,5 +1,5 @@
 import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
-import { getDayList, getDiffInDays } from '../../common/scripts.js'
+import { datetimeToDate, getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
 import Settings from './settings.js'
 import { convertCurrency, costObject } from '../helper.js'
@@ -17,17 +17,21 @@ import {
   transportTypes,
   travelStates,
   lumpsumTypes,
-  distanceRefundTypes
+  distanceRefundTypes,
+  Place
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!
 
-function place(required = false) {
-  return {
+function place(required = false, withPlace = true) {
+  const obj: any = {
     country: { type: String, ref: 'Country', required: required },
-    place: { type: String, required: required },
     special: { type: String }
   }
+  if (withPlace) {
+    obj['place'] = { type: String, required: required }
+  }
+  return obj
 }
 
 interface Methods {
@@ -35,6 +39,7 @@ interface Methods {
   calculateProgress(): void
   getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[]
   getBorderCrossings(): Promise<{ date: Date; country: CountrySimple, special?: string }[]>
+  getDateOfLastPlaceOfWork(): Date | null
   calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
   addOvernightRefunds(): Promise<void>
@@ -79,6 +84,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     advance: costObject(true, false, false, settings.baseCurrency._id),
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
+    lastPlaceOfWork: place(true, false),
     progress: { type: Number, min: 0, max: 100, default: 0 },
     history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
     historic: { type: Boolean, required: true, default: false },
@@ -140,6 +146,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'days.refunds.refund.currency' }),
     doc.populate({ path: 'organisation', select: { name: 1 } }),
     doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }),
@@ -226,7 +233,7 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
       // Country Change
-      if (stage.startLocation && stage.endLocation && stage.startLocation.country._id != stage.endLocation.country._id) {
+      if (stage.startLocation && stage.endLocation && stage.startLocation.country._id !== stage.endLocation.country._id) {
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
@@ -262,6 +269,23 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
   }
 }
 
+travelSchema.methods.getDateOfLastPlaceOfWork = function (this: TravelDoc) {
+  var date: Date | null = null
+  function sameCountryAndSpecial(placeA: Place, placeB: Place): boolean {
+    return placeA.country._id === placeB.country._id && placeA.special === placeB.special
+  }
+  for (var i = this.stages.length - 1; i >= 0; i--) {
+    if (sameCountryAndSpecial(this.stages[i].endLocation, this.lastPlaceOfWork)) {
+      date = datetimeToDate(this.stages[i].arrival)
+      break
+    } else if (sameCountryAndSpecial(this.stages[i].startLocation, this.lastPlaceOfWork)) {
+      date = datetimeToDate(this.stages[i].departure)
+      break
+    }
+  }
+  return date
+}
+
 travelSchema.methods.calculateDays = async function (this: TravelDoc) {
   const borderCrossings = await this.getBorderCrossings()
   const days = this.getDays()
@@ -284,6 +308,23 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     ; (day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
       ; (day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
   }
+
+  // change days according to last place of work
+  const dateOfLastPlaceOfWork = this.getDateOfLastPlaceOfWork()
+
+  if (dateOfLastPlaceOfWork) {
+    const dbCountry = await Country.findOne({ _id: this.lastPlaceOfWork.country._id })
+    if (!dbCountry) {
+      throw new Error('No Country found with _id: ' + this.lastPlaceOfWork.country._id)
+    }
+    for (const day of days) {
+      if (day.date.valueOf() >= dateOfLastPlaceOfWork.valueOf()) {
+        ; (day as Partial<TravelDay>).country = dbCountry
+          ; (day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
+      }
+    }
+  }
+
   this.days = days as TravelDay[]
 }
 
