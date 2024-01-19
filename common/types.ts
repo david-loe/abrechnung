@@ -238,6 +238,7 @@ export interface TravelDay {
 
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
+  lastPlaceOfWork: Place
   professionalShare: number | null
   history: Types.ObjectId[]
   historic: boolean

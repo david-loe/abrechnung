@@ -140,6 +140,7 @@ router.post('/appliedFor', async (req, res) => {
     startDate: req.body.startDate,
     endDate: req.body.endDate,
     destinationPlace: req.body.destinationPlace,
+    lastPlaceOfWork: { country: req.body.destinationPlace.country },
     travelInsideOfEU: req.body.travelInsideOfEU,
     advance: req.body.advance,
     claimSpouseRefund: req.body.claimSpouseRefund,

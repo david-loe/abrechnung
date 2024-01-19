@@ -140,7 +140,7 @@
 
       <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
 
-      <div class="row justify-content-center mb-5">
+      <div class="row gx-5 justify-content-center align-items-center mb-5">
         <div class="col-auto">
           <div class="form-check form-switch">
             <input
@@ -153,6 +153,27 @@
               :disabled="isReadOnly" />
             <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum') }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="row align-items-center">
+            <div class="col-auto pe-2">
+              <label class="form-lable mb-0">{{ $t('labels.lastPlaceOfWork') }}</label>
+            </div>
+            <div class="col-auto p-0">
+              <select
+                class="form-select form-select-sm"
+                @change="postTravelSettings"
+                v-model="travel.lastPlaceOfWork"
+                :disabled="isReadOnly">
+                <option v-for="place of getLastPaceOfWorkList(travel)" :value="place" :key="place.country._id + place.special">
+                  <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
+                </option>
+              </select>
+            </div>
+            <div class="col-auto ps-2">
+              <InfoPoint :text="$t('info.lastPlaceOfWork')" />
+            </div>
           </div>
         </div>
         <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
@@ -466,7 +487,8 @@ import {
   meals,
   travelStates,
   UserSimple,
-  User
+  User,
+  Place
 } from '../../../../common/types.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -531,6 +553,7 @@ export default defineComponent({
       const travel = {
         _id: this.travel._id,
         claimOvernightLumpSum: this.travel.claimOvernightLumpSum,
+        lastPlaceOfWork: this.travel.lastPlaceOfWork,
         days: this.travel.days
       }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
@@ -730,6 +753,26 @@ export default defineComponent({
         return result.data.map((x) => x.email)
       }
       return []
+    },
+    getLastPaceOfWorkList(travel: Travel) {
+      const list: Place[] = []
+      function add(place: Place, list: Place[]) {
+        var found = false
+        for (const entry of list) {
+          if (entry.country._id === place.country._id && entry.special === place.special) {
+            found = true
+            break
+          }
+        }
+        if (!found) {
+          list.push(place)
+        }
+      }
+      for (const stage of travel.stages) {
+        add(stage.startLocation, list)
+        add(stage.endLocation, list)
+      }
+      return list
     },
     getMoneyString,
     datetoDateString,
