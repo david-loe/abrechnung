@@ -26,8 +26,9 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 ## Getting Started
 
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
-2. Run `docker compose up`
-3. Open `http://localhost:5000` and login with `professor:professor`
+2. Copy `.env.example` to `.env` and adapt if needed
+3. Run `docker compose up`
+4. Open `http://localhost:5000` and login with `professor:professor`
 
 > ℹ You can change ports and URLs in the `.env` file
 
