@@ -12,6 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: copy .env file
+        uses: canastro/copy-file-action@master
+        with:
+          source: '.env.example'
+          target: '.env'
       - name: Build the stack
         run: docker-compose up -d --build backend ldap inbucket
       - name: Wait that backend initializes db
