@@ -194,7 +194,6 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
 }
 
 const settings = (await Settings.findOne().lean())!
-// const settings = { baseCurrency: { _id: 'EUR' } }
 
 export async function convertCurrency(
   date: Date | string | number,
