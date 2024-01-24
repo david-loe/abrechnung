@@ -21,7 +21,7 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 
 ## Wechselkurse
 
-[fixer](https://currencybeacon.com/)
+[currencybeacon](https://currencybeacon.com/)
 
 ## Getting Started
 
