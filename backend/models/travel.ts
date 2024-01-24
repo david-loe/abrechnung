@@ -23,15 +23,12 @@ import {
 
 const settings = (await Settings.findOne().lean())!
 
-function place(required = false, withPlace = true) {
-  const obj: any = {
+function place(required = false) {
+  return {
     country: { type: String, ref: 'Country', required: required },
+    place: { type: String, required: required },
     special: { type: String }
   }
-  if (withPlace) {
-    obj['place'] = { type: String, required: required }
-  }
-  return obj
 }
 
 interface Methods {
@@ -84,7 +81,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     advance: costObject(true, false, false, settings.baseCurrency._id),
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
-    lastPlaceOfWork: place(true, false),
+    lastPlaceOfWork: place(true),
     progress: { type: Number, min: 0, max: 100, default: 0 },
     history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
     historic: { type: Boolean, required: true, default: false },

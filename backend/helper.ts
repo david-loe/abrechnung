@@ -218,17 +218,15 @@ export async function convertCurrency(
     const dataStr = fs.readFileSync(filePath, 'utf8')
     data = JSON.parse(dataStr)
   } else {
-    const url = 'http://data.fixer.io/api/' + dateStr + '?access_key=' + process.env.FIXER_API_KEY + '&base=' + to
+    const url = 'https://api.currencybeacon.com/v1/historical?api_key=' + process.env.CURRENCYBEACON_API_KEY + '&base=' + to + '&date=' + dateStr
     const res = await axios.get(url)
     if (res.status === 200) {
-      if (res.data.success) {
-        data = res.data
-        fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
-          if (error) {
-            console.error(error)
-          }
-        })
-      }
+      data = res.data
+      fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
+        if (error) {
+          console.error(error)
+        }
+      })
     }
   }
   var rate = null
