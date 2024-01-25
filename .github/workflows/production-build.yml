@@ -12,6 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: copy .env file
+        uses: canastro/copy-file-action@master
+        with:
+          source: '.env.example'
+          target: '.env'
       - name: Set production mode in .env
         uses: jacobtomlinson/gha-find-replace@v3
         with:

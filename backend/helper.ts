@@ -46,13 +46,23 @@ export function getter(
       }
     } else {
       var conditions: any = {}
-      for (const filter of Object.keys(req.query)) {
-        if (req.query[filter] && (req.query[filter] as string[]).length > 0) {
+      const fields = Object.keys(model.schema.obj)
+      for (const field of Object.keys(req.query)) {
+        if (field.indexOf('.') !== -1) {
+          if (fields.indexOf(field.split('.')[0]) === -1) {
+            continue
+          }
+        } else {
+          if (fields.indexOf(field) === -1) {
+            continue
+          }
+        }
+        if (req.query[field] && (req.query[field] as string[]).length > 0) {
           var qFilter: any = {}
-          if ((req.query[filter] as string[]).indexOf('name') !== -1) {
-            qFilter[filter] = { $regex: req.query[filter], $options: 'i' }
+          if ((req.query[field] as string[]).indexOf('name') !== -1) {
+            qFilter[field] = { $regex: req.query[field], $options: 'i' }
           } else {
-            qFilter[filter] = req.query[filter]
+            qFilter[field] = req.query[field]
           }
           if (!('$and' in conditions)) {
             conditions.$and = []
@@ -194,7 +204,6 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
 }
 
 const settings = (await Settings.findOne().lean())!
-// const settings = { baseCurrency: { _id: 'EUR' } }
 
 export async function convertCurrency(
   date: Date | string | number,
@@ -218,17 +227,15 @@ export async function convertCurrency(
     const dataStr = fs.readFileSync(filePath, 'utf8')
     data = JSON.parse(dataStr)
   } else {
-    const url = 'http://data.fixer.io/api/' + dateStr + '?access_key=' + process.env.FIXER_API_KEY + '&base=' + to
+    const url = 'https://api.currencybeacon.com/v1/historical?api_key=' + process.env.CURRENCYBEACON_API_KEY + '&base=' + to + '&date=' + dateStr
     const res = await axios.get(url)
     if (res.status === 200) {
-      if (res.data.success) {
-        data = res.data
-        fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
-          if (error) {
-            console.error(error)
-          }
-        })
-      }
+      data = res.data
+      fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
+        if (error) {
+          console.error(error)
+        }
+      })
     }
   }
   var rate = null

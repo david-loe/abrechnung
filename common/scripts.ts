@@ -132,23 +132,26 @@ export function getMoneyString(
   money: Money,
   useExchangeRate: boolean = true,
   func: (x: number) => number = (x: number): number => x,
-  locale: Locale = 'de'
+  locale: Locale = 'de',
+  warning: boolean = false
 ): string {
   var amount = 0
+  var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
   if (useExchangeRate && money.exchangeRate) {
     amount = money.exchangeRate.amount
-  } else if (money.amount != null) {
-    amount = money.amount
+    currency = settings.baseCurrency._id
+  } else {
+    if (money.amount !== null) {
+      amount = money.amount
+    }
+    if (useExchangeRate && !money.exchangeRate && currency !== settings.baseCurrency._id) {
+      warning = true
+    }
   }
-  return func(amount).toLocaleString(locale, {
+  return (func(amount).toLocaleString(locale, {
     style: 'currency',
-    currency:
-      useExchangeRate && money.exchangeRate
-        ? settings.baseCurrency._id
-        : typeof money.currency === 'string'
-        ? money.currency
-        : money.currency._id // baseCurrency
-  })
+    currency: currency
+  })) + (warning ? ' ⚠' : '')
 }
 
 export function getDetailedMoneyString(money: Money, locale: Locale, printZero = false): string {
@@ -225,16 +228,23 @@ export function getLumpSumsSum(travel: Travel): Money {
   return { amount: sum, currency: settings.baseCurrency }
 }
 
+function getBaseCurrencyAmount(a: Money): number {
+  var amount = 0
+  if (a.amount !== null) {
+    if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
+      amount += a.exchangeRate.amount
+    } else if (a.currency._id == settings.baseCurrency._id) {
+      amount += a.amount
+    }
+  }
+  return amount
+}
+
 export function getExpensesSum(travel: Travel): Money {
   var sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount != null) {
-      var add = 0
-      if (stage.cost.exchangeRate && typeof stage.cost.exchangeRate.amount == 'number') {
-        add = stage.cost.exchangeRate.amount
-      } else {
-        add = stage.cost.amount
-      }
+      var add = getBaseCurrencyAmount(stage.cost)
       if (stage.purpose === 'mixed') {
         add = add * travel.professionalShare!
       }
@@ -243,12 +253,7 @@ export function getExpensesSum(travel: Travel): Money {
   }
   for (const expense of travel.expenses) {
     if (expense.cost && expense.cost.amount != null) {
-      var add = 0
-      if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
-        add = expense.cost.exchangeRate.amount
-      } else {
-        add = expense.cost.amount
-      }
+      var add = getBaseCurrencyAmount(expense.cost)
       if (expense.purpose === 'mixed') {
         add = add * travel.professionalShare!
       }
@@ -261,7 +266,7 @@ export function getExpensesSum(travel: Travel): Money {
 export function getTravelTotal(travel: Travel): Money {
   var advance = 0
   if (travel.advance && travel.advance.amount != null) {
-    advance = travel.advance.exchangeRate ? travel.advance.exchangeRate.amount : travel.advance.amount
+    advance = getBaseCurrencyAmount(travel.advance)
   }
   return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
 }
@@ -270,11 +275,7 @@ export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
   var sum = 0
   for (const expense of expenseReport.expenses) {
     if (expense.cost && expense.cost.amount != null) {
-      if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
-        sum += expense.cost.exchangeRate.amount
-      } else {
-        sum += expense.cost.amount
-      }
+      sum += getBaseCurrencyAmount(expense.cost)
     }
   }
   return { amount: sum, currency: settings.baseCurrency }
@@ -284,11 +285,7 @@ export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
   var sum = 0
   for (const expense of healthCareCost.expenses) {
     if (expense.cost && expense.cost.amount != null) {
-      if (expense.cost.exchangeRate && typeof expense.cost.exchangeRate.amount == 'number') {
-        sum += expense.cost.exchangeRate.amount
-      } else {
-        sum += expense.cost.amount
-      }
+      sum += getBaseCurrencyAmount(expense.cost)
     }
   }
   return { amount: sum, currency: settings.baseCurrency }
@@ -317,7 +314,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
           return resolve(file)
         }
         // We resize the image with the canvas method drawImage();
-        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        ; (ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
       }
       // We put the Data URI in the image's src attribute

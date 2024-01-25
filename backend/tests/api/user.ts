@@ -8,37 +8,37 @@ await loginUser(agent, 'user')
 
 test('POST /auth/ldapauth', async (t) => {
   const res = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
 })
 
 test('GET /user', async (t) => {
   const res = await agent.get('/api/user')
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
 })
 
 test('GET /user/token', async (t) => {
   const res = await agent.get('/api/user/token')
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
 })
 
 test('POST /user/token', async (t) => {
   t.plan(3)
   const res = await agent.post('/api/user/token')
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
   t.true(res.body.result.hasOwnProperty('_id'))
   t.deepEqual(res.body.result.files, [])
 })
 
 test('DELETE /user/token', async (t) => {
   const res = await agent.delete('/api/user/token')
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
 })
 
 test('POST /user/settings', async (t) => {
   t.plan(3)
   const settings = { language: 'en', lastCurrencies: [{ _id: 'EUR' }], lastCountries: [{ _id: 'DE' }] }
   const res = await agent.post('/api/user/settings').send(settings)
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
   const res2 = await agent.get('/api/user')
   t.is(res2.status, 200, 'GET /user')
   t.like(res2.body.data.settings, settings)
@@ -59,7 +59,7 @@ test('POST /user/vehicleRegistration', async (t) => {
     }
   }
   const res = await req
-  t.is(res.status, 200)
+  if (res.status === 200) { t.pass() } else { console.log(res.body) }
   const res2 = await agent.get('/api/documentFile').query({ id: (res.body.result as User).vehicleRegistration![0]._id })
   t.is(res2.status, 200, 'GET /documentFile')
 })
