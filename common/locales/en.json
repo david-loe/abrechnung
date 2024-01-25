@@ -281,7 +281,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{applicant} has submit his health care costs.",
+        "paragraph": "{owner} has submit his health care costs.",
         "subject": "🛂 Health Care Costs to examine"
       },
       "underExaminationByInsurance": {
@@ -325,7 +325,7 @@
       }
     },
     "underExaminationByInsurance": {
-      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {applicant}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     }
   },

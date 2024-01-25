@@ -100,13 +100,7 @@
           </div>
         </div>
         <div v-if="endpointPrefix !== ''" class="text-secondary">
-          {{
-            healthCareCost.applicant.name.givenName +
-            ' ' +
-            healthCareCost.applicant.name.familyName +
-            ' - ' +
-            healthCareCost.organisation.name
-          }}
+          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' + healthCareCost.organisation.name }}
         </div>
       </div>
 
@@ -333,7 +327,7 @@ export default defineComponent({
         this.$t('mail.underExaminationByInsurance.subject', { companyNumber: orga?.companyNumber }),
         this.$t('mail.underExaminationByInsurance.body', {
           insuranceName: healthCareCost.insurance.name,
-          applicant: healthCareCost.applicant.name.givenName + ' ' + healthCareCost.applicant.name.familyName,
+          owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
           bankDetails: orga?.bankDetails,
           organisationName: orga?.name,
           amount: getMoneyString(getHealthCareCostTotal(healthCareCost))

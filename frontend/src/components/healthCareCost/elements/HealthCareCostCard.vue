@@ -2,7 +2,7 @@
   <CardElement
     :state="healthCareCost.state"
     :name="healthCareCost.name"
-    :user="healthCareCost.applicant"
+    :user="healthCareCost.owner"
     :organisation="healthCareCost.organisation"
     :editor="healthCareCost.editor"
     :showUser="showUser"

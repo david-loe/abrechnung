@@ -59,13 +59,13 @@ router.post('/underExaminationByInsurance', async (req, res) => {
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
         '/reports/healthCareCost/' +
-          subfolder +
-          healthCareCost.applicant.name.familyName +
-          ' ' +
-          healthCareCost.applicant.name.givenName[0] +
-          ' - ' +
-          healthCareCost.name +
-          '.pdf',
+        subfolder +
+        healthCareCost.owner.name.familyName +
+        ' ' +
+        healthCareCost.owner.name.givenName[0] +
+        ' - ' +
+        healthCareCost.name +
+        '.pdf',
         await generateHealthCareCostReport(healthCareCost)
       )
     }
@@ -80,7 +80,7 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
     return res.sendStatus(403)
   }
 
-  await documentFileHandler(['cost', 'receipts'], false, healthCareCost.applicant._id)(req, res, () => null)
+  await documentFileHandler(['cost', 'receipts'], false, healthCareCost.owner._id)(req, res, () => null)
 
   if (req.body._id && req.body._id !== '') {
     var found = false
@@ -149,12 +149,12 @@ router.get('/report', async (req, res) => {
     res.setHeader(
       'Content-disposition',
       'attachment; filename=' +
-        healthCareCost.applicant.name.familyName +
-        ' ' +
-        healthCareCost.applicant.name.givenName[0] +
-        ' - ' +
-        healthCareCost.name +
-        '.pdf'
+      healthCareCost.owner.name.familyName +
+      ' ' +
+      healthCareCost.owner.name.givenName[0] +
+      ' - ' +
+      healthCareCost.name +
+      '.pdf'
     )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

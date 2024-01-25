@@ -126,8 +126,8 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
 }
 
 export async function sendHealthCareCostNotificationMail(healthCareCost: HealthCareCost) {
-  const interpolation: { applicant: string; comment?: string; commentator?: string; refundSum?: string } = {
-    applicant: healthCareCost.applicant.name.givenName,
+  const interpolation: { owner: string; comment?: string; commentator?: string; refundSum?: string } = {
+    owner: healthCareCost.owner.name.givenName,
     refundSum: getMoneyString(healthCareCost.refundSum)
   }
 
@@ -153,7 +153,7 @@ export async function sendHealthCareCostNotificationMail(healthCareCost: HealthC
     button.link = process.env.VITE_FRONTEND_URL + '/examine/healthCareCost/' + healthCareCost._id
   } else {
     // 'refunded' and 'underExaminationByInsurance'
-    recipients = [healthCareCost.applicant]
+    recipients = [healthCareCost.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/healthCareCost' + '/' + healthCareCost._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)

@@ -16,7 +16,7 @@ type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Methods>(
   {
     name: { type: String },
-    applicant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     patientName: { type: String, trim: true, required: true },
     insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
@@ -59,7 +59,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'applicant', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
@@ -138,4 +138,4 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
 
 export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', healthCareCostSchema)
 
-export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> {}
+export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> { }

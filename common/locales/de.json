@@ -281,7 +281,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{applicant} hat Krankenkosten eingereicht.",
+        "paragraph": "{owner} hat Krankenkosten eingereicht.",
         "subject": "🛂 Krankenkosten zu prüfen"
       },
       "underExaminationByInsurance": {
@@ -325,7 +325,7 @@
       }
     },
     "underExaminationByInsurance": {
-      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {applicant} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     }
   },

@@ -268,7 +268,7 @@ export interface ExpenseReport extends ExpenseReportSimple {
 
 export interface HealthCareCostSimple {
   name: string
-  applicant: UserSimple
+  owner: UserSimple
   organisation: OrganisationSimple
   patientName: string
   insurance: HealthInsurance
