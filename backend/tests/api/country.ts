@@ -16,3 +16,8 @@ test('GET /country?addLumpSums=true', async (t) => {
   t.is(res.status, 200)
   t.true((res.body.data[0] as Country).hasOwnProperty('lumpSums'))
 })
+
+test('GET /specialLumpSums', async (t) => {
+  const res = await agent.get('/api/specialLumpSums')
+  t.is(res.status, 200)
+})

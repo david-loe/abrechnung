@@ -32,7 +32,6 @@ test.serial('GET /organisation', async (t) => {
 
 test.serial('POST /travel/appliedFor', async (t) => {
   const res = await agent.post('/api/travel/appliedFor').send(travel)
-  console.log(res.body)
   travel = res.body.result
   t.is(res.status, 200)
 })
