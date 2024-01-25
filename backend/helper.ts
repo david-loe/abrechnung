@@ -46,13 +46,13 @@ export function getter(
       }
     } else {
       var conditions: any = {}
-      for (const filter of Object.keys(req.query)) {
-        if (req.query[filter] && (req.query[filter] as string[]).length > 0) {
+      for (const field of Object.keys(model.schema.obj)) {
+        if (req.query[field] && (req.query[field] as string[]).length > 0) {
           var qFilter: any = {}
-          if ((req.query[filter] as string[]).indexOf('name') !== -1) {
-            qFilter[filter] = { $regex: req.query[filter], $options: 'i' }
+          if ((req.query[field] as string[]).indexOf('name') !== -1) {
+            qFilter[field] = { $regex: req.query[field], $options: 'i' }
           } else {
-            qFilter[filter] = req.query[filter]
+            qFilter[field] = req.query[field]
           }
           if (!('$and' in conditions)) {
             conditions.$and = []

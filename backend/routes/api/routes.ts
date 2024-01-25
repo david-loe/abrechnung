@@ -51,12 +51,11 @@ router.get('/healthInsurance', getter(HealthInsurance, 'health insurance', 200))
 router.get('/organisation', getter(Organisation, 'organisation', 50, {}, { name: 1 }))
 router.get('/currency', getter(Currency, 'currency', 500))
 router.get('/country', async (req, res) => {
-  const select: Partial<{ [key in keyof ICountry]: number }> = {}
-  if (!req.query.addLumpSums) {
-    select.lumpSums = 0
-    select.lumpSumsFrom = 0
+  var select: Partial<{ [key in keyof ICountry]: number }> | undefined = { lumpSums: 0, lumpSumsFrom: 0 }
+  if (req.query.addLumpSums) {
+    select = undefined
+    delete req.query.addLumpSums
   }
-  delete req.query.addLumpSums
   return getter(Country, 'country', 500, {}, select)(req, res)
 })
 router.get('/specialLumpSums', async (req, res) => {
