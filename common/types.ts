@@ -191,7 +191,7 @@ export interface HealthCareCostComment extends Comment {
 
 export interface TravelSimple {
   name: string
-  traveler: UserSimple
+  owner: UserSimple
   organisation: OrganisationSimple
   state: TravelState
   editor: UserSimple

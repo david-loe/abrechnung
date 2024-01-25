@@ -53,7 +53,7 @@ import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../.
 import { TravelSimple, travelStates } from '../../../../../common/types.js'
 
 const keys = [
-  'traveler',
+  'owner',
   'reason',
   'startDate',
   'endDate',
@@ -88,11 +88,11 @@ export default defineComponent({
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':
-          if (this.travel.traveler._id == this.travel.editor._id) {
+          if (this.travel.owner._id == this.travel.editor._id) {
             return ''
           }
           return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
-        case 'traveler':
+        case 'owner':
           return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
         case 'comments':
           if (this.travel.comments.length > 0) {

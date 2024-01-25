@@ -66,13 +66,13 @@ router.post('/refunded', async (req, res) => {
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       writeToDisk(
         '/reports/travel/' +
-          subfolder +
-          travel.traveler.name.familyName +
-          ' ' +
-          travel.traveler.name.givenName[0] +
-          ' - ' +
-          travel.name +
-          '.pdf',
+        subfolder +
+        travel.owner.name.familyName +
+        ' ' +
+        travel.owner.name.givenName[0] +
+        ' - ' +
+        travel.name +
+        '.pdf',
         await generateTravelReport(travel)
       )
     }
@@ -83,7 +83,7 @@ router.post('/refunded', async (req, res) => {
 router.post('/', async (req, res) => {
   req.body.editor = req.user!._id
   delete req.body.state
-  delete req.body.traveler
+  delete req.body.owner
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
@@ -104,7 +104,7 @@ function postRecord(recordType: 'stages' | 'expenses') {
       return res.sendStatus(403)
     }
 
-    await documentFileHandler(['cost', 'receipts'], false, travel.traveler._id)(req, res, () => null)
+    await documentFileHandler(['cost', 'receipts'], false, travel.owner._id)(req, res, () => null)
 
     if (req.body._id && req.body._id !== '') {
       var found = false
@@ -185,7 +185,7 @@ router.get('/report', async (req, res) => {
     const report = await generateTravelReport(travel)
     res.setHeader(
       'Content-disposition',
-      'attachment; filename=' + travel.traveler.name.familyName + ' ' + travel.traveler.name.givenName[0] + ' - ' + travel.name + '.pdf'
+      'attachment; filename=' + travel.owner.name.familyName + ' ' + travel.owner.name.givenName[0] + ' - ' + travel.name + '.pdf'
     )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

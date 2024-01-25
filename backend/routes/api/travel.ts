@@ -26,15 +26,15 @@ router.get('/', async (req, res) => {
     select.days = 0
   }
   delete req.query.addDays
-  return getter(Travel, 'travel', 20, { traveler: req.user!._id, historic: false }, select, sortFn)(req, res)
+  return getter(Travel, 'travel', 20, { owner: req.user!._id, historic: false }, select, sortFn)(req, res)
 })
 
-router.delete('/', deleter(Travel, 'traveler'))
+router.delete('/', deleter(Travel, 'owner'))
 
 router.post('/', async (req, res) => {
   req.body.editor = req.user!._id
   delete req.body.state
-  delete req.body.traveler
+  delete req.body.owner
   delete req.body.history
   delete req.body.historic
   delete req.body.stages
@@ -44,14 +44,14 @@ router.post('/', async (req, res) => {
   const check = async (oldObject: TravelDoc) => {
     return oldObject.state !== 'refunded'
   }
-  return setter(Travel, 'traveler', false, check)(req, res)
+  return setter(Travel, 'owner', false, check)(req, res)
 })
 
 function postRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
     const travel = await Travel.findOne({ _id: req.body.travelId })
     delete req.body.travelId
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user!._id)) {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.owner._id.equals(req.user!._id)) {
       return res.sendStatus(403)
     }
     if (req.body._id && req.body._id !== '') {
@@ -91,7 +91,7 @@ function deleteRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
     const travel = await Travel.findOne({ _id: req.query.travelId })
     delete req.query.travelId
-    if (!travel || travel.historic || travel.state !== 'approved' || !travel.traveler._id.equals(req.user!._id)) {
+    if (!travel || travel.historic || travel.state !== 'approved' || !travel.owner._id.equals(req.user!._id)) {
       return res.sendStatus(403)
     }
     if (req.query.id && req.query.id !== '') {
@@ -130,7 +130,7 @@ router.delete('/expense', deleteRecord('expenses'))
 router.post('/appliedFor', async (req, res) => {
   req.body = {
     state: 'appliedFor',
-    traveler: req.user!._id,
+    owner: req.user!._id,
     organisation: req.body.organisation,
     editor: req.user!._id,
     comment: null,
@@ -164,7 +164,7 @@ router.post('/appliedFor', async (req, res) => {
   const check = async (oldObject: TravelDoc) => {
     return oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved'
   }
-  return setter(Travel, 'traveler', true, check, sendTravelNotificationMail)(req, res)
+  return setter(Travel, 'owner', true, check, sendTravelNotificationMail)(req, res)
 })
 
 router.post('/underExamination', async (req, res) => {
@@ -199,11 +199,11 @@ router.post('/underExamination', async (req, res) => {
       return false
     }
   }
-  return setter(Travel, 'traveler', false, check, sendTravelNotificationMail)(req, res)
+  return setter(Travel, 'owner', false, check, sendTravelNotificationMail)(req, res)
 })
 
 router.get('/report', async (req, res) => {
-  const travel = await Travel.findOne({ _id: req.query.id, traveler: req.user!._id, historic: false, state: 'refunded' }).lean()
+  const travel = await Travel.findOne({ _id: req.query.id, owner: req.user!._id, historic: false, state: 'refunded' }).lean()
   if (travel) {
     const report = await generateTravelReport(travel)
     res.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')

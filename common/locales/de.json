@@ -171,6 +171,7 @@
     "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
+    "owner": "Ersteller",
     "password": "Passwort",
     "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
@@ -299,7 +300,7 @@
     "travel": {
       "appliedFor": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
+        "paragraph": "Ein neuer Reiseantrag von {owner} kam grade rein.",
         "subject": "🆕 Neue Reise"
       },
       "approved": {
@@ -319,7 +320,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{traveler} hat die abrechnung fertiggestellt.",
+        "paragraph": "{owner} hat die abrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
     },

@@ -57,11 +57,11 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.traveler') +
-      ': ' +
-      travel.traveler.name.givenName +
-      ' ' +
-      travel.traveler.name.familyName +
-      (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
+    ': ' +
+    travel.owner.name.givenName +
+    ' ' +
+    travel.owner.name.familyName +
+    (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
     {
       x: opts.xStart,
       y: y,

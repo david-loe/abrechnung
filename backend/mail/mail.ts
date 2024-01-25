@@ -59,7 +59,7 @@ export function sendMail(
 }
 
 export async function sendTravelNotificationMail(travel: TravelSimple) {
-  const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name.givenName }
+  const interpolation: { owner: string; comment?: string; commentator?: string } = { owner: travel.owner.name.givenName }
 
   if (travel.comments.length > 0) {
     const comment = travel.comments[travel.comments.length - 1]
@@ -86,7 +86,7 @@ export async function sendTravelNotificationMail(travel: TravelSimple) {
     button.link = process.env.VITE_FRONTEND_URL + '/examine/travel/' + travel._id
   } else {
     // 'rejected', 'approved', 'refunded'
-    recipients = [travel.traveler]
+    recipients = [travel.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : '/' + travel._id)
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)

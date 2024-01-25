@@ -2,11 +2,11 @@
   <CardElement
     :state="travel.state"
     :name="travel.name"
-    :user="travel.traveler"
+    :user="travel.owner"
     :organisation="travel.organisation"
     :editor="travel.editor"
     :showUser="showUser"
-    :showEditor="travel.traveler._id !== travel.editor._id"
+    :showEditor="travel.owner._id !== travel.editor._id"
     :showDropdown="showDropdown"
     @clicked="$emit('clicked')"
     @deleted="$emit('deleted')">

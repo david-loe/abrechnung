@@ -100,9 +100,9 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   page.drawText(
     i18n.t('labels.traveler') +
     ': ' +
-    travel.traveler.name.givenName +
+    travel.owner.name.givenName +
     ' ' +
-    travel.traveler.name.familyName +
+    travel.owner.name.familyName +
     (travel.claimSpouseRefund ? ' & ' + travel.fellowTravelersNames : ''),
     {
       x: opts.xStart,
