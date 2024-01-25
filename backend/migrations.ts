@@ -112,6 +112,12 @@ async function migrate(from: string) {
         }
       }
     }
+    case '0.3.7': {
+      console.log('Appy migration from v0.3.7')
+      mongoose.connection.collection('travels').updateMany({}, { $rename: { 'traveler': 'owner' } })
+      mongoose.connection.collection('expensereports').updateMany({}, { $rename: { 'expensePayer': 'owner' } })
+      mongoose.connection.collection('healthcarecosts').updateMany({}, { $rename: { 'applicant': 'owner' } })
+    }
     default:
       if (settings) {
         settings.migrateFrom = undefined
