@@ -51,9 +51,9 @@ router.get('/healthInsurance', getter(HealthInsurance, 'health insurance', 200))
 router.get('/organisation', getter(Organisation, 'organisation', 50, {}, { name: 1 }))
 router.get('/currency', getter(Currency, 'currency', 500))
 router.get('/country', async (req, res) => {
-  var select: Partial<{ [key in keyof ICountry]: number }> | undefined = { lumpSums: 0, lumpSumsFrom: 0 }
+  var select: Partial<{ [key in keyof ICountry]: number }> = { lumpSums: 0, lumpSumsFrom: 0 }
   if (req.query.addLumpSums) {
-    select = undefined
+    select = {}
     delete req.query.addLumpSums
   }
   return getter(Country, 'country', 500, {}, select)(req, res)
