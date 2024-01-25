@@ -249,7 +249,7 @@ export interface Travel extends TravelSimple {
 
 export interface ExpenseReportSimple {
   name: string
-  expensePayer: UserSimple
+  owner: UserSimple
   organisation: OrganisationSimple
   state: ExpenseReportState
   editor: UserSimple

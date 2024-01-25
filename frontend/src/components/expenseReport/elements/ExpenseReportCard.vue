@@ -2,7 +2,7 @@
   <CardElement
     :state="expenseReport.state"
     :name="expenseReport.name"
-    :user="expenseReport.expensePayer"
+    :user="expenseReport.owner"
     :organisation="expenseReport.organisation"
     :editor="expenseReport.editor"
     :showUser="showUser"

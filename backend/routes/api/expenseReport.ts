@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
     select.expenses = 0
   }
   delete req.query.addExpenses
-  return getter(ExpenseReport, 'expense report', 20, { expensePayer: req.user!._id, historic: false }, select, sortFn)(req, res)
+  return getter(ExpenseReport, 'expense report', 20, { owner: req.user!._id, historic: false }, select, sortFn)(req, res)
 })
 
-router.delete('/', deleter(ExpenseReport, 'expensePayer'))
+router.delete('/', deleter(ExpenseReport, 'owner'))
 
 router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receipts'], true)], async (req: Request, res: Response) => {
   const expenseReport = await ExpenseReport.findOne({ _id: req.body.expenseReportId })
@@ -30,7 +30,7 @@ router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receip
     !expenseReport ||
     expenseReport.historic ||
     expenseReport.state !== 'inWork' ||
-    !expenseReport.expensePayer._id.equals(req.user!._id)
+    !expenseReport.owner._id.equals(req.user!._id)
   ) {
     return res.sendStatus(403)
   }
@@ -67,7 +67,7 @@ router.delete('/expense', async (req: Request, res: Response) => {
     !expenseReport ||
     expenseReport.historic ||
     expenseReport.state !== 'inWork' ||
-    !expenseReport.expensePayer._id.equals(req.user!._id)
+    !expenseReport.owner._id.equals(req.user!._id)
   ) {
     return res.sendStatus(403)
   }
@@ -103,7 +103,7 @@ router.delete('/expense', async (req: Request, res: Response) => {
 router.post('/inWork', async (req, res) => {
   req.body = {
     state: 'inWork',
-    expensePayer: req.user!._id,
+    owner: req.user!._id,
     organisation: req.body.organisation,
     editor: req.user!._id,
     _id: req.body._id,
@@ -123,7 +123,7 @@ router.post('/inWork', async (req, res) => {
       return res.status(400).send(error)
     }
   }
-  return setter(ExpenseReport, 'expensePayer', true)(req, res)
+  return setter(ExpenseReport, 'owner', true)(req, res)
 })
 
 router.post('/underExamination', async (req, res) => {
@@ -143,13 +143,13 @@ router.post('/underExamination', async (req, res) => {
       return false
     }
   }
-  return setter(ExpenseReport, 'expensePayer', false, check, sendExpenseReportNotificationMail)(req, res)
+  return setter(ExpenseReport, 'owner', false, check, sendExpenseReportNotificationMail)(req, res)
 })
 
 router.get('/report', async (req, res) => {
   const expenseReport = await ExpenseReport.findOne({
     _id: req.query.id,
-    expensePayer: req.user!._id,
+    owner: req.user!._id,
     historic: false,
     state: 'refunded'
   }).lean()

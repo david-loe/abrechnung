@@ -13,7 +13,7 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Methods>(
   {
     name: { type: String },
-    expensePayer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
     state: {
       type: String,
@@ -50,7 +50,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'organisation', select: { name: 1 } }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expensePayer', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
@@ -129,4 +129,4 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
 
 export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', expenseReportSchema)
 
-export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> {}
+export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> { }

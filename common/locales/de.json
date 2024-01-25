@@ -264,7 +264,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{expensePayer} hat die Auslagenabrechnung fertiggestellt.",
+        "paragraph": "{owner} hat die Auslagenabrechnung fertiggestellt.",
         "subject": "🛂 Auslagen zu prüfen"
       }
     },

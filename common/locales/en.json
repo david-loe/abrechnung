@@ -264,7 +264,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{expensePayer} has finished his expense report.",
+        "paragraph": "{owner} has finished his expense report.",
         "subject": "🛂 Expense Report to examine"
       }
     },

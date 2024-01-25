@@ -93,8 +93,8 @@ export async function sendTravelNotificationMail(travel: TravelSimple) {
 }
 
 export async function sendExpenseReportNotificationMail(expenseReport: ExpenseReport) {
-  const interpolation: { expensePayer: string; comment?: string; commentator?: string } = {
-    expensePayer: expenseReport.expensePayer.name.givenName
+  const interpolation: { owner: string; comment?: string; commentator?: string } = {
+    owner: expenseReport.owner.name.givenName
   }
 
   if (expenseReport.comments.length > 0) {
@@ -119,7 +119,7 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
     button.link = process.env.VITE_FRONTEND_URL + '/examine/expenseReport/' + expenseReport._id
   } else {
     // 'refunded'
-    recipients = [expenseReport.expensePayer]
+    recipients = [expenseReport.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/expenseReport' + '/' + expenseReport._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
