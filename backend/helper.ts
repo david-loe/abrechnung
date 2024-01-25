@@ -46,7 +46,11 @@ export function getter(
       }
     } else {
       var conditions: any = {}
-      for (const field of Object.keys(model.schema.obj)) {
+      for (const field of Object.keys(req.query)) {
+        const fields = Object.keys(model.schema.obj)
+        if (fields.indexOf(field) === -1 && (field.indexOf('.') !== -1 && fields.indexOf(field.split('.')[0]) === -1)) {
+          continue
+        }
         if (req.query[field] && (req.query[field] as string[]).length > 0) {
           var qFilter: any = {}
           if ((req.query[field] as string[]).indexOf('name') !== -1) {
