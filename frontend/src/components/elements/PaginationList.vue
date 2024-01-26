@@ -1,7 +1,7 @@
 <template>
   <div style="min-height: 120px">
     <template v-if="hasData">
-      <template v-if="showSearch && meta && meta.countPages > 1">
+      <template v-if="showSearch">
         <div v-if="!search" class="row justify-content-end mb-2">
           <div class="col-auto">
             <button type="button" class="btn btn-light" @click="search = true"><i class="bi bi-search"></i></button>
