@@ -16,7 +16,7 @@ export interface Settings {
   distanceRefunds: { [key in DistanceRefundType]: number }
   secoundNightOnAirplaneLumpSumCountry: string
   secoundNightOnShipOrFerryLumpSumCountry: string
-  stateColors: { [key in TravelState | HealthCareCostState | ExpenseReportState]: { color: string; text: string } }
+  stateColors: { [key in AnyState]: { color: string; text: string } }
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
   allowTravelApplicationForThePast: boolean
@@ -189,12 +189,8 @@ export interface HealthCareCostComment extends Comment {
   toState: HealthCareCostState
 }
 
-export interface TravelSimple {
-  name: string
-  owner: UserSimple
-  organisation: OrganisationSimple
+export interface TravelSimple extends RequestSimple {
   state: TravelState
-  editor: UserSimple
   comments: TravelComment[]
   comment?: string | null
   reason: string
@@ -204,9 +200,6 @@ export interface TravelSimple {
   endDate: Date | string
   advance: Money
   progress: number
-  _id: Types.ObjectId
-  createdAt: Date | string
-  updatedAt: Date | string
   claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
   fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
@@ -236,6 +229,17 @@ export interface TravelDay {
   _id: Types.ObjectId
 }
 
+export interface RequestSimple {
+  name: string
+  owner: UserSimple
+  state: AnyState
+  organisation: OrganisationSimple
+  editor: UserSimple
+  createdAt: Date | string
+  updatedAt: Date | string
+  _id: Types.ObjectId
+}
+
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
   lastPlaceOfWork: Place
@@ -247,17 +251,10 @@ export interface Travel extends TravelSimple {
   days: TravelDay[]
 }
 
-export interface ExpenseReportSimple {
-  name: string
-  owner: UserSimple
-  organisation: OrganisationSimple
+export interface ExpenseReportSimple extends RequestSimple {
   state: ExpenseReportState
-  editor: UserSimple
   comments: ExpenseReportComment[]
   comment?: string | null
-  createdAt: Date | string
-  updatedAt: Date | string
-  _id: Types.ObjectId
 }
 
 export interface ExpenseReport extends ExpenseReportSimple {
@@ -266,20 +263,13 @@ export interface ExpenseReport extends ExpenseReportSimple {
   expenses: Expense[]
 }
 
-export interface HealthCareCostSimple {
-  name: string
-  owner: UserSimple
-  organisation: OrganisationSimple
+export interface HealthCareCostSimple extends RequestSimple {
   patientName: string
   insurance: HealthInsurance
   refundSum: MoneyPlus
   state: HealthCareCostState
-  editor: UserSimple
   comments: HealthCareCostComment[]
   comment?: string | null
-  createdAt: Date | string
-  updatedAt: Date | string
-  _id: Types.ObjectId
 }
 
 export interface HealthCareCost extends HealthCareCostSimple {
@@ -299,6 +289,8 @@ export type ExpenseReportState = (typeof expenseReportStates)[number]
 
 export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
 export type HealthCareCostState = (typeof healthCareCostStates)[number]
+
+export type AnyState = TravelState | HealthCareCostState | ExpenseReportState
 
 const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const
 export const transportTypes = ['ownCar', ...transportTypesButOwnCar] as const
