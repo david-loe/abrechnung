@@ -4,7 +4,8 @@
     <ExpenseReportCardList
       class="mb-5"
       endpoint="examine/expenseReport"
-      :showUser="true"
+      :showOwner="true"
+      :showSearch="true"
       @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
     </ExpenseReportCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
@@ -17,7 +18,8 @@
       <hr class="hr" />
       <ExpenseReportCardList
         endpoint="examine/expenseReport/refunded"
-        :showUser="true"
+        :showOwner="true"
+        :showSearch="true"
         @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
       </ExpenseReportCardList>
     </template>

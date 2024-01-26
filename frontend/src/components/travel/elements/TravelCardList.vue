@@ -1,9 +1,9 @@
 <template>
-  <PaginationList :endpoint="endpoint" ref="list">
+  <PaginationList :endpoint="endpoint" :showSearch="showSearch" ref="list">
     <template #entry="{ entry }">
       <TravelCard
         :travel="entry"
-        :showUser="showUser"
+        :showOwner="showOwner"
         :showDropdown="showDropdown"
         @clicked="$emit('clicked', entry)"
         @deleted="deleteTravel(entry._id)"
@@ -24,7 +24,8 @@ export default defineComponent({
   components: { TravelCard, PaginationList },
   props: {
     endpoint: { type: String, required: true },
-    showUser: { type: Boolean, default: false },
+    showSearch: { type: Boolean, default: false },
+    showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
   methods: {

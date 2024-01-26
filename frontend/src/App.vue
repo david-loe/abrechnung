@@ -190,6 +190,7 @@ export default defineComponent({
       healthInsurances: [] as HealthInsurance[],
       organisations: [] as OrganisationSimple[],
       specialLumpSums: {} as { [key: string]: string[] },
+      users: [] as { name: User['name']; _id: string }[],
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
@@ -210,7 +211,8 @@ export default defineComponent({
           this.getter<Settings[]>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
           this.getter<OrganisationSimple[]>('organisation'),
-          this.getter<{ [key: string]: string[] }>('specialLumpSums')
+          this.getter<{ [key: string]: string[] }>('specialLumpSums'),
+          this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
         ]).then((result) => {
           this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
           log(this.$t('labels.user') + ':')
@@ -226,6 +228,7 @@ export default defineComponent({
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
           this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
           this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}
+          this.users = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : []) : []
           this.checkUserSettings(this.user.settings)
           this.loadState = 'LOADED'
         })
@@ -248,7 +251,7 @@ export default defineComponent({
         console.log(error.response.data)
       }
     },
-    async getter<T>(endpoint: string, params: any = {}, config: any = {}): Promise<{ ok?: GETResponse<T>; error?: any }> {
+    async getter<T>(endpoint: string, params: any = {}, config: any = {}, showAlert = true): Promise<{ ok?: GETResponse<T>; error?: any }> {
       try {
         const res = await axios.get(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -268,8 +271,10 @@ export default defineComponent({
         if (error.response.status === 401) {
           this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
-          console.log(error.response.data)
-          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          if (showAlert) {
+            console.log(error.response.data)
+            this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          }
         }
         return { error: error }
       }

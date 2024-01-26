@@ -1,11 +1,7 @@
 <template>
   <CardElement
-    :state="expenseReport.state"
-    :name="expenseReport.name"
-    :user="expenseReport.owner"
-    :organisation="expenseReport.organisation"
-    :editor="expenseReport.editor"
-    :showUser="showUser"
+    :request="expenseReport"
+    :showOwner="showOwner"
     :showEditor="'refunded' === expenseReport.state"
     :showDropdown="showDropdown"
     @clicked="$emit('clicked')"
@@ -24,7 +20,7 @@ export default defineComponent({
   components: { CardElement },
   props: {
     expenseReport: { type: Object as PropType<ExpenseReportSimple>, required: true },
-    showUser: { type: Boolean, default: false },
+    showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   }
 })

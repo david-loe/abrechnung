@@ -5,7 +5,8 @@
       class="mb-5"
       ref="travelCardListRef"
       endpoint="examine/travel"
-      :showUser="true"
+      :showOwner="true"
+      :showSearch="true"
       @clicked="(t) => $router.push('/examine/travel/' + t._id)">
     </TravelCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
@@ -16,7 +17,11 @@
         {{ $t('labels.hideX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <TravelCardList endpoint="examine/travel/refunded" :showUser="true" @clicked="(t) => $router.push('/examine/travel/' + t._id)">
+      <TravelCardList
+        endpoint="examine/travel/refunded"
+        :showOwner="true"
+        :showSearch="true"
+        @clicked="(t) => $router.push('/examine/travel/' + t._id)">
       </TravelCardList>
     </template>
   </div>

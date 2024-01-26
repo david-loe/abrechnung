@@ -46,6 +46,7 @@ declare module '@vue/runtime-core' {
       healthInsurances: HealthInsurance[]
       organisations: OrganisationSimple[]
       specialLumpSums: { [key: string]: string[] }
+      users: { name: User['name'], _id: string }[]
     }
   }
 }

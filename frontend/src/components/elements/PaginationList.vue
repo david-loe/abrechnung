@@ -1,6 +1,38 @@
 <template>
   <div style="min-height: 120px">
     <template v-if="hasData">
+      <template v-if="showSearch && meta && meta.countPages > 1">
+        <div v-if="!search" class="row justify-content-end mb-2">
+          <div class="col-auto">
+            <button type="button" class="btn btn-light" @click="search = true"><i class="bi bi-search"></i></button>
+          </div>
+        </div>
+        <div v-else class="row mb-2">
+          <div class="col">
+            <div class="row justify-content-center align-items-center">
+              <div class="col-auto">
+                <form @submit.prevent="getData(meta.page)">
+                  <div class="row">
+                    <div class="col-auto">
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control" :placeholder="$t('labels.name')" v-model="searchParams.name" />
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <UserSelector v-model="searchParams.owner" @update:model-value="getData(meta.page)"></UserSelector>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-auto ms-auto">
+            <button type="button" class="btn btn-light" @click="clearSearch()"><i class="bi bi-x-lg"></i></button>
+          </div>
+        </div>
+      </template>
+
       <div class="row justify-content-center gx-4 gy-2">
         <div class="col-auto" v-for="entry of data" :key="entry._id">
           <slot name="entry" :entry="entry"></slot>
@@ -27,20 +59,32 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import UserSelector from './UserSelector.vue'
+
 export default defineComponent({
   name: 'PaginationList',
+  components: { UserSelector },
   data() {
     return {
       hasData: false,
       hasMeta: false,
       data: [] as any[],
-      meta: { countPages: -1, page: -1 }
+      meta: { countPages: -1, page: -1 },
+      search: false,
+      searchParams: this.default()
     }
   },
   props: {
-    endpoint: { type: String, required: true }
+    endpoint: { type: String, required: true },
+    showSearch: { type: Boolean, default: false }
   },
   methods: {
+    default() {
+      return {
+        name: null as string | null,
+        owner: null as string | null
+      }
+    },
     async getData(page?: number): Promise<void> {
       if (page === 0 || page) {
         if (page < 1) {
@@ -51,13 +95,18 @@ export default defineComponent({
       } else if (this.hasMeta) {
         page = this.meta.page
       }
-      var result = (await this.$root.getter<any[]>(this.endpoint, { page })).ok
+      var result = (await this.$root.getter<any[]>(this.endpoint, Object.assign(this.searchParams, { page }))).ok
       if (result) {
         this.data = result.data
         this.hasData = true
         this.meta = result.meta
         this.hasMeta = true
       }
+    },
+    clearSearch() {
+      this.searchParams = this.default()
+      this.search = false
+      this.getData(this.meta.page)
     }
   },
   async created() {
