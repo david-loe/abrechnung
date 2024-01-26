@@ -59,7 +59,7 @@ export function sendMail(
 }
 
 export async function sendTravelNotificationMail(travel: TravelSimple) {
-  const interpolation: { traveler: string; comment?: string; commentator?: string } = { traveler: travel.traveler.name.givenName }
+  const interpolation: { owner: string; comment?: string; commentator?: string } = { owner: travel.owner.name.givenName }
 
   if (travel.comments.length > 0) {
     const comment = travel.comments[travel.comments.length - 1]
@@ -86,15 +86,15 @@ export async function sendTravelNotificationMail(travel: TravelSimple) {
     button.link = process.env.VITE_FRONTEND_URL + '/examine/travel/' + travel._id
   } else {
     // 'rejected', 'approved', 'refunded'
-    recipients = [travel.traveler]
+    recipients = [travel.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/travel' + (travel.state === 'rejected' ? '' : '/' + travel._id)
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
 
 export async function sendExpenseReportNotificationMail(expenseReport: ExpenseReport) {
-  const interpolation: { expensePayer: string; comment?: string; commentator?: string } = {
-    expensePayer: expenseReport.expensePayer.name.givenName
+  const interpolation: { owner: string; comment?: string; commentator?: string } = {
+    owner: expenseReport.owner.name.givenName
   }
 
   if (expenseReport.comments.length > 0) {
@@ -119,15 +119,15 @@ export async function sendExpenseReportNotificationMail(expenseReport: ExpenseRe
     button.link = process.env.VITE_FRONTEND_URL + '/examine/expenseReport/' + expenseReport._id
   } else {
     // 'refunded'
-    recipients = [expenseReport.expensePayer]
+    recipients = [expenseReport.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/expenseReport' + '/' + expenseReport._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
 
 export async function sendHealthCareCostNotificationMail(healthCareCost: HealthCareCost) {
-  const interpolation: { applicant: string; comment?: string; commentator?: string; refundSum?: string } = {
-    applicant: healthCareCost.applicant.name.givenName,
+  const interpolation: { owner: string; comment?: string; commentator?: string; refundSum?: string } = {
+    owner: healthCareCost.owner.name.givenName,
     refundSum: getMoneyString(healthCareCost.refundSum)
   }
 
@@ -153,7 +153,7 @@ export async function sendHealthCareCostNotificationMail(healthCareCost: HealthC
     button.link = process.env.VITE_FRONTEND_URL + '/examine/healthCareCost/' + healthCareCost._id
   } else {
     // 'refunded' and 'underExaminationByInsurance'
-    recipients = [healthCareCost.applicant]
+    recipients = [healthCareCost.owner]
     button.link = process.env.VITE_FRONTEND_URL + '/healthCareCost' + '/' + healthCareCost._id
   }
   sendMail(recipients, subject, paragraph, button, lastParagraph)

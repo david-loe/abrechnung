@@ -55,13 +55,13 @@ router.post('/approved', async (req: Request, res: Response) => {
     if (travel.advance.amount !== null && travel.advance.amount > 0 && process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
         '/reports/advance/' +
-          subfolder +
-          travel.traveler.name.familyName +
-          ' ' +
-          travel.traveler.name.givenName[0] +
-          ' - ' +
-          travel.name +
-          '.pdf',
+        subfolder +
+        travel.owner.name.familyName +
+        ' ' +
+        travel.owner.name.givenName[0] +
+        ' - ' +
+        travel.name +
+        '.pdf',
         await generateAdvanceReport(travel)
       )
     }

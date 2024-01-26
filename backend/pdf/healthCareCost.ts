@@ -67,18 +67,18 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.insurance') +
-      ': ' +
-      healthCareCost.insurance.name +
-      '      ' +
-      i18n.t('labels.applicant') +
-      ': ' +
-      healthCareCost.applicant.name.givenName +
-      ' ' +
-      healthCareCost.applicant.name.familyName +
-      '      ' +
-      i18n.t('labels.patientName') +
-      ': ' +
-      healthCareCost.patientName,
+    ': ' +
+    healthCareCost.insurance.name +
+    '      ' +
+    i18n.t('labels.applicant') +
+    ': ' +
+    healthCareCost.owner.name.givenName +
+    ' ' +
+    healthCareCost.owner.name.familyName +
+    '      ' +
+    i18n.t('labels.patientName') +
+    ': ' +
+    healthCareCost.patientName,
     {
       x: opts.xStart,
       y: y,

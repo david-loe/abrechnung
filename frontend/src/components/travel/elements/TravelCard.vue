@@ -1,12 +1,8 @@
 <template>
   <CardElement
-    :state="travel.state"
-    :name="travel.name"
-    :user="travel.traveler"
-    :organisation="travel.organisation"
-    :editor="travel.editor"
-    :showUser="showUser"
-    :showEditor="travel.traveler._id !== travel.editor._id"
+    :request="travel"
+    :showOwner="showOwner"
+    :showEditor="travel.owner._id !== travel.editor._id"
     :showDropdown="showDropdown"
     @clicked="$emit('clicked')"
     @deleted="$emit('deleted')">
@@ -51,7 +47,7 @@ export default defineComponent({
   components: { CardElement, ProgressCircle },
   props: {
     travel: { type: Object as PropType<TravelSimple>, required: true },
-    showUser: { type: Boolean, default: false },
+    showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
   methods: {

@@ -1,9 +1,9 @@
 <template>
-  <PaginationList :endpoint="endpoint" ref="list">
+  <PaginationList :endpoint="endpoint" :showSearch="showSearch" ref="list">
     <template #entry="{ entry }">
       <HealthCareCostCard
         :healthCareCost="entry"
-        :showUser="showUser"
+        :showOwner="showOwner"
         :showDropdown="showDropdown"
         @clicked="$emit('clicked', entry)"
         @deleted="deleteHealthCareCost(entry._id)"></HealthCareCostCard>
@@ -22,7 +22,8 @@ export default defineComponent({
   components: { HealthCareCostCard, PaginationList },
   props: {
     endpoint: { type: String, required: true },
-    showUser: { type: Boolean, default: false },
+    showSearch: { type: Boolean, default: false },
+    showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
   methods: {

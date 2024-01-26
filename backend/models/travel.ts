@@ -56,7 +56,7 @@ type TravelModel = Model<Travel, {}, Methods>
 const travelSchema = new Schema<Travel, TravelModel, Methods>(
   {
     name: { type: String },
-    traveler: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
     state: {
       type: String,
@@ -153,7 +153,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'traveler', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])

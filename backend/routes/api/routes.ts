@@ -1,13 +1,14 @@
-import express from 'express'
+import express, { Response, Request } from 'express'
 const router = express.Router()
-import { getter } from '../../helper.js'
+import { accessControl, getter } from '../../helper.js'
 import Currency from '../../models/currency.js'
 import Country from '../../models/country.js'
+import User from '../../models/user.js'
 import { UserDoc } from '../../models/user.js'
 import Settings from '../../models/settings.js'
 import HealthInsurance from '../../models/healthInsurance.js'
 import Organisation from '../../models/organisation.js'
-import { Country as ICountry } from '../../../common/types.js'
+import { Country as ICountry, accesses } from '../../../common/types.js'
 import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
@@ -78,5 +79,10 @@ router.get('/specialLumpSums', async (req, res) => {
   }
   res.send({ data: specialCountries })
 })
+
+const moreThanUser = accesses.filter((access) => access !== 'user')
+router.get('/users', [accessControl(moreThanUser), async (req: Request, res: Response) => {
+  return getter(User, 'user', 500, {}, { name: 1 })(req, res)
+}])
 
 export default router

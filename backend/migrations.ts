@@ -25,8 +25,8 @@ async function migrate(from: string) {
       const healthCareCosts = await HealthCareCost.find()
       const expenseReports = await ExpenseReport.find()
       for (const travel of travels) {
-        if (!travel.organisation) {
-          if (travel.traveler) {
+        if (!travel.organisation) { //@ts-ignore
+          if (travel.traveler) { //@ts-ignore
             const user = await User.findOne({ _id: travel.traveler._id }).lean()
             var org = user?.settings.organisation
             if (!org) {
@@ -40,8 +40,8 @@ async function migrate(from: string) {
         }
       }
       for (const healthCareCost of healthCareCosts) {
-        if (!healthCareCost.organisation) {
-          if (healthCareCost.applicant) {
+        if (!healthCareCost.organisation) { //@ts-ignore
+          if (healthCareCost.applicant) { //@ts-ignore
             const user = await User.findOne({ _id: healthCareCost.applicant._id }).lean()
             var org = user?.settings.organisation
             if (!org) {
@@ -55,8 +55,8 @@ async function migrate(from: string) {
         }
       }
       for (const expenseReport of expenseReports) {
-        if (!expenseReport.organisation) {
-          if (expenseReport.expensePayer) {
+        if (!expenseReport.organisation) { //@ts-ignore
+          if (expenseReport.expensePayer) { //@ts-ignore
             const user = await User.findOne({ _id: expenseReport.expensePayer._id }).lean()
             var org = user?.settings.organisation
             if (!org) {
@@ -111,6 +111,12 @@ async function migrate(from: string) {
           console.error('Failed migrating travel: ' + travel._id, Object.values(error.errors).map((val: any) => val.message))
         }
       }
+    }
+    case '0.3.7': {
+      console.log('Appy migration from v0.3.7')
+      mongoose.connection.collection('travels').updateMany({}, { $rename: { 'traveler': 'owner' } })
+      mongoose.connection.collection('expensereports').updateMany({}, { $rename: { 'expensePayer': 'owner' } })
+      mongoose.connection.collection('healthcarecosts').updateMany({}, { $rename: { 'applicant': 'owner' } })
     }
     default:
       if (settings) {

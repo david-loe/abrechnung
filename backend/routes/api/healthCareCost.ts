@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
     select.expenses = 0
   }
   delete req.query.addExpenses
-  return getter(HealthCareCost, 'expense report', 20, { applicant: req.user!._id, historic: false }, select, sortFn)(req, res)
+  return getter(HealthCareCost, 'expense report', 20, { owner: req.user!._id, historic: false }, select, sortFn)(req, res)
 })
 
-router.delete('/', deleter(HealthCareCost, 'applicant'))
+router.delete('/', deleter(HealthCareCost, 'owner'))
 
 router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receipts'], true)], async (req: Request, res: Response) => {
   const healthCareCost = await HealthCareCost.findOne({ _id: req.body.healthCareCostId })
@@ -30,7 +30,7 @@ router.post('/expense', [fileHandler.any(), documentFileHandler(['cost', 'receip
     !healthCareCost ||
     healthCareCost.historic ||
     healthCareCost.state !== 'inWork' ||
-    !healthCareCost.applicant._id.equals(req.user!._id)
+    !healthCareCost.owner._id.equals(req.user!._id)
   ) {
     return res.sendStatus(403)
   }
@@ -67,7 +67,7 @@ router.delete('/expense', async (req: Request, res: Response) => {
     !healthCareCost ||
     healthCareCost.historic ||
     healthCareCost.state !== 'inWork' ||
-    !healthCareCost.applicant._id.equals(req.user!._id)
+    !healthCareCost.owner._id.equals(req.user!._id)
   ) {
     return res.sendStatus(403)
   }
@@ -103,7 +103,7 @@ router.delete('/expense', async (req: Request, res: Response) => {
 router.post('/inWork', async (req, res) => {
   req.body = {
     state: 'inWork',
-    applicant: req.user!._id,
+    owner: req.user!._id,
     editor: req.user!._id,
     _id: req.body._id,
     name: req.body.name,
@@ -125,7 +125,7 @@ router.post('/inWork', async (req, res) => {
       return res.status(400).send(error)
     }
   }
-  return setter(HealthCareCost, 'applicant', true)(req, res)
+  return setter(HealthCareCost, 'owner', true)(req, res)
 })
 
 router.post('/underExamination', async (req, res) => {
@@ -145,13 +145,13 @@ router.post('/underExamination', async (req, res) => {
       return false
     }
   }
-  return setter(HealthCareCost, 'applicant', false, check, sendHealthCareCostNotificationMail)(req, res)
+  return setter(HealthCareCost, 'owner', false, check, sendHealthCareCostNotificationMail)(req, res)
 })
 
 router.get('/report', async (req, res) => {
   const healthCareCost = await HealthCareCost.findOne({
     $and: [
-      { _id: req.query.id, applicant: req.user!._id, historic: false },
+      { _id: req.query.id, owner: req.user!._id, historic: false },
       { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }
     ]
   }).lean()

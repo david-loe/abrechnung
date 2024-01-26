@@ -57,13 +57,13 @@ router.post('/refunded', async (req, res) => {
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
       await writeToDisk(
         '/reports/expenseReport/' +
-          subfolder +
-          expenseReport.expensePayer.name.familyName +
-          ' ' +
-          expenseReport.expensePayer.name.givenName[0] +
-          ' - ' +
-          expenseReport.name +
-          '.pdf',
+        subfolder +
+        expenseReport.owner.name.familyName +
+        ' ' +
+        expenseReport.owner.name.givenName[0] +
+        ' - ' +
+        expenseReport.name +
+        '.pdf',
         await generateExpenseReportReport(expenseReport)
       )
     }
@@ -78,7 +78,7 @@ router.post('/expense', fileHandler.any(), async (req: Request, res: Response) =
     return res.sendStatus(403)
   }
 
-  await documentFileHandler(['cost', 'receipts'], false, expenseReport.expensePayer._id)(req, res, () => null)
+  await documentFileHandler(['cost', 'receipts'], false, expenseReport.owner._id)(req, res, () => null)
 
   if (req.body._id && req.body._id !== '') {
     var found = false
@@ -147,12 +147,12 @@ router.get('/report', async (req, res) => {
     res.setHeader(
       'Content-disposition',
       'attachment; filename=' +
-        expenseReport.expensePayer.name.familyName +
-        ' ' +
-        expenseReport.expensePayer.name.givenName[0] +
-        ' - ' +
-        expenseReport.name +
-        '.pdf'
+      expenseReport.owner.name.familyName +
+      ' ' +
+      expenseReport.owner.name.givenName[0] +
+      ' - ' +
+      expenseReport.name +
+      '.pdf'
     )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

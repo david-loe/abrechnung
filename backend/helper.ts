@@ -57,9 +57,9 @@ export function getter(
             continue
           }
         }
-        if (req.query[field] && (req.query[field] as string[]).length > 0) {
+        if (req.query[field] && (req.query[field] as string).length > 0) {
           var qFilter: any = {}
-          if ((req.query[field] as string[]).indexOf('name') !== -1) {
+          if (field.indexOf('name') !== -1) {
             qFilter[field] = { $regex: req.query[field], $options: 'i' }
           } else {
             qFilter[field] = req.query[field]

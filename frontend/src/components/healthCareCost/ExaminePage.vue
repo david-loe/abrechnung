@@ -4,7 +4,8 @@
     <HealthCareCostCardList
       class="mb-5"
       endpoint="examine/healthCareCost"
-      :showUser="true"
+      :showOwner="true"
+      :showSearch="true"
       @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
     </HealthCareCostCardList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
@@ -17,7 +18,8 @@
       <hr class="hr" />
       <HealthCareCostCardList
         endpoint="examine/healthCareCost/underExaminationByInsurance"
-        :showUser="true"
+        :showOwner="true"
+        :showSearch="true"
         @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
       </HealthCareCostCardList>
     </template>

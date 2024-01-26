@@ -61,13 +61,13 @@ router.post(
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
           '/reports/healthCareCost/confirmed/' +
-            subfolder +
-            healthCareCost.applicant.name.familyName +
-            ' ' +
-            healthCareCost.applicant.name.givenName[0] +
-            ' - ' +
-            healthCareCost.name +
-            '.pdf',
+          subfolder +
+          healthCareCost.owner.name.familyName +
+          ' ' +
+          healthCareCost.owner.name.givenName[0] +
+          ' - ' +
+          healthCareCost.name +
+          '.pdf',
           await generateHealthCareCostReport(healthCareCost)
         )
       }
@@ -83,12 +83,12 @@ router.get('/report', async (req, res) => {
     res.setHeader(
       'Content-disposition',
       'attachment; filename=' +
-        healthCareCost.applicant.name.familyName +
-        ' ' +
-        healthCareCost.applicant.name.givenName[0] +
-        ' - ' +
-        healthCareCost.name +
-        '.pdf'
+      healthCareCost.owner.name.familyName +
+      ' ' +
+      healthCareCost.owner.name.givenName[0] +
+      ' - ' +
+      healthCareCost.name +
+      '.pdf'
     )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Length', report.length)

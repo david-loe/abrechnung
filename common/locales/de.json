@@ -171,6 +171,7 @@
     "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
+    "owner": "Ersteller",
     "password": "Passwort",
     "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
@@ -263,7 +264,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{expensePayer} hat die Auslagenabrechnung fertiggestellt.",
+        "paragraph": "{owner} hat die Auslagenabrechnung fertiggestellt.",
         "subject": "🛂 Auslagen zu prüfen"
       }
     },
@@ -280,7 +281,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{applicant} hat Krankenkosten eingereicht.",
+        "paragraph": "{owner} hat Krankenkosten eingereicht.",
         "subject": "🛂 Krankenkosten zu prüfen"
       },
       "underExaminationByInsurance": {
@@ -299,7 +300,7 @@
     "travel": {
       "appliedFor": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Ein neuer Reiseantrag von {traveler} kam grade rein.",
+        "paragraph": "Ein neuer Reiseantrag von {owner} kam grade rein.",
         "subject": "🆕 Neue Reise"
       },
       "approved": {
@@ -319,12 +320,12 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{traveler} hat die abrechnung fertiggestellt.",
+        "paragraph": "{owner} hat die abrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
     },
     "underExaminationByInsurance": {
-      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {applicant} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     }
   },

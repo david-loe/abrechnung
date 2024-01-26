@@ -3,7 +3,7 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-          <h5 class="card-title">{{ name }}</h5>
+          <h5 class="card-title">{{ request.name }}</h5>
         </div>
         <div class="col-auto">
           <slot name="top-right"></slot>
@@ -26,19 +26,19 @@
         </div>
       </div>
 
-      <span v-if="showUser && user" class="card-subtitle mb-1 fs-6 fw-medium text-muted">
-        {{ user.name.givenName + ' ' + user.name.familyName + ' - ' + organisation.name }}
+      <span v-if="showOwner && request.owner" class="card-subtitle mb-1 fs-6 fw-medium text-muted">
+        {{ request.owner.name.givenName + ' ' + request.owner.name.familyName + ' - ' + request.organisation.name }}
       </span>
       <div class="row mb-2">
         <slot name="details"></slot>
       </div>
 
       <div class="row">
-        <div class="col"><StateBadge :state="state"></StateBadge></div>
+        <div class="col"><StateBadge :state="request.state"></StateBadge></div>
         <div v-if="showEditor" class="col-auto">
           <small class="ms-1">
             <i class="bi bi-pencil-square"></i>
-            {{ editor.name.givenName }}
+            {{ request.editor.name.givenName }}
           </small>
         </div>
       </div>
@@ -50,19 +50,15 @@
 import { defineComponent, PropType } from 'vue'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { Settings, UserSimple, OrganisationSimple } from '../../../../common/types.js'
+import { RequestSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CardElement',
   emits: ['clicked', 'deleted'],
   components: { StateBadge, ProgressCircle },
   props: {
-    name: { type: String, required: true },
-    state: { type: String as PropType<keyof Settings['stateColors']>, required: true },
-    user: { type: Object as PropType<UserSimple>, required: true },
-    organisation: { type: Object as PropType<OrganisationSimple>, required: true },
-    editor: { type: Object as PropType<UserSimple>, required: true },
-    showUser: { type: Boolean, default: false },
+    request: { type: Object as PropType<RequestSimple>, required: true },
+    showOwner: { type: Boolean, default: false },
     showEditor: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },

@@ -1,11 +1,7 @@
 <template>
   <CardElement
-    :state="healthCareCost.state"
-    :name="healthCareCost.name"
-    :user="healthCareCost.applicant"
-    :organisation="healthCareCost.organisation"
-    :editor="healthCareCost.editor"
-    :showUser="showUser"
+    :request="healthCareCost"
+    :showOwner="showOwner"
     :showEditor="'refunded' === healthCareCost.state || 'underExaminationByInsurance' === healthCareCost.state"
     :showDropdown="showDropdown"
     @clicked="$emit('clicked')"
@@ -24,7 +20,7 @@ export default defineComponent({
   components: { CardElement },
   props: {
     healthCareCost: { type: Object as PropType<HealthCareCostSimple>, required: true },
-    showUser: { type: Boolean, default: false },
+    showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   }
 })

@@ -171,6 +171,7 @@
     "organisation": "Organisation",
     "otherTransport": "Other transport 🚆🚖",
     "ownCar": "Own car 🚘",
+    "owner": "Owner",
     "password": "Password",
     "patientName": "Patient name",
     "place": "Place",
@@ -263,7 +264,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{expensePayer} has finished his expense report.",
+        "paragraph": "{owner} has finished his expense report.",
         "subject": "🛂 Expense Report to examine"
       }
     },
@@ -280,7 +281,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{applicant} has submit his health care costs.",
+        "paragraph": "{owner} has submit his health care costs.",
         "subject": "🛂 Health Care Costs to examine"
       },
       "underExaminationByInsurance": {
@@ -299,7 +300,7 @@
     "travel": {
       "appliedFor": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "A new travel application from {traveler} just came in.",
+        "paragraph": "A new travel application from {owner} just came in.",
         "subject": "🆕 New Travel"
       },
       "approved": {
@@ -319,12 +320,12 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{traveler} has finished his travel expenses.",
+        "paragraph": "{owner} has finished his travel expenses.",
         "subject": "🛂 Travel to examine"
       }
     },
     "underExaminationByInsurance": {
-      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {applicant}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     }
   },
