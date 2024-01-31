@@ -293,11 +293,8 @@ export function accessControl(accesses: Access[]) {
 }
 
 export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
-  return asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    if (!owner) {
-      owner = req.user!._id
-    }
-    owner = owner.toString()
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const fileOwner = owner ? owner : req.user!._id
     var pathExists = true
     var tmpCheckObj = req.body
     for (const prop of pathToFiles) {
@@ -329,7 +326,7 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
             }
           }
           if (buffer) {
-            reqDocuments[i].owner = owner
+            reqDocuments[i].owner = fileOwner
             reqDocuments[i].data = buffer
             reqDocuments[i] = await new DocumentFile(reqDocuments[i]).save()
           } else {
@@ -340,7 +337,7 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
           }
         } else {
           const documentFile = await DocumentFile.findOne({ _id: reqDocuments[i]._id }, { owner: 1 }).lean()
-          if (!documentFile || (checkOwner && !documentFile.owner.equals(owner))) {
+          if (!documentFile || (checkOwner && !documentFile.owner.equals(fileOwner))) {
             reqDocuments.splice(i, 1)
             i -= 1
             iR += 1
@@ -351,15 +348,5 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
       }
     }
     next()
-  })
-}
-
-function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) {
-  return async function (req: Request, res: Response, next: NextFunction) {
-    try {
-      await fn(req, res, next)
-    } catch (e) {
-      next(e)
-    }
   }
 }
