@@ -165,7 +165,6 @@ import {
   SETResponse
 } from '../../common/types.js'
 import { log } from '../../common/logger.js'
-import TwemojiCountryFlags from '../../common/fonts/TwemojiCountryFlags.woff2'
 import UserSettingsForm from './components/settings/forms/UserSettingsForm.vue'
 import { getFlagEmoji } from '../../common/scripts.js'
 
@@ -195,8 +194,7 @@ export default defineComponent({
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
-      accesses,
-      TwemojiCountryFlags
+      accesses
     }
   },
   components: { UserSettingsForm },
@@ -401,7 +399,7 @@ export default defineComponent({
 @font-face {
   font-family: 'Twemoji Country Flags';
   unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
-  src: v-bind('TwemojiCountryFlags') format('woff2');
+  src: url('../../common/fonts/TwemojiCountryFlags.woff2');
 }
 
 body {
