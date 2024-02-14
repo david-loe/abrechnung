@@ -1,4 +1,4 @@
-import { documentFileHandler, getter, setter } from '../../../helper.js'
+import { deleter, documentFileHandler, getter, setter } from '../../../helper.js'
 import express, { Request, Response } from 'express'
 const router = express.Router()
 import DocumentFile from '../../../models/documentFile.js'
@@ -33,6 +33,8 @@ router.get('/refunded', async (req, res) => {
 
   return getter(ExpenseReport, 'expense report', 20, { state: 'refunded', historic: false }, select, sortFn)(req, res)
 })
+
+router.delete('/', deleter(ExpenseReport))
 
 router.post('/refunded', async (req, res) => {
   req.body = {
