@@ -2,12 +2,11 @@ import i18n from './i18n.js'
 import DocumentFile from './models/documentFile.js'
 import Settings from './models/settings.js'
 import axios from 'axios'
-import { datetimeToDateString } from '../common/scripts.js'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
-import { Access, GETResponse, Meta, SETResponse } from '../common/types.js'
+import { Access, ExchangeRate as ExchangeRateI, GETResponse, Meta, SETResponse } from '../common/types.js'
 import { log } from '../common/logger.js'
-import fs from 'fs'
+import ExchangeRate from './models/exchangeRate.js'
 
 export function getter(
   model: Model<any>,
@@ -205,6 +204,8 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
 
 const settings = (await Settings.findOne().lean())!
 
+type InforEuroResponse = Array<{ country: string; currency: string; isoA3Code: string; isoA2Code: string; value: number; comment: null | string }>
+
 export async function convertCurrency(
   date: Date | string | number,
   amount: number,
@@ -214,37 +215,26 @@ export async function convertCurrency(
   if (from === to) {
     return null
   }
-  from = from.toUpperCase()
-  to = to.toUpperCase()
-  const convertionDate = new Date(date)
+  var convertionDate = new Date(date)
   if (convertionDate.valueOf() - new Date().valueOf() > 0) {
-    date = new Date()
+    convertionDate = new Date()
   }
-  const dateStr = datetimeToDateString(convertionDate)
-  const filePath = './data/exchange-rates/' + dateStr + '.json'
-  var data: any = undefined
-  if (fs.existsSync(filePath)) {
-    const dataStr = fs.readFileSync(filePath, 'utf8')
-    data = JSON.parse(dataStr)
-  } else {
-    const url = 'https://api.currencybeacon.com/v1/historical?api_key=' + process.env.CURRENCYBEACON_API_KEY + '&base=' + to + '&date=' + dateStr
+  const month = convertionDate.getUTCMonth() + 1
+  const year = convertionDate.getUTCFullYear()
+  var data: ExchangeRateI | null | undefined = await ExchangeRate.findOne({ currency: from.toUpperCase(), month: month, year: year }).lean()
+  if (!data && !(await ExchangeRate.findOne({ month: month, year: year }).lean())) {
+    const url = `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`
     const res = await axios.get(url)
     if (res.status === 200) {
-      data = res.data
-      fs.writeFile(filePath, JSON.stringify(data), { encoding: 'utf-8' }, (error) => {
-        if (error) {
-          console.error(error)
-        }
-      })
+      const rates = (res.data as InforEuroResponse).map(r => ({ currency: r.isoA3Code, value: r.value, month: month, year: year } as ExchangeRateI))
+      ExchangeRate.insertMany(rates)
+      data = rates.find(r => r.currency === from.toUpperCase())
     }
   }
-  var rate = null
-  if (data) {
-    rate = data.rates[from]
-  }
-  if (!rate) {
+  if (!data) {
     return null
   }
+  const rate = data.value
   amount = Math.round((amount / rate) * 100) / 100
   return { date: convertionDate, rate, amount }
 }
