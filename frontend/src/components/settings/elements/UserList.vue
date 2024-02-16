@@ -6,6 +6,11 @@
       :rows-per-page="5"
       sort-by="name"
       :items="users"
+      :filter-options="[{
+        field: 'name',
+        criteria: filter.name,
+        comparison: (value: User['name'], criteria: string): boolean =>  (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
+      }]"
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },
@@ -13,6 +18,15 @@
         { text: $t('labels.access'), value: 'access' },
         { value: 'buttons' }
       ]">
+      <template #header-name="header">
+        <div class="filter-column">
+          <i class="bi bi-funnel" @click="_filter.name = !_filter.name"></i>
+          {{ header.text }}
+          <div v-if="_filter.name">
+            <input type="text" class="form-control" v-model="filter.name" />
+          </div>
+        </div>
+      </template>
       <template #item-name="{ name }">
         {{ name.givenName + ' ' + name.familyName }}
       </template>
@@ -55,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, toValue } from 'vue'
 import UserForm from '../forms/UserForm.vue'
 import { User, accesses } from '../../../../../common/types.js'
 export default defineComponent({
@@ -67,6 +81,12 @@ export default defineComponent({
       userToEdit: undefined as User | undefined,
       userFormMode: 'add' as 'add' | 'edit',
       showForm_: false,
+      filter: {
+        name: ''
+      },
+      _filter: {
+        name: false
+      },
       accesses
     }
   },
@@ -96,6 +116,10 @@ export default defineComponent({
       if (result) {
         this.users = result.data
       }
+    },
+    clearSearch() {
+      this._search = ''
+      this._showSearch = false
     }
   },
   async created() {
