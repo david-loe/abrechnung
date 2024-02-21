@@ -10,6 +10,11 @@
         field: 'name',
         criteria: filter.name,
         comparison: (value: User['name'], criteria: string): boolean =>  (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
+      },
+      {
+        field: 'email',
+        criteria: filter.email,
+        comparison: (value: User['email'], criteria: string): boolean =>  value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
       }]"
       :headers="[
         { text: $t('labels.name'), value: 'name' },
@@ -20,10 +25,25 @@
       ]">
       <template #header-name="header">
         <div class="filter-column">
-          <i class="bi bi-funnel" @click="_filter.name = !_filter.name"></i>
           {{ header.text }}
+          <span style="cursor: pointer" @click="clickFilter('name')">
+            <i v-if="_filter.name" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
           <div v-if="_filter.name">
             <input type="text" class="form-control" v-model="filter.name" />
+          </div>
+        </div>
+      </template>
+      <template #header-email="header">
+        <div class="filter-column">
+          {{ header.text }}
+          <span style="cursor: pointer" @click="clickFilter('email')">
+            <i v-if="_filter.email" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="_filter.email">
+            <input type="text" class="form-control" v-model="filter.email" />
           </div>
         </div>
       </template>
@@ -69,9 +89,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toValue } from 'vue'
+import { defineComponent } from 'vue'
 import UserForm from '../forms/UserForm.vue'
 import { User, accesses } from '../../../../../common/types.js'
+
+interface Filter<T> {
+  name: T
+  email: T
+}
 export default defineComponent({
   name: 'UserList',
   components: { UserForm },
@@ -82,11 +107,13 @@ export default defineComponent({
       userFormMode: 'add' as 'add' | 'edit',
       showForm_: false,
       filter: {
-        name: ''
-      },
+        name: '',
+        email: ''
+      } as Filter<string>,
       _filter: {
-        name: false
-      },
+        name: false,
+        email: false
+      } as Filter<boolean>,
       accesses
     }
   },
@@ -117,9 +144,13 @@ export default defineComponent({
         this.users = result.data
       }
     },
-    clearSearch() {
-      this._search = ''
-      this._showSearch = false
+    clickFilter(header: keyof Filter<string>) {
+      if (this._filter[header]) {
+        this._filter[header] = false
+        this.filter[header] = ''
+      } else {
+        this._filter[header] = true
+      }
     }
   },
   async created() {
