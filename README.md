@@ -25,7 +25,15 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 
 Dieser statische Währungsrechner zeigt den offiziellen monatlichen Buchungskurs der Europäischen Kommission für den Euro und die durch den Rechnungsführer im Einklang mit Artikel 19 der Haushaltsordnung festgelegten Umrechnungskurse an.
 
-## Getting Started
+## Run
+
+### Gitpod
+
+Click below to launch a ready-to-use Gitpod workspace in your browser.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/david-loe/abrechnung)
+
+### Local
 
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
 2. Copy `.env.example` to `.env` and adapt if needed
