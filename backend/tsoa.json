@@ -1,0 +1,23 @@
+{
+  "entryFile": "./app.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": [
+    "controller/**/*Controller.ts"
+  ],
+  "spec": {
+    "outputDirectory": "dist",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "name": "abrechnung",
+        "in": "cookie"
+      }
+    }
+  },
+  "routes": {
+    "routesDir": "dist",
+    "esm": true,
+    "authenticationModule": "authentication.ts"
+  }
+}

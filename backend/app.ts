@@ -1,6 +1,6 @@
 import './db.js'
 import './migrations.js'
-import express from 'express'
+import express, { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import session from 'express-session'
@@ -10,6 +10,9 @@ import routes from './routes/api/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
 import auth from './auth.js'
+import swaggerUi from "swagger-ui-express";
+import { RegisterRoutes } from "./dist/routes.js";
+import swaggerDocument from "./dist/swagger.json"  assert { type: 'json' }
 
 const app = express()
 
@@ -40,5 +43,15 @@ app.use(
 app.use(auth)
 app.use('/api', routes)
 app.use('/upload', uploadRoutes)
+
+app.use("/docs", swaggerUi.serve, async (_req: Request, res: Response) => {
+  return res.send(
+    swaggerUi.generateHTML(swaggerDocument)
+  );
+});
+
+//app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+RegisterRoutes(app);
 
 export default app

@@ -1,0 +1,38 @@
+name: Publish Docs
+
+on:
+  push:
+    branches: ['main', 'refactor-backend-to-use-tsoa']
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: copy .env file
+        uses: canastro/copy-file-action@master
+        with:
+          source: '.env.example'
+          target: '.env'
+      - name: Set production mode in .env
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'NODE_ENV=development'
+          replace: 'NODE_ENV=production'
+          include: '.env'
+      - name: Build
+        run: docker compose up -d --build backend
+      - name: Copy open api spec
+        run: docker compose cp backend:/build/dist/swagger.json swagger.json
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@v1
+        with:
+          output: swagger-ui
+          spec-file: swagger.json
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: swagger-ui

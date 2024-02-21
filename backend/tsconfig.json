@@ -8,6 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
     "paths": {
       "@/*": [
         "./src/*" // set path `@/*` as alias of `src/*`

@@ -89,9 +89,12 @@ export interface Token {
   files: DocumentFile[]
 }
 
-export interface UserSimple {
+export interface Contact {
   email: string
   name: { givenName: string; familyName: string }
+}
+
+export interface UserSimple extends Contact {
   _id: Types.ObjectId
 }
 
