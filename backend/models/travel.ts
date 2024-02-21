@@ -232,8 +232,8 @@ travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Prom
     const borderCrossings: { date: Date; country: CountrySimple, special?: string }[] = [{ date: new Date(this.stages[0].departure), country: startCountry }]
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
-      // Country Change
-      if (stage.startLocation && stage.endLocation && stage.startLocation.country._id !== stage.endLocation.country._id) {
+      // Country Change (or special change)
+      if (stage.startLocation && stage.endLocation && (stage.startLocation.country._id !== stage.endLocation.country._id || stage.startLocation.special !== stage.endLocation.special)) {
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
