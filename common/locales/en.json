@@ -296,6 +296,12 @@
       "buttonText": "Jump to abrechnung🧾",
       "paragraph": "Click here to get access."
     },
+    "newMagiclogin": {
+      "buttonText": "To abrechnung🧾",
+      "subject": "Welcome to abrechnung🧾",
+      "paragraph": "Welcome to abrechnung🧾. Here you can submit all your expenses.",
+      "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it."
+    },
     "regards": "Best Regards",
     "travel": {
       "appliedFor": {

@@ -296,6 +296,12 @@
       "buttonText": "Weiter zu abrechnung🧾",
       "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen."
     },
+    "newMagiclogin": {
+      "buttonText": "Zu abrechnung🧾",
+      "subject": "Willkommen bei abrechnung🧾",
+      "paragraph": "Herzlich willkommen bei abrechnung🧾. Hier kannst du all deine Abrechnungen einreichen.",
+      "lastParagraph": "Zum Anmelden benötigst du lediglich deine E-Mail Adresse.\nDrücke auf 'Mit E-Mail anmelden', gib deine E-Mail Adresse ein und dann bekommst du eine E-Mail mit einem Link der dich direkt einloggt."
+    },
     "regards": "Beste Grüße",
     "travel": {
       "appliedFor": {
