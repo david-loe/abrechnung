@@ -1,4 +1,0 @@
-# In Production only an empty image is loaded
-FROM scratch
-ADD emptyimage /
-CMD ["/emptyimage"]

@@ -1,2 +1,0 @@
-FROM gitea/test-openldap
-HEALTHCHECK NONE

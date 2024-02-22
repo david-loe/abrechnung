@@ -1,0 +1,82 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {},
+		"securitySchemes": {
+			"cookieAuth": {
+				"type": "apiKey",
+				"name": "abrechnung",
+				"in": "cookie"
+			}
+		}
+	},
+	"info": {
+		"title": "abrechnung-backend",
+		"version": "0.3.9",
+		"contact": {}
+	},
+	"paths": {
+		"/auth/magiclogin": {
+			"post": {
+				"operationId": "Magiclogin",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Send a magiclogin email to the destination email address.",
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"destination": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"destination"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/magiclogin/callback": {
+			"get": {
+				"operationId": "MagicloginCallback",
+				"responses": {
+					"302": {
+						"description": ""
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
