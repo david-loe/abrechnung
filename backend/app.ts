@@ -21,7 +21,7 @@ app.use(express.urlencoded({ limit: '2mb', extended: true }))
 app.use(
   cors({
     credentials: true,
-    origin: process.env.VITE_FRONTEND_URL
+    origin: [process.env.VITE_FRONTEND_URL, process.env.VITE_BACKEND_URL]
   })
 )
 
@@ -49,8 +49,6 @@ app.use("/docs", swaggerUi.serve, async (_req: Request, res: Response) => {
     swaggerUi.generateHTML(swaggerDocument)
   );
 });
-
-//app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 RegisterRoutes(app);
 

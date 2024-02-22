@@ -23,7 +23,7 @@ const magicLogin = new MagicLoginStrategy.default({
   verify: async function (payload, callback) {
     var user = await User.findOne({ 'fk.magiclogin': payload.destination }).lean()
     if (user) {
-      callback(null, user)
+      callback(null, user, { redirect: payload.redirect })
     } else {
       callback(Error('No magiclogin user found for e-mail: ' + payload.destination))
     }
