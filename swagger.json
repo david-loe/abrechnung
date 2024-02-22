@@ -21,15 +21,22 @@
 		"contact": {}
 	},
 	"paths": {
-		"/auth/magiclogin": {
+		"/auth/ldapauth": {
 			"post": {
-				"operationId": "Magiclogin",
+				"operationId": "Ldapauth",
 				"responses": {
 					"204": {
 						"description": "No content"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by .env settings."
 					}
 				},
-				"description": "Send a magiclogin email to the destination email address.",
+				"description": "Provides the authentication cookie.",
+				"summary": "Login using LDAP",
+				"tags": [
+					"Authentication"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -38,6 +45,108 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"password": {
+										"type": "string"
+									},
+									"username": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"password",
+									"username"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/microsoft": {
+			"get": {
+				"operationId": "Microsoft",
+				"responses": {
+					"302": {
+						"description": "Redirecting to Microsoft"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by .env settings."
+					}
+				},
+				"summary": "Redirecting to Microsoft login",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "redirect",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/microsoft/callback": {
+			"get": {
+				"operationId": "MicrosoftCallback",
+				"responses": {
+					"302": {
+						"description": "Redirecting to Frontend"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by .env settings."
+					}
+				},
+				"description": "Provides the authentication cookie.",
+				"summary": "Microsoft login endpoint",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "state",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/magiclogin": {
+			"post": {
+				"operationId": "Magiclogin",
+				"responses": {
+					"200": {
+						"description": ""
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by .env settings."
+					}
+				},
+				"description": "Send a magiclogin email to the destination email address.",
+				"summary": "Send login email",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"redirect": {
+										"type": "string"
+									},
 									"destination": {
 										"type": "string"
 									}
@@ -57,9 +166,17 @@
 				"operationId": "MagicloginCallback",
 				"responses": {
 					"302": {
-						"description": ""
+						"description": "Redirecting to Frontend"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by .env settings."
 					}
 				},
+				"description": "Provides the authentication cookie.",
+				"summary": "Email login endpoint",
+				"tags": [
+					"Authentication"
+				],
 				"security": [],
 				"parameters": [
 					{
