@@ -7,6 +7,8 @@ on:
 jobs:
   publish-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +32,6 @@ jobs:
         with:
           output: swagger-ui
           spec-file: swagger.json
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
