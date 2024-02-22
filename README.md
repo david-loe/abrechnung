@@ -25,6 +25,9 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 
 Dieser statische Währungsrechner zeigt den offiziellen monatlichen Buchungskurs der Europäischen Kommission für den Euro und die durch den Rechnungsführer im Einklang mit Artikel 19 der Haushaltsordnung festgelegten Umrechnungskurse an.
 
+## API
+[API Documentation](https://david-loe.github.io/abrechnung/)
+
 ## Run
 
 ### Gitpod
