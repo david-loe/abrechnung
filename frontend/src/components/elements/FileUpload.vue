@@ -150,8 +150,8 @@ export default defineComponent({
       this.token = (await this.$root.setter<Token>('user/token', {}, undefined, false)).ok
       if (this.token) {
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
-        url.searchParams.append('user', this.$root.user._id)
-        url.searchParams.append('token', this.token._id)
+        url.searchParams.append('userId', this.$root.user._id)
+        url.searchParams.append('tokenId', this.token._id)
         log(this.$t('labels.uploadLink') + ':')
         log(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })

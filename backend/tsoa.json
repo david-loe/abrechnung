@@ -18,6 +18,6 @@
   "routes": {
     "routesDir": "dist",
     "esm": true,
-    "authenticationModule": "authentication.ts"
+    "authenticationModule": "controller/authentication.ts"
   }
 }

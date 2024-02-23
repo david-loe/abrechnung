@@ -283,8 +283,11 @@ export function accessControl(accesses: Access[]) {
 }
 
 export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const fileOwner = owner ? owner : req.user!._id
+  return async (req: Request, res?: Response, next?: NextFunction) => {
+    const fileOwner = owner ? owner : req.user?._id
+    if (!fileOwner) {
+      throw new Error('No owner for uploaded files')
+    }
     var pathExists = true
     var tmpCheckObj = req.body
     for (const prop of pathToFiles) {
@@ -337,6 +340,8 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
         reqDocuments[i] = reqDocuments[i]._id
       }
     }
-    next()
+    if (next) {
+      next()
+    }
   }
 }
