@@ -1,6 +1,7 @@
 import './db.js'
 import './migrations.js'
-import express, { Request, Response } from 'express'
+import express, { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
+import { ValidateError } from 'tsoa'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import session from 'express-session'
@@ -10,9 +11,9 @@ import routes from './routes/api/routes.js'
 import uploadRoutes from './routes/upload/routes.js'
 import { MongoClient } from 'mongodb'
 import auth from './auth.js'
-import swaggerUi from "swagger-ui-express";
-import { RegisterRoutes } from "./dist/routes.js";
-import swaggerDocument from "./dist/swagger.json"  assert { type: 'json' }
+import swaggerUi from 'swagger-ui-express'
+import { RegisterRoutes } from './dist/routes.js'
+import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
 
 const app = express()
 
@@ -44,12 +45,24 @@ app.use(auth)
 app.use('/api', routes)
 app.use('/upload', uploadRoutes)
 
-app.use("/docs", swaggerUi.serve, async (_req: Request, res: Response) => {
-  return res.send(
-    swaggerUi.generateHTML(swaggerDocument)
-  );
-});
+app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
+  return res.send(swaggerUi.generateHTML(swaggerDocument))
+})
 
-RegisterRoutes(app);
+RegisterRoutes(app)
+
+app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): ExResponse | void {
+  if (err instanceof ValidateError) {
+    console.warn(`Caught Validation Error for ${req.path}:`, err.fields)
+    return res.status(422).json({
+      message: 'Validation Failed',
+      details: err?.fields
+    })
+  }
+  if (err instanceof Error) {
+    next(err)
+  }
+  next()
+})
 
 export default app
