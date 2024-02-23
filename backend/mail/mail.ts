@@ -23,7 +23,7 @@ export function sendMail(
   const regards = i18n.t('mail.regards')
   const app = { name: i18n.t('headlines.title') + ' ' + i18n.t('headlines.emoji'), url: process.env.VITE_FRONTEND_URL }
 
-  const template = fs.readFileSync('./mail/mail_template.ejs', { encoding: 'utf-8' })
+  const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
     salutation,
     paragaph,
