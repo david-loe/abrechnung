@@ -1,19 +1,7 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Route,
-  SuccessResponse,
-  Response,
-  Get,
-  Query,
-  Tags,
-  Middlewares,
-  Request
-} from "tsoa";
-import User, { UserDoc } from "../models/user.js";
+import { Body, Controller, Post, Route, SuccessResponse, Response, Get, Query, Tags, Middlewares, Request } from 'tsoa'
+import User, { UserDoc } from '../models/user.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import passport from "passport";
+import passport from 'passport'
 import magiclogin from '../authStrategies/magiclogin.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
@@ -21,38 +9,37 @@ const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true
 const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
 const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
 
-const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => { res.status(501).send(disabledMessage) }
+const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  res.status(501).send(disabledMessage)
+}
 
-const ldapauthHandler = useLDAPauth ?
-  passport.authenticate('ldapauth', { session: true }) :
-  NotImplementedMiddleware
+const ldapauthHandler = useLDAPauth ? passport.authenticate('ldapauth', { session: true }) : NotImplementedMiddleware
 
+const microsoftHandler = useMicrosoft
+  ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
+      const redirect = req.query.redirect
+      const state = req.query.redirect ? Buffer.from(JSON.stringify({ redirect })).toString('base64') : undefined
+      passport.authenticate('microsoft', { state: state })(req, res, next)
+    }
+  : NotImplementedMiddleware
 
-const microsoftHandler = useMicrosoft ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  const redirect = req.query.redirect
-  const state = req.query.redirect ? Buffer.from(JSON.stringify({ redirect })).toString('base64') : undefined
-  passport.authenticate('microsoft', { state: state })(req, res, next)
-} : NotImplementedMiddleware
+const microsoftCallbackHandler = useMicrosoft ? (req: ExRequest, res: ExResponse, next: NextFunction) => {} : NotImplementedMiddleware
 
-const microsoftCallbackHandler = useMicrosoft ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
+const magicloginHandler = useMagicLogin
+  ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+      var user = await User.findOne({ 'fk.magiclogin': req.body.destination })
+      if (user && (await (user as UserDoc).isActive())) {
+        magiclogin.send(req, res)
+      } else {
+        throw new Error('No magiclogin user found for e-mail: ' + req.body.destination)
+      }
+    }
+  : NotImplementedMiddleware
 
-} : NotImplementedMiddleware
-
-const magicloginHandler = useMagicLogin ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  var user = await User.findOne({ 'fk.magiclogin': req.body.destination })
-  if (user && (await (user as UserDoc).isActive())) {
-    magiclogin.send(req, res)
-  } else {
-    throw new Error('No magiclogin user found for e-mail: ' + req.body.destination)
-  }
-} : NotImplementedMiddleware
-
-const magicloginCallbackHandler = useMagicLogin ?
-  passport.authenticate('magiclogin') :
-  NotImplementedMiddleware
+const magicloginCallbackHandler = useMagicLogin ? passport.authenticate('magiclogin') : NotImplementedMiddleware
 
 @Tags('Authentication')
-@Route("auth")
+@Route('auth')
 @Response(501, disabledMessage)
 export class AuthController extends Controller {
   /**
@@ -61,10 +48,7 @@ export class AuthController extends Controller {
    */
   @Post('ldapauth')
   @Middlewares(ldapauthHandler)
-  public ldapauth(
-    @Body() requestBody: { username: string, password: string }) {
-
-  }
+  public ldapauth(@Body() requestBody: { username: string; password: string }) {}
 
   /**
    * @summary Redirecting to Microsoft login
@@ -72,9 +56,7 @@ export class AuthController extends Controller {
   @Get('microsoft')
   @Middlewares(microsoftHandler)
   @SuccessResponse(302, 'Redirecting to Microsoft')
-  public microsoft(@Query() redirect?: string) {
-
-  }
+  public microsoft(@Query() redirect?: string) {}
 
   /**
    * Provides the authentication cookie.
@@ -88,8 +70,7 @@ export class AuthController extends Controller {
     if (state) {
       try {
         redirect = JSON.parse(Buffer.from(state, 'base64').toString()).redirect
-      } catch {
-      }
+      } catch {}
     }
     this.redirectToFrontend(redirect)
   }
@@ -101,9 +82,7 @@ export class AuthController extends Controller {
   @Post('magiclogin')
   @Middlewares(magicloginHandler)
   @SuccessResponse(200)
-  public magiclogin(@Body() requestBody: { destination: string, redirect?: string }) {
-
-  }
+  public magiclogin(@Body() requestBody: { destination: string; redirect?: string }) {}
 
   /**
    * Provides the authentication cookie.
@@ -121,7 +100,7 @@ export class AuthController extends Controller {
     if (path && path.startsWith('/')) {
       redirect = path
     }
-    this.setHeader("Location", process.env.VITE_FRONTEND_URL + redirect)
+    this.setHeader('Location', process.env.VITE_FRONTEND_URL + redirect)
     this.setStatus(302)
   }
 }

@@ -1,6 +1,6 @@
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
 import User from '../models/user.js'
-import { NewUser, addAdminIfNone } from './index.js';
+import { NewUser, addAdminIfNone } from './index.js'
 
 interface msProfile {
   provider: 'microsoft'

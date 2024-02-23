@@ -6,7 +6,7 @@ const url = process.env.VITE_BACKEND_URL
 
 declare global {
   namespace Express {
-    interface User extends HydratedDocument<IUser> { }
+    interface User extends HydratedDocument<IUser> {}
     interface AuthInfo {
       redirect?: string
     }

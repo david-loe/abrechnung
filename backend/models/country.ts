@@ -69,4 +69,4 @@ countrySchema.methods.getLumpSum = async function (date: Date, special: string |
 
 export default model<Country, CountryModel>('Country', countrySchema)
 
-export interface CountryDoc extends Methods, HydratedDocument<Country> { }
+export interface CountryDoc extends Methods, HydratedDocument<Country> {}

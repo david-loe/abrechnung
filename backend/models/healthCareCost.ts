@@ -138,4 +138,4 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
 
 export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', healthCareCostSchema)
 
-export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> { }
+export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> {}

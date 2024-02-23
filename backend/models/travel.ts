@@ -38,7 +38,7 @@ interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
   getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[]
-  getBorderCrossings(): Promise<{ date: Date; country: CountrySimple, special?: string }[]>
+  getBorderCrossings(): Promise<{ date: Date; country: CountrySimple; special?: string }[]>
   getDateOfLastPlaceOfWork(): Date | null
   calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
@@ -226,14 +226,22 @@ travelSchema.methods.getDays = function (this: TravelDoc) {
   }
 }
 
-travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Promise<{ date: Date; country: CountrySimple, special?: string }[]> {
+travelSchema.methods.getBorderCrossings = async function (
+  this: TravelDoc
+): Promise<{ date: Date; country: CountrySimple; special?: string }[]> {
   if (this.stages.length > 0) {
     const startCountry = this.stages[0].startLocation.country
-    const borderCrossings: { date: Date; country: CountrySimple, special?: string }[] = [{ date: new Date(this.stages[0].departure), country: startCountry }]
+    const borderCrossings: { date: Date; country: CountrySimple; special?: string }[] = [
+      { date: new Date(this.stages[0].departure), country: startCountry }
+    ]
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
       // Country Change (or special change)
-      if (stage.startLocation && stage.endLocation && (stage.startLocation.country._id !== stage.endLocation.country._id || stage.startLocation.special !== stage.endLocation.special)) {
+      if (
+        stage.startLocation &&
+        stage.endLocation &&
+        (stage.startLocation.country._id !== stage.endLocation.country._id || stage.startLocation.special !== stage.endLocation.special)
+      ) {
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
@@ -305,8 +313,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     ) {
       bXIndex++
     }
-    ; (day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
-      ; (day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
+    ;(day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
+    ;(day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
   }
 
   // change days according to last place of work
@@ -319,8 +327,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     }
     for (const day of days) {
       if (day.date.valueOf() >= dateOfLastPlaceOfWork.valueOf()) {
-        ; (day as Partial<TravelDay>).country = dbCountry
-          ; (day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
+        ;(day as Partial<TravelDay>).country = dbCountry
+        ;(day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
       }
     }
   }
@@ -346,9 +354,9 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
         amount:
           Math.round(
             amount *
-            leftover *
-            ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
-            100
+              leftover *
+              ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
+              100
           ) / 100,
         currency: settings.baseCurrency
       }
@@ -385,8 +393,8 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
           amount:
             Math.round(
               amount *
-              (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
-              100
+                (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
+                100
             ) / 100,
           currency: settings.baseCurrency
         }
@@ -555,4 +563,4 @@ travelSchema.pre('save', async function (this: TravelDoc, next) {
 
 export default model<Travel, TravelModel>('Travel', travelSchema)
 
-export interface TravelDoc extends Methods, HydratedDocument<Travel> { }
+export interface TravelDoc extends Methods, HydratedDocument<Travel> {}

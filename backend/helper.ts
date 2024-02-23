@@ -204,7 +204,14 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
 
 const settings = (await Settings.findOne().lean())!
 
-type InforEuroResponse = Array<{ country: string; currency: string; isoA3Code: string; isoA2Code: string; value: number; comment: null | string }>
+type InforEuroResponse = Array<{
+  country: string
+  currency: string
+  isoA3Code: string
+  isoA2Code: string
+  value: number
+  comment: null | string
+}>
 
 export async function convertCurrency(
   date: Date | string | number,
@@ -226,9 +233,11 @@ export async function convertCurrency(
     const url = `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`
     const res = await axios.get(url)
     if (res.status === 200) {
-      const rates = (res.data as InforEuroResponse).map(r => ({ currency: r.isoA3Code, value: r.value, month: month, year: year } as ExchangeRateI))
+      const rates = (res.data as InforEuroResponse).map(
+        (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year } as ExchangeRateI)
+      )
       ExchangeRate.insertMany(rates)
-      data = rates.find(r => r.currency === from.toUpperCase())
+      data = rates.find((r) => r.currency === from.toUpperCase())
     }
   }
   if (!data) {

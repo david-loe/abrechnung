@@ -4,5 +4,6 @@
     "semi": false,
     "singleQuote": true,
     "printWidth": 140,
-    "bracketSameLine": true
+    "bracketSameLine": true,
+    "parser": "typescript"
 }

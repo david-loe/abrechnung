@@ -2,7 +2,6 @@
 /pdf/output.pdf
 output.pdf
 /dist
-/data/exchange-rates
 
 # Docker Volume Feedback
 common
