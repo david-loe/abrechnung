@@ -6,7 +6,39 @@
 		"parameters": {},
 		"requestBodies": {},
 		"responses": {},
-		"schemas": {},
+		"schemas": {
+			"DocumentFileType": {
+				"type": "string",
+				"enum": [
+					"image/jpeg",
+					"image/png",
+					"application/pdf"
+				]
+			},
+			"File": {
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/DocumentFileType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"data": {
+						"type": "string",
+						"format": "binary"
+					},
+					"_id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"type",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
 		"securitySchemes": {
 			"cookieAuth": {
 				"type": "apiKey",
@@ -21,6 +53,89 @@
 		"contact": {}
 	},
 	"paths": {
+		"/upload/new": {
+			"get": {
+				"operationId": "UploadPage",
+				"responses": {
+					"200": {
+						"description": ""
+					}
+				},
+				"tags": [
+					"Upload"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Upload",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Upload"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"properties": {
+									"files": {
+										"items": {
+											"$ref": "#/components/schemas/File"
+										},
+										"type": "array"
+									}
+								},
+								"required": [
+									"files"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/auth/ldapauth": {
 			"post": {
 				"operationId": "Ldapauth",
