@@ -7,6 +7,187 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Locale": {
+				"type": "string",
+				"enum": [
+					"de",
+					"en"
+				]
+			},
+			"Currency": {
+				"properties": {
+					"name": {
+						"properties": {
+							"en": {
+								"type": "string"
+							},
+							"de": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"en",
+							"de"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"type": "string"
+					},
+					"subunit": {
+						"type": "string",
+						"nullable": true
+					},
+					"symbol": {
+						"type": "string",
+						"nullable": true
+					},
+					"flag": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CountrySimple": {
+				"properties": {
+					"name": {
+						"properties": {
+							"en": {
+								"type": "string"
+							},
+							"de": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"en",
+							"de"
+						],
+						"type": "object"
+					},
+					"alias": {
+						"properties": {
+							"en": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"de": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"de"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"type": "string"
+					},
+					"flag": {
+						"type": "string",
+						"nullable": true
+					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"mongoose.Types.ObjectId": {
+				"type": "string"
+			},
+			"HealthInsurance": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"email",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Organisation": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"subfolderPath": {
+						"type": "string"
+					},
+					"bankDetails": {
+						"type": "string",
+						"nullable": true
+					},
+					"companyNumber": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id",
+					"subfolderPath"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"mongoose.Types.Buffer": {
+				"properties": {
+					"data": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"Buffer"
+						],
+						"nullable": false
+					}
+				},
+				"required": [
+					"data",
+					"type"
+				],
+				"type": "object"
+			},
 			"DocumentFileType": {
 				"type": "string",
 				"enum": [
@@ -14,6 +195,605 @@
 					"image/png",
 					"application/pdf"
 				]
+			},
+			"DocumentFile": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/mongoose.Types.Buffer"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"type": {
+						"$ref": "#/components/schemas/DocumentFileType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Token": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"files": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"_id",
+					"createdAt",
+					"files"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"User": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"familyName",
+							"givenName"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string",
+								"nullable": true
+							},
+							"ldapauth": {
+								"type": "string",
+								"nullable": true
+							},
+							"microsoft": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"access": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"user",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"settings": {
+						"properties": {
+							"organisation": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/Organisation"
+									}
+								],
+								"nullable": true
+							},
+							"insurance": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/HealthInsurance"
+									}
+								],
+								"nullable": true
+							},
+							"lastCountries": {
+								"items": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"type": "array"
+							},
+							"lastCurrencies": {
+								"items": {
+									"$ref": "#/components/schemas/Currency"
+								},
+								"type": "array"
+							},
+							"language": {
+								"$ref": "#/components/schemas/Locale"
+							}
+						},
+						"required": [
+							"lastCountries",
+							"lastCurrencies",
+							"language"
+						],
+						"type": "object"
+					},
+					"vehicleRegistration": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"token": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Token"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id",
+					"fk",
+					"access",
+					"settings"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Meta": {
+				"properties": {
+					"count": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"countPages": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"count",
+					"page",
+					"limit",
+					"countPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_User-or-User-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/User"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/User"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IUser": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"familyName",
+							"givenName"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string",
+								"nullable": true
+							},
+							"ldapauth": {
+								"type": "string",
+								"nullable": true
+							},
+							"microsoft": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"access": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"user",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"settings": {
+						"properties": {
+							"organisation": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/Organisation"
+									}
+								],
+								"nullable": true
+							},
+							"insurance": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/HealthInsurance"
+									}
+								],
+								"nullable": true
+							},
+							"lastCountries": {
+								"items": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"type": "array"
+							},
+							"lastCurrencies": {
+								"items": {
+									"$ref": "#/components/schemas/Currency"
+								},
+								"type": "array"
+							},
+							"language": {
+								"$ref": "#/components/schemas/Locale"
+							}
+						},
+						"required": [
+							"lastCountries",
+							"lastCurrencies",
+							"language"
+						],
+						"type": "object"
+					},
+					"vehicleRegistration": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"token": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Token"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id",
+					"fk",
+					"access",
+					"settings"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IUser_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"type": "string",
+						"pattern": "^[0-9a-fA-F]{24}$"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"email",
+								"name",
+								"_id",
+								"fk",
+								"access",
+								"loseAccessAt",
+								"settings",
+								"vehicleRegistration",
+								"token"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_IUser_": {
+				"properties": {
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string"
+							},
+							"ldapauth": {
+								"type": "string"
+							},
+							"microsoft": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"access": {
+						"properties": {
+							"admin": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"user": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"admin",
+							"confirm/healthCareCost",
+							"examine/healthCareCost",
+							"examine/expenseReport",
+							"examine/travel",
+							"approve/travel",
+							"user"
+						],
+						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"settings": {
+						"properties": {
+							"organisation": {
+								"$ref": "#/components/schemas/Organisation"
+							},
+							"insurance": {
+								"$ref": "#/components/schemas/HealthInsurance"
+							},
+							"lastCountries": {
+								"items": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"type": "array"
+							},
+							"lastCurrencies": {
+								"items": {
+									"$ref": "#/components/schemas/Currency"
+								},
+								"type": "array"
+							},
+							"language": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							}
+						},
+						"required": [
+							"lastCountries",
+							"lastCurrencies",
+							"language"
+						],
+						"type": "object"
+					},
+					"vehicleRegistration": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array"
+					},
+					"token": {
+						"$ref": "#/components/schemas/Token"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"familyName",
+							"givenName"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"SetterBody_IUser_": {
+				"$ref": "#/components/schemas/Partial_IUser_",
+				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"File": {
 				"properties": {
@@ -43,7 +823,16 @@
 			"cookieAuth": {
 				"type": "apiKey",
 				"name": "abrechnung",
-				"in": "cookie"
+				"in": "cookie",
+				"scopes": {
+					"user": "make requests",
+					"approve/travel": "approve travel requests",
+					"examine/travel": "examine travel expense requests",
+					"examine/expenseReport": "examine expense report requests",
+					"examine/healthCareCost": "examine healthcare cost requests",
+					"confirm/healthCareCost": "confirm healthcare cost requests",
+					"admin": "admin"
+				}
 			}
 		}
 	},
@@ -53,6 +842,182 @@
 		"contact": {}
 	},
 	"paths": {
+		"/admin/user": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_User-or-User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"email",
+									"name",
+									"_id",
+									"fk",
+									"access",
+									"loseAccessAt",
+									"settings",
+									"vehicleRegistration",
+									"token"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "PostUser",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IUser_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user": {
+			"get": {
+				"operationId": "GetMe",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/token": {
+			"get": {
+				"operationId": "GetToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Token"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/upload/new": {
 			"get": {
 				"operationId": "UploadPage",
