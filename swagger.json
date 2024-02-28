@@ -463,6 +463,10 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"_id": {
+				"type": "string",
+				"pattern": "^[0-9a-fA-F]{24}$"
+			},
 			"IUser": {
 				"properties": {
 					"email": {
@@ -631,8 +635,7 @@
 						"minimum": 1
 					},
 					"_id": {
-						"type": "string",
-						"pattern": "^[0-9a-fA-F]{24}$"
+						"$ref": "#/components/schemas/_id"
 					},
 					"additionalFields": {
 						"items": {
@@ -660,115 +663,68 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_IUser_": {
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"Document": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/_id"
+					},
+					{
+						"properties": {
+							"_id": {
+								"$ref": "#/components/schemas/_id"
+							}
+						},
+						"required": [
+							"_id"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"UserSettingsPost": {
 				"properties": {
-					"fk": {
-						"properties": {
-							"magiclogin": {
-								"type": "string"
-							},
-							"ldapauth": {
-								"type": "string"
-							},
-							"microsoft": {
-								"type": "string"
-							}
-						},
-						"type": "object"
+					"language": {
+						"$ref": "#/components/schemas/Locale"
 					},
-					"access": {
-						"properties": {
-							"admin": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
-							"examine/healthCareCost": {
-								"type": "boolean"
-							},
-							"examine/expenseReport": {
-								"type": "boolean"
-							},
-							"examine/travel": {
-								"type": "boolean"
-							},
-							"approve/travel": {
-								"type": "boolean"
-							},
-							"user": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"admin",
-							"confirm/healthCareCost",
-							"examine/healthCareCost",
-							"examine/expenseReport",
-							"examine/travel",
-							"approve/travel",
-							"user"
-						],
-						"type": "object"
-					},
-					"loseAccessAt": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"settings": {
-						"properties": {
-							"organisation": {
-								"$ref": "#/components/schemas/Organisation"
-							},
-							"insurance": {
-								"$ref": "#/components/schemas/HealthInsurance"
-							},
-							"lastCountries": {
-								"items": {
-									"$ref": "#/components/schemas/CountrySimple"
-								},
-								"type": "array"
-							},
-							"lastCurrencies": {
-								"items": {
-									"$ref": "#/components/schemas/Currency"
-								},
-								"type": "array"
-							},
-							"language": {
-								"type": "string",
-								"enum": [
-									"de",
-									"en"
-								]
-							}
-						},
-						"required": [
-							"lastCountries",
-							"lastCurrencies",
-							"language"
-						],
-						"type": "object"
-					},
-					"vehicleRegistration": {
+					"lastCurrencies": {
 						"items": {
-							"$ref": "#/components/schemas/DocumentFile"
+							"$ref": "#/components/schemas/Currency"
 						},
 						"type": "array"
 					},
-					"token": {
-						"$ref": "#/components/schemas/Token"
+					"lastCountries": {
+						"items": {
+							"$ref": "#/components/schemas/CountrySimple"
+						},
+						"type": "array"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					"insurance": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Document"
+							}
+						],
+						"nullable": true
 					},
+					"organisation": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Document"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserPost": {
+				"properties": {
 					"email": {
 						"type": "string"
 					},
@@ -786,24 +742,99 @@
 							"givenName"
 						],
 						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string",
+								"nullable": true
+							},
+							"ldapauth": {
+								"type": "string",
+								"nullable": true
+							},
+							"microsoft": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"access": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"settings": {
+						"$ref": "#/components/schemas/UserSettingsPost"
 					}
 				},
+				"required": [
+					"email",
+					"name"
+				],
 				"type": "object",
-				"description": "Make all properties in T optional"
+				"additionalProperties": false
 			},
-			"SetterBody_IUser_": {
-				"$ref": "#/components/schemas/Partial_IUser_",
-				"description": "With _id everything else is optional. Without some fields may be required."
+			"DeleteResult": {
+				"properties": {
+					"acknowledged": {
+						"type": "boolean",
+						"description": "Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined."
+					},
+					"deletedCount": {
+						"type": "number",
+						"format": "double",
+						"description": "The number of documents that were deleted"
+					}
+				},
+				"required": [
+					"acknowledged",
+					"deletedCount"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"NativeDate": {
 				"type": "string"
 			},
-			"Required___id-mongoose.Types.ObjectId__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
-			},
-			"Partial_IUser-at-settings_": {
+			"Partial_UserSettingsPost_": {
 				"properties": {
 					"language": {
 						"type": "string",
@@ -825,10 +856,10 @@
 						"type": "array"
 					},
 					"insurance": {
-						"$ref": "#/components/schemas/HealthInsurance"
+						"$ref": "#/components/schemas/Document"
 					},
 					"organisation": {
-						"$ref": "#/components/schemas/Organisation"
+						"$ref": "#/components/schemas/Document"
 					}
 				},
 				"type": "object",
@@ -847,7 +878,7 @@
 						"format": "binary"
 					},
 					"_id": {
-						"type": "string"
+						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
@@ -881,7 +912,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/admin/user": {
+		"/api/admin/user": {
 			"get": {
 				"operationId": "GetUser",
 				"responses": {
@@ -933,8 +964,7 @@
 						"name": "_id",
 						"required": false,
 						"schema": {
-							"type": "string",
-							"pattern": "^[0-9a-fA-F]{24}$"
+							"$ref": "#/components/schemas/_id"
 						}
 					},
 					{
@@ -973,8 +1003,34 @@
 			"post": {
 				"operationId": "PostUser",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -994,14 +1050,50 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IUser_"
+								"$ref": "#/components/schemas/UserPost"
 							}
 						}
 					}
 				}
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
 			}
 		},
-		"/user": {
+		"/api/user": {
 			"get": {
 				"operationId": "GetMe",
 				"responses": {
@@ -1010,7 +1102,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/User"
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/User"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
 								}
 							}
 						}
@@ -1029,7 +1129,7 @@
 				"parameters": []
 			}
 		},
-		"/user/token": {
+		"/api/user/token": {
 			"get": {
 				"operationId": "GetToken",
 				"responses": {
@@ -1038,13 +1138,20 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Token"
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
 								}
 							}
 						}
 					}
 				},
 				"tags": [
+					"Upload",
 					"User"
 				],
 				"security": [
@@ -1064,6 +1171,7 @@
 					}
 				},
 				"tags": [
+					"Upload",
 					"User"
 				],
 				"security": [
@@ -1146,6 +1254,7 @@
 					}
 				},
 				"tags": [
+					"Upload",
 					"User"
 				],
 				"security": [
@@ -1158,7 +1267,7 @@
 				"parameters": []
 			}
 		},
-		"/user/settings": {
+		"/api/user/settings": {
 			"post": {
 				"operationId": "PostSettings",
 				"responses": {
@@ -1199,14 +1308,14 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Partial_IUser-at-settings_"
+								"$ref": "#/components/schemas/Partial_UserSettingsPost_"
 							}
 						}
 					}
 				}
 			}
 		},
-		"/user/vehicleRegistration": {
+		"/api/user/vehicleRegistration": {
 			"post": {
 				"operationId": "PostVehicleRegistration",
 				"responses": {
@@ -1515,6 +1624,48 @@
 						}
 					}
 				]
+			}
+		},
+		"/auth/logout": {
+			"delete": {
+				"operationId": "Logout",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Logout and delete session",
+				"summary": "Logout",
+				"tags": [
+					"Authentication"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/auth/authenticated": {
+			"get": {
+				"operationId": "Authenticated",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Empty method",
+				"summary": "Check if request is authenticated",
+				"tags": [
+					"Authentication"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": []
 			}
 		}
 	},
