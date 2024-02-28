@@ -795,6 +795,45 @@
 				"$ref": "#/components/schemas/Partial_IUser_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
+			"NativeDate": {
+				"type": "string"
+			},
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"Partial_IUser-at-settings_": {
+				"properties": {
+					"language": {
+						"type": "string",
+						"enum": [
+							"de",
+							"en"
+						]
+					},
+					"lastCurrencies": {
+						"items": {
+							"$ref": "#/components/schemas/Currency"
+						},
+						"type": "array"
+					},
+					"lastCountries": {
+						"items": {
+							"$ref": "#/components/schemas/CountrySimple"
+						},
+						"type": "array"
+					},
+					"insurance": {
+						"$ref": "#/components/schemas/HealthInsurance"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/Organisation"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
 			"File": {
 				"properties": {
 					"type": {
@@ -1016,6 +1055,214 @@
 					}
 				],
 				"parameters": []
+			},
+			"delete": {
+				"operationId": "DeleteToken",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "PostToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"properties": {
+														"updatedAt": {
+															"$ref": "#/components/schemas/NativeDate"
+														},
+														"createdAt": {
+															"$ref": "#/components/schemas/NativeDate"
+														}
+													},
+													"required": [
+														"updatedAt",
+														"createdAt"
+													],
+													"type": "object"
+												},
+												{
+													"properties": {
+														"files": {
+															"items": {
+																"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+															},
+															"type": "array"
+														}
+													},
+													"required": [
+														"files"
+													],
+													"type": "object"
+												},
+												{
+													"properties": {
+														"_id": {
+															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+														}
+													},
+													"required": [
+														"_id"
+													],
+													"type": "object"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/settings": {
+			"post": {
+				"operationId": "PostSettings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Partial_IUser-at-settings_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/vehicleRegistration": {
+			"post": {
+				"operationId": "PostVehicleRegistration",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"properties": {
+									"vehicleRegistration": {
+										"items": {
+											"$ref": "#/components/schemas/File"
+										},
+										"type": "array"
+									}
+								},
+								"required": [
+									"vehicleRegistration"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/upload/new": {
