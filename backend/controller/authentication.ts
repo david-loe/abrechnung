@@ -11,8 +11,6 @@ export async function expressAuthentication(req: Request, securityName: string, 
             throw new Error('alerts.request.unauthorized')
           }
         }
-      } else if (!req.user!.access['user']) {
-        throw new Error('alerts.request.unauthorized')
       }
       return req.user!
     } else {

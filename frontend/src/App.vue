@@ -237,10 +237,10 @@ export default defineComponent({
     },
     async logout() {
       try {
-        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/logout', {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/auth/logout', {
           withCredentials: true
         })
-        if (res.status === 200) {
+        if (res.status === 204) {
           this.auth = false
           this.$router.push({ path: '/login' })
         }

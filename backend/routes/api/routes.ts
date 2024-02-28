@@ -9,7 +9,6 @@ import Settings from '../../models/settings.js'
 import HealthInsurance from '../../models/healthInsurance.js'
 import Organisation from '../../models/organisation.js'
 import { Country as ICountry, accesses } from '../../../common/types.js'
-import userRoutes from './user.js'
 import travelRoutes from './travel.js'
 import documentFileRoutes from './documentFile.js'
 import expenseReportRoutes from './expenseReport.js'
@@ -28,7 +27,6 @@ router.use(async (req, res, next) => {
   }
 })
 
-router.use('/user', userRoutes)
 router.use('/travel', travelRoutes)
 router.use('/documentFile', documentFileRoutes)
 router.use('/expenseReport', expenseReportRoutes)
@@ -37,15 +35,6 @@ router.use('/admin', adminRoutes)
 router.use('/approve', approveRoutes)
 router.use('/examine', examineRoutes)
 router.use('/confirm', confirmRoutes)
-
-router.delete('/logout', function (req, res) {
-  req.logout(function (err) {
-    if (err) {
-      res.status(400).send({ error: err })
-    }
-  })
-  res.send({ status: 'ok' })
-})
 
 router.get('/settings', getter(Settings, 'settings', 1))
 router.get('/healthInsurance', getter(HealthInsurance, 'health insurance', 500))
@@ -81,8 +70,11 @@ router.get('/specialLumpSums', async (req, res) => {
 })
 
 const moreThanUser = accesses.filter((access) => access !== 'user')
-router.get('/users', [accessControl(moreThanUser), async (req: Request, res: Response) => {
-  return getter(User, 'user', 500, {}, { name: 1 })(req, res)
-}])
+router.get('/users', [
+  accessControl(moreThanUser),
+  async (req: Request, res: Response) => {
+    return getter(User, 'user', 500, {}, { name: 1 })(req, res)
+  }
+])
 
 export default router

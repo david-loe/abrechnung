@@ -2,7 +2,7 @@ import { Controller as TsoaController } from 'tsoa'
 import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mongoose'
 import { GETResponse, Meta } from '../../common/types.js'
 import { DeleteResult } from 'mongodb'
-import { ModuleType } from 'i18next'
+import { _id } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -15,10 +15,7 @@ export interface GetterQuery<ModelType> {
    * @minimum 1
    */
   page?: number
-  /**
-   * @pattern ^[0-9a-fA-F]{24}$
-   */
-  _id?: string
+  _id?: _id
   additionalFields?: (keyof ModelType)[]
   /**
    * @format byte
@@ -47,10 +44,7 @@ export interface SetterOptions<ModelType> {
 }
 
 export interface DeleterQuery {
-  /**
-   * @pattern ^[0-9a-fA-F]{24}$
-   */
-  _id: string
+  _id: _id
 }
 
 export interface DeleterOptions<ModelType> extends DeleterQuery {

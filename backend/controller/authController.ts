@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Route, SuccessResponse, Response, Get, Query, Tags, Middlewares, Request } from 'tsoa'
+import { Body, Controller, Post, Route, SuccessResponse, Response, Get, Query, Tags, Middlewares, Request, Delete, Security } from 'tsoa'
 import User, { UserDoc } from '../models/user.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import passport from 'passport'
@@ -103,4 +103,28 @@ export class AuthController extends Controller {
     this.setHeader('Location', process.env.VITE_FRONTEND_URL + redirect)
     this.setStatus(302)
   }
+}
+
+@Tags('Authentication')
+@Security('cookieAuth')
+@Route('auth')
+export class logoutController extends Controller {
+  /**
+   * Logout and delete session
+   * @summary Logout
+   */
+  @Delete('logout')
+  public logout(@Request() request: ExRequest) {
+    request.logout((err) => {
+      if (err) {
+        throw new Error(err)
+      }
+    })
+  }
+  /**
+   * Empty method
+   * @summary Check if request is authenticated
+   */
+  @Get('authenticated')
+  public authenticated(): void {}
 }

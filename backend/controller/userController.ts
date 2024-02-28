@@ -1,5 +1,5 @@
-import { Route, Get, Tags, Security, Queries, Request, Post, Body, Delete, Middlewares, Consumes, BodyProp } from 'tsoa'
-import { Controller, GetterOptions, GetterQuery, SetterBody } from './controller.js'
+import { Route, Get, Tags, Security, Queries, Request, Post, Body, Delete, Middlewares, Consumes, BodyProp, Query } from 'tsoa'
+import { Controller, DeleterQuery, GetterOptions, GetterQuery } from './controller.js'
 import multer from 'multer'
 import User from '../models/user.js'
 import Token from '../models/token.js'
@@ -8,22 +8,22 @@ import { Request as ExRequest } from 'express'
 import { sendMail } from '../mail/mail.js'
 import i18n from '../i18n.js'
 import { documentFileHandler } from '../helper.js'
-import { File } from './types.js'
+import { File, UserPost, UserSettingsPost, _id } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('Admin', 'User')
-@Route('admin')
+@Route('api/admin/user')
 @Security('cookieAuth', ['admin'])
 export class UserAdminController extends Controller {
-  @Get('user')
-  public getUser(@Queries() query: GetterQuery<IUser>) {
+  @Get()
+  public async getUser(@Queries() query: GetterQuery<IUser>) {
     const options: GetterOptions<IUser> = {}
-    return this.getter(User, Object.assign({}, query, options))
+    return await this.getter(User, Object.assign({}, query, options))
   }
 
-  @Post('user')
-  public postUser(@Body() requestBody: SetterBody<IUser>) {
+  @Post()
+  public async postUser(@Body() requestBody: UserPost) {
     var cb: ((data: IUser) => any) | undefined = undefined
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
       cb = (user: IUser) => {
@@ -36,44 +36,52 @@ export class UserAdminController extends Controller {
         )
       }
     }
-    this.setter(User, { requestBody, allowNew: true, cb })
+    return await this.setter(User, { requestBody: requestBody as unknown as IUser, allowNew: true, cb })
+  }
+
+  @Delete()
+  public async deleteUser(@Query() _id: _id) {
+    return await this.deleter(User, { _id })
   }
 }
 
 @Tags('User')
-@Route('user')
+@Route('api/user')
 @Security('cookieAuth', ['user'])
 export class UserController extends Controller {
   @Get()
   public getMe(@Request() request: ExRequest) {
-    return request.user! as IUser
+    return { data: request.user! as IUser }
   }
 
+  @Tags('Upload')
   @Get('token')
   public getToken(@Request() request: ExRequest) {
-    return request.user!.token as IToken
+    return { data: request.user!.token }
   }
 
+  @Tags('Upload')
   @Delete('token')
   public async deleteToken(@Request() request: ExRequest) {
     request.user!.token = undefined
     await request.user!.save()
   }
 
+  @Tags('Upload')
   @Post('token')
   public async postToken(@Request() request: ExRequest) {
     const token = (await new Token().save()).toObject()
     request.user!.token = token as unknown as any
     await request.user!.save()
-    return { message: i18n.t('alerts.successSaving'), result: token }
+    return { message: 'alerts.successSaving', result: token }
   }
 
   @Post('settings')
-  public async postSettings(@Body() requestBody: Partial<IUser['settings']>, @Request() request: ExRequest) {
+  public async postSettings(@Body() requestBody: Partial<UserSettingsPost>, @Request() request: ExRequest) {
     Object.assign(request.user!.settings, requestBody)
     request.user!.markModified('settings')
     const result = await request.user!.save()
-    return { message: i18n.t('alerts.successSaving'), result: result.settings }
+    return { message: 'alerts.successSaving', result: result.settings }
   }
 
   @Post('vehicleRegistration')
@@ -83,6 +91,6 @@ export class UserController extends Controller {
     request.user!.vehicleRegistration = vehicleRegistration as unknown as any
     request.user!.markModified('vehicleRegistration')
     const result = await request.user!.save()
-    return { message: i18n.t('alerts.successSaving'), result: result }
+    return { message: 'alerts.successSaving', result: result }
   }
 }
