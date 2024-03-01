@@ -1,9 +1,5 @@
-import { CountrySimple, Currency, DocumentFileType, Locale, Contact, Access } from '../../common/types.js'
+import { CountrySimple, Currency, DocumentFileType, Locale, Contact, Access, _id } from '../../common/types.js'
 
-/**
- * @pattern ^[0-9a-fA-F]{24}$
- */
-export type _id = string
 type Document = _id | { _id: _id }
 
 export interface File {

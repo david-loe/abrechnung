@@ -48,7 +48,7 @@
           {{ $t('labels.organisation') }}
         </label>
         <select class="form-select" id="userSettingsFormOrganisation" v-model="formUser.settings.organisation">
-          <option v-for="organisation of $root.organisations" :value="organisation._id" :key="organisation._id">
+          <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
             {{ organisation.name }}
           </option>
         </select>
@@ -58,7 +58,7 @@
           {{ $t('labels.insurance') }}
         </label>
         <select class="form-select" id="userSettingsFormInsurance" v-model="formUser.settings.insurance">
-          <option v-for="insurance of $root.healthInsurances" :value="insurance._id" :key="insurance._id">{{ insurance.name }}</option>
+          <option v-for="insurance of $root.healthInsurances" :value="insurance" :key="insurance._id">{{ insurance.name }}</option>
         </select>
       </div>
     </div>

@@ -49,7 +49,7 @@ export async function initDB() {
   await initer<any>(Currency, 'currencies', currencies)
   await initer<any>(Country, 'countries', countries)
   await addLumpSumsToCountries(iLumpSums)
-  initer(HealthInsurance, 'health insurances', healthInsurances)
+  initer<any>(HealthInsurance, 'health insurances', healthInsurances)
   initer<any>(Organisation, 'organisation', organisations)
 }
 

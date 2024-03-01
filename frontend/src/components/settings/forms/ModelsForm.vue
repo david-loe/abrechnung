@@ -96,8 +96,8 @@ export default defineComponent({
       if (this.model) {
         const res = (await this.$root.getter<any[]>(this.model.GET ? this.model.GET : this.model.name)).ok
         if (res) {
-          if (res.data.length == 1) {
-            this.object = res.data[0]
+          if (res.data.length !== 0 && !res.data.length) {
+            this.object = res.data
           } else {
             this.objects = res.data
           }

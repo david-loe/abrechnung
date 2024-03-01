@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose'
+import { HealthInsurance } from '../../common/types.js'
 
-const healthInsuranceSchema = new Schema({
+const healthInsuranceSchema = new Schema<HealthInsurance>({
   name: { type: String, trim: true, required: true },
   email: { type: String, trim: true, required: true }
 })
 
-export default model('HealthInsurance', healthInsuranceSchema)
+export default model<HealthInsurance>('HealthInsurance', healthInsuranceSchema)

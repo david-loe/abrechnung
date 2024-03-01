@@ -1,8 +1,7 @@
 import { Controller as TsoaController } from 'tsoa'
 import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mongoose'
-import { GETResponse, Meta } from '../../common/types.js'
+import { GETResponse, Meta, _id } from '../../common/types.js'
 import { DeleteResult } from 'mongodb'
-import { _id } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -23,7 +22,8 @@ export interface GetterQuery<ModelType> {
   filterJSON?: string
 }
 
-export interface GetterOptions<ModelType> extends GetterQuery<ModelType> {
+export interface GetterOptions<ModelType> {
+  query: GetterQuery<ModelType>
   filter?: FilterQuery<ModelType>
   projection?: ProjectionType<ModelType>
   sortFn?: (a: ModelType, b: ModelType) => number
@@ -53,20 +53,21 @@ export interface DeleterOptions<ModelType> extends DeleterQuery {
 }
 
 export class Controller extends TsoaController {
-  async getter<ModelType>(model: Model<ModelType>, options: GetterOptions<ModelType> = {}): Promise<GETResponse<ModelType | ModelType[]>> {
-    options.limit ||= 0
-    options.page ||= 1
+  async getter<ModelType>(model: Model<ModelType>, options: GetterOptions<ModelType>): Promise<GETResponse<ModelType | ModelType[]>> {
+    options.query.limit ||= 0
+    options.query.page ||= 1
     options.filter ||= {}
     options.projection ||= {}
 
     const meta: Meta = {
-      limit: options.limit,
-      page: options.page,
+      limit: options.query.limit,
+      page: options.query.page,
       count: 1,
       countPages: 1
     }
-    if (Object.keys(options.projection).length > 0 && options.additionalFields && options.allowedAdditionalFields) {
-      for (const additionalField of options.additionalFields) {
+
+    if (Object.keys(options.projection).length > 0 && options.query.additionalFields && options.allowedAdditionalFields) {
+      for (const additionalField of options.query.additionalFields) {
         if (options.allowedAdditionalFields.indexOf(additionalField) !== -1) {
           //@ts-ignore
           if (options.projection[additionalField] === 0) {
@@ -79,8 +80,8 @@ export class Controller extends TsoaController {
         }
       }
     }
-    if (options._id) {
-      var conditions: any = Object.assign({ _id: options._id }, options.filter)
+    if (options.query._id) {
+      var conditions: any = Object.assign({ _id: options.query._id }, options.filter)
       const result = (await model.findOne(conditions, options.projection).lean()) as ModelType
       if (result !== null) {
         if (options.cb) {
@@ -88,12 +89,12 @@ export class Controller extends TsoaController {
         }
         return { data: result, meta }
       } else {
-        throw new Error(`No ${model.modelName} for _id: '${options._id}' found.`)
+        throw new Error(`No ${model.modelName} for _id: '${options.query._id}' found.`)
       }
     } else {
       var conditions: any = {}
-      if (options.filterJSON) {
-        conditions = JSON.parse(Buffer.from(options.filterJSON, 'base64').toString())
+      if (options.query.filterJSON) {
+        conditions = JSON.parse(Buffer.from(options.query.filterJSON, 'base64').toString())
       }
       if (Object.keys(options.filter).length > 0) {
         if (!('$and' in conditions)) {
@@ -121,7 +122,7 @@ export class Controller extends TsoaController {
     }
   }
 
-  async setter<ModelType extends { _id: string | Types.ObjectId }>(model: Model<ModelType>, options: SetterOptions<ModelType>) {
+  async setter<ModelType extends { _id?: Types.ObjectId | string }>(model: Model<ModelType>, options: SetterOptions<ModelType>) {
     if (options.requestBody._id) {
       var oldObject = await model.findOne({ _id: options.requestBody._id })
       if (!oldObject) {

@@ -132,7 +132,7 @@
 
           <span class="ps-2 text-muted">
             © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
-            <small v-if="settings.version"
+            <small v-if="settings"
               ><a
                 class="text-decoration-none link-dark"
                 target="_blank"
@@ -206,7 +206,7 @@ export default defineComponent({
           this.getter<User>('user'),
           this.getter<Currency[]>('currency'),
           this.getter<CountrySimple[]>('country'),
-          this.getter<Settings[]>('settings'),
+          this.getter<Settings>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
           this.getter<OrganisationSimple[]>('organisation'),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
@@ -222,7 +222,7 @@ export default defineComponent({
           this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
           this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
           this.settings =
-            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data[0] : ({} as Settings)) : ({} as Settings)
+            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
           this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
           this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}

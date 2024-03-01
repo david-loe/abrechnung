@@ -1,5 +1,10 @@
 import { Types } from 'mongoose'
 
+/**
+ * @pattern ^[0-9a-fA-F]{24}$
+ */
+export type _id = Types.ObjectId
+
 export interface Settings {
   accessIcons: { [key in Access]: string[] }
   allowSpouseRefund: boolean
@@ -22,8 +27,17 @@ export interface Settings {
   allowTravelApplicationForThePast: boolean
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   version: string
+  /**
+   * @Hidden
+   */
   migrateFrom?: string | null
+  _id: _id
 }
+
+/**
+ * @pattern ^[A-Z]{2}$
+ */
+type CountryCode = string
 
 export interface CountrySimple {
   name: {
@@ -34,7 +48,7 @@ export interface CountrySimple {
     de: string[]
     en?: string[]
   }
-  _id: string
+  _id: CountryCode
   flag?: string | null
   currency?: Currency | null
 }
@@ -58,12 +72,17 @@ export interface ExchangeRate {
   month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 }
 
+/**
+ * @pattern ^[A-Z]{3}$
+ */
+type CurrencyCode = string
+
 export interface Currency {
   name: {
     de: string
     en: string
   }
-  _id: string
+  _id: CurrencyCode
   subunit?: string | null
   symbol?: string | null
   flag?: string | null
@@ -77,14 +96,14 @@ export interface Place {
 
 export interface DocumentFile {
   data: Types.Buffer
-  owner: Types.ObjectId
+  owner: _id
   type: DocumentFileType
   name: string
-  _id?: Types.ObjectId
+  _id?: _id
 }
 
 export interface Token {
-  _id: Types.ObjectId
+  _id: _id
   createdAt: Date | string
   files: DocumentFile[]
 }
@@ -95,18 +114,18 @@ export interface Contact {
 }
 
 export interface UserSimple extends Contact {
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface HealthInsurance {
   name: string
   email: string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface OrganisationSimple {
   name: string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Organisation extends OrganisationSimple {
@@ -165,13 +184,13 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Expense {
   description: string
   cost: Cost
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface TravelExpense extends Expense {
@@ -184,7 +203,7 @@ export type Record = Stage | TravelExpense
 export interface Comment {
   text: string
   author: UserSimple
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface TravelComment extends Comment {
@@ -217,10 +236,10 @@ export interface TravelSimple extends RequestSimple {
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | {
-    type: 'ownCar'
-    distance: number
-    distanceRefundType: DistanceRefundType
-  }
+      type: 'ownCar'
+      distance: number
+      distanceRefundType: DistanceRefundType
+    }
 
 export interface Refund {
   type: LumpsumType
@@ -236,7 +255,7 @@ export interface TravelDay {
   }
   purpose: PurposeSimple
   refunds: Refund[]
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface RequestSimple {
@@ -247,14 +266,14 @@ export interface RequestSimple {
   editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
   lastPlaceOfWork: Place
   professionalShare: number | null
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   stages: Stage[]
   expenses: TravelExpense[]
@@ -268,7 +287,7 @@ export interface ExpenseReportSimple extends RequestSimple {
 }
 
 export interface ExpenseReport extends ExpenseReportSimple {
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   expenses: Expense[]
 }
@@ -283,7 +302,7 @@ export interface HealthCareCostSimple extends RequestSimple {
 }
 
 export interface HealthCareCost extends HealthCareCostSimple {
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   expenses: Expense[]
 }
