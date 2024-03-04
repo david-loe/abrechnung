@@ -9,8 +9,10 @@ tasks:
 ports:
   - name: frontend
     port: 5000
+    visibility: public
   - name: backend
     port: 8000
+    visibility: public
   - name: inbucket
     port: 9000
   - name: mongo-express
