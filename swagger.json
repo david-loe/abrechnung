@@ -1705,6 +1705,605 @@
 				"$ref": "#/components/schemas/Partial_IHealthInsurance_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
+			"Cost": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Expense": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"description",
+					"cost",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseReportState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork"
+				]
+			},
+			"UserSimple": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"familyName",
+							"givenName"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseReportComment": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"_id",
+					"toState"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelState": {
+				"type": "string",
+				"enum": [
+					"rejected",
+					"appliedFor",
+					"approved",
+					"underExamination",
+					"refunded"
+				]
+			},
+			"HealthCareCostState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork",
+					"underExaminationByInsurance"
+				]
+			},
+			"AnyState": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/TravelState"
+					},
+					{
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					{
+						"$ref": "#/components/schemas/ExpenseReportState"
+					}
+				]
+			},
+			"OrganisationSimple": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseReport": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/ExpenseReportComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"comments",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_ExpenseReport-or-ExpenseReport-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ExpenseReport"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/ExpenseReport"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IExpenseReport": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/ExpenseReportComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"comments",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IExpenseReport_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"name",
+								"owner",
+								"state",
+								"organisation",
+								"editor",
+								"createdAt",
+								"updatedAt",
+								"_id",
+								"state",
+								"comments",
+								"comment",
+								"history",
+								"historic",
+								"expenses"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CostPost": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/File"
+						},
+						"type": "array"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpensePost": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/CostPost"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"description",
+					"cost"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_IExpenseReport_": {
+				"properties": {
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense"
+						},
+						"type": "array"
+					},
+					"state": {
+						"type": "string",
+						"enum": [
+							"underExamination",
+							"refunded",
+							"inWork"
+						]
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/ExpenseReportComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"SetterBody_IExpenseReport_": {
+				"$ref": "#/components/schemas/Partial_IExpenseReport_",
+				"description": "With _id everything else is optional. Without some fields may be required."
+			},
 			"GETResponse_Currency-or-Currency-Array_": {
 				"properties": {
 					"data": {
@@ -1807,11 +2406,6 @@
 				},
 				"type": "object",
 				"additionalProperties": false
-			},
-			"Required___id-string__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
 			},
 			"Partial_ICurrency_": {
 				"properties": {
@@ -2714,14 +3308,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-												}
-											]
+											"$ref": "#/components/schemas/User"
 										},
 										"message": {
 											"type": "string"
@@ -2927,14 +3514,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Settings"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-												}
-											]
+											"$ref": "#/components/schemas/Settings"
 										},
 										"message": {
 											"type": "string"
@@ -3152,14 +3732,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Organisation"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-												}
-											]
+											"$ref": "#/components/schemas/Organisation"
 										},
 										"message": {
 											"type": "string"
@@ -3328,14 +3901,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/HealthInsurance"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-												}
-											]
+											"$ref": "#/components/schemas/HealthInsurance"
 										},
 										"message": {
 											"type": "string"
@@ -3391,6 +3957,335 @@
 				"tags": [
 					"Admin",
 					"HealthInsurance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/expenseReport": {
+			"get": {
+				"operationId": "GetExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport-or-ExpenseReport-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"comments",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/expenseReport/expense": {
+			"post": {
+				"operationId": "PostExpense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ExpensePost"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/admin/expenseReport": {
+			"post": {
+				"operationId": "PostExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IExpenseReport_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"ExpenseReport"
 				],
 				"security": [
 					{
@@ -3664,14 +4559,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Currency"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-string__"
-												}
-											]
+											"$ref": "#/components/schemas/Currency"
 										},
 										"message": {
 											"type": "string"
@@ -3887,14 +4775,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Country"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-string__"
-												}
-											]
+											"$ref": "#/components/schemas/Country"
 										},
 										"message": {
 											"type": "string"
