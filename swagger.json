@@ -1705,37 +1705,6 @@
 				"$ref": "#/components/schemas/Partial_IHealthInsurance_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
-			"Partial_IDocumentFile_": {
-				"properties": {
-					"data": {
-						"type": "string",
-						"format": "byte"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"type": {
-						"type": "string",
-						"enum": [
-							"image/jpeg",
-							"image/png",
-							"application/pdf"
-						]
-					},
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_IDocumentFile_": {
-				"$ref": "#/components/schemas/Partial_IDocumentFile_",
-				"description": "With _id everything else is optional. Without some fields may be required."
-			},
 			"GETResponse_Currency-or-Currency-Array_": {
 				"properties": {
 					"data": {
@@ -3507,62 +3476,48 @@
 				]
 			}
 		},
-		"/api/admin/documentFile": {
-			"post": {
-				"operationId": "PostDocumentFile",
+		"/api/examine/documentFile": {
+			"get": {
+				"operationId": "GetDocumentFile",
 				"responses": {
 					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/DocumentFile"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-												}
-											]
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"result",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
+						"description": ""
 					}
 				},
 				"tags": [
-					"Admin",
+					"Examine",
 					"DocumentFile"
 				],
 				"security": [
 					{
 						"cookieAuth": [
-							"admin"
+							"user",
+							"examine/travel"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/expenseReport"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/healthCareCost"
 						]
 					}
 				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IDocumentFile_"
-							}
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
 						}
 					}
-				}
+				]
 			},
 			"delete": {
 				"operationId": "DeleteDocumentFile",
@@ -3579,13 +3534,26 @@
 					}
 				},
 				"tags": [
-					"Admin",
+					"Examine",
 					"DocumentFile"
 				],
 				"security": [
 					{
 						"cookieAuth": [
-							"admin"
+							"user",
+							"examine/travel"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/expenseReport"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/healthCareCost"
 						]
 					}
 				],
