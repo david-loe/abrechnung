@@ -1,7 +1,7 @@
 import { Route, Get, Tags, Security, Request, Post, Body, Delete, Query, Produces, SuccessResponse } from 'tsoa'
 import { Controller, SetterBody } from './controller.js'
 import DocumentFile from '../models/documentFile.js'
-import { DocumentFile as IDocumentFile, _id } from '../../common/types.js'
+import { documentFileTypes, DocumentFile as IDocumentFile, _id } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import { mongo } from 'mongoose'
 
@@ -10,15 +10,15 @@ import { mongo } from 'mongoose'
 @Security('cookieAuth', ['user'])
 export class DocumentFileController extends Controller {
   @Get()
-  @Produces('application/pdf')
-  @Produces('image/png')
-  @Produces('image/jpg')
+  @Produces(documentFileTypes[0])
+  @Produces(documentFileTypes[1])
+  @Produces(documentFileTypes[2])
   @SuccessResponse(200)
   public async getDocumentFile(@Query() _id: _id, @Request() request: ExRequest) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
   if (file && request.user!._id.equals(file.owner._id)) {
-    this.setHeader('Content-Type', file.type)
-    this.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
+    request.res?.setHeader('Content-Type', file.type)
+    request.res?.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
     request.res?.send((file.data as any as mongo.Binary).buffer)
   } else {
     throw new Error('alerts.request.unauthorized')

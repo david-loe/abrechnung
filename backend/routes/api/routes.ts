@@ -2,7 +2,6 @@ import express from 'express'
 const router = express.Router()
 import { UserDoc } from '../../models/user.js'
 import travelRoutes from './travel.js'
-import documentFileRoutes from './documentFile.js'
 import expenseReportRoutes from './expenseReport.js'
 import healthCareCostRoutes from './healthCareCost.js'
 import approveRoutes from './approve/routes.js'
@@ -19,7 +18,6 @@ router.use(async (req, res, next) => {
 })
 
 router.use('/travel', travelRoutes)
-router.use('/documentFile', documentFileRoutes)
 router.use('/expenseReport', expenseReportRoutes)
 router.use('/healthCareCost', healthCareCostRoutes)
 router.use('/approve', approveRoutes)
