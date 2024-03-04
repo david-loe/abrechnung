@@ -2,8 +2,8 @@ tasks:
   - name: Start
     init: |
       cp .env.example .env &&
-      sed -i 's/^VITE_FRONTEND_URL=.*/VITE_FRONTEND_URL=$(gp url 5000)/g' .env
-      sed -i 's/^VITE_BACKEND_URL=.*/VITE_BACKEND_URL=$(gp url 8000)/g' .env
+      sed -i 's@^VITE_FRONTEND_URL=.*@VITE_FRONTEND_URL='"$(gp url 5000)"'@g' .env
+      sed -i 's@^VITE_BACKEND_URL=.*@VITE_BACKEND_URL='"$(gp url 8000)"'@g' .env
     command: docker compose up
 
 ports:
