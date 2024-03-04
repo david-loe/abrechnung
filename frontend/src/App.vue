@@ -266,10 +266,10 @@ export default defineComponent({
         }
         return { ok: res.data }
       } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
-        } else {
-          if (showAlert) {
+        if(showAlert){
+          if (error.response.status === 401) {
+            this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
+          } else {
             console.log(error.response.data)
             this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
           }
