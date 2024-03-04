@@ -29,8 +29,8 @@ export default defineComponent({
     showDropdown: { type: Boolean, default: false }
   },
   methods: {
-    async deleteTravel(id: string): Promise<void> {
-      const result = await this.$root.deleter('travel', { id: id })
+    async deleteTravel(_id: string): Promise<void> {
+      const result = await this.$root.deleter('travel', { _id })
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }

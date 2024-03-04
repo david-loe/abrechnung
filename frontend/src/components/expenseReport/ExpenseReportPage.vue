@@ -248,7 +248,7 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteExpenseReport() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', {_id: this._id} )
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -288,8 +288,8 @@ export default defineComponent({
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { id: id, expenseReportId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, expenseReportId: this._id })
       if (result) {
         await this.getExpenseReport()
         this.hideModal()

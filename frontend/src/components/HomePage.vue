@@ -180,8 +180,8 @@ export default defineComponent({
         this.$router.push('/healthCareCost/' + result._id)
       }
     },
-    async deleteTravel(id: string) {
-      const result = await this.$root.deleter('travel', { id: id })
+    async deleteTravel(_id: string) {
+      const result = await this.$root.deleter('travel', {_id})
       if (result) {
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()

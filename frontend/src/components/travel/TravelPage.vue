@@ -576,7 +576,7 @@ export default defineComponent({
       }
     },
     async deleteTravel() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -617,8 +617,8 @@ export default defineComponent({
         }
       }
     },
-    async deleteStage(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { id: id, travelId: this._id })
+    async deleteStage(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()
@@ -638,8 +638,8 @@ export default defineComponent({
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { id: id, travelId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, travelId: this._id })
       if (result) {
         await this.getTravel()
         this.hideModal()

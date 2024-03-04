@@ -133,7 +133,7 @@ export default defineComponent({
       this.userToEdit = undefined
     },
     async deleteUser(user: User) {
-      const result = await this.$root.deleter('admin/user', { id: user._id })
+      const result = await this.$root.deleter('admin/user', { _id: user._id })
       if (result) {
         this.getUsers()
       }

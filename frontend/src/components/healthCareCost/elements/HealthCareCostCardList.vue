@@ -27,8 +27,8 @@ export default defineComponent({
     showDropdown: { type: Boolean, default: false }
   },
   methods: {
-    async deleteHealthCareCost(id: string): Promise<void> {
-      const result = await this.$root.deleter('healthCareCost', { id: id })
+    async deleteHealthCareCost(_id: string): Promise<void> {
+      const result = await this.$root.deleter('healthCareCost', { _id })
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }

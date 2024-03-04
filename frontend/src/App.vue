@@ -301,7 +301,7 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-    async deleter(endpoint: string, params: { [key: string]: any; id: string }, ask = true, showAlert = true): Promise<boolean> {
+    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false
@@ -313,7 +313,7 @@ export default defineComponent({
           withCredentials: true
         })
         if (res.status === 200) {
-          if (showAlert) this.addAlert({ message: '', title: res.data.message, type: 'success' })
+          if (showAlert) this.addAlert({ message: '', title: this.$t('alerts.successDeleting'), type: 'success' })
           return true
         }
       } catch (error: any) {

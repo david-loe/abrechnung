@@ -297,7 +297,7 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteHealthCareCost() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { _id: this._id })
       if (result) {
         this.$router.push({ path: this.parentPages[0].link })
       }
@@ -371,8 +371,8 @@ export default defineComponent({
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { id: id, healthCareCostId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, healthCareCostId: this._id })
       if (result) {
         await this.getHealthCareCost()
         this.hideModal()

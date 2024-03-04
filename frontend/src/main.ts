@@ -32,7 +32,7 @@ declare module '@vue/runtime-core' {
     $root: {
       getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
       setter: <T>(endpoint: string, data: any, config?: {}, showAlert?: Boolean) => Promise<{ ok?: T; error?: any }>
-      deleter: (endpoint: string, params: { [key: string]: any; id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean>
+      deleter: (endpoint: string, params: { [key: string]: any; _id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean>
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
