@@ -380,7 +380,7 @@ export default defineComponent({
     },
     async getHealthCareCost() {
       const params: any = {
-        id: this._id,
+        _id: this._id,
         addExpenses: true
       }
       if (this.endpointPrefix === 'examine/') {

@@ -719,7 +719,7 @@ export default defineComponent({
     async getTravel() {
       const oldTravel = this.travel
       const params: any = {
-        id: this._id,
+        _id: this._id,
         addStages: true,
         addExpenses: true,
         addDays: true
