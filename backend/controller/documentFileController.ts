@@ -27,13 +27,7 @@ export class DocumentFileController extends Controller {
 
   @Delete()
   public async deleteDocumentFile(@Query() _id: _id, @Request() request: ExRequest){
-    return await this.deleter(DocumentFile, { _id: _id, async checkOldObject(oldObject) {
-      if(request.user!._id.equals(oldObject.owner._id)){
-        return true
-      }else{
-        throw Error('alerts.request.unauthorized')
-      }
-    }, })
+    return await this.deleter(DocumentFile, { _id: _id, checkOldObject: this.checkOwner(request.user!) })
   }
 }
 

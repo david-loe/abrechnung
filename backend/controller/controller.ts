@@ -1,6 +1,6 @@
 import { Controller as TsoaController } from 'tsoa'
 import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mongoose'
-import { GETResponse, Meta, _id } from '../../common/types.js'
+import { GETResponse, Meta, User, _id } from '../../common/types.js'
 import { DeleteResult } from 'mongodb'
 
 export interface GetterQuery<ModelType> {
@@ -36,11 +36,17 @@ export interface GetterOptions<ModelType> {
  */
 export type SetterBody<ModelType> = Partial<ModelType>
 
-export interface SetterOptions<ModelType> {
+export interface SetterOptions<ModelType, CheckType = ModelType> {
   requestBody: SetterBody<ModelType>
-  cb?: (data: ModelType) => any
+  cb?: (data: CheckType) => any
   allowNew?: boolean
-  checkOldObject?: (oldObject: HydratedDocument<ModelType>) => Promise<boolean>
+  checkOldObject?: (oldObject: HydratedDocument<CheckType>) => Promise<boolean>
+}
+
+export interface SetterForArrayElementOptions<ModelType, ArrayElementType> extends SetterOptions<ArrayElementType, ModelType>{
+  arrayElementKey: (keyof ModelType)
+  parentId: _id
+  sortFn?: (a: ArrayElementType, b: ArrayElementType) => number
 }
 
 export interface DeleterQuery {
@@ -50,6 +56,15 @@ export interface DeleterQuery {
 export interface DeleterOptions<ModelType> extends DeleterQuery {
   cb?: (data: DeleteResult) => any
   checkOldObject?: (oldObject: HydratedDocument<ModelType>) => Promise<boolean>
+}
+
+export interface DeleterForArrayElemetQuery extends DeleterQuery {
+  parentId: _id
+}
+
+export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType = any> extends DeleterOptions<ModelType>, DeleterForArrayElemetQuery {
+  arrayElementKey: (keyof ModelType)
+  beforeDelete?(element: ArrayElementType): Promise<any>
 }
 
 export class Controller extends TsoaController {
@@ -123,6 +138,7 @@ export class Controller extends TsoaController {
   }
 
   async setter<ModelType extends { _id?: Types.ObjectId | string }>(model: Model<ModelType>, options: SetterOptions<ModelType>) {
+    var result: ModelType
     if (options.requestBody._id) {
       var oldObject = await model.findOne({ _id: options.requestBody._id })
       if (!oldObject) {
@@ -132,20 +148,52 @@ export class Controller extends TsoaController {
         throw new Error(`Not allowed to modify this ${model.modelName}`)
       }
       Object.assign(oldObject, options.requestBody)
-      const result = (await oldObject.save()).toObject()
-      if (options.cb) {
-        options.cb(result)
-      }
-      return { message: 'alerts.successSaving', result }
+      result = (await oldObject.save()).toObject()
     } else if (options.allowNew) {
-      const result = (await new model(options.requestBody).save()).toObject()
-      if (options.cb) {
-        options.cb(result)
-      }
-      return { message: 'alerts.successSaving', result }
+      result = (await new model(options.requestBody).save()).toObject()
     } else {
       throw Error(`Not allowed to create a new ${model.modelName}`)
     }
+    if (options.cb) {
+      options.cb(result)
+    }
+    return { message: 'alerts.successSaving', result }
+  }
+
+  async setterForArrayElement<ModelType extends { _id?: Types.ObjectId | string },  ArrayElementType extends { _id?: Types.ObjectId | string }>(model: Model<ModelType>, options: SetterForArrayElementOptions<ModelType, ArrayElementType>){
+    const parentObject = await model.findOne({ _id: options.parentId })
+    if (!parentObject) {
+      throw new Error(`No ${model.modelName} for _id: '${options.parentId}' found.`)
+    }
+    if(options.checkOldObject && !(await options.checkOldObject(parentObject))){
+      throw new Error(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
+    }
+    if (options.requestBody._id && options.requestBody._id !== '') {
+      var found = false
+      for (const arrayElement of parentObject[options.arrayElementKey] as Array<ArrayElementType>) {
+        if ((arrayElement._id! as Types.ObjectId).equals(options.requestBody._id)) {
+          found = true
+          Object.assign(arrayElement, options.requestBody)
+          break
+        }
+      }
+      if (!found) {
+        throw new Error(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
+      }
+    } else if (options.allowNew) {
+      (parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
+    }else {
+      throw Error(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
+    }
+    if(options.sortFn){
+      (parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
+    }
+    parentObject.markModified(options.arrayElementKey)
+    const result: ModelType = (await parentObject.save()).toObject()
+    if (options.cb) {
+      options.cb(result)
+    }
+    return { message: 'alerts.successSaving', result: result }
   }
 
   async deleter<ModelType>(model: Model<ModelType>, options: DeleterOptions<ModelType>) {
@@ -161,5 +209,46 @@ export class Controller extends TsoaController {
       options.cb(result)
     }
     return result
+  }
+
+  async deleterForArrayElement<ModelType>(model: Model<ModelType>, options: DeleterForArrayElemetOptions<ModelType>){
+    const parentObject = await model.findOne({ _id: options.parentId })
+    if (!parentObject) {
+      throw new Error(`No ${model.modelName} for _id: '${options.parentId}' found.`)
+    }
+    if(options.checkOldObject && !(await options.checkOldObject(parentObject))){
+      throw new Error(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
+    }
+    var found = false
+    for (var i = 0; i < (parentObject[options.arrayElementKey] as Array<{_id: _id}>).length; i++) {
+      if ((parentObject[options.arrayElementKey] as Array<{_id: _id}>)[i]._id.equals(options._id)) {
+        found = true
+        if(options.beforeDelete){
+          await options.beforeDelete((parentObject[options.arrayElementKey] as Array<any>)[i])
+        }
+        ;(parentObject[options.arrayElementKey] as Array<any>).splice(i, 1)
+        break
+      }
+    }
+    if (!found) {
+      throw new Error(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options._id}' found.`)
+    }
+    parentObject.markModified(options.arrayElementKey)
+    const result: ModelType = (await parentObject.save()).toObject()
+    if (options.cb) {
+      options.cb({acknowledged: true, deletedCount: 1})
+    }
+    return { message: 'alerts.successDeleting', result: result }
+    
+  }
+
+  checkOwner(requestUser: User){
+    return async function(oldObject: {owner: {_id: Types.ObjectId | string} }) {
+      if(requestUser._id.equals(oldObject.owner._id)){
+        return true
+      }else{
+        throw Error('alerts.request.unauthorized')
+      }
+    }
   }
 }

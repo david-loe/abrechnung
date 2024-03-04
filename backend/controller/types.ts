@@ -1,4 +1,4 @@
-import { CountrySimple, Currency, DocumentFileType, Locale, Contact, Access, _id } from '../../common/types.js'
+import { CountrySimple, Currency, DocumentFileType, Locale, Contact, Access, _id, Money } from '../../common/types.js'
 
 type Document = _id | { _id: _id }
 
@@ -32,4 +32,15 @@ export interface UserSettingsPost {
   lastCountries?: CountrySimple[]
   insurance?: Document | null
   organisation?: Document | null
+}
+
+export interface CostPost extends Money {
+  receipts: File[]
+  date: Date
+}
+
+export interface ExpensePost {
+  description: string
+  cost: CostPost
+  _id?: _id
 }

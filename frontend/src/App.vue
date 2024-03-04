@@ -148,7 +148,7 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
 import {
@@ -277,7 +277,7 @@ export default defineComponent({
         return { error: error }
       }
     },
-    async setter<T>(endpoint: string, data: any, config = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
+    async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
           import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
@@ -301,7 +301,7 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean> {
+    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean|any> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false
@@ -314,6 +314,9 @@ export default defineComponent({
         })
         if (res.status === 200) {
           if (showAlert) this.addAlert({ message: '', title: this.$t('alerts.successDeleting'), type: 'success' })
+          if(res.data.result){
+            return res.data.result
+          }
           return true
         }
       } catch (error: any) {

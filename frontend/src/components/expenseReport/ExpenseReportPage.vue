@@ -281,32 +281,34 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).expenseReportId = this.expenseReport._id
-      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers, params: {parentId: this.expenseReport._id} })
       if (result.ok) {
-        await this.getExpenseReport()
+        this.setExpenseReport(result.ok)
         this.hideModal()
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, expenseReportId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getExpenseReport()
+        this.setExpenseReport(result)
         this.hideModal()
       }
     },
     async getExpenseReport() {
       const params: any = {
         _id: this._id,
-        addExpenses: true
+        additionalFields: ['expenses']
       }
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
       const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
-      if (result) {
-        this.expenseReport = result.data
+      if(result){
+        this.setExpenseReport(result.data)
       }
+    },
+    setExpenseReport(expenseReport: ExpenseReport){
+      this.expenseReport = expenseReport
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },
