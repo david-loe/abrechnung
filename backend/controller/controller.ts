@@ -152,7 +152,7 @@ export class Controller extends TsoaController {
     } else if (options.allowNew) {
       result = (await new model(options.requestBody).save()).toObject()
     } else {
-      throw Error(`Not allowed to create a new ${model.modelName}`)
+      throw new Error(`Not allowed to create a new ${model.modelName}`)
     }
     if (options.cb) {
       options.cb(result)
@@ -183,7 +183,7 @@ export class Controller extends TsoaController {
     } else if (options.allowNew) {
       (parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
     }else {
-      throw Error(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
+      throw new Error(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if(options.sortFn){
       (parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
@@ -247,7 +247,7 @@ export class Controller extends TsoaController {
       if(requestUser._id.equals(oldObject.owner._id)){
         return true
       }else{
-        throw Error('alerts.request.unauthorized')
+        throw new Error('alerts.request.unauthorized')
       }
     }
   }

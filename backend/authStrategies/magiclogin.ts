@@ -17,7 +17,7 @@ const magicLogin = new MagicLoginStrategy.default({
         ''
       )
     } else {
-      throw Error('No magiclogin user found for e-mail: ' + destination)
+      throw new Error('No magiclogin user found for e-mail: ' + destination)
     }
   },
   verify: async function (payload, callback) {

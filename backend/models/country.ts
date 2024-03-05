@@ -54,7 +54,7 @@ countrySchema.methods.getLumpSum = async function (date: Date, special: string |
       }
     }
     if (date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf() < 0) {
-      throw Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
+      throw new Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
     }
     if (special && this.lumpSums[nearest].spezials) {
       for (const lumpSumSpecial of this.lumpSums[nearest].spezials!) {

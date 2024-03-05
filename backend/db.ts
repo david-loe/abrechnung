@@ -85,7 +85,7 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
           count++
         }
       } else {
-        throw Error('No Country with id "' + lumpSum.countryCode + '" found')
+        throw new Error('No Country with id "' + lumpSum.countryCode + '" found')
       }
     }
     if (count > 0) {
