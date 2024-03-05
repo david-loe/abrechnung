@@ -2,6 +2,7 @@ import { Controller as TsoaController } from 'tsoa'
 import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mongoose'
 import { GETResponse, Meta, User, _id } from '../../common/types.js'
 import { DeleteResult } from 'mongodb'
+import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -34,13 +35,15 @@ export interface GetterOptions<ModelType> {
 /**
  * With _id everything else is optional. Without some fields may be required.
  */
-export type SetterBody<ModelType> = Partial<ModelType>
+export type SetterBody<ModelType> = {
+  [K in keyof ModelType]?: ModelType[K] extends string | number | Date | boolean | Types.ObjectId?  ModelType[K] :(ModelType[K] extends any[]? IdDocument[] | ModelType[K] : IdDocument | ModelType[K])  ;
+};
 
-export interface SetterOptions<ModelType, CheckType = ModelType> {
+export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
   requestBody: SetterBody<ModelType>
   cb?: (data: CheckType) => any
   allowNew?: boolean
-  checkOldObject?: (oldObject: HydratedDocument<CheckType>) => Promise<boolean>
+  checkOldObject?: (oldObject: HydratedDocument<CheckType> & ModelMethods) => Promise<boolean>
 }
 
 export interface SetterForArrayElementOptions<ModelType, ArrayElementType> extends SetterOptions<ArrayElementType, ModelType>{
@@ -171,7 +174,7 @@ export class Controller extends TsoaController {
     if (options.requestBody._id && options.requestBody._id !== '') {
       var found = false
       for (const arrayElement of parentObject[options.arrayElementKey] as Array<ArrayElementType>) {
-        if ((arrayElement._id! as Types.ObjectId).equals(options.requestBody._id)) {
+        if ((arrayElement._id! as Types.ObjectId).equals(options.requestBody._id as string)) {
           found = true
           Object.assign(arrayElement, options.requestBody)
           break
