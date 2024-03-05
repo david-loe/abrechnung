@@ -429,7 +429,7 @@
 				"type": "object",
 				"description": "Make all properties in T required"
 			},
-			"Document": {
+			"IdDocument": {
 				"anyOf": [
 					{
 						"$ref": "#/components/schemas/_id"
@@ -469,10 +469,10 @@
 						"type": "array"
 					},
 					"insurance": {
-						"$ref": "#/components/schemas/Document"
+						"$ref": "#/components/schemas/IdDocument"
 					},
 					"organisation": {
-						"$ref": "#/components/schemas/Document"
+						"$ref": "#/components/schemas/IdDocument"
 					}
 				},
 				"type": "object",
@@ -771,7 +771,7 @@
 					"insurance": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/Document"
+								"$ref": "#/components/schemas/IdDocument"
 							}
 						],
 						"nullable": true
@@ -779,7 +779,7 @@
 					"organisation": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/Document"
+								"$ref": "#/components/schemas/IdDocument"
 							}
 						],
 						"nullable": true
@@ -1203,69 +1203,83 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_ISettings_": {
+			"SetterBody_ISettings_": {
 				"properties": {
 					"accessIcons": {
-						"properties": {
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
+							{
+								"properties": {
+									"admin": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"confirm/healthCareCost": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"examine/healthCareCost": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"examine/expenseReport": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"examine/travel": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"approve/travel": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"user": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									}
 								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+								"required": [
+									"admin",
+									"confirm/healthCareCost",
+									"examine/healthCareCost",
+									"examine/expenseReport",
+									"examine/travel",
+									"approve/travel",
+									"user"
+								],
+								"type": "object"
 							}
-						},
-						"required": [
-							"admin",
-							"confirm/healthCareCost",
-							"examine/healthCareCost",
-							"examine/expenseReport",
-							"examine/travel",
-							"approve/travel",
-							"user"
-						],
-						"type": "object"
+						]
 					},
 					"allowSpouseRefund": {
 						"type": "boolean"
 					},
 					"baseCurrency": {
-						"$ref": "#/components/schemas/Currency"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument"
+							}
+						]
 					},
 					"breakfastCateringLumpSumCut": {
 						"type": "number",
@@ -1284,20 +1298,40 @@
 						"format": "double"
 					},
 					"factorCateringLumpSumExceptions": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"factorOvernightLumpSum": {
 						"type": "number",
 						"format": "double"
 					},
 					"factorOvernightLumpSumExceptions": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"fallBackLumpSumCountry": {
 						"type": "string"
@@ -1307,26 +1341,33 @@
 						"format": "double"
 					},
 					"distanceRefunds": {
-						"properties": {
-							"halfCar": {
-								"type": "number",
-								"format": "double"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"motorcycle": {
-								"type": "number",
-								"format": "double"
-							},
-							"car": {
-								"type": "number",
-								"format": "double"
+							{
+								"properties": {
+									"halfCar": {
+										"type": "number",
+										"format": "double"
+									},
+									"motorcycle": {
+										"type": "number",
+										"format": "double"
+									},
+									"car": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"halfCar",
+									"motorcycle",
+									"car"
+								],
+								"type": "object"
 							}
-						},
-						"required": [
-							"halfCar",
-							"motorcycle",
-							"car"
-						],
-						"type": "object"
+						]
 					},
 					"secoundNightOnAirplaneLumpSumCountry": {
 						"type": "string"
@@ -1335,123 +1376,130 @@
 						"type": "string"
 					},
 					"stateColors": {
-						"properties": {
-							"underExaminationByInsurance": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"inWork": {
+							{
 								"properties": {
-									"text": {
-										"type": "string"
+									"underExaminationByInsurance": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
 									},
-									"color": {
-										"type": "string"
+									"inWork": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
+									},
+									"refunded": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
+									},
+									"underExamination": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
+									},
+									"approved": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
+									},
+									"appliedFor": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
+									},
+									"rejected": {
+										"properties": {
+											"text": {
+												"type": "string"
+											},
+											"color": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"text",
+											"color"
+										],
+										"type": "object"
 									}
 								},
 								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"refunded": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"underExamination": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"approved": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"appliedFor": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"rejected": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
+									"underExaminationByInsurance",
+									"inWork",
+									"refunded",
+									"underExamination",
+									"approved",
+									"appliedFor",
+									"rejected"
 								],
 								"type": "object"
 							}
-						},
-						"required": [
-							"underExaminationByInsurance",
-							"inWork",
-							"refunded",
-							"underExamination",
-							"approved",
-							"appliedFor",
-							"rejected"
-						],
-						"type": "object"
+						]
 					},
 					"toleranceStageDatesToApprovedTravelDates": {
 						"type": "number",
@@ -1483,10 +1531,6 @@
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_ISettings_": {
-				"$ref": "#/components/schemas/Partial_ISettings_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"GETResponse_Organisation-or-Organisation-Array_": {
@@ -1580,7 +1624,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_IOrganisation_": {
+			"SetterBody_IOrganisation_": {
 				"properties": {
 					"subfolderPath": {
 						"type": "string"
@@ -1599,10 +1643,6 @@
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_IOrganisation_": {
-				"$ref": "#/components/schemas/Partial_IOrganisation_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"GETResponse_HealthInsurance-or-HealthInsurance-Array_": {
@@ -1686,7 +1726,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_IHealthInsurance_": {
+			"SetterBody_IHealthInsurance_": {
 				"properties": {
 					"name": {
 						"type": "string"
@@ -1699,10 +1739,6 @@
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_IHealthInsurance_": {
-				"$ref": "#/components/schemas/Partial_IHealthInsurance_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"Cost": {
@@ -2225,22 +2261,42 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_IExpenseReport_": {
+			"SetterBody_IExpenseReport_": {
 				"properties": {
 					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"historic": {
 						"type": "boolean"
 					},
 					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/Expense"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Expense"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"state": {
 						"type": "string",
@@ -2251,10 +2307,20 @@
 						]
 					},
 					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/ExpenseReportComment"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/ExpenseReportComment"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"comment": {
 						"type": "string"
@@ -2263,13 +2329,34 @@
 						"type": "string"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument"
+							}
+						]
 					},
 					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/OrganisationSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument"
+							}
+						]
 					},
 					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument"
+							}
+						]
 					},
 					"createdAt": {
 						"anyOf": [
@@ -2298,10 +2385,6 @@
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_IExpenseReport_": {
-				"$ref": "#/components/schemas/Partial_IExpenseReport_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"GETResponse_Currency-or-Currency-Array_": {
@@ -2407,22 +2490,29 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_ICurrency_": {
+			"SetterBody_ICurrency_": {
 				"properties": {
 					"name": {
-						"properties": {
-							"en": {
-								"type": "string"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"de": {
-								"type": "string"
+							{
+								"properties": {
+									"en": {
+										"type": "string"
+									},
+									"de": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"en",
+									"de"
+								],
+								"type": "object"
 							}
-						},
-						"required": [
-							"en",
-							"de"
-						],
-						"type": "object"
+						]
 					},
 					"_id": {
 						"type": "string"
@@ -2438,10 +2528,6 @@
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_ICurrency_": {
-				"$ref": "#/components/schemas/Partial_ICurrency_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			},
 			"LumpSum": {
@@ -2729,51 +2815,75 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_ICountry_": {
+			"SetterBody_ICountry_": {
 				"properties": {
 					"lumpSums": {
-						"items": {
-							"$ref": "#/components/schemas/CountryLumpSum"
-						},
-						"type": "array"
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/CountryLumpSum"
+								},
+								"type": "array"
+							}
+						]
 					},
 					"lumpSumsFrom": {
 						"type": "string"
 					},
 					"name": {
-						"properties": {
-							"en": {
-								"type": "string"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"de": {
-								"type": "string"
+							{
+								"properties": {
+									"en": {
+										"type": "string"
+									},
+									"de": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"en",
+									"de"
+								],
+								"type": "object"
 							}
-						},
-						"required": [
-							"en",
-							"de"
-						],
-						"type": "object"
+						]
 					},
 					"alias": {
-						"properties": {
-							"en": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument"
 							},
-							"de": {
-								"items": {
-									"type": "string"
+							{
+								"properties": {
+									"en": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"de": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									}
 								},
-								"type": "array"
+								"required": [
+									"de"
+								],
+								"type": "object"
 							}
-						},
-						"required": [
-							"de"
-						],
-						"type": "object"
+						]
 					},
 					"_id": {
 						"type": "string"
@@ -2782,14 +2892,17 @@
 						"type": "string"
 					},
 					"currency": {
-						"$ref": "#/components/schemas/Currency"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument"
+							}
+						]
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
-			},
-			"SetterBody_ICountry_": {
-				"$ref": "#/components/schemas/Partial_ICountry_",
 				"description": "With _id everything else is optional. Without some fields may be required."
 			}
 		},
@@ -4217,6 +4330,189 @@
 						}
 					}
 				]
+			}
+		},
+		"/api/expenseReport/inWork": {
+			"post": {
+				"operationId": "PostInWork",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									},
+									"organisation": {
+										"$ref": "#/components/schemas/IdDocument"
+									}
+								},
+								"required": [
+									"organisation"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/expenseReport/underExamination": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/expenseReport/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/expenseReport/examiner": {
+			"get": {
+				"operationId": "GetExaminer",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_User-or-User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/api/admin/expenseReport": {
