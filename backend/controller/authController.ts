@@ -3,6 +3,7 @@ import User, { UserDoc } from '../models/user.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import passport from 'passport'
 import magiclogin from '../authStrategies/magiclogin.js'
+import { Base64 } from '../../common/scripts.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
 const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
@@ -18,7 +19,7 @@ const ldapauthHandler = useLDAPauth ? passport.authenticate('ldapauth', { sessio
 const microsoftHandler = useMicrosoft
   ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
       const redirect = req.query.redirect
-      const state = req.query.redirect ? Buffer.from(JSON.stringify({ redirect })).toString('base64') : undefined
+      const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
       passport.authenticate('microsoft', { state: state })(req, res, next)
     }
   : NotImplementedMiddleware
@@ -69,7 +70,7 @@ export class AuthController extends Controller {
     var redirect: string | undefined
     if (state) {
       try {
-        redirect = JSON.parse(Buffer.from(state, 'base64').toString()).redirect
+        redirect = JSON.parse(Base64.decode(state)).redirect
       } catch {}
     }
     this.redirectToFrontend(redirect)
