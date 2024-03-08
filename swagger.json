@@ -2261,132 +2261,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_IExpenseReport_": {
-				"properties": {
-					"history": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"expenses": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/Expense"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"state": {
-						"type": "string",
-						"enum": [
-							"underExamination",
-							"refunded",
-							"inWork"
-						]
-					},
-					"comments": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/ExpenseReportComment"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"comment": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							}
-						]
-					},
-					"organisation": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/OrganisationSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							}
-						]
-					},
-					"editor": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							}
-						]
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
-			},
 			"GETResponse_Currency-or-Currency-Array_": {
 				"properties": {
 					"data": {
@@ -4515,9 +4389,139 @@
 				"parameters": []
 			}
 		},
-		"/api/admin/expenseReport": {
+		"/api/examine/expenseReport": {
+			"get": {
+				"operationId": "GetExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport-or-ExpenseReport-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"comments",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteExpenseReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/expenseReport/expense": {
 			"post": {
-				"operationId": "PostExpenseReport",
+				"operationId": "PostExpense",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -4543,13 +4547,129 @@
 					}
 				},
 				"tags": [
-					"Admin",
+					"Examine",
 					"ExpenseReport"
 				],
 				"security": [
 					{
 						"cookieAuth": [
-							"admin"
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ExpensePost"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/expenseReport/refunded": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"ExpenseReport"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
 						]
 					}
 				],
@@ -4559,34 +4679,40 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IExpenseReport_"
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
 							}
 						}
 					}
 				}
-			},
-			"delete": {
-				"operationId": "DeleteExpenseReport",
+			}
+		},
+		"/api/examine/expenseReport/report": {
+			"get": {
+				"operationId": "GetReport",
 				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/DeleteResult"
-								}
-							}
-						}
+					"204": {
+						"description": "No content"
 					}
 				},
 				"tags": [
-					"Admin",
+					"Examine",
 					"ExpenseReport"
 				],
 				"security": [
 					{
 						"cookieAuth": [
-							"admin"
+							"examine/expenseReport"
 						]
 					}
 				],
