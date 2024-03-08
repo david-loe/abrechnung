@@ -15,16 +15,9 @@
             <button type="button" class="btn-close" @click="hideModal"></button>
           </div>
           <div v-if="healthCareCost._id" class="modal-body">
-            <ExpenseForm
-              ref="expenseForm"
-              :expense="(modalExpense as Partial<Expense> | undefined)"
-              :disabled="isReadOnly"
-              :mode="modalMode"
-              :endpointPrefix="endpointPrefix"
-              @add="postExpense"
-              @edit="postExpense"
-              @deleted="deleteExpense"
-              @cancel="hideModal">
+            <ExpenseForm ref="expenseForm" :expense="(modalExpense as Partial<Expense> | undefined)"
+              :disabled="isReadOnly" :mode="modalMode" :endpointPrefix="endpointPrefix" @add="postExpense"
+              @edit="postExpense" @deleted="deleteExpense" @cancel="hideModal">
             </ExpenseForm>
           </div>
         </div>
@@ -52,7 +45,8 @@
                 <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
               </li>
               <li>
-                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i
+                    class="bi bi-microsoft-teams me-1"></i>Teams</a>
               </li>
             </ul>
           </div>
@@ -74,7 +68,8 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost" v-model="isReadOnly" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost"
+                          v-model="isReadOnly" />
                         <label class="form-check-label text-nowrap" for="editHealthCareCost">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ $t('labels.readOnly') }}</span>
@@ -87,9 +82,7 @@
                   </li>
                 </template>
                 <li>
-                  <a
-                    :class="'dropdown-item' + (isReadOnly && endpointPrefix !== '' ? ' disabled' : '')"
-                    href="#"
+                  <a :class="'dropdown-item' + (isReadOnly && endpointPrefix !== '' ? ' disabled' : '')" href="#"
                     @click="isReadOnly && endpointPrefix !== '' ? null : deleteHealthCareCost()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ $t('labels.delete') }}</span>
@@ -100,7 +93,8 @@
           </div>
         </div>
         <div v-if="endpointPrefix !== ''" class="text-secondary">
-          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' + healthCareCost.organisation.name }}
+          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' +
+            healthCareCost.organisation.name }}
         </div>
       </div>
 
@@ -110,7 +104,8 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.healthCareCost') }) }}</span>
                 <span class="ms-1 d-md-none">{{ $t('labels.healthCareCost') }}</span>
@@ -129,7 +124,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
+              <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer"
+                @click="showModal('edit', expense)">
                 <td>{{ datetoDateString(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
                 <td>{{ getMoneyString(expense.cost) }}</td>
@@ -137,9 +133,7 @@
             </tbody>
           </table>
         </div>
-        <div
-          :class="
-            endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance' ? 'col-lg-4 col' : 'col-lg-3 col'
+        <div :class="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance' ? 'col-lg-4 col' : 'col-lg-3 col'
           ">
           <div class="card">
             <div class="card-body">
@@ -167,64 +161,48 @@
                 </div>
                 <div v-if="healthCareCost.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
-                    id="comment"
-                    rows="1"
-                    v-model="(healthCareCost.comment as string | undefined)"
-                    :disabled="
-                      (isReadOnly && endpointPrefix === '') ||
+                  <textarea class="form-control" id="comment" rows="1"
+                    v-model="(healthCareCost.comment as string | undefined)" :disabled="(isReadOnly && endpointPrefix === '') ||
                       (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
-                    "></textarea>
+                      "></textarea>
                 </div>
 
-                <button
-                  v-if="healthCareCost.state === 'inWork'"
-                  class="btn btn-primary"
+                <button v-if="healthCareCost.state === 'inWork'" class="btn btn-primary"
                   @click="isReadOnly ? null : toExamination()"
                   :disabled="isReadOnly || healthCareCost.expenses.length < 1">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
+                <template
+                  v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
                   <a class="btn btn-primary" :href="reportLink()" :download="healthCareCost.name + '.pdf'">
                     <i class="bi bi-download"></i>
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
-                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2" :href="mailToInsuranceLink(healthCareCost)">
+                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2"
+                    :href="mailToInsuranceLink(healthCareCost)">
                     <i class="bi bi-envelope"></i>
                     <span class="ms-1">{{ $t('labels.mailToInsurance') }}</span>
                   </a>
                 </template>
-                <a
-                  v-else-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'"
-                  class="btn btn-primary"
-                  :href="mailToInsuranceLink(healthCareCost)"
-                  @click="toExaminationByInsurance()">
+                <a v-else-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'"
+                  class="btn btn-primary" :href="mailToInsuranceLink(healthCareCost)" @click="toExaminationByInsurance()">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExaminationByInsurance') }}</span>
                 </a>
-                <form
-                  class="mt-3"
+                <form class="mt-3"
                   v-if="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance'"
                   @submit.prevent="refund()">
-                  <label for="refundSum" class="form-label me-2"> {{ $t('labels.refundSum') }}<span class="text-danger">*</span> </label>
+                  <label for="refundSum" class="form-label me-2"> {{ $t('labels.refundSum') }}<span
+                      class="text-danger">*</span> </label>
                   <div id="refundSum" class="input-group mb-3">
-                    <input
-                      style="min-width: 100px"
-                      type="number"
-                      class="form-control"
-                      step="0.01"
-                      v-model="healthCareCost.refundSum.amount"
-                      min="0"
-                      required />
+                    <input style="min-width: 100px" type="number" class="form-control" step="0.01"
+                      v-model="healthCareCost.refundSum.amount" min="0" required />
                     <CurrencySelector v-model="healthCareCost.refundSum!.currency" :required="true"></CurrencySelector>
                   </div>
                   <div class="mb-3">
                     <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
-                    <FileUpload
-                      ref="fileUpload"
-                      id="expenseFormFile"
+                    <FileUpload ref="fileUpload" id="expenseFormFile"
                       v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
                       :endpointPrefix="endpointPrefix" />
                   </div>
@@ -292,7 +270,7 @@ export default defineComponent({
         this.modal.hide()
       }
       if (this.$refs.expenseForm) {
-        ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
+        ; (this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
       this.modalExpense = undefined
     },
@@ -355,7 +333,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'healthCareCost/report?id=' + this.healthCareCost._id
+      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
     },
     async postExpense(expense: Expense) {
       var headers = {}
@@ -364,35 +342,31 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).healthCareCostId = this.healthCareCost._id
-      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
+      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, { headers, params: {parentId: this.healthCareCost._id} })
       if (result.ok) {
-        await this.getHealthCareCost()
+        this.setExpenseReport(result.ok)
         this.hideModal()
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, healthCareCostId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getHealthCareCost()
+        this.setExpenseReport(result)
         this.hideModal()
       }
     },
     async getHealthCareCost() {
       const params: any = {
         _id: this._id,
-        addExpenses: true
-      }
-      if (this.endpointPrefix === 'examine/') {
-        params.addByInsurance = true
-      } else if (this.endpointPrefix === 'confirm/') {
-        params.addRefunded = true
+        additionalFields: ['expenses']
       }
       const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
       if (result) {
-        this.healthCareCost = result.data
+        this.setExpenseReport(result.data)
       }
-
+    },
+    setExpenseReport(healthCareCost: HealthCareCost) {
+      this.healthCareCost = healthCareCost
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },

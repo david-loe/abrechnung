@@ -1,5 +1,5 @@
 <template>
-  <PaginationList :endpoint="endpoint" :showSearch="showSearch" ref="list">
+  <PaginationList :endpoint="endpoint" :params="params" :showSearch="showSearch" ref="list">
     <template #entry="{ entry }">
       <HealthCareCostCard
         :healthCareCost="entry"
@@ -22,6 +22,7 @@ export default defineComponent({
   components: { HealthCareCostCard, PaginationList },
   props: {
     endpoint: { type: String, required: true },
+    params: {type: Object},
     showSearch: { type: Boolean, default: false },
     showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }

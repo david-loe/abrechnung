@@ -39,6 +39,11 @@ export interface CostPost extends Money {
   date: Date
 }
 
+export interface MoneyPlusPost extends Money {
+  receipts?: File[]
+  date?: Date
+}
+
 export interface ExpensePost {
   description: string
   cost: CostPost
