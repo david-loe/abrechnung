@@ -1828,12 +1828,80 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ExpenseReportState": {
+			"MoneyPlus": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount",
+					"currency"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HealthCareCostState": {
 				"type": "string",
 				"enum": [
 					"underExamination",
 					"refunded",
-					"inWork"
+					"inWork",
+					"underExaminationByInsurance"
 				]
 			},
 			"UserSimple": {
@@ -1868,7 +1936,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ExpenseReportComment": {
+			"HealthCareCostComment": {
 				"properties": {
 					"text": {
 						"type": "string"
@@ -1880,7 +1948,7 @@
 						"$ref": "#/components/schemas/_id"
 					},
 					"toState": {
-						"$ref": "#/components/schemas/ExpenseReportState"
+						"$ref": "#/components/schemas/HealthCareCostState"
 					}
 				},
 				"required": [
@@ -1902,13 +1970,12 @@
 					"refunded"
 				]
 			},
-			"HealthCareCostState": {
+			"ExpenseReportState": {
 				"type": "string",
 				"enum": [
 					"underExamination",
 					"refunded",
-					"inWork",
-					"underExaminationByInsurance"
+					"inWork"
 				]
 			},
 			"AnyState": {
@@ -1936,6 +2003,436 @@
 				"required": [
 					"name",
 					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HealthCareCost": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"patientName": {
+						"type": "string"
+					},
+					"insurance": {
+						"$ref": "#/components/schemas/HealthInsurance"
+					},
+					"refundSum": {
+						"$ref": "#/components/schemas/MoneyPlus"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/HealthCareCostComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"patientName",
+					"insurance",
+					"refundSum",
+					"comments",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_HealthCareCost-or-HealthCareCost-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/HealthCareCost"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/HealthCareCost"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IHealthCareCost": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"patientName": {
+						"type": "string"
+					},
+					"insurance": {
+						"$ref": "#/components/schemas/HealthInsurance"
+					},
+					"refundSum": {
+						"$ref": "#/components/schemas/MoneyPlus"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/HealthCareCostComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"patientName",
+					"insurance",
+					"refundSum",
+					"comments",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IHealthCareCost_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"name",
+								"owner",
+								"state",
+								"organisation",
+								"editor",
+								"createdAt",
+								"updatedAt",
+								"_id",
+								"patientName",
+								"insurance",
+								"refundSum",
+								"state",
+								"comments",
+								"comment",
+								"history",
+								"historic",
+								"expenses"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CostPost": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/File"
+						},
+						"type": "array"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpensePost": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/CostPost"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"description",
+					"cost"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MoneyPlusPost": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/File"
+						},
+						"type": "array"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"amount",
+					"currency"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseReportComment": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"_id",
+					"toState"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -2179,85 +2676,6 @@
 						"format": "byte"
 					}
 				},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CostPost": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/File"
-						},
-						"type": "array"
-					},
-					"date": {
-						"type": "string",
-						"format": "date-time"
-					}
-				},
-				"required": [
-					"amount",
-					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ExpensePost": {
-				"properties": {
-					"description": {
-						"type": "string"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/CostPost"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"description",
-					"cost"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -3949,6 +4367,1063 @@
 					{
 						"cookieAuth": [
 							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/healthCareCost": {
+			"get": {
+				"operationId": "GetHealthCareCost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost-or-HealthCareCost-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"patientName",
+									"insurance",
+									"refundSum",
+									"state",
+									"comments",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteHealthCareCost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/healthCareCost/expense": {
+			"post": {
+				"operationId": "PostExpense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ExpensePost"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/healthCareCost/inWork": {
+			"post": {
+				"operationId": "PostInWork",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									},
+									"patientName": {
+										"type": "string"
+									},
+									"insurance": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"organisation": {
+										"$ref": "#/components/schemas/IdDocument"
+									}
+								},
+								"required": [
+									"patientName",
+									"insurance",
+									"organisation"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/healthCareCost/underExamination": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/healthCareCost/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/healthCareCost/examiner": {
+			"get": {
+				"operationId": "GetExaminer",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_User-or-User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/api/examine/healthCareCost": {
+			"get": {
+				"operationId": "GetHealthCareCost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost-or-HealthCareCost-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"patientName",
+									"insurance",
+									"refundSum",
+									"state",
+									"comments",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteHealthCareCost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/healthCareCost/expense": {
+			"post": {
+				"operationId": "PostExpense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ExpensePost"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/healthCareCost/underExaminationByInsurance": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/examine/healthCareCost/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/healthCareCost/organisation": {
+			"get": {
+				"operationId": "GetOrganisation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Organisation-or-Organisation-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"_id",
+									"subfolderPath",
+									"bankDetails",
+									"companyNumber"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/confirm/healthCareCost": {
+			"get": {
+				"operationId": "GetHealthCareCost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost-or-HealthCareCost-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Confirm",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"confirm/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"patientName",
+									"insurance",
+									"refundSum",
+									"state",
+									"comments",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/confirm/healthCareCost/refunded": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Confirm",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"confirm/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"refundSum": {
+										"$ref": "#/components/schemas/MoneyPlusPost"
+									},
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"refundSum",
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/confirm/healthCareCost/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Confirm",
+					"HealthCareCost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"confirm/healthCareCost"
 						]
 					}
 				],
