@@ -299,9 +299,6 @@ export default defineComponent({
         _id: this._id,
         additionalFields: ['expenses']
       }
-      if (this.endpointPrefix === 'examine/') {
-        params.addRefunded = true
-      }
       const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
       if(result){
         this.setExpenseReport(result.data)

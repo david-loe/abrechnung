@@ -4,6 +4,7 @@
     <ExpenseReportCardList
       class="mb-5"
       endpoint="examine/expenseReport"
+      :params="params('underExamination')"
       :showOwner="true"
       :showSearch="true"
       @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
@@ -17,7 +18,8 @@
       </button>
       <hr class="hr" />
       <ExpenseReportCardList
-        endpoint="examine/expenseReport/refunded"
+        endpoint="examine/expenseReport"
+        :params="params('refunded')"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
@@ -29,6 +31,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
+import { ExpenseReportState } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ExaminePage',
@@ -39,10 +42,15 @@ export default defineComponent({
       showRefunded: false
     }
   },
-  methods: {},
+  methods: {
+    params(state: ExpenseReportState){
+    return {filter: {$and:[{state}]}}
+  }
+},
   async created() {
     await this.$root.load()
   }
+  
 })
 </script>
 

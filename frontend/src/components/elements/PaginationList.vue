@@ -15,12 +15,12 @@
                   <div class="row">
                     <div class="col-auto">
                       <div class="input-group mb-3">
-                        <input type="text" class="form-control" :placeholder="$t('labels.name')" v-model="searchParams.name" />
+                        <input type="text" class="form-control" :placeholder="$t('labels.name')" v-model="searchFilter.name" />
                         <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
                       </div>
                     </div>
                     <div class="col-auto">
-                      <UserSelector v-model="searchParams.owner" @update:model-value="getData(meta.page)"></UserSelector>
+                      <UserSelector v-model="searchFilter.owner" @update:model-value="getData(meta.page)"></UserSelector>
                     </div>
                   </div>
                 </form>
@@ -60,6 +60,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import UserSelector from './UserSelector.vue'
+import { Base64 } from '../../../../common/scripts.js'
 
 export default defineComponent({
   name: 'PaginationList',
@@ -71,18 +72,19 @@ export default defineComponent({
       data: [] as any[],
       meta: { countPages: -1, page: -1 },
       search: false,
-      searchParams: this.default()
+      searchFilter: this.default()
     }
   },
   props: {
     endpoint: { type: String, required: true },
+    params: {type: Object, default: () => {return{filter: {}}}},
     showSearch: { type: Boolean, default: false }
   },
   methods: {
     default() {
       return {
-        name: null as string | null,
-        owner: null as string | null
+        name: undefined as string | undefined,
+        owner: undefined as string | undefined
       }
     },
     async getData(page?: number): Promise<void> {
@@ -95,7 +97,14 @@ export default defineComponent({
       } else if (this.hasMeta) {
         page = this.meta.page
       }
-      var result = (await this.$root.getter<any[]>(this.endpoint, Object.assign(this.searchParams, { page }))).ok
+      const queryParams: any = structuredClone(this.params)
+      console.log(queryParams)
+      Object.assign(queryParams.filter, this.searchFilter)
+      const filterJSON = Base64.encode(JSON.stringify(queryParams.filter))
+      delete queryParams.filter
+      queryParams.filterJSON = filterJSON !== 'e30=' ? filterJSON : undefined
+
+      var result = (await this.$root.getter<any[]>(this.endpoint, Object.assign({}, queryParams, { page }))).ok
       if (result) {
         this.data = result.data
         this.hasData = true
@@ -104,7 +113,7 @@ export default defineComponent({
       }
     },
     clearSearch() {
-      this.searchParams = this.default()
+      this.searchFilter = this.default()
       this.search = false
       this.getData(this.meta.page)
     }
