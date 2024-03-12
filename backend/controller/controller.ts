@@ -36,13 +36,41 @@ export interface GetterOptions<ModelType> {
 /**
  * With _id everything else is optional. Without some fields may be required.
  */
-export type SetterBody<ModelType> = {
-  [K in keyof ModelType]?: ModelType[K] extends string | number | Date | boolean | Types.ObjectId
-    ? ModelType[K]
-    : ModelType[K] extends any[]
-    ? IdDocument[] | ModelType[K]
-    : IdDocument | ModelType[K]
-}
+// export type SetterBody<ModelType> = ModelType extends {}
+//   ? {
+//       [K in keyof ModelType]?: ModelType[K] extends
+//         | string
+//         | number
+//         | Date
+//         | boolean
+//         | Types.ObjectId
+//         | string[]
+//         | number[]
+//         | Date[]
+//         | boolean[]
+//         | Types.ObjectId[]
+//         ? ModelType[K]
+//         : ModelType[K] extends Array<infer ElementType>
+//         ? IdDocument[] | Partial<ElementType>[]
+//         : IdDocument | Partial<ModelType[K]>
+//     }
+//   : ModelType
+
+/**
+ * @format binary
+ */
+type Data = string
+
+!!!!! Array<infer ElementType> !!!!
+
+type SetterPartial<T, U extends string | number | symbol> = T extends object
+  ? { [P in Exclude<keyof T, U>]?: P extends Types.Buffer ? Data : T[P] }
+  : T
+type DeepPartial<T, U extends string | number | symbol> = SetterPartial<
+  SetterPartial<SetterPartial<SetterPartial<SetterPartial<T, U>, U>, U>, U>,
+  U
+>
+export type SetterBody<ModelType> = DeepPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
 
 export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
   requestBody: SetterBody<ModelType>

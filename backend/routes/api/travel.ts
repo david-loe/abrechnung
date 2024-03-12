@@ -11,42 +11,6 @@ import { sendTravelNotificationMail } from '../../mail/mail.js'
 import { generateTravelReport } from '../../pdf/travel.js'
 import { Travel as ITravel } from '../../../common/types.js'
 
-router.get('/', async (req, res) => {
-  const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
-  const select: Partial<{ [key in keyof ITravel]: number }> = { history: 0, historic: 0 }
-  if (!req.query.addStages) {
-    select.stages = 0
-  }
-  delete req.query.addStages
-  if (!req.query.addExpenses) {
-    select.expenses = 0
-  }
-  delete req.query.addExpenses
-  if (!req.query.addDays) {
-    select.days = 0
-  }
-  delete req.query.addDays
-  return getter(Travel, 'travel', 20, { owner: req.user!._id, historic: false }, select, sortFn)(req, res)
-})
-
-router.delete('/', deleter(Travel, 'owner'))
-
-router.post('/', async (req, res) => {
-  req.body.editor = req.user!._id
-  delete req.body.state
-  delete req.body.owner
-  delete req.body.history
-  delete req.body.historic
-  delete req.body.stages
-  delete req.body.expenses
-  delete req.body.professionalShare
-
-  const check = async (oldObject: TravelDoc) => {
-    return oldObject.state !== 'refunded'
-  }
-  return setter(Travel, 'owner', false, check)(req, res)
-})
-
 function postRecord(recordType: 'stages' | 'expenses') {
   return async (req: Request, res: Response) => {
     const travel = await Travel.findOne({ _id: req.body.travelId })
