@@ -1,4 +1,4 @@
-import { Controller, Post, Route, Get, Query, Tags, Request, Produces, Middlewares, Consumes, BodyProp, SuccessResponse } from 'tsoa'
+import { Controller, Post, Route, Get, Query, Tags, Request, Produces, Middlewares, Consumes, SuccessResponse, Body } from 'tsoa'
 import fs from 'node:fs/promises'
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
@@ -9,6 +9,7 @@ import Settings from '../models/settings.js'
 import i18n from '../i18n.js'
 import { documentFileHandler } from '../helper.js'
 import { File } from './types.js'
+import { _id } from '../../common/types.js'
 
 async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction) {
   const user = await User.findOne({ _id: req.query.userId }).lean()
@@ -56,12 +57,17 @@ export class UploadController extends Controller {
   @Post('new')
   @Middlewares(validateToken, fileHandler.any())
   @Consumes('multipart/form-data')
-  public async upload(@Query() userId: string, @Query() tokenId: string, @BodyProp() files: File[], @Request() req: ExRequest) {
+  public async upload(
+    @Query() userId: string,
+    @Query() tokenId: string,
+    @Body() requestBody: { files: File[] },
+    @Request() req: ExRequest
+  ) {
     const token = await Token.findOne({ _id: tokenId })
     if (token) {
       if (true) {
         await documentFileHandler(['files'], false, userId)(req)
-        token.files = token.files.concat(req.body.files)
+        token.files = token.files.concat(requestBody.files as unknown as _id[])
         token.markModified('files')
         await token.save()
       }
