@@ -109,7 +109,7 @@
 					"currency": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/Currency"
+								"$ref": "#/components/schemas/CurrencyCode"
 							}
 						],
 						"nullable": true
@@ -429,59 +429,178 @@
 				"type": "object",
 				"description": "Make all properties in T required"
 			},
-			"IdDocument": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/_id"
-					},
-					{
+			"SetterPartial_IUser-at-settings.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
+				"properties": {
+					"organisation": {
 						"properties": {
+							"companyNumber": {
+								"type": "string"
+							},
+							"bankDetails": {
+								"type": "string"
+							},
+							"subfolderPath": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
 							"_id": {
-								"$ref": "#/components/schemas/_id"
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						},
-						"required": [
-							"_id"
-						],
 						"type": "object"
-					}
-				]
-			},
-			"Partial_UserSettingsPost_": {
-				"properties": {
+					},
+					"insurance": {
+						"properties": {
+							"email": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"_id": {
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						},
+						"type": "object"
+					},
+					"lastCountries": {
+						"items": {
+							"properties": {
+								"currency": {
+									"type": "string"
+								},
+								"flag": {
+									"type": "string"
+								},
+								"name": {
+									"properties": {
+										"en": {
+											"type": "string"
+										},
+										"de": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"en",
+										"de"
+									],
+									"type": "object"
+								},
+								"alias": {
+									"properties": {
+										"en": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"de": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"de"
+									],
+									"type": "object"
+								},
+								"_id": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"lastCurrencies": {
+						"items": {
+							"properties": {
+								"flag": {
+									"type": "string"
+								},
+								"subunit": {
+									"type": "string"
+								},
+								"name": {
+									"properties": {
+										"en": {
+											"type": "string"
+										},
+										"de": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"en",
+										"de"
+									],
+									"type": "object"
+								},
+								"_id": {
+									"type": "string"
+								},
+								"symbol": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
 					"language": {
 						"type": "string",
 						"enum": [
 							"de",
 							"en"
 						]
-					},
-					"lastCurrencies": {
-						"items": {
-							"$ref": "#/components/schemas/Currency"
-						},
-						"type": "array"
-					},
-					"lastCountries": {
-						"items": {
-							"$ref": "#/components/schemas/CountrySimple"
-						},
-						"type": "array"
-					},
-					"insurance": {
-						"$ref": "#/components/schemas/IdDocument"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/IdDocument"
 					}
 				},
+				"type": "object"
+			},
+			"SetterBody_IUser-at-settings_": {
+				"$ref": "#/components/schemas/SetterPartial_IUser-at-settings.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
+			},
+			"Pick_DocumentFile.Exclude_keyofDocumentFile.data-or-owner__": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"image/jpeg",
+							"image/png",
+							"application/pdf"
+						]
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"type",
+					"name"
+				],
 				"type": "object",
-				"description": "Make all properties in T optional"
+				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
 			"File": {
 				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
 					"type": {
-						"$ref": "#/components/schemas/DocumentFileType"
+						"type": "string",
+						"enum": [
+							"image/jpeg",
+							"image/png",
+							"application/pdf"
+						]
 					},
 					"name": {
 						"type": "string"
@@ -489,9 +608,6 @@
 					"data": {
 						"type": "string",
 						"format": "binary"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
@@ -751,44 +867,994 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserSettingsPost": {
+			"SetterPartial_IUser.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"language": {
-						"$ref": "#/components/schemas/Locale"
-					},
-					"lastCurrencies": {
+					"vehicleRegistration": {
 						"items": {
-							"$ref": "#/components/schemas/Currency"
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"data": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "string",
+											"format": "byte"
+										}
+									]
+								},
+								"type": {
+									"type": "string",
+									"enum": [
+										"image/jpeg",
+										"image/png",
+										"application/pdf"
+									]
+								},
+								"_id": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								}
+							},
+							"type": "object"
 						},
 						"type": "array"
 					},
-					"lastCountries": {
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"access": {
+						"properties": {
+							"admin": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"user": {
+								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string"
+							},
+							"ldapauth": {
+								"type": "string"
+							},
+							"microsoft": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"settings": {
+						"properties": {
+							"organisation": {
+								"properties": {
+									"companyNumber": {
+										"type": "string"
+									},
+									"bankDetails": {
+										"type": "string"
+									},
+									"subfolderPath": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									}
+								},
+								"type": "object"
+							},
+							"insurance": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									}
+								},
+								"type": "object"
+							},
+							"lastCountries": {
+								"items": {
+									"properties": {
+										"currency": {
+											"type": "string"
+										},
+										"flag": {
+											"type": "string"
+										},
+										"name": {
+											"properties": {
+												"en": {
+													"type": "string"
+												},
+												"de": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"en",
+												"de"
+											],
+											"type": "object"
+										},
+										"alias": {
+											"properties": {
+												"en": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
+												"de": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"de"
+											],
+											"type": "object"
+										},
+										"_id": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"lastCurrencies": {
+								"items": {
+									"properties": {
+										"flag": {
+											"type": "string"
+										},
+										"subunit": {
+											"type": "string"
+										},
+										"name": {
+											"properties": {
+												"en": {
+													"type": "string"
+												},
+												"de": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"en",
+												"de"
+											],
+											"type": "object"
+										},
+										"_id": {
+											"type": "string"
+										},
+										"symbol": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"language": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"token": {
+						"properties": {
+							"files": {
+								"items": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "byte"
+												}
+											]
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"image/jpeg",
+												"image/png",
+												"application/pdf"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"_id": {
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBodyUser": {
+				"properties": {
+					"vehicleRegistration": {
 						"items": {
-							"$ref": "#/components/schemas/CountrySimple"
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"data": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "string",
+											"format": "byte"
+										}
+									]
+								},
+								"type": {
+									"type": "string",
+									"enum": [
+										"image/jpeg",
+										"image/png",
+										"application/pdf"
+									]
+								},
+								"_id": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								}
+							},
+							"type": "object"
 						},
 						"type": "array"
 					},
-					"insurance": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							}
-						],
+					"loseAccessAt": {
+						"type": "string",
+						"format": "date-time",
 						"nullable": true
 					},
-					"organisation": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
+					"access": {
+						"properties": {
+							"admin": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"user": {
+								"type": "boolean"
 							}
-						],
-						"nullable": true
+						},
+						"type": "object"
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string"
+							},
+							"ldapauth": {
+								"type": "string"
+							},
+							"microsoft": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"properties": {
+							"familyName": {
+								"type": "string"
+							},
+							"givenName": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"settings": {
+						"properties": {
+							"organisation": {
+								"properties": {
+									"companyNumber": {
+										"type": "string"
+									},
+									"bankDetails": {
+										"type": "string"
+									},
+									"subfolderPath": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									}
+								},
+								"type": "object"
+							},
+							"insurance": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									}
+								},
+								"type": "object"
+							},
+							"lastCountries": {
+								"items": {
+									"properties": {
+										"currency": {
+											"type": "string"
+										},
+										"flag": {
+											"type": "string"
+										},
+										"name": {
+											"properties": {
+												"en": {
+													"type": "string"
+												},
+												"de": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"en",
+												"de"
+											],
+											"type": "object"
+										},
+										"alias": {
+											"properties": {
+												"en": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
+												"de": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"de"
+											],
+											"type": "object"
+										},
+										"_id": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"lastCurrencies": {
+								"items": {
+									"properties": {
+										"flag": {
+											"type": "string"
+										},
+										"subunit": {
+											"type": "string"
+										},
+										"name": {
+											"properties": {
+												"en": {
+													"type": "string"
+												},
+												"de": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"en",
+												"de"
+											],
+											"type": "object"
+										},
+										"_id": {
+											"type": "string"
+										},
+										"symbol": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"language": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"token": {
+						"properties": {
+							"files": {
+								"items": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "byte"
+												}
+											]
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"image/jpeg",
+												"image/png",
+												"application/pdf"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"_id": {
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						},
+						"type": "object"
 					}
 				},
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserPost": {
+			"DeleteResult": {
+				"properties": {
+					"acknowledged": {
+						"type": "boolean",
+						"description": "Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined."
+					},
+					"deletedCount": {
+						"type": "number",
+						"format": "double",
+						"description": "The number of documents that were deleted"
+					}
+				},
+				"required": [
+					"acknowledged",
+					"deletedCount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Place": {
+				"properties": {
+					"place": {
+						"type": "string"
+					},
+					"country": {
+						"$ref": "#/components/schemas/CountrySimple"
+					},
+					"special": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"place",
+					"country"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DistanceRefundType": {
+				"type": "string",
+				"enum": [
+					"car",
+					"motorcycle",
+					"halfCar"
+				]
+			},
+			"Transport": {
+				"anyOf": [
+					{
+						"properties": {
+							"type": {
+								"type": "string",
+								"enum": [
+									"airplane",
+									"shipOrFerry",
+									"otherTransport"
+								]
+							}
+						},
+						"required": [
+							"type"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"distanceRefundType": {
+								"$ref": "#/components/schemas/DistanceRefundType"
+							},
+							"distance": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"ownCar"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"distanceRefundType",
+							"distance",
+							"type"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"Cost": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile"
+						},
+						"type": "array"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PurposeSimple": {
+				"type": "string",
+				"enum": [
+					"professional",
+					"private"
+				]
+			},
+			"Purpose": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/PurposeSimple"
+					},
+					{
+						"type": "string",
+						"enum": [
+							"mixed"
+						]
+					}
+				]
+			},
+			"Stage": {
+				"properties": {
+					"departure": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"arrival": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"startLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"endLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"midnightCountries": {
+						"items": {
+							"properties": {
+								"country": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"date": {
+									"anyOf": [
+										{
+											"type": "string",
+											"format": "date-time"
+										},
+										{
+											"type": "string"
+										}
+									]
+								}
+							},
+							"required": [
+								"country",
+								"date"
+							],
+							"type": "object"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"transport": {
+						"$ref": "#/components/schemas/Transport"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost"
+					},
+					"purpose": {
+						"$ref": "#/components/schemas/Purpose"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"departure",
+					"arrival",
+					"startLocation",
+					"endLocation",
+					"transport",
+					"cost",
+					"purpose",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelExpense": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"purpose": {
+						"type": "string",
+						"enum": [
+							"professional",
+							"mixed"
+						]
+					}
+				},
+				"required": [
+					"description",
+					"cost",
+					"_id",
+					"purpose"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LumpsumType": {
+				"type": "string",
+				"enum": [
+					"overnight",
+					"catering8",
+					"catering24"
+				]
+			},
+			"Money": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount",
+					"currency"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Refund": {
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/LumpsumType"
+					},
+					"refund": {
+						"$ref": "#/components/schemas/Money"
+					}
+				},
+				"required": [
+					"type",
+					"refund"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelDay": {
+				"properties": {
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"country": {
+						"$ref": "#/components/schemas/CountrySimple"
+					},
+					"special": {
+						"type": "string"
+					},
+					"cateringNoRefund": {
+						"properties": {
+							"breakfast": {
+								"type": "boolean"
+							},
+							"lunch": {
+								"type": "boolean"
+							},
+							"dinner": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"breakfast",
+							"lunch",
+							"dinner"
+						],
+						"type": "object"
+					},
+					"purpose": {
+						"$ref": "#/components/schemas/PurposeSimple"
+					},
+					"refunds": {
+						"items": {
+							"$ref": "#/components/schemas/Refund"
+						},
+						"type": "array"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"date",
+					"country",
+					"cateringNoRefund",
+					"purpose",
+					"refunds",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelState": {
+				"type": "string",
+				"enum": [
+					"rejected",
+					"appliedFor",
+					"approved",
+					"underExamination",
+					"refunded"
+				]
+			},
+			"UserSimple": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -810,51 +1876,104 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelComment": {
+				"properties": {
+					"text": {
+						"type": "string"
 					},
-					"fk": {
-						"properties": {
-							"magiclogin": {
-								"type": "string",
-								"nullable": true
-							},
-							"ldapauth": {
-								"type": "string",
-								"nullable": true
-							},
-							"microsoft": {
-								"type": "string",
-								"nullable": true
-							}
-						},
-						"type": "object"
+					"author": {
+						"$ref": "#/components/schemas/UserSimple"
 					},
-					"access": {
-						"properties": {
-							"user": {
-								"type": "boolean"
-							},
-							"approve/travel": {
-								"type": "boolean"
-							},
-							"examine/travel": {
-								"type": "boolean"
-							},
-							"examine/expenseReport": {
-								"type": "boolean"
-							},
-							"examine/healthCareCost": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
-							"admin": {
-								"type": "boolean"
-							}
-						},
-						"type": "object"
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					},
-					"loseAccessAt": {
+					"toState": {
+						"$ref": "#/components/schemas/TravelState"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"_id",
+					"toState"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HealthCareCostState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork",
+					"underExaminationByInsurance"
+				]
+			},
+			"ExpenseReportState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork"
+				]
+			},
+			"AnyState": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/TravelState"
+					},
+					{
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					{
+						"$ref": "#/components/schemas/ExpenseReportState"
+					}
+				]
+			},
+			"OrganisationSimple": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Travel": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
 						"anyOf": [
 							{
 								"type": "string",
@@ -863,35 +1982,1437 @@
 							{
 								"type": "string"
 							}
-						],
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/TravelComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
 						"nullable": true
 					},
-					"settings": {
-						"$ref": "#/components/schemas/UserSettingsPost"
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
+					"progress": {
+						"type": "number",
+						"format": "double"
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"claimOvernightLumpSum": {
+						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"stages": {
+						"items": {
+							"$ref": "#/components/schemas/Stage"
+						},
+						"type": "array"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/TravelExpense"
+						},
+						"type": "array"
+					},
+					"days": {
+						"items": {
+							"$ref": "#/components/schemas/TravelDay"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
-					"email",
-					"name"
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"comments",
+					"reason",
+					"destinationPlace",
+					"travelInsideOfEU",
+					"startDate",
+					"endDate",
+					"advance",
+					"progress",
+					"claimOvernightLumpSum",
+					"lastPlaceOfWork",
+					"professionalShare",
+					"history",
+					"historic",
+					"stages",
+					"expenses",
+					"days"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"DeleteResult": {
+			"GETResponse_Travel-or-Travel-Array_": {
 				"properties": {
-					"acknowledged": {
-						"type": "boolean",
-						"description": "Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined."
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Travel"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Travel"
+								},
+								"type": "array"
+							}
+						]
 					},
-					"deletedCount": {
-						"type": "number",
-						"format": "double",
-						"description": "The number of documents that were deleted"
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
 					}
 				},
 				"required": [
-					"acknowledged",
-					"deletedCount"
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ITravel": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/TravelComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
+					"progress": {
+						"type": "number",
+						"format": "double"
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"claimOvernightLumpSum": {
+						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"stages": {
+						"items": {
+							"$ref": "#/components/schemas/Stage"
+						},
+						"type": "array"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/TravelExpense"
+						},
+						"type": "array"
+					},
+					"days": {
+						"items": {
+							"$ref": "#/components/schemas/TravelDay"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"comments",
+					"reason",
+					"destinationPlace",
+					"travelInsideOfEU",
+					"startDate",
+					"endDate",
+					"advance",
+					"progress",
+					"claimOvernightLumpSum",
+					"lastPlaceOfWork",
+					"professionalShare",
+					"history",
+					"historic",
+					"stages",
+					"expenses",
+					"days"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_ITravel_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"name",
+								"owner",
+								"state",
+								"organisation",
+								"editor",
+								"createdAt",
+								"updatedAt",
+								"_id",
+								"state",
+								"comments",
+								"comment",
+								"reason",
+								"destinationPlace",
+								"travelInsideOfEU",
+								"startDate",
+								"endDate",
+								"advance",
+								"progress",
+								"claimSpouseRefund",
+								"fellowTravelersNames",
+								"claimOvernightLumpSum",
+								"lastPlaceOfWork",
+								"professionalShare",
+								"history",
+								"historic",
+								"stages",
+								"expenses",
+								"days"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_TravelPost.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
+				"properties": {
+					"fellowTravelersNames": {
+						"type": "string"
+					},
+					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"advance": {
+						"properties": {
+							"exchangeRate": {
+								"properties": {
+									"rate": {
+										"type": "number",
+										"format": "double"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"date": {
+										"anyOf": [
+											{
+												"type": "string"
+											},
+											{
+												"type": "string",
+												"format": "date-time"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"currency": {
+								"properties": {
+									"flag": {
+										"type": "string"
+									},
+									"subunit": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"symbol": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"destinationPlace": {
+						"properties": {
+							"place": {
+								"type": "string"
+							},
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"properties": {
+									"currency": {
+										"type": "string"
+									},
+									"flag": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"alias": {
+										"properties": {
+											"en": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"de": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											}
+										},
+										"required": [
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"days": {
+						"items": {
+							"properties": {
+								"cateringNoRefund": {
+									"properties": {
+										"dinner": {
+											"type": "boolean"
+										},
+										"lunch": {
+											"type": "boolean"
+										},
+										"breakfast": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"dinner",
+										"lunch",
+										"breakfast"
+									],
+									"type": "object"
+								},
+								"purpose": {
+									"$ref": "#/components/schemas/PurposeSimple"
+								},
+								"date": {
+									"type": "string",
+									"format": "date-time"
+								},
+								"_id": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"lastPlaceOfWork": {
+						"properties": {
+							"place": {
+								"type": "string"
+							},
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"properties": {
+									"currency": {
+										"type": "string"
+									},
+									"flag": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"alias": {
+										"properties": {
+											"en": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"de": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											}
+										},
+										"required": [
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"claimOvernightLumpSum": {
+						"type": "boolean"
+					},
+					"name": {
+						"type": "string"
+					},
+					"organisation": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"_id": {
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_TravelPost_": {
+				"$ref": "#/components/schemas/SetterPartial_TravelPost.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
+			},
+			"SetterPartial_TravelExpense.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
+				"properties": {
+					"purpose": {
+						"type": "string",
+						"enum": [
+							"professional",
+							"mixed"
+						]
+					},
+					"cost": {
+						"properties": {
+							"receipts": {
+								"items": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "byte"
+												}
+											]
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"image/jpeg",
+												"image/png",
+												"application/pdf"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"exchangeRate": {
+								"properties": {
+									"rate": {
+										"type": "number",
+										"format": "double"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"date": {
+										"anyOf": [
+											{
+												"type": "string"
+											},
+											{
+												"type": "string",
+												"format": "date-time"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"currency": {
+								"properties": {
+									"flag": {
+										"type": "string"
+									},
+									"subunit": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"symbol": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"type": "object"
+					},
+					"description": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_TravelExpense_": {
+				"$ref": "#/components/schemas/SetterPartial_TravelExpense.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
+			},
+			"SetterPartial_Stage.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
+				"properties": {
+					"purpose": {
+						"$ref": "#/components/schemas/Purpose"
+					},
+					"cost": {
+						"properties": {
+							"receipts": {
+								"items": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "byte"
+												}
+											]
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"image/jpeg",
+												"image/png",
+												"application/pdf"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"exchangeRate": {
+								"properties": {
+									"rate": {
+										"type": "number",
+										"format": "double"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"date": {
+										"anyOf": [
+											{
+												"type": "string"
+											},
+											{
+												"type": "string",
+												"format": "date-time"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"currency": {
+								"properties": {
+									"flag": {
+										"type": "string"
+									},
+									"subunit": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"symbol": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"type": "object"
+					},
+					"transport": {
+						"anyOf": [
+							{
+								"properties": {
+									"type": {
+										"type": "string",
+										"enum": [
+											"airplane",
+											"shipOrFerry",
+											"otherTransport"
+										]
+									}
+								},
+								"type": "object"
+							},
+							{
+								"properties": {
+									"distanceRefundType": {
+										"type": "string",
+										"enum": [
+											"car",
+											"motorcycle",
+											"halfCar"
+										]
+									},
+									"distance": {
+										"type": "number",
+										"format": "double"
+									},
+									"type": {
+										"type": "string",
+										"enum": [
+											"ownCar"
+										],
+										"nullable": false
+									}
+								},
+								"type": "object"
+							}
+						]
+					},
+					"midnightCountries": {
+						"items": {
+							"properties": {
+								"country": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"date": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "string",
+											"format": "date-time"
+										}
+									]
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"endLocation": {
+						"properties": {
+							"place": {
+								"type": "string"
+							},
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"properties": {
+									"currency": {
+										"type": "string"
+									},
+									"flag": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"alias": {
+										"properties": {
+											"en": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"de": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											}
+										},
+										"required": [
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"startLocation": {
+						"properties": {
+							"place": {
+								"type": "string"
+							},
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"properties": {
+									"currency": {
+										"type": "string"
+									},
+									"flag": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"alias": {
+										"properties": {
+											"en": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"de": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											}
+										},
+										"required": [
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"arrival": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"departure": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_Stage_": {
+				"$ref": "#/components/schemas/SetterPartial_Stage.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
+			},
+			"TravelSimple": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"state": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/TravelComment"
+						},
+						"type": "array"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
+					"progress": {
+						"type": "number",
+						"format": "double"
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"state",
+					"organisation",
+					"editor",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"comments",
+					"reason",
+					"destinationPlace",
+					"travelInsideOfEU",
+					"startDate",
+					"endDate",
+					"advance",
+					"progress"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_TravelSimple.Exclude_keyofTravelSimple.state-or-comments-or-comment-or-progress-or-name-or-_id-or-advance__": {
+				"properties": {
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"fellowTravelersNames": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"owner",
+					"editor",
+					"organisation",
+					"reason",
+					"destinationPlace",
+					"travelInsideOfEU",
+					"startDate",
+					"endDate"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"TravelApplication": {
+				"properties": {
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/OrganisationSimple"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"travelInsideOfEU": {
+						"type": "boolean"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"fellowTravelersNames": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"owner",
+					"editor",
+					"organisation",
+					"reason",
+					"destinationPlace",
+					"travelInsideOfEU",
+					"startDate",
+					"endDate"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1203,314 +3724,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_ISettings_": {
+			"SetterPartial_ISettings.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"accessIcons": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"admin": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"confirm/healthCareCost": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"examine/healthCareCost": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"examine/expenseReport": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"examine/travel": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"approve/travel": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"user": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									}
-								},
-								"required": [
-									"admin",
-									"confirm/healthCareCost",
-									"examine/healthCareCost",
-									"examine/expenseReport",
-									"examine/travel",
-									"approve/travel",
-									"user"
-								],
-								"type": "object"
-							}
-						]
-					},
-					"allowSpouseRefund": {
-						"type": "boolean"
-					},
-					"baseCurrency": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Currency"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							}
-						]
-					},
-					"breakfastCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"lunchCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"dinnerCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSumExceptions": {
-						"anyOf": [
-							{
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"factorOvernightLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorOvernightLumpSumExceptions": {
-						"anyOf": [
-							{
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"fallBackLumpSumCountry": {
+					"migrateFrom": {
 						"type": "string"
 					},
-					"maxTravelDayCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"distanceRefunds": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"halfCar": {
-										"type": "number",
-										"format": "double"
-									},
-									"motorcycle": {
-										"type": "number",
-										"format": "double"
-									},
-									"car": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"required": [
-									"halfCar",
-									"motorcycle",
-									"car"
-								],
-								"type": "object"
-							}
-						]
-					},
-					"secoundNightOnAirplaneLumpSumCountry": {
+					"version": {
 						"type": "string"
-					},
-					"secoundNightOnShipOrFerryLumpSumCountry": {
-						"type": "string"
-					},
-					"stateColors": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"underExaminationByInsurance": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"inWork": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"refunded": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"underExamination": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"approved": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"appliedFor": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									},
-									"rejected": {
-										"properties": {
-											"text": {
-												"type": "string"
-											},
-											"color": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"text",
-											"color"
-										],
-										"type": "object"
-									}
-								},
-								"required": [
-									"underExaminationByInsurance",
-									"inWork",
-									"refunded",
-									"underExamination",
-									"approved",
-									"appliedFor",
-									"rejected"
-								],
-								"type": "object"
-							}
-						]
-					},
-					"toleranceStageDatesToApprovedTravelDates": {
-						"type": "number",
-						"format": "double"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"allowTravelApplicationForThePast": {
-						"type": "boolean"
 					},
 					"vehicleRegistrationWhenUsingOwnCar": {
 						"type": "string",
@@ -1520,18 +3740,247 @@
 							"none"
 						]
 					},
-					"version": {
+					"allowTravelApplicationForThePast": {
+						"type": "boolean"
+					},
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
+					},
+					"toleranceStageDatesToApprovedTravelDates": {
+						"type": "number",
+						"format": "double"
+					},
+					"stateColors": {
+						"properties": {
+							"underExaminationByInsurance": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"inWork": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"refunded": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"underExamination": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"approved": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"appliedFor": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"rejected": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"secoundNightOnShipOrFerryLumpSumCountry": {
 						"type": "string"
 					},
-					"migrateFrom": {
+					"secoundNightOnAirplaneLumpSumCountry": {
 						"type": "string"
+					},
+					"distanceRefunds": {
+						"properties": {
+							"halfCar": {
+								"type": "number",
+								"format": "double"
+							},
+							"motorcycle": {
+								"type": "number",
+								"format": "double"
+							},
+							"car": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"maxTravelDayCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"fallBackLumpSumCountry": {
+						"type": "string"
+					},
+					"factorOvernightLumpSumExceptions": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"factorOvernightLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSumExceptions": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"factorCateringLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"dinnerCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"lunchCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"breakfastCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"baseCurrency": {
+						"properties": {
+							"flag": {
+								"type": "string"
+							},
+							"subunit": {
+								"type": "string"
+							},
+							"name": {
+								"properties": {
+									"en": {
+										"type": "string"
+									},
+									"de": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"_id": {
+								"type": "string"
+							},
+							"symbol": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"accessIcons": {
+						"properties": {
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
+				"type": "object"
+			},
+			"SetterBody_ISettings_": {
+				"$ref": "#/components/schemas/SetterPartial_ISettings.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
 			},
 			"GETResponse_Organisation-or-Organisation-Array_": {
 				"properties": {
@@ -1624,15 +4073,15 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_IOrganisation_": {
+			"SetterPartial_IOrganisation.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"subfolderPath": {
+					"companyNumber": {
 						"type": "string"
 					},
 					"bankDetails": {
 						"type": "string"
 					},
-					"companyNumber": {
+					"subfolderPath": {
 						"type": "string"
 					},
 					"name": {
@@ -1642,8 +4091,10 @@
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
+				"type": "object"
+			},
+			"SetterBody_IOrganisation_": {
+				"$ref": "#/components/schemas/SetterPartial_IOrganisation.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
 			},
 			"GETResponse_HealthInsurance-or-HealthInsurance-Array_": {
 				"properties": {
@@ -1726,87 +4177,22 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_IHealthInsurance_": {
+			"SetterPartial_IHealthInsurance.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"name": {
+					"email": {
 						"type": "string"
 					},
-					"email": {
+					"name": {
 						"type": "string"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
+				"type": "object"
 			},
-			"Cost": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile"
-						},
-						"type": "array"
-					},
-					"date": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					}
-				},
-				"required": [
-					"amount",
-					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
+			"SetterBody_IHealthInsurance_": {
+				"$ref": "#/components/schemas/SetterPartial_IHealthInsurance.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
 			},
 			"Expense": {
 				"properties": {
@@ -1895,47 +4281,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"HealthCareCostState": {
-				"type": "string",
-				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork",
-					"underExaminationByInsurance"
-				]
-			},
-			"UserSimple": {
-				"properties": {
-					"email": {
-						"type": "string"
-					},
-					"name": {
-						"properties": {
-							"familyName": {
-								"type": "string"
-							},
-							"givenName": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"familyName",
-							"givenName"
-						],
-						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"email",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"HealthCareCostComment": {
 				"properties": {
 					"text": {
@@ -1956,53 +4301,6 @@
 					"author",
 					"_id",
 					"toState"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"TravelState": {
-				"type": "string",
-				"enum": [
-					"rejected",
-					"appliedFor",
-					"approved",
-					"underExamination",
-					"refunded"
-				]
-			},
-			"ExpenseReportState": {
-				"type": "string",
-				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork"
-				]
-			},
-			"AnyState": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/TravelState"
-					},
-					{
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					{
-						"$ref": "#/components/schemas/ExpenseReportState"
-					}
-				]
-			},
-			"OrganisationSimple": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"name",
-					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -2276,84 +4574,146 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"CostPost": {
+			"SetterPartial_Expense.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
+					"cost": {
 						"properties": {
+							"receipts": {
+								"items": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "byte"
+												}
+											]
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"image/jpeg",
+												"image/png",
+												"application/pdf"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"exchangeRate": {
+								"properties": {
+									"rate": {
+										"type": "number",
+										"format": "double"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"date": {
+										"anyOf": [
+											{
+												"type": "string"
+											},
+											{
+												"type": "string",
+												"format": "date-time"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
 							"amount": {
 								"type": "number",
 								"format": "double"
 							},
-							"rate": {
-								"type": "number",
-								"format": "double"
+							"currency": {
+								"properties": {
+									"flag": {
+										"type": "string"
+									},
+									"subunit": {
+										"type": "string"
+									},
+									"name": {
+										"properties": {
+											"en": {
+												"type": "string"
+											},
+											"de": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"en",
+											"de"
+										],
+										"type": "object"
+									},
+									"_id": {
+										"type": "string"
+									},
+									"symbol": {
+										"type": "string"
+									}
+								},
+								"type": "object"
 							},
 							"date": {
 								"anyOf": [
 									{
-										"type": "string",
-										"format": "date-time"
+										"type": "string"
 									},
 									{
-										"type": "string"
+										"type": "string",
+										"format": "date-time"
 									}
 								]
 							}
 						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
+						"type": "object"
 					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/File"
-						},
-						"type": "array"
-					},
-					"date": {
-						"type": "string",
-						"format": "date-time"
-					}
-				},
-				"required": [
-					"amount",
-					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ExpensePost": {
-				"properties": {
 					"description": {
 						"type": "string"
 					},
-					"cost": {
-						"$ref": "#/components/schemas/CostPost"
-					},
 					"_id": {
-						"$ref": "#/components/schemas/_id"
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
-				"required": [
-					"description",
-					"cost"
-				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"SetterBody_Expense_": {
+				"$ref": "#/components/schemas/SetterPartial_Expense.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
+			},
+			"IdDocument": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/_id"
+					},
+					{
+						"properties": {
+							"_id": {
+								"$ref": "#/components/schemas/_id"
+							}
+						},
+						"required": [
+							"_id"
+						],
+						"type": "object"
+					}
+				]
 			},
 			"MoneyPlusPost": {
 				"properties": {
@@ -2782,45 +5142,36 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_ICurrency_": {
+			"SetterPartial_ICurrency.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"name": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"en": {
-										"type": "string"
-									},
-									"de": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"en",
-									"de"
-								],
-								"type": "object"
-							}
-						]
-					},
-					"_id": {
+					"flag": {
 						"type": "string"
 					},
 					"subunit": {
 						"type": "string"
 					},
-					"symbol": {
+					"name": {
+						"properties": {
+							"en": {
+								"type": "string"
+							},
+							"de": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
 						"type": "string"
 					},
-					"flag": {
+					"symbol": {
 						"type": "string"
 					}
 				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
+				"type": "object"
+			},
+			"SetterBody_ICurrency_": {
+				"$ref": "#/components/schemas/SetterPartial_ICurrency.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
 			},
 			"LumpSum": {
 				"properties": {
@@ -2947,7 +5298,7 @@
 					"currency": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/Currency"
+								"$ref": "#/components/schemas/CurrencyCode"
 							}
 						],
 						"nullable": true
@@ -3044,7 +5395,7 @@
 					"currency": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/Currency"
+								"$ref": "#/components/schemas/CurrencyCode"
 							}
 						],
 						"nullable": true
@@ -3107,95 +5458,107 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterBody_ICountry_": {
+			"SetterPartial_ICountry.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_": {
 				"properties": {
-					"lumpSums": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/CountryLumpSum"
-								},
-								"type": "array"
-							}
-						]
-					},
 					"lumpSumsFrom": {
 						"type": "string"
 					},
-					"name": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"en": {
-										"type": "string"
+					"lumpSums": {
+						"items": {
+							"properties": {
+								"spezials": {
+									"items": {
+										"properties": {
+											"city": {
+												"type": "string"
+											},
+											"catering24": {
+												"type": "number",
+												"format": "double"
+											},
+											"catering8": {
+												"type": "number",
+												"format": "double"
+											},
+											"overnight": {
+												"type": "number",
+												"format": "double"
+											}
+										},
+										"type": "object"
 									},
-									"de": {
-										"type": "string"
-									}
+									"type": "array"
 								},
-								"required": [
-									"en",
-									"de"
-								],
-								"type": "object"
-							}
-						]
-					},
-					"alias": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument"
-							},
-							{
-								"properties": {
-									"en": {
-										"items": {
+								"validFrom": {
+									"anyOf": [
+										{
 											"type": "string"
 										},
-										"type": "array"
-									},
-									"de": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									}
+										{
+											"type": "string",
+											"format": "date-time"
+										}
+									]
 								},
-								"required": [
-									"de"
-								],
-								"type": "object"
-							}
-						]
+								"catering24": {
+									"type": "number",
+									"format": "double"
+								},
+								"catering8": {
+									"type": "number",
+									"format": "double"
+								},
+								"overnight": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					},
-					"_id": {
+					"currency": {
 						"type": "string"
 					},
 					"flag": {
 						"type": "string"
 					},
-					"currency": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Currency"
+					"name": {
+						"properties": {
+							"en": {
+								"type": "string"
 							},
-							{
-								"$ref": "#/components/schemas/IdDocument"
+							"de": {
+								"type": "string"
 							}
-						]
+						},
+						"type": "object"
+					},
+					"alias": {
+						"properties": {
+							"en": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"de": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"type": "string"
 					}
 				},
-				"type": "object",
-				"description": "With _id everything else is optional. Without some fields may be required."
+				"type": "object"
+			},
+			"SetterBody_ICountry_": {
+				"$ref": "#/components/schemas/SetterPartial_ICountry.historic-or-owner-or-history-or-createdAt-or-updatedAt-or-editor_"
 			}
 		},
 		"securitySchemes": {
@@ -3436,7 +5799,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Partial_UserSettingsPost_"
+								"$ref": "#/components/schemas/SetterBody_IUser-at-settings_"
 							}
 						}
 					}
@@ -3746,7 +6109,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UserPost"
+								"$ref": "#/components/schemas/SetterBodyUser"
 							}
 						}
 					}
@@ -3870,6 +6233,946 @@
 						}
 					}
 				}
+			}
+		},
+		"/api/travel": {
+			"get": {
+				"operationId": "GetTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Travel-or-Travel-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"comments",
+									"comment",
+									"reason",
+									"destinationPlace",
+									"travelInsideOfEU",
+									"startDate",
+									"endDate",
+									"advance",
+									"progress",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
+									"claimOvernightLumpSum",
+									"lastPlaceOfWork",
+									"professionalShare",
+									"history",
+									"historic",
+									"stages",
+									"expenses",
+									"days"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "PostTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_TravelPost_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/travel/expense": {
+			"post": {
+				"operationId": "PostExpense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_TravelExpense_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/travel/stage": {
+			"post": {
+				"operationId": "PostStage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_Stage_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteStage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/travel/appliedFor": {
+			"post": {
+				"operationId": "PostInWork",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/TravelSimple"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TravelApplication"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/travel/underExamination": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/TravelSimple"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/travel/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/travel/examiner": {
+			"get": {
+				"operationId": "GetExaminer",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_User-or-User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/api/examine/travel": {
+			"get": {
+				"operationId": "GetTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Travel-or-Travel-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"comments",
+									"comment",
+									"reason",
+									"destinationPlace",
+									"travelInsideOfEU",
+									"startDate",
+									"endDate",
+									"advance",
+									"progress",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
+									"claimOvernightLumpSum",
+									"lastPlaceOfWork",
+									"professionalShare",
+									"history",
+									"historic",
+									"stages",
+									"expenses",
+									"days"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/travel/expense": {
+			"post": {
+				"operationId": "PostExpense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_TravelExpense_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/travel/refunded": {
+			"post": {
+				"operationId": "PostUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/examine/travel/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
 			}
 		},
 		"/api/settings": {
@@ -4565,7 +7868,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ExpensePost"
+								"$ref": "#/components/schemas/SetterBody_Expense_"
 							}
 						}
 					}
@@ -5004,7 +8307,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ExpensePost"
+								"$ref": "#/components/schemas/SetterBody_Expense_"
 							}
 						}
 					}
@@ -5619,7 +8922,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ExpensePost"
+								"$ref": "#/components/schemas/SetterBody_Expense_"
 							}
 						}
 					}
@@ -6047,7 +9350,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ExpensePost"
+								"$ref": "#/components/schemas/SetterBody_Expense_"
 							}
 						}
 					}
