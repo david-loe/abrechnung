@@ -3,8 +3,38 @@ import fs from 'fs'
 import i18n from '../i18n.js'
 import { datetoDateStringWithYear } from '../../common/scripts.js'
 import DocumentFile from '../models/documentFile.js'
+import Organisation from '../models/organisation.js'
 import { mongo } from 'mongoose'
-import { Cost, DocumentFile as IDocumentFile, Locale, Place } from '../../common/types.js'
+import {
+  Cost,
+  ExpenseReport,
+  HealthCareCost,
+  DocumentFile as IDocumentFile,
+  Locale,
+  Place,
+  Travel,
+  reportIsHealthCareCost,
+  reportIsTravel
+} from '../../common/types.js'
+
+export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost): Promise<string> {
+  var path = '/reports/'
+  if (reportIsTravel(report)) {
+    path += 'travel/'
+  } else if (reportIsHealthCareCost(report)) {
+    if (report.state === 'refunded') {
+      path += 'healthCareCost/confirmed/'
+    } else {
+      path += 'healthCareCost/'
+    }
+  } else {
+    path += 'expenseReport/'
+  }
+  const org = await Organisation.findOne({ _id: report.organisation._id })
+  const subfolder = org ? org.subfolderPath : ''
+  path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + '.pdf'
+  return path
+}
 
 export function writeToDisk(filePath: string, pdfBytes: Uint8Array) {
   // create folders

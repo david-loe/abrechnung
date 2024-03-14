@@ -369,3 +369,15 @@ export interface SETResponse<T> {
   message: string
   result: T
 }
+
+export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel {
+  return typeof (report as Travel).travelInsideOfEU === 'boolean'
+}
+
+export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost {
+  return typeof (report as HealthCareCost).patientName === 'string'
+}
+
+export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport {
+  return !reportIsTravel(report) && !reportIsHealthCareCost(report)
+}
