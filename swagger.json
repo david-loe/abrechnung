@@ -6822,6 +6822,238 @@
 				"parameters": []
 			}
 		},
+		"/api/approve/travel": {
+			"get": {
+				"operationId": "GetTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Travel-or-Travel-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Approve",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"organisation",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"comments",
+									"comment",
+									"reason",
+									"destinationPlace",
+									"travelInsideOfEU",
+									"startDate",
+									"endDate",
+									"advance",
+									"progress",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
+									"claimOvernightLumpSum",
+									"lastPlaceOfWork",
+									"professionalShare",
+									"history",
+									"historic",
+									"stages",
+									"expenses",
+									"days"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/approve/travel/approved": {
+			"post": {
+				"operationId": "PostApproved",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Approve",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/approve/travel/rejected": {
+			"post": {
+				"operationId": "PostRejected",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/TravelSimple"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Approve",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/examine/travel": {
 			"get": {
 				"operationId": "GetTravel",
