@@ -20,7 +20,11 @@ import {
 export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost): Promise<string> {
   var path = '/reports/'
   if (reportIsTravel(report)) {
-    path += 'travel/'
+    if (report.state === 'approved') {
+      path += 'advance/'
+    } else {
+      path += 'travel/'
+    }
   } else if (reportIsHealthCareCost(report)) {
     if (report.state === 'refunded') {
       path += 'healthCareCost/confirmed/'

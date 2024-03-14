@@ -12,7 +12,7 @@ import { sendTravelNotificationMail } from '../mail/mail.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import User from '../models/user.js'
 import DocumentFile from '../models/documentFile.js'
-import { writeToDisk } from '../pdf/helper.js'
+import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -192,6 +192,60 @@ export class TravelController extends Controller {
       query: { limit: 5 },
       filter: { 'access.examine/travel': true },
       projection: { name: 1, email: 1 }
+    })
+  }
+}
+
+@Tags('Approve', 'Travel')
+@Route('api/approve/travel')
+@Security('cookieAuth', ['approve/travel'])
+export class TravelApproveController extends Controller {
+  @Get()
+  public async getTravel(@Queries() query: GetterQuery<ITravel>) {
+    const sortFn = (a: ITravel, b: ITravel) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    return await this.getter(Travel, {
+      query,
+      filter: { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] },
+      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      sortFn
+    })
+  }
+
+  @Post('approved')
+  public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
+    const cb = async (travel: ITravel) => {
+      sendTravelNotificationMail(travel)
+      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
+      }
+    }
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      cb,
+      allowNew: false,
+      async checkOldObject(oldObject: TravelDoc) {
+        if (oldObject.state === 'appliedFor') {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
+  @Post('rejected')
+  public async postRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'rejected' as TravelState, editor: request.user?._id })
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      cb: sendTravelNotificationMail,
+      allowNew: false,
+      checkOldObject: async (oldObject: TravelDoc) => oldObject.state === 'appliedFor'
     })
   }
 }
