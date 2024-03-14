@@ -558,7 +558,7 @@ export default defineComponent({
       }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
       } else {
         await this.getTravel()
       }
@@ -567,7 +567,6 @@ export default defineComponent({
       if (confirm(this.$t('alerts.warningReapply'))) {
         const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
-          await this.getTravel()
           this.hideModal()
           this.$router.push({ path: '/' })
         } else {
@@ -594,7 +593,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
+      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?_id=' + this.travel._id
     },
     async postStage(stage: Stage) {
       var headers = {}
@@ -603,10 +602,9 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(stage as any).travelId = this.travel._id
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers })
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers, params: {parentId: this.travel._id} })
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
         this.hideModal()
       } else if (result.error) {
         this.error = result.error?.error
@@ -618,9 +616,9 @@ export default defineComponent({
       }
     },
     async deleteStage(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, travelId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
-        await this.getTravel()
+        this.setTravel(result)
         this.hideModal()
       }
     },
@@ -631,17 +629,16 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).travelId = this.travel._id
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers })
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers, params: {parentId: this.travel._id}  })
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
         this.hideModal()
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, travelId: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getTravel()
+        this.setTravel(result)
         this.hideModal()
       }
     },
@@ -717,20 +714,22 @@ export default defineComponent({
       }
     },
     async getTravel() {
-      const oldTravel = this.travel
       const params: any = {
         _id: this._id,
-        addStages: true,
-        addExpenses: true,
-        addDays: true
+        additionalFields: ['stages', 'expenses', 'days']
       }
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
       const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
       if (res) {
-        this.travel = res.data
-        if (oldTravel.days && this.travel.days) {
+        this.setTravel(res.data)
+      }
+    },
+    setTravel(travel: Travel) {
+      const oldTravel = this.travel
+      this.travel = travel
+      if (oldTravel.days && this.travel.days) {
           for (const oldDay of oldTravel.days) {
             if ((oldDay as Day).showSettings) {
               for (const newDay of this.travel.days) {
@@ -741,8 +740,6 @@ export default defineComponent({
             }
           }
         }
-      }
-
       log(this.$t('labels.travel') + ':')
       log(this.travel)
       this.renderTable()
@@ -774,6 +771,7 @@ export default defineComponent({
           list.push(adding)
         }
       }
+      add(travel.destinationPlace, list)
       for (const stage of travel.stages) {
         add(stage.startLocation, list)
         add(stage.endLocation, list)

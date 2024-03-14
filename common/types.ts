@@ -50,7 +50,7 @@ export interface CountrySimple {
   }
   _id: CountryCode
   flag?: string | null
-  currency?: Currency | null
+  currency?: CurrencyCode | null
 }
 
 export interface CountryLumpSum extends LumpSum {
@@ -143,7 +143,7 @@ export interface User extends UserSimple {
   access: {
     [key in Access]: boolean
   }
-  loseAccessAt?: Date | string | null
+  loseAccessAt?: null | Date | string
   settings: {
     language: Locale
     lastCurrencies: Currency[]

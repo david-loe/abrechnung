@@ -1,16 +1,17 @@
 import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request, Middlewares, Produces } from 'tsoa'
-import { Controller, GetterQuery } from './controller.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import Organisation from '../models/organisation.js'
-import { TravelState, Travel as ITravel, _id } from '../../common/types.js'
+import { TravelState, Travel as ITravel, _id, TravelExpense, Stage } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { documentFileHandler } from '../helper.js'
-import { ExpensePost, IdDocument, TravelApplication, TravelPost } from './types.js'
+import { TravelApplication, TravelPost } from './types.js'
 import i18n from '../i18n.js'
 import { sendTravelNotificationMail } from '../mail/mail.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import User from '../models/user.js'
+import DocumentFile from '../models/documentFile.js'
 import { writeToDisk } from '../pdf/helper.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -32,24 +33,31 @@ export class TravelController extends Controller {
   }
   @Delete()
   public async deleteTravel(@Query() _id: _id, @Request() request: ExRequest) {
-    return await this.deleter(Travel, { _id: _id, checkOldObject: this.checkOwner(request.user!) })
+    return await this.deleter(Travel, {
+      _id: _id,
+      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.owner._id.equals(request.user!._id)
+    })
   }
 
   @Post()
-  public async postTravel(@Body() requestBody: TravelPost, @Request() request: ExRequest) {
+  public async postTravel(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendTravelNotificationMail,
       allowNew: false,
-      checkOldObject: async (oldObject: TravelDoc) => oldObject.owner._id.equals(request.user!._id) && oldObject.state !== 'refunded'
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic && oldObject.owner._id.equals(request.user!._id) && oldObject.state !== 'refunded'
     })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(
+    @Query('parentId') parentId: _id,
+    @Body() requestBody: SetterBody<TravelExpense>,
+    @Request() request: ExRequest
+  ) {
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -60,16 +68,16 @@ export class TravelController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
   @Post('stage')
   @Middlewares(fileHandler.any())
-  public async postStage(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postStage(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -80,10 +88,10 @@ export class TravelController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Stage, b) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
     })
   }
 
@@ -93,13 +101,19 @@ export class TravelController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'approved' && request.user!._id.equals(oldObject.owner._id)) {
-          return true
-        } else {
-          throw new Error('alerts.request.unauthorized')
-        }
-      }
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic && oldObject.state === 'approved' && request.user!._id.equals(oldObject.owner._id)
+    })
+  }
+
+  @Delete('stage')
+  public async deleteStage(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+    return await this.deleterForArrayElement(Travel, {
+      _id,
+      parentId,
+      arrayElementKey: 'stages',
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic && oldObject.state === 'approved' && request.user!._id.equals(oldObject.owner._id)
     })
   }
 
@@ -113,15 +127,23 @@ export class TravelController extends Controller {
     })
 
     if (!extendedBody.name) {
-      var date = new Date()
+      var date = new Date(extendedBody.startDate)
       extendedBody.name =
-        i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
+        extendedBody.destinationPlace.place +
         ' ' +
         i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
         ' ' +
         date.getUTCFullYear()
     }
-    return await this.setter(Travel, { requestBody: extendedBody, checkOldObject: this.checkOwner(request.user!), allowNew: true })
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      cb: sendTravelNotificationMail,
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic &&
+        (oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved') &&
+        request.user!._id.equals(oldObject.owner._id),
+      allowNew: true
+    })
   }
 
   @Post('underExamination')
@@ -160,7 +182,7 @@ export class TravelController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new Error(`No travel found or unauthorized`)
     }
   }
 
@@ -197,7 +219,11 @@ export class TravelExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(
+    @Query('parentId') parentId: _id,
+    @Body() requestBody: SetterBody<TravelExpense>,
+    @Request() request: ExRequest
+  ) {
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -211,7 +237,7 @@ export class TravelExamineController extends Controller {
           throw new Error('alerts.request.unauthorized')
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 

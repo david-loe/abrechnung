@@ -1,7 +1,6 @@
 import express from 'express'
 const router = express.Router()
 import { UserDoc } from '../../models/user.js'
-import travelRoutes from './travel.js'
 import approveRoutes from './approve/routes.js'
 import examineRoutes from './examine/routes.js'
 import i18n from '../../i18n.js'
@@ -14,7 +13,6 @@ router.use(async (req, res, next) => {
   }
 })
 
-router.use('/travel', travelRoutes)
 router.use('/approve', approveRoutes)
 router.use('/examine', examineRoutes)
 

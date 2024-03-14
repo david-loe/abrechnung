@@ -2,11 +2,11 @@ import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
-import { HealthCareCostState, HealthCareCost as IHealthCareCost, _id, Organisation as IOrganisation } from '../../common/types.js'
+import { HealthCareCostState, HealthCareCost as IHealthCareCost, _id, Organisation as IOrganisation, Expense } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { documentFileHandler } from '../helper.js'
-import { CostPost, ExpensePost, IdDocument, MoneyPlusPost } from './types.js'
+import { IdDocument, MoneyPlusPost } from './types.js'
 import i18n from '../i18n.js'
 import { sendHealthCareCostNotificationMail } from '../mail/mail.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
@@ -37,7 +37,7 @@ export class HealthCareCostController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody,
       parentId,
@@ -51,7 +51,7 @@ export class HealthCareCostController extends Controller {
           throw new Error('alerts.request.unauthorized')
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
@@ -164,7 +164,7 @@ export class HealthCareCostExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody,
       parentId,
@@ -178,7 +178,7 @@ export class HealthCareCostExamineController extends Controller {
           throw new Error('alerts.request.unauthorized')
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
@@ -308,7 +308,7 @@ export class HealthCareCostConfirmController extends Controller {
     }
 
     return await this.setter(HealthCareCost, {
-      requestBody: extendedBody as SetterBody<IHealthCareCost>,
+      requestBody: extendedBody,
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {

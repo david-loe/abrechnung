@@ -1,5 +1,5 @@
 import { Route, Get, Tags, Security, Queries, Request, Post, Body, Delete, Middlewares, Consumes, BodyProp, Query } from 'tsoa'
-import { Controller, GetterQuery } from './controller.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 import multer from 'multer'
 import User from '../models/user.js'
 import Token from '../models/token.js'
@@ -8,7 +8,7 @@ import { Request as ExRequest } from 'express'
 import { sendMail } from '../mail/mail.js'
 import i18n from '../i18n.js'
 import { documentFileHandler } from '../helper.js'
-import { File, UserPost, UserSettingsPost } from './types.js'
+import { File } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -44,18 +44,19 @@ export class UserController extends Controller {
   }
 
   @Post('settings')
-  public async postSettings(@Body() requestBody: Partial<UserSettingsPost>, @Request() request: ExRequest) {
+  public async postSettings(@Body() requestBody: SetterBody<IUser['settings']>, @Request() request: ExRequest) {
     Object.assign(request.user!.settings, requestBody)
     request.user!.markModified('settings')
-    const result = await request.user!.save()
+    const result = (await request.user!.save()).toObject()
     return { message: 'alerts.successSaving', result: result.settings }
   }
 
   @Post('vehicleRegistration')
-  @Middlewares(fileHandler.any(), documentFileHandler(['vehicleRegistration'], true))
+  @Middlewares(fileHandler.any())
   @Consumes('multipart/form-data')
-  public async postVehicleRegistration(@BodyProp() vehicleRegistration: File[], @Request() request: ExRequest) {
-    request.user!.vehicleRegistration = vehicleRegistration as unknown as any
+  public async postVehicleRegistration(@Body() requestBody: { vehicleRegistration: File[] }, @Request() request: ExRequest) {
+    await documentFileHandler(['vehicleRegistration'], true)(request)
+    request.user!.vehicleRegistration = requestBody.vehicleRegistration as unknown as any
     request.user!.markModified('vehicleRegistration')
     const result = await request.user!.save()
     return { message: 'alerts.successSaving', result: result }
@@ -75,7 +76,9 @@ export class UsersController extends Controller {
     return await this.getter(User, { query, projection: { name: 1 } })
   }
 }
-
+interface SetterBodyUser extends SetterBody<IUser> {
+  loseAccessAt: null | Date | undefined
+}
 @Tags('Admin', 'User')
 @Route('api/admin/user')
 @Security('cookieAuth', ['admin'])
@@ -86,8 +89,9 @@ export class UserAdminController extends Controller {
   }
 
   @Post()
-  public async postUser(@Body() requestBody: UserPost) {
+  public async postUser(@Body() requestBody: SetterBodyUser) {
     var cb: ((data: IUser) => any) | undefined = undefined
+
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
       cb = (user: IUser) => {
         sendMail(
@@ -99,7 +103,7 @@ export class UserAdminController extends Controller {
         )
       }
     }
-    return await this.setter(User, { requestBody: requestBody as unknown as IUser, allowNew: true, cb })
+    return await this.setter(User, { requestBody: requestBody, allowNew: true, cb })
   }
 
   @Delete()

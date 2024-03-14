@@ -34,46 +34,86 @@ export interface GetterOptions<ModelType> {
 }
 
 /**
- * With _id everything else is optional. Without some fields may be required.
- */
-// export type SetterBody<ModelType> = ModelType extends {}
-//   ? {
-//       [K in keyof ModelType]?: ModelType[K] extends
-//         | string
-//         | number
-//         | Date
-//         | boolean
-//         | Types.ObjectId
-//         | string[]
-//         | number[]
-//         | Date[]
-//         | boolean[]
-//         | Types.ObjectId[]
-//         ? ModelType[K]
-//         : ModelType[K] extends Array<infer ElementType>
-//         ? IdDocument[] | Partial<ElementType>[]
-//         : IdDocument | Partial<ModelType[K]>
-//     }
-//   : ModelType
-
-/**
  * @format binary
  */
 type Data = string
 
-!!!!! Array<infer ElementType> !!!!
-
-type SetterPartial<T, U extends string | number | symbol> = T extends object
-  ? { [P in Exclude<keyof T, U>]?: P extends Types.Buffer ? Data : T[P] }
+type SetterPartial<T, U extends string> = T extends object
+  ? {
+      [P in Exclude<keyof T, U>]?: T[P] extends
+        | string
+        | number
+        | Date
+        | boolean
+        | null
+        | undefined
+        | Types.ObjectId
+        | string[]
+        | number[]
+        | Date[]
+        | boolean[]
+        | Types.ObjectId[]
+        ? T[P] | undefined | null
+        : T[P] extends Types.Buffer | null | undefined
+        ? Data | Types.Buffer | undefined
+        : T[P] extends (infer ElementType)[] | null | undefined
+        ? _SetterPartial1<ElementType, U>[] | undefined
+        : _SetterPartial2<T[P], U> | undefined
+    }
   : T
-type DeepPartial<T, U extends string | number | symbol> = SetterPartial<
-  SetterPartial<SetterPartial<SetterPartial<SetterPartial<T, U>, U>, U>, U>,
-  U
->
-export type SetterBody<ModelType> = DeepPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
+
+type _SetterPartial2<T, U extends string> = T extends object
+  ? {
+      [P in Exclude<keyof T, U>]?: T[P] extends
+        | string
+        | number
+        | Date
+        | boolean
+        | null
+        | undefined
+        | Types.ObjectId
+        | string[]
+        | number[]
+        | Date[]
+        | boolean[]
+        | Types.ObjectId[]
+        ? T[P] | undefined | null
+        : T[P] extends Types.Buffer | null | undefined
+        ? Data | Types.Buffer | undefined
+        : T[P] extends (infer ElementType)[] | null | undefined
+        ? _SetterPartial1<ElementType, U>[] | undefined
+        : _SetterPartial1<T[P], U> | undefined
+    }
+  : T
+
+type _SetterPartial1<T, U extends string> = T extends object
+  ? {
+      [P in Exclude<keyof T, U>]?: T[P] extends
+        | string
+        | number
+        | Date
+        | boolean
+        | null
+        | undefined
+        | Types.ObjectId
+        | string[]
+        | number[]
+        | Date[]
+        | boolean[]
+        | Types.ObjectId[]
+        ? T[P] | undefined | null
+        : T[P] extends Types.Buffer | null | undefined
+        ? Data | Types.Buffer | undefined
+        : T[P] extends (infer ElementType)[] | null | undefined
+        ? _SetterPartial1<ElementType, U>[] | undefined
+        : T[P]
+    }
+  : T
+
+export type SetterBody<ModelType> = SetterPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
 
 export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
-  requestBody: SetterBody<ModelType>
+  requestBody: SetterPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
   cb?: (data: CheckType) => any
   allowNew?: boolean
   checkOldObject?: (oldObject: HydratedDocument<CheckType> & ModelMethods) => Promise<boolean>
@@ -89,9 +129,9 @@ export interface DeleterQuery {
   _id: _id
 }
 
-export interface DeleterOptions<ModelType> extends DeleterQuery {
+export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQuery {
   cb?: (data: DeleteResult) => any
-  checkOldObject?: (oldObject: HydratedDocument<ModelType>) => Promise<boolean>
+  checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
 
 export interface DeleterForArrayElemetQuery extends DeleterQuery {

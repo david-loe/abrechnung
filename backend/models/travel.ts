@@ -1,6 +1,8 @@
 import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
 import { datetimeToDate, getDayList, getDiffInDays } from '../../common/scripts.js'
 import Country, { CountryDoc } from './country.js'
+import User from './user.js'
+import DocumentFile from './documentFile.js'
 import Settings from './settings.js'
 import { convertCurrency, costObject } from '../helper.js'
 import {
@@ -187,6 +189,30 @@ travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
   const old = await model('Travel').create(doc)
   this.history.push(old)
   this.markModified('history')
+  switch (this.state) {
+    case 'approved':
+      {
+        // move vehicle registration of owner as receipt to 'ownCar' stages
+        const receipts = []
+        for (const stage of this.stages) {
+          if (stage.transport.type == 'ownCar') {
+            if (receipts.length == 0) {
+              const owner = await User.findOne({ _id: this.owner._id }).lean()
+              if (owner && owner.vehicleRegistration) {
+                for (const vr of owner.vehicleRegistration) {
+                  const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
+                  delete (doc as unknown as any)._id
+                  receipts.push(await DocumentFile.create(doc))
+                }
+              }
+            }
+            stage.cost.receipts = receipts
+          }
+        }
+      }
+
+      break
+  }
 }
 
 travelSchema.methods.calculateProgress = function (this: TravelDoc) {

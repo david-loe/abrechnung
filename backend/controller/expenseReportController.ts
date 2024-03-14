@@ -1,12 +1,12 @@
 import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request, Middlewares, Produces } from 'tsoa'
-import { Controller, GetterQuery } from './controller.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import Organisation from '../models/organisation.js'
-import { ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
+import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { documentFileHandler } from '../helper.js'
-import { ExpensePost, IdDocument } from './types.js'
+import { IdDocument } from './types.js'
 import i18n from '../i18n.js'
 import { sendExpenseReportNotificationMail } from '../mail/mail.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
@@ -37,7 +37,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
@@ -51,7 +51,7 @@ export class ExpenseReportController extends Controller {
           throw new Error('alerts.request.unauthorized')
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
@@ -164,7 +164,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: ExpensePost, @Request() request: ExRequest) {
+  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
@@ -178,7 +178,7 @@ export class ExpenseReportExamineController extends Controller {
           throw new Error('alerts.request.unauthorized')
         }
       },
-      sortFn: (a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
