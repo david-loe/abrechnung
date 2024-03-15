@@ -316,21 +316,9 @@ export class TravelExamineController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user?._id })
 
     const cb = async (travel: ITravel) => {
-      const org = await Organisation.findOne({ _id: travel.organisation._id })
-      const subfolder = org ? org.subfolderPath : ''
       sendTravelNotificationMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          '/reports/travel/' +
-            subfolder +
-            travel.owner.name.familyName +
-            ' ' +
-            travel.owner.name.givenName[0] +
-            ' - ' +
-            travel.name +
-            '.pdf',
-          await generateTravelReport(travel)
-        )
+        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
       }
     }
 

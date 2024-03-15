@@ -11,7 +11,7 @@ import i18n from '../i18n.js'
 import { sendHealthCareCostNotificationMail } from '../mail/mail.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import User from '../models/user.js'
-import { writeToDisk } from '../pdf/helper.js'
+import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -206,21 +206,9 @@ export class HealthCareCostExamineController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      const org = await Organisation.findOne({ _id: healthCareCost.organisation._id })
-      const subfolder = org ? org.subfolderPath : ''
       sendHealthCareCostNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          '/reports/healthCareCost/' +
-            subfolder +
-            healthCareCost.owner.name.familyName +
-            ' ' +
-            healthCareCost.owner.name.givenName[0] +
-            ' - ' +
-            healthCareCost.name +
-            '.pdf',
-          await generateHealthCareCostReport(healthCareCost)
-        )
+        await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
       }
     }
 
@@ -289,21 +277,9 @@ export class HealthCareCostConfirmController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      const org = await Organisation.findOne({ _id: healthCareCost.organisation._id })
-      const subfolder = org ? org.subfolderPath : ''
       sendHealthCareCostNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          '/reports/healthCareCost/confirmed/' +
-            subfolder +
-            healthCareCost.owner.name.familyName +
-            ' ' +
-            healthCareCost.owner.name.givenName[0] +
-            ' - ' +
-            healthCareCost.name +
-            '.pdf',
-          await generateHealthCareCostReport(healthCareCost)
-        )
+        await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
       }
     }
 

@@ -11,7 +11,7 @@ import i18n from '../i18n.js'
 import { sendExpenseReportNotificationMail } from '../mail/mail.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import User from '../models/user.js'
-import { writeToDisk } from '../pdf/helper.js'
+import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -203,21 +203,9 @@ export class ExpenseReportExamineController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user?._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
-      const org = await Organisation.findOne({ _id: expenseReport.organisation._id })
-      const subfolder = org ? org.subfolderPath : ''
       sendExpenseReportNotificationMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          '/reports/expenseReport/' +
-            subfolder +
-            expenseReport.owner.name.familyName +
-            ' ' +
-            expenseReport.owner.name.givenName[0] +
-            ' - ' +
-            expenseReport.name +
-            '.pdf',
-          await generateExpenseReportReport(expenseReport)
-        )
+        await writeToDisk(await writeToDiskFilePath(expenseReport), await generateExpenseReportReport(expenseReport))
       }
     }
 

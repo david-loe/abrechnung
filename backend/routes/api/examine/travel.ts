@@ -9,7 +9,7 @@ import multer from 'multer'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 import { sendTravelNotificationMail } from '../../../mail/mail.js'
 import { generateTravelReport } from '../../../pdf/travel.js'
-import { writeToDisk } from '../../../pdf/helper.js'
+import { writeToDisk, writeToDiskFilePath } from '../../../pdf/helper.js'
 import { Travel as ITravel } from '../../../../common/types.js'
 
 router.get('/', async (req, res) => {
@@ -60,21 +60,9 @@ router.post('/refunded', async (req, res) => {
     }
   }
   const cb = async (travel: ITravel) => {
-    const org = await Organisation.findOne({ _id: travel.organisation._id })
-    const subfolder = org ? org.subfolderPath : ''
     sendTravelNotificationMail(travel)
     if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-      writeToDisk(
-        '/reports/travel/' +
-        subfolder +
-        travel.owner.name.familyName +
-        ' ' +
-        travel.owner.name.givenName[0] +
-        ' - ' +
-        travel.name +
-        '.pdf',
-        await generateTravelReport(travel)
-      )
+      writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
     }
   }
   return setter(Travel, '', false, check, cb)(req, res)
