@@ -7,7 +7,6 @@ import cors from 'cors'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import i18n from './i18n.js'
-import routes from './routes/api/routes.js'
 import { MongoClient } from 'mongodb'
 import auth from './auth.js'
 import swaggerUi from 'swagger-ui-express'
@@ -41,11 +40,12 @@ app.use(
 )
 
 app.use(auth)
-app.use('/api', routes)
 
-app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-  return res.send(swaggerUi.generateHTML(swaggerDocument))
-})
+if (process.env.NODE_ENV === 'development') {
+  app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
+    return res.send(swaggerUi.generateHTML(swaggerDocument))
+  })
+}
 
 RegisterRoutes(app)
 

@@ -266,6 +266,17 @@ export class TravelExamineController extends Controller {
     })
   }
 
+  @Post()
+  public async postTravel(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      allowNew: false,
+      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state !== 'refunded'
+    })
+  }
+
   @Delete()
   public async deleteTravel(@Query() _id: _id) {
     return await this.deleter(Travel, { _id: _id })
@@ -288,10 +299,30 @@ export class TravelExamineController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+    })
+  }
+
+  @Post('stage')
+  @Middlewares(fileHandler.any())
+  public async postStage(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
+    return await this.setterForArrayElement(Travel, {
+      requestBody,
+      parentId,
+      arrayElementKey: 'stages',
+      allowNew: true,
+      async checkOldObject(oldObject) {
+        if (!oldObject.historic && oldObject.state === 'underExamination') {
+          await documentFileHandler(['cost', 'receipts'], true)(request)
+          return true
+        } else {
+          return false
+        }
+      },
+      sortFn: (a: Stage, b) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
     })
   }
 
@@ -301,13 +332,17 @@ export class TravelExamineController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
-          return true
-        } else {
-          throw new Error('alerts.request.unauthorized')
-        }
-      }
+      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state === 'underExamination'
+    })
+  }
+
+  @Delete('stage')
+  public async deleteStage(@Query() _id: _id, @Query() parentId: _id) {
+    return await this.deleterForArrayElement(Travel, {
+      _id,
+      parentId,
+      arrayElementKey: 'stages',
+      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state === 'underExamination'
     })
   }
 
@@ -327,7 +362,7 @@ export class TravelExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (!oldObject.historic && oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
