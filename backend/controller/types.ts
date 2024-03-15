@@ -13,6 +13,7 @@ export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
 interface MoneyPost extends Omit<Money, 'currency'> {
   amount: Money['amount']
   currency: IdDocument<CurrencyCode> | Currency
+  exchangeRate: Money['exchangeRate']
 }
 
 export interface MoneyPlusPost extends MoneyPost {
