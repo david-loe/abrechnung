@@ -116,7 +116,7 @@
     "days": "Tage",
     "delete": "Löschen",
     "deleteX": "{X} löschen",
-    "departure": "Abfahrt/-flug",
+    "departure": "Abfahrt /-flug",
     "description": "Beschreibung",
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
@@ -167,6 +167,7 @@
     "name": "Name",
     "new": "Neu",
     "newX": "{X} - Neu",
+    "note": "Bemerkung",
     "object": "Objekt",
     "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
@@ -298,9 +299,9 @@
     },
     "newMagiclogin": {
       "buttonText": "Zu abrechnung🧾",
-      "subject": "Willkommen bei abrechnung🧾",
+      "lastParagraph": "Zum Anmelden benötigst du lediglich deine E-Mail Adresse.\nDrücke auf 'Mit E-Mail anmelden', gib deine E-Mail Adresse ein und dann bekommst du eine E-Mail mit einem Link der dich direkt einloggt.",
       "paragraph": "Herzlich willkommen bei abrechnung🧾. Hier kannst du all deine Abrechnungen einreichen.",
-      "lastParagraph": "Zum Anmelden benötigst du lediglich deine E-Mail Adresse.\nDrücke auf 'Mit E-Mail anmelden', gib deine E-Mail Adresse ein und dann bekommst du eine E-Mail mit einem Link der dich direkt einloggt."
+      "subject": "Willkommen bei abrechnung🧾"
     },
     "regards": "Beste Grüße",
     "travel": {

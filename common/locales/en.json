@@ -167,6 +167,7 @@
     "name": "Name",
     "new": "New",
     "newX": "New {X}",
+    "note": "Note",
     "object": "Object",
     "organisation": "Organisation",
     "otherTransport": "Other transport 🚆🚖",
@@ -298,9 +299,9 @@
     },
     "newMagiclogin": {
       "buttonText": "To abrechnung🧾",
-      "subject": "Welcome to abrechnung🧾",
+      "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it.",
       "paragraph": "Welcome to abrechnung🧾. Here you can submit all your expenses.",
-      "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it."
+      "subject": "Welcome to abrechnung🧾"
     },
     "regards": "Best Regards",
     "travel": {

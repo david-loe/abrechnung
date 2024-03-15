@@ -1,21 +1,18 @@
-import pdf_lib from 'pdf-lib'
-import pdf_fontkit from 'pdf-fontkit'
 import fs from 'fs'
-import i18n from '../i18n.js'
+import pdf_fontkit from 'pdf-fontkit'
+import pdf_lib from 'pdf-lib'
 import {
-  getDetailedMoneyString,
-  getLumpSumsSum,
-  getExpensesSum,
-  getTravelTotal,
   dateTimeToString,
+  datetoDateString,
   datetoDateStringWithYear,
-  datetoDateString
+  getDetailedMoneyString,
+  getExpensesSum,
+  getLumpSumsSum,
+  getTravelTotal
 } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
-  TravelExpense,
-  Travel,
   Locale,
   Meal,
   Money,
@@ -24,22 +21,25 @@ import {
   PurposeSimple,
   Refund,
   Transport,
+  Travel,
   TravelDay,
+  TravelExpense,
   baseCurrency
 } from '../../common/types.js'
+import i18n from '../i18n.js'
+import Settings from '../models/settings.js'
 import {
   Column,
   Options,
   ReceiptMap,
   TabelOptions,
-  drawTable,
+  attachReceipts,
   drawFlag,
   drawLogo,
-  attachReceipts,
   drawPlace,
+  drawTable,
   getReceiptMap
 } from './helper.js'
-import Settings from '../models/settings.js'
 
 export async function generateTravelReport(travel: Travel) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -200,21 +200,21 @@ async function drawStages(
   const columns: Column[] = []
   columns.push({
     key: 'departure',
-    width: 65,
+    width: 45,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.departure'),
     fn: (d: Date) => dateTimeToString(d)
   })
   columns.push({
     key: 'arrival',
-    width: 65,
+    width: 45,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.arrival'),
     fn: (d: Date) => dateTimeToString(d)
   })
   columns.push({
     key: 'startLocation',
-    width: 150,
+    width: 145,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.startLocation'),
     fn: (p: Place) => p.place + ', ' + p.country.name[i18n.language as Locale],
@@ -224,7 +224,7 @@ async function drawStages(
   })
   columns.push({
     key: 'endLocation',
-    width: 150,
+    width: 145,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.endLocation'),
     fn: (p: Place) => p.place + ', ' + p.country.name[i18n.language as Locale],
@@ -263,9 +263,15 @@ async function drawStages(
     fn: (m: Cost) => getDetailedMoneyString(m, i18n.language as Locale)
   })
   columns.push({
+    key: 'note',
+    width: 70,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: i18n.t('labels.note')
+  })
+  columns.push({
     key: 'cost',
     width: 35,
-    alignment: pdf_lib.TextAlignment.Right,
+    alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.receiptNumber'),
     fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id!.toString()].number).join(', ')
   })
@@ -310,6 +316,12 @@ function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, t
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.invoiceDate'),
     fn: (c: Cost) => datetoDateStringWithYear(c.date)
+  })
+  columns.push({
+    key: 'note',
+    width: 130,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: i18n.t('labels.note')
   })
   columns.push({
     key: 'cost',

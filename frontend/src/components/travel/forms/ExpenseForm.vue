@@ -34,9 +34,20 @@
 
     <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
     <InfoPoint :text="$t('info.purpose')" />
-    <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
+    <select class="form-select mb-2" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
     </select>
+
+    <div class="mb-3">
+      <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
+      <textarea
+        type="text"
+        class="form-control form-control-sm"
+        id="travelFormDescription"
+        v-model="formExpense.note"
+        :disabled="disabled"
+        rows="1"></textarea>
+    </div>
 
     <div class="mb-1">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
@@ -96,7 +107,8 @@ export default defineComponent({
           receipts: [],
           date: ''
         },
-        purpose: 'professional'
+        purpose: 'professional',
+        note: undefined
       }
     },
     clear() {
