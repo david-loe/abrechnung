@@ -1,17 +1,17 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request, Middlewares, Produces } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
-import Organisation from '../models/organisation.js'
-import { HealthCareCostState, HealthCareCost as IHealthCareCost, _id, Organisation as IOrganisation, Expense } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Expense, HealthCareCostState, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
-import { IdDocument, MoneyPlusPost } from './types.js'
 import i18n from '../i18n.js'
 import { sendHealthCareCostNotificationMail } from '../mail/mail.js'
-import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
+import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
+import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
+import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { IdDocument, MoneyPlusPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -303,7 +303,9 @@ export class HealthCareCostConfirmController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
-    const healthCareCost = await HealthCareCost.findOne({ _id, historic: false, state: 'refunded' }).lean()
+    const healthCareCost = await HealthCareCost.findOne({
+      $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+    }).lean()
     if (healthCareCost) {
       const report = await generateHealthCareCostReport(healthCareCost)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
