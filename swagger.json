@@ -2955,11 +2955,11 @@
 							"date": {
 								"anyOf": [
 									{
-										"type": "string"
-									},
-									{
 										"type": "string",
 										"format": "date-time"
+									},
+									{
+										"type": "string"
 									}
 								]
 							}
@@ -2969,7 +2969,8 @@
 							"rate",
 							"date"
 						],
-						"type": "object"
+						"type": "object",
+						"nullable": true
 					},
 					"amount": {
 						"type": "number",
@@ -2989,7 +2990,8 @@
 				},
 				"required": [
 					"amount",
-					"currency"
+					"currency",
+					"exchangeRate"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4385,11 +4387,11 @@
 							"date": {
 								"anyOf": [
 									{
-										"type": "string"
-									},
-									{
 										"type": "string",
 										"format": "date-time"
+									},
+									{
+										"type": "string"
 									}
 								]
 							}
@@ -4399,7 +4401,8 @@
 							"rate",
 							"date"
 						],
-						"type": "object"
+						"type": "object",
+						"nullable": true
 					},
 					"amount": {
 						"type": "number",
@@ -4429,7 +4432,8 @@
 				},
 				"required": [
 					"amount",
-					"currency"
+					"currency",
+					"exchangeRate"
 				],
 				"type": "object",
 				"additionalProperties": false
