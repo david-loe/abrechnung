@@ -613,6 +613,10 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
+      if (!stage.cost.amount) {
+        //@ts-ignore
+        stage.cost = undefined
+      }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
         headers,
         params: { parentId: this.travel._id }

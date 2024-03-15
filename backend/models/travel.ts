@@ -1,28 +1,28 @@
-import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
+import { Document, Error, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { datetimeToDate, getDayList, getDiffInDays } from '../../common/scripts.js'
-import Country, { CountryDoc } from './country.js'
-import User from './user.js'
-import DocumentFile from './documentFile.js'
-import Settings from './settings.js'
-import { convertCurrency, costObject } from '../helper.js'
 import {
+  CountrySimple,
+  Currency as ICurrency,
+  Meal,
   Money,
+  Place,
+  PurposeSimple,
   Record,
   Refund,
   Travel,
-  TravelDay,
-  Currency as ICurrency,
-  CountrySimple,
-  Meal,
-  PurposeSimple,
   TravelComment,
-  transportTypes,
-  travelStates,
-  lumpsumTypes,
+  TravelDay,
+  baseCurrency,
   distanceRefundTypes,
-  Place,
-  baseCurrency
+  lumpsumTypes,
+  transportTypes,
+  travelStates
 } from '../../common/types.js'
+import { convertCurrency, costObject } from '../helper.js'
+import Country, { CountryDoc } from './country.js'
+import DocumentFile from './documentFile.js'
+import Settings from './settings.js'
+import User from './user.js'
 
 const settings = (await Settings.findOne().lean())!
 
@@ -567,13 +567,11 @@ travelSchema.methods.validateCountries = function (this: TravelDoc) {
   }
 }
 
-travelSchema.pre('validate', function (this: TravelDoc) {
+travelSchema.pre('validate', async function (this: TravelDoc, next) {
   this.addComment()
   this.validateDates()
   this.validateCountries()
-})
 
-travelSchema.pre('save', async function (this: TravelDoc, next) {
   await populate(this)
 
   this.calculateProgress()

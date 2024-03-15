@@ -5,6 +5,7 @@
       class="mb-5"
       ref="travelCardListRef"
       endpoint="examine/travel"
+      :params="params('underExamination')"
       :showOwner="true"
       :showSearch="true"
       @clicked="(t) => $router.push('/examine/travel/' + t._id)">
@@ -18,7 +19,8 @@
       </button>
       <hr class="hr" />
       <TravelCardList
-        endpoint="examine/travel/refunded"
+        endpoint="examine/travel"
+        :params="params('refunded')"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/examine/travel/' + t._id)">
@@ -29,6 +31,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { TravelState } from '../../../../common/types'
 import TravelCardList from './elements/TravelCardList.vue'
 
 export default defineComponent({
@@ -40,7 +43,11 @@ export default defineComponent({
       showRefunded: false
     }
   },
-  methods: {},
+  methods: {
+    params(state: TravelState) {
+      return { filter: { $and: [{ state }] } }
+    }
+  },
   async created() {
     await this.$root.load()
   }
