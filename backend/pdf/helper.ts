@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { mongo } from 'mongoose'
 import pdf_lib from 'pdf-lib'
-import { datetoDateStringWithYear } from '../../common/scripts.js'
+import { datetoDateStringWithYear, getMoneyString, getTotal } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -34,9 +34,10 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   } else {
     path += 'expenseReport/'
   }
+  const totalSum = getMoneyString(getTotal(report), false)
   const org = await Organisation.findOne({ _id: report.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
-  path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + '.pdf'
+  path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
   return path
 }
 

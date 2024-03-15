@@ -1,4 +1,14 @@
-import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency } from './types.js'
+import {
+  ExpenseReport,
+  HealthCareCost,
+  Locale,
+  Money,
+  Place,
+  Travel,
+  baseCurrency,
+  reportIsHealthCareCost,
+  reportIsTravel
+} from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -249,6 +259,16 @@ export function getExpensesSum(travel: Travel): Money {
     }
   }
   return { amount: sum, currency: baseCurrency }
+}
+
+export function getTotal(report: Travel | ExpenseReport | HealthCareCost): Money {
+  if (reportIsTravel(report)) {
+    return getTravelTotal(report)
+  } else if (reportIsHealthCareCost(report)) {
+    return getHealthCareCostTotal(report)
+  } else {
+    return getExpenseReportTotal(report)
+  }
 }
 
 export function getTravelTotal(travel: Travel): Money {
