@@ -3478,9 +3478,6 @@
 					"allowSpouseRefund": {
 						"type": "boolean"
 					},
-					"baseCurrency": {
-						"$ref": "#/components/schemas/Currency"
-					},
 					"breakfastCateringLumpSumCut": {
 						"type": "number",
 						"format": "double"
@@ -3499,7 +3496,7 @@
 					},
 					"factorCateringLumpSumExceptions": {
 						"items": {
-							"type": "string"
+							"$ref": "#/components/schemas/CountryCode"
 						},
 						"type": "array"
 					},
@@ -3509,12 +3506,12 @@
 					},
 					"factorOvernightLumpSumExceptions": {
 						"items": {
-							"type": "string"
+							"$ref": "#/components/schemas/CountryCode"
 						},
 						"type": "array"
 					},
 					"fallBackLumpSumCountry": {
-						"type": "string"
+						"$ref": "#/components/schemas/CountryCode"
 					},
 					"maxTravelDayCount": {
 						"type": "number",
@@ -3543,10 +3540,10 @@
 						"type": "object"
 					},
 					"secoundNightOnAirplaneLumpSumCountry": {
-						"type": "string"
+						"$ref": "#/components/schemas/CountryCode"
 					},
 					"secoundNightOnShipOrFerryLumpSumCountry": {
-						"type": "string"
+						"$ref": "#/components/schemas/CountryCode"
 					},
 					"stateColors": {
 						"properties": {
@@ -3700,7 +3697,6 @@
 				"required": [
 					"accessIcons",
 					"allowSpouseRefund",
-					"baseCurrency",
 					"breakfastCateringLumpSumCut",
 					"lunchCateringLumpSumCut",
 					"dinnerCateringLumpSumCut",
@@ -3894,34 +3890,6 @@
 					"breakfastCateringLumpSumCut": {
 						"type": "number",
 						"format": "double"
-					},
-					"baseCurrency": {
-						"properties": {
-							"flag": {
-								"type": "string"
-							},
-							"subunit": {
-								"type": "string"
-							},
-							"name": {
-								"properties": {
-									"en": {
-										"type": "string"
-									},
-									"de": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"_id": {
-								"type": "string"
-							},
-							"symbol": {
-								"type": "string"
-							}
-						},
-						"type": "object"
 					},
 					"allowSpouseRefund": {
 						"type": "boolean"
