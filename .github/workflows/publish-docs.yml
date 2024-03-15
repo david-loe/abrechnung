@@ -2,7 +2,7 @@ name: Publish Docs
 
 on:
   push:
-    branches: ['main', 'refactor-backend-to-use-tsoa']
+    branches: ['main']
 
 jobs:
   publish-docs:
