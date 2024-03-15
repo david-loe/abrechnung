@@ -39,7 +39,7 @@
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
-        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" :max="getMaxDate()" required />
+        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="formTravel.startDate as string" :max="getMaxDate()" required />
       </div>
     </div>
 
@@ -100,8 +100,8 @@
           mode === 'add'
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
-            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
-            : $t('labels.save')
+              ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+              : $t('labels.save')
         }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">

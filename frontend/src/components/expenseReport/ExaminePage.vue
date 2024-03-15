@@ -43,14 +43,13 @@ export default defineComponent({
     }
   },
   methods: {
-    params(state: ExpenseReportState){
-    return {filter: {$and:[{state}]}}
-  }
-},
+    params(state: ExpenseReportState) {
+      return { filter: { $and: [{ state }] } }
+    }
+  },
   async created() {
     await this.$root.load()
   }
-  
 })
 </script>
 

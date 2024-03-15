@@ -1,8 +1,6 @@
 {
   "typescript.tsdk": "backend/node_modules/typescript/lib",
-  "cSpell.words": [
-    "tsoa"
-  ],
+  "cSpell.words": ["tsoa"],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"

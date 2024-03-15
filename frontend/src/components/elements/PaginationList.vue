@@ -77,7 +77,12 @@ export default defineComponent({
   },
   props: {
     endpoint: { type: String, required: true },
-    params: {type: Object, default: () => {return{filter: {}}}},
+    params: {
+      type: Object,
+      default: () => {
+        return { filter: {} }
+      }
+    },
     showSearch: { type: Boolean, default: false }
   },
   methods: {

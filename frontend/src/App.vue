@@ -266,7 +266,7 @@ export default defineComponent({
         }
         return { ok: res.data }
       } catch (error: any) {
-        if(showAlert){
+        if (showAlert) {
           if (error.response.status === 401) {
             this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
           } else {
@@ -301,7 +301,7 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean|any> {
+    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean | any> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false
@@ -314,7 +314,7 @@ export default defineComponent({
         })
         if (res.status === 200) {
           if (showAlert) this.addAlert({ message: '', title: this.$t('alerts.successDeleting'), type: 'success' })
-          if(res.data.result){
+          if (res.data.result) {
             return res.data.result
           }
           return true

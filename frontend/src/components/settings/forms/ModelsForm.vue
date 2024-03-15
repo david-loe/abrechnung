@@ -33,7 +33,7 @@
           id="objectJSON"
           rows="10"
           :value="JSON.stringify(object, null, 2)"
-          @input="event => object = JSON.parse((event as any).target.value)"></textarea>
+          @input="(event) => (object = JSON.parse((event as any).target.value))"></textarea>
       </div>
     </template>
     <div class="mb-2">
@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   components: {},

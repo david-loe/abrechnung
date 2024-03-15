@@ -12,7 +12,7 @@
             <template v-if="modalObjectType === 'travel'">
               <TravelApplication
                 v-if="modalMode === 'view'"
-                :travel="(modalObject as TravelSimple)"
+                :travel="modalObject as TravelSimple"
                 @cancel="hideModal()"
                 @edit="showModal('edit', modalObject, 'travel')"
                 @deleted="deleteTravel"></TravelApplication>
@@ -20,21 +20,21 @@
                 v-else
                 :mode="modalMode"
                 @cancel="hideModal()"
-                :travel="(modalObject as Partial<TravelSimple>)"
+                :travel="modalObject as Partial<TravelSimple>"
                 @add="applyForTravel"
                 @edit="applyForTravel"
                 ref="travelApplyForm"></TravelApplyForm>
             </template>
             <ExpenseReportForm
               v-else-if="modalObjectType === 'expenseReport'"
-              :mode="(modalMode as 'add' | 'edit')"
-              :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+              :mode="modalMode as 'add' | 'edit'"
+              :expenseReport="modalObject as Partial<ExpenseReportSimple>"
               @cancel="hideModal()"
               @add="addExpenseReport"></ExpenseReportForm>
             <HealthCareCostForm
               v-else
-              :mode="(modalMode as 'add' | 'edit')"
-              :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
+              :mode="modalMode as 'add' | 'edit'"
+              :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
               @cancel="hideModal()"
               @add="addHealthCareCost"></HealthCareCostForm>
           </div>
@@ -181,7 +181,7 @@ export default defineComponent({
       }
     },
     async deleteTravel(_id: string) {
-      const result = await this.$root.deleter('travel', {_id})
+      const result = await this.$root.deleter('travel', { _id })
       if (result) {
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()

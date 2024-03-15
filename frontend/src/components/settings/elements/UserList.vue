@@ -6,16 +6,19 @@
       :rows-per-page="5"
       sort-by="name"
       :items="users"
-      :filter-options="[{
-        field: 'name',
-        criteria: filter.name,
-        comparison: (value: User['name'], criteria: string): boolean =>  (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
-      },
-      {
-        field: 'email',
-        criteria: filter.email,
-        comparison: (value: User['email'], criteria: string): boolean =>  value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
-      }]"
+      :filter-options="[
+        {
+          field: 'name',
+          criteria: filter.name,
+          comparison: (value: User['name'], criteria: string): boolean =>
+            (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+        },
+        {
+          field: 'email',
+          criteria: filter.email,
+          comparison: (value: User['email'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+        }
+      ]"
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },

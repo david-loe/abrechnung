@@ -20,7 +20,7 @@
               v-if="modalObjectType === 'stage'"
               ref="stageForm"
               :mode="modalMode"
-              :stage="(modalObject as Partial<Stage> | Gap | undefined)"
+              :stage="modalObject as Partial<Stage> | Gap | undefined"
               :travelStartDate="travel.startDate"
               :travelEndDate="travel.endDate"
               :disabled="isReadOnly"
@@ -35,7 +35,7 @@
             <ExpenseForm
               v-else-if="modalObjectType === 'expense'"
               ref="expenseForm"
-              :expense="(modalObject as Partial<TravelExpense> | undefined)"
+              :expense="modalObject as Partial<TravelExpense> | undefined"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -48,7 +48,7 @@
               v-else-if="modalObjectType === 'travel'"
               :mode="modalMode"
               @cancel="hideModal"
-              :travel="(modalObject as TravelSimple)"
+              :travel="modalObject as TravelSimple"
               @edit="applyForTravel"
               ref="travelApplyForm"></TravelApplyForm>
           </div>
@@ -254,7 +254,13 @@
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        ">
                         <i class="bi bi-sun"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -262,7 +268,13 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        ">
                         <i class="bi bi-moon"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -601,7 +613,10 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers, params: {parentId: this.travel._id} })
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
+        headers,
+        params: { parentId: this.travel._id }
+      })
       if (result.ok) {
         this.setTravel(result.ok)
         this.hideModal()
@@ -628,7 +643,10 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers, params: {parentId: this.travel._id}  })
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, {
+        headers,
+        params: { parentId: this.travel._id }
+      })
       if (result.ok) {
         this.setTravel(result.ok)
         this.hideModal()
@@ -729,16 +747,16 @@ export default defineComponent({
       const oldTravel = this.travel
       this.travel = travel
       if (oldTravel.days && this.travel.days) {
-          for (const oldDay of oldTravel.days) {
-            if ((oldDay as Day).showSettings) {
-              for (const newDay of this.travel.days) {
-                if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
-                  ;(newDay as Day).showSettings = true
-                }
+        for (const oldDay of oldTravel.days) {
+          if ((oldDay as Day).showSettings) {
+            for (const newDay of this.travel.days) {
+              if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
+                ;(newDay as Day).showSettings = true
               }
             }
           }
         }
+      }
       log(this.$t('labels.travel') + ':')
       log(this.travel)
       this.renderTable()

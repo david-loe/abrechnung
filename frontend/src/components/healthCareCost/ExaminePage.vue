@@ -43,9 +43,10 @@ export default defineComponent({
     }
   },
   methods: {
-    params(state: HealthCareCostState){
-    return {filter: {$and:[{state}]}}
-  }},
+    params(state: HealthCareCostState) {
+      return { filter: { $and: [{ state }] } }
+    }
+  },
   async created() {
     await this.$root.load()
   }

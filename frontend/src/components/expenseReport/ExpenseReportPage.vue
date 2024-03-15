@@ -17,7 +17,7 @@
           <div v-if="expenseReport._id" class="modal-body">
             <ExpenseForm
               ref="expenseForm"
-              :expense="(modalExpense as Partial<Expense> | undefined)"
+              :expense="modalExpense as Partial<Expense> | undefined"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -248,7 +248,7 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteExpenseReport() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', {_id: this._id} )
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -281,7 +281,10 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers, params: {parentId: this.expenseReport._id} })
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, {
+        headers,
+        params: { parentId: this.expenseReport._id }
+      })
       if (result.ok) {
         this.setExpenseReport(result.ok)
         this.hideModal()
@@ -300,11 +303,11 @@ export default defineComponent({
         additionalFields: ['expenses']
       }
       const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
-      if(result){
+      if (result) {
         this.setExpenseReport(result.data)
       }
     },
-    setExpenseReport(expenseReport: ExpenseReport){
+    setExpenseReport(expenseReport: ExpenseReport) {
       this.expenseReport = expenseReport
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)

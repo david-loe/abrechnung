@@ -110,7 +110,7 @@ export default defineComponent({
     async deleteFile(index: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (this.modelValue[index]._id) {
-          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', {_id: this.modelValue[index]._id!}, false)
+          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { _id: this.modelValue[index]._id! }, false)
           if (!result) {
             return null
           }
@@ -181,7 +181,7 @@ export default defineComponent({
       this.token = undefined
       this.qr = undefined
       this.secondsLeft = this.expireAfterSeconds
-      this.$root.deleter('user/token', {_id: ''}, false, false)
+      this.$root.deleter('user/token', { _id: '' }, false, false)
     }
   },
   unmounted() {

@@ -22,7 +22,7 @@ export default defineComponent({
   components: { HealthCareCostCard, PaginationList },
   props: {
     endpoint: { type: String, required: true },
-    params: {type: Object},
+    params: { type: Object },
     showSearch: { type: Boolean, default: false },
     showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
