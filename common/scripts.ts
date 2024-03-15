@@ -1,18 +1,4 @@
-import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel } from './types.js'
-
-// TODO: Resolve this to settings from DB
-const settings = {
-  baseCurrency: {
-    _id: 'EUR',
-    flag: '🇪🇺',
-    name: {
-      de: 'Euro',
-      en: 'euro'
-    },
-    subunit: 'Cent',
-    symbol: '€'
-  }
-}
+import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency } from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -139,19 +125,21 @@ export function getMoneyString(
   var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
   if (useExchangeRate && money.exchangeRate) {
     amount = money.exchangeRate.amount
-    currency = settings.baseCurrency._id
+    currency = baseCurrency._id
   } else {
     if (money.amount !== null) {
       amount = money.amount
     }
-    if (useExchangeRate && !money.exchangeRate && currency !== settings.baseCurrency._id) {
+    if (useExchangeRate && !money.exchangeRate && currency !== baseCurrency._id) {
       warning = true
     }
   }
-  return (func(amount).toLocaleString(locale, {
-    style: 'currency',
-    currency: currency
-  })) + (warning ? ' ⚠' : '')
+  return (
+    func(amount).toLocaleString(locale, {
+      style: 'currency',
+      currency: currency
+    }) + (warning ? ' ⚠' : '')
+  )
 }
 
 export function getDetailedMoneyString(money: Money, locale: Locale, printZero = false): string {
@@ -168,7 +156,7 @@ export function getDetailedMoneyString(money: Money, locale: Locale, printZero =
       str +
       money.exchangeRate.amount.toLocaleString(locale, {
         style: 'currency',
-        currency: settings.baseCurrency._id
+        currency: baseCurrency._id
       })
   }
   return str
@@ -225,7 +213,7 @@ export function getLumpSumsSum(travel: Travel): Money {
       }
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 function getBaseCurrencyAmount(a: Money): number {
@@ -233,7 +221,7 @@ function getBaseCurrencyAmount(a: Money): number {
   if (a.amount !== null) {
     if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
       amount += a.exchangeRate.amount
-    } else if (a.currency._id == settings.baseCurrency._id) {
+    } else if (a.currency._id == baseCurrency._id) {
       amount += a.amount
     }
   }
@@ -260,7 +248,7 @@ export function getExpensesSum(travel: Travel): Money {
       sum += add
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 export function getTravelTotal(travel: Travel): Money {
@@ -268,7 +256,7 @@ export function getTravelTotal(travel: Travel): Money {
   if (travel.advance && travel.advance.amount != null) {
     advance = getBaseCurrencyAmount(travel.advance)
   }
-  return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
+  return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: baseCurrency }
 }
 
 export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
@@ -278,7 +266,7 @@ export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
       sum += getBaseCurrencyAmount(expense.cost)
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
@@ -288,7 +276,7 @@ export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
       sum += getBaseCurrencyAmount(expense.cost)
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 // From https://stackoverflow.com/a/52983833/13582326
@@ -314,11 +302,127 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
           return resolve(file)
         }
         // We resize the image with the canvas method drawImage();
-        ; (ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
       }
       // We put the Data URI in the image's src attribute
       img.src = this.result as string
     }
   })
+}
+
+export class Base64 {
+  static #keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+
+  static encode(input: string): string {
+    var output = ''
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4
+    var i = 0
+
+    input = this.#utf8_encode(input)
+
+    while (i < input.length) {
+      chr1 = input.charCodeAt(i++)
+      chr2 = input.charCodeAt(i++)
+      chr3 = input.charCodeAt(i++)
+
+      enc1 = chr1 >> 2
+      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
+      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
+      enc4 = chr3 & 63
+
+      if (isNaN(chr2)) {
+        enc3 = enc4 = 64
+      } else if (isNaN(chr3)) {
+        enc4 = 64
+      }
+
+      output = output + this.#keyStr.charAt(enc1) + this.#keyStr.charAt(enc2) + this.#keyStr.charAt(enc3) + this.#keyStr.charAt(enc4)
+    }
+
+    return output
+  }
+
+  static decode(input: string): string {
+    var output = ''
+    var chr1, chr2, chr3
+    var enc1, enc2, enc3, enc4
+    var i = 0
+
+    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '')
+
+    while (i < input.length) {
+      enc1 = this.#keyStr.indexOf(input.charAt(i++))
+      enc2 = this.#keyStr.indexOf(input.charAt(i++))
+      enc3 = this.#keyStr.indexOf(input.charAt(i++))
+      enc4 = this.#keyStr.indexOf(input.charAt(i++))
+
+      chr1 = (enc1 << 2) | (enc2 >> 4)
+      chr2 = ((enc2 & 15) << 4) | (enc3 >> 2)
+      chr3 = ((enc3 & 3) << 6) | enc4
+
+      output = output + String.fromCharCode(chr1)
+
+      if (enc3 != 64) {
+        output = output + String.fromCharCode(chr2)
+      }
+      if (enc4 != 64) {
+        output = output + String.fromCharCode(chr3)
+      }
+    }
+
+    output = this.#utf8_decode(output)
+
+    return output
+  }
+
+  static #utf8_encode(string: string): string {
+    string = string.replace(/\r\n/g, '\n')
+    var utftext = ''
+
+    for (var n = 0; n < string.length; n++) {
+      var c = string.charCodeAt(n)
+
+      if (c < 128) {
+        utftext += String.fromCharCode(c)
+      } else if (c > 127 && c < 2048) {
+        utftext += String.fromCharCode((c >> 6) | 192)
+        utftext += String.fromCharCode((c & 63) | 128)
+      } else {
+        utftext += String.fromCharCode((c >> 12) | 224)
+        utftext += String.fromCharCode(((c >> 6) & 63) | 128)
+        utftext += String.fromCharCode((c & 63) | 128)
+      }
+    }
+
+    return utftext
+  }
+
+  static #utf8_decode(utftext: string): string {
+    var string = ''
+    var i = 0
+    var c,
+      c2,
+      c3 = 0
+
+    while (i < utftext.length) {
+      c = utftext.charCodeAt(i)
+
+      if (c < 128) {
+        string += String.fromCharCode(c)
+        i++
+      } else if (c > 191 && c < 224) {
+        c2 = utftext.charCodeAt(i + 1)
+        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63))
+        i += 2
+      } else {
+        c2 = utftext.charCodeAt(i + 1)
+        c3 = utftext.charCodeAt(i + 2)
+        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63))
+        i += 3
+      }
+    }
+
+    return string
+  }
 }

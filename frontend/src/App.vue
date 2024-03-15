@@ -132,7 +132,7 @@
 
           <span class="ps-2 text-muted">
             © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
-            <small v-if="settings.version"
+            <small v-if="settings"
               ><a
                 class="text-decoration-none link-dark"
                 target="_blank"
@@ -148,7 +148,7 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
 import {
@@ -206,7 +206,7 @@ export default defineComponent({
           this.getter<User>('user'),
           this.getter<Currency[]>('currency'),
           this.getter<CountrySimple[]>('country'),
-          this.getter<Settings[]>('settings'),
+          this.getter<Settings>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
           this.getter<OrganisationSimple[]>('organisation'),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
@@ -222,7 +222,7 @@ export default defineComponent({
           this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
           this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
           this.settings =
-            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data[0] : ({} as Settings)) : ({} as Settings)
+            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
           this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
           this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}
@@ -237,10 +237,10 @@ export default defineComponent({
     },
     async logout() {
       try {
-        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/logout', {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/auth/logout', {
           withCredentials: true
         })
-        if (res.status === 200) {
+        if (res.status === 204) {
           this.auth = false
           this.$router.push({ path: '/login' })
         }
@@ -252,7 +252,7 @@ export default defineComponent({
     async getter<T>(endpoint: string, params: any = {}, config: any = {}, showAlert = true): Promise<{ ok?: GETResponse<T>; error?: any }> {
       try {
         const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
           Object.assign(
             {
               params: params,
@@ -266,10 +266,10 @@ export default defineComponent({
         }
         return { ok: res.data }
       } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
-        } else {
-          if (showAlert) {
+        if (showAlert) {
+          if (error.response.status === 401) {
+            this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
+          } else {
             console.log(error.response.data)
             this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
           }
@@ -277,10 +277,10 @@ export default defineComponent({
         return { error: error }
       }
     },
-    async setter<T>(endpoint: string, data: any, config = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
+    async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
-          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
           data,
           Object.assign(
             {
@@ -301,19 +301,22 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-    async deleter(endpoint: string, params: { [key: string]: any; id: string }, ask = true, showAlert = true): Promise<boolean> {
+    async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean | any> {
       if (ask) {
         if (!confirm(this.$t('alerts.areYouSureDelete'))) {
           return false
         }
       }
       try {
-        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint, {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/' + endpoint, {
           params: params,
           withCredentials: true
         })
         if (res.status === 200) {
-          if (showAlert) this.addAlert({ message: '', title: res.data.message, type: 'success' })
+          if (showAlert) this.addAlert({ message: '', title: this.$t('alerts.successDeleting'), type: 'success' })
+          if (res.data.result) {
+            return res.data.result
+          }
           return true
         }
       } catch (error: any) {
@@ -344,7 +347,7 @@ export default defineComponent({
     async pushUserSettings(settings: User['settings']) {
       settings.language = this.$i18n.locale as Locale
       try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', settings, {
+        await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true
         })
       } catch (error: any) {

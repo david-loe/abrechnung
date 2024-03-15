@@ -36,8 +36,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
 import { User } from '../../../../../common/types.js'
+import InfoPoint from '../../elements/InfoPoint.vue'
 
 const defaultSettings: { insurance: null | string; organisation: null | string } = {
   insurance: null,

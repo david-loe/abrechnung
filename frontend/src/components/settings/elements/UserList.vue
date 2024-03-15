@@ -6,16 +6,19 @@
       :rows-per-page="5"
       sort-by="name"
       :items="users"
-      :filter-options="[{
-        field: 'name',
-        criteria: filter.name,
-        comparison: (value: User['name'], criteria: string): boolean =>  (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
-      },
-      {
-        field: 'email',
-        criteria: filter.email,
-        comparison: (value: User['email'], criteria: string): boolean =>  value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1,
-      }]"
+      :filter-options="[
+        {
+          field: 'name',
+          criteria: filter.name,
+          comparison: (value: User['name'], criteria: string): boolean =>
+            (value.givenName + ' ' + value.familyName).toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+        },
+        {
+          field: 'email',
+          criteria: filter.email,
+          comparison: (value: User['email'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+        }
+      ]"
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },
@@ -90,8 +93,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserForm from '../forms/UserForm.vue'
 import { User, accesses } from '../../../../../common/types.js'
+import UserForm from '../forms/UserForm.vue'
 
 interface Filter<T> {
   name: T
@@ -133,7 +136,7 @@ export default defineComponent({
       this.userToEdit = undefined
     },
     async deleteUser(user: User) {
-      const result = await this.$root.deleter('admin/user', { id: user._id })
+      const result = await this.$root.deleter('admin/user', { _id: user._id })
       if (result) {
         this.getUsers()
       }

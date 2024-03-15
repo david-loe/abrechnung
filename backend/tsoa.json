@@ -1,0 +1,30 @@
+{
+  "entryFile": "./app.ts",
+  "noImplicitAdditionalProperties": "silently-remove-extras",
+  "controllerPathGlobs": ["controller/**/*Controller.ts"],
+  "spec": {
+    "outputDirectory": "dist",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "name": "abrechnung",
+        "in": "cookie",
+        "scopes": {
+          "user": "make requests",
+          "approve/travel": "approve travel requests",
+          "examine/travel": "examine travel expense requests",
+          "examine/expenseReport": "examine expense report requests",
+          "examine/healthCareCost": "examine healthcare cost requests",
+          "confirm/healthCareCost": "confirm healthcare cost requests",
+          "admin": "admin"
+        }
+      }
+    }
+  },
+  "routes": {
+    "routesDir": "dist",
+    "esm": true,
+    "authenticationModule": "controller/authentication.ts"
+  }
+}

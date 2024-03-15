@@ -20,7 +20,7 @@
               v-if="modalObjectType === 'stage'"
               ref="stageForm"
               :mode="modalMode"
-              :stage="(modalObject as Partial<Stage> | Gap | undefined)"
+              :stage="modalObject as Partial<Stage> | Gap | undefined"
               :travelStartDate="travel.startDate"
               :travelEndDate="travel.endDate"
               :disabled="isReadOnly"
@@ -35,7 +35,7 @@
             <ExpenseForm
               v-else-if="modalObjectType === 'expense'"
               ref="expenseForm"
-              :expense="(modalObject as Partial<TravelExpense> | undefined)"
+              :expense="modalObject as Partial<TravelExpense> | undefined"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -48,7 +48,7 @@
               v-else-if="modalObjectType === 'travel'"
               :mode="modalMode"
               @cancel="hideModal"
-              :travel="(modalObject as TravelSimple)"
+              :travel="modalObject as TravelSimple"
               @edit="applyForTravel"
               ref="travelApplyForm"></TravelApplyForm>
           </div>
@@ -254,7 +254,13 @@
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        ">
                         <i class="bi bi-sun"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -262,7 +268,13 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') + $t('lumpSums.' + refund.type) + ' ' + (row.data as Day).country.flag + ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')">
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        ">
                         <i class="bi bi-moon"></i>
                         {{ getMoneyString(refund.refund) }}
                       </div>
@@ -375,7 +387,6 @@
                         <ProgressCircle :progress="travel.progress"></ProgressCircle>
                       </td>
                     </tr>
-                    <!-- baseCurrency -->
                     <tr>
                       <td>
                         <small>
@@ -455,41 +466,41 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from '../elements/StatePipeline.vue'
-import ProgressCircle from '../elements/ProgressCircle.vue'
-import StageForm from './forms/StageForm.vue'
-import ExpenseForm from './forms/ExpenseForm.vue'
-import InfoPoint from '../elements/InfoPoint.vue'
-import PlaceElement from '../elements/PlaceElement.vue'
-import TravelApplyForm from './forms/TravelApplyForm.vue'
-import ErrorBanner from '../elements/ErrorBanner.vue'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
 import {
-  getMoneyString,
   datetoDateString,
-  getLumpSumsSum,
   getExpensesSum,
+  getLumpSumsSum,
+  getMoneyString,
   getTravelTotal,
   mailToLink,
   msTeamsToLink
 } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
 import {
   DocumentFile,
-  TravelExpense,
+  meals,
+  Place,
   Record,
   RecordType,
   Stage,
   Travel,
   TravelDay,
+  TravelExpense,
   TravelSimple,
-  meals,
   travelStates,
-  UserSimple,
   User,
-  Place
+  UserSimple
 } from '../../../../common/types.js'
+import ErrorBanner from '../elements/ErrorBanner.vue'
+import InfoPoint from '../elements/InfoPoint.vue'
+import PlaceElement from '../elements/PlaceElement.vue'
+import ProgressCircle from '../elements/ProgressCircle.vue'
+import StatePipeline from '../elements/StatePipeline.vue'
+import ExpenseForm from './forms/ExpenseForm.vue'
+import StageForm from './forms/StageForm.vue'
+import TravelApplyForm from './forms/TravelApplyForm.vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -558,7 +569,7 @@ export default defineComponent({
       }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
       } else {
         await this.getTravel()
       }
@@ -567,7 +578,6 @@ export default defineComponent({
       if (confirm(this.$t('alerts.warningReapply'))) {
         const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
-          await this.getTravel()
           this.hideModal()
           this.$router.push({ path: '/' })
         } else {
@@ -576,7 +586,7 @@ export default defineComponent({
       }
     },
     async deleteTravel() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -594,7 +604,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?id=' + this.travel._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'travel/report?_id=' + this.travel._id
     },
     async postStage(stage: Stage) {
       var headers = {}
@@ -603,10 +613,16 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(stage as any).travelId = this.travel._id
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, { headers })
+      if (!stage.cost.amount) {
+        //@ts-ignore
+        stage.cost = undefined
+      }
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
+        headers,
+        params: { parentId: this.travel._id }
+      })
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
         this.hideModal()
       } else if (result.error) {
         this.error = result.error?.error
@@ -617,10 +633,10 @@ export default defineComponent({
         }
       }
     },
-    async deleteStage(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { id: id, travelId: this._id })
+    async deleteStage(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
-        await this.getTravel()
+        this.setTravel(result)
         this.hideModal()
       }
     },
@@ -631,17 +647,19 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).travelId = this.travel._id
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, { headers })
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, {
+        headers,
+        params: { parentId: this.travel._id }
+      })
       if (result.ok) {
-        await this.getTravel()
+        this.setTravel(result.ok)
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { id: id, travelId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getTravel()
+        this.setTravel(result)
         this.hideModal()
       }
     },
@@ -717,32 +735,32 @@ export default defineComponent({
       }
     },
     async getTravel() {
-      const oldTravel = this.travel
       const params: any = {
-        id: this._id,
-        addStages: true,
-        addExpenses: true,
-        addDays: true
+        _id: this._id,
+        additionalFields: ['stages', 'expenses', 'days']
       }
       if (this.endpointPrefix === 'examine/') {
         params.addRefunded = true
       }
       const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
       if (res) {
-        this.travel = res.data
-        if (oldTravel.days && this.travel.days) {
-          for (const oldDay of oldTravel.days) {
-            if ((oldDay as Day).showSettings) {
-              for (const newDay of this.travel.days) {
-                if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
-                  ;(newDay as Day).showSettings = true
-                }
+        this.setTravel(res.data)
+      }
+    },
+    setTravel(travel: Travel) {
+      const oldTravel = this.travel
+      this.travel = travel
+      if (oldTravel.days && this.travel.days) {
+        for (const oldDay of oldTravel.days) {
+          if ((oldDay as Day).showSettings) {
+            for (const newDay of this.travel.days) {
+              if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
+                ;(newDay as Day).showSettings = true
               }
             }
           }
         }
       }
-
       log(this.$t('labels.travel') + ':')
       log(this.travel)
       this.renderTable()
@@ -774,6 +792,7 @@ export default defineComponent({
           list.push(adding)
         }
       }
+      add(travel.destinationPlace, list)
       for (const stage of travel.stages) {
         add(stage.startLocation, list)
         add(stage.endLocation, list)

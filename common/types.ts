@@ -1,29 +1,42 @@
 import { Types } from 'mongoose'
 
+/**
+ * @pattern ^[0-9a-fA-F]{24}$
+ */
+export type _id = Types.ObjectId
+
 export interface Settings {
   accessIcons: { [key in Access]: string[] }
   allowSpouseRefund: boolean
-  baseCurrency: Currency
   breakfastCateringLumpSumCut: number
   lunchCateringLumpSumCut: number
   dinnerCateringLumpSumCut: number
   factorCateringLumpSum: number
-  factorCateringLumpSumExceptions: string[]
+  factorCateringLumpSumExceptions: CountryCode[]
   factorOvernightLumpSum: number
-  factorOvernightLumpSumExceptions: string[]
-  fallBackLumpSumCountry: string
+  factorOvernightLumpSumExceptions: CountryCode[]
+  fallBackLumpSumCountry: CountryCode
   maxTravelDayCount: number
   distanceRefunds: { [key in DistanceRefundType]: number }
-  secoundNightOnAirplaneLumpSumCountry: string
-  secoundNightOnShipOrFerryLumpSumCountry: string
+  secoundNightOnAirplaneLumpSumCountry: CountryCode
+  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
   stateColors: { [key in AnyState]: { color: string; text: string } }
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
   allowTravelApplicationForThePast: boolean
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   version: string
+  /**
+   * @Hidden
+   */
   migrateFrom?: string | null
+  _id: _id
 }
+
+/**
+ * @pattern ^[A-Z]{2}$
+ */
+export type CountryCode = string
 
 export interface CountrySimple {
   name: {
@@ -34,9 +47,9 @@ export interface CountrySimple {
     de: string[]
     en?: string[]
   }
-  _id: string
+  _id: CountryCode
   flag?: string | null
-  currency?: Currency | null
+  currency?: CurrencyCode | null
 }
 
 export interface CountryLumpSum extends LumpSum {
@@ -58,12 +71,17 @@ export interface ExchangeRate {
   month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 }
 
+/**
+ * @pattern ^[A-Z]{3}$
+ */
+export type CurrencyCode = string
+
 export interface Currency {
   name: {
     de: string
     en: string
   }
-  _id: string
+  _id: CurrencyCode
   subunit?: string | null
   symbol?: string | null
   flag?: string | null
@@ -77,33 +95,36 @@ export interface Place {
 
 export interface DocumentFile {
   data: Types.Buffer
-  owner: Types.ObjectId
+  owner: _id
   type: DocumentFileType
   name: string
-  _id?: Types.ObjectId
+  _id?: _id
 }
 
 export interface Token {
-  _id: Types.ObjectId
+  _id: _id
   createdAt: Date | string
   files: DocumentFile[]
 }
 
-export interface UserSimple {
+export interface Contact {
   email: string
   name: { givenName: string; familyName: string }
-  _id: Types.ObjectId
+}
+
+export interface UserSimple extends Contact {
+  _id: _id
 }
 
 export interface HealthInsurance {
   name: string
   email: string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface OrganisationSimple {
   name: string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Organisation extends OrganisationSimple {
@@ -121,7 +142,7 @@ export interface User extends UserSimple {
   access: {
     [key in Access]: boolean
   }
-  loseAccessAt?: Date | string | null
+  loseAccessAt?: null | Date | string
   settings: {
     language: Locale
     lastCurrencies: Currency[]
@@ -162,13 +183,13 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Expense {
   description: string
   cost: Cost
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface TravelExpense extends Expense {
@@ -181,7 +202,7 @@ export type Record = Stage | TravelExpense
 export interface Comment {
   text: string
   author: UserSimple
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface TravelComment extends Comment {
@@ -214,10 +235,10 @@ export interface TravelSimple extends RequestSimple {
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | {
-    type: 'ownCar'
-    distance: number
-    distanceRefundType: DistanceRefundType
-  }
+      type: 'ownCar'
+      distance: number
+      distanceRefundType: DistanceRefundType
+    }
 
 export interface Refund {
   type: LumpsumType
@@ -233,7 +254,7 @@ export interface TravelDay {
   }
   purpose: PurposeSimple
   refunds: Refund[]
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface RequestSimple {
@@ -244,14 +265,14 @@ export interface RequestSimple {
   editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string
-  _id: Types.ObjectId
+  _id: _id
 }
 
 export interface Travel extends TravelSimple {
   claimOvernightLumpSum: boolean
   lastPlaceOfWork: Place
   professionalShare: number | null
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   stages: Stage[]
   expenses: TravelExpense[]
@@ -265,7 +286,7 @@ export interface ExpenseReportSimple extends RequestSimple {
 }
 
 export interface ExpenseReport extends ExpenseReportSimple {
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   expenses: Expense[]
 }
@@ -280,7 +301,7 @@ export interface HealthCareCostSimple extends RequestSimple {
 }
 
 export interface HealthCareCost extends HealthCareCostSimple {
-  history: Types.ObjectId[]
+  history: _id[]
   historic: boolean
   expenses: Expense[]
 }
@@ -346,4 +367,27 @@ export interface GETResponse<T> {
 export interface SETResponse<T> {
   message: string
   result: T
+}
+
+export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel {
+  return typeof (report as Travel).travelInsideOfEU === 'boolean'
+}
+
+export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost {
+  return typeof (report as HealthCareCost).patientName === 'string'
+}
+
+export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport {
+  return !reportIsTravel(report) && !reportIsHealthCareCost(report)
+}
+
+export const baseCurrency: Currency = {
+  _id: 'EUR',
+  flag: '🇪🇺',
+  name: {
+    de: 'Euro',
+    en: 'euro'
+  },
+  subunit: 'Cent',
+  symbol: '€'
 }

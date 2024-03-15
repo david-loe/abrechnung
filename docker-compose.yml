@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./
-      dockerfile: ./backend/Dockerfile-${NODE_ENV}
+      dockerfile: ./backend/Dockerfile.${NODE_ENV}
     restart: always
     depends_on:
       - db
@@ -25,11 +25,11 @@ services:
     volumes:
       - db_data:/data/db
 
-  # Uses ningx in production mode see /frontend/Dockerfile-production
+  # Uses ningx in production mode see /frontend/Dockerfile.production
   frontend:
     build:
       context: ./
-      dockerfile: ./frontend/Dockerfile-${NODE_ENV}
+      dockerfile: ./frontend/Dockerfile.${NODE_ENV}
     volumes:
       - ./frontend:/app
       - ./common:/common:ro
@@ -45,7 +45,7 @@ services:
   ldap:
     build:
       context: ./dev-tools/ldap
-      dockerfile: Dockerfile-${NODE_ENV}
+      dockerfile: Dockerfile.${NODE_ENV}
     environment:
       - DEBUG=false
 
@@ -53,7 +53,7 @@ services:
   inbucket:
     build:
       context: ./dev-tools/inbucket
-      dockerfile: Dockerfile-${NODE_ENV}
+      dockerfile: Dockerfile.${NODE_ENV}
     ports:
       - ${INBUCKET_UI_PORT}:9000
     environment:
@@ -63,13 +63,15 @@ services:
   mongo-express:
     build:
       context: ./dev-tools/mongo-express
-      dockerfile: Dockerfile-${NODE_ENV}
+      dockerfile: Dockerfile.${NODE_ENV}
     depends_on:
       - db
     ports:
       - ${MONGO_EXPRESS_PORT}:8081
     environment:
-      - ME_CONFIG_MONGODB_SERVER=db
+      - ME_CONFIG_MONGODB_URL=${MONGO_URL}
+      - ME_CONFIG_BASICAUTH=false
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
 
 volumes:
   db_data:

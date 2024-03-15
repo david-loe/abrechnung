@@ -97,7 +97,7 @@ async function findCountryCode(lumpSum: LumpSumWithCountryName, countryNameLangu
   conditions.$or[1]['alias.' + countryNameLanguage] = lumpSum.country
   const country = await Country.findOne(conditions).lean()
   if (!country) {
-    throw Error('"' + lumpSum.country + '" not found!')
+    throw new Error('"' + lumpSum.country + '" not found!')
   }
   const lumpSumWithCode: LumpSumWithCountryCode = Object.assign(lumpSum, { countryCode: country._id, country: undefined })
   return lumpSumWithCode
@@ -144,7 +144,7 @@ export function csvToObjects(
     }
     var currentline = lines[i].split(separator)
     if (currentline.length !== headers.length) {
-      throw Error('Line (#' + (i + 1) + ') has other length than header: ' + lines[i])
+      throw new Error('Line (#' + (i + 1) + ') has other length than header: ' + lines[i])
     }
     for (var j = 0; j < headers.length; j++) {
       // search for [] to identify arrays

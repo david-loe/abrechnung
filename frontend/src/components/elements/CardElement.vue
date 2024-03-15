@@ -48,9 +48,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { RequestSimple } from '../../../../common/types.js'
 import ProgressCircle from './ProgressCircle.vue'
 import StateBadge from './StateBadge.vue'
-import { RequestSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CardElement',

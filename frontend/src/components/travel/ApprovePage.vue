@@ -25,6 +25,7 @@
         class="mb-5"
         ref="travelCardListRef"
         endpoint="approve/travel"
+        :params="params('appliedFor')"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => showModal(t)"></TravelCardList>
@@ -36,7 +37,12 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelCardList endpoint="approve/travel/approved" :showOwner="true" :showSearch="true" @clicked="(t) => showModal(t)">
+        <TravelCardList
+          endpoint="approve/travel"
+          :params="params('approved')"
+          :showOwner="true"
+          :showSearch="true"
+          @clicked="(t) => showModal(t)">
         </TravelCardList>
       </template>
     </div>
@@ -44,12 +50,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
+import { defineComponent } from 'vue'
+import { TravelSimple, TravelState } from '../../../../common/types.js'
+import TravelApply from './elements/TravelApplication.vue'
 import TravelCardList from './elements/TravelCardList.vue'
 import TravelApproveForm from './forms/TravelApproveForm.vue'
-import TravelApply from './elements/TravelApplication.vue'
-import { TravelSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ApprovePage',
@@ -88,6 +94,9 @@ export default defineComponent({
           this.hideModal()
         }
       }
+    },
+    params(state: TravelState) {
+      return { filter: { $and: [{ state }] } }
     }
   },
   async mounted() {
@@ -96,7 +105,7 @@ export default defineComponent({
       this.approveTravelModal = new Modal(modalEl, {})
     }
     if (this._id) {
-      const result = (await this.$root.getter<TravelSimple>('approve/travel', { id: this._id })).ok
+      const result = (await this.$root.getter<TravelSimple>('approve/travel', { _id: this._id })).ok
       if (result) {
         this.showModal(result.data)
       }

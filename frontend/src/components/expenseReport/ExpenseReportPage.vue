@@ -17,7 +17,7 @@
           <div v-if="expenseReport._id" class="modal-body">
             <ExpenseForm
               ref="expenseForm"
-              :expense="(modalExpense as Partial<Expense> | undefined)"
+              :expense="modalExpense as Partial<Expense> | undefined"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -197,13 +197,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { datetoDateString, getExpenseReportTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getExpenseReportTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
-import { ExpenseReport, expenseReportStates, Expense, UserSimple } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
@@ -248,7 +248,7 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteExpenseReport() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
@@ -272,7 +272,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'expenseReport/report?id=' + this.expenseReport._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'expenseReport/report?_id=' + this.expenseReport._id
     },
     async postExpense(expense: Expense) {
       var headers = {}
@@ -281,32 +281,34 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).expenseReportId = this.expenseReport._id
-      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, { headers })
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, {
+        headers,
+        params: { parentId: this.expenseReport._id }
+      })
       if (result.ok) {
-        await this.getExpenseReport()
+        this.setExpenseReport(result.ok)
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { id: id, expenseReportId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getExpenseReport()
+        this.setExpenseReport(result)
         this.hideModal()
       }
     },
     async getExpenseReport() {
       const params: any = {
-        id: this._id,
-        addExpenses: true
-      }
-      if (this.endpointPrefix === 'examine/') {
-        params.addRefunded = true
+        _id: this._id,
+        additionalFields: ['expenses']
       }
       const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
       if (result) {
-        this.expenseReport = result.data
+        this.setExpenseReport(result.data)
       }
+    },
+    setExpenseReport(expenseReport: ExpenseReport) {
+      this.expenseReport = expenseReport
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },

@@ -39,7 +39,7 @@
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
-        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="(formTravel.startDate as string)" :max="getMaxDate()" required />
+        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="formTravel.startDate as string" :max="getMaxDate()" required />
       </div>
     </div>
 
@@ -100,8 +100,8 @@
           mode === 'add'
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
-            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
-            : $t('labels.save')
+              ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+              : $t('labels.save')
         }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
@@ -117,7 +117,7 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { TravelSimple, Place } from '../../../../../common/types.js'
+import { TravelSimple, baseCurrency } from '../../../../../common/types.js'
 import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 
 export default defineComponent({
@@ -152,7 +152,7 @@ export default defineComponent({
         claimSpouseRefund: false,
         advance: {
           amount: null,
-          currency: this.$root.settings.baseCurrency
+          currency: baseCurrency
         }
       }
     },

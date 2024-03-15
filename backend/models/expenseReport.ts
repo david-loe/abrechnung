@@ -129,4 +129,4 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
 
 export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', expenseReportSchema)
 
-export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> { }
+export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> {}

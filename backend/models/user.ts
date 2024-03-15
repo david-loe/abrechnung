@@ -63,7 +63,7 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.isActive = async function (this: UserDoc) {
   if (this.access.user) {
-    if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() - new Date().valueOf() < 0)) {
+    if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= new Date().valueOf())) {
       return true
     } else {
       for (const access of accesses) {

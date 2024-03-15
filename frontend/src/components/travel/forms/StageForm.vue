@@ -87,7 +87,7 @@
               ' (' +
               $root.settings.distanceRefunds[distanceRefundType] +
               ' ' +
-              ($root.settings.baseCurrency.symbol ? $root.settings.baseCurrency.symbol : $root.settings.baseCurrency._id) +
+              baseCurrency.symbol +
               '/km)'
             }}
           </option>
@@ -116,7 +116,7 @@
         <FileUpload
           ref="fileUpload"
           id="stageFormVehicleRegistration"
-          v-model="($root.user.vehicleRegistration as DocumentFile[]| undefined)"
+          v-model="$root.user.vehicleRegistration as DocumentFile[] | undefined"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'"
@@ -197,14 +197,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
+import { datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
+import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import FileUpload from '../../elements/FileUpload.vue'
-import PlaceInput from '../../elements/PlaceInput.vue'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
+import FileUpload from '../../elements/FileUpload.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import PlaceInput from '../../elements/PlaceInput.vue'
 
 export default defineComponent({
   name: 'StageForm',
@@ -232,7 +232,8 @@ export default defineComponent({
       loading: false,
       vehicleRegistrationChanged: false,
       transportTypes,
-      distanceRefundTypes
+      distanceRefundTypes,
+      baseCurrency
     }
   },
   methods: {
@@ -246,7 +247,7 @@ export default defineComponent({
         transport: { type: 'otherTransport', distance: null, distanceRefundType: distanceRefundTypes[0] },
         cost: {
           amount: null,
-          currency: this.$root.settings.baseCurrency,
+          currency: baseCurrency,
           receipts: [],
           date: ''
         },

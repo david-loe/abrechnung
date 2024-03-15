@@ -1,18 +1,18 @@
-import settings from './data/settings.json' assert { type: 'json' }
-import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
+import mongoose, { Model } from 'mongoose'
+import { CountryLumpSum } from '../common/types.js'
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
+import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
 import iLumpSums from './data/lumpSums.json' assert { type: 'json' }
 import organisations from './data/organisations.json' assert { type: 'json' }
-import Settings from './models/settings.js'
-import Currency from './models/currency.js'
-import Country from './models/country.js'
-import HealthInsurance from './models/healthInsurance.js'
-import mongoose, { Model } from 'mongoose'
-import i18n from './i18n.js'
-import { CountryLumpSum } from '../common/types.js'
-import Organisation from './models/organisation.js'
 import { LumpSumsJSON } from './data/parser.js'
+import settings from './data/settings.json' assert { type: 'json' }
+import i18n from './i18n.js'
+import Country from './models/country.js'
+import Currency from './models/currency.js'
+import HealthInsurance from './models/healthInsurance.js'
+import Organisation from './models/organisation.js'
+import Settings from './models/settings.js'
 
 await connectDB()
 
@@ -49,7 +49,7 @@ export async function initDB() {
   await initer<any>(Currency, 'currencies', currencies)
   await initer<any>(Country, 'countries', countries)
   await addLumpSumsToCountries(iLumpSums)
-  initer(HealthInsurance, 'health insurances', healthInsurances)
+  initer<any>(HealthInsurance, 'health insurances', healthInsurances)
   initer<any>(Organisation, 'organisation', organisations)
 }
 
@@ -85,7 +85,7 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
           count++
         }
       } else {
-        throw Error('No Country with id "' + lumpSum.countryCode + '" found')
+        throw new Error('No Country with id "' + lumpSum.countryCode + '" found')
       }
     }
     if (count > 0) {

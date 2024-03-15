@@ -1,25 +1,28 @@
-import { Schema, Document, Model, model, HydratedDocument, Error } from 'mongoose'
+import { Document, Error, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { datetimeToDate, getDayList, getDiffInDays } from '../../common/scripts.js'
-import Country, { CountryDoc } from './country.js'
-import Settings from './settings.js'
-import { convertCurrency, costObject } from '../helper.js'
 import {
+  CountrySimple,
+  Currency as ICurrency,
+  Meal,
   Money,
+  Place,
+  PurposeSimple,
   Record,
   Refund,
   Travel,
-  TravelDay,
-  Currency as ICurrency,
-  CountrySimple,
-  Meal,
-  PurposeSimple,
   TravelComment,
-  transportTypes,
-  travelStates,
-  lumpsumTypes,
+  TravelDay,
+  baseCurrency,
   distanceRefundTypes,
-  Place
+  lumpsumTypes,
+  transportTypes,
+  travelStates
 } from '../../common/types.js'
+import { convertCurrency, costObject } from '../helper.js'
+import Country, { CountryDoc } from './country.js'
+import DocumentFile from './documentFile.js'
+import Settings from './settings.js'
+import User from './user.js'
 
 const settings = (await Settings.findOne().lean())!
 
@@ -38,7 +41,7 @@ interface Methods {
   saveToHistory(): Promise<void>
   calculateProgress(): void
   getDays(): { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[]
-  getBorderCrossings(): Promise<{ date: Date; country: CountrySimple, special?: string }[]>
+  getBorderCrossings(): Promise<{ date: Date; country: CountrySimple; special?: string }[]>
   getDateOfLastPlaceOfWork(): Date | null
   calculateDays(): Promise<void>
   addCateringRefunds(): Promise<void>
@@ -81,7 +84,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     travelInsideOfEU: { type: Boolean, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    advance: costObject(true, false, false, settings.baseCurrency._id),
+    advance: costObject(true, false, false, baseCurrency._id),
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
     lastPlaceOfWork: place(true, false),
@@ -187,6 +190,30 @@ travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
   const old = await model('Travel').create(doc)
   this.history.push(old)
   this.markModified('history')
+  switch (this.state) {
+    case 'approved':
+      {
+        // move vehicle registration of owner as receipt to 'ownCar' stages
+        const receipts = []
+        for (const stage of this.stages) {
+          if (stage.transport.type == 'ownCar') {
+            if (receipts.length == 0) {
+              const owner = await User.findOne({ _id: this.owner._id }).lean()
+              if (owner && owner.vehicleRegistration) {
+                for (const vr of owner.vehicleRegistration) {
+                  const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
+                  delete (doc as unknown as any)._id
+                  receipts.push(await DocumentFile.create(doc))
+                }
+              }
+            }
+            stage.cost.receipts = receipts
+          }
+        }
+      }
+
+      break
+  }
 }
 
 travelSchema.methods.calculateProgress = function (this: TravelDoc) {
@@ -226,14 +253,22 @@ travelSchema.methods.getDays = function (this: TravelDoc) {
   }
 }
 
-travelSchema.methods.getBorderCrossings = async function (this: TravelDoc): Promise<{ date: Date; country: CountrySimple, special?: string }[]> {
+travelSchema.methods.getBorderCrossings = async function (
+  this: TravelDoc
+): Promise<{ date: Date; country: CountrySimple; special?: string }[]> {
   if (this.stages.length > 0) {
     const startCountry = this.stages[0].startLocation.country
-    const borderCrossings: { date: Date; country: CountrySimple, special?: string }[] = [{ date: new Date(this.stages[0].departure), country: startCountry }]
+    const borderCrossings: { date: Date; country: CountrySimple; special?: string }[] = [
+      { date: new Date(this.stages[0].departure), country: startCountry }
+    ]
     for (var i = 0; i < this.stages.length; i++) {
       const stage = this.stages[i]
       // Country Change (or special change)
-      if (stage.startLocation && stage.endLocation && (stage.startLocation.country._id !== stage.endLocation.country._id || stage.startLocation.special !== stage.endLocation.special)) {
+      if (
+        stage.startLocation &&
+        stage.endLocation &&
+        (stage.startLocation.country._id !== stage.endLocation.country._id || stage.startLocation.special !== stage.endLocation.special)
+      ) {
         // More than 1 night
         if (getDiffInDays(stage.departure, stage.arrival) > 1) {
           if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
@@ -305,8 +340,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     ) {
       bXIndex++
     }
-    ; (day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
-      ; (day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
+    ;(day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
+    ;(day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
   }
 
   // change days according to last place of work
@@ -319,8 +354,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     }
     for (const day of days) {
       if (day.date.valueOf() >= dateOfLastPlaceOfWork.valueOf()) {
-        ; (day as Partial<TravelDay>).country = dbCountry
-          ; (day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
+        ;(day as Partial<TravelDay>).country = dbCountry
+        ;(day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
       }
     }
   }
@@ -346,11 +381,11 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
         amount:
           Math.round(
             amount *
-            leftover *
-            ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
-            100
+              leftover *
+              ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
+              100
           ) / 100,
-        currency: settings.baseCurrency
+        currency: baseCurrency
       }
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount! *= 2
@@ -385,10 +420,10 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
           amount:
             Math.round(
               amount *
-              (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
-              100
+                (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
+                100
             ) / 100,
-          currency: settings.baseCurrency
+          currency: baseCurrency
         }
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount! *= 2
@@ -402,7 +437,7 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
 async function exchange(costObject: Money, date: string | number | Date) {
   var exchangeRate = null
 
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== settings.baseCurrency._id) {
+  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
     exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate
@@ -465,7 +500,7 @@ travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
       if (stage.transport.distance && stage.transport.distanceRefundType) {
         stage.cost = Object.assign(stage.cost, {
           amount: Math.round(stage.transport.distance * settings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
-          currency: settings.baseCurrency
+          currency: baseCurrency
         })
       }
     }
@@ -532,13 +567,11 @@ travelSchema.methods.validateCountries = function (this: TravelDoc) {
   }
 }
 
-travelSchema.pre('validate', function (this: TravelDoc) {
+travelSchema.pre('validate', async function (this: TravelDoc, next) {
   this.addComment()
   this.validateDates()
   this.validateCountries()
-})
 
-travelSchema.pre('save', async function (this: TravelDoc, next) {
   await populate(this)
 
   this.calculateProgress()
@@ -555,4 +588,4 @@ travelSchema.pre('save', async function (this: TravelDoc, next) {
 
 export default model<Travel, TravelModel>('Travel', travelSchema)
 
-export interface TravelDoc extends Methods, HydratedDocument<Travel> { }
+export interface TravelDoc extends Methods, HydratedDocument<Travel> {}

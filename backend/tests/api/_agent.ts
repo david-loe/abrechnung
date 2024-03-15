@@ -1,6 +1,7 @@
 import request from 'supertest'
-import app from '../../app.js'
+import { Base64 } from '../../../common/scripts.js'
 import { User } from '../../../common/types.js'
+import app from '../../app.js'
 
 const users = {
   user: { username: 'fry', password: 'fry', access: { user: true } },
@@ -15,21 +16,17 @@ const users = {
 }
 
 async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
-  const res = await agent.get('/api/admin/user').query({ 'fk.ldapauth': users[userKey].username })
-  var userId = undefined
-  if (res.body.data.length > 0) {
-    userId = (res.body.data as User[])[0]._id
-  } else {
-    await loginUser(agent, userKey)
-    await loginUser(agent, 'admin')
-  }
+  await loginUser(agent, userKey)
+  await loginUser(agent, 'admin')
+  const res = await agent
+    .get('/admin/user')
+    .query({ filterJSON: Base64.encode(JSON.stringify({ 'fk.ldapauth': users[userKey].username })) })
+  const userId = (res.body.data as User[])[0]._id
   const user = {
     _id: userId,
-    fk: { ldapauth: users[userKey].username },
-    access: users[userKey].access,
-    email: users[userKey].username + '@planetexpress.com'
+    access: users[userKey].access
   }
-  await agent.post('/api/admin/user').send(user)
+  await agent.post('/admin/user').send(user)
 }
 
 export default async function createAgent() {
@@ -43,6 +40,6 @@ export default async function createAgent() {
 }
 
 export async function loginUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
-  await agent.post('/api/logout')
+  await agent.post('/logout')
   await agent.post('/auth/ldapauth').send({ username: users[userKey].username, password: users[userKey].password })
 }

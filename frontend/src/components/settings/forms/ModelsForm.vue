@@ -33,7 +33,7 @@
           id="objectJSON"
           rows="10"
           :value="JSON.stringify(object, null, 2)"
-          @input="event => object = JSON.parse((event as any).target.value)"></textarea>
+          @input="(event) => (object = JSON.parse((event as any).target.value))"></textarea>
       </div>
     </template>
     <div class="mb-2">
@@ -96,8 +96,8 @@ export default defineComponent({
       if (this.model) {
         const res = (await this.$root.getter<any[]>(this.model.GET ? this.model.GET : this.model.name)).ok
         if (res) {
-          if (res.data.length == 1) {
-            this.object = res.data[0]
+          if (res.data.length !== 0 && !res.data.length) {
+            this.object = res.data
           } else {
             this.objects = res.data
           }
@@ -107,7 +107,7 @@ export default defineComponent({
     async deleteIt() {
       this.loading = true
       if (this.object || this.object._id) {
-        await this.$root.deleter('admin/' + this.model, { id: this.object._id })
+        await this.$root.deleter('admin/' + this.model, { _id: this.object._id })
       }
       this.clear()
     }

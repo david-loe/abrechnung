@@ -1,294 +1,294 @@
 [
-    {
-        "email": "info@bw.aok.de",
-        "name": "AOK Baden-Württemberg"
-    },
-    {
-        "email": "info@by.aok.de",
-        "name": "AOK Bayern"
-    },
-    {
-        "email": "info@hb.aok.de",
-        "name": "AOK Bremen/Bremerhaven"
-    },
-    {
-        "email": "service@he.aok.de",
-        "name": "AOK Hessen"
-    },
-    {
-        "email": "aok.service@nds.aok.de",
-        "name": "AOK Niedersachsen"
-    },
-    {
-        "email": "service@nordost.aok.de ",
-        "name": "AOK Nordost"
-    },
-    {
-        "email": "kontakt@nw.aok.de",
-        "name": "AOK Nordwest"
-    },
-    {
-        "email": "service@plus.aok.de",
-        "name": "AOK Plus"
-    },
-    {
-        "email": "service@rps.aok.de",
-        "name": "AOK Rheinland-Pfalz/Saarland"
-    },
-    {
-        "email": "service@rh.aok.de",
-        "name": "AOK Rheinland/Hamburg"
-    },
-    {
-        "email": "service@san.aok.de",
-        "name": "AOK Sachsen-Anhalt"
-    },
-    {
-        "email": "info@audibkk.de",
-        "name": "Audi BKK"
-    },
-    {
-        "email": "service@bahn-bkk.de",
-        "name": "BAHN-BKK"
-    },
-    {
-        "email": "service@barmer.de",
-        "name": "BARMER"
-    },
-    {
-        "email": "info@bergische-krankenkasse.de",
-        "name": "BERGISCHE Krankenkasse"
-    },
-    {
-        "email": "service@bertelsmann-bkk.de",
-        "name": "Bertelsmann BKK"
-    },
-    {
-        "email": "info@big-direkt.de",
-        "name": "BIG direkt gesund"
-    },
-    {
-        "email": "info@bkk-akzo.de",
-        "name": "BKK Akzo Nobel Bayern"
-    },
-    {
-        "email": "info@bkk-diakonie.de ",
-        "name": "BKK Diakonie"
-    },
-    {
-        "email": "info@bkk-da.de",
-        "name": "BKK DürkoppAdler"
-    },
-    {
-        "email": "info@bkk-euregio.de",
-        "name": "BKK EUREGIO"
-    },
-    {
-        "email": "info@bkkexklusiv.de",
-        "name": "BKK exklusiv"
-    },
-    {
-        "email": "info@bkk-faber-castell.de",
-        "name": "BKK Faber-Castell & Partner"
-    },
-    {
-        "email": "info@bkk-firmus.de",
-        "name": "BKK firmus"
-    },
-    {
-        "email": "bkk@bkk-freudenberg.de",
-        "name": "BKK Freudenberg"
-    },
-    {
-        "email": "info@bkkgs.de",
-        "name": "BKK GILDEMEISTER SEIDENSTICKER"
-    },
-    {
-        "email": "info@bkk-herkules.de",
-        "name": "BKK HERKULES"
-    },
-    {
-        "email": "info@bkk-linde.de",
-        "name": "BKK Linde"
-    },
-    {
-        "email": "info@bkk-melitta.de",
-        "name": "bkk melitta hmr"
-    },
-    {
-        "email": "info@bkk-pfaff.de",
-        "name": "BKK PFAFF"
-    },
-    {
-        "email": "info@bkkpfalz.de",
-        "name": "BKK Pfalz"
-    },
-    {
-        "email": "info@bkk-provita.de",
-        "name": "BKK ProVita"
-    },
-    {
-        "email": "service@bkk-public.de",
-        "name": "BKK Public"
-    },
-    {
-        "email": "info@bkk-sbh.de",
-        "name": "BKK SBH"
-    },
-    {
-        "email": "info@bkk-scheufelen.de",
-        "name": "BKK Scheufelen"
-    },
-    {
-        "email": "ag@bkk-technoform.de",
-        "name": "BKK Technoform"
-    },
-    {
-        "email": "info@bkk-textilgruppe-hof.de",
-        "name": "BKK Textilgruppe Hof"
-    },
-    {
-        "email": "firmenkunden@meine-krankenkasse.de",
-        "name": "BKK VBU"
-    },
-    {
-        "email": "info@bkk-vdn.de",
-        "name": "BKK VDN"
-    },
-    {
-        "email": "info@bkkvp.de",
-        "name": "BKK VerbundPlus"
-    },
-    {
-        "email": "info@bkk-wm.de",
-        "name": "BKK Werra-Meissner"
-    },
-    {
-        "email": "info@bkk-wf.de",
-        "name": "BKK WIRTSCHAFT & FINANZEN"
-    },
-    {
-        "email": "betriebsservice@bkk-zf-partner.de",
-        "name": "BKK ZF & Partner"
-    },
-    {
-        "email": "info@bkk24.de",
-        "name": "BKK24"
-    },
-    {
-        "email": "info@bosch-bkk.de ",
-        "name": "Bosch BKK"
-    },
-    {
-        "email": "arbeitgeber@continentale-bkk.de",
-        "name": "Continentale BKK"
-    },
-    {
-        "email": "service@dak.de",
-        "name": "DAK Gesundheit"
-    },
-    {
-        "email": "info@debeka-bkk.de",
-        "name": "Debeka BKK"
-    },
-    {
-        "email": "info@energie-bkk.de",
-        "name": "energie-BKK"
-    },
-    {
-        "email": "info@heimat-krankenkasse.de",
-        "name": "Heimat Krankenkasse"
-    },
-    {
-        "email": "kontakt@hek.de",
-        "name": "HEK - Hanseatische Krankenkasse"
-    },
-    {
-        "email": "info@hkk.de",
-        "name": "hkk Krankenkasse"
-    },
-    {
-        "email": "firmenkunden@die-ik.de",
-        "name": "IKK - Die Innovationskasse"
-    },
-    {
-        "email": "service@ikkbb.de",
-        "name": "IKK Brandenburg und Berlin"
-    },
-    {
-        "email": "info@ikk-classic.de",
-        "name": "IKK classic"
-    },
-    {
-        "email": "info@ikk-gesundplus.de",
-        "name": "IKK gesund plus"
-    },
-    {
-        "email": "info@ikk-sw.de",
-        "name": "IKK Südwest"
-    },
-    {
-        "email": "service@kkh.de",
-        "name": "KKH Kaufmännische Krankenkasse"
-    },
-    {
-        "email": "melde-beitragswesen@kbs.de",
-        "name": "KNAPPSCHAFT"
-    },
-    {
-        "email": "info@mhplus.de",
-        "name": "mhplus Krankenkasse"
-    },
-    {
-        "email": "info@service.mobil-krankenkasse.de",
-        "name": "Mobil Krankenkasse"
-    },
-    {
-        "email": "info@novitas-bkk.de",
-        "name": "Novitas BKK"
-    },
-    {
-        "email": "service@pronovabkk.de",
-        "name": "Pronova BKK"
-    },
-    {
-        "email": "info@ruv-bkk.de",
-        "name": "R+V Betriebskrankenkasse"
-    },
-    {
-        "email": "service@salus-bkk.de",
-        "name": "Salus BKK"
-    },
-    {
-        "email": "info@sbk.org",
-        "name": "SBK"
-    },
-    {
-        "email": "mail@securvita-bkk.de",
-        "name": "SECURVITA Krankenkasse"
-    },
-    {
-        "email": "gesund@skd-bkk.de",
-        "name": "SKD BKK"
-    },
-    {
-        "email": "service@tk.de",
-        "name": "Techniker Krankenkasse (TK)"
-    },
-    {
-        "email": "service@tui-bkk.de",
-        "name": "TUI BKK"
-    },
-    {
-        "email": "service@viactiv.de",
-        "name": "VIACTIV Krankenkasse"
-    },
-    {
-        "email": "info@vividabkk.de",
-        "name": "vivida bkk"
-    },
-    {
-        "email": "service@wmf-bkk.de",
-        "name": "WMF BKK"
-    }
+  {
+    "email": "info@bw.aok.de",
+    "name": "AOK Baden-Württemberg"
+  },
+  {
+    "email": "info@by.aok.de",
+    "name": "AOK Bayern"
+  },
+  {
+    "email": "info@hb.aok.de",
+    "name": "AOK Bremen/Bremerhaven"
+  },
+  {
+    "email": "service@he.aok.de",
+    "name": "AOK Hessen"
+  },
+  {
+    "email": "aok.service@nds.aok.de",
+    "name": "AOK Niedersachsen"
+  },
+  {
+    "email": "service@nordost.aok.de ",
+    "name": "AOK Nordost"
+  },
+  {
+    "email": "kontakt@nw.aok.de",
+    "name": "AOK Nordwest"
+  },
+  {
+    "email": "service@plus.aok.de",
+    "name": "AOK Plus"
+  },
+  {
+    "email": "service@rps.aok.de",
+    "name": "AOK Rheinland-Pfalz/Saarland"
+  },
+  {
+    "email": "service@rh.aok.de",
+    "name": "AOK Rheinland/Hamburg"
+  },
+  {
+    "email": "service@san.aok.de",
+    "name": "AOK Sachsen-Anhalt"
+  },
+  {
+    "email": "info@audibkk.de",
+    "name": "Audi BKK"
+  },
+  {
+    "email": "service@bahn-bkk.de",
+    "name": "BAHN-BKK"
+  },
+  {
+    "email": "service@barmer.de",
+    "name": "BARMER"
+  },
+  {
+    "email": "info@bergische-krankenkasse.de",
+    "name": "BERGISCHE Krankenkasse"
+  },
+  {
+    "email": "service@bertelsmann-bkk.de",
+    "name": "Bertelsmann BKK"
+  },
+  {
+    "email": "info@big-direkt.de",
+    "name": "BIG direkt gesund"
+  },
+  {
+    "email": "info@bkk-akzo.de",
+    "name": "BKK Akzo Nobel Bayern"
+  },
+  {
+    "email": "info@bkk-diakonie.de ",
+    "name": "BKK Diakonie"
+  },
+  {
+    "email": "info@bkk-da.de",
+    "name": "BKK DürkoppAdler"
+  },
+  {
+    "email": "info@bkk-euregio.de",
+    "name": "BKK EUREGIO"
+  },
+  {
+    "email": "info@bkkexklusiv.de",
+    "name": "BKK exklusiv"
+  },
+  {
+    "email": "info@bkk-faber-castell.de",
+    "name": "BKK Faber-Castell & Partner"
+  },
+  {
+    "email": "info@bkk-firmus.de",
+    "name": "BKK firmus"
+  },
+  {
+    "email": "bkk@bkk-freudenberg.de",
+    "name": "BKK Freudenberg"
+  },
+  {
+    "email": "info@bkkgs.de",
+    "name": "BKK GILDEMEISTER SEIDENSTICKER"
+  },
+  {
+    "email": "info@bkk-herkules.de",
+    "name": "BKK HERKULES"
+  },
+  {
+    "email": "info@bkk-linde.de",
+    "name": "BKK Linde"
+  },
+  {
+    "email": "info@bkk-melitta.de",
+    "name": "bkk melitta hmr"
+  },
+  {
+    "email": "info@bkk-pfaff.de",
+    "name": "BKK PFAFF"
+  },
+  {
+    "email": "info@bkkpfalz.de",
+    "name": "BKK Pfalz"
+  },
+  {
+    "email": "info@bkk-provita.de",
+    "name": "BKK ProVita"
+  },
+  {
+    "email": "service@bkk-public.de",
+    "name": "BKK Public"
+  },
+  {
+    "email": "info@bkk-sbh.de",
+    "name": "BKK SBH"
+  },
+  {
+    "email": "info@bkk-scheufelen.de",
+    "name": "BKK Scheufelen"
+  },
+  {
+    "email": "ag@bkk-technoform.de",
+    "name": "BKK Technoform"
+  },
+  {
+    "email": "info@bkk-textilgruppe-hof.de",
+    "name": "BKK Textilgruppe Hof"
+  },
+  {
+    "email": "firmenkunden@meine-krankenkasse.de",
+    "name": "BKK VBU"
+  },
+  {
+    "email": "info@bkk-vdn.de",
+    "name": "BKK VDN"
+  },
+  {
+    "email": "info@bkkvp.de",
+    "name": "BKK VerbundPlus"
+  },
+  {
+    "email": "info@bkk-wm.de",
+    "name": "BKK Werra-Meissner"
+  },
+  {
+    "email": "info@bkk-wf.de",
+    "name": "BKK WIRTSCHAFT & FINANZEN"
+  },
+  {
+    "email": "betriebsservice@bkk-zf-partner.de",
+    "name": "BKK ZF & Partner"
+  },
+  {
+    "email": "info@bkk24.de",
+    "name": "BKK24"
+  },
+  {
+    "email": "info@bosch-bkk.de ",
+    "name": "Bosch BKK"
+  },
+  {
+    "email": "arbeitgeber@continentale-bkk.de",
+    "name": "Continentale BKK"
+  },
+  {
+    "email": "service@dak.de",
+    "name": "DAK Gesundheit"
+  },
+  {
+    "email": "info@debeka-bkk.de",
+    "name": "Debeka BKK"
+  },
+  {
+    "email": "info@energie-bkk.de",
+    "name": "energie-BKK"
+  },
+  {
+    "email": "info@heimat-krankenkasse.de",
+    "name": "Heimat Krankenkasse"
+  },
+  {
+    "email": "kontakt@hek.de",
+    "name": "HEK - Hanseatische Krankenkasse"
+  },
+  {
+    "email": "info@hkk.de",
+    "name": "hkk Krankenkasse"
+  },
+  {
+    "email": "firmenkunden@die-ik.de",
+    "name": "IKK - Die Innovationskasse"
+  },
+  {
+    "email": "service@ikkbb.de",
+    "name": "IKK Brandenburg und Berlin"
+  },
+  {
+    "email": "info@ikk-classic.de",
+    "name": "IKK classic"
+  },
+  {
+    "email": "info@ikk-gesundplus.de",
+    "name": "IKK gesund plus"
+  },
+  {
+    "email": "info@ikk-sw.de",
+    "name": "IKK Südwest"
+  },
+  {
+    "email": "service@kkh.de",
+    "name": "KKH Kaufmännische Krankenkasse"
+  },
+  {
+    "email": "melde-beitragswesen@kbs.de",
+    "name": "KNAPPSCHAFT"
+  },
+  {
+    "email": "info@mhplus.de",
+    "name": "mhplus Krankenkasse"
+  },
+  {
+    "email": "info@service.mobil-krankenkasse.de",
+    "name": "Mobil Krankenkasse"
+  },
+  {
+    "email": "info@novitas-bkk.de",
+    "name": "Novitas BKK"
+  },
+  {
+    "email": "service@pronovabkk.de",
+    "name": "Pronova BKK"
+  },
+  {
+    "email": "info@ruv-bkk.de",
+    "name": "R+V Betriebskrankenkasse"
+  },
+  {
+    "email": "service@salus-bkk.de",
+    "name": "Salus BKK"
+  },
+  {
+    "email": "info@sbk.org",
+    "name": "SBK"
+  },
+  {
+    "email": "mail@securvita-bkk.de",
+    "name": "SECURVITA Krankenkasse"
+  },
+  {
+    "email": "gesund@skd-bkk.de",
+    "name": "SKD BKK"
+  },
+  {
+    "email": "service@tk.de",
+    "name": "Techniker Krankenkasse (TK)"
+  },
+  {
+    "email": "service@tui-bkk.de",
+    "name": "TUI BKK"
+  },
+  {
+    "email": "service@viactiv.de",
+    "name": "VIACTIV Krankenkasse"
+  },
+  {
+    "email": "info@vividabkk.de",
+    "name": "vivida bkk"
+  },
+  {
+    "email": "service@wmf-bkk.de",
+    "name": "WMF BKK"
+  }
 ]

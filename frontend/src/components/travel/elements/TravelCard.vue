@@ -36,10 +36,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CardElement from '../../elements/CardElement.vue'
-import ProgressCircle from '../../elements/ProgressCircle.vue'
 import { datetoDateString } from '../../../../../common/scripts.js'
 import { TravelSimple } from '../../../../../common/types.js'
+import CardElement from '../../elements/CardElement.vue'
+import ProgressCircle from '../../elements/ProgressCircle.vue'
 
 export default defineComponent({
   name: 'TravelCard',

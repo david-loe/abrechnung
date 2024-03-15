@@ -1,1486 +1,1486 @@
 [
-    {
-        "code": "EUR",
-        "name": {
-            "de": "Euro",
-            "en": "euro"
-        },
-        "subunit": "Cent",
-        "symbol": "€",
-        "flag": "🇪🇺"
-    },
-    {
-        "code": "USD",
-        "name": {
-            "de": "US-Dollar",
-            "en": "US dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇺🇸"
-    },
-    {
-        "code": "GBP",
-        "name": {
-            "de": "Pfund Sterling",
-            "en": "Guernsey pound"
-        },
-        "subunit": "Penny",
-        "symbol": "£",
-        "flag": "🇬🇧"
-    },
-    {
-        "code": "CNY",
-        "name": {
-            "de": "Renminbi Yuan",
-            "en": "renminbi-yuan"
-        },
-        "subunit": "Fen",
-        "symbol": "¥",
-        "flag": "🇨🇳"
-    },
-    {
-        "code": "CHF",
-        "name": {
-            "de": "Schweizer Franken",
-            "en": "Swiss franc"
-        },
-        "subunit": "Rappen;Centime",
-        "symbol": "CHF",
-        "flag": "🇨🇭"
-    },
-    {
-        "code": "HKD",
-        "name": {
-            "de": "Hongkong-Dollar",
-            "en": "Hong Kong dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇭🇰"
-    },
-    {
-        "code": "SGD",
-        "name": {
-            "de": "Singapur-Dollar",
-            "en": "Singapore dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇸🇬"
-    },
-    {
-        "code": "NZD",
-        "name": {
-            "de": "Neuseeland-Dollar",
-            "en": "New Zealand dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇳🇿"
-    },
-    {
-        "code": "INR",
-        "name": {
-            "de": "indische Rupie",
-            "en": "Indian rupee"
-        },
-        "subunit": "Paisa",
-        "symbol": "₹",
-        "flag": "🇮🇳"
-    },
-    {
-        "code": "ZAR",
-        "name": {
-            "de": "Rand",
-            "en": "rand"
-        },
-        "subunit": "Cent",
-        "symbol": "R",
-        "flag": "🇿🇦"
-    },
-    {
-        "code": "THB",
-        "name": {
-            "de": "Baht",
-            "en": "baht"
-        },
-        "subunit": "Satang",
-        "symbol": "฿",
-        "flag": "🇹🇭"
-    },
-    {
-        "code": "IDR",
-        "name": {
-            "de": "Indonesische Rupiah",
-            "en": "Indonesian rupiah"
-        },
-        "subunit": "Sen",
-        "symbol": "Rp",
-        "flag": "🇮🇩"
-    },
-    {
-        "code": "AED",
-        "name": {
-            "de": "VAE-Dirham",
-            "en": "UAE dirham"
-        },
-        "subunit": "Fils",
-        "flag": "🇦🇪"
-    },
-    {
-        "code": "TRY",
-        "name": {
-            "de": "türkische Lira",
-            "en": "Turkish lira"
-        },
-        "subunit": "Kurus",
-        "symbol": "₺",
-        "flag": "🇹🇷"
-    },
-    {
-        "code": "XCD",
-        "name": {
-            "de": "ostkaribischer Dollar",
-            "en": "East Caribbean dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": null
-    },
-    {
-        "code": "ALL",
-        "name": {
-            "de": "Lek",
-            "en": "lek"
-        },
-        "symbol": "Lek",
-        "flag": "🇦🇱"
-    },
-    {
-        "code": "AFN",
-        "name": {
-            "de": "Afghani",
-            "en": "afghani"
-        },
-        "subunit": "Pul",
-        "symbol": "؋",
-        "flag": "🇦🇫"
-    },
-    {
-        "code": "AMD",
-        "name": {
-            "de": "Dram",
-            "en": "dram"
-        },
-        "subunit": "Lumma",
-        "flag": "🇦🇲"
-    },
-    {
-        "code": "AOA",
-        "name": {
-            "de": "Kwanza",
-            "en": "kwanza"
-        },
-        "subunit": "Cêntimo",
-        "flag": "🇦🇴"
-    },
-    {
-        "code": "ARS",
-        "name": {
-            "de": "argentinischer Peso",
-            "en": "Argentine peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "$",
-        "flag": "🇦🇷"
-    },
-    {
-        "code": "AUD",
-        "name": {
-            "de": "australischer Dollar",
-            "en": "Australian dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇦🇺"
-    },
-    {
-        "code": "AWG",
-        "name": {
-            "de": "Aruba-Gulden",
-            "en": "Aruban guilder"
-        },
-        "subunit": "Cent",
-        "symbol": "ƒ",
-        "flag": "🇦🇼"
-    },
-    {
-        "code": "AZN",
-        "name": {
-            "de": "Aserbaidschan-Manat",
-            "en": "Azerbaijan manat"
-        },
-        "subunit": "Qäpik",
-        "symbol": "₼",
-        "flag": "🇦🇿"
-    },
-    {
-        "code": "BAM",
-        "name": {
-            "de": "konvertierbare Mark",
-            "en": "convertible mark"
-        },
-        "subunit": "Fening",
-        "symbol": "KM",
-        "flag": "🇧🇦"
-    },
-    {
-        "code": "BBD",
-        "name": {
-            "de": "Barbados-Dollar",
-            "en": "Barbados dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇧🇧"
-    },
-    {
-        "code": "BDT",
-        "name": {
-            "de": "Taka",
-            "en": "taka"
-        },
-        "subunit": "Poisha",
-        "flag": "🇧🇩"
-    },
-    {
-        "code": "XOF",
-        "name": {
-            "de": "CFA-Franc (BCEAO)",
-            "en": "CFA franc"
-        },
-        "subunit": "Centime",
-        "flag": null
-    },
-    {
-        "code": "BGN",
-        "name": {
-            "de": "Lew",
-            "en": "lev"
-        },
-        "subunit": "Stótinka",
-        "symbol": "лв",
-        "flag": "🇧🇬"
-    },
-    {
-        "code": "BHD",
-        "name": {
-            "de": "Bahrain-Dinar",
-            "en": "Bahraini dinar"
-        },
-        "subunit": "Fils",
-        "flag": "🇧🇭"
-    },
-    {
-        "code": "BIF",
-        "name": {
-            "de": "Burundi-Franc",
-            "en": "Burundi franc"
-        },
-        "subunit": "Centime",
-        "flag": "🇧🇮"
-    },
-    {
-        "code": "BMD",
-        "name": {
-            "de": "Bermuda-Dollar",
-            "en": "Bermuda dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇧🇲"
-    },
-    {
-        "code": "BND",
-        "name": {
-            "de": "Brunei-Dollar",
-            "en": "Brunei dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇧🇳"
-    },
-    {
-        "code": "BOB",
-        "name": {
-            "de": "Boliviano",
-            "en": "boliviano"
-        },
-        "subunit": "Centavo",
-        "symbol": "$b",
-        "flag": "🇧🇴"
-    },
-    {
-        "code": "BRL",
-        "name": {
-            "de": "Real",
-            "en": "real"
-        },
-        "subunit": "Centavo",
-        "symbol": "R$",
-        "flag": "🇧🇷"
-    },
-    {
-        "code": "BSD",
-        "name": {
-            "de": "Bahama-Dollar",
-            "en": "Bahamian dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇧🇸"
-    },
-    {
-        "code": "BTN",
-        "name": {
-            "de": "Ngultrum",
-            "en": "ngultrum"
-        },
-        "subunit": "Chhetrum",
-        "flag": "🇧🇹"
-    },
-    {
-        "code": "BWP",
-        "name": {
-            "de": "Pula",
-            "en": "pula"
-        },
-        "subunit": "Thebe",
-        "symbol": "P",
-        "flag": "🇧🇼"
-    },
-    {
-        "code": "BYN",
-        "name": {
-            "de": "belarussischer Rubel",
-            "en": "Belarusian rouble"
-        },
-        "subunit": "Kupeke",
-        "symbol": "Br",
-        "flag": "🇧🇾"
-    },
-    {
-        "code": "BZD",
-        "name": {
-            "de": "Belize-Dollar",
-            "en": "Belize dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "BZ$",
-        "flag": "🇧🇿"
-    },
-    {
-        "code": "CAD",
-        "name": {
-            "de": "kanadischer Dollar",
-            "en": "Canadian dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇨🇦"
-    },
-    {
-        "code": "CDF",
-        "name": {
-            "de": "Kongo-Franc",
-            "en": "Congolese franc"
-        },
-        "subunit": "Centime",
-        "flag": "🇨🇩"
-    },
-    {
-        "code": "XAF",
-        "name": {
-            "de": "CFA-Franc (BEAC)",
-            "en": "CFA franc"
-        },
-        "subunit": "Centime",
-        "flag": null
-    },
-    {
-        "code": "CLP",
-        "name": {
-            "de": "chilenischer Peso",
-            "en": "Chilean peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "$",
-        "flag": "🇨🇱"
-    },
-    {
-        "code": "COP",
-        "name": {
-            "de": "kolumbianischer Peso",
-            "en": "Colombian peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "$",
-        "flag": "🇨🇴"
-    },
-    {
-        "code": "CRC",
-        "name": {
-            "de": "Costa-Rica-Colón",
-            "en": "Costa Rican colón"
-        },
-        "subunit": "Céntimo",
-        "symbol": "₡",
-        "flag": "🇨🇷"
-    },
-    {
-        "code": "CUP",
-        "name": {
-            "de": "kubanischer Peso",
-            "en": "Cuban peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "₱",
-        "flag": "🇨🇺"
-    },
-    {
-        "code": "CVE",
-        "name": {
-            "de": "Cabo-Verde-Escudo",
-            "en": "Cabo Verde escudo"
-        },
-        "subunit": "Centavo",
-        "flag": "🇨🇻"
-    },
-    {
-        "code": "ANG",
-        "name": {
-            "de": "Niederländische-Antillen-Gulden",
-            "en": "Netherlands Antillean guilder"
-        },
-        "subunit": "Cent",
-        "symbol": "ƒ",
-        "flag": null
-    },
-    {
-        "code": "CZK",
-        "name": {
-            "de": "tschechische Krone",
-            "en": "Czech koruna"
-        },
-        "subunit": "Haléř",
-        "symbol": "Kč",
-        "flag": "🇨🇿"
-    },
-    {
-        "code": "DJF",
-        "name": {
-            "de": "Dschibuti-Franc",
-            "en": "Djibouti franc"
-        },
-        "flag": "🇩🇯"
-    },
-    {
-        "code": "DKK",
-        "name": {
-            "de": "dänische Krone",
-            "en": "Danish krone"
-        },
-        "subunit": "Øre",
-        "symbol": "kr",
-        "flag": "🇩🇰"
-    },
-    {
-        "code": "DOP",
-        "name": {
-            "de": "dominikanischer Peso",
-            "en": "Dominican peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "RD$",
-        "flag": "🇩🇴"
-    },
-    {
-        "code": "DZD",
-        "name": {
-            "de": "algerischer Dinar",
-            "en": "Algerian dinar"
-        },
-        "subunit": "Centime",
-        "flag": "🇩🇿"
-    },
-    {
-        "code": "EGP",
-        "name": {
-            "de": "ägyptisches Pfund",
-            "en": "Egyptian pound"
-        },
-        "subunit": "Piaster",
-        "symbol": "£",
-        "flag": "🇪🇬"
-    },
-    {
-        "code": "MAD",
-        "name": {
-            "de": "marokkanischer Dirham",
-            "en": "Moroccan dirham"
-        },
-        "subunit": "Centime",
-        "flag": "🇲🇦"
-    },
-    {
-        "code": "ERN",
-        "name": {
-            "de": "Nakfa",
-            "en": "nakfa"
-        },
-        "subunit": "Cent",
-        "flag": "🇪🇷"
-    },
-    {
-        "code": "ETB",
-        "name": {
-            "de": "Birr",
-            "en": "birr"
-        },
-        "subunit": "Cent",
-        "flag": "🇪🇹"
-    },
-    {
-        "code": "FJD",
-        "name": {
-            "de": "Fidschi-Dollar",
-            "en": "Fiji dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇫🇯"
-    },
-    {
-        "code": "FKP",
-        "name": {
-            "de": "Falkland-Pfund",
-            "en": "Falkland Islands pound"
-        },
-        "subunit": "Penny",
-        "symbol": "£",
-        "flag": "🇫🇰"
-    },
-    {
-        "code": "GEL",
-        "name": {
-            "de": "Lari",
-            "en": "lari"
-        },
-        "subunit": "Tetri",
-        "symbol": "₾",
-        "flag": "🇬🇪"
-    },
-    {
-        "code": "GHS",
-        "name": {
-            "de": "Ghana Cedi",
-            "en": "Ghana cedi"
-        },
-        "subunit": "Pesewa",
-        "symbol": "¢",
-        "flag": "🇬🇭"
-    },
-    {
-        "code": "GIP",
-        "name": {
-            "de": "Gibraltar-Pfund",
-            "en": "Gibraltar pound"
-        },
-        "subunit": "Penny",
-        "symbol": "£",
-        "flag": "🇬🇮"
-    },
-    {
-        "code": "GMD",
-        "name": {
-            "de": "Dalasi",
-            "en": "dalasi"
-        },
-        "subunit": "Butut",
-        "flag": "🇬🇲"
-    },
-    {
-        "code": "GNF",
-        "name": {
-            "de": "Guinea-Franc",
-            "en": "Guinean franc"
-        },
-        "flag": "🇬🇳"
-    },
-    {
-        "code": "GTQ",
-        "name": {
-            "de": "Quetzal",
-            "en": "quetzal"
-        },
-        "subunit": "Centavo",
-        "symbol": "Q",
-        "flag": "🇬🇹"
-    },
-    {
-        "code": "GYD",
-        "name": {
-            "de": "Guyana-Dollar",
-            "en": "Guyana dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇬🇾"
-    },
-    {
-        "code": "HNL",
-        "name": {
-            "de": "Lempira",
-            "en": "lempira"
-        },
-        "subunit": "Centavo",
-        "symbol": "L",
-        "flag": "🇭🇳"
-    },
-    {
-        "code": "HTG",
-        "name": {
-            "de": "Gourde",
-            "en": "gourde"
-        },
-        "subunit": "Centime",
-        "flag": "🇭🇹"
-    },
-    {
-        "code": "HUF",
-        "name": {
-            "de": "Forint",
-            "en": "forint"
-        },
-        "symbol": "Ft",
-        "flag": "🇭🇺"
-    },
-    {
-        "code": "ILS",
-        "name": {
-            "de": "Schekel",
-            "en": "shekel"
-        },
-        "subunit": "Agora",
-        "symbol": "₪",
-        "flag": "🇮🇱"
-    },
-    {
-        "code": "IQD",
-        "name": {
-            "de": "Irak-Dinar",
-            "en": "Iraqi dinar"
-        },
-        "subunit": "Fils",
-        "flag": "🇮🇶"
-    },
-    {
-        "code": "IRR",
-        "name": {
-            "de": "iranischer Rial",
-            "en": "Iranian rial"
-        },
-        "symbol": "﷼",
-        "flag": "🇮🇷"
-    },
-    {
-        "code": "ISK",
-        "name": {
-            "de": "isländische Krone",
-            "en": "króna"
-        },
-        "symbol": "kr",
-        "flag": "🇮🇸"
-    },
-    {
-        "code": "JMD",
-        "name": {
-            "de": "Jamaika-Dollar",
-            "en": "Jamaica dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "J$",
-        "flag": "🇯🇲"
-    },
-    {
-        "code": "JOD",
-        "name": {
-            "de": "Jordan-Dinar",
-            "en": "Jordanian dinar"
-        },
-        "subunit": "Piaster",
-        "flag": "🇯🇴"
-    },
-    {
-        "code": "JPY",
-        "name": {
-            "de": "Yen",
-            "en": "yen"
-        },
-        "symbol": "¥",
-        "flag": "🇯🇵"
-    },
-    {
-        "code": "KES",
-        "name": {
-            "de": "Kenia-Schilling",
-            "en": "Kenyan shilling"
-        },
-        "subunit": "Cent",
-        "flag": "🇰🇪"
-    },
-    {
-        "code": "KGS",
-        "name": {
-            "de": "Som",
-            "en": "som"
-        },
-        "subunit": "Tyin",
-        "symbol": "лв",
-        "flag": "🇰🇬"
-    },
-    {
-        "code": "KHR",
-        "name": {
-            "de": "Riel",
-            "en": "riel"
-        },
-        "symbol": "៛",
-        "flag": "🇰🇭"
-    },
-    {
-        "code": "KMF",
-        "name": {
-            "de": "Komoren-Franc",
-            "en": "Comorian franc"
-        },
-        "flag": "🇰🇲"
-    },
-    {
-        "code": "KPW",
-        "name": {
-            "de": "nordkoreanischer Won",
-            "en": "North Korean won"
-        },
-        "subunit": "Chon",
-        "symbol": "₩",
-        "flag": "🇰🇵"
-    },
-    {
-        "code": "KRW",
-        "name": {
-            "de": "südkoreanischer Won",
-            "en": "South Korean won"
-        },
-        "symbol": "₩",
-        "flag": "🇰🇷"
-    },
-    {
-        "code": "KWD",
-        "name": {
-            "de": "Kuwait-Dinar",
-            "en": "Kuwaiti dinar"
-        },
-        "subunit": "Fils",
-        "flag": "🇰🇼"
-    },
-    {
-        "code": "KYD",
-        "name": {
-            "de": "Kaiman-Dollar",
-            "en": "Cayman Islands dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇰🇾"
-    },
-    {
-        "code": "KZT",
-        "name": {
-            "de": "Tenge",
-            "en": "tenge"
-        },
-        "subunit": "Tyin",
-        "symbol": "лв",
-        "flag": "🇰🇿"
-    },
-    {
-        "code": "LAK",
-        "name": {
-            "de": "Kip",
-            "en": "kip"
-        },
-        "symbol": "₭",
-        "flag": "🇱🇦"
-    },
-    {
-        "code": "LBP",
-        "name": {
-            "de": "libanesisches Pfund",
-            "en": "Lebanese pound"
-        },
-        "symbol": "£",
-        "flag": "🇱🇧"
-    },
-    {
-        "code": "LKR",
-        "name": {
-            "de": "Sri-Lanka-Rupie",
-            "en": "Sri Lankan rupee"
-        },
-        "subunit": "Sri-Lanka-Cent",
-        "symbol": "₨",
-        "flag": "🇱🇰"
-    },
-    {
-        "code": "LRD",
-        "name": {
-            "de": "liberianischer Dollar",
-            "en": "Liberian dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇱🇷"
-    },
-    {
-        "code": "LSL",
-        "name": {
-            "de": "Loti",
-            "en": "loti"
-        },
-        "subunit": "Sente",
-        "flag": "🇱🇸"
-    },
-    {
-        "code": "LYD",
-        "name": {
-            "de": "libyscher Dinar",
-            "en": "Libyan dinar"
-        },
-        "subunit": "Dirham",
-        "flag": "🇱🇾"
-    },
-    {
-        "code": "MDL",
-        "name": {
-            "de": "Moldau-Leu",
-            "en": "Moldovan leu"
-        },
-        "subunit": "Ban",
-        "flag": "🇲🇩"
-    },
-    {
-        "code": "MGA",
-        "name": {
-            "de": "Ariary",
-            "en": "ariary"
-        },
-        "subunit": "Iraimbilanja",
-        "flag": "🇲🇬"
-    },
-    {
-        "code": "MKD",
-        "name": {
-            "de": "Denar",
-            "en": "denar"
-        },
-        "subunit": "Denimazedonisch",
-        "symbol": "ден",
-        "flag": "🇲🇰"
-    },
-    {
-        "code": "MMK",
-        "name": {
-            "de": "Kyat",
-            "en": "kyat"
-        },
-        "subunit": "Pya",
-        "flag": "🇲🇲"
-    },
-    {
-        "code": "MNT",
-        "name": {
-            "de": "Tugrik",
-            "en": "tugrik"
-        },
-        "subunit": "Möngö",
-        "symbol": "₮",
-        "flag": "🇲🇳"
-    },
-    {
-        "code": "MOP",
-        "name": {
-            "de": "Pataca",
-            "en": "pataca"
-        },
-        "subunit": "Avo",
-        "flag": "🇲🇴"
-    },
-    {
-        "code": "MRU",
-        "name": {
-            "de": "Ouguiya",
-            "en": "ouguiya"
-        },
-        "subunit": "Khoum",
-        "flag": "🇲🇷"
-    },
-    {
-        "code": "MUR",
-        "name": {
-            "de": "Mauritius-Rupie",
-            "en": "Mauritian rupee"
-        },
-        "subunit": "Cent",
-        "symbol": "₨",
-        "flag": "🇲🇺"
-    },
-    {
-        "code": "MVR",
-        "name": {
-            "de": "Rufiyaa",
-            "en": "rufiyaa"
-        },
-        "subunit": "Laari",
-        "flag": "🇲🇻"
-    },
-    {
-        "code": "MWK",
-        "name": {
-            "de": "Malawi-Kwacha",
-            "en": "Malawian kwacha"
-        },
-        "subunit": "Tambala",
-        "flag": "🇲🇼"
-    },
-    {
-        "code": "MXN",
-        "name": {
-            "de": "mexikanischer Peso",
-            "en": "Mexican peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "$",
-        "flag": "🇲🇽"
-    },
-    {
-        "code": "MYR",
-        "name": {
-            "de": "Ringgit",
-            "en": "ringgit"
-        },
-        "subunit": "Sen",
-        "symbol": "RM",
-        "flag": "🇲🇾"
-    },
-    {
-        "code": "MZN",
-        "name": {
-            "de": "Metical",
-            "en": "metical"
-        },
-        "subunit": "Centavo",
-        "symbol": "MT",
-        "flag": "🇲🇿"
-    },
-    {
-        "code": "NAD",
-        "name": {
-            "de": "Namibia-Dollar",
-            "en": "Namibian dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇳🇦"
-    },
-    {
-        "code": "XPF",
-        "name": {
-            "de": "CFP-Franc",
-            "en": "CFP franc"
-        },
-        "subunit": "Centime",
-        "flag": null
-    },
-    {
-        "code": "NGN",
-        "name": {
-            "de": "Naira",
-            "en": "naira"
-        },
-        "subunit": "Kobo",
-        "symbol": "₦",
-        "flag": "🇳🇬"
-    },
-    {
-        "code": "NIO",
-        "name": {
-            "de": "Córdoba Oro",
-            "en": "córdoba oro"
-        },
-        "subunit": "Centavo",
-        "symbol": "C$",
-        "flag": "🇳🇮"
-    },
-    {
-        "code": "NOK",
-        "name": {
-            "de": "norwegische Krone",
-            "en": "Norwegian krone"
-        },
-        "subunit": "Øre",
-        "symbol": "kr",
-        "flag": "🇳🇴"
-    },
-    {
-        "code": "NPR",
-        "name": {
-            "de": "nepalesische Rupie",
-            "en": "Nepalese rupee"
-        },
-        "subunit": "Paisa; Mohur",
-        "symbol": "₨",
-        "flag": "🇳🇵"
-    },
-    {
-        "code": "OMR",
-        "name": {
-            "de": "Omani-Rial",
-            "en": "Omani rial"
-        },
-        "subunit": "Baiza",
-        "symbol": "﷼",
-        "flag": "🇴🇲"
-    },
-    {
-        "code": "PAB",
-        "name": {
-            "de": "Balboa",
-            "en": "balboa"
-        },
-        "subunit": "Centésimo",
-        "symbol": "B/.",
-        "flag": "🇵🇦"
-    },
-    {
-        "code": "PEN",
-        "name": {
-            "de": "Sol",
-            "en": "sol"
-        },
-        "subunit": "Céntimo",
-        "symbol": "S/.",
-        "flag": "🇵🇪"
-    },
-    {
-        "code": "PGK",
-        "name": {
-            "de": "Kina",
-            "en": "kina"
-        },
-        "subunit": "Toea",
-        "flag": "🇵🇬"
-    },
-    {
-        "code": "PHP",
-        "name": {
-            "de": "philippinischer Peso",
-            "en": "Philippine peso"
-        },
-        "subunit": "Centavo",
-        "symbol": "₱",
-        "flag": "🇵🇭"
-    },
-    {
-        "code": "PKR",
-        "name": {
-            "de": "pakistanische Rupie",
-            "en": "Pakistani rupee"
-        },
-        "subunit": "Paisa",
-        "symbol": "₨",
-        "flag": "🇵🇰"
-    },
-    {
-        "code": "PLN",
-        "name": {
-            "de": "Zloty",
-            "en": "zloty"
-        },
-        "subunit": "Grosz",
-        "symbol": "zł",
-        "flag": "🇵🇱"
-    },
-    {
-        "code": "PYG",
-        "name": {
-            "de": "Guarani",
-            "en": "guaraní"
-        },
-        "subunit": "Céntimo",
-        "symbol": "Gs",
-        "flag": "🇵🇾"
-    },
-    {
-        "code": "QAR",
-        "name": {
-            "de": "Katar-Riyal",
-            "en": "Qatari riyal"
-        },
-        "subunit": "Dirham",
-        "symbol": "﷼",
-        "flag": "🇶🇦"
-    },
-    {
-        "code": "RON",
-        "name": {
-            "de": "rumänischer Leu",
-            "en": "Romanian leu"
-        },
-        "subunit": "Ban",
-        "symbol": "lei",
-        "flag": "🇷🇴"
-    },
-    {
-        "code": "RSD",
-        "name": {
-            "de": "serbischer Dinar",
-            "en": "Serbian dinar"
-        },
-        "subunit": "Para",
-        "symbol": "Дин.",
-        "flag": "🇷🇸"
-    },
-    {
-        "code": "RUB",
-        "name": {
-            "de": "russischer Rubel",
-            "en": "Russian rouble"
-        },
-        "subunit": "Kopeke",
-        "symbol": "₽",
-        "flag": "🇷🇺"
-    },
-    {
-        "code": "RWF",
-        "name": {
-            "de": "Ruanda-Franc",
-            "en": "Rwandese franc"
-        },
-        "subunit": "Centime",
-        "flag": "🇷🇼"
-    },
-    {
-        "code": "SAR",
-        "name": {
-            "de": "Saudi-Riyal",
-            "en": "riyal"
-        },
-        "subunit": "Halala",
-        "symbol": "﷼",
-        "flag": "🇸🇦"
-    },
-    {
-        "code": "SBD",
-        "name": {
-            "de": "Salomonen-Dollar",
-            "en": "Solomon Islands dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇸🇧"
-    },
-    {
-        "code": "SCR",
-        "name": {
-            "de": "Seychellen-Rupie",
-            "en": "Seychelles rupee"
-        },
-        "subunit": "Cent",
-        "symbol": "₨",
-        "flag": "🇸🇨"
-    },
-    {
-        "code": "SDG",
-        "name": {
-            "de": "sudanesisches Pfund",
-            "en": "Sudanese pound"
-        },
-        "subunit": "Piaster",
-        "flag": "🇸🇩"
-    },
-    {
-        "code": "SEK",
-        "name": {
-            "de": "schwedische Krone",
-            "en": "krona"
-        },
-        "subunit": "Öre",
-        "symbol": "kr",
-        "flag": "🇸🇪"
-    },
-    {
-        "code": "SHP",
-        "name": {
-            "de": "St.-Helena-Pfund",
-            "en": "Saint Helena pound"
-        },
-        "subunit": "Penny",
-        "symbol": "£",
-        "flag": "🇸🇭"
-    },
-    {
-        "code": "SLE",
-        "name": {
-            "de": "Leone",
-            "en": "leone"
-        },
-        "subunit": "Cent",
-        "flag": "🇸🇱"
-    },
-    {
-        "code": "SOS",
-        "name": {
-            "de": "Somalia-Schilling",
-            "en": "Somali shilling"
-        },
-        "subunit": "Cent",
-        "symbol": "S",
-        "flag": "🇸🇴"
-    },
-    {
-        "code": "SRD",
-        "name": {
-            "de": "Suriname-Dollar",
-            "en": "Surinamese dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "$",
-        "flag": "🇸🇷"
-    },
-    {
-        "code": "SSP",
-        "name": {
-            "de": "südsudanesisches Pfund",
-            "en": "South Sudanese pound"
-        },
-        "subunit": "Piaster",
-        "flag": "🇸🇸"
-    },
-    {
-        "code": "STN",
-        "name": {
-            "de": "Dobra",
-            "en": "dobra"
-        },
-        "subunit": "Centime",
-        "flag": "🇸🇹"
-    },
-    {
-        "code": "SVC",
-        "name": {
-            "de": "El-Salvador-Colón",
-            "en": "Salvadorian colón"
-        },
-        "subunit": "Centavo",
-        "symbol": "$",
-        "flag": "🇸🇻"
-    },
-    {
-        "code": "SYP",
-        "name": {
-            "de": "syrisches Pfund",
-            "en": "Syrian pound"
-        },
-        "subunit": "Piastre",
-        "symbol": "£",
-        "flag": "🇸🇾"
-    },
-    {
-        "code": "SZL",
-        "name": {
-            "de": "Lilangeni",
-            "en": "lilangeni"
-        },
-        "subunit": "Cent",
-        "flag": "🇸🇿"
-    },
-    {
-        "code": "TJS",
-        "name": {
-            "de": "Somoni",
-            "en": "somoni"
-        },
-        "subunit": "Diram",
-        "flag": "🇹🇯"
-    },
-    {
-        "code": "TMT",
-        "name": {
-            "de": "Turkmenistan-Manat",
-            "en": "Turkmen manat"
-        },
-        "subunit": "Tenge",
-        "flag": "🇹🇲"
-    },
-    {
-        "code": "TND",
-        "name": {
-            "de": "tunesischer Dinar",
-            "en": "Tunisian dinar"
-        },
-        "subunit": "Millime",
-        "flag": "🇹🇳"
-    },
-    {
-        "code": "TOP",
-        "name": {
-            "de": "Pa’anga",
-            "en": "pa’anga"
-        },
-        "subunit": "Seniti",
-        "flag": "🇹🇴"
-    },
-    {
-        "code": "TTD",
-        "name": {
-            "de": "Trinidad-und-Tobago-Dollar",
-            "en": "Trinidad and Tobago dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "TT$",
-        "flag": "🇹🇹"
-    },
-    {
-        "code": "TWD",
-        "name": {
-            "de": "neuer Taiwan-Dollar",
-            "en": "new Taiwan dollar"
-        },
-        "subunit": "Cent",
-        "symbol": "NT$",
-        "flag": "🇹🇼"
-    },
-    {
-        "code": "TZS",
-        "name": {
-            "de": "Tansania-Schilling",
-            "en": "Tanzanian shilling"
-        },
-        "subunit": "Cent",
-        "flag": "🇹🇿"
-    },
-    {
-        "code": "UAH",
-        "name": {
-            "de": "Griwna",
-            "en": "hryvnia"
-        },
-        "subunit": "Kopeke",
-        "symbol": "₴",
-        "flag": "🇺🇦"
-    },
-    {
-        "code": "UGX",
-        "name": {
-            "de": "Uganda-Schilling",
-            "en": "Uganda shilling"
-        },
-        "subunit": "Cent",
-        "flag": "🇺🇬"
-    },
-    {
-        "code": "UYU",
-        "name": {
-            "de": "uruguayischer Peso",
-            "en": "Uruguayan peso"
-        },
-        "subunit": "Centésimo",
-        "symbol": "$U",
-        "flag": "🇺🇾"
-    },
-    {
-        "code": "UZS",
-        "name": {
-            "de": "Sum",
-            "en": "sum"
-        },
-        "subunit": "Tiyin",
-        "symbol": "лв",
-        "flag": "🇺🇿"
-    },
-    {
-        "code": "VES",
-        "name": {
-            "de": "Bolívar Soberano",
-            "en": "bolívar soberano"
-        },
-        "subunit": "Céntimo",
-        "flag": "🇻🇪"
-    },
-    {
-        "code": "VND",
-        "name": {
-            "de": "Dong",
-            "en": "dong"
-        },
-        "symbol": "₫",
-        "flag": "🇻🇳"
-    },
-    {
-        "code": "VUV",
-        "name": {
-            "de": "Vatu",
-            "en": "vatu"
-        },
-        "flag": "🇻🇺"
-    },
-    {
-        "code": "WST",
-        "name": {
-            "de": "Tala",
-            "en": "tala"
-        },
-        "subunit": "Sene",
-        "flag": "🇼🇸"
-    },
-    {
-        "code": "YER",
-        "name": {
-            "de": "Jemen-Rial",
-            "en": "Yemeni rial"
-        },
-        "subunit": "Fils",
-        "symbol": "﷼",
-        "flag": "🇾🇪"
-    },
-    {
-        "code": "ZMW",
-        "name": {
-            "de": "sambischer Kwacha",
-            "en": "Zambian kwacha"
-        },
-        "subunit": "Ngwee",
-        "flag": "🇿🇲"
-    },
-    {
-        "code": "ZWL",
-        "name": {
-            "de": "Simbabwe-Dollar",
-            "en": "Zimbabwe dollar"
-        },
-        "subunit": "Cent",
-        "flag": "🇿🇼"
-    }
+  {
+    "code": "EUR",
+    "name": {
+      "de": "Euro",
+      "en": "euro"
+    },
+    "subunit": "Cent",
+    "symbol": "€",
+    "flag": "🇪🇺"
+  },
+  {
+    "code": "USD",
+    "name": {
+      "de": "US-Dollar",
+      "en": "US dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇺🇸"
+  },
+  {
+    "code": "GBP",
+    "name": {
+      "de": "Pfund Sterling",
+      "en": "Guernsey pound"
+    },
+    "subunit": "Penny",
+    "symbol": "£",
+    "flag": "🇬🇧"
+  },
+  {
+    "code": "CNY",
+    "name": {
+      "de": "Renminbi Yuan",
+      "en": "renminbi-yuan"
+    },
+    "subunit": "Fen",
+    "symbol": "¥",
+    "flag": "🇨🇳"
+  },
+  {
+    "code": "CHF",
+    "name": {
+      "de": "Schweizer Franken",
+      "en": "Swiss franc"
+    },
+    "subunit": "Rappen;Centime",
+    "symbol": "CHF",
+    "flag": "🇨🇭"
+  },
+  {
+    "code": "HKD",
+    "name": {
+      "de": "Hongkong-Dollar",
+      "en": "Hong Kong dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇭🇰"
+  },
+  {
+    "code": "SGD",
+    "name": {
+      "de": "Singapur-Dollar",
+      "en": "Singapore dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇸🇬"
+  },
+  {
+    "code": "NZD",
+    "name": {
+      "de": "Neuseeland-Dollar",
+      "en": "New Zealand dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇳🇿"
+  },
+  {
+    "code": "INR",
+    "name": {
+      "de": "indische Rupie",
+      "en": "Indian rupee"
+    },
+    "subunit": "Paisa",
+    "symbol": "₹",
+    "flag": "🇮🇳"
+  },
+  {
+    "code": "ZAR",
+    "name": {
+      "de": "Rand",
+      "en": "rand"
+    },
+    "subunit": "Cent",
+    "symbol": "R",
+    "flag": "🇿🇦"
+  },
+  {
+    "code": "THB",
+    "name": {
+      "de": "Baht",
+      "en": "baht"
+    },
+    "subunit": "Satang",
+    "symbol": "฿",
+    "flag": "🇹🇭"
+  },
+  {
+    "code": "IDR",
+    "name": {
+      "de": "Indonesische Rupiah",
+      "en": "Indonesian rupiah"
+    },
+    "subunit": "Sen",
+    "symbol": "Rp",
+    "flag": "🇮🇩"
+  },
+  {
+    "code": "AED",
+    "name": {
+      "de": "VAE-Dirham",
+      "en": "UAE dirham"
+    },
+    "subunit": "Fils",
+    "flag": "🇦🇪"
+  },
+  {
+    "code": "TRY",
+    "name": {
+      "de": "türkische Lira",
+      "en": "Turkish lira"
+    },
+    "subunit": "Kurus",
+    "symbol": "₺",
+    "flag": "🇹🇷"
+  },
+  {
+    "code": "XCD",
+    "name": {
+      "de": "ostkaribischer Dollar",
+      "en": "East Caribbean dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": null
+  },
+  {
+    "code": "ALL",
+    "name": {
+      "de": "Lek",
+      "en": "lek"
+    },
+    "symbol": "Lek",
+    "flag": "🇦🇱"
+  },
+  {
+    "code": "AFN",
+    "name": {
+      "de": "Afghani",
+      "en": "afghani"
+    },
+    "subunit": "Pul",
+    "symbol": "؋",
+    "flag": "🇦🇫"
+  },
+  {
+    "code": "AMD",
+    "name": {
+      "de": "Dram",
+      "en": "dram"
+    },
+    "subunit": "Lumma",
+    "flag": "🇦🇲"
+  },
+  {
+    "code": "AOA",
+    "name": {
+      "de": "Kwanza",
+      "en": "kwanza"
+    },
+    "subunit": "Cêntimo",
+    "flag": "🇦🇴"
+  },
+  {
+    "code": "ARS",
+    "name": {
+      "de": "argentinischer Peso",
+      "en": "Argentine peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "$",
+    "flag": "🇦🇷"
+  },
+  {
+    "code": "AUD",
+    "name": {
+      "de": "australischer Dollar",
+      "en": "Australian dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇦🇺"
+  },
+  {
+    "code": "AWG",
+    "name": {
+      "de": "Aruba-Gulden",
+      "en": "Aruban guilder"
+    },
+    "subunit": "Cent",
+    "symbol": "ƒ",
+    "flag": "🇦🇼"
+  },
+  {
+    "code": "AZN",
+    "name": {
+      "de": "Aserbaidschan-Manat",
+      "en": "Azerbaijan manat"
+    },
+    "subunit": "Qäpik",
+    "symbol": "₼",
+    "flag": "🇦🇿"
+  },
+  {
+    "code": "BAM",
+    "name": {
+      "de": "konvertierbare Mark",
+      "en": "convertible mark"
+    },
+    "subunit": "Fening",
+    "symbol": "KM",
+    "flag": "🇧🇦"
+  },
+  {
+    "code": "BBD",
+    "name": {
+      "de": "Barbados-Dollar",
+      "en": "Barbados dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇧🇧"
+  },
+  {
+    "code": "BDT",
+    "name": {
+      "de": "Taka",
+      "en": "taka"
+    },
+    "subunit": "Poisha",
+    "flag": "🇧🇩"
+  },
+  {
+    "code": "XOF",
+    "name": {
+      "de": "CFA-Franc (BCEAO)",
+      "en": "CFA franc"
+    },
+    "subunit": "Centime",
+    "flag": null
+  },
+  {
+    "code": "BGN",
+    "name": {
+      "de": "Lew",
+      "en": "lev"
+    },
+    "subunit": "Stótinka",
+    "symbol": "лв",
+    "flag": "🇧🇬"
+  },
+  {
+    "code": "BHD",
+    "name": {
+      "de": "Bahrain-Dinar",
+      "en": "Bahraini dinar"
+    },
+    "subunit": "Fils",
+    "flag": "🇧🇭"
+  },
+  {
+    "code": "BIF",
+    "name": {
+      "de": "Burundi-Franc",
+      "en": "Burundi franc"
+    },
+    "subunit": "Centime",
+    "flag": "🇧🇮"
+  },
+  {
+    "code": "BMD",
+    "name": {
+      "de": "Bermuda-Dollar",
+      "en": "Bermuda dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇧🇲"
+  },
+  {
+    "code": "BND",
+    "name": {
+      "de": "Brunei-Dollar",
+      "en": "Brunei dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇧🇳"
+  },
+  {
+    "code": "BOB",
+    "name": {
+      "de": "Boliviano",
+      "en": "boliviano"
+    },
+    "subunit": "Centavo",
+    "symbol": "$b",
+    "flag": "🇧🇴"
+  },
+  {
+    "code": "BRL",
+    "name": {
+      "de": "Real",
+      "en": "real"
+    },
+    "subunit": "Centavo",
+    "symbol": "R$",
+    "flag": "🇧🇷"
+  },
+  {
+    "code": "BSD",
+    "name": {
+      "de": "Bahama-Dollar",
+      "en": "Bahamian dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇧🇸"
+  },
+  {
+    "code": "BTN",
+    "name": {
+      "de": "Ngultrum",
+      "en": "ngultrum"
+    },
+    "subunit": "Chhetrum",
+    "flag": "🇧🇹"
+  },
+  {
+    "code": "BWP",
+    "name": {
+      "de": "Pula",
+      "en": "pula"
+    },
+    "subunit": "Thebe",
+    "symbol": "P",
+    "flag": "🇧🇼"
+  },
+  {
+    "code": "BYN",
+    "name": {
+      "de": "belarussischer Rubel",
+      "en": "Belarusian rouble"
+    },
+    "subunit": "Kupeke",
+    "symbol": "Br",
+    "flag": "🇧🇾"
+  },
+  {
+    "code": "BZD",
+    "name": {
+      "de": "Belize-Dollar",
+      "en": "Belize dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "BZ$",
+    "flag": "🇧🇿"
+  },
+  {
+    "code": "CAD",
+    "name": {
+      "de": "kanadischer Dollar",
+      "en": "Canadian dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇨🇦"
+  },
+  {
+    "code": "CDF",
+    "name": {
+      "de": "Kongo-Franc",
+      "en": "Congolese franc"
+    },
+    "subunit": "Centime",
+    "flag": "🇨🇩"
+  },
+  {
+    "code": "XAF",
+    "name": {
+      "de": "CFA-Franc (BEAC)",
+      "en": "CFA franc"
+    },
+    "subunit": "Centime",
+    "flag": null
+  },
+  {
+    "code": "CLP",
+    "name": {
+      "de": "chilenischer Peso",
+      "en": "Chilean peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "$",
+    "flag": "🇨🇱"
+  },
+  {
+    "code": "COP",
+    "name": {
+      "de": "kolumbianischer Peso",
+      "en": "Colombian peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "$",
+    "flag": "🇨🇴"
+  },
+  {
+    "code": "CRC",
+    "name": {
+      "de": "Costa-Rica-Colón",
+      "en": "Costa Rican colón"
+    },
+    "subunit": "Céntimo",
+    "symbol": "₡",
+    "flag": "🇨🇷"
+  },
+  {
+    "code": "CUP",
+    "name": {
+      "de": "kubanischer Peso",
+      "en": "Cuban peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "₱",
+    "flag": "🇨🇺"
+  },
+  {
+    "code": "CVE",
+    "name": {
+      "de": "Cabo-Verde-Escudo",
+      "en": "Cabo Verde escudo"
+    },
+    "subunit": "Centavo",
+    "flag": "🇨🇻"
+  },
+  {
+    "code": "ANG",
+    "name": {
+      "de": "Niederländische-Antillen-Gulden",
+      "en": "Netherlands Antillean guilder"
+    },
+    "subunit": "Cent",
+    "symbol": "ƒ",
+    "flag": null
+  },
+  {
+    "code": "CZK",
+    "name": {
+      "de": "tschechische Krone",
+      "en": "Czech koruna"
+    },
+    "subunit": "Haléř",
+    "symbol": "Kč",
+    "flag": "🇨🇿"
+  },
+  {
+    "code": "DJF",
+    "name": {
+      "de": "Dschibuti-Franc",
+      "en": "Djibouti franc"
+    },
+    "flag": "🇩🇯"
+  },
+  {
+    "code": "DKK",
+    "name": {
+      "de": "dänische Krone",
+      "en": "Danish krone"
+    },
+    "subunit": "Øre",
+    "symbol": "kr",
+    "flag": "🇩🇰"
+  },
+  {
+    "code": "DOP",
+    "name": {
+      "de": "dominikanischer Peso",
+      "en": "Dominican peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "RD$",
+    "flag": "🇩🇴"
+  },
+  {
+    "code": "DZD",
+    "name": {
+      "de": "algerischer Dinar",
+      "en": "Algerian dinar"
+    },
+    "subunit": "Centime",
+    "flag": "🇩🇿"
+  },
+  {
+    "code": "EGP",
+    "name": {
+      "de": "ägyptisches Pfund",
+      "en": "Egyptian pound"
+    },
+    "subunit": "Piaster",
+    "symbol": "£",
+    "flag": "🇪🇬"
+  },
+  {
+    "code": "MAD",
+    "name": {
+      "de": "marokkanischer Dirham",
+      "en": "Moroccan dirham"
+    },
+    "subunit": "Centime",
+    "flag": "🇲🇦"
+  },
+  {
+    "code": "ERN",
+    "name": {
+      "de": "Nakfa",
+      "en": "nakfa"
+    },
+    "subunit": "Cent",
+    "flag": "🇪🇷"
+  },
+  {
+    "code": "ETB",
+    "name": {
+      "de": "Birr",
+      "en": "birr"
+    },
+    "subunit": "Cent",
+    "flag": "🇪🇹"
+  },
+  {
+    "code": "FJD",
+    "name": {
+      "de": "Fidschi-Dollar",
+      "en": "Fiji dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇫🇯"
+  },
+  {
+    "code": "FKP",
+    "name": {
+      "de": "Falkland-Pfund",
+      "en": "Falkland Islands pound"
+    },
+    "subunit": "Penny",
+    "symbol": "£",
+    "flag": "🇫🇰"
+  },
+  {
+    "code": "GEL",
+    "name": {
+      "de": "Lari",
+      "en": "lari"
+    },
+    "subunit": "Tetri",
+    "symbol": "₾",
+    "flag": "🇬🇪"
+  },
+  {
+    "code": "GHS",
+    "name": {
+      "de": "Ghana Cedi",
+      "en": "Ghana cedi"
+    },
+    "subunit": "Pesewa",
+    "symbol": "¢",
+    "flag": "🇬🇭"
+  },
+  {
+    "code": "GIP",
+    "name": {
+      "de": "Gibraltar-Pfund",
+      "en": "Gibraltar pound"
+    },
+    "subunit": "Penny",
+    "symbol": "£",
+    "flag": "🇬🇮"
+  },
+  {
+    "code": "GMD",
+    "name": {
+      "de": "Dalasi",
+      "en": "dalasi"
+    },
+    "subunit": "Butut",
+    "flag": "🇬🇲"
+  },
+  {
+    "code": "GNF",
+    "name": {
+      "de": "Guinea-Franc",
+      "en": "Guinean franc"
+    },
+    "flag": "🇬🇳"
+  },
+  {
+    "code": "GTQ",
+    "name": {
+      "de": "Quetzal",
+      "en": "quetzal"
+    },
+    "subunit": "Centavo",
+    "symbol": "Q",
+    "flag": "🇬🇹"
+  },
+  {
+    "code": "GYD",
+    "name": {
+      "de": "Guyana-Dollar",
+      "en": "Guyana dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇬🇾"
+  },
+  {
+    "code": "HNL",
+    "name": {
+      "de": "Lempira",
+      "en": "lempira"
+    },
+    "subunit": "Centavo",
+    "symbol": "L",
+    "flag": "🇭🇳"
+  },
+  {
+    "code": "HTG",
+    "name": {
+      "de": "Gourde",
+      "en": "gourde"
+    },
+    "subunit": "Centime",
+    "flag": "🇭🇹"
+  },
+  {
+    "code": "HUF",
+    "name": {
+      "de": "Forint",
+      "en": "forint"
+    },
+    "symbol": "Ft",
+    "flag": "🇭🇺"
+  },
+  {
+    "code": "ILS",
+    "name": {
+      "de": "Schekel",
+      "en": "shekel"
+    },
+    "subunit": "Agora",
+    "symbol": "₪",
+    "flag": "🇮🇱"
+  },
+  {
+    "code": "IQD",
+    "name": {
+      "de": "Irak-Dinar",
+      "en": "Iraqi dinar"
+    },
+    "subunit": "Fils",
+    "flag": "🇮🇶"
+  },
+  {
+    "code": "IRR",
+    "name": {
+      "de": "iranischer Rial",
+      "en": "Iranian rial"
+    },
+    "symbol": "﷼",
+    "flag": "🇮🇷"
+  },
+  {
+    "code": "ISK",
+    "name": {
+      "de": "isländische Krone",
+      "en": "króna"
+    },
+    "symbol": "kr",
+    "flag": "🇮🇸"
+  },
+  {
+    "code": "JMD",
+    "name": {
+      "de": "Jamaika-Dollar",
+      "en": "Jamaica dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "J$",
+    "flag": "🇯🇲"
+  },
+  {
+    "code": "JOD",
+    "name": {
+      "de": "Jordan-Dinar",
+      "en": "Jordanian dinar"
+    },
+    "subunit": "Piaster",
+    "flag": "🇯🇴"
+  },
+  {
+    "code": "JPY",
+    "name": {
+      "de": "Yen",
+      "en": "yen"
+    },
+    "symbol": "¥",
+    "flag": "🇯🇵"
+  },
+  {
+    "code": "KES",
+    "name": {
+      "de": "Kenia-Schilling",
+      "en": "Kenyan shilling"
+    },
+    "subunit": "Cent",
+    "flag": "🇰🇪"
+  },
+  {
+    "code": "KGS",
+    "name": {
+      "de": "Som",
+      "en": "som"
+    },
+    "subunit": "Tyin",
+    "symbol": "лв",
+    "flag": "🇰🇬"
+  },
+  {
+    "code": "KHR",
+    "name": {
+      "de": "Riel",
+      "en": "riel"
+    },
+    "symbol": "៛",
+    "flag": "🇰🇭"
+  },
+  {
+    "code": "KMF",
+    "name": {
+      "de": "Komoren-Franc",
+      "en": "Comorian franc"
+    },
+    "flag": "🇰🇲"
+  },
+  {
+    "code": "KPW",
+    "name": {
+      "de": "nordkoreanischer Won",
+      "en": "North Korean won"
+    },
+    "subunit": "Chon",
+    "symbol": "₩",
+    "flag": "🇰🇵"
+  },
+  {
+    "code": "KRW",
+    "name": {
+      "de": "südkoreanischer Won",
+      "en": "South Korean won"
+    },
+    "symbol": "₩",
+    "flag": "🇰🇷"
+  },
+  {
+    "code": "KWD",
+    "name": {
+      "de": "Kuwait-Dinar",
+      "en": "Kuwaiti dinar"
+    },
+    "subunit": "Fils",
+    "flag": "🇰🇼"
+  },
+  {
+    "code": "KYD",
+    "name": {
+      "de": "Kaiman-Dollar",
+      "en": "Cayman Islands dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇰🇾"
+  },
+  {
+    "code": "KZT",
+    "name": {
+      "de": "Tenge",
+      "en": "tenge"
+    },
+    "subunit": "Tyin",
+    "symbol": "лв",
+    "flag": "🇰🇿"
+  },
+  {
+    "code": "LAK",
+    "name": {
+      "de": "Kip",
+      "en": "kip"
+    },
+    "symbol": "₭",
+    "flag": "🇱🇦"
+  },
+  {
+    "code": "LBP",
+    "name": {
+      "de": "libanesisches Pfund",
+      "en": "Lebanese pound"
+    },
+    "symbol": "£",
+    "flag": "🇱🇧"
+  },
+  {
+    "code": "LKR",
+    "name": {
+      "de": "Sri-Lanka-Rupie",
+      "en": "Sri Lankan rupee"
+    },
+    "subunit": "Sri-Lanka-Cent",
+    "symbol": "₨",
+    "flag": "🇱🇰"
+  },
+  {
+    "code": "LRD",
+    "name": {
+      "de": "liberianischer Dollar",
+      "en": "Liberian dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇱🇷"
+  },
+  {
+    "code": "LSL",
+    "name": {
+      "de": "Loti",
+      "en": "loti"
+    },
+    "subunit": "Sente",
+    "flag": "🇱🇸"
+  },
+  {
+    "code": "LYD",
+    "name": {
+      "de": "libyscher Dinar",
+      "en": "Libyan dinar"
+    },
+    "subunit": "Dirham",
+    "flag": "🇱🇾"
+  },
+  {
+    "code": "MDL",
+    "name": {
+      "de": "Moldau-Leu",
+      "en": "Moldovan leu"
+    },
+    "subunit": "Ban",
+    "flag": "🇲🇩"
+  },
+  {
+    "code": "MGA",
+    "name": {
+      "de": "Ariary",
+      "en": "ariary"
+    },
+    "subunit": "Iraimbilanja",
+    "flag": "🇲🇬"
+  },
+  {
+    "code": "MKD",
+    "name": {
+      "de": "Denar",
+      "en": "denar"
+    },
+    "subunit": "Denimazedonisch",
+    "symbol": "ден",
+    "flag": "🇲🇰"
+  },
+  {
+    "code": "MMK",
+    "name": {
+      "de": "Kyat",
+      "en": "kyat"
+    },
+    "subunit": "Pya",
+    "flag": "🇲🇲"
+  },
+  {
+    "code": "MNT",
+    "name": {
+      "de": "Tugrik",
+      "en": "tugrik"
+    },
+    "subunit": "Möngö",
+    "symbol": "₮",
+    "flag": "🇲🇳"
+  },
+  {
+    "code": "MOP",
+    "name": {
+      "de": "Pataca",
+      "en": "pataca"
+    },
+    "subunit": "Avo",
+    "flag": "🇲🇴"
+  },
+  {
+    "code": "MRU",
+    "name": {
+      "de": "Ouguiya",
+      "en": "ouguiya"
+    },
+    "subunit": "Khoum",
+    "flag": "🇲🇷"
+  },
+  {
+    "code": "MUR",
+    "name": {
+      "de": "Mauritius-Rupie",
+      "en": "Mauritian rupee"
+    },
+    "subunit": "Cent",
+    "symbol": "₨",
+    "flag": "🇲🇺"
+  },
+  {
+    "code": "MVR",
+    "name": {
+      "de": "Rufiyaa",
+      "en": "rufiyaa"
+    },
+    "subunit": "Laari",
+    "flag": "🇲🇻"
+  },
+  {
+    "code": "MWK",
+    "name": {
+      "de": "Malawi-Kwacha",
+      "en": "Malawian kwacha"
+    },
+    "subunit": "Tambala",
+    "flag": "🇲🇼"
+  },
+  {
+    "code": "MXN",
+    "name": {
+      "de": "mexikanischer Peso",
+      "en": "Mexican peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "$",
+    "flag": "🇲🇽"
+  },
+  {
+    "code": "MYR",
+    "name": {
+      "de": "Ringgit",
+      "en": "ringgit"
+    },
+    "subunit": "Sen",
+    "symbol": "RM",
+    "flag": "🇲🇾"
+  },
+  {
+    "code": "MZN",
+    "name": {
+      "de": "Metical",
+      "en": "metical"
+    },
+    "subunit": "Centavo",
+    "symbol": "MT",
+    "flag": "🇲🇿"
+  },
+  {
+    "code": "NAD",
+    "name": {
+      "de": "Namibia-Dollar",
+      "en": "Namibian dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇳🇦"
+  },
+  {
+    "code": "XPF",
+    "name": {
+      "de": "CFP-Franc",
+      "en": "CFP franc"
+    },
+    "subunit": "Centime",
+    "flag": null
+  },
+  {
+    "code": "NGN",
+    "name": {
+      "de": "Naira",
+      "en": "naira"
+    },
+    "subunit": "Kobo",
+    "symbol": "₦",
+    "flag": "🇳🇬"
+  },
+  {
+    "code": "NIO",
+    "name": {
+      "de": "Córdoba Oro",
+      "en": "córdoba oro"
+    },
+    "subunit": "Centavo",
+    "symbol": "C$",
+    "flag": "🇳🇮"
+  },
+  {
+    "code": "NOK",
+    "name": {
+      "de": "norwegische Krone",
+      "en": "Norwegian krone"
+    },
+    "subunit": "Øre",
+    "symbol": "kr",
+    "flag": "🇳🇴"
+  },
+  {
+    "code": "NPR",
+    "name": {
+      "de": "nepalesische Rupie",
+      "en": "Nepalese rupee"
+    },
+    "subunit": "Paisa; Mohur",
+    "symbol": "₨",
+    "flag": "🇳🇵"
+  },
+  {
+    "code": "OMR",
+    "name": {
+      "de": "Omani-Rial",
+      "en": "Omani rial"
+    },
+    "subunit": "Baiza",
+    "symbol": "﷼",
+    "flag": "🇴🇲"
+  },
+  {
+    "code": "PAB",
+    "name": {
+      "de": "Balboa",
+      "en": "balboa"
+    },
+    "subunit": "Centésimo",
+    "symbol": "B/.",
+    "flag": "🇵🇦"
+  },
+  {
+    "code": "PEN",
+    "name": {
+      "de": "Sol",
+      "en": "sol"
+    },
+    "subunit": "Céntimo",
+    "symbol": "S/.",
+    "flag": "🇵🇪"
+  },
+  {
+    "code": "PGK",
+    "name": {
+      "de": "Kina",
+      "en": "kina"
+    },
+    "subunit": "Toea",
+    "flag": "🇵🇬"
+  },
+  {
+    "code": "PHP",
+    "name": {
+      "de": "philippinischer Peso",
+      "en": "Philippine peso"
+    },
+    "subunit": "Centavo",
+    "symbol": "₱",
+    "flag": "🇵🇭"
+  },
+  {
+    "code": "PKR",
+    "name": {
+      "de": "pakistanische Rupie",
+      "en": "Pakistani rupee"
+    },
+    "subunit": "Paisa",
+    "symbol": "₨",
+    "flag": "🇵🇰"
+  },
+  {
+    "code": "PLN",
+    "name": {
+      "de": "Zloty",
+      "en": "zloty"
+    },
+    "subunit": "Grosz",
+    "symbol": "zł",
+    "flag": "🇵🇱"
+  },
+  {
+    "code": "PYG",
+    "name": {
+      "de": "Guarani",
+      "en": "guaraní"
+    },
+    "subunit": "Céntimo",
+    "symbol": "Gs",
+    "flag": "🇵🇾"
+  },
+  {
+    "code": "QAR",
+    "name": {
+      "de": "Katar-Riyal",
+      "en": "Qatari riyal"
+    },
+    "subunit": "Dirham",
+    "symbol": "﷼",
+    "flag": "🇶🇦"
+  },
+  {
+    "code": "RON",
+    "name": {
+      "de": "rumänischer Leu",
+      "en": "Romanian leu"
+    },
+    "subunit": "Ban",
+    "symbol": "lei",
+    "flag": "🇷🇴"
+  },
+  {
+    "code": "RSD",
+    "name": {
+      "de": "serbischer Dinar",
+      "en": "Serbian dinar"
+    },
+    "subunit": "Para",
+    "symbol": "Дин.",
+    "flag": "🇷🇸"
+  },
+  {
+    "code": "RUB",
+    "name": {
+      "de": "russischer Rubel",
+      "en": "Russian rouble"
+    },
+    "subunit": "Kopeke",
+    "symbol": "₽",
+    "flag": "🇷🇺"
+  },
+  {
+    "code": "RWF",
+    "name": {
+      "de": "Ruanda-Franc",
+      "en": "Rwandese franc"
+    },
+    "subunit": "Centime",
+    "flag": "🇷🇼"
+  },
+  {
+    "code": "SAR",
+    "name": {
+      "de": "Saudi-Riyal",
+      "en": "riyal"
+    },
+    "subunit": "Halala",
+    "symbol": "﷼",
+    "flag": "🇸🇦"
+  },
+  {
+    "code": "SBD",
+    "name": {
+      "de": "Salomonen-Dollar",
+      "en": "Solomon Islands dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇸🇧"
+  },
+  {
+    "code": "SCR",
+    "name": {
+      "de": "Seychellen-Rupie",
+      "en": "Seychelles rupee"
+    },
+    "subunit": "Cent",
+    "symbol": "₨",
+    "flag": "🇸🇨"
+  },
+  {
+    "code": "SDG",
+    "name": {
+      "de": "sudanesisches Pfund",
+      "en": "Sudanese pound"
+    },
+    "subunit": "Piaster",
+    "flag": "🇸🇩"
+  },
+  {
+    "code": "SEK",
+    "name": {
+      "de": "schwedische Krone",
+      "en": "krona"
+    },
+    "subunit": "Öre",
+    "symbol": "kr",
+    "flag": "🇸🇪"
+  },
+  {
+    "code": "SHP",
+    "name": {
+      "de": "St.-Helena-Pfund",
+      "en": "Saint Helena pound"
+    },
+    "subunit": "Penny",
+    "symbol": "£",
+    "flag": "🇸🇭"
+  },
+  {
+    "code": "SLE",
+    "name": {
+      "de": "Leone",
+      "en": "leone"
+    },
+    "subunit": "Cent",
+    "flag": "🇸🇱"
+  },
+  {
+    "code": "SOS",
+    "name": {
+      "de": "Somalia-Schilling",
+      "en": "Somali shilling"
+    },
+    "subunit": "Cent",
+    "symbol": "S",
+    "flag": "🇸🇴"
+  },
+  {
+    "code": "SRD",
+    "name": {
+      "de": "Suriname-Dollar",
+      "en": "Surinamese dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "$",
+    "flag": "🇸🇷"
+  },
+  {
+    "code": "SSP",
+    "name": {
+      "de": "südsudanesisches Pfund",
+      "en": "South Sudanese pound"
+    },
+    "subunit": "Piaster",
+    "flag": "🇸🇸"
+  },
+  {
+    "code": "STN",
+    "name": {
+      "de": "Dobra",
+      "en": "dobra"
+    },
+    "subunit": "Centime",
+    "flag": "🇸🇹"
+  },
+  {
+    "code": "SVC",
+    "name": {
+      "de": "El-Salvador-Colón",
+      "en": "Salvadorian colón"
+    },
+    "subunit": "Centavo",
+    "symbol": "$",
+    "flag": "🇸🇻"
+  },
+  {
+    "code": "SYP",
+    "name": {
+      "de": "syrisches Pfund",
+      "en": "Syrian pound"
+    },
+    "subunit": "Piastre",
+    "symbol": "£",
+    "flag": "🇸🇾"
+  },
+  {
+    "code": "SZL",
+    "name": {
+      "de": "Lilangeni",
+      "en": "lilangeni"
+    },
+    "subunit": "Cent",
+    "flag": "🇸🇿"
+  },
+  {
+    "code": "TJS",
+    "name": {
+      "de": "Somoni",
+      "en": "somoni"
+    },
+    "subunit": "Diram",
+    "flag": "🇹🇯"
+  },
+  {
+    "code": "TMT",
+    "name": {
+      "de": "Turkmenistan-Manat",
+      "en": "Turkmen manat"
+    },
+    "subunit": "Tenge",
+    "flag": "🇹🇲"
+  },
+  {
+    "code": "TND",
+    "name": {
+      "de": "tunesischer Dinar",
+      "en": "Tunisian dinar"
+    },
+    "subunit": "Millime",
+    "flag": "🇹🇳"
+  },
+  {
+    "code": "TOP",
+    "name": {
+      "de": "Pa’anga",
+      "en": "pa’anga"
+    },
+    "subunit": "Seniti",
+    "flag": "🇹🇴"
+  },
+  {
+    "code": "TTD",
+    "name": {
+      "de": "Trinidad-und-Tobago-Dollar",
+      "en": "Trinidad and Tobago dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "TT$",
+    "flag": "🇹🇹"
+  },
+  {
+    "code": "TWD",
+    "name": {
+      "de": "neuer Taiwan-Dollar",
+      "en": "new Taiwan dollar"
+    },
+    "subunit": "Cent",
+    "symbol": "NT$",
+    "flag": "🇹🇼"
+  },
+  {
+    "code": "TZS",
+    "name": {
+      "de": "Tansania-Schilling",
+      "en": "Tanzanian shilling"
+    },
+    "subunit": "Cent",
+    "flag": "🇹🇿"
+  },
+  {
+    "code": "UAH",
+    "name": {
+      "de": "Griwna",
+      "en": "hryvnia"
+    },
+    "subunit": "Kopeke",
+    "symbol": "₴",
+    "flag": "🇺🇦"
+  },
+  {
+    "code": "UGX",
+    "name": {
+      "de": "Uganda-Schilling",
+      "en": "Uganda shilling"
+    },
+    "subunit": "Cent",
+    "flag": "🇺🇬"
+  },
+  {
+    "code": "UYU",
+    "name": {
+      "de": "uruguayischer Peso",
+      "en": "Uruguayan peso"
+    },
+    "subunit": "Centésimo",
+    "symbol": "$U",
+    "flag": "🇺🇾"
+  },
+  {
+    "code": "UZS",
+    "name": {
+      "de": "Sum",
+      "en": "sum"
+    },
+    "subunit": "Tiyin",
+    "symbol": "лв",
+    "flag": "🇺🇿"
+  },
+  {
+    "code": "VES",
+    "name": {
+      "de": "Bolívar Soberano",
+      "en": "bolívar soberano"
+    },
+    "subunit": "Céntimo",
+    "flag": "🇻🇪"
+  },
+  {
+    "code": "VND",
+    "name": {
+      "de": "Dong",
+      "en": "dong"
+    },
+    "symbol": "₫",
+    "flag": "🇻🇳"
+  },
+  {
+    "code": "VUV",
+    "name": {
+      "de": "Vatu",
+      "en": "vatu"
+    },
+    "flag": "🇻🇺"
+  },
+  {
+    "code": "WST",
+    "name": {
+      "de": "Tala",
+      "en": "tala"
+    },
+    "subunit": "Sene",
+    "flag": "🇼🇸"
+  },
+  {
+    "code": "YER",
+    "name": {
+      "de": "Jemen-Rial",
+      "en": "Yemeni rial"
+    },
+    "subunit": "Fils",
+    "symbol": "﷼",
+    "flag": "🇾🇪"
+  },
+  {
+    "code": "ZMW",
+    "name": {
+      "de": "sambischer Kwacha",
+      "en": "Zambian kwacha"
+    },
+    "subunit": "Ngwee",
+    "flag": "🇿🇲"
+  },
+  {
+    "code": "ZWL",
+    "name": {
+      "de": "Simbabwe-Dollar",
+      "en": "Zimbabwe dollar"
+    },
+    "subunit": "Cent",
+    "flag": "🇿🇼"
+  }
 ]

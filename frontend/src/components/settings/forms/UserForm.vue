@@ -98,7 +98,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { User, accesses } from '../../../../../common/types.js'
+import { accesses, User } from '../../../../../common/types.js'
 import DateInput from '../../elements/DateInput.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 

@@ -109,7 +109,7 @@ export default defineComponent({
           },
           { withCredentials: true }
         )
-        if (res.status === 200) {
+        if (res.status === 204) {
           this.$root.loadState = 'UNLOADED'
           this.$router.push(this.$route.query.redirect ? (this.$route.query.redirect as string) : '/')
         }

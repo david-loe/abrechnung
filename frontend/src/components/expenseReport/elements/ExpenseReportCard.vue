@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CardElement from '../../elements/CardElement.vue'
 import { ExpenseReportSimple } from '../../../../../common/types.js'
+import CardElement from '../../elements/CardElement.vue'
 
 export default defineComponent({
   name: 'ExpenseReportCard',

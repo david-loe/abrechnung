@@ -17,7 +17,7 @@
           <div v-if="healthCareCost._id" class="modal-body">
             <ExpenseForm
               ref="expenseForm"
-              :expense="(modalExpense as Partial<Expense> | undefined)"
+              :expense="modalExpense as Partial<Expense> | undefined"
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
@@ -171,7 +171,7 @@
                     class="form-control"
                     id="comment"
                     rows="1"
-                    v-model="(healthCareCost.comment as string | undefined)"
+                    v-model="healthCareCost.comment as string | undefined"
                     :disabled="
                       (isReadOnly && endpointPrefix === '') ||
                       (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
@@ -225,7 +225,7 @@
                     <FileUpload
                       ref="fileUpload"
                       id="expenseFormFile"
-                      v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
+                      v-model="healthCareCost.refundSum.receipts as DocumentFile[] | undefined"
                       :endpointPrefix="endpointPrefix" />
                   </div>
                   <button type="submit" class="btn btn-success">
@@ -243,15 +243,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from '../elements/StatePipeline.vue'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { datetoDateString, getById, getHealthCareCostTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
+import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink, getById } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation, DocumentFile } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
@@ -297,7 +297,7 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteHealthCareCost() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { id: this._id })
+      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { _id: this._id })
       if (result) {
         this.$router.push({ path: this.parentPages[0].link })
       }
@@ -355,7 +355,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'healthCareCost/report?id=' + this.healthCareCost._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
     },
     async postExpense(expense: Expense) {
       var headers = {}
@@ -364,35 +364,34 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      ;(expense as any).healthCareCostId = this.healthCareCost._id
-      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, { headers })
+      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, {
+        headers,
+        params: { parentId: this.healthCareCost._id }
+      })
       if (result.ok) {
-        await this.getHealthCareCost()
+        this.setExpenseReport(result.ok)
         this.hideModal()
       }
     },
-    async deleteExpense(id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { id: id, healthCareCostId: this._id })
+    async deleteExpense(_id: string) {
+      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
       if (result) {
-        await this.getHealthCareCost()
+        this.setExpenseReport(result)
         this.hideModal()
       }
     },
     async getHealthCareCost() {
       const params: any = {
-        id: this._id,
-        addExpenses: true
-      }
-      if (this.endpointPrefix === 'examine/') {
-        params.addByInsurance = true
-      } else if (this.endpointPrefix === 'confirm/') {
-        params.addRefunded = true
+        _id: this._id,
+        additionalFields: ['expenses']
       }
       const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
       if (result) {
-        this.healthCareCost = result.data
+        this.setExpenseReport(result.data)
       }
-
+    },
+    setExpenseReport(healthCareCost: HealthCareCost) {
+      this.healthCareCost = healthCareCost
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },

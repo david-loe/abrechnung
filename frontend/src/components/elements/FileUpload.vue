@@ -59,11 +59,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { DocumentFile, Token } from '../../../../common/types.js'
-import { resizeImage } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
 import QRCode from 'qrcode'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { resizeImage } from '../../../../common/scripts.js'
+import { DocumentFile, Token } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'FileUpload',
@@ -94,7 +94,7 @@ export default defineComponent({
       const windowProxy = window.open('', '_blank') as Window
       if (this.modelValue[index]._id) {
         const result = (
-          await this.$root.getter<Blob>(this.endpointPrefix + 'documentFile', { id: this.modelValue[index]._id }, { responseType: 'blob' })
+          await this.$root.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: this.modelValue[index]._id }, { responseType: 'blob' })
         ).ok
         if (result) {
           const fileURL = URL.createObjectURL(result.data)
@@ -110,7 +110,7 @@ export default defineComponent({
     async deleteFile(index: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (this.modelValue[index]._id) {
-          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { id: this.modelValue[index]._id! }, false)
+          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { _id: this.modelValue[index]._id! }, false)
           if (!result) {
             return null
           }
@@ -150,8 +150,8 @@ export default defineComponent({
       this.token = (await this.$root.setter<Token>('user/token', {}, undefined, false)).ok
       if (this.token) {
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
-        url.searchParams.append('user', this.$root.user._id)
-        url.searchParams.append('token', this.token._id)
+        url.searchParams.append('userId', this.$root.user._id)
+        url.searchParams.append('tokenId', this.token._id)
         log(this.$t('labels.uploadLink') + ':')
         log(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
@@ -181,7 +181,7 @@ export default defineComponent({
       this.token = undefined
       this.qr = undefined
       this.secondsLeft = this.expireAfterSeconds
-      this.$root.deleter('user/token', { id: '' }, false, false)
+      this.$root.deleter('user/token', { _id: '' }, false, false)
     }
   },
   unmounted() {
