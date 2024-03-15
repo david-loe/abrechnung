@@ -1,5 +1,5 @@
 import test from 'ava'
-import { TravelExpense, Stage, Travel, TravelSimple } from '../../../common/types.js'
+import { Stage, Travel, TravelExpense, TravelSimple } from '../../../common/types.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
@@ -167,7 +167,7 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
-    var req = agent.post('/travel/stage')
+    var req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
     for (const entry of objectToFormFields(stage)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -175,7 +175,7 @@ test.serial('POST /travel/stage', async (t) => {
         req = req.field(entry.field, entry.val)
       }
     }
-    const res = await req.field('travelId', travel._id.toString())
+    const res = await req
     if (res.status === 200) {
       t.pass()
     } else {
@@ -201,7 +201,7 @@ const expenses: TravelExpense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/travel/expense')
+    var req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -209,7 +209,7 @@ test.serial('POST /travel/expense', async (t) => {
         req = req.field(entry.field, entry.val)
       }
     }
-    const res = await req.field('travelId', travel._id.toString())
+    const res = await req
     if (res.status === 200) {
       t.pass()
     } else {

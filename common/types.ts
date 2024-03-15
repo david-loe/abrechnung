@@ -36,7 +36,7 @@ export interface Settings {
 /**
  * @pattern ^[A-Z]{2}$
  */
-type CountryCode = string
+export type CountryCode = string
 
 export interface CountrySimple {
   name: {
@@ -74,7 +74,7 @@ export interface ExchangeRate {
 /**
  * @pattern ^[A-Z]{3}$
  */
-type CurrencyCode = string
+export type CurrencyCode = string
 
 export interface Currency {
   name: {

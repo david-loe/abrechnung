@@ -47,7 +47,7 @@ test('POST /user/token', async (t) => {
 
 test('DELETE /user/token', async (t) => {
   const res = await agent.delete('/user/token')
-  if (res.status === 200) {
+  if (res.status === 204) {
     t.pass()
   } else {
     console.log(res.body)

@@ -1,18 +1,16 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request, Middlewares, Produces } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import Travel, { TravelDoc } from '../models/travel.js'
-import Organisation from '../models/organisation.js'
-import { TravelState, Travel as ITravel, _id, TravelExpense, Stage } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Travel as ITravel, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
-import { TravelApplication, TravelPost } from './types.js'
 import i18n from '../i18n.js'
 import { sendTravelNotificationMail } from '../mail/mail.js'
-import { generateTravelReport } from '../pdf/travel.js'
+import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
-import DocumentFile from '../models/documentFile.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
+import { generateTravelReport } from '../pdf/travel.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { TravelApplication, TravelPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -123,13 +121,13 @@ export class TravelController extends Controller {
       state: 'appliedFor' as TravelState,
       owner: request.user?._id,
       editor: request.user?._id,
-      lastPlaceOfWork: { country: requestBody.destinationPlace.country, place: '' }
+      lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
     })
 
-    if (!extendedBody.name) {
+    if (!extendedBody.name && extendedBody.startDate) {
       var date = new Date(extendedBody.startDate)
       extendedBody.name =
-        extendedBody.destinationPlace.place +
+        extendedBody.destinationPlace?.place +
         ' ' +
         i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
         ' ' +

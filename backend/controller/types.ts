@@ -1,6 +1,7 @@
-import { _id, Money, DocumentFile, TravelSimple, Travel, TravelDay } from '../../common/types.js'
+import { Currency, CurrencyCode, DocumentFile, Money, Travel, TravelDay, TravelSimple, _id } from '../../common/types.js'
+import { SetterBody } from './controller.js'
 
-export type IdDocument = _id | { _id: _id }
+export type IdDocument<idType = _id> = idType | { _id: idType }
 
 export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
   /**
@@ -9,18 +10,22 @@ export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
   data?: string
 }
 
-export interface MoneyPlusPost extends Money {
+interface MoneyPost extends Omit<Money, 'currency'> {
+  amount: Money['amount']
+  currency: IdDocument<CurrencyCode> | Currency
+  exchangeRate: Money['exchangeRate']
+}
+
+export interface MoneyPlusPost extends MoneyPost {
   receipts?: File[]
   date?: Date
 }
 
-export interface TravelApplication extends Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress' | 'name' | '_id' | 'advance'> {
-  name?: TravelSimple['name']
-  advance?: TravelSimple['advance']
-  _id?: TravelSimple['_id']
+export interface TravelApplication extends SetterBody<Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress' | 'advance'>> {
+  advance: MoneyPost | undefined
 }
 
-export interface TravelPost extends TravelApplication {
+export interface TravelPost extends Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress'> {
   claimOvernightLumpSum: Travel['claimOvernightLumpSum']
   lastPlaceOfWork: Travel['lastPlaceOfWork']
   days: TravelDayPost[]

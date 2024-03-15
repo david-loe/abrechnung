@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Expense, HealthCareCost, HealthCareCostSimple, HealthInsurance } from '../../../common/types.js'
+import { Expense, HealthCareCost, HealthCareCostSimple } from '../../../common/types.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
@@ -88,7 +88,7 @@ const expenses: Expense[] = [
 test.serial('POST /healthCareCost/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/healthCareCost/expense')
+    var req = agent.post('/healthCareCost/expense').query({ parentId: healthCareCost._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -96,7 +96,7 @@ test.serial('POST /healthCareCost/expense', async (t) => {
         req = req.field(entry.field, entry.val)
       }
     }
-    const res = await req.field('healthCareCostId', healthCareCost._id.toString())
+    const res = await req
     if (res.status === 200) {
       t.pass()
     } else {

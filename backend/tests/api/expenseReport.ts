@@ -77,7 +77,7 @@ const expenses: Expense[] = [
 test.serial('POST /expenseReport/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/expenseReport/expense')
+    var req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -85,7 +85,7 @@ test.serial('POST /expenseReport/expense', async (t) => {
         req = req.field(entry.field, entry.val)
       }
     }
-    const res = await req.field('expenseReportId', expenseReport._id.toString())
+    const res = await req
     if (res.status === 200) {
       t.pass()
     } else {

@@ -1,8 +1,9 @@
-import { Controller as TsoaController } from 'tsoa'
-import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mongoose'
-import { GETResponse, Meta, User, _id } from '../../common/types.js'
-import { Base64 } from '../../common/scripts.js'
 import { DeleteResult } from 'mongodb'
+import { FilterQuery, HydratedDocument, Model, ProjectionType, Types } from 'mongoose'
+import { Controller as TsoaController } from 'tsoa'
+import { Base64 } from '../../common/scripts.js'
+import { GETResponse, Meta, User, _id } from '../../common/types.js'
+import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -57,6 +58,8 @@ type SetterPartial<T, U extends string> = T extends object
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
         ? _SetterPartial1<ElementType, U>[] | undefined
+        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+        ? T[P] | IdDocument<idType> | null | undefined
         : _SetterPartial2<T[P], U> | undefined
     }
   : T
@@ -81,6 +84,8 @@ type _SetterPartial2<T, U extends string> = T extends object
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
         ? _SetterPartial1<ElementType, U>[] | undefined
+        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+        ? T[P] | IdDocument<idType> | null | undefined
         : _SetterPartial1<T[P], U> | undefined
     }
   : T
@@ -105,14 +110,17 @@ type _SetterPartial1<T, U extends string> = T extends object
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
         ? _SetterPartial1<ElementType, U>[] | undefined
+        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+        ? T[P] | IdDocument<idType> | null | undefined
         : T[P]
     }
   : T
 
-export type SetterBody<ModelType> = SetterPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
+export type NoPost = 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'
+export type SetterBody<ModelType> = SetterPartial<ModelType, NoPost>
 
 export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
-  requestBody: SetterPartial<ModelType, 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor'>
+  requestBody: SetterPartial<ModelType, NoPost>
   cb?: (data: CheckType) => any
   allowNew?: boolean
   checkOldObject?: (oldObject: HydratedDocument<CheckType> & ModelMethods) => Promise<boolean>
