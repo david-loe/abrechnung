@@ -3,7 +3,6 @@ import { Model, Types, FilterQuery, ProjectionType, HydratedDocument } from 'mon
 import { GETResponse, Meta, User, _id } from '../../common/types.js'
 import { Base64 } from '../../common/scripts.js'
 import { DeleteResult } from 'mongodb'
-import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**

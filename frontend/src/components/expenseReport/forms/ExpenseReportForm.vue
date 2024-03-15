@@ -36,8 +36,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
 import { ExpenseReportSimple } from '../../../../../common/types.js'
+import InfoPoint from '../../elements/InfoPoint.vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',

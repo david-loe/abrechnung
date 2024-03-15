@@ -59,11 +59,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { DocumentFile, Token } from '../../../../common/types.js'
-import { resizeImage } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
 import QRCode from 'qrcode'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { resizeImage } from '../../../../common/scripts.js'
+import { DocumentFile, Token } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'FileUpload',

@@ -454,41 +454,41 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from '../elements/StatePipeline.vue'
-import ProgressCircle from '../elements/ProgressCircle.vue'
-import StageForm from './forms/StageForm.vue'
-import ExpenseForm from './forms/ExpenseForm.vue'
-import InfoPoint from '../elements/InfoPoint.vue'
-import PlaceElement from '../elements/PlaceElement.vue'
-import TravelApplyForm from './forms/TravelApplyForm.vue'
-import ErrorBanner from '../elements/ErrorBanner.vue'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
 import {
-  getMoneyString,
   datetoDateString,
-  getLumpSumsSum,
   getExpensesSum,
+  getLumpSumsSum,
+  getMoneyString,
   getTravelTotal,
   mailToLink,
   msTeamsToLink
 } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
 import {
   DocumentFile,
-  TravelExpense,
+  meals,
+  Place,
   Record,
   RecordType,
   Stage,
   Travel,
   TravelDay,
+  TravelExpense,
   TravelSimple,
-  meals,
   travelStates,
-  UserSimple,
   User,
-  Place
+  UserSimple
 } from '../../../../common/types.js'
+import ErrorBanner from '../elements/ErrorBanner.vue'
+import InfoPoint from '../elements/InfoPoint.vue'
+import PlaceElement from '../elements/PlaceElement.vue'
+import ProgressCircle from '../elements/ProgressCircle.vue'
+import StatePipeline from '../elements/StatePipeline.vue'
+import ExpenseForm from './forms/ExpenseForm.vue'
+import StageForm from './forms/StageForm.vue'
+import TravelApplyForm from './forms/TravelApplyForm.vue'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'

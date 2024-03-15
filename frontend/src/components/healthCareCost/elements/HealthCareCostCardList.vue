@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
-import PaginationList from '../../elements/PaginationList.vue'
 import { defineComponent } from 'vue'
+import PaginationList from '../../elements/PaginationList.vue'
 import HealthCareCostCard from './HealthCareCostCard.vue'
 
 export default defineComponent({

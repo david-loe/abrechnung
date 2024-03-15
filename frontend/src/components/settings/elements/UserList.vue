@@ -90,8 +90,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserForm from '../forms/UserForm.vue'
 import { User, accesses } from '../../../../../common/types.js'
+import UserForm from '../forms/UserForm.vue'
 
 interface Filter<T> {
   name: T

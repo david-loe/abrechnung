@@ -62,7 +62,7 @@ export async function convertCurrency(
     const res = await axios.get(url)
     if (res.status === 200) {
       const rates = (res.data as InforEuroResponse).map(
-        (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year } as ExchangeRateI)
+        (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year }) as ExchangeRateI
       )
       ExchangeRate.insertMany(rates)
       data = rates.find((r) => r.currency === from.toUpperCase())

@@ -29,7 +29,7 @@ if (/windows/i.test(navigator.userAgent)) {
 }
 
 // globally config axios
-axios.defaults.paramsSerializer = (params) => qs.stringify(params, {arrayFormat: 'repeat'})
+axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -37,7 +37,7 @@ declare module '@vue/runtime-core' {
     $root: {
       getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
       setter: <T>(endpoint: string, data: any, config?: AxiosRequestConfig<any>, showAlert?: Boolean) => Promise<{ ok?: T; error?: any }>
-      deleter: (endpoint: string, params: { [key: string]: any; _id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean|any>
+      deleter: (endpoint: string, params: { [key: string]: any; _id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean | any>
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
@@ -51,7 +51,7 @@ declare module '@vue/runtime-core' {
       healthInsurances: HealthInsurance[]
       organisations: OrganisationSimple[]
       specialLumpSums: { [key: string]: string[] }
-      users: { name: User['name'], _id: string }[]
+      users: { name: User['name']; _id: string }[]
     }
   }
 }

@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Settings } from '../../../../common/types.js'
+import { defineComponent, PropType } from 'vue';
+import { Settings } from '../../../../common/types.js';
 
 export default defineComponent({
   name: 'StateBadge',

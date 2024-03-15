@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import CardElement from '../../elements/CardElement.vue'
-import { HealthCareCostSimple } from '../../../../../common/types.js'
+import { defineComponent, PropType } from 'vue';
+import { HealthCareCostSimple } from '../../../../../common/types.js';
+import CardElement from '../../elements/CardElement.vue';
 
 export default defineComponent({
   name: 'HealthCareCostCard',

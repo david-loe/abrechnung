@@ -46,10 +46,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import StatePipeline from '../../elements/StatePipeline.vue'
-import PlaceElement from '../../elements/PlaceElement.vue'
-import { getMoneyString, datetoDateStringWithYear, getDiffInDays } from '../../../../../common/scripts.js'
+import { datetoDateStringWithYear, getDiffInDays, getMoneyString } from '../../../../../common/scripts.js'
 import { TravelSimple, travelStates } from '../../../../../common/types.js'
+import PlaceElement from '../../elements/PlaceElement.vue'
+import StatePipeline from '../../elements/StatePipeline.vue'
 
 const keys = [
   'owner',

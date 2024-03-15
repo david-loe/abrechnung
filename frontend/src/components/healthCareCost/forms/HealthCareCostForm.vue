@@ -57,8 +57,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { HealthCareCostSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
-import { HealthCareCostSimple, Place } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'HealthCareCostForm',

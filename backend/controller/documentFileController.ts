@@ -1,9 +1,9 @@
-import { Route, Get, Tags, Security, Request, Delete, Query, Produces, SuccessResponse } from 'tsoa'
-import { Controller } from './controller.js'
-import DocumentFile from '../models/documentFile.js'
-import { documentFileTypes, _id } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import { mongo } from 'mongoose'
+import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
+import { _id, documentFileTypes } from '../../common/types.js'
+import DocumentFile from '../models/documentFile.js'
+import { Controller } from './controller.js'
 
 @Tags('DocumentFile')
 @Route('api/documentFile')
@@ -26,7 +26,7 @@ export class DocumentFileController extends Controller {
   }
 
   @Delete()
-  public async deleteDocumentFile(@Query() _id: _id, @Request() request: ExRequest){
+  public async deleteDocumentFile(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(DocumentFile, { _id: _id, checkOldObject: this.checkOwner(request.user!) })
   }
 }
@@ -54,7 +54,7 @@ export class DocumentFileAdminController extends Controller {
   }
 
   @Delete()
-  public async deleteDocumentFile(@Query() _id: _id, @Request() request: ExRequest){
-    return await this.deleter(DocumentFile, { _id: _id})
+  public async deleteDocumentFile(@Query() _id: _id, @Request() request: ExRequest) {
+    return await this.deleter(DocumentFile, { _id: _id })
   }
 }

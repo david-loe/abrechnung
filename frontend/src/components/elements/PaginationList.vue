@@ -59,8 +59,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserSelector from './UserSelector.vue'
 import { Base64 } from '../../../../common/scripts.js'
+import UserSelector from './UserSelector.vue'
 
 export default defineComponent({
   name: 'PaginationList',

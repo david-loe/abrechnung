@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
 import { ExpenseReportState } from '../../../../common/types.js'
+import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

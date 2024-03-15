@@ -3,5 +3,8 @@
   "cSpell.words": [
     "tsoa"
   ],
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  }
 }

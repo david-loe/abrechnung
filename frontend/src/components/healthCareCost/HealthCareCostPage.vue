@@ -221,15 +221,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
-import StatePipeline from '../elements/StatePipeline.vue'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { datetoDateString, getById, getHealthCareCostTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
+import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getHealthCareCostTotal, mailToLink, msTeamsToLink, getById } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
-import { HealthCareCost, healthCareCostStates, Expense, UserSimple, Organisation, DocumentFile } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 

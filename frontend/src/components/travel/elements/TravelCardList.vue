@@ -13,9 +13,8 @@
 </template>
 
 <script lang="ts">
-import PaginationList from '../../elements/PaginationList.vue'
 import { defineComponent } from 'vue'
-import { TravelSimple } from '../../../../../common/types.js'
+import PaginationList from '../../elements/PaginationList.vue'
 import TravelCard from './TravelCard.vue'
 
 export default defineComponent({

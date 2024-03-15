@@ -59,11 +59,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { baseCurrency, TravelExpense } from '../../../../../common/types.js'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { TravelExpense, baseCurrency } from '../../../../../common/types.js'
+import FileUpload from '../../elements/FileUpload.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
 
 export default defineComponent({
   name: 'ExpenseForm',

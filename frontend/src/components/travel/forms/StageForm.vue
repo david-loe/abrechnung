@@ -197,14 +197,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
+import { datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
+import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import FileUpload from '../../elements/FileUpload.vue'
-import PlaceInput from '../../elements/PlaceInput.vue'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { distanceRefundTypes, DocumentFile, Place, Stage, transportTypes, baseCurrency } from '../../../../../common/types.js'
+import FileUpload from '../../elements/FileUpload.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import PlaceInput from '../../elements/PlaceInput.vue'
 
 export default defineComponent({
   name: 'StageForm',

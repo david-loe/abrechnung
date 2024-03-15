@@ -77,4 +77,4 @@ userSchema.methods.isActive = async function (this: UserDoc) {
 
 export default model<User>('User', userSchema)
 
-export interface UserDoc extends Methods, HydratedDocument<User> { }
+export interface UserDoc extends Methods, HydratedDocument<User> {}

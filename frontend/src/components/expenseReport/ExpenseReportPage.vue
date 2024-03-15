@@ -197,13 +197,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
 import { Modal } from 'bootstrap'
+import { defineComponent, PropType } from 'vue'
+import { log } from '../../../../common/logger.js'
+import { datetoDateString, getExpenseReportTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-import { getMoneyString, datetoDateString, getExpenseReportTotal, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { log } from '../../../../common/logger.js'
-import { ExpenseReport, expenseReportStates, Expense, UserSimple } from '../../../../common/types.js'
 
 type ModalMode = 'add' | 'edit'
 
