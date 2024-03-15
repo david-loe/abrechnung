@@ -6,7 +6,7 @@ import DocumentFile from '../models/documentFile.js'
 import { Controller } from './controller.js'
 
 @Tags('DocumentFile')
-@Route('api/documentFile')
+@Route('documentFile')
 @Security('cookieAuth', ['user'])
 export class DocumentFileController extends Controller {
   @Get()
@@ -32,7 +32,7 @@ export class DocumentFileController extends Controller {
 }
 
 @Tags('Examine', 'DocumentFile')
-@Route('api/examine/documentFile')
+@Route('examine/documentFile')
 @Security('cookieAuth', ['user', 'examine/travel'])
 @Security('cookieAuth', ['user', 'examine/expenseReport'])
 @Security('cookieAuth', ['user', 'examine/healthCareCost'])

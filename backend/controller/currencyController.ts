@@ -4,7 +4,7 @@ import Currency from '../models/currency.js'
 import { Currency as ICurrency, _id } from '../../common/types.js'
 
 @Tags('Currency')
-@Route('api/currency')
+@Route('currency')
 @Security('cookieAuth', ['user'])
 export class CurrencyController extends Controller {
   @Get()
@@ -14,7 +14,7 @@ export class CurrencyController extends Controller {
 }
 
 @Tags('Admin', 'Currency')
-@Route('api/admin/currency')
+@Route('admin/currency')
 @Security('cookieAuth', ['admin'])
 export class CurrencyAdminController extends Controller {
   @Post()

@@ -6,7 +6,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 test('GET /country', async (t) => {
-  const res = await agent.get('/api/country')
+  const res = await agent.get('/country')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -16,7 +16,7 @@ test('GET /country', async (t) => {
 
 test('GET /country?additionalFields=lumpSums&additionalFields=lumpSumsFrom', async (t) => {
   t.plan(2)
-  const res = await agent.get('/api/country').query({ additionalFields: ['lumpSums', 'lumpSumsFrom'] })
+  const res = await agent.get('/country').query({ additionalFields: ['lumpSums', 'lumpSumsFrom'] })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -26,7 +26,7 @@ test('GET /country?additionalFields=lumpSums&additionalFields=lumpSumsFrom', asy
 })
 
 test('GET /specialLumpSums', async (t) => {
-  const res = await agent.get('/api/specialLumpSums')
+  const res = await agent.get('/specialLumpSums')
   if (res.status === 200) {
     t.pass()
   } else {

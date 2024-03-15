@@ -12,7 +12,7 @@ var expenseReport: ExpenseReportSimple = {
 }
 
 test.serial('GET /organisation', async (t) => {
-  const res = await agent.get('/api/organisation')
+  const res = await agent.get('/organisation')
   expenseReport.organisation = res.body.data[0]
   if (res.status === 200) {
     t.pass()
@@ -22,7 +22,7 @@ test.serial('GET /organisation', async (t) => {
 })
 
 test.serial('POST /expenseReport/inWork', async (t) => {
-  const res = await agent.post('/api/expenseReport/inWork').send(expenseReport)
+  const res = await agent.post('/expenseReport/inWork').send(expenseReport)
   expenseReport = res.body.result
   if (res.status === 200) {
     t.pass()
@@ -33,7 +33,7 @@ test.serial('POST /expenseReport/inWork', async (t) => {
 
 test.serial('GET /expenseReport', async (t) => {
   t.plan(2)
-  const res = await agent.get('/api/expenseReport')
+  const res = await agent.get('/expenseReport')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -77,7 +77,7 @@ const expenses: Expense[] = [
 test.serial('POST /expenseReport/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/api/expenseReport/expense')
+    var req = agent.post('/expenseReport/expense')
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -97,7 +97,7 @@ test.serial('POST /expenseReport/expense', async (t) => {
 test.serial('POST /expenseReport/underExamination', async (t) => {
   t.plan(4)
   const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
-  const res = await agent.post('/api/expenseReport/underExamination').send({ _id: expenseReport._id, comment })
+  const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -114,7 +114,7 @@ test.serial('POST /examine/expenseReport/refunded', async (t) => {
   await loginUser(agent, 'expenseReport')
   t.plan(4)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/api/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
+  const res = await agent.post('/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -129,7 +129,7 @@ test.serial('POST /examine/expenseReport/refunded', async (t) => {
 
 test.serial('GET /expenseReport/report', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.get('/api/expenseReport/report').query({ id: expenseReport._id })
+  const res = await agent.get('/expenseReport/report').query({ id: expenseReport._id })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -139,7 +139,7 @@ test.serial('GET /expenseReport/report', async (t) => {
 
 test.after.always('DELETE /expenseReport', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.delete('/api/expenseReport').query({ id: expenseReport._id })
+  const res = await agent.delete('/expenseReport').query({ id: expenseReport._id })
   if (res.status === 200) {
     t.pass()
   } else {

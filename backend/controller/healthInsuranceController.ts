@@ -4,7 +4,7 @@ import HealthInsurance from '../models/healthInsurance.js'
 import { HealthInsurance as IHealthInsurance, _id } from '../../common/types.js'
 
 @Tags('HealthInsurance')
-@Route('api/healthInsurance')
+@Route('healthInsurance')
 @Security('cookieAuth', ['user'])
 export class HealthInsuranceController extends Controller {
   @Get()
@@ -14,7 +14,7 @@ export class HealthInsuranceController extends Controller {
 }
 
 @Tags('Admin', 'HealthInsurance')
-@Route('api/admin/healthInsurance')
+@Route('admin/healthInsurance')
 @Security('cookieAuth', ['admin'])
 export class HealthInsuranceAdminController extends Controller {
   @Post()

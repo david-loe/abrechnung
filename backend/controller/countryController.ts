@@ -4,7 +4,7 @@ import Country from '../models/country.js'
 import { Country as ICountry, _id } from '../../common/types.js'
 
 @Tags('Country')
-@Route('api/')
+@Route('')
 @Security('cookieAuth', ['user'])
 export class CountryController extends Controller {
   @Get('country')
@@ -39,7 +39,7 @@ export class CountryController extends Controller {
 }
 
 @Tags('Admin', 'Country')
-@Route('api/admin/country')
+@Route('admin/country')
 @Security('cookieAuth', ['admin'])
 export class CountryAdminController extends Controller {
   @Post()

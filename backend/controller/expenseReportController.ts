@@ -16,7 +16,7 @@ import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('ExpenseReport')
-@Route('api/expenseReport')
+@Route('expenseReport')
 @Security('cookieAuth', ['user'])
 export class ExpenseReportController extends Controller {
   @Get()
@@ -142,7 +142,7 @@ export class ExpenseReportController extends Controller {
 }
 
 @Tags('Examine', 'ExpenseReport')
-@Route('api/examine/expenseReport')
+@Route('examine/expenseReport')
 @Security('cookieAuth', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()

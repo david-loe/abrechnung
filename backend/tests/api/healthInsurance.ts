@@ -5,7 +5,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 test('GET /healthInsurance', async (t) => {
-  const res = await agent.get('/api/healthInsurance')
+  const res = await agent.get('/healthInsurance')
   if (res.status === 200) {
     t.pass()
   } else {

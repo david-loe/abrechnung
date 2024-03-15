@@ -4,7 +4,7 @@ import Settings from '../models/settings.js'
 import { Settings as ISettings } from '../../common/types.js'
 
 @Tags('Settings')
-@Route('api/settings')
+@Route('settings')
 @Security('cookieAuth', ['user'])
 export class SettingsController extends Controller {
   @Get()
@@ -14,7 +14,7 @@ export class SettingsController extends Controller {
 }
 
 @Tags('Admin', 'Settings')
-@Route('api/admin/settings')
+@Route('admin/settings')
 @Security('cookieAuth', ['admin'])
 export class SettingsAdminController extends Controller {
   @Post()

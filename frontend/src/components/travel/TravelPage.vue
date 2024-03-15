@@ -592,7 +592,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'travel/report?_id=' + this.travel._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'travel/report?_id=' + this.travel._id
     },
     async postStage(stage: Stage) {
       var headers = {}

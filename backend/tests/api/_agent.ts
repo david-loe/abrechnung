@@ -15,7 +15,7 @@ const users = {
 }
 
 async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
-  const res = await agent.get('/api/admin/user').query({ 'fk.ldapauth': users[userKey].username })
+  const res = await agent.get('/admin/user').query({ 'fk.ldapauth': users[userKey].username })
   var userId = undefined
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id
@@ -29,7 +29,7 @@ async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof u
     access: users[userKey].access,
     email: users[userKey].username + '@planetexpress.com'
   }
-  await agent.post('/api/admin/user').send(user)
+  await agent.post('/admin/user').send(user)
 }
 
 export default async function createAgent() {
@@ -43,6 +43,6 @@ export default async function createAgent() {
 }
 
 export async function loginUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
-  await agent.post('/api/logout')
+  await agent.post('/logout')
   await agent.post('/auth/ldapauth').send({ username: users[userKey].username, password: users[userKey].password })
 }

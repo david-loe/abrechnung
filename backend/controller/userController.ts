@@ -13,7 +13,7 @@ import { File } from './types.js'
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('User')
-@Route('api/user')
+@Route('user')
 @Security('cookieAuth', ['user'])
 export class UserController extends Controller {
   @Get()
@@ -64,7 +64,7 @@ export class UserController extends Controller {
 }
 
 @Tags('User')
-@Route('api/users')
+@Route('users')
 @Security('cookieAuth', ['user', 'approve/travel'])
 @Security('cookieAuth', ['user', 'examine/travel'])
 @Security('cookieAuth', ['user', 'examine/expenseReport'])
@@ -80,7 +80,7 @@ interface SetterBodyUser extends SetterBody<IUser> {
   loseAccessAt: null | Date | undefined
 }
 @Tags('Admin', 'User')
-@Route('api/admin/user')
+@Route('admin/user')
 @Security('cookieAuth', ['admin'])
 export class UserAdminController extends Controller {
   @Get()

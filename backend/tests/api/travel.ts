@@ -25,7 +25,7 @@ var travel: TravelSimple = {
 }
 
 test.serial('GET /organisation', async (t) => {
-  const res = await agent.get('/api/organisation')
+  const res = await agent.get('/organisation')
   travel.organisation = res.body.data[0]
   if (res.status === 200) {
     t.pass()
@@ -35,7 +35,7 @@ test.serial('GET /organisation', async (t) => {
 })
 
 test.serial('POST /travel/appliedFor', async (t) => {
-  const res = await agent.post('/api/travel/appliedFor').send(travel)
+  const res = await agent.post('/travel/appliedFor').send(travel)
   travel = res.body.result
   if (res.status === 200) {
     t.pass()
@@ -46,7 +46,7 @@ test.serial('POST /travel/appliedFor', async (t) => {
 
 test.serial('GET /travel', async (t) => {
   t.plan(2)
-  const res = await agent.get('/api/travel')
+  const res = await agent.get('/travel')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -65,7 +65,7 @@ test.serial('GET /travel', async (t) => {
 test.serial('GET /approve/travel', async (t) => {
   await loginUser(agent, 'travel')
   t.plan(2)
-  const res = await agent.get('/api/approve/travel')
+  const res = await agent.get('/approve/travel')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -82,7 +82,7 @@ test.serial('GET /approve/travel', async (t) => {
 test.serial('POST /approve/travel/approved', async (t) => {
   t.plan(4)
   const comment = 'A Comment'
-  const res = await agent.post('/api/approve/travel/approved').send({ _id: travel._id, comment })
+  const res = await agent.post('/approve/travel/approved').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -167,7 +167,7 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
-    var req = agent.post('/api/travel/stage')
+    var req = agent.post('/travel/stage')
     for (const entry of objectToFormFields(stage)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -201,7 +201,7 @@ const expenses: TravelExpense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/api/travel/expense')
+    var req = agent.post('/travel/expense')
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -221,7 +221,7 @@ test.serial('POST /travel/expense', async (t) => {
 test.serial('POST /travel/underExamination', async (t) => {
   t.plan(4)
   const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
-  const res = await agent.post('/api/travel/underExamination').send({ _id: travel._id, comment })
+  const res = await agent.post('/travel/underExamination').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -238,7 +238,7 @@ test.serial('POST /examine/travel/refunded', async (t) => {
   await loginUser(agent, 'travel')
   t.plan(4)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/api/examine/travel/refunded').send({ _id: travel._id, comment })
+  const res = await agent.post('/examine/travel/refunded').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -253,7 +253,7 @@ test.serial('POST /examine/travel/refunded', async (t) => {
 
 test.serial('GET /travel/report', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.get('/api/travel/report').query({ id: travel._id })
+  const res = await agent.get('/travel/report').query({ id: travel._id })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -263,7 +263,7 @@ test.serial('GET /travel/report', async (t) => {
 
 test.after.always('DELETE /travel', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.delete('/api/travel').query({ id: travel._id })
+  const res = await agent.delete('/travel').query({ id: travel._id })
   if (res.status === 200) {
     t.pass()
   } else {

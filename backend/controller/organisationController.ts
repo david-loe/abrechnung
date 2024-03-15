@@ -4,7 +4,7 @@ import Organisation from '../models/organisation.js'
 import { Organisation as IOrganisation, _id } from '../../common/types.js'
 
 @Tags('Organisation')
-@Route('api/organisation')
+@Route('organisation')
 @Security('cookieAuth', ['user'])
 export class OrganisationController extends Controller {
   @Get()
@@ -14,7 +14,7 @@ export class OrganisationController extends Controller {
 }
 
 @Tags('Admin', 'Organisation')
-@Route('api/admin/organisation')
+@Route('admin/organisation')
 @Security('cookieAuth', ['admin'])
 export class OrganisationAdminController extends Controller {
   @Get()

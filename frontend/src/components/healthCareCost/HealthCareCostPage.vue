@@ -333,7 +333,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
     },
     async postExpense(expense: Expense) {
       var headers = {}

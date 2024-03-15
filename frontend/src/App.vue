@@ -252,7 +252,7 @@ export default defineComponent({
     async getter<T>(endpoint: string, params: any = {}, config: any = {}, showAlert = true): Promise<{ ok?: GETResponse<T>; error?: any }> {
       try {
         const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
           Object.assign(
             {
               params: params,
@@ -280,7 +280,7 @@ export default defineComponent({
     async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
-          import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint,
+          import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
           data,
           Object.assign(
             {
@@ -308,7 +308,7 @@ export default defineComponent({
         }
       }
       try {
-        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/api/' + endpoint, {
+        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/' + endpoint, {
           params: params,
           withCredentials: true
         })
@@ -347,7 +347,7 @@ export default defineComponent({
     async pushUserSettings(settings: User['settings']) {
       settings.language = this.$i18n.locale as Locale
       try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/user/settings', settings, {
+        await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true
         })
       } catch (error: any) {

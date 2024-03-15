@@ -272,7 +272,7 @@ export default defineComponent({
       }
     },
     reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/api/' + this.endpointPrefix + 'expenseReport/report?_id=' + this.expenseReport._id
+      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'expenseReport/report?_id=' + this.expenseReport._id
     },
     async postExpense(expense: Expense) {
       var headers = {}
