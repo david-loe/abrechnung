@@ -59,5 +59,10 @@
   "allowTravelApplicationForThePast": false,
   "vehicleRegistrationWhenUsingOwnCar": "optional",
   "uploadTokenExpireAfterSeconds": 600,
+  "disableReportType": {
+    "travel": false,
+    "expenseReport": false,
+    "healthCareCost": false
+  },
   "version": "0.3.9"
 }

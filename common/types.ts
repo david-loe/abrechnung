@@ -25,6 +25,7 @@ export interface Settings {
   uploadTokenExpireAfterSeconds: number
   allowTravelApplicationForThePast: boolean
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
+  disableReportType: { [key in ReportType]: boolean }
   version: string
   /**
    * @Hidden
@@ -331,6 +332,9 @@ export type DistanceRefundType = (typeof distanceRefundTypes)[number]
 
 export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
+
+export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
+export type ReportType = (typeof reportTypes)[number]
 
 export const accesses = [
   'user',

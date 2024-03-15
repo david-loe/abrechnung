@@ -13,7 +13,7 @@
         </option>
       </select>
     </div>
-    <div class="mb-3">
+    <div class="mb-3" v-if="!$root.settings.disableReportType.healthCareCost">
       <label for="userSettingsFormInsurance" class="form-label me-2">
         {{ $t('labels.insurance') }}<span class="text-danger">*</span>
       </label>
@@ -39,9 +39,9 @@ import { defineComponent, PropType } from 'vue'
 import { User } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
 
-const defaultSettings: { insurance: null | string; organisation: null | string } = {
-  insurance: null,
-  organisation: null
+const defaultSettings: { insurance: undefined | string; organisation: undefined | string } = {
+  insurance: undefined,
+  organisation: undefined
 }
 export default defineComponent({
   name: 'UserSettingsForm',
