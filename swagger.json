@@ -2316,30 +2316,6 @@
 					},
 					"advance": {
 						"properties": {
-							"exchangeRate": {
-								"properties": {
-									"rate": {
-										"type": "number",
-										"format": "double"
-									},
-									"amount": {
-										"type": "number",
-										"format": "double"
-									},
-									"date": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "string",
-												"format": "date-time"
-											}
-										]
-									}
-								},
-								"type": "object"
-							},
 							"amount": {
 								"type": "number",
 								"format": "double"
@@ -2533,30 +2509,6 @@
 								},
 								"type": "array"
 							},
-							"exchangeRate": {
-								"properties": {
-									"rate": {
-										"type": "number",
-										"format": "double"
-									},
-									"amount": {
-										"type": "number",
-										"format": "double"
-									},
-									"date": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "string",
-												"format": "date-time"
-											}
-										]
-									}
-								},
-								"type": "object"
-							},
 							"amount": {
 								"type": "number",
 								"format": "double"
@@ -2636,30 +2588,6 @@
 									"type": "object"
 								},
 								"type": "array"
-							},
-							"exchangeRate": {
-								"properties": {
-									"rate": {
-										"type": "number",
-										"format": "double"
-									},
-									"amount": {
-										"type": "number",
-										"format": "double"
-									},
-									"date": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "string",
-												"format": "date-time"
-											}
-										]
-									}
-								},
-								"type": "object"
 							},
 							"amount": {
 								"type": "number",
@@ -2972,10 +2900,6 @@
 			},
 			"Pick_Money.Exclude_keyofMoney.currency__": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double"
-					},
 					"exchangeRate": {
 						"properties": {
 							"amount": {
@@ -3004,6 +2928,10 @@
 							"date"
 						],
 						"type": "object"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
@@ -3014,11 +2942,6 @@
 			},
 			"MoneyPost": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
 					"exchangeRate": {
 						"properties": {
 							"amount": {
@@ -3032,11 +2955,11 @@
 							"date": {
 								"anyOf": [
 									{
-										"type": "string",
-										"format": "date-time"
+										"type": "string"
 									},
 									{
-										"type": "string"
+										"type": "string",
+										"format": "date-time"
 									}
 								]
 							}
@@ -3046,7 +2969,11 @@
 							"rate",
 							"date"
 						],
-						"type": "object",
+						"type": "object"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double",
 						"nullable": true
 					},
 					"currency": {
@@ -3062,13 +2989,12 @@
 				},
 				"required": [
 					"amount",
-					"currency",
-					"exchangeRate"
+					"currency"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_Omit_TravelSimple.state-or-comments-or-comment-or-progress-or-advance_.NoPost_": {
+			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance_.NoPost_": {
 				"properties": {
 					"fellowTravelersNames": {
 						"type": "string"
@@ -4386,30 +4312,6 @@
 								},
 								"type": "array"
 							},
-							"exchangeRate": {
-								"properties": {
-									"rate": {
-										"type": "number",
-										"format": "double"
-									},
-									"amount": {
-										"type": "number",
-										"format": "double"
-									},
-									"date": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "string",
-												"format": "date-time"
-											}
-										]
-									}
-								},
-								"type": "object"
-							},
 							"amount": {
 								"type": "number",
 								"format": "double"
@@ -4470,11 +4372,6 @@
 			},
 			"MoneyPlusPost": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
 					"exchangeRate": {
 						"properties": {
 							"amount": {
@@ -4488,11 +4385,11 @@
 							"date": {
 								"anyOf": [
 									{
-										"type": "string",
-										"format": "date-time"
+										"type": "string"
 									},
 									{
-										"type": "string"
+										"type": "string",
+										"format": "date-time"
 									}
 								]
 							}
@@ -4502,7 +4399,11 @@
 							"rate",
 							"date"
 						],
-						"type": "object",
+						"type": "object"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double",
 						"nullable": true
 					},
 					"currency": {
@@ -4528,8 +4429,7 @@
 				},
 				"required": [
 					"amount",
-					"currency",
-					"exchangeRate"
+					"currency"
 				],
 				"type": "object",
 				"additionalProperties": false
