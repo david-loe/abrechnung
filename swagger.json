@@ -7129,6 +7129,55 @@
 					}
 				]
 			},
+			"post": {
+				"operationId": "PostTravel",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_TravelPost_"
+							}
+						}
+					}
+				}
+			},
 			"delete": {
 				"operationId": "DeleteTravel",
 				"responses": {
@@ -7227,6 +7276,122 @@
 			},
 			"delete": {
 				"operationId": "DeleteExpenese",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/api/examine/travel/stage": {
+			"post": {
+				"operationId": "PostStage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Examine",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_Stage_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteStage",
 				"responses": {
 					"200": {
 						"description": "Ok",
