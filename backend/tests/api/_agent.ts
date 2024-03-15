@@ -1,6 +1,7 @@
 import request from 'supertest'
 import app from '../../app.js'
 import { User } from '../../../common/types.js'
+import { Base64 } from '../../helper.js'
 
 const users = {
   user: { username: 'fry', password: 'fry', access: { user: true } },
@@ -15,7 +16,9 @@ const users = {
 }
 
 async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
-  const res = await agent.get('/admin/user').query({ 'fk.ldapauth': users[userKey].username })
+  const res = await agent
+    .get('/admin/user')
+    .query({ filterJSON: Base64.encode(JSON.stringify({ 'fk.ldapauth': users[userKey].username })) })
   var userId = undefined
   if (res.body.data.length > 0) {
     userId = (res.body.data as User[])[0]._id

@@ -129,7 +129,7 @@ test.serial('POST /examine/expenseReport/refunded', async (t) => {
 
 test.serial('GET /expenseReport/report', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.get('/expenseReport/report').query({ id: expenseReport._id })
+  const res = await agent.get('/expenseReport/report').query({ _id: expenseReport._id })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -139,7 +139,7 @@ test.serial('GET /expenseReport/report', async (t) => {
 
 test.after.always('DELETE /expenseReport', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.delete('/expenseReport').query({ id: expenseReport._id })
+  const res = await agent.delete('/expenseReport').query({ _id: expenseReport._id })
   if (res.status === 200) {
     t.pass()
   } else {

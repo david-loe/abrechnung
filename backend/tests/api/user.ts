@@ -88,6 +88,6 @@ test('POST /user/vehicleRegistration', async (t) => {
   } else {
     console.log(res.body)
   }
-  const res2 = await agent.get('/documentFile').query({ id: (res.body.result as User).vehicleRegistration![0]._id })
+  const res2 = await agent.get('/documentFile').query({ _id: (res.body.result as User).vehicleRegistration![0]._id })
   t.is(res2.status, 200, 'GET /documentFile')
 })

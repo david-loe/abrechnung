@@ -141,7 +141,7 @@ test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t
 test.serial('GET /healthCareCost/report', async (t) => {
   t.timeout(20000) // 20 seconds
   await loginUser(agent, 'user')
-  const res = await agent.get('/healthCareCost/report').query({ id: healthCareCost._id })
+  const res = await agent.get('/healthCareCost/report').query({ _id: healthCareCost._id })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -151,7 +151,7 @@ test.serial('GET /healthCareCost/report', async (t) => {
 
 test.after.always('DELETE /healthCareCost', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.delete('/healthCareCost').query({ id: healthCareCost._id })
+  const res = await agent.delete('/healthCareCost').query({ _id: healthCareCost._id })
   if (res.status === 200) {
     t.pass()
   } else {

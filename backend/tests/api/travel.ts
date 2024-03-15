@@ -253,7 +253,7 @@ test.serial('POST /examine/travel/refunded', async (t) => {
 
 test.serial('GET /travel/report', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.get('/travel/report').query({ id: travel._id })
+  const res = await agent.get('/travel/report').query({ _id: travel._id })
   if (res.status === 200) {
     t.pass()
   } else {
@@ -263,7 +263,7 @@ test.serial('GET /travel/report', async (t) => {
 
 test.after.always('DELETE /travel', async (t) => {
   await loginUser(agent, 'user')
-  const res = await agent.delete('/travel').query({ id: travel._id })
+  const res = await agent.delete('/travel').query({ _id: travel._id })
   if (res.status === 200) {
     t.pass()
   } else {
