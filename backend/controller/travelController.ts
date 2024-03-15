@@ -345,7 +345,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Post('refunded')
-  public async postUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user?._id })
 
     const cb = async (travel: ITravel) => {

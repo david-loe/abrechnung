@@ -1,17 +1,16 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query, Request, Middlewares, Produces } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
-import Organisation from '../models/organisation.js'
-import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
-import { IdDocument } from './types.js'
 import i18n from '../i18n.js'
 import { sendExpenseReportNotificationMail } from '../mail/mail.js'
-import { generateExpenseReportReport } from '../pdf/expenseReport.js'
+import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
+import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { IdDocument } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -199,7 +198,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Post('refunded')
-  public async postUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user?._id })
 
     const cb = async (expenseReport: IExpenseReport) => {

@@ -199,7 +199,7 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Post('underExaminationByInsurance')
-  public async postUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postUnderExaminationByInsurance(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'underExaminationByInsurance' as HealthCareCostState,
       editor: request.user?._id
@@ -267,10 +267,7 @@ export class HealthCareCostConfirmController extends Controller {
 
   @Post('refunded')
   @Middlewares(fileHandler.any())
-  public async postUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string; refundSum: MoneyPlusPost },
-    @Request() request: ExRequest
-  ) {
+  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string; refundSum: MoneyPlusPost }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'refunded' as HealthCareCostState,
       editor: request.user?._id
