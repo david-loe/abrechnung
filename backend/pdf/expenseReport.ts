@@ -127,7 +127,7 @@ function drawExpenses(
     return options.yStart
   }
   const columns: Column[] = []
-  columns.push({ key: 'description', width: 400, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
+  columns.push({ key: 'description', width: 300, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({
     key: 'cost',
     width: 160,

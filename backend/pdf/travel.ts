@@ -137,11 +137,11 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   if (travel.professionalShare !== 1) {
     text = text + '    ' + i18n.t('labels.professionalShare') + ': ' + Math.round(travel.professionalShare! * 100) + '%'
   }
-
+  const lastPlace = { country: travel.lastPlaceOfWork.country, place: travel.lastPlaceOfWork.special }
   var y = y - opts.fontSize * 1.5
   drawPlace(
     page,
-    travel.lastPlaceOfWork,
+    lastPlace,
     Object.assign(opts, {
       yStart: y,
       prefix: text + '    ' + i18n.t('labels.lastPlaceOfWork') + ': '
