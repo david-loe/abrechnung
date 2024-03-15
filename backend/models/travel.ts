@@ -20,7 +20,8 @@ import {
   travelStates,
   lumpsumTypes,
   distanceRefundTypes,
-  Place
+  Place,
+  baseCurrency
 } from '../../common/types.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -83,7 +84,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     travelInsideOfEU: { type: Boolean, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    advance: costObject(true, false, false, settings.baseCurrency._id),
+    advance: costObject(true, false, false, baseCurrency._id),
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
     lastPlaceOfWork: place(true, false),
@@ -384,7 +385,7 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
               ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
               100
           ) / 100,
-        currency: settings.baseCurrency
+        currency: baseCurrency
       }
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount! *= 2
@@ -422,7 +423,7 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
                 (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
                 100
             ) / 100,
-          currency: settings.baseCurrency
+          currency: baseCurrency
         }
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount! *= 2
@@ -436,7 +437,7 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
 async function exchange(costObject: Money, date: string | number | Date) {
   var exchangeRate = null
 
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== settings.baseCurrency._id) {
+  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
     exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate
@@ -499,7 +500,7 @@ travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
       if (stage.transport.distance && stage.transport.distanceRefundType) {
         stage.cost = Object.assign(stage.cost, {
           amount: Math.round(stage.transport.distance * settings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
-          currency: settings.baseCurrency
+          currency: baseCurrency
         })
       }
     }

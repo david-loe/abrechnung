@@ -1,9 +1,13 @@
 import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
-import Settings from './settings.js'
 import { costObject, convertCurrency } from '../helper.js'
-import { Money, Currency as ICurrency, HealthCareCost, HealthCareCostComment, healthCareCostStates } from '../../common/types.js'
-
-const settings = (await Settings.findOne().lean())!
+import {
+  Money,
+  Currency as ICurrency,
+  HealthCareCost,
+  HealthCareCostComment,
+  healthCareCostStates,
+  baseCurrency
+} from '../../common/types.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -26,7 +30,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
       enum: healthCareCostStates,
       default: 'inWork'
     },
-    refundSum: costObject(true, true, false, settings.baseCurrency._id),
+    refundSum: costObject(true, true, false, baseCurrency._id),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
       {
@@ -94,7 +98,7 @@ healthCareCostSchema.methods.saveToHistory = async function (this: HealthCareCos
 async function exchange(costObject: Money, date: string | number | Date) {
   var exchangeRate = null
 
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== settings.baseCurrency._id) {
+  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
     exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate

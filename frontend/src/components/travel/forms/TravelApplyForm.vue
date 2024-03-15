@@ -117,7 +117,7 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { TravelSimple, Place } from '../../../../../common/types.js'
+import { TravelSimple, baseCurrency } from '../../../../../common/types.js'
 import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 
 export default defineComponent({
@@ -152,7 +152,7 @@ export default defineComponent({
         claimSpouseRefund: false,
         advance: {
           amount: null,
-          currency: this.$root.settings.baseCurrency
+          currency: baseCurrency
         }
       }
     },

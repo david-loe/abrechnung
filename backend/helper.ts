@@ -1,10 +1,9 @@
 import i18n from './i18n.js'
 import DocumentFile from './models/documentFile.js'
-import Settings from './models/settings.js'
 import axios from 'axios'
 import { Model, Types, Schema, SchemaTypeOptions } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
-import { Access, ExchangeRate as ExchangeRateI, GETResponse, Meta, SETResponse } from '../common/types.js'
+import { Access, ExchangeRate as ExchangeRateI, GETResponse, Meta, SETResponse, baseCurrency } from '../common/types.js'
 import { log } from '../common/logger.js'
 import ExchangeRate from './models/exchangeRate.js'
 
@@ -202,8 +201,6 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
   return str
 }
 
-const settings = (await Settings.findOne().lean())!
-
 type InforEuroResponse = Array<{
   country: string
   currency: string
@@ -217,7 +214,7 @@ export async function convertCurrency(
   date: Date | string | number,
   amount: number,
   from: string,
-  to: string = settings.baseCurrency._id
+  to: string = baseCurrency._id
 ): Promise<{ date: Date; rate: number; amount: number } | null> {
   if (from === to) {
     return null

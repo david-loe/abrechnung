@@ -8,19 +8,18 @@ export type _id = Types.ObjectId
 export interface Settings {
   accessIcons: { [key in Access]: string[] }
   allowSpouseRefund: boolean
-  baseCurrency: Currency
   breakfastCateringLumpSumCut: number
   lunchCateringLumpSumCut: number
   dinnerCateringLumpSumCut: number
   factorCateringLumpSum: number
-  factorCateringLumpSumExceptions: string[]
+  factorCateringLumpSumExceptions: CountryCode[]
   factorOvernightLumpSum: number
-  factorOvernightLumpSumExceptions: string[]
-  fallBackLumpSumCountry: string
+  factorOvernightLumpSumExceptions: CountryCode[]
+  fallBackLumpSumCountry: CountryCode
   maxTravelDayCount: number
   distanceRefunds: { [key in DistanceRefundType]: number }
-  secoundNightOnAirplaneLumpSumCountry: string
-  secoundNightOnShipOrFerryLumpSumCountry: string
+  secoundNightOnAirplaneLumpSumCountry: CountryCode
+  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
   stateColors: { [key in AnyState]: { color: string; text: string } }
   toleranceStageDatesToApprovedTravelDates: number
   uploadTokenExpireAfterSeconds: number
@@ -380,4 +379,15 @@ export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCa
 
 export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport {
   return !reportIsTravel(report) && !reportIsHealthCareCost(report)
+}
+
+export const baseCurrency: Currency = {
+  _id: 'EUR',
+  flag: '🇪🇺',
+  name: {
+    de: 'Euro',
+    en: 'euro'
+  },
+  subunit: 'Cent',
+  symbol: '€'
 }

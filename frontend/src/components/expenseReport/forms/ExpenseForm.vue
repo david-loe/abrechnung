@@ -57,7 +57,7 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import DateInput from '../../elements/DateInput.vue'
-import { Expense } from '../../../../../common/types.js'
+import { Expense, baseCurrency } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'ExpenseForm',
@@ -86,7 +86,7 @@ export default defineComponent({
         description: '',
         cost: {
           amount: null,
-          currency: this.$root.settings.baseCurrency,
+          currency: baseCurrency,
           receipts: [],
           date: ''
         }

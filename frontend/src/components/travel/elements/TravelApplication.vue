@@ -21,7 +21,6 @@
             <span>
               {{ getMoneyString(travel.advance) }}
             </span>
-            <!-- baseCurrency -->
             <span v-if="travel.advance.exchangeRate" class="text-secondary">
               &nbsp;-&nbsp;
               {{ getMoneyString(travel.advance, false) }}

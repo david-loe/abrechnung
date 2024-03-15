@@ -87,7 +87,7 @@
               ' (' +
               $root.settings.distanceRefunds[distanceRefundType] +
               ' ' +
-              ($root.settings.baseCurrency.symbol ? $root.settings.baseCurrency.symbol : $root.settings.baseCurrency._id) +
+              baseCurrency.symbol +
               '/km)'
             }}
           </option>
@@ -204,7 +204,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import DateInput from '../../elements/DateInput.vue'
 import { getDayList, datetoDateString, datetimeToDateString } from '../../../../../common/scripts.js'
-import { distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
+import { distanceRefundTypes, DocumentFile, Place, Stage, transportTypes, baseCurrency } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'StageForm',
@@ -232,7 +232,8 @@ export default defineComponent({
       loading: false,
       vehicleRegistrationChanged: false,
       transportTypes,
-      distanceRefundTypes
+      distanceRefundTypes,
+      baseCurrency
     }
   },
   methods: {
@@ -246,7 +247,7 @@ export default defineComponent({
         transport: { type: 'otherTransport', distance: null, distanceRefundType: distanceRefundTypes[0] },
         cost: {
           amount: null,
-          currency: this.$root.settings.baseCurrency,
+          currency: baseCurrency,
           receipts: [],
           date: ''
         },

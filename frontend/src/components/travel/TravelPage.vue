@@ -375,7 +375,6 @@
                         <ProgressCircle :progress="travel.progress"></ProgressCircle>
                       </td>
                     </tr>
-                    <!-- baseCurrency -->
                     <tr>
                       <td>
                         <small>

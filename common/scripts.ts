@@ -1,18 +1,4 @@
-import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel } from './types.js'
-
-// TODO: Resolve this to settings from DB
-const settings = {
-  baseCurrency: {
-    _id: 'EUR',
-    flag: '🇪🇺',
-    name: {
-      de: 'Euro',
-      en: 'euro'
-    },
-    subunit: 'Cent',
-    symbol: '€'
-  }
-}
+import { ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency } from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -139,12 +125,12 @@ export function getMoneyString(
   var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
   if (useExchangeRate && money.exchangeRate) {
     amount = money.exchangeRate.amount
-    currency = settings.baseCurrency._id
+    currency = baseCurrency._id
   } else {
     if (money.amount !== null) {
       amount = money.amount
     }
-    if (useExchangeRate && !money.exchangeRate && currency !== settings.baseCurrency._id) {
+    if (useExchangeRate && !money.exchangeRate && currency !== baseCurrency._id) {
       warning = true
     }
   }
@@ -170,7 +156,7 @@ export function getDetailedMoneyString(money: Money, locale: Locale, printZero =
       str +
       money.exchangeRate.amount.toLocaleString(locale, {
         style: 'currency',
-        currency: settings.baseCurrency._id
+        currency: baseCurrency._id
       })
   }
   return str
@@ -227,7 +213,7 @@ export function getLumpSumsSum(travel: Travel): Money {
       }
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 function getBaseCurrencyAmount(a: Money): number {
@@ -235,7 +221,7 @@ function getBaseCurrencyAmount(a: Money): number {
   if (a.amount !== null) {
     if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
       amount += a.exchangeRate.amount
-    } else if (a.currency._id == settings.baseCurrency._id) {
+    } else if (a.currency._id == baseCurrency._id) {
       amount += a.amount
     }
   }
@@ -262,7 +248,7 @@ export function getExpensesSum(travel: Travel): Money {
       sum += add
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 export function getTravelTotal(travel: Travel): Money {
@@ -270,7 +256,7 @@ export function getTravelTotal(travel: Travel): Money {
   if (travel.advance && travel.advance.amount != null) {
     advance = getBaseCurrencyAmount(travel.advance)
   }
-  return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: settings.baseCurrency }
+  return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: baseCurrency }
 }
 
 export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
@@ -280,7 +266,7 @@ export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
       sum += getBaseCurrencyAmount(expense.cost)
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
@@ -290,7 +276,7 @@ export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
       sum += getBaseCurrencyAmount(expense.cost)
     }
   }
-  return { amount: sum, currency: settings.baseCurrency }
+  return { amount: sum, currency: baseCurrency }
 }
 
 // From https://stackoverflow.com/a/52983833/13582326

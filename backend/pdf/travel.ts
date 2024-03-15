@@ -24,7 +24,8 @@ import {
   PurposeSimple,
   Refund,
   Transport,
-  TravelDay
+  TravelDay,
+  baseCurrency
 } from '../../common/types.js'
 import {
   Column,
@@ -242,7 +243,7 @@ async function drawStages(
           ' (' +
           settings.distanceRefunds[t.distanceRefundType] +
           ' ' +
-          (settings.baseCurrency.symbol ? settings.baseCurrency.symbol : settings.baseCurrency._id) +
+          baseCurrency.symbol +
           '/km)'
         : i18n.t('labels.' + t.type)
   })

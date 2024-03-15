@@ -40,7 +40,6 @@ for (const refund of distanceRefundTypes) {
 const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
-  baseCurrency: { type: String, ref: 'Currency', required: true },
   breakfastCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   dinnerCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
@@ -60,14 +59,6 @@ const settingsSchema = new Schema<Settings>({
   vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
   version: { type: String, required: true },
   migrateFrom: { type: String }
-})
-
-function populate(doc: Document) {
-  return Promise.allSettled([doc.populate({ path: 'baseCurrency' })])
-}
-
-settingsSchema.pre(/^find((?!Update).)*$/, function (this: HydratedDocument<SettingsSchema>) {
-  populate(this)
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
