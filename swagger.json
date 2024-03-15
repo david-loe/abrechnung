@@ -5552,7 +5552,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/api/user": {
+		"/user": {
 			"get": {
 				"operationId": "GetMe",
 				"responses": {
@@ -5588,7 +5588,7 @@
 				"parameters": []
 			}
 		},
-		"/api/user/token": {
+		"/user/token": {
 			"get": {
 				"operationId": "GetToken",
 				"responses": {
@@ -5726,7 +5726,7 @@
 				"parameters": []
 			}
 		},
-		"/api/user/settings": {
+		"/user/settings": {
 			"post": {
 				"operationId": "PostSettings",
 				"responses": {
@@ -5774,7 +5774,7 @@
 				}
 			}
 		},
-		"/api/user/vehicleRegistration": {
+		"/user/vehicleRegistration": {
 			"post": {
 				"operationId": "PostVehicleRegistration",
 				"responses": {
@@ -5833,7 +5833,7 @@
 				}
 			}
 		},
-		"/api/users": {
+		"/users": {
 			"get": {
 				"operationId": "GetUsers",
 				"responses": {
@@ -5946,7 +5946,7 @@
 				]
 			}
 		},
-		"/api/admin/user": {
+		"/admin/user": {
 			"get": {
 				"operationId": "GetUser",
 				"responses": {
@@ -6203,7 +6203,7 @@
 				}
 			}
 		},
-		"/api/travel": {
+		"/travel": {
 			"get": {
 				"operationId": "GetTravel",
 				"responses": {
@@ -6393,7 +6393,7 @@
 				}
 			}
 		},
-		"/api/travel/expense": {
+		"/travel/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -6507,7 +6507,7 @@
 				]
 			}
 		},
-		"/api/travel/stage": {
+		"/travel/stage": {
 			"post": {
 				"operationId": "PostStage",
 				"responses": {
@@ -6621,7 +6621,7 @@
 				]
 			}
 		},
-		"/api/travel/appliedFor": {
+		"/travel/appliedFor": {
 			"post": {
 				"operationId": "PostInWork",
 				"responses": {
@@ -6671,7 +6671,7 @@
 				}
 			}
 		},
-		"/api/travel/underExamination": {
+		"/travel/underExamination": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -6732,7 +6732,7 @@
 				}
 			}
 		},
-		"/api/travel/report": {
+		"/travel/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -6762,7 +6762,7 @@
 				]
 			}
 		},
-		"/api/travel/examiner": {
+		"/travel/examiner": {
 			"get": {
 				"operationId": "GetExaminer",
 				"responses": {
@@ -6790,7 +6790,7 @@
 				"parameters": []
 			}
 		},
-		"/api/approve/travel": {
+		"/approve/travel": {
 			"get": {
 				"operationId": "GetTravel",
 				"responses": {
@@ -6898,7 +6898,7 @@
 				]
 			}
 		},
-		"/api/approve/travel/approved": {
+		"/approve/travel/approved": {
 			"post": {
 				"operationId": "PostApproved",
 				"responses": {
@@ -6960,7 +6960,7 @@
 				}
 			}
 		},
-		"/api/approve/travel/rejected": {
+		"/approve/travel/rejected": {
 			"post": {
 				"operationId": "PostRejected",
 				"responses": {
@@ -7022,7 +7022,7 @@
 				}
 			}
 		},
-		"/api/examine/travel": {
+		"/examine/travel": {
 			"get": {
 				"operationId": "GetTravel",
 				"responses": {
@@ -7215,7 +7215,7 @@
 				]
 			}
 		},
-		"/api/examine/travel/expense": {
+		"/examine/travel/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -7331,7 +7331,7 @@
 				]
 			}
 		},
-		"/api/examine/travel/stage": {
+		"/examine/travel/stage": {
 			"post": {
 				"operationId": "PostStage",
 				"responses": {
@@ -7447,7 +7447,7 @@
 				]
 			}
 		},
-		"/api/examine/travel/refunded": {
+		"/examine/travel/refunded": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -7509,7 +7509,7 @@
 				}
 			}
 		},
-		"/api/examine/travel/report": {
+		"/examine/travel/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -7540,7 +7540,7 @@
 				]
 			}
 		},
-		"/api/settings": {
+		"/settings": {
 			"get": {
 				"operationId": "GetSettings",
 				"responses": {
@@ -7576,7 +7576,7 @@
 				"parameters": []
 			}
 		},
-		"/api/admin/settings": {
+		"/admin/settings": {
 			"post": {
 				"operationId": "PostUser",
 				"responses": {
@@ -7627,7 +7627,7 @@
 				}
 			}
 		},
-		"/api/organisation": {
+		"/organisation": {
 			"get": {
 				"operationId": "GetOrganisation",
 				"responses": {
@@ -7711,7 +7711,7 @@
 				]
 			}
 		},
-		"/api/admin/organisation": {
+		"/admin/organisation": {
 			"get": {
 				"operationId": "GetOrganisation",
 				"responses": {
@@ -7881,7 +7881,7 @@
 				]
 			}
 		},
-		"/api/healthInsurance": {
+		"/healthInsurance": {
 			"get": {
 				"operationId": "GetHealthInsurance",
 				"responses": {
@@ -7963,7 +7963,7 @@
 				]
 			}
 		},
-		"/api/admin/healthInsurance": {
+		"/admin/healthInsurance": {
 			"post": {
 				"operationId": "PostHealthInsurance",
 				"responses": {
@@ -8050,7 +8050,7 @@
 				]
 			}
 		},
-		"/api/healthCareCost": {
+		"/healthCareCost": {
 			"get": {
 				"operationId": "GetHealthCareCost",
 				"responses": {
@@ -8181,7 +8181,7 @@
 				]
 			}
 		},
-		"/api/healthCareCost/expense": {
+		"/healthCareCost/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -8295,7 +8295,7 @@
 				]
 			}
 		},
-		"/api/healthCareCost/inWork": {
+		"/healthCareCost/inWork": {
 			"post": {
 				"operationId": "PostInWork",
 				"responses": {
@@ -8367,7 +8367,7 @@
 				}
 			}
 		},
-		"/api/healthCareCost/underExamination": {
+		"/healthCareCost/underExamination": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -8428,7 +8428,7 @@
 				}
 			}
 		},
-		"/api/healthCareCost/report": {
+		"/healthCareCost/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -8458,7 +8458,7 @@
 				]
 			}
 		},
-		"/api/healthCareCost/examiner": {
+		"/healthCareCost/examiner": {
 			"get": {
 				"operationId": "GetExaminer",
 				"responses": {
@@ -8486,7 +8486,7 @@
 				"parameters": []
 			}
 		},
-		"/api/examine/healthCareCost": {
+		"/examine/healthCareCost": {
 			"get": {
 				"operationId": "GetHealthCareCost",
 				"responses": {
@@ -8619,7 +8619,7 @@
 				]
 			}
 		},
-		"/api/examine/healthCareCost/expense": {
+		"/examine/healthCareCost/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -8735,7 +8735,7 @@
 				]
 			}
 		},
-		"/api/examine/healthCareCost/underExaminationByInsurance": {
+		"/examine/healthCareCost/underExaminationByInsurance": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -8797,7 +8797,7 @@
 				}
 			}
 		},
-		"/api/examine/healthCareCost/report": {
+		"/examine/healthCareCost/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -8828,7 +8828,7 @@
 				]
 			}
 		},
-		"/api/examine/healthCareCost/organisation": {
+		"/examine/healthCareCost/organisation": {
 			"get": {
 				"operationId": "GetOrganisation",
 				"responses": {
@@ -8913,7 +8913,7 @@
 				]
 			}
 		},
-		"/api/confirm/healthCareCost": {
+		"/confirm/healthCareCost": {
 			"get": {
 				"operationId": "GetHealthCareCost",
 				"responses": {
@@ -9010,7 +9010,7 @@
 				]
 			}
 		},
-		"/api/confirm/healthCareCost/refunded": {
+		"/confirm/healthCareCost/refunded": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -9076,7 +9076,7 @@
 				}
 			}
 		},
-		"/api/confirm/healthCareCost/report": {
+		"/confirm/healthCareCost/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -9107,7 +9107,7 @@
 				]
 			}
 		},
-		"/api/expenseReport": {
+		"/expenseReport": {
 			"get": {
 				"operationId": "GetExpenseReport",
 				"responses": {
@@ -9235,7 +9235,7 @@
 				]
 			}
 		},
-		"/api/expenseReport/expense": {
+		"/expenseReport/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -9349,7 +9349,7 @@
 				]
 			}
 		},
-		"/api/expenseReport/inWork": {
+		"/expenseReport/inWork": {
 			"post": {
 				"operationId": "PostInWork",
 				"responses": {
@@ -9413,7 +9413,7 @@
 				}
 			}
 		},
-		"/api/expenseReport/underExamination": {
+		"/expenseReport/underExamination": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -9474,7 +9474,7 @@
 				}
 			}
 		},
-		"/api/expenseReport/report": {
+		"/expenseReport/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -9504,7 +9504,7 @@
 				]
 			}
 		},
-		"/api/expenseReport/examiner": {
+		"/expenseReport/examiner": {
 			"get": {
 				"operationId": "GetExaminer",
 				"responses": {
@@ -9532,7 +9532,7 @@
 				"parameters": []
 			}
 		},
-		"/api/examine/expenseReport": {
+		"/examine/expenseReport": {
 			"get": {
 				"operationId": "GetExpenseReport",
 				"responses": {
@@ -9662,7 +9662,7 @@
 				]
 			}
 		},
-		"/api/examine/expenseReport/expense": {
+		"/examine/expenseReport/expense": {
 			"post": {
 				"operationId": "PostExpense",
 				"responses": {
@@ -9778,7 +9778,7 @@
 				]
 			}
 		},
-		"/api/examine/expenseReport/refunded": {
+		"/examine/expenseReport/refunded": {
 			"post": {
 				"operationId": "PostUnderExamination",
 				"responses": {
@@ -9840,7 +9840,7 @@
 				}
 			}
 		},
-		"/api/examine/expenseReport/report": {
+		"/examine/expenseReport/report": {
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
@@ -9871,7 +9871,7 @@
 				]
 			}
 		},
-		"/api/documentFile": {
+		"/documentFile": {
 			"get": {
 				"operationId": "GetDocumentFile",
 				"responses": {
@@ -9936,7 +9936,7 @@
 				]
 			}
 		},
-		"/api/examine/documentFile": {
+		"/examine/documentFile": {
 			"get": {
 				"operationId": "GetDocumentFile",
 				"responses": {
@@ -10029,7 +10029,7 @@
 				]
 			}
 		},
-		"/api/currency": {
+		"/currency": {
 			"get": {
 				"operationId": "GetCurrency",
 				"responses": {
@@ -10113,7 +10113,7 @@
 				]
 			}
 		},
-		"/api/admin/currency": {
+		"/admin/currency": {
 			"post": {
 				"operationId": "PostCurrency",
 				"responses": {
@@ -10200,7 +10200,7 @@
 				]
 			}
 		},
-		"/api/country": {
+		"/country": {
 			"get": {
 				"operationId": "GetCountry",
 				"responses": {
@@ -10286,7 +10286,7 @@
 				]
 			}
 		},
-		"/api/specialLumpSums": {
+		"/specialLumpSums": {
 			"get": {
 				"operationId": "GetSpecialLumpSums",
 				"responses": {
@@ -10329,7 +10329,7 @@
 				"parameters": []
 			}
 		},
-		"/api/admin/country": {
+		"/admin/country": {
 			"post": {
 				"operationId": "PostCountry",
 				"responses": {
