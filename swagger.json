@@ -7144,7 +7144,7 @@
 		},
 		"/examine/travel/refunded": {
 			"post": {
-				"operationId": "PostUnderExamination",
+				"operationId": "PostRefunded",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -8432,7 +8432,7 @@
 		},
 		"/examine/healthCareCost/underExaminationByInsurance": {
 			"post": {
-				"operationId": "PostUnderExamination",
+				"operationId": "PostUnderExaminationByInsurance",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -8707,7 +8707,7 @@
 		},
 		"/confirm/healthCareCost/refunded": {
 			"post": {
-				"operationId": "PostUnderExamination",
+				"operationId": "PostRefunded",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -9475,7 +9475,7 @@
 		},
 		"/examine/expenseReport/refunded": {
 			"post": {
-				"operationId": "PostUnderExamination",
+				"operationId": "PostRefunded",
 				"responses": {
 					"200": {
 						"description": "Ok",
