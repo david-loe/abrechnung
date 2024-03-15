@@ -2990,8 +2990,7 @@
 				},
 				"required": [
 					"amount",
-					"currency",
-					"exchangeRate"
+					"currency"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4432,8 +4431,7 @@
 				},
 				"required": [
 					"amount",
-					"currency",
-					"exchangeRate"
+					"currency"
 				],
 				"type": "object",
 				"additionalProperties": false
