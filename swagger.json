@@ -3431,6 +3431,25 @@
 							"none"
 						]
 					},
+					"disableReportType": {
+						"properties": {
+							"travel": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"healthCareCost": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost"
+						],
+						"type": "object"
+					},
 					"version": {
 						"type": "string"
 					},
@@ -3462,6 +3481,7 @@
 					"uploadTokenExpireAfterSeconds",
 					"allowTravelApplicationForThePast",
 					"vehicleRegistrationWhenUsingOwnCar",
+					"disableReportType",
 					"version",
 					"_id"
 				],
@@ -3475,6 +3495,20 @@
 					},
 					"version": {
 						"type": "string"
+					},
+					"disableReportType": {
+						"properties": {
+							"healthCareCost": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"travel": {
+								"type": "boolean"
+							}
+						},
+						"type": "object"
 					},
 					"vehicleRegistrationWhenUsingOwnCar": {
 						"type": "string",
