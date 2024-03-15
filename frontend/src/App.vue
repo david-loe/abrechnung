@@ -149,24 +149,24 @@
 
 <script lang="ts">
 import axios, { AxiosRequestConfig } from 'axios'
-import { defineComponent } from 'vue'
 import { Modal } from 'bootstrap'
+import { defineComponent } from 'vue'
+import { log } from '../../common/logger.js'
+import { getFlagEmoji } from '../../common/scripts.js'
 import {
   CountrySimple,
   Currency,
+  GETResponse,
+  HealthInsurance,
   Locale,
+  OrganisationSimple,
+  SETResponse,
+  Settings,
   User,
   accesses,
-  locales,
-  Settings,
-  HealthInsurance,
-  OrganisationSimple,
-  GETResponse,
-  SETResponse
+  locales
 } from '../../common/types.js'
-import { log } from '../../common/logger.js'
 import UserSettingsForm from './components/settings/forms/UserSettingsForm.vue'
-import { getFlagEmoji } from '../../common/scripts.js'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -381,7 +381,10 @@ export default defineComponent({
       this.pushUserSettings(this.user.settings)
     },
     checkUserSettings(settings: User['settings']) {
-      if (!settings.insurance || (this.organisations.length > 0 && !settings.organisation)) {
+      if (
+        (!this.settings.disableReportType.healthCareCost && !settings.insurance) ||
+        (this.organisations.length > 0 && !settings.organisation)
+      ) {
         if (this.userSettingsModal) this.userSettingsModal.show()
       } else {
         if (this.userSettingsModal) this.userSettingsModal.hide()

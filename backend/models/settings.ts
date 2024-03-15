@@ -1,19 +1,21 @@
-import '../db.js'
-import { HydratedDocument, Document, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose'
+import { InferSchemaType, Schema, model } from 'mongoose'
 import {
   Access,
-  accesses,
-  TravelState,
-  HealthCareCostState,
-  ExpenseReportState,
-  travelStates,
-  healthCareCostStates,
-  expenseReportStates,
   DistanceRefundType,
-  distanceRefundTypes,
+  ExpenseReportState,
+  HealthCareCostState,
+  ReportType,
+  Settings,
+  TravelState,
   _id,
-  Settings
+  accesses,
+  distanceRefundTypes,
+  expenseReportStates,
+  healthCareCostStates,
+  reportTypes,
+  travelStates
 } from '../../common/types.js'
+import '../db.js'
 
 const accessIcons = {} as { [key in Access]: { type: StringConstructor; required: true }[] }
 for (const access of accesses) {
@@ -37,6 +39,11 @@ for (const refund of distanceRefundTypes) {
   distanceRefunds[refund] = { type: Number, min: 0, required: true }
 }
 
+const disableReportType = {} as { [key in ReportType]: { type: BooleanConstructor; required: true } }
+for (const report of reportTypes) {
+  disableReportType[report] = { type: Boolean, required: true }
+}
+
 const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
@@ -57,6 +64,7 @@ const settingsSchema = new Schema<Settings>({
   uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
   allowTravelApplicationForThePast: { type: Boolean, required: true },
   vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
+  disableReportType: { type: disableReportType, required: true },
   version: { type: String, required: true },
   migrateFrom: { type: String }
 })

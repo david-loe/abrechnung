@@ -1,12 +1,12 @@
-import Organisation from './models/organisation.js'
-import Travel from './models/travel.js'
-import HealthCareCost from './models/healthCareCost.js'
-import ExpenseReport from './models/expenseReport.js'
-import User from './models/user.js'
-import Settings from './models/settings.js'
 import mongoose from 'mongoose'
 import { distanceRefundTypes } from '../common/types.js'
 import { initDB } from './db.js'
+import ExpenseReport from './models/expenseReport.js'
+import HealthCareCost from './models/healthCareCost.js'
+import Organisation from './models/organisation.js'
+import Settings from './models/settings.js'
+import Travel from './models/travel.js'
+import User from './models/user.js'
 
 const settings = await Settings.findOne()
 if (settings?.migrateFrom) {

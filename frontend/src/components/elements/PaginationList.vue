@@ -103,7 +103,6 @@ export default defineComponent({
         page = this.meta.page
       }
       const queryParams: any = structuredClone(this.params)
-      console.log(queryParams)
       Object.assign(queryParams.filter, this.searchFilter)
       const filterJSON = Base64.encode(JSON.stringify(queryParams.filter))
       delete queryParams.filter
