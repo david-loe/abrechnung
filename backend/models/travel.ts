@@ -104,14 +104,16 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
           type: { type: String, enum: transportTypes, required: true }
         },
         cost: costObject(true, true),
-        purpose: { type: String, enum: ['professional', 'mixed', 'private'] }
+        purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
+        note: { type: String }
       }
     ],
     expenses: [
       {
         description: { type: String, required: true },
         cost: costObject(true, true, true),
-        purpose: { type: String, enum: ['professional', 'mixed'] }
+        purpose: { type: String, enum: ['professional', 'mixed'] },
+        note: { type: String }
       }
     ],
     days: [

@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-2">
       <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
       <InfoPoint :text="$t('info.receipts')" />
       <FileUpload
@@ -30,6 +30,17 @@
         :disabled="disabled"
         :required="true"
         :endpointPrefix="endpointPrefix" />
+    </div>
+
+    <div class="mb-3">
+      <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
+      <textarea
+        type="text"
+        class="form-control form-control-sm"
+        id="travelFormDescription"
+        v-model="formExpense.note"
+        :disabled="disabled"
+        rows="1"></textarea>
     </div>
 
     <div class="mb-1">
@@ -89,7 +100,8 @@ export default defineComponent({
           currency: baseCurrency,
           receipts: [],
           date: ''
-        }
+        },
+        note: undefined
       }
     },
     clear() {

@@ -1,13 +1,13 @@
-import { Schema, Document, Model, model, HydratedDocument } from 'mongoose'
-import { costObject, convertCurrency } from '../helper.js'
+import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import {
-  Money,
-  Currency as ICurrency,
   HealthCareCost,
   HealthCareCostComment,
-  healthCareCostStates,
-  baseCurrency
+  Currency as ICurrency,
+  Money,
+  baseCurrency,
+  healthCareCostStates
 } from '../../common/types.js'
+import { convertCurrency, costObject } from '../helper.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -48,7 +48,8 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
     expenses: [
       {
         description: { type: String, required: true },
-        cost: costObject(true, true, true)
+        cost: costObject(true, true, true),
+        note: { type: String }
       }
     ]
   },

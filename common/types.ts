@@ -183,12 +183,14 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
+  note?: string | null
   _id: _id
 }
 
 export interface Expense {
   description: string
   cost: Cost
+  note?: string | null
   _id: _id
 }
 

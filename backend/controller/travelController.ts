@@ -258,8 +258,8 @@ export class TravelExamineController extends Controller {
     return await this.getter(Travel, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },
-      projection: { history: 0, historic: 0, expenses: 0 },
-      allowedAdditionalFields: ['expenses', 'stages'],
+      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sortFn
     })
   }

@@ -1,21 +1,21 @@
-import pdf_lib from 'pdf-lib'
 import fs from 'fs'
-import i18n from '../i18n.js'
-import { datetoDateStringWithYear } from '../../common/scripts.js'
-import DocumentFile from '../models/documentFile.js'
-import Organisation from '../models/organisation.js'
 import { mongo } from 'mongoose'
+import pdf_lib from 'pdf-lib'
+import { datetoDateStringWithYear } from '../../common/scripts.js'
 import {
   Cost,
+  CountrySimple,
   ExpenseReport,
   HealthCareCost,
   DocumentFile as IDocumentFile,
   Locale,
-  Place,
   Travel,
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
+import i18n from '../i18n.js'
+import DocumentFile from '../models/documentFile.js'
+import Organisation from '../models/organisation.js'
 
 export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost): Promise<string> {
   var path = '/reports/'
@@ -210,7 +210,7 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
   }
 }
 
-export async function drawPlace(page: pdf_lib.PDFPage, place: Place, options: Options) {
+export async function drawPlace(page: pdf_lib.PDFPage, place: { country: CountrySimple; place?: string }, options: Options) {
   const opts = Object.assign(
     {
       textColor: pdf_lib.rgb(0, 0, 0),
@@ -219,7 +219,11 @@ export async function drawPlace(page: pdf_lib.PDFPage, place: Place, options: Op
     options
   )
 
-  const text = opts.prefix + place.place + ', ' + place.country.name[i18n.language as Locale]
+  var text = opts.prefix
+  if (place.place) {
+    text += place.place + ', '
+  }
+  text += place.country.name[i18n.language as Locale]
   const flagX = opts.xStart + opts.font.widthOfTextAtSize(text, opts.fontSize) + opts.fontSize / 4
 
   page.drawText(text, {

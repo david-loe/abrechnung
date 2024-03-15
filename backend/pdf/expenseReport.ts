@@ -1,10 +1,10 @@
-import pdf_lib from 'pdf-lib'
-import pdf_fontkit from 'pdf-fontkit'
 import fs from 'fs'
+import pdf_fontkit from 'pdf-fontkit'
+import pdf_lib from 'pdf-lib'
+import { datetoDateStringWithYear, getDetailedMoneyString, getExpenseReportTotal } from '../../common/scripts.js'
+import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
-import { getDetailedMoneyString, datetoDateStringWithYear, getExpenseReportTotal } from '../../common/scripts.js'
-import { Cost, Locale, Money, ExpenseReport } from '../../common/types.js'
-import { Column, Options, ReceiptMap, TabelOptions, drawTable, drawLogo, attachReceipts, getReceiptMap } from './helper.js'
+import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
 
 export async function generateExpenseReportReport(expenseReport: ExpenseReport) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -127,7 +127,7 @@ function drawExpenses(
     return options.yStart
   }
   const columns: Column[] = []
-  columns.push({ key: 'description', width: 400, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
+  columns.push({ key: 'description', width: 300, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
   columns.push({
     key: 'cost',
     width: 160,
@@ -141,6 +141,12 @@ function drawExpenses(
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.invoiceDate'),
     fn: (c: Cost) => datetoDateStringWithYear(c.date)
+  })
+  columns.push({
+    key: 'note',
+    width: 130,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: i18n.t('labels.note')
   })
   columns.push({
     key: 'cost',
