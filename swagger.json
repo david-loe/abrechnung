@@ -1579,6 +1579,10 @@
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					}
@@ -1603,6 +1607,10 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost"
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -2467,6 +2475,9 @@
 			},
 			"SetterPartial_TravelExpense.NoPost_": {
 				"properties": {
+					"note": {
+						"type": "string"
+					},
 					"purpose": {
 						"type": "string",
 						"enum": [
@@ -2551,6 +2562,9 @@
 			},
 			"SetterPartial_Stage.NoPost_": {
 				"properties": {
+					"note": {
+						"type": "string"
+					},
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
@@ -3904,6 +3918,10 @@
 					"cost": {
 						"$ref": "#/components/schemas/Cost"
 					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					}
@@ -4278,6 +4296,9 @@
 			},
 			"SetterPartial_Expense.NoPost_": {
 				"properties": {
+					"note": {
+						"type": "string"
+					},
 					"cost": {
 						"properties": {
 							"receipts": {
