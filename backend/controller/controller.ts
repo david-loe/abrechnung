@@ -334,7 +334,7 @@ export class Controller extends TsoaController {
       if (requestUser._id.equals(oldObject.owner._id)) {
         return true
       } else {
-        throw new Error('alerts.request.unauthorized')
+        return false
       }
     }
   }

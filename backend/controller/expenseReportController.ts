@@ -47,7 +47,7 @@ export class ExpenseReportController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -64,7 +64,7 @@ export class ExpenseReportController extends Controller {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -174,7 +174,7 @@ export class ExpenseReportExamineController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -191,7 +191,7 @@ export class ExpenseReportExamineController extends Controller {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })

@@ -48,7 +48,7 @@ export class HealthCareCostController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -65,7 +65,7 @@ export class HealthCareCostController extends Controller {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -175,7 +175,7 @@ export class HealthCareCostExamineController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -192,7 +192,7 @@ export class HealthCareCostExamineController extends Controller {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
