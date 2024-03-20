@@ -608,12 +608,12 @@ export default defineComponent({
     },
     async postStage(stage: Stage) {
       var headers = {}
-      if (stage.cost.receipts) {
+      if (stage.cost && stage.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }
       }
-      if (!stage.cost.amount) {
+      if (!stage.cost || !stage.cost.amount) {
         //@ts-ignore
         stage.cost = undefined
       }

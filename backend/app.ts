@@ -1,17 +1,17 @@
-import './db.js'
-import './migrations.js'
-import express, { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import { ValidateError } from 'tsoa'
-import mongoose from 'mongoose'
-import cors from 'cors'
-import session from 'express-session'
 import MongoStore from 'connect-mongo'
-import i18n from './i18n.js'
+import cors from 'cors'
+import express, { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
+import session from 'express-session'
 import { MongoClient } from 'mongodb'
-import auth from './auth.js'
+import mongoose, { Error as MongooseErrors } from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
+import { ValidateError } from 'tsoa'
+import auth from './auth.js'
+import './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
+import i18n from './i18n.js'
+import './migrations.js'
 
 const app = express()
 
@@ -56,6 +56,9 @@ app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, nex
       message: 'Validation Failed',
       details: err?.fields
     })
+  }
+  if (err instanceof MongooseErrors.ValidationError) {
+    return res.status(422).send({ error: err })
   }
   if (err instanceof Error) {
     next(err)
