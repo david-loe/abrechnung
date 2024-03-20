@@ -1,0 +1,209 @@
+name: Publish Docker
+
+on:
+  push:
+    tags: ['**']
+
+jobs:
+  build_and_publish_platform_containers:
+    name: Build and publish platform containers
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - warp-ubuntu-latest-x64-4x
+          - warp-ubuntu-latest-arm64-4x
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build the backend docker image
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker build \
+            -f ./backend/Dockerfile.production \
+            --progress=plain \
+            -t "davidloe/abrechnung-backend-$BUILD_PLATFORM:latest" \
+            -t "davidloe/abrechnung-backend-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "davidloe/abrechnung-backend-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "ghcr.io/david-loe/abrechnung-backend-$BUILD_PLATFORM:latest" \
+            -t "ghcr.io/david-loe/abrechnung-backend-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "ghcr.io/david-loe/abrechnung-backend-$BUILD_PLATFORM:$APP_VERSION" \
+            .
+
+      - name: Build the frontend docker image
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker build \
+            -f ./frontend/Dockerfile.production \
+            --progress=plain \
+            -t "davidloe/abrechnung-frontend-$BUILD_PLATFORM:latest" \
+            -t "davidloe/abrechnung-frontend-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "davidloe/abrechnung-frontend-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "ghcr.io/david-loe/abrechnung-frontend-$BUILD_PLATFORM:latest" \
+            -t "ghcr.io/david-loe/abrechnung-frontend-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "ghcr.io/david-loe/abrechnung-frontend-$BUILD_PLATFORM:$APP_VERSION" \
+            .
+
+      - name: Push the backend docker image to DockerHub
+        run: docker push --all-tags "davidloe/abrechnung-backend-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+      - name: Push the backend docker image to GitHub Container Registry
+        run: docker push --all-tags "ghcr.io/david-loe/abrechnung-backend-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+      - name: Push the frontend docker image to DockerHub
+        run: docker push --all-tags "davidloe/abrechnung-frontend-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+      - name: Push the frontend docker image to GitHub Container Registry
+        run: docker push --all-tags "ghcr.io/david-loe/abrechnung-frontend-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+  create_and_publish_manifest_for_multiarch:
+    name: Create and publish manifest for multi-arch
+    runs-on: ubuntu-latest
+    needs: build_and_publish_platform_containers
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Create and push DockerHub manifest for backend
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            davidloe/abrechnung-backend:latest \
+            --amend davidloe/abrechnung-backend-amd64:latest \
+            --amend davidloe/abrechnung-backend-arm64:latest \
+
+          docker manifest create \
+            davidloe/abrechnung-backend:$GIT_SHA \
+            --amend davidloe/abrechnung-backend-amd64:$GIT_SHA \
+            --amend davidloe/abrechnung-backend-arm64:$GIT_SHA \
+
+          docker manifest create \
+            davidloe/abrechnung-backend:$APP_VERSION \
+            --amend davidloe/abrechnung-backend-amd64:$APP_VERSION \
+            --amend davidloe/abrechnung-backend-arm64:$APP_VERSION \
+
+          docker manifest push davidloe/abrechnung-backend:latest
+          docker manifest push davidloe/abrechnung-backend:$GIT_SHA
+          docker manifest push davidloe/abrechnung-backend:$APP_VERSION
+
+      - name: Create and push DockerHub manifest for frontend
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            davidloe/abrechnung-frontend:latest \
+            --amend davidloe/abrechnung-frontend-amd64:latest \
+            --amend davidloe/abrechnung-frontend-arm64:latest \
+
+          docker manifest create \
+            davidloe/abrechnung-frontend:$GIT_SHA \
+            --amend davidloe/abrechnung-frontend-amd64:$GIT_SHA \
+            --amend davidloe/abrechnung-frontend-arm64:$GIT_SHA \
+
+          docker manifest create \
+            davidloe/abrechnung-frontend:$APP_VERSION \
+            --amend davidloe/abrechnung-frontend-amd64:$APP_VERSION \
+            --amend davidloe/abrechnung-frontend-arm64:$APP_VERSION \
+
+          docker manifest push davidloe/abrechnung-frontend:latest
+          docker manifest push davidloe/abrechnung-frontend:$GIT_SHA
+          docker manifest push davidloe/abrechnung-frontend:$APP_VERSION
+
+      - name: Create and push Github Container Registry manifest for backend
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-backend:latest \
+            --amend ghcr.io/david-loe/abrechnung-backend-amd64:latest \
+            --amend ghcr.io/david-loe/abrechnung-backend-arm64:latest \
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-backend:$GIT_SHA \
+            --amend ghcr.io/david-loe/abrechnung-backend-amd64:$GIT_SHA \
+            --amend ghcr.io/david-loe/abrechnung-backend-arm64:$GIT_SHA \
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-backend:$APP_VERSION \
+            --amend ghcr.io/david-loe/abrechnung-backend-amd64:$APP_VERSION \
+            --amend ghcr.io/david-loe/abrechnung-backend-arm64:$APP_VERSION \
+
+          docker manifest push ghcr.io/david-loe/abrechnung-backend:latest
+          docker manifest push ghcr.io/david-loe/abrechnung-backend:$GIT_SHA
+          docker manifest push ghcr.io/david-loe/abrechnung-backend:$APP_VERSION
+
+      - name: Create and push Github Container Registry manifest for frontend
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-frontend:latest \
+            --amend ghcr.io/david-loe/abrechnung-frontend-amd64:latest \
+            --amend ghcr.io/david-loe/abrechnung-frontend-arm64:latest \
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-frontend:$GIT_SHA \
+            --amend ghcr.io/david-loe/abrechnung-frontend-amd64:$GIT_SHA \
+            --amend ghcr.io/david-loe/abrechnung-frontend-arm64:$GIT_SHA \
+
+          docker manifest create \
+            ghcr.io/david-loe/abrechnung-frontend:$APP_VERSION \
+            --amend ghcr.io/david-loe/abrechnung-frontend-amd64:$APP_VERSION \
+            --amend ghcr.io/david-loe/abrechnung-frontend-arm64:$APP_VERSION \
+
+          docker manifest push ghcr.io/david-loe/abrechnung-frontend:latest
+          docker manifest push ghcr.io/david-loe/abrechnung-frontend:$GIT_SHA
+          docker manifest push ghcr.io/david-loe/abrechnung-frontend:$APP_VERSION

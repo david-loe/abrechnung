@@ -16,6 +16,10 @@ RUN npm run build
 
 FROM nginx as production-stage
 
+LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
+LABEL org.opencontainers.image.description="abrechnung🧾 frontend"
+LABEL org.opencontainers.image.licenses=AGPL-3.0-only
+
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 COPY frontend/nginx.conf /etc/nginx/nginx.conf
