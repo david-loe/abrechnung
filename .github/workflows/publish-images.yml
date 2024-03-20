@@ -65,7 +65,7 @@ jobs:
             type=sha
 
       - name: Build and push backend image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./backend/Dockerfile.production
@@ -74,7 +74,7 @@ jobs:
           tags: ${{ steps.meta-backend.outputs.tags }}
 
       - name: Build and push frontend image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./frontend/Dockerfile.production
