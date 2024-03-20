@@ -1,8 +1,9 @@
-name: Publish Docker
+name: Publish Images
 
 on:
-  push:
-    tags: ['**']
+  workflow_dispatch
+  # push:
+  #   tags: ['**']
 
 jobs:
   build_and_publish_platform_containers:
