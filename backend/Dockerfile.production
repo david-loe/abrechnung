@@ -1,5 +1,9 @@
 FROM node:20-alpine
 
+LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
+LABEL org.opencontainers.image.description="abrechnung🧾 backend"
+LABEL org.opencontainers.image.licenses=AGPL-3.0-only
+
 RUN mkdir /reports
 
 WORKDIR /build
