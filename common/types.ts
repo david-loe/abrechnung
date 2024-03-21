@@ -129,9 +129,11 @@ export interface OrganisationSimple {
 }
 
 export interface Project {
-  name: string
+  identifier: string
   organisation: Organisation
+  name?: string
   balance?: number
+  _id: _id
 }
 
 export interface Organisation extends OrganisationSimple {
@@ -156,7 +158,7 @@ export interface User extends UserSimple {
     lastCountries: CountrySimple[]
     lastProjects: Project[]
     insurance?: HealthInsurance | null
-    organisation?: Organisation | null
+    project?: Project | null
   }
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
@@ -271,7 +273,7 @@ export interface RequestSimple {
   name: string
   owner: UserSimple
   state: AnyState
-  organisation: OrganisationSimple
+  project: Project
   editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string

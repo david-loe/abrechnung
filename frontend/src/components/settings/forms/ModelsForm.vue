@@ -68,6 +68,7 @@ export default defineComponent({
         { name: 'country' },
         { name: 'currency' },
         { name: 'organisation', GET: 'admin/organisation' },
+        { name: 'project', GET: 'admin/project' },
         { name: 'healthInsurance' },
         { name: 'settings' }
       ],

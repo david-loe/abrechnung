@@ -22,7 +22,7 @@
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },
-        { text: $t('labels.organisation'), value: 'settings.organisation.name', sortable: true },
+        { text: $t('labels.project'), value: 'settings.project.identifier', sortable: true },
         { text: $t('labels.access'), value: 'access' },
         { value: 'buttons' }
       ]">

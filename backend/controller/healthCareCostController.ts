@@ -74,7 +74,7 @@ export class HealthCareCostController extends Controller {
 
   @Post('inWork')
   public async postInWork(
-    @Body() requestBody: { organisation?: IdDocument; insurance?: IdDocument; patientName?: string; _id?: _id; name?: string },
+    @Body() requestBody: { project?: IdDocument; insurance?: IdDocument; patientName?: string; _id?: _id; name?: string },
     @Request() request: ExRequest
   ) {
     const extendedBody = Object.assign(requestBody, {

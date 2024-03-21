@@ -28,7 +28,7 @@ const userSchema = new Schema<User, UserModel, Methods>({
     lastCountries: [{ type: String, ref: 'Country' }],
     lastProjects: [{ type: String, ref: 'Project' }],
     insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
-    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
+    project: { type: Schema.Types.ObjectId, ref: 'Project' }
   },
   vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
@@ -37,7 +37,7 @@ const userSchema = new Schema<User, UserModel, Methods>({
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'settings.insurance' }),
-    doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
+    doc.populate({ path: 'settings.project', select: { name: 1, organisation: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'settings.lastProjects', select: { name: 1, organisation: 1 } }),

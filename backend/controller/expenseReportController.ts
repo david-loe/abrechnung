@@ -72,7 +72,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postInWork(@Body() requestBody: { organisation?: IdDocument; _id?: _id; name?: string }, @Request() request: ExRequest) {
+  public async postInWork(@Body() requestBody: { project?: IdDocument; _id?: _id; name?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'inWork' as ExpenseReportState,
       owner: request.user?._id,

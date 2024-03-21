@@ -60,7 +60,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
   {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
     state: {
       type: String,
       required: true,
@@ -149,7 +149,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'stages.cost.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'days.refunds.refund.currency' }),
-    doc.populate({ path: 'organisation', select: { name: 1 } }),
+    doc.populate({ path: 'project', select: { name: 1, organisation: 1 } }),
     doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),

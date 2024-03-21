@@ -35,7 +35,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
     path += 'expenseReport/'
   }
   const totalSum = getMoneyString(getTotal(report), false)
-  const org = await Organisation.findOne({ _id: report.organisation._id })
+  const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
   return path

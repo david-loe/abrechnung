@@ -25,15 +25,16 @@ async function migrate(from: string) {
       const healthCareCosts = await HealthCareCost.find()
       const expenseReports = await ExpenseReport.find()
       for (const travel of travels) {
+        //@ts-ignore
         if (!travel.organisation) {
           //@ts-ignore
           if (travel.traveler) {
             //@ts-ignore
-            const user = await User.findOne({ _id: travel.traveler._id }).lean()
+            const user = await User.findOne({ _id: travel.traveler._id }).lean() //@ts-ignore
             var org = user?.settings.organisation
             if (!org) {
               org = randomOrg
-            }
+            } //@ts-ignore
             travel.organisation = org
             travel.save()
           } else {
@@ -42,15 +43,16 @@ async function migrate(from: string) {
         }
       }
       for (const healthCareCost of healthCareCosts) {
+        //@ts-ignore
         if (!healthCareCost.organisation) {
           //@ts-ignore
           if (healthCareCost.applicant) {
             //@ts-ignore
-            const user = await User.findOne({ _id: healthCareCost.applicant._id }).lean()
+            const user = await User.findOne({ _id: healthCareCost.applicant._id }).lean() //@ts-ignore
             var org = user?.settings.organisation
             if (!org) {
               org = randomOrg
-            }
+            } //@ts-ignore
             healthCareCost.organisation = org
             healthCareCost.save()
           } else {
@@ -59,15 +61,16 @@ async function migrate(from: string) {
         }
       }
       for (const expenseReport of expenseReports) {
+        //@ts-ignore
         if (!expenseReport.organisation) {
           //@ts-ignore
           if (expenseReport.expensePayer) {
             //@ts-ignore
-            const user = await User.findOne({ _id: expenseReport.expensePayer._id }).lean()
+            const user = await User.findOne({ _id: expenseReport.expensePayer._id }).lean() //@ts-ignore
             var org = user?.settings.organisation
             if (!org) {
               org = randomOrg
-            }
+            } //@ts-ignore
             expenseReport.organisation = org
             expenseReport.save()
           } else {
