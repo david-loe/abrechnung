@@ -244,6 +244,26 @@ export class HealthCareCostExamineController extends Controller {
     })
   }
 
+  @Post('inWork')
+  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user?._id })
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      cb: (e: IHealthCareCost) => sendNotificationMail(e, 'backToInWork'),
+      allowNew: false,
+      async checkOldObject(oldObject: HealthCareCostDoc) {
+        if (oldObject.state === 'underExamination') {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
@@ -303,25 +323,6 @@ export class HealthCareCostConfirmController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExaminationByInsurance') {
           await documentFileHandler(['refundSum', 'receipts'])(request)
-          await oldObject.saveToHistory()
-          await oldObject.save()
-          return true
-        } else {
-          return false
-        }
-      }
-    })
-  }
-  @Post('inWork')
-  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user?._id })
-
-    return await this.setter(HealthCareCost, {
-      requestBody: extendedBody,
-      cb: (e: IHealthCareCost) => sendNotificationMail(e, 'backToInWork'),
-      allowNew: false,
-      async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
