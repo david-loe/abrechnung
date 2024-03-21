@@ -232,7 +232,7 @@ test.serial('POST /travel/underExamination', async (t) => {
   t.like((res.body.result as Travel).comments[1], { text: comment, toState: 'underExamination' })
 })
 
-test.serial('POST /travel/approved', async (t) => {
+test.serial('POST /travel/approved AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/travel/approved').send({ _id: travel._id })
   if (res.status === 200) {
@@ -244,7 +244,7 @@ test.serial('POST /travel/approved', async (t) => {
   t.is((res.body.result as Travel).history.length, 3)
 })
 
-test.serial('POST /travel/underExamination', async (t) => {
+test.serial('POST /travel/underExamination AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
   if (res.status === 200) {

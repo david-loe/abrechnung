@@ -121,7 +121,7 @@ test.serial('POST /healthCareCost/underExamination', async (t) => {
 
 // EXAMINE
 
-test.serial('POST /examine/healthCareCost/inWork', async (t) => {
+test.serial('POST /examine/healthCareCost/inWork AGAIN', async (t) => {
   await loginUser(agent, 'healthCareCost')
   t.plan(4)
   const comment = 'back to inWork'
@@ -138,7 +138,7 @@ test.serial('POST /examine/healthCareCost/inWork', async (t) => {
 
 // USER
 
-test.serial('POST /healthCareCost/underExamination', async (t) => {
+test.serial('POST /healthCareCost/underExamination AGAIN', async (t) => {
   await loginUser(agent, 'user')
   t.plan(3)
   const res = await agent.post('/healthCareCost/underExamination').send({ _id: healthCareCost._id })

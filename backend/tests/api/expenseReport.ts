@@ -108,7 +108,7 @@ test.serial('POST /expenseReport/underExamination', async (t) => {
   t.like((res.body.result as ExpenseReport).comments[0], { text: comment, toState: 'underExamination' })
 })
 
-test.serial('POST /expenseReport/inWork', async (t) => {
+test.serial('POST /expenseReport/inWork AGAIN', async (t) => {
   t.plan(4)
   const comment = ''
   const res = await agent.post('/expenseReport/inWork').send({ _id: expenseReport._id, comment })
@@ -122,7 +122,7 @@ test.serial('POST /expenseReport/inWork', async (t) => {
   t.is((res.body.result as ExpenseReport).comments.length, 1)
 })
 
-test.serial('POST /expenseReport/underExamination', async (t) => {
+test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id })
   if (res.status === 200) {
