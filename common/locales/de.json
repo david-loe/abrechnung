@@ -39,12 +39,13 @@
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
     },
-    "request": {
-      "unauthorized": "Nicht autorisiert!"
-    },
+    "notAllowed": "Nicht erlaubt!",
+    "notFound": "Nichts gefunden!",
+    "NotImplemented": "Nicht implementiert!",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "successDeleting": "Gelöscht",
     "successSaving": "Gespeichert",
+    "unauthorized": "Nicht autorisiert!",
     "ValidationError": "Valdierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"

@@ -39,12 +39,13 @@
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
     },
-    "request": {
-      "unauthorized": "Not authorized!"
-    },
+    "notAllowed": "Not allowed!",
+    "notFound": "Not found!",
+    "NotImplemented": "Not implemented!",
     "stagesOverlapping": "Stages are overlapping",
     "successDeleting": "Deleted successfully",
     "successSaving": "Saved successfully",
+    "unauthorized": "Unauthorized!",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "wrongPassword": "Wrong Password"

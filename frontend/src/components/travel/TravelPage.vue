@@ -625,7 +625,7 @@ export default defineComponent({
         this.setTravel(result.ok)
         this.hideModal()
       } else if (result.error) {
-        this.error = result.error?.error
+        this.error = result.error
         ;(this.$refs.stageForm as typeof StageForm).loading = false
         const modalEl = document.getElementById('modal')
         if (modalEl) {
