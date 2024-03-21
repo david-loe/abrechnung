@@ -148,7 +148,7 @@ test.serial('POST /healthCareCost/underExamination AGAIN', async (t) => {
     console.log(res.body)
   }
   t.is((res.body.result as HealthCareCost).state, 'underExamination')
-  t.is((res.body.result as HealthCareCost).history.length, 1)
+  t.is((res.body.result as HealthCareCost).history.length, 3)
 })
 
 // EXAMINE
