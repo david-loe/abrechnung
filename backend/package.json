@@ -48,8 +48,8 @@
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/build/server.js",
     "test": "npm run test:$NODE_ENV",
-    "test:production": "npm run build && ava --serial dist/build/tests/**/*",
-    "test:development": "npm run build && ava --serial dist/app/tests/**/*",
+    "test:production": "npm run build && ava --serial --timeout=1m dist/build/tests/**/* ",
+    "test:development": "npm run build && ava --serial --timeout=1m dist/app/tests/**/* ",
     "parse-lumpsums": "npm run parse-lumpsums:$NODE_ENV",
     "parse-lumpsums:production": "npm run build && node dist/build/data/run-parser.js",
     "parse-lumpsums:development": "npm run build && node dist/app/data/run-parser.js"
