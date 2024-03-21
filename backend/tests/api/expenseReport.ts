@@ -108,11 +108,37 @@ test.serial('POST /expenseReport/underExamination', async (t) => {
   t.like((res.body.result as ExpenseReport).comments[0], { text: comment, toState: 'underExamination' })
 })
 
+test.serial('POST /expenseReport/inWork', async (t) => {
+  t.plan(4)
+  const comment = ''
+  const res = await agent.post('/expenseReport/inWork').send({ _id: expenseReport._id, comment })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as ExpenseReport).state, 'inWork')
+  t.is((res.body.result as ExpenseReport).history.length, 2)
+  t.is((res.body.result as ExpenseReport).comments.length, 1)
+})
+
+test.serial('POST /expenseReport/underExamination', async (t) => {
+  t.plan(3)
+  const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as ExpenseReport).state, 'underExamination')
+  t.is((res.body.result as ExpenseReport).history.length, 3)
+})
+
 // EXAMINE
 
 test.serial('POST /examine/expenseReport/refunded', async (t) => {
   await loginUser(agent, 'expenseReport')
-  t.plan(4)
+  t.plan(3)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
@@ -121,8 +147,7 @@ test.serial('POST /examine/expenseReport/refunded', async (t) => {
     console.log(res.body)
   }
   t.is((res.body.result as ExpenseReport).state, 'refunded')
-  t.is((res.body.result as ExpenseReport).history.length, 2)
-  t.is((res.body.result as ExpenseReport).comments.length, 1)
+  t.is((res.body.result as ExpenseReport).history.length, 4)
 })
 
 // REPORT

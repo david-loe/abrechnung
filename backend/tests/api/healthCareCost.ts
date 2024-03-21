@@ -121,6 +121,38 @@ test.serial('POST /healthCareCost/underExamination', async (t) => {
 
 // EXAMINE
 
+test.serial('POST /examine/healthCareCost/inWork', async (t) => {
+  await loginUser(agent, 'healthCareCost')
+  t.plan(4)
+  const comment = 'back to inWork'
+  const res = await agent.post('/examine/healthCareCost/inWork').send({ _id: healthCareCost._id, comment })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as HealthCareCost).state, 'inWork')
+  t.is((res.body.result as HealthCareCost).history.length, 2)
+  t.like((res.body.result as HealthCareCost).comments[1], { text: comment, toState: 'inWork' })
+})
+
+// USER
+
+test.serial('POST /healthCareCost/underExamination', async (t) => {
+  await loginUser(agent, 'user')
+  t.plan(3)
+  const res = await agent.post('/healthCareCost/underExamination').send({ _id: healthCareCost._id })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as HealthCareCost).state, 'underExamination')
+  t.is((res.body.result as HealthCareCost).history.length, 1)
+})
+
+// EXAMINE
+
 test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t) => {
   await loginUser(agent, 'healthCareCost')
   t.plan(4)
@@ -132,8 +164,8 @@ test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t
     console.log(res.body)
   }
   t.is((res.body.result as HealthCareCost).state, 'underExaminationByInsurance')
-  t.is((res.body.result as HealthCareCost).history.length, 2)
-  t.is((res.body.result as HealthCareCost).comments.length, 1)
+  t.is((res.body.result as HealthCareCost).history.length, 4)
+  t.is((res.body.result as HealthCareCost).comments.length, 2)
 })
 
 // REPORT
