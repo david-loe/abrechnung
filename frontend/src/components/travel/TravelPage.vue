@@ -613,6 +613,10 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
+      // When clearing the number form field '' is returned. This would cause error as only number|null is excepted
+      if ((stage.cost.amount as unknown) === '') {
+        stage.cost.amount = 0
+      }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
         headers,
         params: { parentId: this.travel._id }
