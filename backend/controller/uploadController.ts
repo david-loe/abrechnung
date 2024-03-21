@@ -1,20 +1,21 @@
-import { Controller, Post, Route, Get, Query, Tags, Request, Produces, Middlewares, Consumes, SuccessResponse, Body } from 'tsoa'
-import fs from 'node:fs/promises'
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import multer from 'multer'
-import User from '../models/user.js'
-import Token from '../models/token.js'
-import Settings from '../models/settings.js'
-import i18n from '../i18n.js'
-import { documentFileHandler } from '../helper.js'
-import { File } from './types.js'
+import fs from 'node:fs/promises'
+import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
 import { _id } from '../../common/types.js'
+import { documentFileHandler } from '../helper.js'
+import i18n from '../i18n.js'
+import Settings from '../models/settings.js'
+import Token from '../models/token.js'
+import User from '../models/user.js'
+import { AuthorizationError } from './error.js'
+import { File } from './types.js'
 
 async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction) {
   const user = await User.findOne({ _id: req.query.userId }).lean()
   if (!(user && user.token && user.token._id.equals(req.query.tokenId as string))) {
-    throw new Error('Token not valid')
+    throw new AuthorizationError('Token not valid')
   }
   next()
 }

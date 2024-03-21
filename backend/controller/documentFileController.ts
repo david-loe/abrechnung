@@ -4,6 +4,7 @@ import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse
 import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
 import { Controller } from './controller.js'
+import { NotAllowedError, NotFoundError } from './error.js'
 
 @Tags('DocumentFile')
 @Route('documentFile')
@@ -21,7 +22,7 @@ export class DocumentFileController extends Controller {
       request.res?.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
       request.res?.send((file.data as any as mongo.Binary).buffer)
     } else {
-      throw new Error('alerts.request.unauthorized')
+      throw new NotAllowedError()
     }
   }
 
@@ -49,7 +50,7 @@ export class DocumentFileAdminController extends Controller {
       request.res?.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
       request.res?.send((file.data as any as mongo.Binary).buffer)
     } else {
-      throw new Error('No file found')
+      throw new NotFoundError('No file found')
     }
   }
 

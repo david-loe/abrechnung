@@ -10,6 +10,7 @@ import User from '../models/user.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { NotFoundError } from './error.js'
 import { IdDocument } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -47,7 +48,7 @@ export class ExpenseReportController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -64,7 +65,7 @@ export class ExpenseReportController extends Controller {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -126,7 +127,7 @@ export class ExpenseReportController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report found or not allowed`)
     }
   }
 
@@ -174,7 +175,7 @@ export class ExpenseReportExamineController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -191,7 +192,7 @@ export class ExpenseReportExamineController extends Controller {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -235,7 +236,7 @@ export class ExpenseReportExamineController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report found or unauthorized`)
     }
   }
 }

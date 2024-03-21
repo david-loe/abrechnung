@@ -88,7 +88,7 @@
             :key="alert.id"
             :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'"
             role="alert"
-            style="z-index: 1100; max-width: 250px">
+            style="z-index: 1100; max-width: 250px; max-height: 150px; overflow-y: hidden">
             <strong>
               <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
               <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
@@ -271,10 +271,14 @@ export default defineComponent({
             this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
           } else {
             console.log(error.response.data)
-            this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+            this.addAlert({
+              message: error.response.data.message,
+              title: error.response.data.name ? this.$t(error.response.data.name) : 'ERROR',
+              type: 'danger'
+            })
           }
         }
-        return { error: error }
+        return { error: error.response.data }
       }
     },
     async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
@@ -289,14 +293,18 @@ export default defineComponent({
             config
           )
         )
-        if (showAlert) this.addAlert({ message: '', title: (res.data as SETResponse<T>).message, type: 'success' })
+        if (showAlert) this.addAlert({ title: this.$t(res.data.message), type: 'success' })
         return { ok: (res.data as SETResponse<T>).result }
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
-          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          this.addAlert({
+            message: error.response.data.message,
+            title: error.response.data.name ? this.$t(error.response.data.name) : 'ERROR',
+            type: 'danger'
+          })
         }
         return { error: error.response.data }
       }
@@ -324,7 +332,11 @@ export default defineComponent({
           this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
         } else {
           console.log(error.response.data)
-          this.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
+          this.addAlert({
+            message: error.response.data.message,
+            title: error.response.data.name ? this.$t(error.response.data.name) : 'ERROR',
+            type: 'danger'
+          })
         }
       }
       return false

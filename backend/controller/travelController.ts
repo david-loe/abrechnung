@@ -10,6 +10,7 @@ import User from '../models/user.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { NotAllowedError } from './error.js'
 import { TravelApplication, TravelPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -180,7 +181,7 @@ export class TravelController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No travel found or unauthorized`)
+      throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -382,7 +383,7 @@ export class TravelExamineController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
     }
   }
 }

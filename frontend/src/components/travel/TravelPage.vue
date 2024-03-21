@@ -613,9 +613,9 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      if (!stage.cost.amount) {
-        //@ts-ignore
-        stage.cost = undefined
+      // When clearing the number form field '' is returned. This would cause error as only number|null is excepted
+      if ((stage.cost.amount as unknown) === '') {
+        stage.cost.amount = 0
       }
       const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
         headers,
@@ -625,7 +625,7 @@ export default defineComponent({
         this.setTravel(result.ok)
         this.hideModal()
       } else if (result.error) {
-        this.error = result.error?.error
+        this.error = result.error
         ;(this.$refs.stageForm as typeof StageForm).loading = false
         const modalEl = document.getElementById('modal')
         if (modalEl) {

@@ -1,17 +1,17 @@
-import './db.js'
-import './migrations.js'
-import express, { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import { ValidateError } from 'tsoa'
-import mongoose from 'mongoose'
-import cors from 'cors'
-import session from 'express-session'
 import MongoStore from 'connect-mongo'
-import i18n from './i18n.js'
+import cors from 'cors'
+import express, { Request as ExRequest, Response as ExResponse } from 'express'
+import session from 'express-session'
 import { MongoClient } from 'mongodb'
-import auth from './auth.js'
+import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
+import auth from './auth.js'
+import { errorHandler } from './controller/error.js'
+import './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
+import i18n from './i18n.js'
+import './migrations.js'
 
 const app = express()
 
@@ -49,18 +49,6 @@ if (process.env.NODE_ENV === 'development') {
 
 RegisterRoutes(app)
 
-app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): ExResponse | void {
-  if (err instanceof ValidateError) {
-    console.warn(`Caught Validation Error for ${req.path}:`, err.fields)
-    return res.status(422).json({
-      message: 'Validation Failed',
-      details: err?.fields
-    })
-  }
-  if (err instanceof Error) {
-    next(err)
-  }
-  next()
-})
+app.use(errorHandler)
 
 export default app

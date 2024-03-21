@@ -11,6 +11,7 @@ import User from '../models/user.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -48,7 +49,7 @@ export class HealthCareCostController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -65,7 +66,7 @@ export class HealthCareCostController extends Controller {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -127,7 +128,7 @@ export class HealthCareCostController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -175,7 +176,7 @@ export class HealthCareCostExamineController extends Controller {
           await documentFileHandler(['cost', 'receipts'], true)(request)
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
@@ -192,7 +193,7 @@ export class HealthCareCostExamineController extends Controller {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
           return true
         } else {
-          throw new Error('alerts.request.unauthorized')
+          return false
         }
       }
     })
@@ -239,7 +240,7 @@ export class HealthCareCostExamineController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -310,7 +311,7 @@ export class HealthCareCostConfirmController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 }
