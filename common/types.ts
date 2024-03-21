@@ -375,15 +375,21 @@ export interface SETResponse<T> {
   result: T
 }
 
-export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel {
-  return typeof (report as Travel).travelInsideOfEU === 'boolean'
+export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel
+export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is TravelSimple
+export function reportIsTravel(report: any): report is { travelInsideOfEU: boolean } {
+  return typeof report.travelInsideOfEU === 'boolean'
 }
 
-export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost {
-  return typeof (report as HealthCareCost).patientName === 'string'
+export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost
+export function reportIsHealthCareCost(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is HealthCareCost
+export function reportIsHealthCareCost(report: any): report is { patientName: string } {
+  return typeof report.patientName === 'string'
 }
 
-export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport {
+export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport
+export function reportIsExpenseReport(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is ExpenseReport
+export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsHealthCareCost(report)
 }
 
