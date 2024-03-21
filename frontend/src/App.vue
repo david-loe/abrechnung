@@ -88,7 +88,7 @@
             :key="alert.id"
             :class="'alert alert-' + alert.type + ' alert-dismissible ms-auto'"
             role="alert"
-            style="z-index: 1100; max-width: 250px">
+            style="z-index: 1100; max-width: 250px; max-height: 150px; overflow-y: hidden">
             <strong>
               <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
               <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
