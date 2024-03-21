@@ -1,12 +1,12 @@
 import MongoStore from 'connect-mongo'
 import cors from 'cors'
-import express, { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
+import express, { Request as ExRequest, Response as ExResponse } from 'express'
 import session from 'express-session'
 import { MongoClient } from 'mongodb'
-import mongoose, { Error as MongooseErrors } from 'mongoose'
+import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
-import { ValidateError } from 'tsoa'
 import auth from './auth.js'
+import { errorHandler } from './controller/error.js'
 import './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
@@ -49,21 +49,6 @@ if (process.env.NODE_ENV === 'development') {
 
 RegisterRoutes(app)
 
-app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): ExResponse | void {
-  if (err instanceof ValidateError) {
-    console.warn(`Caught Validation Error for ${req.path}:`, err.fields)
-    return res.status(422).json({
-      message: 'Validation Failed',
-      details: err?.fields
-    })
-  }
-  if (err instanceof MongooseErrors.ValidationError) {
-    return res.status(422).send({ error: err })
-  }
-  if (err instanceof Error) {
-    next(err)
-  }
-  next()
-})
+app.use(errorHandler)
 
 export default app
