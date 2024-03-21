@@ -11,6 +11,7 @@ import User from '../models/user.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -127,7 +128,7 @@ export class HealthCareCostController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -239,7 +240,7 @@ export class HealthCareCostExamineController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -310,7 +311,7 @@ export class HealthCareCostConfirmController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 }

@@ -3,6 +3,7 @@ import { FilterQuery, HydratedDocument, Model, ProjectionType, Types } from 'mon
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
 import { GETResponse, Meta, User, _id } from '../../common/types.js'
+import { NotAllowedError, NotFoundError } from './error.js'
 import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
@@ -189,7 +190,7 @@ export class Controller extends TsoaController {
         }
         return { data: result, meta }
       } else {
-        throw new Error(`No ${model.modelName} for _id: '${options.query._id}' found.`)
+        throw new NotFoundError(`No ${model.modelName} for _id: '${options.query._id}' found.`)
       }
     } else {
       var conditions: any = {}
@@ -227,17 +228,17 @@ export class Controller extends TsoaController {
     if (options.requestBody._id) {
       var oldObject = await model.findOne({ _id: options.requestBody._id })
       if (!oldObject) {
-        throw new Error(`No ${model.modelName} for _id: '${options.requestBody._id}' found.`)
+        throw new NotFoundError(`No ${model.modelName} for _id: '${options.requestBody._id}' found.`)
       }
       if (options.checkOldObject && !(await options.checkOldObject(oldObject))) {
-        throw new Error(`Not allowed to modify this ${model.modelName}`)
+        throw new NotAllowedError(`Not allowed to modify this ${model.modelName}`)
       }
       Object.assign(oldObject, options.requestBody)
       result = (await oldObject.save()).toObject()
     } else if (options.allowNew) {
       result = (await new model(options.requestBody).save()).toObject()
     } else {
-      throw new Error(`Not allowed to create a new ${model.modelName}`)
+      throw new NotAllowedError(`Not allowed to create a new ${model.modelName}`)
     }
     if (options.cb) {
       options.cb(result)
@@ -251,10 +252,10 @@ export class Controller extends TsoaController {
   >(model: Model<ModelType>, options: SetterForArrayElementOptions<ModelType, ArrayElementType>) {
     const parentObject = await model.findOne({ _id: options.parentId })
     if (!parentObject) {
-      throw new Error(`No ${model.modelName} for _id: '${options.parentId}' found.`)
+      throw new NotFoundError(`No ${model.modelName} for _id: '${options.parentId}' found.`)
     }
     if (options.checkOldObject && !(await options.checkOldObject(parentObject))) {
-      throw new Error(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
+      throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if (options.requestBody._id && options.requestBody._id !== '') {
       var found = false
@@ -266,12 +267,12 @@ export class Controller extends TsoaController {
         }
       }
       if (!found) {
-        throw new Error(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
+        throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
       }
     } else if (options.allowNew) {
       ;(parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
     } else {
-      throw new Error(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
+      throw new NotAllowedError(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if (options.sortFn) {
       ;(parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
@@ -287,10 +288,10 @@ export class Controller extends TsoaController {
   async deleter<ModelType>(model: Model<ModelType>, options: DeleterOptions<ModelType>) {
     const doc = await model.findOne({ _id: options._id })
     if (!doc) {
-      throw new Error(`No ${model.modelName} for _id: '${options._id}' found.`)
+      throw new NotFoundError(`No ${model.modelName} for _id: '${options._id}' found.`)
     }
     if (options.checkOldObject && !(await options.checkOldObject(doc))) {
-      throw new Error(`Not allowed to delete this ${model.modelName}`)
+      throw new NotAllowedError(`Not allowed to delete this ${model.modelName}`)
     }
     const result = await doc.deleteOne()
     if (options.cb) {
@@ -302,10 +303,10 @@ export class Controller extends TsoaController {
   async deleterForArrayElement<ModelType>(model: Model<ModelType>, options: DeleterForArrayElemetOptions<ModelType>) {
     const parentObject = await model.findOne({ _id: options.parentId })
     if (!parentObject) {
-      throw new Error(`No ${model.modelName} for _id: '${options.parentId}' found.`)
+      throw new NotFoundError(`No ${model.modelName} for _id: '${options.parentId}' found.`)
     }
     if (options.checkOldObject && !(await options.checkOldObject(parentObject))) {
-      throw new Error(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
+      throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     var found = false
     for (var i = 0; i < (parentObject[options.arrayElementKey] as Array<{ _id: _id }>).length; i++) {
@@ -319,7 +320,7 @@ export class Controller extends TsoaController {
       }
     }
     if (!found) {
-      throw new Error(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options._id}' found.`)
+      throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options._id}' found.`)
     }
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()

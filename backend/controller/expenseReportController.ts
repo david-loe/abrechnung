@@ -10,6 +10,7 @@ import User from '../models/user.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { NotFoundError } from './error.js'
 import { IdDocument } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -126,7 +127,7 @@ export class ExpenseReportController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report found or not allowed`)
     }
   }
 
@@ -235,7 +236,7 @@ export class ExpenseReportExamineController extends Controller {
       request.res?.setHeader('Content-Length', report.length)
       request.res?.send(Buffer.from(report))
     } else {
-      throw new Error(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report found or unauthorized`)
     }
   }
 }

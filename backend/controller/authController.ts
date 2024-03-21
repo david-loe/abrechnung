@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Route, SuccessResponse, Response, Get, Query, Tags, Middlewares, Request, Delete, Security } from 'tsoa'
-import User, { UserDoc } from '../models/user.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import passport from 'passport'
-import magiclogin from '../authStrategies/magiclogin.js'
+import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
+import magiclogin from '../authStrategies/magiclogin.js'
+import User, { UserDoc } from '../models/user.js'
+import { NotAllowedError, NotImplementedError } from './error.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
 const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
@@ -11,7 +12,7 @@ const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 
 const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
 
 const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  res.status(501).send(disabledMessage)
+  throw new NotImplementedError(disabledMessage)
 }
 
 const ldapauthHandler = useLDAPauth ? passport.authenticate('ldapauth', { session: true }) : NotImplementedMiddleware
@@ -32,7 +33,7 @@ const magicloginHandler = useMagicLogin
       if (user && (await (user as UserDoc).isActive())) {
         magiclogin.send(req, res)
       } else {
-        throw new Error('No magiclogin user found for e-mail: ' + req.body.destination)
+        throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)
       }
     }
   : NotImplementedMiddleware
@@ -64,7 +65,7 @@ export class AuthController extends Controller {
    * @summary Microsoft login endpoint
    */
   @Get('microsoft/callback')
-  @Middlewares(microsoftHandler)
+  @Middlewares(microsoftCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
   public microsoftCallback(@Query() state?: string) {
     var redirect: string | undefined

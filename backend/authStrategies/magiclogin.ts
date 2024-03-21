@@ -1,7 +1,8 @@
 import { default as MagicLoginStrategy } from 'passport-magic-login'
-import User from '../models/user.js'
-import { sendMail } from '../mail/mail.js'
+import { NotAllowedError } from '../controller/error.js'
 import i18n from '../i18n.js'
+import { sendMail } from '../mail/mail.js'
+import User from '../models/user.js'
 
 const magicLogin = new MagicLoginStrategy.default({
   secret: process.env.MAGIC_LOGIN_SECRET,
@@ -17,7 +18,7 @@ const magicLogin = new MagicLoginStrategy.default({
         ''
       )
     } else {
-      throw new Error('No magiclogin user found for e-mail: ' + destination)
+      throw new NotAllowedError('No magiclogin user found for e-mail: ' + destination)
     }
   },
   verify: async function (payload, callback) {
@@ -25,7 +26,7 @@ const magicLogin = new MagicLoginStrategy.default({
     if (user) {
       callback(null, user, { redirect: payload.redirect })
     } else {
-      callback(Error('No magiclogin user found for e-mail: ' + payload.destination))
+      callback(new NotAllowedError('No magiclogin user found for e-mail: ' + payload.destination))
     }
   },
   jwtOptions: {
