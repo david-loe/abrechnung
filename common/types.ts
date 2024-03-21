@@ -128,6 +128,12 @@ export interface OrganisationSimple {
   _id: _id
 }
 
+export interface Project {
+  name: string
+  organisation: Organisation
+  balance?: number
+}
+
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null
@@ -148,6 +154,7 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
+    lastProjects: Project[]
     insurance?: HealthInsurance | null
     organisation?: Organisation | null
   }
