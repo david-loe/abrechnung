@@ -196,14 +196,24 @@
                     <span class="ms-1">{{ $t('labels.mailToInsurance') }}</span>
                   </a>
                 </template>
-                <a
-                  v-else-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'"
-                  class="btn btn-primary"
-                  :href="mailToInsuranceLink(healthCareCost)"
-                  @click="toExaminationByInsurance()">
-                  <i class="bi bi-pencil-square"></i>
-                  <span class="ms-1">{{ $t('labels.toExaminationByInsurance') }}</span>
-                </a>
+                <template v-else>
+                  <a
+                    v-if="endpointPrefix === 'examine/'"
+                    class="btn btn-primary mb-2"
+                    :href="mailToInsuranceLink(healthCareCost)"
+                    @click="toExaminationByInsurance()">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ $t('labels.toExaminationByInsurance') }}</span>
+                  </a>
+                  <button
+                    class="btn btn-secondary"
+                    @click="healthCareCost.editor._id !== $root.user._id ? null : backToInWork()"
+                    :disabled="healthCareCost.editor._id !== $root.user._id">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                  </button>
+                </template>
+
                 <form
                   class="mt-3"
                   v-if="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance'"
@@ -311,6 +321,20 @@ export default defineComponent({
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
+    async backToInWork() {
+      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/inWork', {
+        _id: this.healthCareCost._id,
+        comment: this.healthCareCost.comment
+      })
+      if (result.ok) {
+        if (this.endpointPrefix === 'examine/') {
+          this.$router.push({ path: '/examine/healthCareCost' })
+        } else {
+          this.setHealthCareCost(result.ok)
+          this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.healthCareCost.state) !== -1
+        }
+      }
+    },
     async toExaminationByInsurance() {
       const result = await this.$root.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
         _id: this.healthCareCost._id,
@@ -369,14 +393,14 @@ export default defineComponent({
         params: { parentId: this.healthCareCost._id }
       })
       if (result.ok) {
-        this.setExpenseReport(result.ok)
+        this.setHealthCareCost(result.ok)
         this.hideModal()
       }
     },
     async deleteExpense(_id: string) {
       const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
       if (result) {
-        this.setExpenseReport(result)
+        this.setHealthCareCost(result)
         this.hideModal()
       }
     },
@@ -387,10 +411,10 @@ export default defineComponent({
       }
       const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
       if (result) {
-        this.setExpenseReport(result.data)
+        this.setHealthCareCost(result.data)
       }
     },
-    setExpenseReport(healthCareCost: HealthCareCost) {
+    setHealthCareCost(healthCareCost: HealthCareCost) {
       this.healthCareCost = healthCareCost
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)

@@ -232,6 +232,30 @@ test.serial('POST /travel/underExamination', async (t) => {
   t.like((res.body.result as Travel).comments[1], { text: comment, toState: 'underExamination' })
 })
 
+test.serial('POST /travel/approved AGAIN', async (t) => {
+  t.plan(3)
+  const res = await agent.post('/travel/approved').send({ _id: travel._id })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as Travel).state, 'approved')
+  t.is((res.body.result as Travel).history.length, 3)
+})
+
+test.serial('POST /travel/underExamination AGAIN', async (t) => {
+  t.plan(3)
+  const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as Travel).state, 'underExamination')
+  t.is((res.body.result as Travel).history.length, 4)
+})
+
 // EXAMINE
 
 test.serial('POST /examine/travel/refunded', async (t) => {
@@ -245,7 +269,7 @@ test.serial('POST /examine/travel/refunded', async (t) => {
     console.log(res.body)
   }
   t.is((res.body.result as Travel).state, 'refunded')
-  t.is((res.body.result as Travel).history.length, 3)
+  t.is((res.body.result as Travel).history.length, 5)
   t.is((res.body.result as Travel).comments.length, 2)
 })
 

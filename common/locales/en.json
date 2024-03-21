@@ -96,6 +96,7 @@
     "approve": "Approve",
     "approvedTravels": "approved travels",
     "arrival": "Arrival",
+    "backToApplicant": "Back to applicant",
     "breakfast": "Breakfast",
     "by": "by",
     "cancel": "Cancel",
@@ -126,6 +127,7 @@
     "done": "Done",
     "downloadX": "Download {X}",
     "edit": "Edit",
+    "editAgain": "Edit again",
     "editor": "Editor",
     "editX": "Edit {X}",
     "email": "Email address",
@@ -254,42 +256,52 @@
   },
   "mail": {
     "expenseReport": {
+      "backToInWork": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your expense report has been sent back to you for revision.",
+        "subject": "🔙 Revise expense report"
+      },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your expense report gets refunded.",
-        "subject": "💲 Expense Report refunded"
+        "subject": "💲 Expense report refunded"
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your expense report got rejected.",
-        "subject": "❌ Expense Report rejected"
+        "subject": "❌ Expense report rejected"
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has finished his expense report.",
-        "subject": "🛂 Expense Report to examine"
+        "subject": "🛂 Expense report to examine"
       }
     },
     "healthCareCost": {
+      "backToInWork": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your health care costs have been sent back to you for revision.",
+        "subject": "🔙 Revise health care costs"
+      },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs got reimbursed in the amount of {refundSum} by the insurance.",
-        "subject": "💲 Health Care Costs refunded"
+        "subject": "💲 Health care costs refunded"
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs got rejected.",
-        "subject": "❌ Health Care Costs rejected"
+        "subject": "❌ Health care costs rejected"
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has submit his health care costs.",
-        "subject": "🛂 Health Care Costs to examine"
+        "subject": "🛂 Health care costs to examine"
       },
       "underExaminationByInsurance": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs have been send to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
-        "subject": "🔜 Health Care Costs at insurance"
+        "subject": "🔜 Health care costs at insurance"
       }
     },
     "hi": "Hi there,",
@@ -315,6 +327,11 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel application got approved.",
         "subject": "✅ Travel approved"
+      },
+      "backToApproved": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "Your travel expenses have been sent back to you for revision.",
+        "subject": "🔙 Revise travel expenses"
       },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",

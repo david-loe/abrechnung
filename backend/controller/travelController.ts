@@ -4,9 +4,10 @@ import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request
 import { Travel as ITravel, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendTravelNotificationMail } from '../mail/mail.js'
+import { sendNotificationMail } from '../mail/mail.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
+import { generateAdvanceReport } from '../pdf/advance.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
@@ -136,12 +137,35 @@ export class TravelController extends Controller {
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendTravelNotificationMail,
+      cb: sendNotificationMail,
       checkOldObject: async (oldObject: TravelDoc) =>
         !oldObject.historic &&
         (oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved') &&
         request.user!._id.equals(oldObject.owner._id),
       allowNew: true
+    })
+  }
+
+  @Post('approved')
+  public async postApproved(@Body() requestBody: { _id: _id }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      allowNew: false,
+      async checkOldObject(oldObject: TravelDoc) {
+        if (
+          oldObject.owner._id.equals(request.user!._id) &&
+          oldObject.state === 'underExamination' &&
+          oldObject.editor._id.equals(request.user!._id)
+        ) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
     })
   }
 
@@ -151,7 +175,7 @@ export class TravelController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendTravelNotificationMail,
+      cb: sendNotificationMail,
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'approved') {
@@ -214,9 +238,13 @@ export class TravelApproveController extends Controller {
   public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
     const cb = async (travel: ITravel) => {
-      sendTravelNotificationMail(travel)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
+      sendNotificationMail(travel)
+      if (
+        travel.advance.amount !== null &&
+        travel.advance.amount > 0 &&
+        process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true'
+      ) {
+        await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel))
       }
     }
 
@@ -242,7 +270,7 @@ export class TravelApproveController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendTravelNotificationMail,
+      cb: sendNotificationMail,
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) => oldObject.state === 'appliedFor'
     })
@@ -350,7 +378,7 @@ export class TravelExamineController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user?._id })
 
     const cb = async (travel: ITravel) => {
-      sendTravelNotificationMail(travel)
+      sendNotificationMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
       }
@@ -362,6 +390,26 @@ export class TravelExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
+  @Post('approved')
+  public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      allowNew: false,
+      cb: (e: ITravel) => sendNotificationMail(e, 'backToApproved'),
+      async checkOldObject(oldObject: TravelDoc) {
+        if (oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
