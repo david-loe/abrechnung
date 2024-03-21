@@ -96,6 +96,7 @@
     "approve": "Genehmigen",
     "approvedTravels": "Genehmigte Reisen",
     "arrival": "Ankunft",
+    "backToApplicant": "Zurück zum Antragsteller",
     "breakfast": "Frühstück",
     "by": "von",
     "cancel": "Abbrechen",
@@ -126,6 +127,7 @@
     "done": "Erledigt",
     "downloadX": "{X} herunterladen",
     "edit": "Bearbeiten",
+    "editAgain": "Nochmal bearbeiten",
     "editor": "Bearbeiter",
     "editX": "{X} bearbeiten",
     "email": "Email Addresse",
@@ -254,6 +256,11 @@
   },
   "mail": {
     "expenseReport": {
+      "backToInWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Auslagenabrechnung wurde dir zum Überarbeiten zurückgeschickt.",
+        "subject": "🔙 Auslagen überarbeiten"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wird erstattet.",
@@ -271,6 +278,11 @@
       }
     },
     "healthCareCost": {
+      "backToInWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Krankenkosten wurden dir zum Überarbeiten zurückgeschickt.",
+        "subject": "🔙 Auslagen überarbeiten"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
@@ -315,6 +327,11 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Reiseantrag wurde genehmigt.",
         "subject": "✅ Reise genehmigt"
+      },
+      "backToApproved": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Deine Reisekosten wurden dir zum Überarbeiten zurückgeschickt.",
+        "subject": "🔙 Reisekosten überarbeiten"
       },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

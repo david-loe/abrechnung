@@ -4,7 +4,7 @@ import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request
 import { Expense, HealthCareCostState, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendHealthCareCostNotificationMail } from '../mail/mail.js'
+import { sendNotificationMail } from '../mail/mail.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
@@ -74,7 +74,7 @@ export class HealthCareCostController extends Controller {
 
   @Post('inWork')
   public async postInWork(
-    @Body() requestBody: { organisation: IdDocument; insurance: IdDocument; patientName: string; _id?: _id; name?: string },
+    @Body() requestBody: { organisation?: IdDocument; insurance?: IdDocument; patientName?: string; _id?: _id; name?: string },
     @Request() request: ExRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
@@ -83,7 +83,7 @@ export class HealthCareCostController extends Controller {
       editor: request.user?._id
     })
 
-    if (!extendedBody.name) {
+    if (!extendedBody._id && !extendedBody.name) {
       var date = new Date()
       extendedBody.name =
         requestBody.patientName +
@@ -92,7 +92,22 @@ export class HealthCareCostController extends Controller {
         ' ' +
         date.getUTCFullYear()
     }
-    return await this.setter(HealthCareCost, { requestBody: extendedBody, checkOldObject: this.checkOwner(request.user!), allowNew: true })
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      async checkOldObject(oldObject: HealthCareCostDoc) {
+        if (
+          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') ||
+          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user!._id))
+        ) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      },
+      allowNew: true
+    })
   }
 
   @Post('underExamination')
@@ -101,7 +116,7 @@ export class HealthCareCostController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: sendHealthCareCostNotificationMail,
+      cb: sendNotificationMail,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') {
@@ -207,7 +222,7 @@ export class HealthCareCostExamineController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      sendHealthCareCostNotificationMail(healthCareCost)
+      sendNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
       }
@@ -275,7 +290,7 @@ export class HealthCareCostConfirmController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      sendHealthCareCostNotificationMail(healthCareCost)
+      sendNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
       }
@@ -288,6 +303,25 @@ export class HealthCareCostConfirmController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExaminationByInsurance') {
           await documentFileHandler(['refundSum', 'receipts'])(request)
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+  @Post('inWork')
+  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user?._id })
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      cb: (e: IHealthCareCost) => sendNotificationMail(e, 'backToInWork'),
+      allowNew: false,
+      async checkOldObject(oldObject: HealthCareCostDoc) {
+        if (oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true

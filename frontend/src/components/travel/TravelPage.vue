@@ -431,15 +431,27 @@
                     </p>
                   </small>
                 </div>
-                <div v-if="travel.state !== 'refunded'" class="mb-3">
-                  <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
-                    id="comment"
-                    rows="1"
-                    v-model="travel.comment"
-                    :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
-                </div>
+                <template v-if="travel.state !== 'refunded'">
+                  <div class="mb-3">
+                    <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
+                    <textarea
+                      class="form-control"
+                      id="comment"
+                      rows="1"
+                      v-model="travel.comment"
+                      :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
+                  </div>
+                  <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
+                    <i class="bi bi-coin"></i>
+                    <span class="ms-1">{{ $t('labels.refund') }}</span>
+                  </button>
+                </template>
+                <template v-else>
+                  <a class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
+                  </a>
+                </template>
                 <button
                   v-if="travel.state === 'approved'"
                   class="btn btn-primary"
@@ -448,13 +460,13 @@
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <a v-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
-                  <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
-                </a>
-                <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success" @click="refund()">
-                  <i class="bi bi-coin"></i>
-                  <span class="ms-1">{{ $t('labels.refund') }}</span>
+                <button
+                  v-if="travel.state === 'underExamination'"
+                  class="btn btn-secondary"
+                  @click="travel.editor._id !== $root.user._id ? null : backToApproved()"
+                  :disabled="travel.editor._id !== $root.user._id">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                 </button>
               </div>
             </div>
@@ -595,6 +607,20 @@ export default defineComponent({
       const result = await this.$root.setter<Travel>('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
       if (result.ok) {
         this.$router.push({ path: '/' })
+      }
+    },
+    async backToApproved() {
+      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/approved', {
+        _id: this.travel._id,
+        comment: this.travel.comment
+      })
+      if (result.ok) {
+        if (this.endpointPrefix === 'examine/') {
+          this.$router.push({ path: '/examine/travel' })
+        } else {
+          this.setTravel(result.ok)
+          this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.travel.state) !== -1
+        }
       }
     },
     async refund() {
@@ -738,9 +764,6 @@ export default defineComponent({
       const params: any = {
         _id: this._id,
         additionalFields: ['stages', 'expenses', 'days']
-      }
-      if (this.endpointPrefix === 'examine/') {
-        params.addRefunded = true
       }
       const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
       if (res) {

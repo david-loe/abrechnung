@@ -4,7 +4,7 @@ import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendExpenseReportNotificationMail } from '../mail/mail.js'
+import { sendNotificationMail } from '../mail/mail.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
@@ -72,14 +72,14 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postInWork(@Body() requestBody: { organisation: IdDocument; _id?: _id; name?: string }, @Request() request: ExRequest) {
+  public async postInWork(@Body() requestBody: { organisation?: IdDocument; _id?: _id; name?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'inWork' as ExpenseReportState,
       owner: request.user?._id,
       editor: request.user?._id
     })
 
-    if (!extendedBody.name) {
+    if (!extendedBody._id && !extendedBody.name) {
       var date = new Date()
       extendedBody.name =
         i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
@@ -88,7 +88,22 @@ export class ExpenseReportController extends Controller {
         ' ' +
         date.getUTCFullYear()
     }
-    return await this.setter(ExpenseReport, { requestBody: extendedBody, checkOldObject: this.checkOwner(request.user!), allowNew: true })
+    return await this.setter(ExpenseReport, {
+      requestBody: extendedBody,
+      async checkOldObject(oldObject: ExpenseReportDoc) {
+        if (
+          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') ||
+          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user!._id))
+        ) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      },
+      allowNew: true
+    })
   }
 
   @Post('underExamination')
@@ -97,7 +112,7 @@ export class ExpenseReportController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: sendExpenseReportNotificationMail,
+      cb: sendNotificationMail,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') {
@@ -198,12 +213,32 @@ export class ExpenseReportExamineController extends Controller {
     })
   }
 
+  @Post('inWork')
+  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'inWork' as ExpenseReportState, editor: request.user?._id })
+
+    return await this.setter(ExpenseReport, {
+      requestBody: extendedBody,
+      cb: (e: IExpenseReport) => sendNotificationMail(e, 'backToInWork'),
+      allowNew: false,
+      async checkOldObject(oldObject: ExpenseReportDoc) {
+        if (oldObject.state === 'underExamination') {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
   @Post('refunded')
   public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user?._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
-      sendExpenseReportNotificationMail(expenseReport)
+      sendNotificationMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(expenseReport), await generateExpenseReportReport(expenseReport))
       }

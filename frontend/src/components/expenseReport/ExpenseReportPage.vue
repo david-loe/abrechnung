@@ -183,9 +183,17 @@
                   <i class="bi bi-download"></i>
                   <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                 </a>
-                <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success" @click="refund()">
+                <button v-else-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
                   <i class="bi bi-coin"></i>
                   <span class="ms-1">{{ $t('labels.refund') }}</span>
+                </button>
+                <button
+                  v-if="expenseReport.state === 'underExamination'"
+                  class="btn btn-secondary"
+                  @click="expenseReport.editor._id !== $root.user._id ? null : backToInWork()"
+                  :disabled="expenseReport.editor._id !== $root.user._id">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                 </button>
               </div>
             </div>
@@ -260,6 +268,20 @@ export default defineComponent({
       })
       if (result.ok) {
         this.$router.push({ path: '/' })
+      }
+    },
+    async backToInWork() {
+      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/inWork', {
+        _id: this.expenseReport._id,
+        comment: this.expenseReport.comment
+      })
+      if (result.ok) {
+        if (this.endpointPrefix === 'examine/') {
+          this.$router.push({ path: '/examine/expenseReport' })
+        } else {
+          this.setExpenseReport(result.ok)
+          this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.expenseReport.state) !== -1
+        }
       }
     },
     async refund() {
