@@ -129,6 +129,26 @@
 				"$ref": "#/components/schemas/mongoose.Types.ObjectId",
 				"pattern": "^[0-9a-fA-F]{24}$"
 			},
+			"ProjectSimple": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"HealthInsurance": {
 				"properties": {
 					"name": {
@@ -149,30 +169,18 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Organisation": {
+			"OrganisationSimple": {
 				"properties": {
 					"name": {
 						"type": "string"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
-					},
-					"subfolderPath": {
-						"type": "string"
-					},
-					"bankDetails": {
-						"type": "string",
-						"nullable": true
-					},
-					"companyNumber": {
-						"type": "string",
-						"nullable": true
 					}
 				},
 				"required": [
 					"name",
-					"_id",
-					"subfolderPath"
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -358,7 +366,7 @@
 							"organisation": {
 								"allOf": [
 									{
-										"$ref": "#/components/schemas/Organisation"
+										"$ref": "#/components/schemas/OrganisationSimple"
 									}
 								],
 								"nullable": true
@@ -370,6 +378,12 @@
 									}
 								],
 								"nullable": true
+							},
+							"lastProjects": {
+								"items": {
+									"$ref": "#/components/schemas/ProjectSimple"
+								},
+								"type": "array"
 							},
 							"lastCountries": {
 								"items": {
@@ -388,6 +402,7 @@
 							}
 						},
 						"required": [
+							"lastProjects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -452,7 +467,7 @@
 					"organisation": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/Organisation"
+								"$ref": "#/components/schemas/OrganisationSimple"
 							},
 							{
 								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -468,6 +483,23 @@
 								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
+					},
+					"lastProjects": {
+						"items": {
+							"properties": {
+								"identifier": {
+									"type": "string"
+								},
+								"organisation": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								},
+								"_id": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					},
 					"lastCountries": {
 						"items": {
@@ -767,7 +799,7 @@
 							"organisation": {
 								"allOf": [
 									{
-										"$ref": "#/components/schemas/Organisation"
+										"$ref": "#/components/schemas/OrganisationSimple"
 									}
 								],
 								"nullable": true
@@ -779,6 +811,12 @@
 									}
 								],
 								"nullable": true
+							},
+							"lastProjects": {
+								"items": {
+									"$ref": "#/components/schemas/ProjectSimple"
+								},
+								"type": "array"
 							},
 							"lastCountries": {
 								"items": {
@@ -797,6 +835,7 @@
 							}
 						},
 						"required": [
+							"lastProjects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -976,7 +1015,7 @@
 							"organisation": {
 								"anyOf": [
 									{
-										"$ref": "#/components/schemas/Organisation"
+										"$ref": "#/components/schemas/OrganisationSimple"
 									},
 									{
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -992,6 +1031,23 @@
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 									}
 								]
+							},
+							"lastProjects": {
+								"items": {
+									"properties": {
+										"identifier": {
+											"type": "string"
+										},
+										"organisation": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							"lastCountries": {
 								"items": {
@@ -1205,7 +1261,7 @@
 							"organisation": {
 								"anyOf": [
 									{
-										"$ref": "#/components/schemas/Organisation"
+										"$ref": "#/components/schemas/OrganisationSimple"
 									},
 									{
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -1221,6 +1277,23 @@
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 									}
 								]
+							},
+							"lastProjects": {
+								"items": {
+									"properties": {
+										"identifier": {
+											"type": "string"
+										},
+										"organisation": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							"lastCountries": {
 								"items": {
@@ -1862,22 +1935,6 @@
 					}
 				]
 			},
-			"OrganisationSimple": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Travel": {
 				"properties": {
 					"name": {
@@ -1889,8 +1946,8 @@
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2019,7 +2076,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -2081,8 +2138,8 @@
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2211,7 +2268,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -2258,7 +2315,7 @@
 								"name",
 								"owner",
 								"state",
-								"organisation",
+								"project",
 								"editor",
 								"createdAt",
 								"updatedAt",
@@ -2316,6 +2373,16 @@
 			},
 			"SetterPartial_TravelPost.NoPost_": {
 				"properties": {
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"fellowTravelersNames": {
 						"type": "string"
 					},
@@ -2453,16 +2520,6 @@
 					},
 					"name": {
 						"type": "string"
-					},
-					"organisation": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/OrganisationSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -2785,8 +2842,8 @@
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2877,7 +2934,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -2929,8 +2986,8 @@
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2975,7 +3032,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -3087,8 +3144,8 @@
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -3142,7 +3199,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -3272,6 +3329,16 @@
 			},
 			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance_.NoPost_": {
 				"properties": {
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"fellowTravelersNames": {
 						"type": "string"
 					},
@@ -3329,16 +3396,6 @@
 					},
 					"name": {
 						"type": "string"
-					},
-					"organisation": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/OrganisationSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -3348,6 +3405,16 @@
 			},
 			"TravelApplication": {
 				"properties": {
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"fellowTravelersNames": {
 						"type": "string"
 					},
@@ -3405,16 +3472,6 @@
 					},
 					"name": {
 						"type": "string"
-					},
-					"organisation": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/OrganisationSimple"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -3993,6 +4050,210 @@
 			"SetterBody_ISettings_": {
 				"$ref": "#/components/schemas/SetterPartial_ISettings.NoPost_"
 			},
+			"Project": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_Project-or-Project-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Project"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Project"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_ProjectSimple_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"identifier",
+								"organisation",
+								"_id"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IProject": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IProject_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"identifier",
+								"organisation",
+								"_id",
+								"name",
+								"balance"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_IProject.NoPost_": {
+				"properties": {
+					"balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"identifier": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_IProject_": {
+				"$ref": "#/components/schemas/SetterPartial_IProject.NoPost_"
+			},
+			"Organisation": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"subfolderPath": {
+						"type": "string"
+					},
+					"bankDetails": {
+						"type": "string",
+						"nullable": true
+					},
+					"companyNumber": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id",
+					"subfolderPath"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GETResponse_Organisation-or-Organisation-Array_": {
 				"properties": {
 					"data": {
@@ -4240,8 +4501,8 @@
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -4310,7 +4571,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -4363,8 +4624,8 @@
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -4433,7 +4694,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -4471,7 +4732,7 @@
 								"name",
 								"owner",
 								"state",
-								"organisation",
+								"project",
 								"editor",
 								"createdAt",
 								"updatedAt",
@@ -4672,8 +4933,8 @@
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -4733,7 +4994,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -4783,8 +5044,8 @@
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
-					"organisation": {
-						"$ref": "#/components/schemas/OrganisationSimple"
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -4844,7 +5105,7 @@
 					"name",
 					"owner",
 					"state",
-					"organisation",
+					"project",
 					"editor",
 					"createdAt",
 					"updatedAt",
@@ -4879,7 +5140,7 @@
 								"name",
 								"owner",
 								"state",
-								"organisation",
+								"project",
 								"editor",
 								"createdAt",
 								"updatedAt",
@@ -5444,7 +5705,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "0.3.9",
+		"version": "0.3.10",
 		"contact": {}
 	},
 	"paths": {
@@ -6165,7 +6426,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -6831,7 +7092,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -7073,7 +7334,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -7673,6 +7934,258 @@
 				}
 			}
 		},
+		"/project": {
+			"get": {
+				"operationId": "GetProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Project-or-Project-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"identifier",
+									"organisation",
+									"_id"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/project": {
+			"get": {
+				"operationId": "GetProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Project-or-Project-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"identifier",
+									"organisation",
+									"_id",
+									"name",
+									"balance"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "PostProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Project"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IProject_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
 		"/organisation": {
 			"get": {
 				"operationId": "GetOrganisation",
@@ -8162,7 +8675,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -8397,7 +8910,7 @@
 									"insurance": {
 										"$ref": "#/components/schemas/IdDocument"
 									},
-									"organisation": {
+									"project": {
 										"$ref": "#/components/schemas/IdDocument"
 									}
 								},
@@ -8604,7 +9117,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -9093,7 +9606,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -9286,7 +9799,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
@@ -9512,7 +10025,7 @@
 									"_id": {
 										"$ref": "#/components/schemas/_id"
 									},
-									"organisation": {
+									"project": {
 										"$ref": "#/components/schemas/IdDocument"
 									}
 								},
@@ -9719,7 +10232,7 @@
 									"name",
 									"owner",
 									"state",
-									"organisation",
+									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
