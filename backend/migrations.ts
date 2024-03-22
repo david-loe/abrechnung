@@ -16,7 +16,7 @@ if (settings?.migrateFrom) {
 async function migrate(from: string) {
   switch (from) {
     case '0.3.0': {
-      console.log('Appy migration from v0.3.0')
+      console.log('Apply migration from v0.3.0')
       var randomOrg = await Organisation.findOne()
       if (!randomOrg) {
         randomOrg = (await new Organisation({ name: 'My Organisation' }).save()).toObject()
@@ -80,8 +80,8 @@ async function migrate(from: string) {
       }
     }
     case '0.3.2': {
-      console.log('Appy migration from v0.3.2')
-      const allTravels = (await mongoose.connection.asPromise()).collection('travels').find()
+      console.log('Apply migration from v0.3.2')
+      const allTravels = mongoose.connection.collection('travels').find()
       for await (const travel of allTravels) {
         for (const stage of travel.stages) {
           stage.transport = {
@@ -94,17 +94,17 @@ async function migrate(from: string) {
       }
     }
     case '0.3.3': {
-      console.log('Appy migration from v0.3.3')
+      console.log('Apply migration from v0.3.3')
       await mongoose.connection.collection('countries').drop()
       initDB()
     }
     case '0.3.4': {
-      console.log('Appy migration from v0.3.4')
+      console.log('Apply migration from v0.3.4')
       mongoose.connection.collection('users').updateMany({}, { $set: { 'access.user': true } })
       mongoose.connection.collection('settings').updateMany({}, { $set: { 'accessIcons.user': ['bi-card-list'] } })
     }
     case '0.3.5': {
-      console.log('Appy migration from v0.3.5')
+      console.log('Apply migration from v0.3.5')
       const travels = await Travel.find()
       for (const travel of travels) {
         if (travel.state === 'refunded' || travel.state === 'underExamination') {
@@ -125,10 +125,21 @@ async function migrate(from: string) {
       }
     }
     case '0.3.7': {
-      console.log('Appy migration from v0.3.7')
+      console.log('Apply migration from v0.3.7')
       mongoose.connection.collection('travels').updateMany({}, { $rename: { traveler: 'owner' } })
       mongoose.connection.collection('expensereports').updateMany({}, { $rename: { expensePayer: 'owner' } })
       mongoose.connection.collection('healthcarecosts').updateMany({}, { $rename: { applicant: 'owner' } })
+    }
+    case '0.3.9': {
+      console.log('Apply migration from v0.3.9')
+      const project = await mongoose.connection.collection('projects').findOne()
+      if (project) {
+        mongoose.connection.collection('travels').updateMany({}, { $set: { project: project._id } })
+        mongoose.connection.collection('expensereports').updateMany({}, { $set: { project: project._id } })
+        mongoose.connection.collection('healthcarecosts').updateMany({}, { $set: { project: project._id } })
+      } else {
+        throw new Error('No project found')
+      }
     }
     default:
       if (settings) {
