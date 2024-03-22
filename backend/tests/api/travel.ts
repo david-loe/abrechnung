@@ -24,9 +24,9 @@ var travel: TravelSimple = {
   }
 }
 
-test.serial('GET /organisation', async (t) => {
-  const res = await agent.get('/organisation')
-  travel.organisation = res.body.data[0]
+test.serial('GET /project', async (t) => {
+  const res = await agent.get('/project')
+  travel.project = res.body.data[0]
   if (res.status === 200) {
     t.pass()
   } else {

@@ -11,9 +11,9 @@ var expenseReport: ExpenseReportSimple = {
   name: 'Expenses from last Month'
 }
 
-test.serial('GET /organisation', async (t) => {
-  const res = await agent.get('/organisation')
-  expenseReport.organisation = res.body.data[0]
+test.serial('GET /project', async (t) => {
+  const res = await agent.get('/project')
+  expenseReport.project = res.body.data[0]
   if (res.status === 200) {
     t.pass()
   } else {
