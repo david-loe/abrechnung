@@ -7,6 +7,21 @@
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
     <div class="mb-3">
+      <label for="expenseReportFormAdvance" class="form-label me-2">
+        {{ $t('labels.advance') }}
+      </label>
+      <div class="input-group" id="expenseReportFormAdvance">
+        <input
+          type="number"
+          class="form-control"
+          step="0.01"
+          id="expenseReportFormAdvanceAmount"
+          v-model="formExpenseReport.advance.amount" />
+        <CurrencySelector v-model="formExpenseReport.advance.currency" required></CurrencySelector>
+      </div>
+    </div>
+
+    <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
       <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" required> </ProjectSelector>
@@ -25,13 +40,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { ExpenseReportSimple } from '../../../../../common/types.js'
+import { baseCurrency, ExpenseReportSimple } from '../../../../../common/types.js'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import ProjectSelector from '../../elements/ProjectSelector.vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint, ProjectSelector },
+  components: { InfoPoint, ProjectSelector, CurrencySelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {
@@ -50,7 +66,13 @@ export default defineComponent({
   },
   methods: {
     default() {
-      return { name: '' }
+      return {
+        name: '',
+        advance: {
+          amount: null,
+          currency: baseCurrency
+        }
+      }
     },
     clear() {
       this.loading = false

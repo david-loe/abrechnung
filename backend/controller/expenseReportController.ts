@@ -11,7 +11,7 @@ import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotFoundError } from './error.js'
-import { IdDocument } from './types.js'
+import { IdDocument, MoneyPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -72,7 +72,10 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postInWork(@Body() requestBody: { project?: IdDocument; _id?: _id; name?: string }, @Request() request: ExRequest) {
+  public async postInWork(
+    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined },
+    @Request() request: ExRequest
+  ) {
     const extendedBody = Object.assign(requestBody, {
       state: 'inWork' as ExpenseReportState,
       owner: request.user?._id,

@@ -10,7 +10,7 @@ export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
   data?: string
 }
 
-interface MoneyPost extends Omit<Money, 'currency'> {
+export interface MoneyPost extends Omit<Money, 'currency'> {
   amount: Money['amount']
   currency: IdDocument<CurrencyCode> | Currency
   exchangeRate: Money['exchangeRate'] | undefined

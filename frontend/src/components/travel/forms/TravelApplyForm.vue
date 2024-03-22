@@ -65,15 +65,15 @@
           :required="formTravel.claimSpouseRefund" />
       </div>
     </template>
-
-    <label for="travelFormAdvance" class="form-label me-2">
-      {{ $t('labels.advance') }}
-    </label>
-    <InfoPoint :text="$t('info.advance')" />
-
-    <div class="input-group mb-2" id="travelFormAdvance">
-      <input type="number" class="form-control" step="0.01" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
-      <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
+    <div class="mb-2">
+      <label for="travelFormAdvance" class="form-label me-2">
+        {{ $t('labels.advance') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <div class="input-group" id="travelFormAdvance">
+        <input type="number" class="form-control" step="0.01" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
+        <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
+      </div>
     </div>
 
     <div class="mb-3">
