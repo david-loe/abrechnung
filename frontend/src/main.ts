@@ -17,7 +17,16 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import { CountrySimple, Currency, GETResponse, HealthInsurance, ProjectSimple, Settings, User } from '../../common/types.js'
+import {
+  CountrySimple,
+  Currency,
+  GETResponse,
+  HealthInsurance,
+  OrganisationSimple,
+  ProjectSimple,
+  Settings,
+  User
+} from '../../common/types.js'
 import i18n from './i18n.js'
 
 // find windows user to give country flag web font on them
@@ -41,6 +50,7 @@ declare module '@vue/runtime-core' {
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
+      setLastProject(project: ProjectSimple): void
       load: () => Promise<void>
       pushUserSettings: (settings: User['settings']) => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
@@ -49,6 +59,7 @@ declare module '@vue/runtime-core' {
       user: User
       settings: Settings
       healthInsurances: HealthInsurance[]
+      organisations: OrganisationSimple[]
       projects: ProjectSimple[]
       specialLumpSums: { [key: string]: string[] }
       users: { name: User['name']; _id: string }[]

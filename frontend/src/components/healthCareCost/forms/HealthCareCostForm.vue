@@ -30,16 +30,7 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <select
-        class="form-select"
-        id="healthCareCostFormProject"
-        v-model="formHealthCareCost.project"
-        @update:model-value="settingsChanged = true"
-        required>
-        <option v-for="project of $root.projects" :value="project" :key="project._id">
-          {{ project.identifier }}
-        </option>
-      </select>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" required> </ProjectSelector>
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
@@ -57,10 +48,11 @@
 import { defineComponent, PropType } from 'vue'
 import { HealthCareCostSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
+import ProjectSelector from '../../elements/ProjectSelector.vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint },
+  components: { InfoPoint, ProjectSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {

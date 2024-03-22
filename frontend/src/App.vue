@@ -143,6 +143,7 @@ import {
   GETResponse,
   HealthInsurance,
   Locale,
+  OrganisationSimple,
   ProjectSimple,
   SETResponse,
   Settings,
@@ -169,6 +170,7 @@ export default defineComponent({
       countries: [] as CountrySimple[],
       settings: {} as Settings,
       healthInsurances: [] as HealthInsurance[],
+      organisations: [] as OrganisationSimple[],
       projects: [] as ProjectSimple[],
       specialLumpSums: {} as { [key: string]: string[] },
       users: [] as { name: User['name']; _id: string }[],
@@ -190,6 +192,7 @@ export default defineComponent({
           this.getter<CountrySimple[]>('country'),
           this.getter<Settings>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
+          this.getter<OrganisationSimple[]>('organisation'),
           this.getter<ProjectSimple[]>('project'),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
           this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
@@ -206,9 +209,10 @@ export default defineComponent({
           this.settings =
             result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
-          this.projects = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
-          this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}
-          this.users = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : []) : []
+          this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
+          this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
+          this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
+          this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -359,7 +363,7 @@ export default defineComponent({
       this.setLast(country, this.user.settings.lastCountries)
       this.pushUserSettings(this.user.settings)
     },
-    setLastProjects(project: ProjectSimple) {
+    setLastProject(project: ProjectSimple) {
       this.setLast(project, this.user.settings.lastProjects)
       this.pushUserSettings(this.user.settings)
     },

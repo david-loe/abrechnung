@@ -79,16 +79,7 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <select
-        class="form-select"
-        id="healthCareCostFormProject"
-        v-model="formTravel.project"
-        @update:model-value="settingsChanged = true"
-        required>
-        <option v-for="project of $root.projects" :value="project" :key="project._id">
-          {{ project.identifier }}
-        </option>
-      </select>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" required> </ProjectSelector>
     </div>
 
     <div class="mb-2">
@@ -117,10 +108,11 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
+import ProjectSelector from '../../elements/ProjectSelector.vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput },
+  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: {

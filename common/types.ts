@@ -159,8 +159,9 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    lastProjects: Project[]
+    lastProjects: ProjectSimple[]
     insurance?: HealthInsurance | null
+    organisation?: OrganisationSimple | null
   }
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
