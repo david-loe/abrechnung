@@ -3017,6 +3017,9 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
 					"comments": {
 						"items": {
 							"$ref": "#/components/schemas/ExpenseReportComment"
@@ -3037,6 +3040,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"advance",
 					"comments"
 				],
 				"type": "object",
@@ -4964,6 +4968,9 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
 					"comments": {
 						"items": {
 							"$ref": "#/components/schemas/ExpenseReportComment"
@@ -4999,6 +5006,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"advance",
 					"comments",
 					"history",
 					"historic",
@@ -5075,6 +5083,9 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"advance": {
+						"$ref": "#/components/schemas/Money"
+					},
 					"comments": {
 						"items": {
 							"$ref": "#/components/schemas/ExpenseReportComment"
@@ -5110,6 +5121,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"advance",
 					"comments",
 					"history",
 					"historic",
@@ -5146,6 +5158,7 @@
 								"updatedAt",
 								"_id",
 								"state",
+								"advance",
 								"comments",
 								"comment",
 								"history",
@@ -9805,6 +9818,7 @@
 									"updatedAt",
 									"_id",
 									"state",
+									"advance",
 									"comments",
 									"comment",
 									"history",
@@ -10019,6 +10033,9 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"advance": {
+										"$ref": "#/components/schemas/MoneyPost"
+									},
 									"name": {
 										"type": "string"
 									},
@@ -10238,6 +10255,7 @@
 									"updatedAt",
 									"_id",
 									"state",
+									"advance",
 									"comments",
 									"comment",
 									"history",
