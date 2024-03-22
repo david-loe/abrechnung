@@ -14,7 +14,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
   {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
     state: {
       type: String,
       required: true,
@@ -49,7 +49,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'organisation', select: { name: 1 } }),
+    doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),

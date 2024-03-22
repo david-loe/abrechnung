@@ -7,20 +7,9 @@
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormOrganisation" class="form-label me-2">
-        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.organisation')" />
-      <select
-        class="form-select"
-        id="healthCareCostFormOrganisation"
-        v-model="$root.user.settings.organisation"
-        @update:model-value="settingsChanged = true"
-        required>
-        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-          {{ organisation.name }}
-        </option>
-      </select>
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
+      <InfoPoint :text="$t('info.project')" />
+      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" required> </ProjectSelector>
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
@@ -38,10 +27,11 @@
 import { defineComponent, PropType } from 'vue'
 import { ExpenseReportSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
+import ProjectSelector from '../../elements/ProjectSelector.vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint },
+  components: { InfoPoint, ProjectSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {
@@ -55,8 +45,7 @@ export default defineComponent({
   data() {
     return {
       formExpenseReport: this.default(),
-      loading: false,
-      settingsChanged: false
+      loading: false
     }
   },
   methods: {
@@ -66,14 +55,9 @@ export default defineComponent({
     clear() {
       this.loading = false
       this.formExpenseReport = this.default()
-      this.settingsChanged = false
     },
     output() {
       this.loading = true
-      if (this.settingsChanged) {
-        this.$root.pushUserSettings(this.$root.user.settings)
-      }
-      this.formExpenseReport.organisation = this.$root.user.settings.organisation
       return this.formExpenseReport
     },
     input() {

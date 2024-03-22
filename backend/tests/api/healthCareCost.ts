@@ -22,9 +22,9 @@ test.serial('GET /healthInsurance', async (t) => {
   }
 })
 
-test.serial('GET /organisation', async (t) => {
-  const res = await agent.get('/organisation')
-  healthCareCost.organisation = res.body.data[0]
+test.serial('GET /project', async (t) => {
+  const res = await agent.get('/project')
+  healthCareCost.project = res.body.data[0]
   if (res.status === 200) {
     t.pass()
   } else {

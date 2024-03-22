@@ -44,16 +44,6 @@
 
     <div class="row mb-3">
       <div class="col">
-        <label for="userSettingsFormOrganisation" class="form-label me-2">
-          {{ $t('labels.organisation') }}
-        </label>
-        <select class="form-select" id="userSettingsFormOrganisation" v-model="formUser.settings.organisation">
-          <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-            {{ organisation.name }}
-          </option>
-        </select>
-      </div>
-      <div class="col">
         <label for="userSettingsFormInsurance" class="form-label me-2">
           {{ $t('labels.insurance') }}
         </label>

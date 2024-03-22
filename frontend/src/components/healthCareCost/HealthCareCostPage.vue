@@ -100,7 +100,7 @@
           </div>
         </div>
         <div v-if="endpointPrefix !== ''" class="text-secondary">
-          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' + healthCareCost.organisation.name }}
+          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' + healthCareCost.project.identifier }}
         </div>
       </div>
 

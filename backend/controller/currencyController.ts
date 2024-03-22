@@ -1,7 +1,7 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import Currency from '../models/currency.js'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Currency as ICurrency, _id } from '../../common/types.js'
+import Currency from '../models/currency.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('Currency')
 @Route('currency')
@@ -19,7 +19,7 @@ export class CurrencyController extends Controller {
 export class CurrencyAdminController extends Controller {
   @Post()
   public async postCurrency(@Body() requestBody: SetterBody<ICurrency>) {
-    return await this.setter(Currency, { requestBody: requestBody })
+    return await this.setter(Currency, { requestBody: requestBody, allowNew: true })
   }
   @Delete()
   public async deleteCurrency(@Query() _id: _id) {

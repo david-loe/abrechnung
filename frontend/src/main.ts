@@ -1,24 +1,33 @@
+import axios, { AxiosRequestConfig } from 'axios'
+import qs from 'qs'
 import { createApp } from 'vue'
 import App, { Alert } from './App.vue'
 import router from './router.js'
-import axios, { AxiosRequestConfig } from 'axios'
-import qs from 'qs'
 
-import vSelect from './vue-select.js'
 import 'vue-select/dist/vue-select.css'
 import './vue-select.css'
+import vSelect from './vue-select.js'
 
 // @ts-ignore
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import './vue3-easy-data-table.css'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
+import {
+  CountrySimple,
+  Currency,
+  GETResponse,
+  HealthInsurance,
+  OrganisationSimple,
+  ProjectSimple,
+  Settings,
+  User
+} from '../../common/types.js'
 import i18n from './i18n.js'
-import { CountrySimple, Currency, GETResponse, HealthInsurance, OrganisationSimple, Settings, User } from '../../common/types.js'
 
 // find windows user to give country flag web font on them
 if (/windows/i.test(navigator.userAgent)) {
@@ -41,6 +50,7 @@ declare module '@vue/runtime-core' {
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
+      setLastProject(project: ProjectSimple): void
       load: () => Promise<void>
       pushUserSettings: (settings: User['settings']) => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
@@ -50,6 +60,7 @@ declare module '@vue/runtime-core' {
       settings: Settings
       healthInsurances: HealthInsurance[]
       organisations: OrganisationSimple[]
+      projects: ProjectSimple[]
       specialLumpSums: { [key: string]: string[] }
       users: { name: User['name']; _id: string }[]
     }

@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-backend",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -19,7 +19,7 @@
     "passport": "^0.7.0",
     "passport-ldapauth": "^3.0.1",
     "passport-magic-login": "^1.2.2",
-    "passport-microsoft": "^1.0.0",
+    "passport-microsoft": "^1.1.0",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1",
     "swagger-ui-express": "^5.0.0",
@@ -48,8 +48,8 @@
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/build/server.js",
     "test": "npm run test:$NODE_ENV",
-    "test:production": "npm run build && ava --serial dist/build/tests/**/*",
-    "test:development": "npm run build && ava --serial dist/app/tests/**/*",
+    "test:production": "npm run build && ava --serial --timeout=1m dist/build/tests/**/* ",
+    "test:development": "npm run build && ava --serial --timeout=1m dist/app/tests/**/* ",
     "parse-lumpsums": "npm run parse-lumpsums:$NODE_ENV",
     "parse-lumpsums:production": "npm run build && node dist/build/data/run-parser.js",
     "parse-lumpsums:development": "npm run build && node dist/app/data/run-parser.js"

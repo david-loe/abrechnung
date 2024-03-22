@@ -128,6 +128,17 @@ export interface OrganisationSimple {
   _id: _id
 }
 
+export interface ProjectSimple {
+  identifier: string
+  organisation: _id
+  _id: _id
+}
+
+export interface Project extends ProjectSimple {
+  name?: string
+  balance?: number
+}
+
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null
@@ -148,8 +159,9 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
+    lastProjects: ProjectSimple[]
     insurance?: HealthInsurance | null
-    organisation?: Organisation | null
+    organisation?: OrganisationSimple | null
   }
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
@@ -264,7 +276,7 @@ export interface RequestSimple {
   name: string
   owner: UserSimple
   state: AnyState
-  organisation: OrganisationSimple
+  project: ProjectSimple
   editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string

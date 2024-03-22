@@ -1,4 +1,4 @@
-import { Schema, Document, model, Query, HydratedDocument, Model } from 'mongoose'
+import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { Access, Token, User, accesses } from '../../common/types.js'
 
 const accessObject: { [key in Access]?: any } = {}
@@ -24,8 +24,9 @@ const userSchema = new Schema<User, UserModel, Methods>({
   loseAccessAt: { type: Date },
   settings: {
     language: { type: String, default: 'de' },
-    lastCurrencies: [{ type: String, ref: 'Currency' }],
-    lastCountries: [{ type: String, ref: 'Country' }],
+    lastCurrencies: { type: [{ type: String, ref: 'Currency' }], default: () => [], required: true },
+    lastCountries: { type: [{ type: String, ref: 'Country' }], default: () => [], required: true },
+    lastProjects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], default: () => [], required: true },
     insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
   },
@@ -39,6 +40,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'settings.lastProjects', select: { identifier: 1, organisation: 1 } }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
     doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })
   ])

@@ -1,7 +1,7 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Query, Delete } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import Organisation from '../models/organisation.js'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Organisation as IOrganisation, _id } from '../../common/types.js'
+import Organisation from '../models/organisation.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('Organisation')
 @Route('organisation')
@@ -24,7 +24,7 @@ export class OrganisationAdminController extends Controller {
 
   @Post()
   public async postOrganisation(@Body() requestBody: SetterBody<IOrganisation>) {
-    return await this.setter(Organisation, { requestBody: requestBody })
+    return await this.setter(Organisation, { requestBody: requestBody, allowNew: true })
   }
 
   @Delete()

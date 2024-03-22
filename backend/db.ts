@@ -4,7 +4,6 @@ import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
 import iLumpSums from './data/lumpSums.json' assert { type: 'json' }
-import organisations from './data/organisations.json' assert { type: 'json' }
 import { LumpSumsJSON } from './data/parser.js'
 import settings from './data/settings.json' assert { type: 'json' }
 import i18n from './i18n.js'
@@ -12,6 +11,7 @@ import Country from './models/country.js'
 import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
+import Project from './models/project.js'
 import Settings from './models/settings.js'
 
 await connectDB()
@@ -46,14 +46,19 @@ export async function initDB() {
     await new Settings(settings).save()
     console.log(i18n.t('alerts.db.createdSettings'))
   }
-  await initer<any>(Currency, 'currencies', currencies)
-  await initer<any>(Country, 'countries', countries)
+  await initer(Currency, 'currencies', currencies)
+  await initer(Country, 'countries', countries)
   await addLumpSumsToCountries(iLumpSums)
-  initer<any>(HealthInsurance, 'health insurances', healthInsurances)
-  initer<any>(Organisation, 'organisation', organisations)
+  initer(HealthInsurance, 'health insurances', healthInsurances)
+
+  const organisations = [{ name: 'My Organisation' }]
+  await initer(Organisation, 'organisation', organisations)
+  const org = await Organisation.findOne()
+  const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
+  initer(Project, 'projects', projects)
 }
 
-async function initer<T>(model: Model<T>, name: string, data: T[]) {
+async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
   const docs = await model.find().lean()
   if (docs.length === 0) {
     const newDocs = await model.insertMany(data)

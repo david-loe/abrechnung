@@ -28,20 +28,9 @@
       </select>
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormOrganisation" class="form-label me-2">
-        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.organisation')" />
-      <select
-        class="form-select"
-        id="healthCareCostFormOrganisation"
-        v-model="$root.user.settings.organisation"
-        @update:model-value="settingsChanged = true"
-        required>
-        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-          {{ organisation.name }}
-        </option>
-      </select>
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
+      <InfoPoint :text="$t('info.project')" />
+      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" required> </ProjectSelector>
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
@@ -59,10 +48,11 @@
 import { defineComponent, PropType } from 'vue'
 import { HealthCareCostSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
+import ProjectSelector from '../../elements/ProjectSelector.vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint },
+  components: { InfoPoint, ProjectSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {
@@ -97,7 +87,6 @@ export default defineComponent({
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
-      this.formHealthCareCost.organisation = this.$root.user.settings.organisation
       this.formHealthCareCost.insurance = this.$root.user.settings.insurance
       return this.formHealthCareCost
     },

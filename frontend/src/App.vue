@@ -109,21 +109,6 @@
       </div>
       <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
     </div>
-    <div class="modal fade" id="userSettingsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ $t('headlines.settings') }}</h5>
-          </div>
-          <div v-if="user.settings" class="modal-body">
-            <UserSettingsForm
-              :settings="user.settings"
-              :showCancel="false"
-              @edit="(settings) => pushUserSettings(settings).then(() => checkUserSettings(settings))" />
-          </div>
-        </div>
-      </div>
-    </div>
 
     <footer class="py-3 border-top">
       <div class="container">
@@ -149,7 +134,6 @@
 
 <script lang="ts">
 import axios, { AxiosRequestConfig } from 'axios'
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
@@ -160,13 +144,13 @@ import {
   HealthInsurance,
   Locale,
   OrganisationSimple,
+  ProjectSimple,
   SETResponse,
   Settings,
   User,
   accesses,
   locales
 } from '../../common/types.js'
-import UserSettingsForm from './components/settings/forms/UserSettingsForm.vue'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -179,7 +163,6 @@ export interface Alert {
 export default defineComponent({
   data() {
     return {
-      userSettingsModal: undefined as Modal | undefined,
       alerts: [] as Alert[],
       auth: false,
       user: {} as User,
@@ -188,6 +171,7 @@ export default defineComponent({
       settings: {} as Settings,
       healthInsurances: [] as HealthInsurance[],
       organisations: [] as OrganisationSimple[],
+      projects: [] as ProjectSimple[],
       specialLumpSums: {} as { [key: string]: string[] },
       users: [] as { name: User['name']; _id: string }[],
       loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
@@ -197,7 +181,7 @@ export default defineComponent({
       accesses
     }
   },
-  components: { UserSettingsForm },
+  components: {},
   methods: {
     async load() {
       if (this.loadState === 'UNLOADED') {
@@ -209,6 +193,7 @@ export default defineComponent({
           this.getter<Settings>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
           this.getter<OrganisationSimple[]>('organisation'),
+          this.getter<ProjectSimple[]>('project'),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
           this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
         ]).then((result) => {
@@ -225,9 +210,9 @@ export default defineComponent({
             result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
           this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
           this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
-          this.specialLumpSums = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : {}) : {}
-          this.users = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : []) : []
-          this.checkUserSettings(this.user.settings)
+          this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
+          this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
+          this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -371,45 +356,30 @@ export default defineComponent({
       }
     },
     setLastCurrency(currency: Currency) {
-      const index = this.user.settings.lastCurrencies.indexOf(currency)
-      if (index !== -1) {
-        this.user.settings.lastCurrencies.splice(index, 1)
-      }
-      const length = this.user.settings.lastCurrencies.unshift(currency)
-      if (length > 3) {
-        this.user.settings.lastCurrencies.pop()
-      }
+      this.setLast(currency, this.user.settings.lastCurrencies)
       this.pushUserSettings(this.user.settings)
     },
     setLastCountry(country: CountrySimple) {
-      const index = this.user.settings.lastCountries.indexOf(country)
-      if (index !== -1) {
-        this.user.settings.lastCountries.splice(index, 1)
-      }
-      const length = this.user.settings.lastCountries.unshift(country)
-      if (length > 3) {
-        this.user.settings.lastCountries.pop()
-      }
+      this.setLast(country, this.user.settings.lastCountries)
       this.pushUserSettings(this.user.settings)
     },
-    checkUserSettings(settings: User['settings']) {
-      if (
-        (!this.settings.disableReportType.healthCareCost && !settings.insurance) ||
-        (this.organisations.length > 0 && !settings.organisation)
-      ) {
-        if (this.userSettingsModal) this.userSettingsModal.show()
-      } else {
-        if (this.userSettingsModal) this.userSettingsModal.hide()
+    setLastProject(project: ProjectSimple) {
+      this.setLast(project, this.user.settings.lastProjects)
+      this.pushUserSettings(this.user.settings)
+    },
+    setLast<T>(item: T, list: T[], limit = 3) {
+      const index = list.indexOf(item)
+      if (index !== -1) {
+        list.splice(index, 1)
+      }
+      const length = list.unshift(item)
+      if (length > limit) {
+        list.pop()
       }
     },
     getFlagEmoji
   },
-  mounted() {
-    const modalEL = document.getElementById('userSettingsModal')
-    if (modalEL) {
-      this.userSettingsModal = new Modal(modalEL, {})
-    }
-  }
+  mounted() {}
 })
 </script>
 
