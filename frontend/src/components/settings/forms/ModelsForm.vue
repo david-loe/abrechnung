@@ -107,8 +107,8 @@ export default defineComponent({
     },
     async deleteIt() {
       this.loading = true
-      if (this.object || this.object._id) {
-        await this.$root.deleter('admin/' + this.model, { _id: this.object._id })
+      if (this.model && (this.object || this.object._id)) {
+        await this.$root.deleter('admin/' + this.model.name, { _id: this.object._id })
       }
       this.clear()
     }
