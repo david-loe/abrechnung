@@ -1,7 +1,7 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import HealthInsurance from '../models/healthInsurance.js'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { HealthInsurance as IHealthInsurance, _id } from '../../common/types.js'
+import HealthInsurance from '../models/healthInsurance.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('HealthInsurance')
 @Route('healthInsurance')
@@ -19,7 +19,7 @@ export class HealthInsuranceController extends Controller {
 export class HealthInsuranceAdminController extends Controller {
   @Post()
   public async postHealthInsurance(@Body() requestBody: SetterBody<IHealthInsurance>) {
-    return await this.setter(HealthInsurance, { requestBody: requestBody })
+    return await this.setter(HealthInsurance, { requestBody: requestBody, allowNew: true })
   }
   @Delete()
   public async deleteHealthInsurance(@Query() _id: _id) {

@@ -23,7 +23,7 @@ export class ProjectAdminController extends Controller {
   }
   @Post()
   public async postProject(@Body() requestBody: SetterBody<IProject>) {
-    return await this.setter(Project, { requestBody: requestBody })
+    return await this.setter(Project, { requestBody: requestBody, allowNew: true })
   }
   @Delete()
   public async deleteProject(@Query() _id: _id) {

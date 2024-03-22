@@ -1,7 +1,7 @@
-import { Route, Get, Tags, Security, Queries, Post, Body, Delete, Query } from 'tsoa'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
-import Country from '../models/country.js'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Country as ICountry, _id } from '../../common/types.js'
+import Country from '../models/country.js'
+import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('Country')
 @Route('')
@@ -44,7 +44,7 @@ export class CountryController extends Controller {
 export class CountryAdminController extends Controller {
   @Post()
   public async postCountry(@Body() requestBody: SetterBody<ICountry>) {
-    return await this.setter(Country, { requestBody: requestBody })
+    return await this.setter(Country, { requestBody: requestBody, allowNew: true })
   }
   @Delete()
   public async deleteCountry(@Query() _id: _id) {
