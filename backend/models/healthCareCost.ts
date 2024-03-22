@@ -59,7 +59,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'insurance' }),
-    doc.populate({ path: 'project', select: { name: 1, organisation: 1 } }),
+    doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
     doc.populate({ path: 'refundSum.currency' }),
     doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),

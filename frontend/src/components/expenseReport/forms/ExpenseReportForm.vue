@@ -7,18 +7,16 @@
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormOrganisation" class="form-label me-2">
-        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.organisation')" />
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
+      <InfoPoint :text="$t('info.project')" />
       <select
         class="form-select"
-        id="healthCareCostFormOrganisation"
-        v-model="$root.user.settings.organisation"
+        id="healthCareCostFormProject"
+        v-model="formExpenseReport.project"
         @update:model-value="settingsChanged = true"
         required>
-        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-          {{ organisation.name }}
+        <option v-for="project of $root.projects" :value="project" :key="project._id">
+          {{ project.identifier }}
         </option>
       </select>
     </div>
@@ -73,7 +71,6 @@ export default defineComponent({
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
-      this.formExpenseReport.organisation = this.$root.user.settings.organisation
       return this.formExpenseReport
     },
     input() {

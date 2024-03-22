@@ -149,7 +149,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'stages.cost.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'days.refunds.refund.currency' }),
-    doc.populate({ path: 'project', select: { name: 1, organisation: 1 } }),
+    doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
     doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),

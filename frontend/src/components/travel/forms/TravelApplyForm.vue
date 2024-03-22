@@ -77,18 +77,16 @@
     </div>
 
     <div class="mb-3">
-      <label for="healthCareCostFormOrganisation" class="form-label me-2">
-        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.organisation')" />
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
+      <InfoPoint :text="$t('info.project')" />
       <select
         class="form-select"
-        id="healthCareCostFormOrganisation"
-        v-model="$root.user.settings.organisation"
+        id="healthCareCostFormProject"
+        v-model="formTravel.project"
         @update:model-value="settingsChanged = true"
         required>
-        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-          {{ organisation.name }}
+        <option v-for="project of $root.projects" :value="project" :key="project._id">
+          {{ project.identifier }}
         </option>
       </select>
     </div>
@@ -100,8 +98,8 @@
           mode === 'add'
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
-              ? $t('labels.reapplyForX', { X: $t('labels.travel') })
-              : $t('labels.save')
+            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+            : $t('labels.save')
         }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
@@ -113,12 +111,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
+import { baseCurrency, TravelSimple } from '../../../../../common/types.js'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
+import DateInput from '../../elements/DateInput.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
-import DateInput from '../../elements/DateInput.vue'
-import { TravelSimple, baseCurrency } from '../../../../../common/types.js'
-import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 
 export default defineComponent({
   name: 'TravelApplyForm',
@@ -166,7 +164,6 @@ export default defineComponent({
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
-      this.formTravel.organisation = this.$root.user.settings.organisation
       return this.formTravel
     },
     input() {

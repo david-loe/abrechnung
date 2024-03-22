@@ -28,18 +28,16 @@
       </select>
     </div>
     <div class="mb-3">
-      <label for="healthCareCostFormOrganisation" class="form-label me-2">
-        {{ $t('labels.organisation') }}<span class="text-danger">*</span>
-      </label>
-      <InfoPoint :text="$t('info.organisation')" />
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
+      <InfoPoint :text="$t('info.project')" />
       <select
         class="form-select"
-        id="healthCareCostFormOrganisation"
-        v-model="$root.user.settings.organisation"
+        id="healthCareCostFormProject"
+        v-model="formHealthCareCost.project"
         @update:model-value="settingsChanged = true"
         required>
-        <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-          {{ organisation.name }}
+        <option v-for="project of $root.projects" :value="project" :key="project._id">
+          {{ project.identifier }}
         </option>
       </select>
     </div>
@@ -97,7 +95,6 @@ export default defineComponent({
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
-      this.formHealthCareCost.organisation = this.$root.user.settings.organisation
       this.formHealthCareCost.insurance = this.$root.user.settings.insurance
       return this.formHealthCareCost
     },
