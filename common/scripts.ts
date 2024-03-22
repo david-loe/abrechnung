@@ -280,13 +280,25 @@ export function getTravelTotal(travel: Travel): Money {
 }
 
 export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
+  return addUpExpenseReport(expenseReport).total
+}
+
+export function addUpExpenseReport(expenseReport: ExpenseReport): { total: Money; advance: Money; expenses: Money } {
   var sum = 0
   for (const expense of expenseReport.expenses) {
     if (expense.cost && expense.cost.amount != null) {
       sum += getBaseCurrencyAmount(expense.cost)
     }
   }
-  return { amount: sum, currency: baseCurrency }
+  var advance = 0
+  if (expenseReport.advance && expenseReport.advance.amount != null) {
+    advance = getBaseCurrencyAmount(expenseReport.advance)
+  }
+  return {
+    total: { amount: sum - advance, currency: baseCurrency },
+    advance: { amount: advance, currency: baseCurrency },
+    expenses: { amount: sum, currency: baseCurrency }
+  }
 }
 
 export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
