@@ -398,7 +398,7 @@
                         </small>
                       </td>
                       <td class="text-end align-top">
-                        <small>{{ getMoneyString(getLumpSumsSum(travel)) }}</small>
+                        <small>{{ getMoneyString(addUp.lumpSums) }}</small>
                       </td>
                     </tr>
                     <tr>
@@ -406,7 +406,7 @@
                         <small>{{ $t('labels.expenses') }}</small>
                       </td>
                       <td class="text-end">
-                        <small>{{ getMoneyString(getExpensesSum(travel)) }}</small>
+                        <small>{{ getMoneyString(addUp.expenses) }}</small>
                       </td>
                     </tr>
                     <tr v-if="travel.advance.amount">
@@ -414,12 +414,12 @@
                         <small>{{ $t('labels.advance') }}</small>
                       </td>
                       <td class="text-end text-secondary">
-                        <small>{{ getMoneyString(travel.advance, true, (x) => 0 - x) }}</small>
+                        <small>{{ getMoneyString(addUp.advance, true, (x) => 0 - x) }}</small>
                       </td>
                     </tr>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(getTravelTotal(travel)) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -481,16 +481,9 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
+import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  datetoDateString,
-  getExpensesSum,
-  getLumpSumsSum,
-  getMoneyString,
-  getTravelTotal,
-  mailToLink,
-  msTeamsToLink
-} from '../../../../common/scripts.js'
-import {
+  BaseCurrencyMoney,
   DocumentFile,
   meals,
   Place,
@@ -538,7 +531,8 @@ export default defineComponent({
       travelStates,
       mailToLink: '',
       msTeamsToLink: '',
-      error: undefined as any
+      error: undefined as any,
+      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney }
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
@@ -773,6 +767,7 @@ export default defineComponent({
     setTravel(travel: Travel) {
       const oldTravel = this.travel
       this.travel = travel
+      this.addUp = addUp(this.travel)
       if (oldTravel.days && this.travel.days) {
         for (const oldDay of oldTravel.days) {
           if ((oldDay as Day).showSettings) {
@@ -823,10 +818,7 @@ export default defineComponent({
       return list
     },
     getMoneyString,
-    datetoDateString,
-    getLumpSumsSum,
-    getExpensesSum,
-    getTravelTotal
+    datetoDateString
   },
   async created() {
     await this.$root.load()

@@ -136,7 +136,8 @@ export interface ProjectSimple {
 
 export interface Project extends ProjectSimple {
   name?: string
-  balance?: number
+  balance: BaseCurrencyMoney
+  budget?: BaseCurrencyMoney
 }
 
 export interface Organisation extends OrganisationSimple {
@@ -167,8 +168,11 @@ export interface User extends UserSimple {
   token?: Token | null
 }
 
-export interface Money {
+export interface BaseCurrencyMoney {
   amount: number | null
+}
+
+export interface Money extends BaseCurrencyMoney {
   currency: Currency
   exchangeRate?: {
     date: Date | string
@@ -257,7 +261,7 @@ export type Transport =
 
 export interface Refund {
   type: LumpsumType
-  refund: Money
+  refund: BaseCurrencyMoney
 }
 
 export interface TravelDay {

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { datetoDateStringWithYear, getDetailedMoneyString, getHealthCareCostTotal } from '../../common/scripts.js'
+import { addUp, datetoDateStringWithYear, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, HealthCareCost, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
 import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
@@ -102,8 +102,9 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, he
     fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
   })
 
+  const addedUp = addUp(healthCareCost)
   const summary = []
-  summary.push({ reference: i18n.t('labels.total'), sum: getHealthCareCostTotal(healthCareCost) })
+  summary.push({ reference: i18n.t('labels.total'), sum: addedUp.total })
   if (healthCareCost.state === 'refunded') {
     summary.push({ reference: i18n.t('labels.refundSum'), sum: healthCareCost.refundSum })
   }

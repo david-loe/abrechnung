@@ -1,14 +1,4 @@
-import {
-  ExpenseReport,
-  HealthCareCost,
-  Locale,
-  Money,
-  Place,
-  Travel,
-  baseCurrency,
-  reportIsHealthCareCost,
-  reportIsTravel
-} from './types.js'
+import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency, reportIsTravel } from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -124,14 +114,19 @@ export function getDayList(startDate: Date | string | number, endDate: Date | st
   return days
 }
 
+export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
+  return Object.assign({ currency: baseCurrency }, basic)
+}
+
 export function getMoneyString(
-  money: Money,
+  baseMoney: BaseCurrencyMoney | Money,
   useExchangeRate: boolean = true,
-  func: (x: number) => number = (x: number): number => x,
+  func = (x: number): number => x,
   locale: Locale = 'de',
   warning: boolean = false
 ): string {
   var amount = 0
+  const money = baseCurrencyMoneyToMoney(baseMoney)
   var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
   if (useExchangeRate && money.exchangeRate) {
     amount = money.exchangeRate.amount
@@ -152,7 +147,8 @@ export function getMoneyString(
   )
 }
 
-export function getDetailedMoneyString(money: Money, locale: Locale, printZero = false): string {
+export function getDetailedMoneyString(baseMoney: Money | BaseCurrencyMoney, locale: Locale, printZero = false): string {
+  const money = baseCurrencyMoneyToMoney(baseMoney)
   if (!money || (money && (typeof money.amount !== 'number' || (!money.amount && !printZero)))) {
     return ''
   }
@@ -214,7 +210,7 @@ export function datetoDateStringWithYear(date: string | number | Date): string {
   }
 }
 
-export function getLumpSumsSum(travel: Travel): Money {
+function getLumpSumsSum(travel: Travel) {
   var sum = 0
   for (const day of travel.days) {
     for (const refund of day.refunds) {
@@ -223,22 +219,22 @@ export function getLumpSumsSum(travel: Travel): Money {
       }
     }
   }
-  return { amount: sum, currency: baseCurrency }
+  return { amount: sum }
 }
 
 function getBaseCurrencyAmount(a: Money): number {
   var amount = 0
   if (a.amount !== null) {
     if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
-      amount += a.exchangeRate.amount
+      amount = a.exchangeRate.amount
     } else if (a.currency._id == baseCurrency._id) {
-      amount += a.amount
+      amount = a.amount
     }
   }
   return amount
 }
 
-export function getExpensesSum(travel: Travel): Money {
+function getTravelExpensesSum(travel: Travel) {
   var sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount != null) {
@@ -258,57 +254,39 @@ export function getExpensesSum(travel: Travel): Money {
       sum += add
     }
   }
-  return { amount: sum, currency: baseCurrency }
+  return { amount: sum }
 }
 
-export function getTotal(report: Travel | ExpenseReport | HealthCareCost): Money {
+export function addUp(report: Travel | ExpenseReport | HealthCareCost): {
+  total: BaseCurrencyMoney
+  advance: BaseCurrencyMoney
+  expenses: BaseCurrencyMoney
+  lumpSums: BaseCurrencyMoney
+} {
+  let expenses = 0
+  let advance = 0
+  let lumpSums = 0
   if (reportIsTravel(report)) {
-    return getTravelTotal(report)
-  } else if (reportIsHealthCareCost(report)) {
-    return getHealthCareCostTotal(report)
+    lumpSums = getLumpSumsSum(report).amount
+    expenses = getTravelExpensesSum(report).amount
   } else {
-    return getExpenseReportTotal(report)
-  }
-}
-
-export function getTravelTotal(travel: Travel): Money {
-  var advance = 0
-  if (travel.advance && travel.advance.amount != null) {
-    advance = getBaseCurrencyAmount(travel.advance)
-  }
-  return { amount: getExpensesSum(travel).amount! + getLumpSumsSum(travel).amount! - advance, currency: baseCurrency }
-}
-
-export function getExpenseReportTotal(expenseReport: ExpenseReport): Money {
-  return addUpExpenseReport(expenseReport).total
-}
-
-export function addUpExpenseReport(expenseReport: ExpenseReport): { total: Money; advance: Money; expenses: Money } {
-  var sum = 0
-  for (const expense of expenseReport.expenses) {
-    if (expense.cost && expense.cost.amount != null) {
-      sum += getBaseCurrencyAmount(expense.cost)
+    for (const expense of report.expenses) {
+      if (expense.cost && expense.cost.amount != null) {
+        expenses += getBaseCurrencyAmount(expense.cost)
+      }
     }
   }
-  var advance = 0
-  if (expenseReport.advance && expenseReport.advance.amount != null) {
-    advance = getBaseCurrencyAmount(expenseReport.advance)
+  if ((report as Travel | ExpenseReport).advance && (report as Travel | ExpenseReport).advance.amount != null) {
+    advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
   }
+  let total = expenses + lumpSums - advance
+
   return {
-    total: { amount: sum - advance, currency: baseCurrency },
-    advance: { amount: advance, currency: baseCurrency },
-    expenses: { amount: sum, currency: baseCurrency }
+    total: { amount: total },
+    advance: { amount: advance },
+    expenses: { amount: expenses },
+    lumpSums: { amount: lumpSums }
   }
-}
-
-export function getHealthCareCostTotal(healthCareCost: HealthCareCost): Money {
-  var sum = 0
-  for (const expense of healthCareCost.expenses) {
-    if (expense.cost && expense.cost.amount != null) {
-      sum += getBaseCurrencyAmount(expense.cost)
-    }
-  }
-  return { amount: sum, currency: baseCurrency }
 }
 
 // From https://stackoverflow.com/a/52983833/13582326

@@ -62,7 +62,7 @@ export async function convertCurrency(
     const res = await axios.get(url)
     if (res.status === 200) {
       const rates = (res.data as InforEuroResponse).map(
-        (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year }) as ExchangeRateI
+        (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year } as ExchangeRateI)
       )
       ExchangeRate.insertMany(rates)
       data = rates.find((r) => r.currency === from.toUpperCase())
@@ -78,8 +78,7 @@ export async function convertCurrency(
 
 export function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency: string | null = null) {
   const costObject: any = {
-    amount: { type: Number, min: 0, required: required, default: null },
-    currency: { type: String, ref: 'Currency', required: required, default: defaultCurrency }
+    amount: { type: Number, min: 0, required: required, default: null }
   }
   if (exchangeRate) {
     costObject.exchangeRate = {
@@ -87,6 +86,7 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
       rate: { type: Number, min: 0 },
       amount: { type: Number, min: 0 }
     }
+    costObject.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
     costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
