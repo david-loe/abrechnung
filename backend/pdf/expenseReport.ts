@@ -1,7 +1,7 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { datetoDateStringWithYear, getDetailedMoneyString, getExpenseReportTotal } from '../../common/scripts.js'
+import { addUpExpenseReport, datetoDateStringWithYear, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
 import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
@@ -98,8 +98,14 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, ex
     fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
   })
 
+  const addUp = addUpExpenseReport(expenseReport)
   const summary = []
-  summary.push({ reference: i18n.t('labels.total'), sum: getExpenseReportTotal(expenseReport) })
+  if (addUp.advance.amount !== null && addUp.advance.amount > 0) {
+    summary.push({ reference: i18n.t('labels.expenses'), sum: addUp.expenses })
+    addUp.advance.amount = -1 * addUp.advance.amount
+    summary.push({ reference: i18n.t('labels.advance'), sum: addUp.advance })
+  }
+  summary.push({ reference: i18n.t('labels.total'), sum: addUp.total })
 
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.summary'), {

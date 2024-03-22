@@ -144,9 +144,28 @@
               <div>
                 <table class="table align-bottom">
                   <tbody>
+                    <template v-if="expenseReport.advance.amount">
+                      <tr>
+                        <td>
+                          <small>{{ $t('labels.expenses') }}</small>
+                        </td>
+                        <td class="text-end">
+                          <small>{{ getMoneyString(addUp.expenses) }}</small>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <small>{{ $t('labels.advance') }}</small>
+                        </td>
+                        <td class="text-end">
+                          <small>{{ getMoneyString(addUp.advance, true, (x) => 0 - x) }}</small>
+                        </td>
+                      </tr>
+                    </template>
+
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(getExpenseReportTotal(expenseReport)) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -208,8 +227,8 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { datetoDateString, getExpenseReportTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
+import { addUpExpenseReport, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { Expense, ExpenseReport, expenseReportStates, Money, UserSimple } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
@@ -226,7 +245,8 @@ export default defineComponent({
       isReadOnly: false,
       expenseReportStates,
       mailToLink: '',
-      msTeamsToLink: ''
+      msTeamsToLink: '',
+      addUp: {} as { total: Money; advance: Money; expenses: Money }
     }
   },
   components: { StatePipeline, ExpenseForm },
@@ -331,6 +351,7 @@ export default defineComponent({
     },
     setExpenseReport(expenseReport: ExpenseReport) {
       this.expenseReport = expenseReport
+      this.addUp = addUpExpenseReport(this.expenseReport)
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },
@@ -342,8 +363,7 @@ export default defineComponent({
       return []
     },
     getMoneyString,
-    datetoDateString,
-    getExpenseReportTotal
+    datetoDateString
   },
   async created() {
     await this.$root.load()

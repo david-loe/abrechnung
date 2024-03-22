@@ -296,6 +296,7 @@ export interface Travel extends TravelSimple {
 
 export interface ExpenseReportSimple extends RequestSimple {
   state: ExpenseReportState
+  advance: Money
   comments: ExpenseReportComment[]
   comment?: string | null
 }
