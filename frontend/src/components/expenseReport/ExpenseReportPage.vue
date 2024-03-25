@@ -167,6 +167,16 @@
                       <th>{{ $t('labels.total') }}</th>
                       <td class="text-end">{{ getMoneyString(addUp.total) }}</td>
                     </tr>
+                    <tr v-if="expenseReport.project.budget">
+                      <td>
+                        <small>{{ $t('labels.project') }}</small>
+                      </td>
+                      <td class="text-end">
+                        <small>{{
+                          getMoneyString(expenseReport.project.balance) + ' von ' + getMoneyString(expenseReport.project.budget)
+                        }}</small>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
@@ -227,8 +237,8 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { addUpExpenseReport, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { Expense, ExpenseReport, expenseReportStates, Money, UserSimple } from '../../../../common/types.js'
+import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { baseCurrency, BaseCurrencyMoney, Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
@@ -246,7 +256,8 @@ export default defineComponent({
       expenseReportStates,
       mailToLink: '',
       msTeamsToLink: '',
-      addUp: {} as { total: Money; advance: Money; expenses: Money }
+      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney },
+      baseCurrency
     }
   },
   components: { StatePipeline, ExpenseForm },
@@ -351,7 +362,7 @@ export default defineComponent({
     },
     setExpenseReport(expenseReport: ExpenseReport) {
       this.expenseReport = expenseReport
-      this.addUp = addUpExpenseReport(this.expenseReport)
+      this.addUp = addUp(this.expenseReport)
       log(this.$t('labels.expenseReport') + ':')
       log(this.expenseReport)
     },

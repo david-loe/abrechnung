@@ -21,6 +21,7 @@ import {
 import { convertCurrency, costObject } from '../helper.js'
 import Country, { CountryDoc } from './country.js'
 import DocumentFile from './documentFile.js'
+import Project from './project.js'
 import Settings from './settings.js'
 import User from './user.js'
 
@@ -60,7 +61,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
   {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: {
       type: String,
       required: true,
@@ -103,7 +104,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
           distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
           type: { type: String, enum: transportTypes, required: true }
         },
-        cost: costObject(true, true),
+        cost: costObject(true, true, false),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
         note: { type: String }
       }
@@ -130,7 +131,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
         refunds: [
           {
             type: { type: String, enum: lumpsumTypes, required: true },
-            refund: costObject(true, false, true)
+            refund: costObject(false, false, true)
           }
         ]
       }
@@ -148,7 +149,6 @@ function populate(doc: Document) {
     doc.populate({ path: 'advance.currency' }),
     doc.populate({ path: 'stages.cost.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'days.refunds.refund.currency' }),
     doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
     doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
@@ -386,8 +386,7 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
               leftover *
               ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
               100
-          ) / 100,
-        currency: baseCurrency
+          ) / 100
       }
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount! *= 2
@@ -424,8 +423,7 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
               amount *
                 (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
                 100
-            ) / 100,
-          currency: baseCurrency
+            ) / 100
         }
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount! *= 2
@@ -586,6 +584,12 @@ travelSchema.pre('validate', async function (this: TravelDoc, next) {
   await this.calculateExchangeRates()
 
   next()
+})
+
+travelSchema.post('save', async function (this: TravelDoc) {
+  if (this.state === 'refunded') {
+    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+  }
 })
 
 export default model<Travel, TravelModel>('Travel', travelSchema)

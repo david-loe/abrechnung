@@ -1,15 +1,7 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import {
-  dateTimeToString,
-  datetoDateString,
-  datetoDateStringWithYear,
-  getDetailedMoneyString,
-  getExpensesSum,
-  getLumpSumsSum,
-  getTravelTotal
-} from '../../common/scripts.js'
+import { addUp, dateTimeToString, datetoDateString, datetoDateStringWithYear, getDetailedMoneyString } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -161,15 +153,15 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
     fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
   })
 
+  const addedUp = addUp(travel)
   const summary = []
-  summary.push({ reference: i18n.t('labels.lumpSums'), sum: getLumpSumsSum(travel) })
-  summary.push({ reference: i18n.t('labels.expenses'), sum: getExpensesSum(travel) })
-  if (travel.advance.amount !== null && travel.advance.amount > 0) {
-    travel.advance.amount = -1 * travel.advance.amount
-    summary.push({ reference: i18n.t('labels.advance'), sum: travel.advance })
-    travel.advance.amount = -1 * travel.advance.amount
+  summary.push({ reference: i18n.t('labels.lumpSums'), sum: addedUp.lumpSums })
+  summary.push({ reference: i18n.t('labels.expenses'), sum: addedUp.expenses })
+  if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
+    addedUp.advance.amount = -1 * addedUp.advance.amount
+    summary.push({ reference: i18n.t('labels.advance'), sum: addedUp.advance })
   }
-  summary.push({ reference: i18n.t('labels.total'), sum: getTravelTotal(travel) })
+  summary.push({ reference: i18n.t('labels.total'), sum: addedUp.total })
 
   const fontSize = options.fontSize + 2
   page.drawText(i18n.t('labels.summary'), {

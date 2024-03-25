@@ -1,10 +1,10 @@
-import pdf_lib from 'pdf-lib'
-import pdf_fontkit from 'pdf-fontkit'
 import fs from 'fs'
-import i18n from '../i18n.js'
+import pdf_fontkit from 'pdf-fontkit'
+import pdf_lib from 'pdf-lib'
 import { getDetailedMoneyString } from '../../common/scripts.js'
 import { Locale, Money, TravelSimple } from '../../common/types.js'
-import { Column, Options, TabelOptions, drawTable, drawLogo, drawPlace } from './helper.js'
+import i18n from '../i18n.js'
+import { Column, Options, TabelOptions, drawLogo, drawPlace, drawTable } from './helper.js'
 
 export async function generateAdvanceReport(travel: TravelSimple) {
   const pdfDoc = await pdf_lib.PDFDocument.create()

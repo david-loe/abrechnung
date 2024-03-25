@@ -149,7 +149,7 @@
                   <tbody>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(getHealthCareCostTotal(healthCareCost)) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total) }}</td>
                     </tr>
                     <tr v-if="healthCareCost.state === 'refunded'">
                       <th>{{ $t('labels.refundSum') }}</th>
@@ -256,8 +256,16 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { datetoDateString, getById, getHealthCareCostTotal, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '../../../../common/types.js'
+import { addUp, datetoDateString, getById, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import {
+  BaseCurrencyMoney,
+  DocumentFile,
+  Expense,
+  HealthCareCost,
+  healthCareCostStates,
+  Organisation,
+  UserSimple
+} from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
@@ -277,7 +285,8 @@ export default defineComponent({
       healthCareCostStates,
       mailToLink: '',
       msTeamsToLink: '',
-      organisations: [] as Organisation[]
+      organisations: [] as Organisation[],
+      addUp: {} as { total: BaseCurrencyMoney; expenses: BaseCurrencyMoney }
     }
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload },
@@ -345,7 +354,7 @@ export default defineComponent({
       }
     },
     mailToInsuranceLink(healthCareCost: HealthCareCost): string {
-      const orga = getById(healthCareCost.organisation._id, this.organisations)
+      const orga = getById(healthCareCost.project.organisation, this.organisations)
       return mailToLink(
         [healthCareCost.insurance.email],
         this.$t('mail.underExaminationByInsurance.subject', { companyNumber: orga?.companyNumber }),
@@ -354,7 +363,7 @@ export default defineComponent({
           owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
           bankDetails: orga?.bankDetails,
           organisationName: orga?.name,
-          amount: getMoneyString(getHealthCareCostTotal(healthCareCost))
+          amount: getMoneyString(this.addUp.total)
         })
       )
     },
@@ -416,6 +425,7 @@ export default defineComponent({
     },
     setHealthCareCost(healthCareCost: HealthCareCost) {
       this.healthCareCost = healthCareCost
+      this.addUp = addUp(this.healthCareCost)
       log(this.$t('labels.healthCareCost') + ':')
       log(this.healthCareCost)
     },
@@ -427,8 +437,7 @@ export default defineComponent({
       return []
     },
     getMoneyString,
-    datetoDateString,
-    getHealthCareCostTotal
+    datetoDateString
   },
   async created() {
     await this.$root.load()
