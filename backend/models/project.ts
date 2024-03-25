@@ -1,13 +1,15 @@
-import mongoose, { HydratedDocument, InferSchemaType, Schema, model } from 'mongoose'
+import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Project, Travel, _id } from '../../common/types.js'
+import { ExpenseReport, HealthCareCost, Project, Travel, _id } from '../../common/types.js'
 import { costObject } from '../helper.js'
 
 interface Methods {
-  calcBalance(): Promise<BaseCurrencyMoney>
+  updateBalance(): Promise<void>
 }
 
-const projectSchema = new Schema<Project>({
+type ProjectModel = Model<Project, {}, Methods>
+
+const projectSchema = new Schema<Project, ProjectModel, Methods>({
   identifier: { type: String, trim: true, required: true, unique: true, index: true },
   organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
   name: { type: String, trim: true },
@@ -15,11 +17,11 @@ const projectSchema = new Schema<Project>({
   budget: costObject(false, false, false)
 })
 
-projectSchema.methods.calcBalance = async function (this: ProjectDoc): Promise<BaseCurrencyMoney> {
+projectSchema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
   let sum = 0
-  const travels = mongoose.connection.collection('travels').find({ project: this._id, state: 'refunded' })
-  const expenseReports = mongoose.connection.collection('expensereports').find({ project: this._id, state: 'refunded' })
-  const healthCareCosts = mongoose.connection.collection('healthcarecosts').find({ project: this._id, state: 'refunded' })
+  const travels = mongoose.connection.collection('travels').find({ project: this._id, state: 'refunded', historic: false })
+  const expenseReports = mongoose.connection.collection('expensereports').find({ project: this._id, state: 'refunded', historic: false })
+  const healthCareCosts = mongoose.connection.collection('healthcarecosts').find({ project: this._id, state: 'refunded', historic: false })
   for await (const travel of travels) {
     const addedUp = addUp(travel as Travel)
     if (addedUp.expenses.amount) {
@@ -41,16 +43,13 @@ projectSchema.methods.calcBalance = async function (this: ProjectDoc): Promise<B
       sum += addedUp.expenses.amount
     }
   }
-  return { amount: sum }
+  this.balance = { amount: sum }
+  await this.save()
 }
-
-projectSchema.pre('validate', async function (this: ProjectDoc, next) {
-  this.balance = await this.calcBalance()
-})
 
 export type ProjectSchema = InferSchemaType<typeof projectSchema>
 export type IProject = ProjectSchema & { _id: _id }
 
-export default model('Project', projectSchema)
+export default model<Project, ProjectModel>('Project', projectSchema)
 
 export interface ProjectDoc extends Methods, HydratedDocument<Project> {}

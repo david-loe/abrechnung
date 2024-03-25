@@ -1,6 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
 import { convertCurrency, costObject } from '../helper.js'
+import Project from './project.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -14,7 +15,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
   {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: {
       type: String,
       required: true,
@@ -128,6 +129,12 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
   await this.calculateExchangeRates()
 
   next()
+})
+
+expenseReportSchema.post('save', async function (this: ExpenseReportDoc) {
+  if (this.state === 'refunded') {
+    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+  }
 })
 
 export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', expenseReportSchema)

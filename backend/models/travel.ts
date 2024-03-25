@@ -21,6 +21,7 @@ import {
 import { convertCurrency, costObject } from '../helper.js'
 import Country, { CountryDoc } from './country.js'
 import DocumentFile from './documentFile.js'
+import Project from './project.js'
 import Settings from './settings.js'
 import User from './user.js'
 
@@ -60,7 +61,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
   {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: {
       type: String,
       required: true,
@@ -583,6 +584,12 @@ travelSchema.pre('validate', async function (this: TravelDoc, next) {
   await this.calculateExchangeRates()
 
   next()
+})
+
+travelSchema.post('save', async function (this: TravelDoc) {
+  if (this.state === 'refunded') {
+    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+  }
 })
 
 export default model<Travel, TravelModel>('Travel', travelSchema)

@@ -225,10 +225,11 @@ function getLumpSumsSum(travel: Travel) {
 function getBaseCurrencyAmount(a: Money): number {
   var amount = 0
   if (a.amount !== null) {
-    if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
-      amount = a.exchangeRate.amount
-    } else if (a.currency._id == baseCurrency._id) {
+    var currency = typeof a.currency === 'string' ? a.currency : a.currency._id
+    if (currency === baseCurrency._id) {
       amount = a.amount
+    } else if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
+      amount = a.exchangeRate.amount
     }
   }
   return amount
@@ -237,7 +238,7 @@ function getBaseCurrencyAmount(a: Money): number {
 function getTravelExpensesSum(travel: Travel) {
   var sum = 0
   for (const stage of travel.stages) {
-    if (stage.cost && stage.cost.amount != null) {
+    if (stage.cost && stage.cost.amount !== null) {
       var add = getBaseCurrencyAmount(stage.cost)
       if (stage.purpose === 'mixed') {
         add = add * travel.professionalShare!
@@ -246,7 +247,7 @@ function getTravelExpensesSum(travel: Travel) {
     }
   }
   for (const expense of travel.expenses) {
-    if (expense.cost && expense.cost.amount != null) {
+    if (expense.cost && expense.cost.amount !== null) {
       var add = getBaseCurrencyAmount(expense.cost)
       if (expense.purpose === 'mixed') {
         add = add * travel.professionalShare!
@@ -271,12 +272,12 @@ export function addUp(report: Travel | ExpenseReport | HealthCareCost): {
     expenses = getTravelExpensesSum(report).amount
   } else {
     for (const expense of report.expenses) {
-      if (expense.cost && expense.cost.amount != null) {
+      if (expense.cost) {
         expenses += getBaseCurrencyAmount(expense.cost)
       }
     }
   }
-  if ((report as Travel | ExpenseReport).advance && (report as Travel | ExpenseReport).advance.amount != null) {
+  if ((report as Travel | ExpenseReport).advance) {
     advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
   }
   let total = expenses + lumpSums - advance

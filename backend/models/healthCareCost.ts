@@ -8,6 +8,7 @@ import {
   healthCareCostStates
 } from '../../common/types.js'
 import { convertCurrency, costObject } from '../helper.js'
+import Project from './project.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -23,7 +24,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     patientName: { type: String, trim: true, required: true },
     insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: {
       type: String,
       required: true,
@@ -139,6 +140,12 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
   await this.calculateExchangeRates()
 
   next()
+})
+
+healthCareCostSchema.post('save', async function (this: HealthCareCostDoc) {
+  if (this.state === 'refunded') {
+    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+  }
 })
 
 export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', healthCareCostSchema)
