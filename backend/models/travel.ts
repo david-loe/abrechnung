@@ -104,7 +104,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
           distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
           type: { type: String, enum: transportTypes, required: true }
         },
-        cost: costObject(true, true),
+        cost: costObject(true, true, false),
         purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
         note: { type: String }
       }

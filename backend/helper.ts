@@ -1,8 +1,8 @@
-import DocumentFile from './models/documentFile.js'
 import axios from 'axios'
-import { Types, Schema } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
+import { Schema, Types } from 'mongoose'
 import { ExchangeRate as ExchangeRateI, baseCurrency } from '../common/types.js'
+import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
@@ -76,21 +76,27 @@ export async function convertCurrency(
   return { date: convertionDate, rate, amount }
 }
 
-export function costObject(exchangeRate = true, receipts = true, required = false, defaultCurrency: string | null = null) {
-  const costObject: any = {
-    amount: { type: Number, min: 0, required: required, default: null }
+export function costObject(
+  exchangeRate = true,
+  receipts = true,
+  required = false,
+  defaultCurrency: string | null = null,
+  defaultAmount: number | null = null
+) {
+  const type: any = {
+    amount: { type: Number, min: 0, required: required, default: defaultAmount }
   }
   if (exchangeRate) {
-    costObject.exchangeRate = {
+    type.exchangeRate = {
       date: { type: Date },
       rate: { type: Number, min: 0 },
       amount: { type: Number, min: 0 }
     }
-    costObject.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
+    type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
-    costObject.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
-    costObject.date = {
+    type.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
+    type.date = {
       type: Date,
       validate: {
         validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(),
@@ -99,7 +105,7 @@ export function costObject(exchangeRate = true, receipts = true, required = fals
       required: required
     }
   }
-  return costObject
+  return { type, required, default: () => ({}) }
 }
 
 export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
