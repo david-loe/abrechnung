@@ -1713,50 +1713,16 @@
 					"catering24"
 				]
 			},
-			"Money": {
+			"BaseCurrencyMoney": {
 				"properties": {
 					"amount": {
 						"type": "number",
 						"format": "double",
 						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
 					}
 				},
 				"required": [
-					"amount",
-					"currency"
+					"amount"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1767,7 +1733,7 @@
 						"$ref": "#/components/schemas/LumpsumType"
 					},
 					"refund": {
-						"$ref": "#/components/schemas/Money"
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
 					}
 				},
 				"required": [
@@ -1901,6 +1867,54 @@
 					"author",
 					"_id",
 					"toState"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Money": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount",
+					"currency"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4069,14 +4083,17 @@
 						"type": "string"
 					},
 					"balance": {
-						"type": "number",
-						"format": "double"
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
 					}
 				},
 				"required": [
 					"identifier",
 					"organisation",
-					"_id"
+					"_id",
+					"balance"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4157,14 +4174,17 @@
 						"type": "string"
 					},
 					"balance": {
-						"type": "number",
-						"format": "double"
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
 					}
 				},
 				"required": [
 					"identifier",
 					"organisation",
-					"_id"
+					"_id",
+					"balance"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4192,7 +4212,8 @@
 								"organisation",
 								"_id",
 								"name",
-								"balance"
+								"balance",
+								"budget"
 							],
 							"nullable": false
 						},
@@ -4208,9 +4229,23 @@
 			},
 			"SetterPartial_IProject.NoPost_": {
 				"properties": {
+					"budget": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
 					"balance": {
-						"type": "number",
-						"format": "double"
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
 					},
 					"identifier": {
 						"type": "string"
@@ -8097,7 +8132,8 @@
 									"organisation",
 									"_id",
 									"name",
-									"balance"
+									"balance",
+									"budget"
 								],
 								"nullable": false
 							}
