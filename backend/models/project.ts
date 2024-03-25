@@ -13,7 +13,7 @@ const projectSchema = new Schema<Project, ProjectModel, Methods>({
   identifier: { type: String, trim: true, required: true, unique: true, index: true },
   organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
   name: { type: String, trim: true },
-  balance: costObject(false, false, true),
+  balance: costObject(false, false, true, null, 0),
   budget: costObject(false, false, false)
 })
 
