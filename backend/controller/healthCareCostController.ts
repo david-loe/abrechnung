@@ -251,13 +251,33 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Post('inWork')
-  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postBackInWork(
+    @Body()
+    requestBody: {
+      project?: IdDocument
+      insurance?: IdDocument
+      patientName?: string
+      _id?: _id
+      name?: string
+      owner?: IdDocument
+      comment?: string
+    },
+    @Request() request: ExRequest
+  ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user?._id })
-
+    if (!extendedBody._id && !extendedBody.name) {
+      var date = new Date()
+      extendedBody.name =
+        requestBody.patientName +
+        ' ' +
+        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+        ' ' +
+        date.getUTCFullYear()
+    }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: (e: IHealthCareCost) => sendNotificationMail(e, 'backToInWork'),
-      allowNew: false,
+      cb: (e: IHealthCareCost) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
+      allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()

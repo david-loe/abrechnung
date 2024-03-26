@@ -221,13 +221,25 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Post('inWork')
-  public async postBackInWork(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postBackInWork(
+    @Body()
+    requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined; owner?: IdDocument; comment?: string },
+    @Request() request: ExRequest
+  ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork' as ExpenseReportState, editor: request.user?._id })
-
+    if (!extendedBody._id && !extendedBody.name) {
+      var date = new Date()
+      extendedBody.name =
+        i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
+        ' ' +
+        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+        ' ' +
+        date.getUTCFullYear()
+    }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: (e: IExpenseReport) => sendNotificationMail(e, 'backToInWork'),
-      allowNew: false,
+      cb: (e: IExpenseReport) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
+      allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination') {
           await oldObject.saveToHistory()

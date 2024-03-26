@@ -12,7 +12,7 @@ import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
-import { TravelApplication, TravelPost } from './types.js'
+import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -260,8 +260,23 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postApproved(
+    @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
+    @Request() request: ExRequest
+  ) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
+    if (!extendedBody._id) {
+      ;(extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
+      if (!(extendedBody as TravelApplication).name && (extendedBody as TravelApplication).startDate) {
+        var date = new Date((extendedBody as TravelApplication).startDate!)
+        ;(extendedBody as TravelApplication).name =
+          (extendedBody as TravelApplication).destinationPlace?.place +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
+    }
     const cb = async (travel: ITravel) => {
       sendNotificationMail(travel)
       if (
@@ -276,7 +291,7 @@ export class TravelApproveController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       cb,
-      allowNew: false,
+      allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'appliedFor') {
           await oldObject.saveToHistory()
