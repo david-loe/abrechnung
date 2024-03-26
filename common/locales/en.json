@@ -6,7 +6,11 @@
     "examine/expenseReport": "Examine Expenses",
     "examine/healthCareCost": "Examine Health Care Costs",
     "examine/travel": "Examine Travels",
-    "user": "Home"
+    "user": "Home",
+    "inWork:expenseReport": "Initiate Expenses",
+    "inWork:healthCareCost": "Initiate Health Care Costs",
+    "appliedFor:travel": "Apply For Travels",
+    "approved:travel": "Initiate Travel Expenses Without Approval"
   },
   "alerts": {
     "areYouSureDelete": "Are you sure that you want to delete this?",

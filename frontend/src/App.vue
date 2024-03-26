@@ -11,7 +11,7 @@
           </div>
           <template v-if="auth">
             <div v-for="access of accesses" :key="access">
-              <template v-if="access !== 'admin' && user.access[access]">
+              <template v-if="access !== 'admin' && access.indexOf(':') === -1 && user.access[access]">
                 <router-link :to="'/' + access" class="nav-link link-dark d-flex align-items-center">
                   <i v-for="icon of $root.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
                   <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
@@ -138,18 +138,18 @@ import { defineComponent } from 'vue'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
-  CountrySimple,
-  Currency,
-  GETResponse,
-  HealthInsurance,
-  Locale,
-  OrganisationSimple,
-  ProjectSimple,
-  SETResponse,
-  Settings,
-  User,
-  accesses,
-  locales
+CountrySimple,
+Currency,
+GETResponse,
+HealthInsurance,
+Locale,
+OrganisationSimple,
+ProjectSimple,
+SETResponse,
+Settings,
+User,
+accesses,
+locales
 } from '../../common/types.js'
 
 export interface Alert {

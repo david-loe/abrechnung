@@ -6,7 +6,11 @@
     "examine/expenseReport": "Auslagen prüfen",
     "examine/healthCareCost": "Krankenkosten prüfen",
     "examine/travel": "Reisen prüfen",
-    "user": "Home"
+    "user": "Home",
+    "inWork:expenseReport": "Auslagenabrechnung initiieren",
+    "inWork:healthCareCost": "Krankenkostenabrechnung initiieren",
+    "appliedFor:travel": "Reisekostenabrechnung beantragen",
+    "approved:travel": "Reisekostenabrechnung ohne Genehmigung initiieren"
   },
   "alerts": {
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",

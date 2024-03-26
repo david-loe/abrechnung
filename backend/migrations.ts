@@ -101,7 +101,6 @@ async function migrate(from: string) {
     case '0.3.4': {
       console.log('Apply migration from v0.3.4')
       mongoose.connection.collection('users').updateMany({}, { $set: { 'access.user': true } })
-      mongoose.connection.collection('settings').updateMany({}, { $set: { 'accessIcons.user': ['bi-card-list'] } })
     }
     case '0.3.5': {
       console.log('Apply migration from v0.3.5')
@@ -140,6 +139,20 @@ async function migrate(from: string) {
       } else {
         throw new Error('No project found')
       }
+    }
+    case '0.3.10': {
+      console.log('Apply migration from v0.3.10: Set default access settings')
+      mongoose.connection.collection('users').updateMany(
+        {},
+        {
+          $set: {
+            'access.inWork:expenseReport': true,
+            'access.inWork:healthCareCost': true,
+            'access.appliedFor:travel': true,
+            'access.approved:travel': false
+          }
+        }
+      )
     }
     default:
       if (settings) {
