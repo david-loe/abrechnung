@@ -10,7 +10,7 @@ import User from '../models/user.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { NotFoundError } from './error.js'
+import { AuthorizationError, NotFoundError } from './error.js'
 import { IdDocument, MoneyPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -82,20 +82,24 @@ export class ExpenseReportController extends Controller {
       editor: request.user?._id
     })
 
-    if (!extendedBody._id && !extendedBody.name) {
-      var date = new Date()
-      extendedBody.name =
-        i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
-        ' ' +
-        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-        ' ' +
-        date.getUTCFullYear()
+    if (!extendedBody._id) {
+      if (!request.user!.access['inWork:expenseReport']) {
+        throw new AuthorizationError()
+      } else if (!extendedBody.name) {
+        var date = new Date()
+        extendedBody.name =
+          i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
-          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') ||
+          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork' && request.user!.access['inWork:expenseReport']) ||
           (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user!._id))
         ) {
           await oldObject.saveToHistory()

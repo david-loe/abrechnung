@@ -11,7 +11,7 @@ import User from '../models/user.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { NotAllowedError } from './error.js'
+import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -83,20 +83,26 @@ export class HealthCareCostController extends Controller {
       editor: request.user?._id
     })
 
-    if (!extendedBody._id && !extendedBody.name) {
-      var date = new Date()
-      extendedBody.name =
-        requestBody.patientName +
-        ' ' +
-        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-        ' ' +
-        date.getUTCFullYear()
+    if (!extendedBody._id) {
+      if (!request.user!.access['inWork:healthCareCost']) {
+        throw new AuthorizationError()
+      } else if (!extendedBody.name) {
+        var date = new Date()
+        extendedBody.name =
+          requestBody.patientName +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (
-          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') ||
+          (oldObject.owner._id.equals(request.user!._id) &&
+            oldObject.state === 'inWork' &&
+            request.user!.access['inWork:healthCareCost']) ||
           (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user!._id))
         ) {
           await oldObject.saveToHistory()
