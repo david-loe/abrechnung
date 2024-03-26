@@ -9,18 +9,38 @@
           </div>
           <div v-if="modalTravel" class="modal-body">
             <TravelApproveForm
-              v-if="modalTravel.state == 'appliedFor'"
+              v-if="modalTravel.state === 'appliedFor'"
               ref="travelApproveForm"
               :travel="modalTravel"
               @cancel="hideModal()"
-              @decision="approveTravel"></TravelApproveForm>
-            <TravelApply v-else :travel="modalTravel" :showButtons="false"></TravelApply>
+              @decision="(d,c) => approveTravel(modalTravel, d,c)"></TravelApproveForm>
+            <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
+            <TravelApplyForm
+                v-else
+                :mode="modalMode"
+                @cancel="hideModal()"
+                :travel="modalTravel as Partial<TravelSimple>"
+                @add="(t)=> approveTravel(t, 'approved')"
+                @edit="(t)=> approveTravel(t, 'approved')"
+                ref="travelApplyForm"
+                askOwner></TravelApplyForm>
           </div>
+          
         </div>
       </div>
     </div>
     <div class="container">
-      <h1 class="mb-3">{{ $t('accesses.approve/travel') }}</h1>
+    <div class="row mb-3 justify-content-end gx-4 gy-2">
+        <div class="col-auto me-auto">
+          <h1>{{ $t('accesses.approve/travel') }}</h1>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-secondary" @click="showModal({}, 'add')">
+            <i class="bi bi-plus-lg"></i>
+            <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.travel') }) }}</span>
+          </button>
+        </div>
+    </div>
       <TravelCardList
         class="mb-5"
         ref="travelCardListRef"
@@ -55,22 +75,25 @@ import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
 import TravelApply from './elements/TravelApplication.vue'
 import TravelCardList from './elements/TravelCardList.vue'
+import TravelApplyForm from './forms/TravelApplyForm.vue'
 import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply },
+  components: { TravelCardList, TravelApproveForm, TravelApply , TravelApplyForm},
   props: { _id: { type: String } },
   data() {
     return {
       approveTravelModal: undefined as Modal | undefined,
       modalTravel: undefined as TravelSimple | undefined,
+      modalMode: 'view' as 'view'|'add'|'edit',
       showApproved: false
     }
   },
   methods: {
-    showModal(travel: TravelSimple) {
+    showModal(travel: TravelSimple, mode: 'view'|'add'|'edit' = 'view') {
       this.modalTravel = travel
+      this.modalMode = mode
       if (this.approveTravelModal) {
         this.approveTravelModal.show()
       }
@@ -82,13 +105,15 @@ export default defineComponent({
       if (this.$refs.travelApproveForm) {
         ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }
-
+      if (this.$refs.travelApplyForm) {
+        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
+      }
       this.modalTravel = undefined
     },
-    async approveTravel(decision: 'approved' | 'rejected', comment?: string) {
-      if (this.modalTravel) {
-        this.modalTravel.comment = comment
-        const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, this.modalTravel)
+    async approveTravel(travel: TravelSimple, decision: 'approved' | 'rejected', comment?: string) {
+      if (travel) {
+        travel.comment = comment
+        const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
           ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
