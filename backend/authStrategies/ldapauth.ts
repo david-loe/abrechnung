@@ -19,8 +19,8 @@ const ldapauth = new LdapStrategy(
     }
   },
   async function (ldapUser: any, cb: (error: any, user?: any) => void) {
-    var user = await User.findOne({ 'fk.ldapauth': ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
-    var email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
+    let user = await User.findOne({ 'fk.ldapauth': ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
+    let email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
     if (Array.isArray(email)) {
       if (email.length > 0) {
         email = email[0]
