@@ -145,6 +145,8 @@ export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null
   companyNumber?: string | null
+  logo?: DocumentFile | null
+  website?: string | null
 }
 
 export interface User extends UserSimple {
