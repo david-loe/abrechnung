@@ -267,6 +267,11 @@
         "paragraph": "Deine Auslagenabrechnung wurde dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Auslagen überarbeiten"
       },
+      "inWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Eine neue Auslagenabrechnung wurden für dich erstellt.",
+        "subject": "🆕 Auslagenabrechnung"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wird erstattet.",
@@ -287,7 +292,12 @@
       "backToInWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden dir zum Überarbeiten zurückgeschickt.",
-        "subject": "🔙 Auslagen überarbeiten"
+        "subject": "🔙 Krankenkosten überarbeiten"
+      },
+      "inWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Eine neue Krankenkostenabrechnung wurden für dich erstellt.",
+        "subject": "🆕 Krankenkosten"
       },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
