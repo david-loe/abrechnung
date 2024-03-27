@@ -319,6 +319,18 @@
 							"user": {
 								"type": "boolean"
 							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
 							"approve/travel": {
 								"type": "boolean"
 							},
@@ -340,6 +352,10 @@
 						},
 						"required": [
 							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
@@ -752,6 +768,18 @@
 							"user": {
 								"type": "boolean"
 							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
 							"approve/travel": {
 								"type": "boolean"
 							},
@@ -773,6 +801,10 @@
 						},
 						"required": [
 							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
@@ -974,6 +1006,18 @@
 								"type": "boolean"
 							},
 							"approve/travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
 								"type": "boolean"
 							},
 							"user": {
@@ -1220,6 +1264,18 @@
 								"type": "boolean"
 							},
 							"approve/travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
 								"type": "boolean"
 							},
 							"user": {
@@ -3501,11 +3557,53 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"IdDocument": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/_id"
+					},
+					{
+						"properties": {
+							"_id": {
+								"$ref": "#/components/schemas/_id"
+							}
+						},
+						"required": [
+							"_id"
+						],
+						"type": "object"
+					}
+				]
+			},
 			"Settings": {
 				"properties": {
 					"accessIcons": {
 						"properties": {
 							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
 								"items": {
 									"type": "string"
 								},
@@ -3550,6 +3648,61 @@
 						},
 						"required": [
 							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"defaultAccess": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
@@ -3799,6 +3952,7 @@
 				},
 				"required": [
 					"accessIcons",
+					"defaultAccess",
 					"allowSpouseRefund",
 					"breakfastCateringLumpSumCut",
 					"lunchCateringLumpSumCut",
@@ -4012,6 +4166,44 @@
 					"allowSpouseRefund": {
 						"type": "boolean"
 					},
+					"defaultAccess": {
+						"properties": {
+							"admin": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"user": {
+								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
 					"accessIcons": {
 						"properties": {
 							"admin": {
@@ -4045,6 +4237,30 @@
 								"type": "array"
 							},
 							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
 								"items": {
 									"type": "string"
 								},
@@ -4877,24 +5093,6 @@
 			},
 			"SetterBody_Expense_": {
 				"$ref": "#/components/schemas/SetterPartial_Expense.NoPost_"
-			},
-			"IdDocument": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/_id"
-					},
-					{
-						"properties": {
-							"_id": {
-								"$ref": "#/components/schemas/_id"
-							}
-						},
-						"required": [
-							"_id"
-						],
-						"type": "object"
-					}
-				]
 			},
 			"MoneyPlusPost": {
 				"properties": {
@@ -5753,7 +5951,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "0.3.10",
+		"version": "0.4.0",
 		"contact": {}
 	},
 	"paths": {
@@ -6929,15 +7127,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"_id": {
-										"$ref": "#/components/schemas/_id"
-									}
-								},
-								"required": [
-									"_id"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/TravelApplication"
 							}
 						}
 					}
@@ -7225,18 +7415,40 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"comment": {
-										"type": "string"
+								"anyOf": [
+									{
+										"allOf": [
+											{
+												"$ref": "#/components/schemas/TravelApplication"
+											},
+											{
+												"properties": {
+													"owner": {
+														"$ref": "#/components/schemas/IdDocument"
+													}
+												},
+												"required": [
+													"owner"
+												],
+												"type": "object"
+											}
+										]
 									},
-									"_id": {
-										"$ref": "#/components/schemas/_id"
+									{
+										"properties": {
+											"comment": {
+												"type": "string"
+											},
+											"_id": {
+												"$ref": "#/components/schemas/_id"
+											}
+										},
+										"required": [
+											"_id"
+										],
+										"type": "object"
 									}
-								},
-								"required": [
-									"_id"
-								],
-								"type": "object"
+								]
 							}
 						}
 					}
@@ -9458,13 +9670,25 @@
 									"comment": {
 										"type": "string"
 									},
+									"owner": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"name": {
+										"type": "string"
+									},
 									"_id": {
 										"$ref": "#/components/schemas/_id"
+									},
+									"patientName": {
+										"type": "string"
+									},
+									"insurance": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"project": {
+										"$ref": "#/components/schemas/IdDocument"
 									}
 								},
-								"required": [
-									"_id"
-								],
 								"type": "object"
 							}
 						}
@@ -10513,13 +10737,22 @@
 									"comment": {
 										"type": "string"
 									},
+									"owner": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"advance": {
+										"$ref": "#/components/schemas/MoneyPost"
+									},
+									"name": {
+										"type": "string"
+									},
 									"_id": {
 										"$ref": "#/components/schemas/_id"
+									},
+									"project": {
+										"$ref": "#/components/schemas/IdDocument"
 									}
 								},
-								"required": [
-									"_id"
-								],
 								"type": "object"
 							}
 						}
