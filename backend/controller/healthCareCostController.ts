@@ -1,7 +1,14 @@
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, HealthCareCostState, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, _id } from '../../common/types.js'
+import {
+  Expense,
+  HealthCareCostState,
+  HealthCareCost as IHealthCareCost,
+  Organisation as IOrganisation,
+  Locale,
+  _id
+} from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
@@ -143,7 +150,7 @@ export class HealthCareCostController extends Controller {
       $and: [{ _id, owner: request.user!._id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
     }).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost)
+      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -230,7 +237,10 @@ export class HealthCareCostExamineController extends Controller {
     const cb = async (healthCareCost: IHealthCareCost) => {
       sendNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
+        await writeToDisk(
+          await writeToDiskFilePath(healthCareCost),
+          await generateHealthCareCostReport(healthCareCost, i18n.language as Locale)
+        )
       }
     }
 
@@ -295,7 +305,7 @@ export class HealthCareCostExamineController extends Controller {
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
     const healthCareCost = await HealthCareCost.findOne({ _id, historic: false, state: 'underExaminationByInsurance' }).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost)
+      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -338,7 +348,10 @@ export class HealthCareCostConfirmController extends Controller {
     const cb = async (healthCareCost: IHealthCareCost) => {
       sendNotificationMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(healthCareCost), await generateHealthCareCostReport(healthCareCost))
+        await writeToDisk(
+          await writeToDiskFilePath(healthCareCost),
+          await generateHealthCareCostReport(healthCareCost, i18n.language as Locale)
+        )
       }
     }
 
@@ -366,7 +379,7 @@ export class HealthCareCostConfirmController extends Controller {
       $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
     }).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost)
+      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

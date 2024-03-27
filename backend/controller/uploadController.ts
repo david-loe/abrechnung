@@ -39,17 +39,17 @@ export class UploadController extends Controller {
       (new Date(user!.token!.createdAt).valueOf() + settings.uploadTokenExpireAfterSeconds * 1000 - new Date().valueOf()) / 1000
     )
     const text = {
-      tapToUpload: i18n.t('labels.tapToUpload'),
-      uploading: i18n.t('labels.uploading'),
-      success: i18n.t('labels.success'),
-      error: i18n.t('labels.error')
+      tapToUpload: i18n.t('labels.tapToUpload', { lng: user?.settings.language }),
+      uploading: i18n.t('labels.uploading', { lng: user?.settings.language }),
+      success: i18n.t('labels.success', { lng: user?.settings.language }),
+      error: i18n.t('labels.error', { lng: user?.settings.language })
     }
     const renderedHTML = ejs.render(template, {
       url: url.href,
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
       text,
-      language: i18n.language
+      language: user?.settings.language
     })
     this.setHeader('Content-Type', 'text/html; charset=utf-8')
     req.res?.send(renderedHTML)

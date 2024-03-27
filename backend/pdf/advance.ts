@@ -6,7 +6,7 @@ import { Locale, Money, TravelSimple } from '../../common/types.js'
 import i18n from '../i18n.js'
 import { Column, Options, TabelOptions, drawLogo, drawPlace, drawTable } from './helper.js'
 
-export async function generateAdvanceReport(travel: TravelSimple) {
+export async function generateAdvanceReport(travel: TravelSimple, language: Locale) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
@@ -23,11 +23,11 @@ export async function generateAdvanceReport(travel: TravelSimple) {
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32 })
+  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
   y = y - edge
-  y = drawGeneralAdvanceInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
+  y = drawGeneralAdvanceInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
 
-  y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
+  y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
 
   return await pdfDoc.save()
 }
@@ -56,7 +56,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   // Traveler
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
-    i18n.t('labels.traveler') +
+    i18n.t('labels.traveler', { lng: opts.language }) +
       ': ' +
       travel.owner.name.givenName +
       ' ' +
@@ -78,19 +78,25 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
     travel.destinationPlace,
     Object.assign(opts, {
       yStart: y,
-      prefix: i18n.t('labels.reason') + ': ' + travel.reason + '    ' + i18n.t('labels.destinationPlace') + ': '
+      prefix:
+        i18n.t('labels.reason', { lng: opts.language }) +
+        ': ' +
+        travel.reason +
+        '    ' +
+        i18n.t('labels.destinationPlace', { lng: opts.language }) +
+        ': '
     })
   )
 
   // Dates
   var text =
-    i18n.t('labels.from') +
+    i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(travel.startDate).toLocaleDateString(i18n.language) +
+    new Date(travel.startDate).toLocaleDateString(opts.language) +
     '    ' +
-    i18n.t('labels.to') +
+    i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(travel.endDate).toLocaleDateString(i18n.language)
+    new Date(travel.endDate).toLocaleDateString(opts.language)
   var y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
@@ -110,14 +116,14 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
     width: 180,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'sum',
-    fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
+    fn: (m: Money) => getDetailedMoneyString(m, options.language, true)
   })
 
   const summary = []
-  summary.push({ reference: i18n.t('labels.total'), sum: travel.advance })
+  summary.push({ reference: i18n.t('labels.total', { lng: options.language }), sum: travel.advance })
 
   const fontSize = options.fontSize + 2
-  page.drawText(i18n.t('labels.advance'), {
+  page.drawText(i18n.t('labels.advance', { lng: options.language }), {
     x: options.xStart,
     y: options.yStart - fontSize,
     size: fontSize,
@@ -132,7 +138,8 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
 
   page.drawText(
     i18n.t('report.advance.approvedXY', {
-      X: (travel.updatedAt as Date).toLocaleDateString(i18n.language),
+      lng: options.language,
+      X: (travel.updatedAt as Date).toLocaleDateString(options.language),
       Y: travel.editor.name.givenName + ' ' + travel.editor.name.familyName
     }),
     {
