@@ -4,7 +4,9 @@
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalTravel" class="modal-title">{{ modalTravel.name }}</h5>
+            <h5 v-if="modalTravel" class="modal-title">
+              {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
+            </h5>
             <button type="button" class="btn-close" @click="hideModal()"></button>
           </div>
           <div v-if="modalTravel" class="modal-body">
@@ -13,34 +15,34 @@
               ref="travelApproveForm"
               :travel="modalTravel"
               @cancel="hideModal()"
-              @decision="(d,c) => approveTravel(modalTravel, d,c)"></TravelApproveForm>
+              @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
             <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
             <TravelApplyForm
-                v-else
-                :mode="modalMode"
-                @cancel="hideModal()"
-                :travel="modalTravel as Partial<TravelSimple>"
-                @add="(t)=> approveTravel(t, 'approved')"
-                @edit="(t)=> approveTravel(t, 'approved')"
-                ref="travelApplyForm"
-                askOwner></TravelApplyForm>
+              v-else-if="modalMode !== 'view'"
+              :mode="modalMode"
+              @cancel="hideModal()"
+              :travel="modalTravel as Partial<TravelSimple>"
+              @add="(t) => approveTravel(t, 'approved')"
+              @edit="(t) => approveTravel(t, 'approved')"
+              ref="travelApplyForm"
+              minStartDate=""
+              askOwner></TravelApplyForm>
           </div>
-          
         </div>
       </div>
     </div>
     <div class="container">
-    <div class="row mb-3 justify-content-end gx-4 gy-2">
+      <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('accesses.approve/travel') }}</h1>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal({}, 'add')">
+          <button class="btn btn-secondary" @click="showModal({} as TravelSimple, 'add')">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.travel') }) }}</span>
+            <span class="ms-1">{{ $t('labels.createX', { X: $t('labels.travel') }) }}</span>
           </button>
         </div>
-    </div>
+      </div>
       <TravelCardList
         class="mb-5"
         ref="travelCardListRef"
@@ -80,18 +82,18 @@ import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply , TravelApplyForm},
+  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm },
   props: { _id: { type: String } },
   data() {
     return {
       approveTravelModal: undefined as Modal | undefined,
       modalTravel: undefined as TravelSimple | undefined,
-      modalMode: 'view' as 'view'|'add'|'edit',
+      modalMode: 'view' as 'view' | 'add' | 'edit',
       showApproved: false
     }
   },
   methods: {
-    showModal(travel: TravelSimple, mode: 'view'|'add'|'edit' = 'view') {
+    showModal(travel: TravelSimple, mode: 'view' | 'add' | 'edit' = 'view') {
       this.modalTravel = travel
       this.modalMode = mode
       if (this.approveTravelModal) {

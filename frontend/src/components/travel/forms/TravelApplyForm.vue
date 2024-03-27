@@ -1,9 +1,7 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-  <div v-if="askOwner" class="mb-2">
-      <label for="travelFormOwner" class="form-label">
-        {{ $t('labels.owner') }}<span class="text-danger">*</span>
-      </label>
+    <div v-if="askOwner" class="mb-2">
+      <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formTravel.owner" required></UserSelector>
     </div>
 
@@ -41,7 +39,7 @@
         <DateInput
           id="startDateInput"
           v-model="formTravel.startDate"
-          :min="$root.settings.allowTravelApplicationForThePast ? undefined : new Date()"
+          :min="$root.settings.allowTravelApplicationForThePast ? undefined : minStartDate"
           required />
       </div>
       <div class="col-auto">
@@ -131,7 +129,12 @@ export default defineComponent({
       required: true
     },
     askOwner: {
-      type: Boolean, default: false
+      type: Boolean,
+      default: false
+    },
+    minStartDate: {
+      type: [Date, String] as PropType<Date | string>,
+      default: new Date()
     }
   },
   data() {

@@ -1,16 +1,16 @@
 {
   "accesses": {
     "admin": "Administrator",
+    "appliedFor:travel": "Reisekostenabrechnung beantragen",
     "approve/travel": "Reisen genehmigen",
+    "approved:travel": "Reisekostenabrechnung ohne Genehmigung initiieren",
     "confirm/healthCareCost": "Krankenkosten bestätigen",
     "examine/expenseReport": "Auslagen prüfen",
     "examine/healthCareCost": "Krankenkosten prüfen",
     "examine/travel": "Reisen prüfen",
-    "user": "Home",
     "inWork:expenseReport": "Auslagenabrechnung initiieren",
     "inWork:healthCareCost": "Krankenkostenabrechnung initiieren",
-    "appliedFor:travel": "Reisekostenabrechnung beantragen",
-    "approved:travel": "Reisekostenabrechnung ohne Genehmigung initiieren"
+    "user": "Home"
   },
   "alerts": {
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
@@ -116,6 +116,7 @@
     "cost": "Kosten",
     "country": "Land",
     "createdBy": "Erstellt von",
+    "createX": "{X} erstellen",
     "currency": "Währung",
     "date": "Datum",
     "day": "Tag",
@@ -179,7 +180,7 @@
     "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
-    "owner": "Ersteller",
+    "owner": "Besitzer",
     "password": "Passwort",
     "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
