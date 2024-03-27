@@ -2005,6 +2005,36 @@
 					}
 				]
 			},
+			"Project": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id",
+					"balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Travel": {
 				"properties": {
 					"name": {
@@ -2017,7 +2047,7 @@
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2209,7 +2239,7 @@
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -2446,10 +2476,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/ProjectSimple"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							},
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							}
 						]
 					},
@@ -2913,7 +2943,7 @@
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -3057,7 +3087,7 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -3219,7 +3249,7 @@
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -3406,10 +3436,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/ProjectSimple"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							},
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							}
 						]
 					},
@@ -3482,10 +3512,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/ProjectSimple"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							},
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							}
 						]
 					},
@@ -4284,36 +4314,6 @@
 			"SetterBody_ISettings_": {
 				"$ref": "#/components/schemas/SetterPartial_ISettings.NoPost_"
 			},
-			"Project": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"name": {
-						"type": "string"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id",
-					"balance"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"GETResponse_Project-or-Project-Array_": {
 				"properties": {
 					"data": {
@@ -4757,7 +4757,7 @@
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -4880,7 +4880,7 @@
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -5171,7 +5171,7 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
@@ -5286,7 +5286,7 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"project": {
-						"$ref": "#/components/schemas/ProjectSimple"
+						"$ref": "#/components/schemas/Project"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple"
