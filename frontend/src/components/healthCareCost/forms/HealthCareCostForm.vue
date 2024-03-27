@@ -1,5 +1,10 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+    <div v-if="askOwner" class="mb-2">
+      <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
+      <UserSelector v-model="formHealthCareCost.owner" required></UserSelector>
+    </div>
+
     <div class="mb-3">
       <label for="healthCareCostFormName" class="form-label">
         {{ $t('labels.healthCareCostName') }}
@@ -49,10 +54,11 @@ import { defineComponent, PropType } from 'vue'
 import { HealthCareCostSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import ProjectSelector from '../../elements/ProjectSelector.vue'
+import UserSelector from '../../elements/UserSelector.vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint, ProjectSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {
@@ -61,6 +67,10 @@ export default defineComponent({
     mode: {
       type: String as PropType<'add' | 'edit'>,
       required: true
+    },
+    askOwner: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -74,7 +84,8 @@ export default defineComponent({
     default() {
       return {
         name: '',
-        patientName: ''
+        patientName: '',
+        owner: null
       }
     },
     clear() {
