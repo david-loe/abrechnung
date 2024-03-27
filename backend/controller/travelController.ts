@@ -1,7 +1,7 @@
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Travel as ITravel, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
+import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
@@ -224,7 +224,7 @@ export class TravelController extends Controller {
       state: 'refunded'
     }).lean()
     if (travel) {
-      const report = await generateTravelReport(travel)
+      const report = await generateTravelReport(travel, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -284,7 +284,7 @@ export class TravelApproveController extends Controller {
         travel.advance.amount > 0 &&
         process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true'
       ) {
-        await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel))
+        await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel, i18n.language as Locale))
       }
     }
 
@@ -420,7 +420,7 @@ export class TravelExamineController extends Controller {
     const cb = async (travel: ITravel) => {
       sendNotificationMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel))
+        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel, i18n.language as Locale))
       }
     }
 
@@ -465,7 +465,7 @@ export class TravelExamineController extends Controller {
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
     const travel = await Travel.findOne({ _id, historic: false, state: 'refunded' }).lean()
     if (travel) {
-      const report = await generateTravelReport(travel)
+      const report = await generateTravelReport(travel, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

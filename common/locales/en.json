@@ -396,7 +396,8 @@
     "inWork": "In work",
     "refunded": "Refunded",
     "rejected": "Rejected",
-    "underExamination": "Under examination"
+    "underExamination": "Under examination",
+    "underExaminationByInsurance": "Under examination by insurance"
   },
   "weekdays": {
     "0": "Sunday",

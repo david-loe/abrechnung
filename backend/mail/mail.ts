@@ -3,9 +3,10 @@ import fs from 'fs'
 import {
   ExpenseReportSimple,
   HealthCareCostSimple,
+  User as IUser,
+  Locale,
   ReportType,
   TravelSimple,
-  UserSimple,
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
@@ -14,7 +15,7 @@ import User from '../models/user.js'
 import mailClient from './client.js'
 
 export function sendMail(
-  recipients: UserSimple[],
+  recipients: IUser[],
   subject: string,
   paragaph: string,
   button: { text: string; link: string },
@@ -23,12 +24,16 @@ export function sendMail(
   if (mailClient == undefined || recipients.length === 0) {
     return false
   }
-  var salutation = i18n.t('mail.hi')
+  const language = recipients[0].settings.language
+  var salutation = i18n.t('mail.hi', { lng: language })
   if (recipients.length === 1) {
-    salutation = i18n.t('mail.hiX', { X: recipients[0].name.givenName })
+    salutation = i18n.t('mail.hiX', { lng: language, X: recipients[0].name.givenName })
   }
-  const regards = i18n.t('mail.regards')
-  const app = { name: i18n.t('headlines.title') + ' ' + i18n.t('headlines.emoji'), url: process.env.VITE_FRONTEND_URL }
+  const regards = i18n.t('mail.regards', { lng: language })
+  const app = {
+    name: i18n.t('headlines.title', { lng: language }) + ' ' + i18n.t('headlines.emoji', { lng: language }),
+    url: process.env.VITE_FRONTEND_URL
+  }
 
   const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
@@ -66,16 +71,6 @@ export function sendMail(
 }
 
 export async function sendNotificationMail(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
-  const interpolation: { owner: string; comment?: string; commentator?: string } = { owner: report.owner.name.givenName }
-
-  if (report.comments.length > 0) {
-    const comment = report.comments[report.comments.length - 1]
-    if (comment.toState == report.state) {
-      interpolation.comment = comment.text
-      interpolation.commentator = comment.author.name.givenName
-    }
-  }
-
   var recipients = []
   var reportType: ReportType
   if (reportIsTravel(report)) {
@@ -85,13 +80,8 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
   } else {
     reportType = 'expenseReport'
   }
-  const subject = i18n.t(`mail.${reportType}.${textState ? textState : report.state}.subject`, interpolation)
-  const paragraph = i18n.t(`mail.${reportType}.${textState ? textState : report.state}.paragraph`, interpolation)
-  const lastParagraph = interpolation.comment
-    ? i18n.t(`mail.${reportType}.${textState ? textState : report.state}.lastParagraph`, interpolation)
-    : ''
   const button = {
-    text: i18n.t('labels.viewX', { X: i18n.t(`labels.${reportType}`) }),
+    text: '',
     link: ''
   }
   const userFilter: any = {}
@@ -110,6 +100,30 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
         : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
   }
   recipients = await User.find(userFilter).lean()
+  if (recipients.length === 0) {
+    return
+  }
+  const language = recipients[0].settings.language
+
+  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string } = {
+    owner: report.owner.name.givenName,
+    lng: language
+  }
+
+  if (report.comments.length > 0) {
+    const comment = report.comments[report.comments.length - 1]
+    if (comment.toState == report.state) {
+      interpolation.comment = comment.text
+      interpolation.commentator = comment.author.name.givenName
+    }
+  }
+
+  const subject = i18n.t(`mail.${reportType}.${textState ? textState : report.state}.subject`, interpolation)
+  const paragraph = i18n.t(`mail.${reportType}.${textState ? textState : report.state}.paragraph`, interpolation)
+  const lastParagraph = interpolation.comment
+    ? i18n.t(`mail.${reportType}.${textState ? textState : report.state}.lastParagraph`, interpolation)
+    : ''
+  button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
 
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

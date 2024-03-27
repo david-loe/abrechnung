@@ -1,12 +1,12 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { addUp, datetoDateStringWithYear, getDetailedMoneyString } from '../../common/scripts.js'
+import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, HealthCareCost, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
 import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
 
-export async function generateHealthCareCostReport(healthCareCost: HealthCareCost) {
+export async function generateHealthCareCostReport(healthCareCost: HealthCareCost, language: Locale) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
@@ -23,13 +23,13 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32 })
+  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
   y = y - edge
-  y = drawGeneralInformation(getLastPage(), healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize })
+  y = drawGeneralInformation(getLastPage(), healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
   const receiptMap = getReceiptMap(healthCareCost.expenses).map
 
-  y = drawSummary(getLastPage(), newPage, healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: 10 })
-  y = drawExpenses(getLastPage(), newPage, healthCareCost, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9 })
+  y = drawSummary(getLastPage(), newPage, healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = drawExpenses(getLastPage(), newPage, healthCareCost, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
 
   const confirmReceiptsMap: ReceiptMap = {}
   if (healthCareCost.refundSum.receipts && healthCareCost.refundSum.receipts.length > 0) {
@@ -38,7 +38,7 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
     }
   }
 
-  await attachReceipts(pdfDoc, Object.assign(confirmReceiptsMap, receiptMap), { font: font, edge: edge / 2, fontSize: 16 })
+  await attachReceipts(pdfDoc, Object.assign(confirmReceiptsMap, receiptMap), { font: font, edge: edge / 2, fontSize: 16, language })
   return await pdfDoc.save()
 }
 
@@ -66,17 +66,17 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
   // Isurance + patientName
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
-    i18n.t('labels.insurance') +
+    i18n.t('labels.insurance', { lng: opts.language }) +
       ': ' +
       healthCareCost.insurance.name +
       '      ' +
-      i18n.t('labels.applicant') +
+      i18n.t('labels.applicant', { lng: opts.language }) +
       ': ' +
       healthCareCost.owner.name.givenName +
       ' ' +
       healthCareCost.owner.name.familyName +
       '      ' +
-      i18n.t('labels.patientName') +
+      i18n.t('labels.patientName', { lng: opts.language }) +
       ': ' +
       healthCareCost.patientName,
     {
@@ -99,18 +99,18 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, he
     width: 85,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'sum',
-    fn: (m: Money) => getDetailedMoneyString(m, i18n.language as Locale, true)
+    fn: (m: Money) => getDetailedMoneyString(m, options.language, true)
   })
 
   const addedUp = addUp(healthCareCost)
   const summary = []
-  summary.push({ reference: i18n.t('labels.total'), sum: addedUp.total })
+  summary.push({ reference: i18n.t('labels.total', { lng: options.language }), sum: addedUp.total })
   if (healthCareCost.state === 'refunded') {
-    summary.push({ reference: i18n.t('labels.refundSum'), sum: healthCareCost.refundSum })
+    summary.push({ reference: i18n.t('labels.refundSum', { lng: options.language }), sum: healthCareCost.refundSum })
   }
 
   const fontSize = options.fontSize + 2
-  page.drawText(i18n.t('labels.summary'), {
+  page.drawText(i18n.t('labels.summary', { lng: options.language }), {
     x: options.xStart,
     y: options.yStart - fontSize,
     size: fontSize,
@@ -135,37 +135,42 @@ function drawExpenses(
     return options.yStart
   }
   const columns: Column[] = []
-  columns.push({ key: 'description', width: 300, alignment: pdf_lib.TextAlignment.Left, title: i18n.t('labels.description') })
+  columns.push({
+    key: 'description',
+    width: 300,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: i18n.t('labels.description', { lng: options.language })
+  })
   columns.push({
     key: 'cost',
     width: 160,
     alignment: pdf_lib.TextAlignment.Right,
-    title: i18n.t('labels.cost'),
-    fn: (m: Cost) => getDetailedMoneyString(m, i18n.language as Locale)
+    title: i18n.t('labels.cost', { lng: options.language }),
+    fn: (m: Cost) => getDetailedMoneyString(m, options.language)
   })
   columns.push({
     key: 'cost',
     width: 90,
     alignment: pdf_lib.TextAlignment.Left,
-    title: i18n.t('labels.invoiceDate'),
-    fn: (c: Cost) => datetoDateStringWithYear(c.date)
+    title: i18n.t('labels.invoiceDate', { lng: options.language }),
+    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language)
   })
   columns.push({
     key: 'note',
     width: 130,
     alignment: pdf_lib.TextAlignment.Left,
-    title: i18n.t('labels.note')
+    title: i18n.t('labels.note', { lng: options.language })
   })
   columns.push({
     key: 'cost',
-    width: 35,
+    width: 45,
     alignment: pdf_lib.TextAlignment.Left,
-    title: i18n.t('labels.receiptNumber'),
+    title: i18n.t('labels.receiptNumber', { lng: options.language }),
     fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id!.toString()].number).join(', ')
   })
 
   const fontSize = options.fontSize + 2
-  page.drawText(i18n.t('labels.expenses'), {
+  page.drawText(i18n.t('labels.expenses', { lng: options.language }), {
     x: options.xStart,
     y: options.yStart - fontSize,
     size: fontSize,

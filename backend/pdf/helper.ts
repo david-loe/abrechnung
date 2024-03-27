@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { mongo } from 'mongoose'
 import pdf_lib from 'pdf-lib'
-import { addUp, datetoDateStringWithYear, getMoneyString } from '../../common/scripts.js'
+import { addUp, getMoneyString } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -34,7 +34,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   } else {
     path += 'expenseReport/'
   }
-  const totalSum = getMoneyString(addUp(report).total)
+  const totalSum = getMoneyString(addUp(report).total, { language: i18n.language as Locale })
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
@@ -89,6 +89,7 @@ export interface Options {
   yStart: number
   textColor?: pdf_lib.Color
   edge?: number
+  language: Locale
 }
 
 export interface TabelOptions extends Options {
@@ -149,7 +150,7 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
     if (receipt.noNumberPrint) {
       return
     }
-    const text = '#' + receipt.number + ' - ' + datetoDateStringWithYear(receipt.date)
+    const text = '#' + receipt.number + ' - ' + receipt.date.toLocaleDateString(opts.language)
     const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
     page.drawRectangle({
       x: 2,
@@ -224,7 +225,7 @@ export async function drawPlace(page: pdf_lib.PDFPage, place: { country: Country
   if (place.place) {
     text += place.place + ', '
   }
-  text += place.country.name[i18n.language as Locale]
+  text += place.country.name[opts.language]
   const flagX = opts.xStart + opts.font.widthOfTextAtSize(text, opts.fontSize) + opts.fontSize / 4
 
   page.drawText(text, {
@@ -264,7 +265,7 @@ export async function drawFlag(page: pdf_lib.PDFPage, countryCode: string, optio
 export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
   const opts = Object.assign({ textColor: pdf_lib.rgb(0, 0, 0), prefix: '' }, options)
 
-  const text = i18n.t('headlines.title')
+  const text = i18n.t('headlines.title', { lng: opts.language })
   const flagX = opts.xStart + opts.font.widthOfTextAtSize(text, opts.fontSize) + opts.fontSize / 4
 
   page.drawText(text, {

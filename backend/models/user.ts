@@ -23,12 +23,16 @@ const userSchema = new Schema<User, UserModel, Methods>({
   access: accessObject,
   loseAccessAt: { type: Date },
   settings: {
-    language: { type: String, default: 'de' },
-    lastCurrencies: { type: [{ type: String, ref: 'Currency' }], default: () => [], required: true },
-    lastCountries: { type: [{ type: String, ref: 'Country' }], default: () => [], required: true },
-    lastProjects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], default: () => [], required: true },
-    insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
-    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
+    type: {
+      language: { type: String, default: process.env.VITE_I18N_LOCALE },
+      lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
+      lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
+      lastProjects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
+      insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
+      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
+    },
+    required: true,
+    default: () => ({})
   },
   vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
   token: { type: Schema.Types.ObjectId, ref: 'Token' }

@@ -1,7 +1,7 @@
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, _id } from '../../common/types.js'
+import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
@@ -143,7 +143,7 @@ export class ExpenseReportController extends Controller {
       state: 'refunded'
     }).lean()
     if (expenseReport) {
-      const report = await generateExpenseReportReport(expenseReport)
+      const report = await generateExpenseReportReport(expenseReport, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -259,7 +259,10 @@ export class ExpenseReportExamineController extends Controller {
     const cb = async (expenseReport: IExpenseReport) => {
       sendNotificationMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(expenseReport), await generateExpenseReportReport(expenseReport))
+        await writeToDisk(
+          await writeToDiskFilePath(expenseReport),
+          await generateExpenseReportReport(expenseReport, i18n.language as Locale)
+        )
       }
     }
 
@@ -284,7 +287,7 @@ export class ExpenseReportExamineController extends Controller {
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
     const expenseReport = await ExpenseReport.findOne({ _id, historic: false, state: 'refunded' }).lean()
     if (expenseReport) {
-      const report = await generateExpenseReportReport(expenseReport)
+      const report = await generateExpenseReportReport(expenseReport, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

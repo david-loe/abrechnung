@@ -19,11 +19,11 @@
           <th>{{ $t('labels.advance') }}</th>
           <td>
             <span>
-              {{ getMoneyString(travel.advance) }}
+              {{ getMoneyString(travel.advance, { language: $i18n.locale }) }}
             </span>
             <span v-if="travel.advance.exchangeRate" class="text-secondary">
               &nbsp;-&nbsp;
-              {{ getMoneyString(travel.advance, false) }}
+              {{ getMoneyString(travel.advance, { language: $i18n.locale, useExchangeRate: false }) }}
             </span>
           </td>
         </tr>
