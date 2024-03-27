@@ -404,6 +404,8 @@ export default defineComponent({
       if (result.ok) {
         this.setHealthCareCost(result.ok)
         this.hideModal()
+      } else {
+        ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
     },
     async deleteExpense(_id: string) {

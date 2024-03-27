@@ -1,11 +1,15 @@
 {
   "accesses": {
     "admin": "Administrator",
+    "appliedFor:travel": "Apply For Travels",
     "approve/travel": "Approve Travels",
+    "approved:travel": "Initiate Travel Expenses Without Approval",
     "confirm/healthCareCost": "Confirm Health Care Costs",
     "examine/expenseReport": "Examine Expenses",
     "examine/healthCareCost": "Examine Health Care Costs",
     "examine/travel": "Examine Travels",
+    "inWork:expenseReport": "Initiate Expenses",
+    "inWork:healthCareCost": "Initiate Health Care Costs",
     "user": "Home"
   },
   "alerts": {
@@ -112,6 +116,7 @@
     "cost": "Cost",
     "country": "Country",
     "createdBy": "Created by",
+    "createX": "Create {X}",
     "currency": "Currency",
     "date": "Date",
     "day": "Day",
@@ -262,6 +267,11 @@
         "paragraph": "Your expense report has been sent back to you for revision.",
         "subject": "🔙 Revise expense report"
       },
+      "inWork": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "A new expense report was created for you.",
+        "subject": "🆕 Expense Report"
+      },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your expense report gets refunded.",
@@ -283,6 +293,11 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs have been sent back to you for revision.",
         "subject": "🔙 Revise health care costs"
+      },
+      "inWork": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "A new health care cost was created for you.",
+        "subject": "🆕 Health care cost"
       },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",

@@ -1,5 +1,10 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+    <div v-if="askOwner" class="mb-3">
+      <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
+      <UserSelector v-model="formExpenseReport.owner" required></UserSelector>
+    </div>
+
     <div class="mb-3">
       <label for="expenseReportFormName" class="form-label">
         {{ $t('labels.expenseReportName') }}
@@ -44,10 +49,11 @@ import { baseCurrency, ExpenseReportSimple } from '../../../../../common/types.j
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import ProjectSelector from '../../elements/ProjectSelector.vue'
+import UserSelector from '../../elements/UserSelector.vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint, ProjectSelector, CurrencySelector },
+  components: { InfoPoint, ProjectSelector, CurrencySelector, UserSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {
@@ -56,6 +62,10 @@ export default defineComponent({
     mode: {
       type: String as PropType<'add' | 'edit'>,
       required: true
+    },
+    askOwner: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -71,7 +81,8 @@ export default defineComponent({
         advance: {
           amount: null,
           currency: baseCurrency
-        }
+        },
+        owner: null
       }
     },
     clear() {

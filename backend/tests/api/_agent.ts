@@ -4,7 +4,11 @@ import { User } from '../../../common/types.js'
 import app from '../../app.js'
 
 const users = {
-  user: { username: 'fry', password: 'fry', access: { user: true } },
+  user: {
+    username: 'fry',
+    password: 'fry',
+    access: { user: true, 'inWork:expenseReport': true, 'inWork:healthCareCost': true, 'appliedFor:travel': true }
+  },
   admin: { username: 'professor', password: 'professor', access: { user: true, admin: true } },
   travel: { username: 'zoidberg', password: 'zoidberg', access: { user: true, 'examine/travel': true, 'approve/travel': true } },
   expenseReport: { username: 'leela', password: 'leela', access: { user: true, 'examine/expenseReport': true } },
@@ -21,6 +25,9 @@ async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof u
   const res = await agent
     .get('/admin/user')
     .query({ filterJSON: Base64.encode(JSON.stringify({ 'fk.ldapauth': users[userKey].username })) })
+  if (res.status !== 200) {
+    throw new Error('Unable to get user. Probably an access issue.')
+  }
   const userId = (res.body.data as User[])[0]._id
   const user = {
     _id: userId,

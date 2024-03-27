@@ -121,7 +121,7 @@ export type NoPost = 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt
 export type SetterBody<ModelType> = SetterPartial<ModelType, NoPost>
 
 export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
-  requestBody: SetterPartial<ModelType, NoPost>
+  requestBody: SetterBody<ModelType>
   cb?: (data: CheckType) => any
   allowNew?: boolean
   checkOldObject?: (oldObject: HydratedDocument<CheckType> & ModelMethods) => Promise<boolean>

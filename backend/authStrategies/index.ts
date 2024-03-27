@@ -8,8 +8,8 @@ export interface NewUser extends Contact {
 }
 
 export function addAdminIfNone(user: HydratedDocument<IUser>) {
-  User.find({ 'access.admin': true }).then((docs) => {
-    if (docs.length == 0) {
+  User.exists({ 'access.admin': true }).then((doc) => {
+    if (doc === null) {
       user.access.admin = true
       user.markModified('access')
       user.save()

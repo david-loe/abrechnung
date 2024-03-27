@@ -59,12 +59,10 @@ export async function initDB() {
 }
 
 async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
-  const docs = await model.find().lean()
-  if (docs.length === 0) {
+  const doc = await model.exists({})
+  if (doc === null) {
     const newDocs = await model.insertMany(data)
     console.log('Added ' + newDocs.length + ' ' + name)
-  } else {
-    console.log(docs.length + ' ' + name + ' exist')
   }
 }
 

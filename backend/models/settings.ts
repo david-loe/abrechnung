@@ -22,6 +22,11 @@ for (const access of accesses) {
   accessIcons[access] = [{ type: String, required: true }]
 }
 
+const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true } } = {}
+for (const access of accesses) {
+  defaultAccess[access] = { type: Boolean, required: true }
+}
+
 const color = { color: { type: String, required: true }, text: { type: String, required: true } }
 const stateColors = {} as { [key in TravelState | HealthCareCostState | ExpenseReportState]: typeof color }
 for (const state of travelStates) {
@@ -46,6 +51,7 @@ for (const report of reportTypes) {
 
 const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
+  defaultAccess: { type: defaultAccess, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
   breakfastCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },

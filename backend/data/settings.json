@@ -1,12 +1,29 @@
 {
   "accessIcons": {
     "user": ["bi-card-list"],
+    "inWork:expenseReport": ["bi-coin", "bi-plus"],
+    "inWork:healthCareCost": ["bi-hospital", "bi-plus"],
+    "appliedFor:travel": ["bi-airplane", "bi-plus"],
+    "approved:travel": ["bi-airplane", "bi-plus", "bi-calendar-check"],
     "admin": ["bi-person-fill"],
     "approve/travel": ["bi-calendar-check"],
     "confirm/healthCareCost": ["bi-hospital", "bi-check-square"],
     "examine/expenseReport": ["bi-coin", "bi-pencil-square"],
     "examine/healthCareCost": ["bi-hospital", "bi-pencil-square"],
     "examine/travel": ["bi-airplane", "bi-pencil-square"]
+  },
+  "defaultAccess": {
+    "user": true,
+    "inWork:expenseReport": true,
+    "inWork:healthCareCost": true,
+    "appliedFor:travel": true,
+    "approved:travel": false,
+    "admin": false,
+    "approve/travel": false,
+    "confirm/healthCareCost": false,
+    "examine/expenseReport": false,
+    "examine/healthCareCost": false,
+    "examine/travel": false
   },
   "allowSpouseRefund": true,
   "breakfastCateringLumpSumCut": 0.2,
@@ -64,5 +81,5 @@
     "expenseReport": false,
     "healthCareCost": false
   },
-  "version": "0.3.10"
+  "version": "0.4.0"
 }

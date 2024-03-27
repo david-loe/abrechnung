@@ -11,8 +11,8 @@ import { generateAdvanceReport } from '../pdf/advance.js'
 import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { NotAllowedError } from './error.js'
-import { TravelApplication, TravelPost } from './types.js'
+import { AuthorizationError, NotAllowedError } from './error.js'
+import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
@@ -126,14 +126,18 @@ export class TravelController extends Controller {
       lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
     })
 
-    if (!extendedBody.name && extendedBody.startDate) {
-      var date = new Date(extendedBody.startDate)
-      extendedBody.name =
-        extendedBody.destinationPlace?.place +
-        ' ' +
-        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-        ' ' +
-        date.getUTCFullYear()
+    if (!extendedBody._id) {
+      if (!request.user!.access['appliedFor:travel']) {
+        throw new AuthorizationError()
+      } else if (!extendedBody.name && extendedBody.startDate) {
+        var date = new Date(extendedBody.startDate)
+        extendedBody.name =
+          extendedBody.destinationPlace?.place +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -141,18 +145,39 @@ export class TravelController extends Controller {
       checkOldObject: async (oldObject: TravelDoc) =>
         !oldObject.historic &&
         (oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved') &&
-        request.user!._id.equals(oldObject.owner._id),
+        request.user!._id.equals(oldObject.owner._id) &&
+        request.user!.access['appliedFor:travel'],
       allowNew: true
     })
   }
 
   @Post('approved')
-  public async postApproved(@Body() requestBody: { _id: _id }, @Request() request: ExRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
-
+  public async postApproved(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
+    var extendedBody: SetterBody<ITravel> = requestBody
+    if (!extendedBody._id) {
+      if (!request.user!.access['approved:travel']) {
+        throw new AuthorizationError()
+      } else if (!extendedBody.name && extendedBody.startDate) {
+        var date = new Date(extendedBody.startDate)
+        extendedBody.name =
+          extendedBody.destinationPlace?.place +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
+      Object.assign(extendedBody, {
+        state: 'approved' as TravelState,
+        editor: request.user?._id,
+        owner: request.user?._id,
+        lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
+      })
+    } else {
+      extendedBody = Object.assign({ _id: extendedBody._id }, { state: 'approved' as TravelState, editor: request.user?._id })
+    }
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      allowNew: false,
+      allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
         if (
           oldObject.owner._id.equals(request.user!._id) &&
@@ -235,8 +260,23 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postApproved(
+    @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
+    @Request() request: ExRequest
+  ) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
+    if (!extendedBody._id) {
+      ;(extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
+      if (!(extendedBody as TravelApplication).name && (extendedBody as TravelApplication).startDate) {
+        var date = new Date((extendedBody as TravelApplication).startDate!)
+        ;(extendedBody as TravelApplication).name =
+          (extendedBody as TravelApplication).destinationPlace?.place +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
+      }
+    }
     const cb = async (travel: ITravel) => {
       sendNotificationMail(travel)
       if (
@@ -251,7 +291,7 @@ export class TravelApproveController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       cb,
-      allowNew: false,
+      allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'appliedFor') {
           await oldObject.saveToHistory()

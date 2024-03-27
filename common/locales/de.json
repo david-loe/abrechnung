@@ -1,11 +1,15 @@
 {
   "accesses": {
     "admin": "Administrator",
+    "appliedFor:travel": "Reisekostenabrechnung beantragen",
     "approve/travel": "Reisen genehmigen",
+    "approved:travel": "Reisekostenabrechnung ohne Genehmigung initiieren",
     "confirm/healthCareCost": "Krankenkosten bestätigen",
     "examine/expenseReport": "Auslagen prüfen",
     "examine/healthCareCost": "Krankenkosten prüfen",
     "examine/travel": "Reisen prüfen",
+    "inWork:expenseReport": "Auslagenabrechnung initiieren",
+    "inWork:healthCareCost": "Krankenkostenabrechnung initiieren",
     "user": "Home"
   },
   "alerts": {
@@ -112,6 +116,7 @@
     "cost": "Kosten",
     "country": "Land",
     "createdBy": "Erstellt von",
+    "createX": "{X} erstellen",
     "currency": "Währung",
     "date": "Datum",
     "day": "Tag",
@@ -175,7 +180,7 @@
     "organisation": "Organisation",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
     "ownCar": "Eigenes Auto 🚘",
-    "owner": "Ersteller",
+    "owner": "Besitzer",
     "password": "Passwort",
     "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
@@ -262,6 +267,11 @@
         "paragraph": "Deine Auslagenabrechnung wurde dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Auslagen überarbeiten"
       },
+      "inWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Eine neue Auslagenabrechnung wurden für dich erstellt.",
+        "subject": "🆕 Auslagenabrechnung"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wird erstattet.",
@@ -282,7 +292,12 @@
       "backToInWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden dir zum Überarbeiten zurückgeschickt.",
-        "subject": "🔙 Auslagen überarbeiten"
+        "subject": "🔙 Krankenkosten überarbeiten"
+      },
+      "inWork": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Eine neue Krankenkostenabrechnung wurden für dich erstellt.",
+        "subject": "🆕 Krankenkosten"
       },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

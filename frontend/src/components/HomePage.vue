@@ -46,19 +46,19 @@
         <div class="col-auto me-auto">
           <h1>{{ $t('headlines.home') }}</h1>
         </div>
-        <div v-if="!$root.settings.disableReportType.travel" class="col-auto">
+        <div v-if="!$root.settings.disableReportType.travel && $root.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.travel') }) }}</span>
           </button>
         </div>
-        <div v-if="!$root.settings.disableReportType.expenseReport" class="col-auto">
+        <div v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
           </button>
         </div>
-        <div v-if="!$root.settings.disableReportType.healthCareCost" class="col-auto">
+        <div v-if="!$root.settings.disableReportType.healthCareCost && $root.user.access['inWork:healthCareCost']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'healthCareCost')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.submitX', { X: $t('labels.healthCareCost') }) }}</span>

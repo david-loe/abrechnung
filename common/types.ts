@@ -7,6 +7,7 @@ export type _id = Types.ObjectId
 
 export interface Settings {
   accessIcons: { [key in Access]: string[] }
+  defaultAccess: { [key in Access]: boolean }
   allowSpouseRefund: boolean
   breakfastCateringLumpSumCut: number
   lunchCateringLumpSumCut: number
@@ -355,6 +356,10 @@ export type ReportType = (typeof reportTypes)[number]
 
 export const accesses = [
   'user',
+  'inWork:expenseReport',
+  'inWork:healthCareCost',
+  'appliedFor:travel',
+  'approved:travel',
   'approve/travel',
   'examine/travel',
   'examine/expenseReport',
