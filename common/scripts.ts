@@ -1,4 +1,4 @@
-import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency, reportIsTravel } from './types.js'
+import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Travel, baseCurrency, reportIsTravel } from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -162,10 +162,6 @@ export function getDetailedMoneyString(baseMoney: Money | BaseCurrencyMoney, loc
       })
   }
   return str
-}
-
-export function placeToString(place: Place, locale: Locale = 'de'): string {
-  return place.place + ', ' + place.country.name[locale] + place.country.flag
 }
 
 export function dateToTimeString(date: string | number | Date): string {

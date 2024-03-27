@@ -1,6 +1,6 @@
-import app from './app.js'
-import { User as IUser } from '../common/types.js'
 import { HydratedDocument } from 'mongoose'
+import { User as IUser, Locale } from '../common/types.js'
+import app from './app.js'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 
@@ -44,8 +44,8 @@ declare global {
       readonly MAIL_SENDER_ADDRESS: string
       readonly BACKEND_PORT: string
       readonly MONGO_URL: string
-      readonly VITE_I18N_LOCALE: string
-      readonly VITE_I18N_FALLBACK_LOCALE: string
+      readonly VITE_I18N_LOCALE: Locale
+      readonly VITE_I18N_FALLBACK_LOCALE: Locale
       readonly BACKEND_SAVE_REPORTS_ON_DISK: 'TRUE' | 'FALSE'
     }
   }

@@ -13,8 +13,8 @@ const magicLogin = new MagicLoginStrategy.default({
       sendMail(
         [user],
         'Login abrechnung🧾',
-        i18n.t('mail.magiclogin.paragraph'),
-        { text: i18n.t('mail.magiclogin.buttonText'), link: href },
+        i18n.t('mail.magiclogin.paragraph', { lng: user.settings.language }),
+        { text: i18n.t('mail.magiclogin.buttonText', { lng: user.settings.language }), link: href },
         ''
       )
     } else {
