@@ -1,54 +1,127 @@
 <template>
-  <div class="container">
-    <h1 class="mb-3">{{ $t('accesses.examine/expenseReport') }}</h1>
-    <ExpenseReportCardList
-      class="mb-5"
-      endpoint="examine/expenseReport"
-      :params="params('underExamination')"
-      :showOwner="true"
-      :showSearch="true"
-      @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
-    </ExpenseReportCardList>
-    <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-      {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
-    </button>
-    <template v-else>
-      <button type="button" class="btn btn-light" @click="showRefunded = false">
-        {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
-      </button>
-      <hr class="hr" />
+  <div>
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 v-if="modalMode === 'add'" class="modal-title">
+              {{
+                $t('labels.newX', {
+                  X: $t('labels.expenseReport')
+                })
+              }}
+            </h5>
+            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expenseReport') }) }}</h5>
+            <button type="button" class="btn-close" @click="hideModal"></button>
+          </div>
+          <div v-if="modalExpenseReport" class="modal-body">
+            <ExpenseReportForm
+              ref="expenseReportForm"
+              :mode="modalMode"
+              :expenseReport="modalExpenseReport"
+              @cancel="hideModal()"
+              @add="addExpenseReport"
+              askOwner>
+            </ExpenseReportForm>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row mb-3 justify-content-end gx-4 gy-2">
+        <div class="col-auto me-auto">
+          <h1>{{ $t('accesses.examine/expenseReport') }}</h1>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-secondary" @click="showModal('add', {} as ExpenseReportSimple)">
+            <i class="bi bi-plus-lg"></i>
+            <span class="ms-1">{{ $t('labels.createX', { X: $t('labels.expenseReport') }) }}</span>
+          </button>
+        </div>
+      </div>
       <ExpenseReportCardList
+        class="mb-5"
         endpoint="examine/expenseReport"
-        :params="params('refunded')"
+        :params="params('underExamination')"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
       </ExpenseReportCardList>
-    </template>
+      <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
+        {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
+      </button>
+      <template v-else>
+        <button type="button" class="btn btn-light" @click="showRefunded = false">
+          {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
+        </button>
+        <hr class="hr" />
+        <ExpenseReportCardList
+          endpoint="examine/expenseReport"
+          :params="params('refunded')"
+          :showOwner="true"
+          :showSearch="true"
+          @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
+        </ExpenseReportCardList>
+      </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
-import { ExpenseReportState } from '../../../../common/types.js'
+import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
 import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
+import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
+type ModalMode = 'add' | 'edit'
 export default defineComponent({
   name: 'ExaminePage',
-  components: { ExpenseReportCardList },
+  components: { ExpenseReportCardList, ExpenseReportForm },
   props: [],
   data() {
     return {
-      showRefunded: false
+      showRefunded: false,
+      modal: undefined as Modal | undefined,
+      modalExpenseReport: undefined as ExpenseReportSimple | undefined,
+      modalMode: 'add' as ModalMode
     }
   },
   methods: {
     params(state: ExpenseReportState) {
       return { filter: { $and: [{ state }] } }
+    },
+    showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
+      this.modalExpenseReport = expenseReport
+      this.modalMode = mode
+      if (this.modal) {
+        this.modal.show()
+      }
+    },
+    hideModal() {
+      if (this.modal) {
+        this.modal.hide()
+      }
+      if (this.$refs.expenseReportForm) {
+        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
+      }
+      this.modalExpenseReport = undefined
+    },
+    async addExpenseReport(expenseReport: ExpenseReportSimple) {
+      const result = (await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)).ok
+      if (result) {
+        this.hideModal()
+      }
     }
   },
   async created() {
     await this.$root.load()
+  },
+  mounted() {
+    const modalEl = document.getElementById('modal')
+    if (modalEl) {
+      this.modal = new Modal(modalEl, {})
+    }
   }
 })
 </script>
