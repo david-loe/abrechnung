@@ -111,9 +111,11 @@ export default defineComponent({
       this.modalHealthCareCost = undefined
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      const result = (await this.$root.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)).ok
-      if (result) {
+      const result = await this.$root.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
+      if (result.ok) {
         this.hideModal()
+      } else {
+        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
     }
   },

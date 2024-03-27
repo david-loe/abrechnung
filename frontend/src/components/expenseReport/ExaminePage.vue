@@ -108,9 +108,11 @@ export default defineComponent({
       this.modalExpenseReport = undefined
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = (await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)).ok
-      if (result) {
+      const result = await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
+      if (result.ok) {
         this.hideModal()
+      } else {
+        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
     }
   },

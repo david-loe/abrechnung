@@ -119,6 +119,8 @@ export default defineComponent({
         if (result.ok) {
           ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
+        } else {
+          ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
         }
       }
     },
@@ -132,9 +134,9 @@ export default defineComponent({
       this.approveTravelModal = new Modal(modalEl, {})
     }
     if (this._id) {
-      const result = (await this.$root.getter<TravelSimple>('approve/travel', { _id: this._id })).ok
-      if (result) {
-        this.showModal(result.data)
+      const result = await this.$root.getter<TravelSimple>('approve/travel', { _id: this._id })
+      if (result.ok) {
+        this.showModal(result.ok.data)
       }
     }
   },
