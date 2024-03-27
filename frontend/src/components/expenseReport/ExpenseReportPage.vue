@@ -132,7 +132,7 @@
               <tr v-for="expense of expenseReport.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
                 <td>{{ datetoDateString(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ getMoneyString(expense.cost) }}</td>
+                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale }) }}</td>
               </tr>
             </tbody>
           </table>
@@ -150,7 +150,7 @@
                           <small>{{ $t('labels.expenses') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ getMoneyString(addUp.expenses) }}</small>
+                          <small>{{ getMoneyString(addUp.expenses, { language: $i18n.locale }) }}</small>
                         </td>
                       </tr>
                       <tr>
@@ -158,22 +158,24 @@
                           <small>{{ $t('labels.advance') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ getMoneyString(addUp.advance, true, (x) => 0 - x) }}</small>
+                          <small>{{ getMoneyString(addUp.advance, { language: $i18n.locale, func: (x) => 0 - x }) }}</small>
                         </td>
                       </tr>
                     </template>
 
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(addUp.total) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale }) }}</td>
                     </tr>
-                    <tr v-if="expenseReport.project.budget">
+                    <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
                       <td>
                         <small>{{ $t('labels.project') }}</small>
                       </td>
                       <td class="text-end">
                         <small>{{
-                          getMoneyString(expenseReport.project.balance) + ' von ' + getMoneyString(expenseReport.project.budget)
+                          getMoneyString(expenseReport.project.balance, { language: $i18n.locale }) +
+                          ' von ' +
+                          getMoneyString(expenseReport.project.budget, { language: $i18n.locale })
                         }}</small>
                       </td>
                     </tr>

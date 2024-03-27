@@ -118,32 +118,28 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
 }
 
-export function getMoneyString(
-  baseMoney: BaseCurrencyMoney | Money,
-  useExchangeRate: boolean = true,
-  func = (x: number): number => x,
-  locale: Locale = 'de',
-  warning: boolean = false
-): string {
+type MoneyStringOptions = { language: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
+export function getMoneyString(baseMoney: BaseCurrencyMoney | Money, options: MoneyStringOptions): string {
+  const opts = Object.assign({ useExchangeRate: true, warning: false, func: (x: number) => x }, options)
   var amount = 0
   const money = baseCurrencyMoneyToMoney(baseMoney)
   var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
-  if (useExchangeRate && money.exchangeRate) {
+  if (opts.useExchangeRate && money.exchangeRate) {
     amount = money.exchangeRate.amount
     currency = baseCurrency._id
   } else {
     if (money.amount !== null) {
       amount = money.amount
     }
-    if (useExchangeRate && !money.exchangeRate && currency !== baseCurrency._id) {
-      warning = true
+    if (opts.useExchangeRate && !money.exchangeRate && currency !== baseCurrency._id) {
+      opts.warning = true
     }
   }
   return (
-    func(amount).toLocaleString(locale, {
+    opts.func(amount).toLocaleString(opts.language, {
       style: 'currency',
       currency: currency
-    }) + (warning ? ' ⚠' : '')
+    }) + (opts.warning ? ' ⚠' : '')
   )
 }
 
