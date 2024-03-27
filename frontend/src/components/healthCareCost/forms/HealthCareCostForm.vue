@@ -1,6 +1,6 @@
 <template>
   <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-    <div v-if="askOwner" class="mb-2">
+    <div v-if="askOwner" class="mb-3">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formHealthCareCost.owner" required></UserSelector>
     </div>
