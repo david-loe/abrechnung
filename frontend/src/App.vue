@@ -138,18 +138,18 @@ import { defineComponent } from 'vue'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
-CountrySimple,
-Currency,
-GETResponse,
-HealthInsurance,
-Locale,
-OrganisationSimple,
-ProjectSimple,
-SETResponse,
-Settings,
-User,
-accesses,
-locales
+  CountrySimple,
+  Currency,
+  GETResponse,
+  HealthInsurance,
+  Locale,
+  OrganisationSimple,
+  ProjectSimple,
+  SETResponse,
+  Settings,
+  User,
+  accesses,
+  locales
 } from '../../common/types.js'
 
 export interface Alert {
@@ -281,17 +281,21 @@ export default defineComponent({
         if (showAlert) this.addAlert({ title: this.$t(res.data.message), type: 'success' })
         return { ok: (res.data as SETResponse<T>).result }
       } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
+        if (error.response) {
+          if (error.response.status === 401) {
+            this.$router.push({ path: '/login', query: { redirect: this.$route.path } })
+          } else {
+            console.log(error.response.data)
+            this.addAlert({
+              message: error.response.data.message,
+              title: error.response.data.name ? this.$t(error.response.data.name) : 'ERROR',
+              type: 'danger'
+            })
+          }
+          return { error: error.response.data }
         } else {
-          console.log(error.response.data)
-          this.addAlert({
-            message: error.response.data.message,
-            title: error.response.data.name ? this.$t(error.response.data.name) : 'ERROR',
-            type: 'danger'
-          })
+          return { error: error }
         }
-        return { error: error.response.data }
       }
     },
     async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean | any> {

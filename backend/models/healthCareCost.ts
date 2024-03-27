@@ -8,7 +8,7 @@ import {
   healthCareCostStates
 } from '../../common/types.js'
 import { convertCurrency, costObject } from '../helper.js'
-import Project from './project.js'
+import { ProjectDoc } from './project.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -60,7 +60,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
 function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'insurance' }),
-    doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
+    doc.populate({ path: 'project' }),
     doc.populate({ path: 'refundSum.currency' }),
     doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),
@@ -144,7 +144,7 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
 
 healthCareCostSchema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
-    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+    ;(this.project as ProjectDoc).updateBalance()
   }
 })
 

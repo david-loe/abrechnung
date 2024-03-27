@@ -1,7 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
 import { convertCurrency, costObject } from '../helper.js'
-import Project from './project.js'
+import { ProjectDoc } from './project.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -52,7 +52,7 @@ function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'advance.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'project', select: { identifier: 1, organisation: 1 } }),
+    doc.populate({ path: 'project' }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
@@ -133,7 +133,7 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
 
 expenseReportSchema.post('save', async function (this: ExpenseReportDoc) {
   if (this.state === 'refunded') {
-    ;(await Project.findOne({ _id: this.project._id }))?.updateBalance()
+    ;(this.project as ProjectDoc).updateBalance()
   }
 })
 

@@ -281,7 +281,7 @@ export interface RequestSimple {
   name: string
   owner: UserSimple
   state: AnyState
-  project: ProjectSimple
+  project: Project
   editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string
