@@ -4,7 +4,17 @@ import pdf_lib from 'pdf-lib'
 import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
-import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
+import {
+  Column,
+  Options,
+  ReceiptMap,
+  TabelOptions,
+  attachReceipts,
+  drawLogo,
+  drawOrganisationLogo,
+  drawTable,
+  getReceiptMap
+} from './helper.js'
 
 export async function generateExpenseReportReport(expenseReport: ExpenseReport, language: Locale) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -24,6 +34,8 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
 
   var y = getLastPage().getSize().height
   drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  drawOrganisationLogo(getLastPage(), expenseReport.project.organisation, { xStart: 200, yStart: y - 160, maxSize: 150 })
+
   y = y - edge
   y = drawGeneralInformation(getLastPage(), expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
   const receiptMap = getReceiptMap(expenseReport.expenses).map

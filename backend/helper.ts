@@ -127,7 +127,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       }
     }
     if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
-      const reqDocuments = tmpCheckObj
+      let reqDocuments = tmpCheckObj
       function multerFileName(i: number) {
         var str = pathToFiles.length > 0 ? pathToFiles[0] : ''
         for (var j = 1; j < pathToFiles.length; j++) {
@@ -154,29 +154,32 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
             reqDoc.data = buffer
             reqDoc = await new DocumentFile(reqDoc).save()
           } else {
-            return false
+            return undefined
           }
         } else {
           const documentFile = await DocumentFile.findOne({ _id: reqDoc._id }, { owner: 1 }).lean()
           if (!documentFile || (opts.checkOwner && !documentFile.owner.equals(fileOwner))) {
-            return false
+            return undefined
           }
         }
-        reqDoc = reqDoc._id
-        return true
+        return reqDoc._id
       }
       if (opts.multiple) {
         var iR = 0 // index reduction
         for (var i = 0; i < reqDocuments.length; i++) {
-          if (!(await handleFile(reqDocuments[i]))) {
+          const resultId = await handleFile(reqDocuments[i])
+          if (resultId) {
+            reqDocuments[i] = resultId
+          } else {
             reqDocuments.splice(i, 1)
             i -= 1
             iR += 1
           }
         }
       } else {
-        await handleFile(reqDocuments)
+        reqDocuments = await handleFile(reqDocuments)
       }
+      console.log(reqDocuments)
     }
     if (next) {
       next()

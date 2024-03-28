@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { mongo } from 'mongoose'
-import pdf_lib from 'pdf-lib'
+import { Types, mongo } from 'mongoose'
+import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import { addUp, getMoneyString } from '../../common/scripts.js'
 import {
   Cost,
@@ -292,6 +292,60 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
     y: opts.yStart - opts.fontSize / 9,
     height: opts.fontSize,
     width: opts.fontSize
+  })
+}
+
+export async function drawOrganisationLogo(
+  page: pdf_lib.PDFPage,
+  organisationId: Types.ObjectId | string,
+  options: { xStart: number; yStart: number; maxSize: number }
+) {
+  const orga = await Organisation.findOne({ _id: organisationId }).lean()
+  if (!orga || !orga.logo) {
+    return
+  }
+  const doc = await DocumentFile.findOne({ _id: orga.logo }).lean()
+  if (!doc) {
+    console.error('No DocumentFile found for id: ' + orga.logo)
+    return
+  }
+  const data = (doc.data as any as mongo.Binary).buffer
+  if (doc.type === 'image/jpeg') {
+    const zeroOffsetData = new Uint8Array(data, 0)
+    var image = await page.doc.embedJpg(zeroOffsetData)
+  } else {
+    // receipt.type === 'image/png'
+    var image = await page.doc.embedPng(data)
+  }
+
+  var size = image.scaleToFit(options.maxSize, options.maxSize)
+  if (size.width > image.width) {
+    size = image.size()
+  }
+  console.log(size)
+
+  if (orga.website) {
+    //add link to website
+    const linkAnnotation = page.doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Link',
+      Rect: [options.xStart, options.yStart, options.xStart + size.width, options.yStart + size.height],
+      Border: [0, 0, 0],
+      C: [0, 0, 1],
+      A: {
+        Type: 'Action',
+        S: 'URI',
+        URI: PDFString.of(orga.website)
+      }
+    })
+    const linkAnnotationRef = page.doc.context.register(linkAnnotation)
+    page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
+  }
+  page.drawImage(image, {
+    x: options.xStart,
+    y: options.yStart,
+    width: size.width,
+    height: size.height
   })
 }
 
