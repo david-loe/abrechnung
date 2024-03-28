@@ -202,6 +202,7 @@ export default defineComponent({
           log(this.user)
           if (this.user._id) {
             this.$i18n.locale = this.user.settings.language
+            this.$vueform.i18n.locale = this.user.settings.language
             this.auth = true
           }
           this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
@@ -347,6 +348,7 @@ export default defineComponent({
     },
     async pushUserSettings(settings: User['settings']) {
       settings.language = this.$i18n.locale as Locale
+      this.$vueform.i18n.locale = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true
