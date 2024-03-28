@@ -9,9 +9,6 @@
       <h2>{{ $t('labels.models') }}</h2>
       <ModelsForm></ModelsForm>
     </div>
-    <Vueform>
-      <TextElement name="hello_world" label="Hello" placeholder="World" />
-    </Vueform>
   </div>
 </template>
 

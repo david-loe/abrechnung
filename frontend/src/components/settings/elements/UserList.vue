@@ -75,6 +75,10 @@
         </button>
       </template>
     </EasyDataTable>
+    <Vueform :schema="schema" v-model="test" :sync="true"></Vueform>
+    <div>
+      {{ test }}
+    </div>
     <UserForm
       v-if="showForm_"
       :user="userToEdit"
@@ -117,7 +121,12 @@ export default defineComponent({
         name: false,
         email: false
       } as Filter<boolean>,
-      accesses
+      accesses,
+      schema: {
+        name: { type: 'object', schema: { firstName: { type: 'text' }, givenName: { type: 'text' } } },
+        email: { type: 'text', rules: ['email', 'required'] }
+      },
+      test: {}
     }
   },
   methods: {
