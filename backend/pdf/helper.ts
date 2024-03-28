@@ -327,21 +327,7 @@ export async function drawOrganisationLogo(
   const y = options.yStart + (options.maxHeight - size.height)
 
   if (orga.website) {
-    //add link to website
-    const linkAnnotation = page.doc.context.obj({
-      Type: 'Annot',
-      Subtype: 'Link',
-      Rect: [x, y, x + size.width, y + size.height],
-      Border: [0, 0, 0],
-      C: [0, 0, 1],
-      A: {
-        Type: 'Action',
-        S: 'URI',
-        URI: PDFString.of(orga.website)
-      }
-    })
-    const linkAnnotationRef = page.doc.context.register(linkAnnotation)
-    page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
+    drawLink(page, orga.website, { xStart: x, yStart: y, width: size.width, height: size.height })
   }
   page.drawImage(image, {
     x: x,
@@ -349,6 +335,23 @@ export async function drawOrganisationLogo(
     width: size.width,
     height: size.height
   })
+}
+
+export function drawLink(page: pdf_lib.PDFPage, url: string, options: { xStart: number; yStart: number; width: number; height: number }) {
+  const linkAnnotation = page.doc.context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [options.xStart, options.yStart, options.xStart + options.width, options.yStart + options.height],
+    Border: [0, 0, 0],
+    C: [0, 0, 1],
+    A: {
+      Type: 'Action',
+      S: 'URI',
+      URI: PDFString.of(url)
+    }
+  })
+  const linkAnnotationRef = page.doc.context.register(linkAnnotation)
+  page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
 }
 
 export function drawTable(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, data: any[], columns: Column[], options: TabelOptions) {

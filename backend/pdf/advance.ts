@@ -4,7 +4,7 @@ import pdf_lib from 'pdf-lib'
 import { getDetailedMoneyString } from '../../common/scripts.js'
 import { Locale, Money, TravelSimple } from '../../common/types.js'
 import i18n from '../i18n.js'
-import { Column, Options, TabelOptions, drawLogo, drawPlace, drawTable } from './helper.js'
+import { Column, Options, TabelOptions, drawLogo, drawOrganisationLogo, drawPlace, drawTable } from './helper.js'
 
 export async function generateAdvanceReport(travel: TravelSimple, language: Locale) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -23,7 +23,13 @@ export async function generateAdvanceReport(travel: TravelSimple, language: Loca
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawOrganisationLogo(getLastPage(), travel.project.organisation, {
+    xStart: getLastPage().getSize().width - 166,
+    yStart: y - 66,
+    maxHeight: 50,
+    maxWidth: 150
+  })
   y = y - edge
   y = drawGeneralAdvanceInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
 

@@ -4,7 +4,17 @@ import pdf_lib from 'pdf-lib'
 import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, HealthCareCost, Locale, Money } from '../../common/types.js'
 import i18n from '../i18n.js'
-import { Column, Options, ReceiptMap, TabelOptions, attachReceipts, drawLogo, drawTable, getReceiptMap } from './helper.js'
+import {
+  Column,
+  Options,
+  ReceiptMap,
+  TabelOptions,
+  attachReceipts,
+  drawLogo,
+  drawOrganisationLogo,
+  drawTable,
+  getReceiptMap
+} from './helper.js'
 
 export async function generateHealthCareCostReport(healthCareCost: HealthCareCost, language: Locale) {
   const pdfDoc = await pdf_lib.PDFDocument.create()
@@ -23,7 +33,13 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawOrganisationLogo(getLastPage(), healthCareCost.project.organisation, {
+    xStart: getLastPage().getSize().width - 166,
+    yStart: y - 66,
+    maxHeight: 50,
+    maxWidth: 150
+  })
   y = y - edge
   y = drawGeneralInformation(getLastPage(), healthCareCost, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
   const receiptMap = getReceiptMap(healthCareCost.expenses).map
