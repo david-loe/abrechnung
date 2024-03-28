@@ -55,7 +55,7 @@ export class UserController extends Controller {
   @Middlewares(fileHandler.any())
   @Consumes('multipart/form-data')
   public async postVehicleRegistration(@Body() requestBody: { vehicleRegistration: File[] }, @Request() request: ExRequest) {
-    await documentFileHandler(['vehicleRegistration'], true)(request)
+    await documentFileHandler(['vehicleRegistration'])(request)
     request.user!.vehicleRegistration = requestBody.vehicleRegistration as unknown as any
     request.user!.markModified('vehicleRegistration')
     const result = await request.user!.save()

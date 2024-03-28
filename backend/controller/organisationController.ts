@@ -1,7 +1,12 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
+import { Request as ExRequest } from 'express'
+import multer from 'multer'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Organisation as IOrganisation, _id } from '../../common/types.js'
+import { documentFileHandler } from '../helper.js'
 import Organisation from '../models/organisation.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+
+const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('Organisation')
 @Route('organisation')
@@ -23,7 +28,10 @@ export class OrganisationAdminController extends Controller {
   }
 
   @Post()
-  public async postOrganisation(@Body() requestBody: SetterBody<IOrganisation>) {
+  @Middlewares(fileHandler.single('[logo][data]'))
+  @Consumes('multipart/form-data')
+  public async postVehicleRegistration(@Body() requestBody: SetterBody<IOrganisation>, @Request() request: ExRequest) {
+    await documentFileHandler(['logo'], { multiple: false, checkOwner: false })(request)
     return await this.setter(Organisation, { requestBody: requestBody, allowNew: true })
   }
 

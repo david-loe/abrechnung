@@ -95,10 +95,10 @@ export interface Place {
   special?: string
 }
 
-export interface DocumentFile {
+export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
   data: Types.Buffer
   owner: _id
-  type: DocumentFileType
+  type: T
   name: string
   _id?: _id
 }
@@ -145,7 +145,7 @@ export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null
   companyNumber?: string | null
-  logo?: DocumentFile | null
+  logo?: DocumentFile<ImageType> | null
   website?: string | null
 }
 
@@ -350,7 +350,10 @@ export type TransportType = (typeof transportTypes)[number]
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
 
-export const documentFileTypes = ['image/jpeg', 'image/png', 'application/pdf'] as const
+export const imageTypes = ['image/jpeg', 'image/png'] as const
+export type ImageType = (typeof imageTypes)[number]
+
+export const documentFileTypes = ['application/pdf', ...imageTypes] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
