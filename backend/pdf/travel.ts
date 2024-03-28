@@ -28,6 +28,7 @@ import {
   attachReceipts,
   drawFlag,
   drawLogo,
+  drawOrganisationLogo,
   drawPlace,
   drawTable,
   getReceiptMap
@@ -50,7 +51,13 @@ export async function generateTravelReport(travel: Travel, language: Locale) {
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawOrganisationLogo(getLastPage(), travel.project.organisation, {
+    xStart: getLastPage().getSize().width - 166,
+    yStart: y - 66,
+    maxHeight: 50,
+    maxWidth: 150
+  })
   y = y - edge
   y = drawGeneralTravelInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
 

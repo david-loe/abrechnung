@@ -108,9 +108,11 @@ export function costObject(
   return { type, required, default: () => ({}) }
 }
 
-export function documentFileHandler(pathToFiles: string[], checkOwner = true, owner: undefined | string | Types.ObjectId = undefined) {
+type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean }
+export function documentFileHandler(pathToFiles: string[], options: FileHandleOptions = {}) {
+  const opts = Object.assign({ checkOwner: true, multiple: true }, options)
   return async (req: Request, res?: Response, next?: NextFunction) => {
-    const fileOwner = owner ? owner : req.user?._id
+    const fileOwner = opts.owner ? opts.owner : req.user?._id
     if (!fileOwner) {
       throw new Error('No owner for uploaded files')
     }
@@ -124,9 +126,9 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
         break
       }
     }
-    if (pathExists && Array.isArray(tmpCheckObj) && req.files) {
-      const reqDocuments = tmpCheckObj
-      const multerFileName = (i: number) => {
+    if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
+      let reqDocuments = tmpCheckObj
+      function multerFileName(i: number) {
         var str = pathToFiles.length > 0 ? pathToFiles[0] : ''
         for (var j = 1; j < pathToFiles.length; j++) {
           str += '[' + pathToFiles[j] + ']'
@@ -134,37 +136,50 @@ export function documentFileHandler(pathToFiles: string[], checkOwner = true, ow
         str += '[' + i + '][data]'
         return str
       }
-      var iR = 0 // index reduction
-      for (var i = 0; i < reqDocuments.length; i++) {
-        if (!reqDocuments[i]._id) {
+      async function handleFile(reqDoc: any) {
+        if (!reqDoc._id) {
           var buffer = null
-          for (const file of req.files as Express.Multer.File[]) {
-            if (file.fieldname == multerFileName(i + iR)) {
-              buffer = file.buffer
-              break
+          if (opts.multiple) {
+            for (const file of req.files as Express.Multer.File[]) {
+              if (file.fieldname == multerFileName(i + iR)) {
+                buffer = file.buffer
+                break
+              }
             }
+          } else {
+            buffer = req.file!.buffer
           }
           if (buffer) {
-            reqDocuments[i].owner = fileOwner
-            reqDocuments[i].data = buffer
-            reqDocuments[i] = await new DocumentFile(reqDocuments[i]).save()
+            reqDoc.owner = fileOwner
+            reqDoc.data = buffer
+            reqDoc = await new DocumentFile(reqDoc).save()
+          } else {
+            return undefined
+          }
+        } else {
+          const documentFile = await DocumentFile.findOne({ _id: reqDoc._id }, { owner: 1 }).lean()
+          if (!documentFile || (opts.checkOwner && !documentFile.owner.equals(fileOwner))) {
+            return undefined
+          }
+        }
+        return reqDoc._id
+      }
+      if (opts.multiple) {
+        var iR = 0 // index reduction
+        for (var i = 0; i < reqDocuments.length; i++) {
+          const resultId = await handleFile(reqDocuments[i])
+          if (resultId) {
+            reqDocuments[i] = resultId
           } else {
             reqDocuments.splice(i, 1)
             i -= 1
             iR += 1
-            continue
-          }
-        } else {
-          const documentFile = await DocumentFile.findOne({ _id: reqDocuments[i]._id }, { owner: 1 }).lean()
-          if (!documentFile || (checkOwner && !documentFile.owner.equals(fileOwner))) {
-            reqDocuments.splice(i, 1)
-            i -= 1
-            iR += 1
-            continue
           }
         }
-        reqDocuments[i] = reqDocuments[i]._id
+      } else {
+        reqDocuments = await handleFile(reqDocuments)
       }
+      console.log(reqDocuments)
     }
     if (next) {
       next()

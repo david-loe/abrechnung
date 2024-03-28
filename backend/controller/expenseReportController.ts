@@ -45,7 +45,7 @@ export class ExpenseReportController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
-          await documentFileHandler(['cost', 'receipts'], true)(request)
+          await documentFileHandler(['cost', 'receipts'])(request)
           return true
         } else {
           return false
@@ -194,7 +194,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
-          await documentFileHandler(['cost', 'receipts'], true)(request)
+          await documentFileHandler(['cost', 'receipts'])(request)
           return true
         } else {
           return false

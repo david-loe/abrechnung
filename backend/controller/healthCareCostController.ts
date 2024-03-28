@@ -53,7 +53,7 @@ export class HealthCareCostController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
-          await documentFileHandler(['cost', 'receipts'], true)(request)
+          await documentFileHandler(['cost', 'receipts'])(request)
           return true
         } else {
           return false
@@ -201,7 +201,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
-          await documentFileHandler(['cost', 'receipts'], true)(request)
+          await documentFileHandler(['cost', 'receipts'])(request)
           return true
         } else {
           return false
@@ -361,7 +361,7 @@ export class HealthCareCostConfirmController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExaminationByInsurance') {
-          await documentFileHandler(['refundSum', 'receipts'])(request)
+          await documentFileHandler(['refundSum', 'receipts'], {checkOwner: false})(request)
           await oldObject.saveToHistory()
           await oldObject.save()
           return true

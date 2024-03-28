@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { mongo } from 'mongoose'
-import pdf_lib from 'pdf-lib'
+import { Types, mongo } from 'mongoose'
+import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import { addUp, getMoneyString } from '../../common/scripts.js'
 import {
   Cost,
@@ -293,6 +293,65 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
     height: opts.fontSize,
     width: opts.fontSize
   })
+}
+
+export async function drawOrganisationLogo(
+  page: pdf_lib.PDFPage,
+  organisationId: Types.ObjectId | string,
+  options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }
+) {
+  const orga = await Organisation.findOne({ _id: organisationId }).lean()
+  if (!orga || !orga.logo) {
+    return
+  }
+  const doc = await DocumentFile.findOne({ _id: orga.logo }).lean()
+  if (!doc) {
+    console.error('No DocumentFile found for id: ' + orga.logo)
+    return
+  }
+  const data = (doc.data as any as mongo.Binary).buffer
+  if (doc.type === 'image/jpeg') {
+    const zeroOffsetData = new Uint8Array(data, 0)
+    var image = await page.doc.embedJpg(zeroOffsetData)
+  } else {
+    // receipt.type === 'image/png'
+    var image = await page.doc.embedPng(data)
+  }
+
+  var size = image.scaleToFit(options.maxWidth, options.maxHeight)
+  if (size.width > image.width) {
+    size = image.size()
+  }
+  // align on right side
+  const x = options.xStart + (options.maxWidth - size.width)
+  const y = options.yStart + (options.maxHeight - size.height)
+
+  if (orga.website) {
+    drawLink(page, orga.website, { xStart: x, yStart: y, width: size.width, height: size.height })
+  }
+  page.drawImage(image, {
+    x: x,
+    y: y,
+    width: size.width,
+    height: size.height
+  })
+}
+
+export function drawLink(page: pdf_lib.PDFPage, url: string, options: { xStart: number; yStart: number; width: number; height: number }) {
+  const linkAnnotation = page.doc.context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [options.xStart, options.yStart, options.xStart + options.width, options.yStart + options.height],
+    Border: [0, 0, 0],
+    C: [0, 0, 1],
+    A: {
+      Type: 'Action',
+      S: 'URI',
+      URI: PDFString.of(url)
+    }
+  })
+  const linkAnnotationRef = page.doc.context.register(linkAnnotation)
+  page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
 }
 
 export function drawTable(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, data: any[], columns: Column[], options: TabelOptions) {
