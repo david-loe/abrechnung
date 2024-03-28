@@ -298,7 +298,7 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
 export async function drawOrganisationLogo(
   page: pdf_lib.PDFPage,
   organisationId: Types.ObjectId | string,
-  options: { xStart: number; yStart: number; maxSize: number }
+  options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }
 ) {
   const orga = await Organisation.findOne({ _id: organisationId }).lean()
   if (!orga || !orga.logo) {
@@ -318,18 +318,20 @@ export async function drawOrganisationLogo(
     var image = await page.doc.embedPng(data)
   }
 
-  var size = image.scaleToFit(options.maxSize, options.maxSize)
+  var size = image.scaleToFit(options.maxWidth, options.maxHeight)
   if (size.width > image.width) {
     size = image.size()
   }
-  console.log(size)
+  // align on right side
+  const x = options.xStart + (options.maxWidth - size.width)
+  const y = options.yStart + (options.maxHeight - size.height)
 
   if (orga.website) {
     //add link to website
     const linkAnnotation = page.doc.context.obj({
       Type: 'Annot',
       Subtype: 'Link',
-      Rect: [options.xStart, options.yStart, options.xStart + size.width, options.yStart + size.height],
+      Rect: [x, y, x + size.width, y + size.height],
       Border: [0, 0, 0],
       C: [0, 0, 1],
       A: {
@@ -342,8 +344,8 @@ export async function drawOrganisationLogo(
     page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
   }
   page.drawImage(image, {
-    x: options.xStart,
-    y: options.yStart,
+    x: x,
+    y: y,
     width: size.width,
     height: size.height
   })

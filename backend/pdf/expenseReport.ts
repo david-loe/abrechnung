@@ -33,8 +33,13 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   newPage()
 
   var y = getLastPage().getSize().height
-  drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
-  drawOrganisationLogo(getLastPage(), expenseReport.project.organisation, { xStart: 200, yStart: y - 160, maxSize: 150 })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawOrganisationLogo(getLastPage(), expenseReport.project.organisation, {
+    xStart: getLastPage().getSize().width - 166,
+    yStart: y - 66,
+    maxHeight: 50,
+    maxWidth: 150
+  })
 
   y = y - edge
   y = drawGeneralInformation(getLastPage(), expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
