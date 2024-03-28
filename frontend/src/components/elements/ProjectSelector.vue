@@ -14,21 +14,20 @@
     </select>
 
     <v-select
-      v-if="$root.projects.length > 0"
+      v-if="$root.user.settings.projects && $root.settings.userCanSeeAllProjects === $root.projects.length > 0"
       ref="projectSelect"
-      :options="$root.user.settings.lastProjects.concat($root.projects)"
+      :options="([] as any[]).concat($root.user.settings.projects, $root.projects)"
       :modelValue="modelValue"
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
-      @option:selected="$root.setLastProject"
       :filter="filter"
       :disabled="disabled"
       style="min-width: 160px">
-      <template #option="{ identifier }">
-        <span>{{ identifier }}</span>
+      <template #option="{ identifier, name }: Project">
+        <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
-      <template #selected-option="{ identifier }">
-        <span>{{ identifier }}</span>
+      <template #selected-option="{ identifier, name }: Project">
+        <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
       <template v-if="required" #search="{ attributes, events }">
         <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" />
@@ -39,7 +38,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue'
-import { ProjectSimple } from '../../../../common/types.js'
+import { Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ProjectSelector',
@@ -54,12 +53,16 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    filter(options: ProjectSimple[], search: string): ProjectSimple[] {
-      return options.filter(
-        (option) =>
-          option.identifier.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1 &&
-          (!this.$root.user.settings.organisation || option.organisation === this.$root.user.settings.organisation._id)
-      )
+    filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
+      return options.filter((option) => {
+        if (this.$root.user.settings.organisation && option.organisation !== this.$root.user.settings.organisation._id) {
+          return false
+        }
+        return (
+          option.identifier.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1 ||
+          ((option as Project).name && (option as Project).name!.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1)
+        )
+      })
     }
   },
   mounted() {

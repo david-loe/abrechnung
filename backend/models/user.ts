@@ -27,7 +27,7 @@ const userSchema = new Schema<User, UserModel, Methods>({
       language: { type: String, default: process.env.VITE_I18N_LOCALE },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
-      lastProjects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
+      projects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
       organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
     },
@@ -44,7 +44,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'settings.lastProjects', select: { identifier: 1, organisation: 1 } }),
+    doc.populate({ path: 'settings.projects' }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
     doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })
   ])

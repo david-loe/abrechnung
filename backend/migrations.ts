@@ -131,7 +131,7 @@ async function migrate(from: string) {
     }
     case '0.3.9': {
       console.log('Apply migration from v0.3.9')
-      const project = await mongoose.connection.collection('projects').findOne()
+      const project = await mongoose.connection.collection('projects').findOne({})
       if (project) {
         mongoose.connection.collection('travels').updateMany({}, { $set: { project: project._id } })
         mongoose.connection.collection('expensereports').updateMany({}, { $set: { project: project._id } })

@@ -1,4 +1,4 @@
-import { Document, Error, HydratedDocument, Model, Schema, model } from 'mongoose'
+import mongoose, { Document, Error, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { datetimeToDate, getDayList, getDiffInDays } from '../../common/scripts.js'
 import {
   CountrySimple,
@@ -9,6 +9,7 @@ import {
   PurposeSimple,
   Record,
   Refund,
+  Settings,
   Travel,
   TravelComment,
   TravelDay,
@@ -22,10 +23,9 @@ import { convertCurrency, costObject } from '../helper.js'
 import Country, { CountryDoc } from './country.js'
 import DocumentFile from './documentFile.js'
 import { ProjectDoc } from './project.js'
-import Settings from './settings.js'
 import User from './user.js'
 
-const settings = (await Settings.findOne().lean())!
+const settings = (await mongoose.connection.collection('settings').findOne({})) as Settings
 
 function place(required = false, withPlace = true) {
   const obj: any = {

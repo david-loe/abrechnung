@@ -31,7 +31,8 @@ const ldapauth = new LdapStrategy(
     if (!user && email) {
       user = await User.findOne({ email: email })
     }
-    const defaultAccess: Settings['defaultAccess'] = (await mongoose.connection.collection('settings').findOne())!.defaultAccess
+    const defaultAccess: Settings['defaultAccess'] = ((await mongoose.connection.collection('settings').findOne({})) as Settings)
+      .defaultAccess
     const newUser: NewUser = {
       fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
       email: email,

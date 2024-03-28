@@ -41,7 +41,8 @@ const microsoft = new MicrosoftStrategy(
     if (!user && email) {
       user = await User.findOne({ email: email })
     }
-    const defaultAccess: Settings['defaultAccess'] = (await mongoose.connection.collection('settings').findOne())!.defaultAccess
+    const defaultAccess: Settings['defaultAccess'] = ((await mongoose.connection.collection('settings').findOne({})) as Settings)
+      .defaultAccess
     const newUser: NewUser = {
       fk: { microsoft: profile._json.id },
       email: email,

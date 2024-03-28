@@ -9,6 +9,7 @@ export interface Settings {
   accessIcons: { [key in Access]: string[] }
   defaultAccess: { [key in Access]: boolean }
   allowSpouseRefund: boolean
+  userCanSeeAllProjects: boolean
   breakfastCateringLumpSumCut: number
   lunchCateringLumpSumCut: number
   dinnerCateringLumpSumCut: number
@@ -163,7 +164,7 @@ export interface User extends UserSimple {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    lastProjects: ProjectSimple[]
+    projects: Project[]
     insurance?: HealthInsurance | null
     organisation?: OrganisationSimple | null
   }

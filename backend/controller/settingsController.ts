@@ -1,7 +1,7 @@
-import { Route, Get, Tags, Security, Queries, Post, Body } from 'tsoa'
-import { Controller, SetterBody } from './controller.js'
-import Settings from '../models/settings.js'
+import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import { Settings as ISettings } from '../../common/types.js'
+import Settings from '../models/settings.js'
+import { Controller, SetterBody } from './controller.js'
 
 @Tags('Settings')
 @Route('settings')
@@ -9,7 +9,7 @@ import { Settings as ISettings } from '../../common/types.js'
 export class SettingsController extends Controller {
   @Get()
   public async getSettings() {
-    return { data: (await Settings.findOne({}, { __v: 0 })) as ISettings }
+    return { data: (await Settings.findOne({}, { __v: 0 }).lean()) as ISettings }
   }
 }
 

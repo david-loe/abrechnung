@@ -193,7 +193,7 @@ export default defineComponent({
           this.getter<Settings>('settings'),
           this.getter<HealthInsurance[]>('healthInsurance'),
           this.getter<OrganisationSimple[]>('organisation'),
-          this.getter<ProjectSimple[]>('project'),
+          this.getter<ProjectSimple[]>('project', {}, {}, false),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
           this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
         ]).then((result) => {
@@ -365,10 +365,6 @@ export default defineComponent({
     },
     setLastCountry(country: CountrySimple) {
       this.setLast(country, this.user.settings.lastCountries)
-      this.pushUserSettings(this.user.settings)
-    },
-    setLastProject(project: ProjectSimple) {
-      this.setLast(project, this.user.settings.lastProjects)
       this.pushUserSettings(this.user.settings)
     },
     setLast<T>(item: T, list: T[], limit = 3) {

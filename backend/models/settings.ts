@@ -53,6 +53,7 @@ const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
   defaultAccess: { type: defaultAccess, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
+  userCanSeeAllProjects: { type: Boolean, required: true },
   breakfastCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   dinnerCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },

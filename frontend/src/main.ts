@@ -50,7 +50,6 @@ declare module '@vue/runtime-core' {
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
-      setLastProject(project: ProjectSimple): void
       load: () => Promise<void>
       pushUserSettings: (settings: User['settings']) => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'

@@ -26,6 +26,7 @@
     "examine/travel": false
   },
   "allowSpouseRefund": true,
+  "userCanSeeAllProjects": true,
   "breakfastCateringLumpSumCut": 0.2,
   "dinnerCateringLumpSumCut": 0.4,
   "factorCateringLumpSum": 1,

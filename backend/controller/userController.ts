@@ -76,6 +76,7 @@ export class UsersController extends Controller {
     return await this.getter(User, { query, projection: { name: 1 } })
   }
 }
+
 interface SetterBodyUser extends SetterBody<IUser> {
   loseAccessAt: null | Date | undefined
 }

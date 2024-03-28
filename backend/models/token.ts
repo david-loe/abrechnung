@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose'
-import Settings from './settings.js'
+import mongoose, { Schema, model } from 'mongoose'
+import { Settings } from '../../common/types.js'
 
-const settings = (await Settings.findOne().lean())!
+const settings = (await mongoose.connection.collection('settings').findOne({})) as Settings
 
 const tokenSchema = new Schema(
   {
