@@ -211,9 +211,9 @@
 			"DocumentFileType": {
 				"type": "string",
 				"enum": [
+					"application/pdf",
 					"image/jpeg",
-					"image/png",
-					"application/pdf"
+					"image/png"
 				]
 			},
 			"DocumentFile": {
@@ -625,9 +625,9 @@
 					"type": {
 						"type": "string",
 						"enum": [
+							"application/pdf",
 							"image/jpeg",
-							"image/png",
-							"application/pdf"
+							"image/png"
 						]
 					},
 					"name": {
@@ -649,9 +649,9 @@
 					"type": {
 						"type": "string",
 						"enum": [
+							"application/pdf",
 							"image/jpeg",
-							"image/png",
-							"application/pdf"
+							"image/png"
 						]
 					},
 					"name": {
@@ -964,9 +964,9 @@
 								"type": {
 									"type": "string",
 									"enum": [
+										"application/pdf",
 										"image/jpeg",
-										"image/png",
-										"application/pdf"
+										"image/png"
 									]
 								},
 								"_id": {
@@ -1228,9 +1228,9 @@
 								"type": {
 									"type": "string",
 									"enum": [
+										"application/pdf",
 										"image/jpeg",
-										"image/png",
-										"application/pdf"
+										"image/png"
 									]
 								},
 								"_id": {
@@ -2664,9 +2664,9 @@
 										"type": {
 											"type": "string",
 											"enum": [
+												"application/pdf",
 												"image/jpeg",
-												"image/png",
-												"application/pdf"
+												"image/png"
 											]
 										},
 										"_id": {
@@ -2747,9 +2747,9 @@
 										"type": {
 											"type": "string",
 											"enum": [
+												"application/pdf",
 												"image/jpeg",
-												"image/png",
-												"application/pdf"
+												"image/png"
 											]
 										},
 										"_id": {
@@ -4481,6 +4481,40 @@
 			"SetterBody_IProject_": {
 				"$ref": "#/components/schemas/SetterPartial_IProject.NoPost_"
 			},
+			"ImageType": {
+				"type": "string",
+				"enum": [
+					"image/jpeg",
+					"image/png"
+				]
+			},
+			"DocumentFile_ImageType_": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/mongoose.Types.Buffer"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"type": {
+						"$ref": "#/components/schemas/ImageType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Organisation": {
 				"properties": {
 					"name": {
@@ -4497,6 +4531,18 @@
 						"nullable": true
 					},
 					"companyNumber": {
+						"type": "string",
+						"nullable": true
+					},
+					"logo": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DocumentFile_ImageType_"
+							}
+						],
+						"nullable": true
+					},
+					"website": {
 						"type": "string",
 						"nullable": true
 					}
@@ -4553,6 +4599,18 @@
 					"companyNumber": {
 						"type": "string",
 						"nullable": true
+					},
+					"logo": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DocumentFile_ImageType_"
+							}
+						],
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
 					}
 				},
 				"required": [
@@ -4586,7 +4644,9 @@
 								"_id",
 								"subfolderPath",
 								"bankDetails",
-								"companyNumber"
+								"companyNumber",
+								"logo",
+								"website"
 							],
 							"nullable": false
 						},
@@ -4602,6 +4662,38 @@
 			},
 			"SetterPartial_IOrganisation.NoPost_": {
 				"properties": {
+					"website": {
+						"type": "string"
+					},
+					"logo": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"data": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "byte"
+									}
+								]
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"image/jpeg",
+									"image/png"
+								]
+							},
+							"_id": {
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						},
+						"type": "object"
+					},
 					"companyNumber": {
 						"type": "string"
 					},
@@ -5041,9 +5133,9 @@
 										"type": {
 											"type": "string",
 											"enum": [
+												"application/pdf",
 												"image/jpeg",
-												"image/png",
-												"application/pdf"
+												"image/png"
 											]
 										},
 										"_id": {
@@ -8514,7 +8606,9 @@
 									"_id",
 									"subfolderPath",
 									"bankDetails",
-									"companyNumber"
+									"companyNumber",
+									"logo",
+									"website"
 								],
 								"nullable": false
 							}
@@ -8599,7 +8693,9 @@
 									"_id",
 									"subfolderPath",
 									"bankDetails",
-									"companyNumber"
+									"companyNumber",
+									"logo",
+									"website"
 								],
 								"nullable": false
 							}
@@ -8616,7 +8712,7 @@
 				]
 			},
 			"post": {
-				"operationId": "PostOrganisation",
+				"operationId": "PostVehicleRegistration",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -8656,7 +8752,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_IOrganisation_"
 							}
@@ -9795,7 +9891,9 @@
 									"_id",
 									"subfolderPath",
 									"bankDetails",
-									"companyNumber"
+									"companyNumber",
+									"logo",
+									"website"
 								],
 								"nullable": false
 							}
