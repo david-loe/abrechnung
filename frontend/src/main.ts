@@ -17,6 +17,10 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
+import Vueform from '@vueform/vueform'
+import '@vueform/vueform/dist/vueform.css'
+import vueformConfig from './../vueform.config'
+
 import {
   CountrySimple,
   Currency,
@@ -66,4 +70,10 @@ declare module '@vue/runtime-core' {
   }
 }
 
-createApp(App).component('vSelect', vSelect).component('EasyDataTable', Vue3EasyDataTable).use(i18n).use(router).mount('#app')
+const app = createApp(App)
+app.component('vSelect', vSelect)
+app.component('EasyDataTable', Vue3EasyDataTable)
+app.use(i18n)
+app.use(router)
+app.use(Vueform, vueformConfig)
+app.mount('#app')
