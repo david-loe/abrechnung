@@ -122,6 +122,20 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"BaseCurrencyMoney": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"mongoose.Types.ObjectId": {
 				"type": "string"
 			},
@@ -129,7 +143,7 @@
 				"$ref": "#/components/schemas/mongoose.Types.ObjectId",
 				"pattern": "^[0-9a-fA-F]{24}$"
 			},
-			"ProjectSimple": {
+			"Project": {
 				"properties": {
 					"identifier": {
 						"type": "string"
@@ -139,12 +153,22 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
 					}
 				},
 				"required": [
 					"identifier",
 					"organisation",
-					"_id"
+					"_id",
+					"balance"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -395,9 +419,9 @@
 								],
 								"nullable": true
 							},
-							"lastProjects": {
+							"projects": {
 								"items": {
-									"$ref": "#/components/schemas/ProjectSimple"
+									"$ref": "#/components/schemas/Project"
 								},
 								"type": "array"
 							},
@@ -418,7 +442,7 @@
 							}
 						},
 						"required": [
-							"lastProjects",
+							"projects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -500,10 +524,19 @@
 							}
 						]
 					},
-					"lastProjects": {
+					"projects": {
 						"items": {
 							"properties": {
 								"identifier": {
+									"type": "string"
+								},
+								"budget": {
+									"$ref": "#/components/schemas/BaseCurrencyMoney"
+								},
+								"balance": {
+									"$ref": "#/components/schemas/BaseCurrencyMoney"
+								},
+								"name": {
 									"type": "string"
 								},
 								"organisation": {
@@ -844,9 +877,9 @@
 								],
 								"nullable": true
 							},
-							"lastProjects": {
+							"projects": {
 								"items": {
-									"$ref": "#/components/schemas/ProjectSimple"
+									"$ref": "#/components/schemas/Project"
 								},
 								"type": "array"
 							},
@@ -867,7 +900,7 @@
 							}
 						},
 						"required": [
-							"lastProjects",
+							"projects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -1076,10 +1109,19 @@
 									}
 								]
 							},
-							"lastProjects": {
+							"projects": {
 								"items": {
 									"properties": {
 										"identifier": {
+											"type": "string"
+										},
+										"budget": {
+											"$ref": "#/components/schemas/BaseCurrencyMoney"
+										},
+										"balance": {
+											"$ref": "#/components/schemas/BaseCurrencyMoney"
+										},
+										"name": {
 											"type": "string"
 										},
 										"organisation": {
@@ -1334,10 +1376,19 @@
 									}
 								]
 							},
-							"lastProjects": {
+							"projects": {
 								"items": {
 									"properties": {
 										"identifier": {
+											"type": "string"
+										},
+										"budget": {
+											"$ref": "#/components/schemas/BaseCurrencyMoney"
+										},
+										"balance": {
+											"$ref": "#/components/schemas/BaseCurrencyMoney"
+										},
+										"name": {
 											"type": "string"
 										},
 										"organisation": {
@@ -1769,20 +1820,6 @@
 					"catering24"
 				]
 			},
-			"BaseCurrencyMoney": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					}
-				},
-				"required": [
-					"amount"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Refund": {
 				"properties": {
 					"type": {
@@ -2004,36 +2041,6 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					}
 				]
-			},
-			"Project": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"name": {
-						"type": "string"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id",
-					"balance"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"Travel": {
 				"properties": {
@@ -2476,10 +2483,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							},
 							{
-								"$ref": "#/components/schemas/Project"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
 					},
@@ -3436,10 +3443,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							},
 							{
-								"$ref": "#/components/schemas/Project"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
 					},
@@ -3512,10 +3519,10 @@
 					"project": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Project"
 							},
 							{
-								"$ref": "#/components/schemas/Project"
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
 					},
@@ -3743,6 +3750,9 @@
 						"type": "object"
 					},
 					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"userCanSeeAllProjects": {
 						"type": "boolean"
 					},
 					"breakfastCateringLumpSumCut": {
@@ -3984,6 +3994,7 @@
 					"accessIcons",
 					"defaultAccess",
 					"allowSpouseRefund",
+					"userCanSeeAllProjects",
 					"breakfastCateringLumpSumCut",
 					"lunchCateringLumpSumCut",
 					"dinnerCateringLumpSumCut",
@@ -4193,6 +4204,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"userCanSeeAllProjects": {
+						"type": "boolean"
+					},
 					"allowSpouseRefund": {
 						"type": "boolean"
 					},
@@ -4340,6 +4354,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ProjectSimple": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GetterQuery_ProjectSimple_": {
 				"properties": {
 					"limit": {
@@ -4445,6 +4479,9 @@
 			},
 			"SetterPartial_IProject.NoPost_": {
 				"properties": {
+					"identifier": {
+						"type": "string"
+					},
 					"budget": {
 						"properties": {
 							"amount": {
@@ -4462,9 +4499,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"identifier": {
-						"type": "string"
 					},
 					"name": {
 						"type": "string"
