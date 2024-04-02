@@ -1,12 +1,12 @@
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { User as IUser, _id } from '../../common/types.js'
-import { documentFileHandler } from '../helper.js'
+import { User as IUser, Locale, _id } from '../../common/types.js'
+import { documentFileHandler, mongooseSchemaToVueformSchema } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
 import Token from '../models/token.js'
-import User from '../models/user.js'
+import User, { userSchema } from '../models/user.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { File } from './types.js'
 
@@ -110,5 +110,9 @@ export class UserAdminController extends Controller {
   @Delete()
   public async deleteUser(@Query() _id: _id) {
     return await this.deleter(User, { _id })
+  }
+  @Get('schema')
+  public async getSchema(@Query() language: Locale) {
+    return mongooseSchemaToVueformSchema(userSchema.obj, language)
   }
 }

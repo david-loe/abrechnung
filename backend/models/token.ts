@@ -5,7 +5,7 @@ const settings = (await Settings.findOne().lean())!
 
 const tokenSchema = new Schema(
   {
-    files: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }]
+    files: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }] }
   },
   { timestamps: true }
 )

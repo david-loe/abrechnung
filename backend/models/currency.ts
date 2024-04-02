@@ -1,10 +1,13 @@
 import { Schema, model } from 'mongoose'
 import { Currency } from '../../common/types.js'
 
-const currencySchema = new Schema<Currency>({
+export const currencySchema = new Schema<Currency>({
   name: {
-    de: { type: String, required: true, trim: true },
-    en: { type: String, required: true, trim: true }
+    type: {
+      de: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true }
+    },
+    required: true
   },
   _id: { type: String, required: true, trim: true, alias: 'code' },
   subunit: { type: String, trim: true },

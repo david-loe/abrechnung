@@ -1,6 +1,7 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { HealthInsurance as IHealthInsurance, _id } from '../../common/types.js'
-import HealthInsurance from '../models/healthInsurance.js'
+import { HealthInsurance as IHealthInsurance, Locale, _id } from '../../common/types.js'
+import { mongooseSchemaToVueformSchema } from '../helper.js'
+import HealthInsurance, { healthInsuranceSchema } from '../models/healthInsurance.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('HealthInsurance')
@@ -24,5 +25,9 @@ export class HealthInsuranceAdminController extends Controller {
   @Delete()
   public async deleteHealthInsurance(@Query() _id: _id) {
     return await this.deleter(HealthInsurance, { _id: _id })
+  }
+  @Get('schema')
+  public async getSchema(@Query() language: Locale) {
+    return mongooseSchemaToVueformSchema(healthInsuranceSchema.obj, language)
   }
 }

@@ -1,6 +1,6 @@
 import { HydratedDocument, Model, Schema, model } from 'mongoose'
-import Settings from './settings.js'
 import { Country, LumpSum } from '../../common/types.js'
+import Settings from './settings.js'
 
 interface Methods {
   getLumpSum(date: Date, special?: string): Promise<LumpSum>
@@ -8,33 +8,42 @@ interface Methods {
 
 type CountryModel = Model<Country, {}, Methods>
 
-const countrySchema = new Schema<Country, CountryModel, Methods>({
+export const countrySchema = new Schema<Country, CountryModel, Methods>({
   name: {
-    de: { type: String, required: true, trim: true },
-    en: { type: String, required: true, trim: true }
+    type: {
+      de: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true }
+    },
+    required: true
   },
   alias: {
-    de: [{ type: String, trim: true }],
-    en: [{ type: String, trim: true }]
+    type: {
+      de: { type: [{ type: String, trim: true }] },
+      en: { type: [{ type: String, trim: true }] }
+    }
   },
   _id: { type: String, required: true, trim: true, alias: 'code' },
   flag: { type: String },
-  lumpSums: [
-    {
-      validFrom: { type: Date },
-      catering24: { type: Number },
-      catering8: { type: Number },
-      overnight: { type: Number },
-      spezials: [
-        {
-          city: { type: String, trim: true },
-          catering24: { type: Number },
-          catering8: { type: Number },
-          overnight: { type: Number }
+  lumpSums: {
+    type: [
+      {
+        validFrom: { type: Date },
+        catering24: { type: Number },
+        catering8: { type: Number },
+        overnight: { type: Number },
+        spezials: {
+          type: [
+            {
+              city: { type: String, trim: true },
+              catering24: { type: Number },
+              catering8: { type: Number },
+              overnight: { type: Number }
+            }
+          ]
         }
-      ]
-    }
-  ],
+      }
+    ]
+  },
   lumpSumsFrom: { type: String, trim: true },
   currency: { type: String, ref: 'Currency' }
 })

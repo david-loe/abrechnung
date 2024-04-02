@@ -12,15 +12,21 @@ interface Methods {
 
 type UserModel = Model<User, {}, Methods>
 
-const userSchema = new Schema<User, UserModel, Methods>({
+export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
-    microsoft: { type: String, index: true, unique: true, sparse: true },
-    ldapauth: { type: String, index: true, unique: true, sparse: true },
-    magiclogin: { type: String, index: true, unique: true, sparse: true }
+    type: {
+      microsoft: { type: String, index: true, unique: true, sparse: true },
+      ldapauth: { type: String, index: true, unique: true, sparse: true },
+      magiclogin: { type: String, index: true, unique: true, sparse: true }
+    },
+    required: true
   },
   email: { type: String, unique: true, index: true, required: true },
-  name: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
-  access: accessObject,
+  name: {
+    type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
+    required: true
+  },
+  access: { type: accessObject },
   loseAccessAt: { type: Date },
   settings: {
     type: {
@@ -34,7 +40,7 @@ const userSchema = new Schema<User, UserModel, Methods>({
     required: true,
     default: () => ({})
   },
-  vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
+  vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }] },
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
 })
 

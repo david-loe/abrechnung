@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { NextFunction, Request, Response } from 'express'
-import { Schema, Types } from 'mongoose'
-import { ExchangeRate as ExchangeRateI, baseCurrency } from '../common/types.js'
+import { Schema, SchemaDefinition, SchemaTypeOptions, Types } from 'mongoose'
+import { ExchangeRate as ExchangeRateI, Locale, baseCurrency } from '../common/types.js'
 import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 
@@ -95,7 +95,7 @@ export function costObject(
     type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
-    type.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
+    type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }] }
     type.date = {
       type: Date,
       validate: {
@@ -185,4 +185,59 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       next()
     }
   }
+}
+
+function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, language: Locale) {
+  const vueformElement = { rules: [] } as any
+  if (schemaType.ref) {
+    vueformElement['type'] = schemaType.ref.toString().toLowerCase()
+  } else if (schemaType.type === String) {
+    vueformElement['type'] = 'text'
+  } else if (schemaType.type === Number) {
+    vueformElement['type'] = 'text'
+    vueformElement['input-type'] = 'number'
+    vueformElement['force-numbers'] = true
+  } else if (schemaType.type === Date) {
+    vueformElement['type'] = 'text'
+    vueformElement['input-type'] = 'date'
+  } else if (Array.isArray(schemaType.type)) {
+    if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
+      vueformElement['type'] = 'list'
+      vueformElement['object'] = mongooseSchemaToVueformSchema(schemaType.type[0], language)
+    } else if (schemaType.type[0].ref) {
+      vueformElement['type'] = schemaType.type[0].ref.toString().toLowerCase()
+      vueformElement['multiple'] = true
+    } else {
+      vueformElement['type'] = 'list'
+      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language)
+    }
+  } else if (typeof schemaType.type === 'object') {
+    if (isCheckboxGroup(schemaType.type)) {
+      vueformElement['type'] = 'checkbox-group'
+      vueformElement['items'] = Object.keys(schemaType.type)
+    } else {
+      vueformElement['type'] = 'object'
+      vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
+    }
+  } else {
+    throw new Error('No Type for conversion found for:' + schemaType.type)
+  }
+  if (schemaType.required) {
+    vueformElement['rules'].push('required')
+  }
+  return vueformElement
+}
+
+function isCheckboxGroup(mongooseSchema: SchemaDefinition | any) {
+  return !Object.keys(mongooseSchema).some((path) => (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Boolean)
+}
+
+export function mongooseSchemaToVueformSchema(mongooseSchema: SchemaDefinition | any, language: Locale) {
+  const vueformSchema: any = {}
+  for (const path in mongooseSchema) {
+    const prop = mongooseSchema[path] as SchemaTypeOptions<any>
+    vueformSchema[path] = mapSchemaTypeToVueformElement(prop, language)
+  }
+
+  return vueformSchema
 }

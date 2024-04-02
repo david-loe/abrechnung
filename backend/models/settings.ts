@@ -49,7 +49,7 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
-const settingsSchema = new Schema<Settings>({
+export const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
   defaultAccess: { type: defaultAccess, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
@@ -58,9 +58,9 @@ const settingsSchema = new Schema<Settings>({
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   dinnerCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   factorCateringLumpSum: { type: Number, min: 0, max: 1, required: true },
-  factorCateringLumpSumExceptions: [{ type: String, ref: 'Country' }],
+  factorCateringLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   factorOvernightLumpSum: { type: Number, min: 0, max: 1, required: true },
-  factorOvernightLumpSumExceptions: [{ type: String, ref: 'Country' }],
+  factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
   maxTravelDayCount: { type: Number, min: 0, required: true },
   distanceRefunds: { type: distanceRefunds, required: true },

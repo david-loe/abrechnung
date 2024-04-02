@@ -1,6 +1,7 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { Country as ICountry, _id } from '../../common/types.js'
-import Country from '../models/country.js'
+import { Country as ICountry, Locale, _id } from '../../common/types.js'
+import { mongooseSchemaToVueformSchema } from '../helper.js'
+import Country, { countrySchema } from '../models/country.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('Country')
@@ -49,5 +50,9 @@ export class CountryAdminController extends Controller {
   @Delete()
   public async deleteCountry(@Query() _id: _id) {
     return await this.deleter(Country, { _id: _id })
+  }
+  @Get('schema')
+  public async getSchema(@Query() language: Locale) {
+    return mongooseSchemaToVueformSchema(countrySchema.obj, language)
   }
 }
