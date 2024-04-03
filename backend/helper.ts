@@ -2,6 +2,7 @@ import axios from 'axios'
 import { NextFunction, Request, Response } from 'express'
 import { Schema, SchemaDefinition, SchemaTypeOptions, Types } from 'mongoose'
 import { ExchangeRate as ExchangeRateI, Locale, baseCurrency } from '../common/types.js'
+import i18n from './i18n.js'
 import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 
@@ -187,8 +188,11 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
   }
 }
 
-function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, language: Locale) {
-  const vueformElement = { rules: [] } as any
+function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, language: Locale, labelStr?: string, assignment = {}) {
+  if (schemaType.hide) {
+    return
+  }
+  const vueformElement = Object.assign({ rules: [] }, assignment) as any
   if (schemaType.ref) {
     vueformElement['type'] = schemaType.ref.toString().toLowerCase()
   } else if (schemaType.type === String) {
@@ -209,21 +213,37 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
       vueformElement['multiple'] = true
     } else {
       vueformElement['type'] = 'list'
-      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language)
+      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr)
     }
   } else if (typeof schemaType.type === 'object') {
+    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
     if (isCheckboxGroup(schemaType.type)) {
-      vueformElement['type'] = 'checkbox-group'
-      vueformElement['items'] = Object.keys(schemaType.type)
+      vueformElement['type'] = 'checkboxgroup'
+      const items: any = {}
+      for (const key of keys) {
+        items[key] = schemaType.type[key].label
+          ? i18n.t(schemaType.type[key].label, { lng: language })
+          : i18n.t('labels.' + key, { lng: language })
+      }
+      vueformElement['items'] = items
     } else {
       vueformElement['type'] = 'object'
-      vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
+      if (keys.length < 4 && keys.length > 1 && isFlatObject(schemaType.type)) {
+        vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language, { columns: { container: 12 / keys.length } })
+      } else {
+        vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
+      }
     }
   } else {
     throw new Error('No Type for conversion found for:' + schemaType.type)
   }
   if (schemaType.required) {
     vueformElement['rules'].push('required')
+  }
+  if (schemaType.label) {
+    vueformElement['label'] = i18n.t(schemaType.label, { lng: language })
+  } else if (labelStr) {
+    vueformElement['label'] = i18n.t('labels.' + labelStr, { lng: language })
   }
   return vueformElement
 }
@@ -232,11 +252,21 @@ function isCheckboxGroup(mongooseSchema: SchemaDefinition | any) {
   return !Object.keys(mongooseSchema).some((path) => (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Boolean)
 }
 
-export function mongooseSchemaToVueformSchema(mongooseSchema: SchemaDefinition | any, language: Locale) {
+function isFlatObject(mongooseSchema: SchemaDefinition | any) {
+  return !Object.keys(mongooseSchema).some(
+    (path) =>
+      (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Boolean &&
+      (mongooseSchema[path] as SchemaTypeOptions<any>).type !== String &&
+      (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Number &&
+      (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Date
+  )
+}
+
+export function mongooseSchemaToVueformSchema(mongooseSchema: SchemaDefinition | any, language: Locale, assignment = {}) {
   const vueformSchema: any = {}
   for (const path in mongooseSchema) {
     const prop = mongooseSchema[path] as SchemaTypeOptions<any>
-    vueformSchema[path] = mapSchemaTypeToVueformElement(prop, language)
+    vueformSchema[path] = mapSchemaTypeToVueformElement(prop, language, path, assignment)
   }
 
   return vueformSchema

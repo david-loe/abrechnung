@@ -122,10 +122,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: {
-        name: { type: 'object', schema: { firstName: { type: 'text' }, givenName: { type: 'text' } } },
-        email: { type: 'text', rules: ['email', 'required'] }
-      },
+      schema: {},
       test: {}
     }
   },
@@ -156,6 +153,13 @@ export default defineComponent({
         this.users = result.data
       }
     },
+    async getSchema() {
+      const result = (await this.$root.getter<any>('admin/user/schema', { language: this.$i18n.locale })).ok as any
+      console.log(result)
+      if (result) {
+        this.schema = result
+      }
+    },
     clickFilter(header: keyof Filter<string>) {
       if (this._filter[header]) {
         this._filter[header] = false
@@ -168,6 +172,7 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getUsers()
+    this.getSchema()
   }
 })
 </script>

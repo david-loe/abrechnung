@@ -14,6 +14,7 @@ const i18n = i18next.createInstance({
   lng: process.env.VITE_I18N_LOCALE || 'de',
   fallbackLng: process.env.VITE_I18N_FALLBACK_LOCALE || 'de',
   resources: loadLocaleMessages(),
+  nsSeparator: false,
   interpolation: {
     prefix: '{',
     suffix: '}',

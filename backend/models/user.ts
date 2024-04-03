@@ -1,10 +1,14 @@
 import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { Access, Token, User, accesses } from '../../common/types.js'
 
-const accessObject: { [key in Access]?: { type: BooleanConstructor; default: false } } = {}
+const accessObject: { [key in Access]?: { type: BooleanConstructor; default: false; label: string } } = {}
 for (const access of accesses) {
-  accessObject[access] = { type: Boolean, default: false }
+  accessObject[access] = { type: Boolean, default: false, label: 'accesses.' + access }
 }
+
+const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
+const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
+const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
 
 interface Methods {
   isActive(): Promise<boolean>
@@ -15,9 +19,9 @@ type UserModel = Model<User, {}, Methods>
 export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
     type: {
-      microsoft: { type: String, index: true, unique: true, sparse: true },
-      ldapauth: { type: String, index: true, unique: true, sparse: true },
-      magiclogin: { type: String, index: true, unique: true, sparse: true }
+      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !useMicrosoft },
+      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !useLDAPauth },
+      magiclogin: { type: String, index: true, unique: true, sparse: true, label: 'Magic Login Email', hide: !useMagicLogin }
     },
     required: true
   },
