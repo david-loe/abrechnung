@@ -93,7 +93,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
-import UserForm from '../forms/UserForm.vue'
 
 interface Filter<T> {
   name: T
@@ -101,7 +100,7 @@ interface Filter<T> {
 }
 export default defineComponent({
   name: 'UserList',
-  components: { UserForm },
+  components: {},
   data() {
     return {
       users: [] as User[],
