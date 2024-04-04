@@ -220,6 +220,8 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
   if (schemaType.ref) {
     vueformElement['type'] = schemaType.ref.toString().toLowerCase()
   } else if (schemaType.type === String) {
+    vueformElement['placeholder'] = vueformElement['label']
+    delete vueformElement['label']
     if (schemaType.enum && Array.isArray(schemaType.enum)) {
       vueformElement['type'] = 'select'
       const items: any = {}
@@ -236,10 +238,17 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
   } else if (schemaType.type === Number) {
     vueformElement['type'] = 'text'
     vueformElement['input-type'] = 'number'
+    vueformElement['rules'].push('numeric')
+    vueformElement['attrs'] = { step: 'any' }
     vueformElement['force-numbers'] = true
+
+    vueformElement['placeholder'] = vueformElement['label']
+    delete vueformElement['label']
   } else if (schemaType.type === Date) {
     vueformElement['type'] = 'date'
     vueformElement['time'] = Boolean(schemaType.time)
+    vueformElement['placeholder'] = vueformElement['label']
+    delete vueformElement['label']
   } else if (schemaType.type === Boolean) {
     vueformElement['type'] = 'checkbox'
     vueformElement['text'] = vueformElement['label']
@@ -254,6 +263,7 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
     } else {
       vueformElement['type'] = 'list'
       vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr)
+      delete vueformElement['element'].placeholder
     }
   } else if (typeof schemaType.type === 'object') {
     const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
@@ -266,7 +276,7 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
     }
   } else {
-    throw new Error('No Type for conversion found for:' + schemaType.type)
+    throw new Error(`No Type for conversion found for: ${labelStr} (${schemaType.type})`)
   }
   return vueformElement
 }
@@ -280,7 +290,7 @@ function isFlatObject(mongooseSchema: SchemaDefinition | any) {
 }
 
 function isFlatType(type: SchemaTypeOptions<any>['type']) {
-  return type === Boolean || type === String || type === Number || type === Date
+  return type === Boolean || type === String || type === Number || type === Date || Array.isArray(type)
 }
 
 export function mongooseSchemaToVueformSchema(mongooseSchema: SchemaDefinition | any, language: Locale, assignment = {}) {
