@@ -1,6 +1,4 @@
-import mongoose from 'mongoose'
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
-import { Settings } from '../../common/types.js'
 import User from '../models/user.js'
 import { NewUser, addAdminIfNone } from './index.js'
 
@@ -41,20 +39,16 @@ const microsoft = new MicrosoftStrategy(
     if (!user && email) {
       user = await User.findOne({ email: email })
     }
-    const defaultAccess: Settings['defaultAccess'] = ((await mongoose.connection.collection('settings').findOne({})) as Settings)
-      .defaultAccess
     const newUser: NewUser = {
       fk: { microsoft: profile._json.id },
       email: email,
-      name: { familyName: profile._json.surname, givenName: profile._json.givenName },
-      access: defaultAccess
+      name: { familyName: profile._json.surname, givenName: profile._json.givenName }
     }
     if (!user) {
       user = new User(newUser)
     } else {
       Object.assign(user.fk, newUser.fk)
       delete newUser.fk
-      delete newUser.access
       Object.assign(user, newUser)
     }
     try {
