@@ -80,12 +80,12 @@
       {{ test }}
     </div>
     <UserForm
-      v-if="showForm_"
+      v-if="_showForm"
       :user="userToEdit"
       :mode="userFormMode"
       @add="postUser"
       @edit="postUser"
-      @cancel="showForm_ = false"
+      @cancel="_showForm = false"
       ref="userform"
       id="userform"
       style="max-width: 650px"></UserForm>
@@ -112,7 +112,7 @@ export default defineComponent({
       users: [] as User[],
       userToEdit: undefined as User | undefined,
       userFormMode: 'add' as 'add' | 'edit',
-      showForm_: false,
+      _showForm: false,
       filter: {
         name: '',
         email: ''
@@ -130,14 +130,14 @@ export default defineComponent({
     showForm(mode: 'add' | 'edit', user?: User) {
       this.userFormMode = mode
       this.userToEdit = user
-      this.showForm_ = true
+      this._showForm = true
     },
     async postUser(user: User) {
       const result = await this.$root.setter<User>('admin/user', user)
       if (result.ok) {
         this.getUsers()
         ;(this.$refs.userform as typeof UserForm).clear()
-        this.showForm_ = false
+        this._showForm = false
       }
       this.userToEdit = undefined
     },
@@ -155,9 +155,11 @@ export default defineComponent({
     },
     async getSchema() {
       const result = (await this.$root.getter<any>('admin/user/schema', { language: this.$i18n.locale })).ok as any
-      console.log(result)
+
       if (result) {
-        this.schema = result
+        this.schema = result //@ts-ignore
+        this.schema.button = { type: 'button', submits: true, buttonLabel: this.$t('labels.save') }
+        console.log(this.schema)
       }
     },
     clickFilter(header: keyof Filter<string>) {

@@ -7,5 +7,8 @@ export default defineConfig({
   theme: vueform,
   locales: { de, en },
   locale: 'de',
-  env: import.meta.env.MODE
+  env: import.meta.env.MODE,
+  validateOn: 'step',
+  displayErrors: false,
+  displayMessages: false
 })
