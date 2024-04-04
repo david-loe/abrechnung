@@ -30,7 +30,7 @@
                     v-model="$i18n.locale"
                     style="max-width: 68px"
                     @change="pushUserSettings(user.settings)">
-                    <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('languages.' + lang)">
+                    <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
                       {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
                     </option>
                   </select>

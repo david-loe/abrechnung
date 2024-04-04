@@ -245,11 +245,9 @@
     "user": "Benutzer",
     "username": "Benutzername",
     "vehicleRegistration": "Fahrzeugschein",
-    "viewX": "{X} ansehen"
-  },
-  "languages": {
-    "de": "Deutsch",
-    "en": "Englisch"
+    "viewX": "{X} ansehen",
+    "de": "Deutsch 🇩🇪",
+    "en": "Englisch 🇬🇧"
   },
   "login": {
     "signIn": "Bitte Anmelden"

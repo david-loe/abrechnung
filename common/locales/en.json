@@ -245,11 +245,9 @@
     "user": "User",
     "username": "User name",
     "vehicleRegistration": "Vehicle Registration",
-    "viewX": "View {X}"
-  },
-  "languages": {
-    "de": "German",
-    "en": "English"
+    "viewX": "View {X}",
+    "de": "German 🇩🇪",
+    "en": "English 🇬🇧"
   },
   "login": {
     "signIn": "Please sign in"
