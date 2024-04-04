@@ -1,5 +1,5 @@
 import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
-import { Access, Token, User, accesses, locales } from '../../common/types.js'
+import { Access, Token, User, accesses, emailRegex, locales } from '../../common/types.js'
 import Settings from './settings.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -29,13 +29,14 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         index: true,
         unique: true,
         sparse: true,
+        validate: emailRegex,
         label: 'Magic Login Email',
         hide: !useMagicLogin
       }
     },
     required: true
   },
-  email: { type: String, unique: true, index: true, required: true },
+  email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
   name: {
     type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
     required: true
