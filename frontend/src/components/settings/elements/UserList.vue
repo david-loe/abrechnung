@@ -75,20 +75,15 @@
         </button>
       </template>
     </EasyDataTable>
-    <Vueform :schema="schema" v-model="test" :sync="true"></Vueform>
-    <div>
-      {{ test }}
+    <div v-if="_showForm" class="container" style="max-width: 650px">
+      <Vueform
+        :schema="schema"
+        v-model="userToEdit"
+        :sync="true"
+        :endpoint="false"
+        @submit="(form$: any) => postUser(form$.data)"
+        @reset="_showForm = false"></Vueform>
     </div>
-    <UserForm
-      v-if="_showForm"
-      :user="userToEdit"
-      :mode="userFormMode"
-      @add="postUser"
-      @edit="postUser"
-      @cancel="_showForm = false"
-      ref="userform"
-      id="userform"
-      style="max-width: 650px"></UserForm>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.user') }) }}
     </button>
@@ -122,7 +117,16 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: {},
+      schema: {
+        buttons: {
+          type: 'group',
+          schema: {
+            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+          }
+        },
+        _id: { type: 'hidden', meta: true }
+      },
       test: {}
     }
   },
@@ -133,10 +137,10 @@ export default defineComponent({
       this._showForm = true
     },
     async postUser(user: User) {
+      console.log(user)
       const result = await this.$root.setter<User>('admin/user', user)
       if (result.ok) {
         this.getUsers()
-        ;(this.$refs.userform as typeof UserForm).clear()
         this._showForm = false
       }
       this.userToEdit = undefined
@@ -155,10 +159,8 @@ export default defineComponent({
     },
     async getSchema() {
       const result = (await this.$root.getter<any>('admin/user/schema', { language: this.$i18n.locale })).ok as any
-
       if (result) {
-        this.schema = result //@ts-ignore
-        this.schema.button = { type: 'button', submits: true, buttonLabel: this.$t('labels.save') }
+        this.schema = Object.assign({}, result, this.schema)
         console.log(this.schema)
       }
     },

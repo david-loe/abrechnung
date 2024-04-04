@@ -42,7 +42,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     required: true
   },
   access: { type: accessObject, default: () => ({}) },
-  loseAccessAt: { type: Date },
+  loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
       language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },

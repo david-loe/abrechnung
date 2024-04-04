@@ -192,15 +192,26 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
   if (schemaType.hide) {
     return
   }
-  const vueformElement = Object.assign({ rules: [] }, assignment) as any
+  const vueformElement = Object.assign({ rules: ['nullable'] }, assignment) as any
 
   if (schemaType.required) {
+    vueformElement['rules'].splice(vueformElement['rules'].indexOf('nullable'), 1)
     vueformElement['rules'].push('required')
   }
+  if (schemaType.min !== undefined) {
+    vueformElement['rules'].push('min:' + schemaType.min)
+  }
+  if (schemaType.max !== undefined) {
+    vueformElement['rules'].push('max:' + schemaType.max)
+  }
+
   if (schemaType.label) {
     vueformElement['label'] = i18n.t(schemaType.label, { lng: language })
   } else if (labelStr) {
     vueformElement['label'] = i18n.t('labels.' + labelStr, { lng: language })
+  }
+  if (schemaType.info) {
+    vueformElement['info'] = i18n.t(schemaType.info, { lng: language })
   }
   if (isFlatType(schemaType.type) && schemaType.default !== undefined) {
     vueformElement['default'] = schemaType.default
@@ -227,8 +238,8 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
     vueformElement['input-type'] = 'number'
     vueformElement['force-numbers'] = true
   } else if (schemaType.type === Date) {
-    vueformElement['type'] = 'text'
-    vueformElement['input-type'] = 'date'
+    vueformElement['type'] = 'date'
+    vueformElement['time'] = Boolean(schemaType.time)
   } else if (schemaType.type === Boolean) {
     vueformElement['type'] = 'checkbox'
     vueformElement['text'] = vueformElement['label']
@@ -249,7 +260,7 @@ function mapSchemaTypeToVueformElement(schemaType: SchemaTypeOptions<any>, langu
     vueformElement['type'] = 'object'
     if (keys.length > 1 && isFlatObject(schemaType.type)) {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language, {
-        columns: { container: 12 / (keys.length == 2 ? 2 : 3) }
+        columns: { lg: { container: 12 / (keys.length == 2 ? 2 : 3) }, sm: { container: 6 } }
       })
     } else {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
