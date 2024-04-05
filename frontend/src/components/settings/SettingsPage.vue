@@ -22,16 +22,11 @@
           </ul>
         </div>
       </div>
-      <div class="col">
+      <div v-if="$root.settings.version" class="col">
         <h1>{{ $t('headlines.settings') }}</h1>
         <div class="container mb-3">
           <h2 id="settings">{{ $t('labels.settings') }}</h2>
-          <Vueform
-            :schema="schema"
-            v-model="$root.settings"
-            :sync="true"
-            :endpoint="false"
-            @submit="(form$: any) => postSettings(form$.data)"></Vueform>
+          <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postSettings(form$.data)"></Vueform>
         </div>
         <div class="container mb-3">
           <h2 id="user">{{ $t('labels.user') }}</h2>
@@ -64,7 +59,7 @@ export default defineComponent({
           }
         },
         _id: { type: 'hidden', meta: true }
-      }
+      } as any
     }
   },
   methods: {
@@ -72,13 +67,21 @@ export default defineComponent({
       const result = (await this.$root.getter<any>('admin/settings/schema', { language: this.$i18n.locale })).ok as any
       if (result) {
         this.schema = Object.assign({}, result, this.schema)
-        console.log(this.schema)
       }
     }
   },
   async created() {
     this.getSchema()
     await this.$root.load()
+  },
+  async mounted() {
+    console.log(new Date())
+    await this.$root.load()
+
+    if (this.$root.settings.version) {
+      console.log('insert')
+      ;(this.$refs.form$ as any).load(this.$root.settings)
+    }
   }
 })
 </script>

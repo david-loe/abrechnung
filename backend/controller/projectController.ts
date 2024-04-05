@@ -1,8 +1,7 @@
 import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Project as IProject, Locale, ProjectSimple, _id } from '../../common/types.js'
-import { mongooseSchemaToVueformSchema } from '../helper.js'
-import Project, { projectSchema } from '../models/project.js'
+import { Project as IProject, ProjectSimple, _id } from '../../common/types.js'
+import Project from '../models/project.js'
 import Settings from '../models/settings.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
@@ -43,9 +42,5 @@ export class ProjectAdminController extends Controller {
   @Delete()
   public async deleteProject(@Query() _id: _id) {
     return await this.deleter(Project, { _id: _id })
-  }
-  @Get('schema')
-  public async getSchema(@Query() language: Locale) {
-    return mongooseSchemaToVueformSchema(projectSchema.obj, language)
   }
 }

@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'fs/promises'
 import { Types, mongo } from 'mongoose'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import { addUp, getMoneyString } from '../../common/scripts.js'
@@ -39,47 +39,6 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   const subfolder = org ? org.subfolderPath : ''
   path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
   return path
-}
-
-export function writeToDisk(filePath: string, pdfBytes: Uint8Array) {
-  // create folders
-  var root = ''
-  var folderPath = filePath
-  if (folderPath[0] === '/') {
-    root = '/'
-    folderPath = folderPath.slice(1)
-  }
-  const folders = folderPath.split('/').slice(0, -1) // remove last item (file)
-  folders.reduce(
-    (acc, folder) => {
-      const cfolderPath = acc + folder + '/'
-      if (!fs.existsSync(cfolderPath)) {
-        fs.mkdirSync(cfolderPath)
-      }
-      return cfolderPath
-    },
-    root // first 'acc', important
-  )
-
-  fs.writeFile(filePath, pdfBytes, (err) => {
-    if (err) {
-      // Second try after 10 seconds
-      setTimeout(function () {
-        fs.writeFile(filePath, pdfBytes, (err) => {
-          if (err) {
-            // Third try after another 10 seconds
-            setTimeout(function () {
-              fs.writeFile(filePath, pdfBytes, (err) => {
-                if (err) {
-                  console.error(err)
-                }
-              })
-            }, 10000)
-          }
-        })
-      }, 10000)
-    }
-  })
 }
 
 export interface Options {
@@ -251,7 +210,7 @@ export async function drawFlag(page: pdf_lib.PDFPage, countryCode: string, optio
     // 0.75 px <=> 1 pt
     filename = filename + '@2x'
   }
-  const flagBytes = fs.readFileSync('./pdf/flags/' + filename + '.png')
+  const flagBytes = await fs.readFile('./pdf/flags/' + filename + '.png')
   const flag = await page.doc.embedPng(flagBytes)
 
   page.drawImage(flag, {
@@ -284,7 +243,7 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
   } else {
     filename = filename + '12'
   }
-  const logoBytes = fs.readFileSync('./pdf/receipt/' + filename + '.png')
+  const logoBytes = await fs.readFile('./pdf/receipt/' + filename + '.png')
   const logo = await page.doc.embedPng(logoBytes)
 
   page.drawImage(logo, {

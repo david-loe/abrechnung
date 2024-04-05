@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-if="$root.settings.accessIcons" class="container">
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
@@ -125,8 +125,7 @@ export default defineComponent({
           }
         },
         _id: { type: 'hidden', meta: true }
-      },
-      test: {}
+      }
     }
   },
   methods: {
@@ -160,7 +159,6 @@ export default defineComponent({
       const result = (await this.$root.getter<any>('admin/user/schema', { language: this.$i18n.locale })).ok as any
       if (result) {
         this.schema = Object.assign({}, result, this.schema)
-        console.log(this.schema)
       }
     },
     clickFilter(header: keyof Filter<string>) {

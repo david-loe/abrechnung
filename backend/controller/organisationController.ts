@@ -1,9 +1,9 @@
 import { Request as ExRequest } from 'express'
 import multer from 'multer'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Organisation as IOrganisation, Locale, _id } from '../../common/types.js'
-import { documentFileHandler, mongooseSchemaToVueformSchema } from '../helper.js'
-import Organisation, { organisationSchema } from '../models/organisation.js'
+import { Organisation as IOrganisation, _id } from '../../common/types.js'
+import { documentFileHandler } from '../helper.js'
+import Organisation from '../models/organisation.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -38,9 +38,5 @@ export class OrganisationAdminController extends Controller {
   @Delete()
   public async deleteOrganisation(@Query() _id: _id) {
     return await this.deleter(Organisation, { _id: _id })
-  }
-  @Get('schema')
-  public async getSchema(@Query() language: Locale) {
-    return mongooseSchemaToVueformSchema(organisationSchema.obj, language)
   }
 }

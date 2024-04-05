@@ -8,7 +8,7 @@ services:
       - db
     volumes:
       - ./backend:/app
-      - ./common:/common:ro
+      - ./common:/common
       # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
       # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
       # - ./reports/advance:/reports/advance #BACKEND_SAVE_REPORTS_ON_DISK

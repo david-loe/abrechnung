@@ -44,7 +44,7 @@
     "typescript": "^5.4.3"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes && node --loader ts-node/esm ./server.ts'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --ignore '../common/forms/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/build/server.js",
     "test": "npm run test:$NODE_ENV",

@@ -1,6 +1,14 @@
 import { HydratedDocument } from 'mongoose'
-import { User as IUser, Locale } from '../common/types.js'
+import { User as IUser, Locale, locales } from '../common/types.js'
 import app from './app.js'
+import { countrySchema } from './models/country.js'
+import { currencySchema } from './models/currency.js'
+import { healthInsuranceSchema } from './models/healthInsurance.js'
+import { organisationSchema } from './models/organisation.js'
+import { projectSchema } from './models/project.js'
+import { settingsSchema } from './models/settings.js'
+import { userSchema } from './models/user.js'
+import { generateForms } from './models/vueformGenerator.js'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 
@@ -50,6 +58,20 @@ declare global {
     }
   }
 }
+
+await generateForms(
+  {
+    user: userSchema.obj,
+    country: countrySchema.obj,
+    currency: currencySchema.obj,
+    project: projectSchema.obj,
+    healthInsurance: healthInsuranceSchema.obj,
+    organisation: organisationSchema.obj,
+    settings: settingsSchema.obj
+  },
+  locales,
+  '../common/forms'
+)
 
 app.listen(port, () => {
   console.log(`Backend listening at ${url}`)

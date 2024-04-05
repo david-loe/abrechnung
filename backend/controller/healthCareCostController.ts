@@ -9,14 +9,14 @@ import {
   Locale,
   _id
 } from '../../common/types.js'
-import { documentFileHandler } from '../helper.js'
+import { documentFileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
-import { writeToDisk, writeToDiskFilePath } from '../pdf/helper.js'
+import { writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
@@ -361,7 +361,7 @@ export class HealthCareCostConfirmController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExaminationByInsurance') {
-          await documentFileHandler(['refundSum', 'receipts'], {checkOwner: false})(request)
+          await documentFileHandler(['refundSum', 'receipts'], { checkOwner: false })(request)
           await oldObject.saveToHistory()
           await oldObject.save()
           return true

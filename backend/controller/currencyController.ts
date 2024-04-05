@@ -1,7 +1,6 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { Currency as ICurrency, Locale, _id } from '../../common/types.js'
-import { mongooseSchemaToVueformSchema } from '../helper.js'
-import Currency, { currencySchema } from '../models/currency.js'
+import { Currency as ICurrency, _id } from '../../common/types.js'
+import Currency from '../models/currency.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Tags('Currency')
@@ -25,9 +24,5 @@ export class CurrencyAdminController extends Controller {
   @Delete()
   public async deleteCurrency(@Query() _id: _id) {
     return await this.deleter(Currency, { _id: _id })
-  }
-  @Get('schema')
-  public async getSchema(@Query() language: Locale) {
-    return mongooseSchemaToVueformSchema(currencySchema.obj, language)
   }
 }
