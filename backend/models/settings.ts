@@ -56,10 +56,16 @@ for (const report of reportTypes) {
 }
 
 export const settingsSchema = new Schema<Settings>({
-  accessIcons: { type: accessIcons, required: true },
-  defaultAccess: { type: defaultAccess, required: true },
   allowSpouseRefund: { type: Boolean, required: true },
+  allowTravelApplicationForThePast: { type: Boolean, required: true },
+  vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
   userCanSeeAllProjects: { type: Boolean, required: true },
+  defaultAccess: { type: defaultAccess, required: true },
+  disableReportType: { type: disableReportType, required: true },
+  maxTravelDayCount: { type: Number, min: 0, required: true },
+  toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
+  distanceRefunds: { type: distanceRefunds, required: true },
+  uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
   breakfastCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   dinnerCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
@@ -68,18 +74,12 @@ export const settingsSchema = new Schema<Settings>({
   factorOvernightLumpSum: { type: Number, min: 0, max: 1, required: true },
   factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
-  maxTravelDayCount: { type: Number, min: 0, required: true },
-  distanceRefunds: { type: distanceRefunds, required: true },
   secoundNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
   secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
   stateColors: { type: stateColors, required: true },
-  toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
-  uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
-  allowTravelApplicationForThePast: { type: Boolean, required: true },
-  vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
-  disableReportType: { type: disableReportType, required: true },
-  version: { type: String, required: true },
-  migrateFrom: { type: String }
+  accessIcons: { type: accessIcons, required: true },
+  version: { type: String, required: true, hide: true },
+  migrateFrom: { type: String, hide: true }
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
