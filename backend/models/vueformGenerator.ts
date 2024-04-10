@@ -41,7 +41,7 @@ function mapSchemaTypeToVueformElement(
   }
   const vueformElement = Object.assign({ rules: ['nullable'] }, assignment) as any
 
-  if (schemaType.required) {
+  if (schemaType.required && schemaType.type !== Boolean) {
     vueformElement['rules'].splice(vueformElement['rules'].indexOf('nullable'), 1)
     vueformElement['rules'].push('required')
   }
