@@ -3,6 +3,9 @@ import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
 
+en.vueform.elements.list.add = '+ Add'
+de.vueform.elements.list.add = '+ Hinzufügen'
+
 function deepReplace(obj: any, search: any, replacement: any) {
   for (const key in obj) {
     if (obj[key] === search) {
