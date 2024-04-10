@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$root.settings.accessIcons" class="container">
+  <div v-if="$root.settings.accessIcons">
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
@@ -92,6 +92,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import userFormSchema from '../../../../../common/forms/user.json'
 import { User, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
@@ -116,7 +117,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: {
+      schema: Object.assign({}, userFormSchema, {
         buttons: {
           type: 'group',
           schema: {
@@ -125,7 +126,7 @@ export default defineComponent({
           }
         },
         _id: { type: 'hidden', meta: true }
-      }
+      })
     }
   },
   methods: {
@@ -155,12 +156,6 @@ export default defineComponent({
         this.users = result.data
       }
     },
-    async getSchema() {
-      const result = (await this.$root.getter<any>('admin/user/schema', { language: this.$i18n.locale })).ok as any
-      if (result) {
-        this.schema = Object.assign({}, result, this.schema)
-      }
-    },
     clickFilter(header: keyof Filter<string>) {
       if (this._filter[header]) {
         this._filter[header] = false
@@ -173,7 +168,6 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getUsers()
-    this.getSchema()
   }
 })
 </script>
