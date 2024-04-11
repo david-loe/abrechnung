@@ -90,6 +90,11 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "factorCateringLumpSumExceptions": "Exceptions to the factorization of the catering lump sums",
+    "factorOvernightLumpSumExceptions": "Exceptions to the factorization of the overnight lump sums",
+    "fallBackLumpSumCountry": "Fall back country for lump sums",
+    "secoundNightOnAirplaneLumpSumCountry": "Country for the overnight lump sums from the 2nd night in an aircraft.",
+    "secoundNightOnShipOrFerryLumpSumCountry": "Country for the overnight lump sums from the 2nd night on a ship.",
     "accessIcons": "Icons for access rights",
     "defaultAccess": "Default access rights",
     "breakfastCateringLumpSumCut": "Catering lump sum cut for breakfast",

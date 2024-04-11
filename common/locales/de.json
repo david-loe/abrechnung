@@ -90,6 +90,11 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "factorCateringLumpSumExceptions": "Ausnahmen der Faktorisierung für die Verpflegungspauschalen",
+    "factorOvernightLumpSumExceptions": "Ausnahmen der Faktorisierung für die Übernachtungspauschalen",
+    "fallBackLumpSumCountry": "Ausweichland für die Pauschalen",
+    "secoundNightOnAirplaneLumpSumCountry": "Land für die Übernachtungspauschalen ab 2. Nacht im Flugzeug.",
+    "secoundNightOnShipOrFerryLumpSumCountry": "Land für die Übernachtungspauschalen ab 2. Nacht auf dem Schiff.",
     "accessIcons": "Icons für Zugriffsrechte",
     "defaultAccess": "Standard Zugriffsrechte",
     "breakfastCateringLumpSumCut": "Verpflegungspauschalenkürung fürs Frühstück",
