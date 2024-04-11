@@ -90,6 +90,8 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "code": "Code",
+    "flag": "Flag",
     "identifier": "Identifier",
     "balance": "Balance",
     "budget": "Budget",

@@ -90,6 +90,8 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "code": "Code",
+    "flag": "Flagge",
     "identifier": "Kennung",
     "balance": "Saldo",
     "budget": "Budget",
