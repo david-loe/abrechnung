@@ -2,7 +2,7 @@ import axios from 'axios'
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
 import { Schema, Types } from 'mongoose'
-import { ExchangeRate as ExchangeRateI, baseCurrency } from '../common/types.js'
+import { ExchangeRate as ExchangeRateI, DocumentFile as IDocumentFile, baseCurrency } from '../common/types.js'
 import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 
@@ -153,7 +153,10 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           if (buffer) {
             reqDoc.owner = fileOwner
             reqDoc.data = buffer
-            reqDoc = await new DocumentFile(reqDoc).save()
+            const dbDoc = (await new DocumentFile(reqDoc).save()).toObject() as Partial<IDocumentFile>
+            delete dbDoc.data
+            delete reqDoc.data
+            Object.assign(reqDoc, dbDoc)
           } else {
             return undefined
           }
@@ -178,7 +181,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           }
         }
       } else {
-        reqDocuments = await handleFile(reqDocuments)
+        await handleFile(reqDocuments)
       }
       console.log(reqDocuments)
     }
