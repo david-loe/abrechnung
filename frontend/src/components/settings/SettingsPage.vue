@@ -18,7 +18,8 @@
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry ==='settings'"></SettingsForm>
-        <UserList v-else-if="entry === 'user'"</UserList>
+        <UserList v-else-if="entry === 'users'"</UserList>
+        <OrganisationList v-else-if="entry === 'organisations'"</OrganisationList>
 
       </div>
     </div>
@@ -27,19 +28,20 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import OrganisationList from './elements/OrganisationList.vue'
 import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
 import ModelsForm from './forms/ModelsForm.vue'
 
-const entries = ['settings', 'user', 'organsiation', 'project', 'country', 'currency', 'healthInsurance'] as const
+const entries = ['users', 'organisations', 'projects', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, ModelsForm, SettingsForm },
+  components: { UserList, ModelsForm, SettingsForm , OrganisationList},
   data() {
     return {
       entries,
-      entry: 'settings' as (typeof entries)[number]
+      entry: 'users' as (typeof entries)[number]
     }
   },
   props: [],

@@ -90,6 +90,18 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "users": "Users",
+    "organisations": "Organisations",
+    "projects": "Projects",
+    "countries": "Countries",
+    "currencies": "Currencies",
+    "healthInsurances": "Health insurances",
+    "lastCountries": "Last countries",
+    "subfolderPath": "Subfolder path",
+    "companyNumber": "Company number",
+    "bankDetails": "Bank details",
+    "website": "Website",
+    "logo": "Logo",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",

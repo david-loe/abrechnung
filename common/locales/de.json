@@ -90,6 +90,18 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "users": "Benutzer",
+    "organisations": "Organisationen",
+    "projects": "Projekte",
+    "countries": "Länder",
+    "currencies": "Währungen",
+    "healthInsurances": "Krankenversucherungen",
+    "lastCountries": "Letzte Länder",
+    "subfolderPath": "Unterordner Pfad",
+    "companyNumber": "Betriebsnummer",
+    "bankDetails": "Bankverbindung",
+    "website": "Website",
+    "logo": "Logo",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
