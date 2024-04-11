@@ -90,6 +90,9 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "identifier": "Kennung",
+    "balance": "Saldo",
+    "budget": "Budget",
     "users": "Benutzer",
     "organisations": "Organisationen",
     "projects": "Projekte",

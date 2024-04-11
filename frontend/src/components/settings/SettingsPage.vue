@@ -20,6 +20,7 @@
         <SettingsForm v-if="entry ==='settings'"></SettingsForm>
         <UserList v-else-if="entry === 'users'"</UserList>
         <OrganisationList v-else-if="entry === 'organisations'"</OrganisationList>
+        <ProjectList v-else-if="entry === 'projects'"</ProjectList>
 
       </div>
     </div>
@@ -31,13 +32,14 @@ import { defineComponent } from 'vue'
 import OrganisationList from './elements/OrganisationList.vue'
 import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
+import ProjectList from './elements/ProjectList.vue'
 import ModelsForm from './forms/ModelsForm.vue'
 
 const entries = ['users', 'organisations', 'projects', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, ModelsForm, SettingsForm , OrganisationList},
+  components: { UserList, ModelsForm, SettingsForm , OrganisationList, ProjectList},
   data() {
     return {
       entries,

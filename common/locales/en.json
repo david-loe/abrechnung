@@ -90,6 +90,9 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "identifier": "Identifier",
+    "balance": "Balance",
+    "budget": "Budget",
     "users": "Users",
     "organisations": "Organisations",
     "projects": "Projects",
