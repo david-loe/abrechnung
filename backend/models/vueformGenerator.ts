@@ -106,11 +106,16 @@ function mapSchemaTypeToVueformElement(
       vueformElement['object'] = mongooseSchemaToVueformSchema(schemaType.type[0], language)
     } else if (schemaType.type[0].ref) {
       vueformElement['type'] = schemaType.type[0].ref.toString().toLowerCase()
-      vueformElement['multiple'] = true
+      vueformElement['extend-options'] = { mode: 'multiple' }
     } else {
       vueformElement['type'] = 'list'
       vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr)
       delete vueformElement['element'].placeholder
+    }
+    const index = vueformElement['rules'].indexOf('required')
+    if (index !== -1) {
+      vueformElement['rules'].splice(index, 1)
+      vueformElement['rules'].push('min:0')
     }
   } else if (typeof schemaType.type === 'object') {
     const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
