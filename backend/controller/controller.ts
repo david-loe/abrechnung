@@ -58,7 +58,9 @@ type SetterPartial<T, U extends string> = T extends object
         : T[P] extends Types.Buffer | null | undefined
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
-        ? _SetterPartial1<ElementType, U>[] | undefined
+        ? ElementType extends { _id: infer idType extends _id | string }
+          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+          : _SetterPartial1<ElementType, U>[] | null | undefined
         : T[P] extends { _id: infer idType extends _id | string } | null | undefined
         ? T[P] | IdDocument<idType> | null | undefined
         : _SetterPartial2<T[P], U> | undefined
@@ -84,7 +86,9 @@ type _SetterPartial2<T, U extends string> = T extends object
         : T[P] extends Types.Buffer | null | undefined
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
-        ? _SetterPartial1<ElementType, U>[] | undefined
+        ? ElementType extends { _id: infer idType extends _id | string }
+          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+          : _SetterPartial1<ElementType, U>[] | null | undefined
         : T[P] extends { _id: infer idType extends _id | string } | null | undefined
         ? T[P] | IdDocument<idType> | null | undefined
         : _SetterPartial1<T[P], U> | undefined
@@ -110,7 +114,9 @@ type _SetterPartial1<T, U extends string> = T extends object
         : T[P] extends Types.Buffer | null | undefined
         ? Data | Types.Buffer | undefined
         : T[P] extends (infer ElementType)[] | null | undefined
-        ? _SetterPartial1<ElementType, U>[] | undefined
+        ? ElementType extends { _id: infer idType extends _id | string }
+          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+          : _SetterPartial1<ElementType, U>[] | null | undefined
         : T[P] extends { _id: infer idType extends _id | string } | null | undefined
         ? T[P] | IdDocument<idType> | null | undefined
         : T[P]
