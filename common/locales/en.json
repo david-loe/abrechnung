@@ -90,8 +90,6 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
-    "validFrom": "Valid from",
-    "specials": "Specials",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",
@@ -199,6 +197,7 @@
     "logo": "Logo",
     "loseAccessAt": "Expiration date",
     "lumpSums": "Lump sums",
+    "lumpSumsFrom": "Lump sums from",
     "lunch": "Lunch",
     "lunchCateringLumpSumCut": "Catering lump sum cut for lunch",
     "mailToInsurance": "Mail to insurance",
@@ -257,6 +256,7 @@
     "showX": "Show {X}",
     "signIn": "Sign in",
     "signInX": "Sign in with {X}",
+    "specials": "Specials",
     "stage": "Stage",
     "stages": "Stages",
     "startDate": "Start date",
@@ -292,6 +292,7 @@
     "userCanSeeAllProjects": "Users can see ALL projects",
     "username": "User name",
     "users": "Users",
+    "validFrom": "Valid from",
     "vehicleRegistration": "Vehicle Registration",
     "vehicleRegistrationWhenUsingOwnCar": "Vehicle registration if traveling with own car",
     "version": "Version",

@@ -90,8 +90,6 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
-    "validFrom": "Gültig ab",
-    "specials": "Besonderheiten",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
@@ -199,6 +197,7 @@
     "logo": "Logo",
     "loseAccessAt": "Ablaufdatum",
     "lumpSums": "Pauschalen",
+    "lumpSumsFrom": "Pauschalen von",
     "lunch": "Mittagessen",
     "lunchCateringLumpSumCut": "Verpflegungspauschalenkürung fürs Mittagessen",
     "mailToInsurance": "E-Mail an Versicherung",
@@ -257,6 +256,7 @@
     "showX": "{X} anzeigen",
     "signIn": "Anmelden",
     "signInX": "Mit {X} anmelden",
+    "specials": "Besonderheiten",
     "stage": "Etappe",
     "stages": "Etappen",
     "startDate": "Startdatum",
@@ -292,6 +292,7 @@
     "userCanSeeAllProjects": "Benutzer können ALLE Projekte sehen",
     "username": "Benutzername",
     "users": "Benutzer",
+    "validFrom": "Gültig ab",
     "vehicleRegistration": "Fahrzeugschein",
     "vehicleRegistrationWhenUsingOwnCar": "Fahrzeugschein wenn mit eigenem Auto unterwegs",
     "version": "Version",

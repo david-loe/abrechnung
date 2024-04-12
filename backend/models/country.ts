@@ -9,6 +9,8 @@ interface Methods {
 type CountryModel = Model<Country, {}, Methods>
 
 export const countrySchema = new Schema<Country, CountryModel, Methods>({
+  _id: { type: String, required: true, trim: true, alias: 'code', label: 'labels.code' },
+  flag: { type: String },
   name: {
     type: {
       de: { type: String, required: true, trim: true },
@@ -22,8 +24,8 @@ export const countrySchema = new Schema<Country, CountryModel, Methods>({
       en: { type: [{ type: String, trim: true }] }
     }
   },
-  _id: { type: String, required: true, trim: true, alias: 'code', label: 'labels.code' },
-  flag: { type: String },
+  lumpSumsFrom: { type: String, ref: 'Country', trim: true },
+  currency: { type: String, ref: 'Currency' },
   lumpSums: {
     type: [
       {
@@ -43,9 +45,7 @@ export const countrySchema = new Schema<Country, CountryModel, Methods>({
         }
       }
     ]
-  },
-  lumpSumsFrom: { type: String, trim: true },
-  currency: { type: String, ref: 'Currency' }
+  }
 })
 
 countrySchema.methods.getLumpSum = async function (date: Date, special: string | undefined = undefined): Promise<LumpSum> {
