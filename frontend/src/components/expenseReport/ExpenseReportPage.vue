@@ -132,7 +132,7 @@
               <tr v-for="expense of expenseReport.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
                 <td>{{ datetoDateString(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale }) }}</td>
+                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale as Locale }) }}</td>
               </tr>
             </tbody>
           </table>
@@ -150,7 +150,7 @@
                           <small>{{ $t('labels.expenses') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ getMoneyString(addUp.expenses, { language: $i18n.locale }) }}</small>
+                          <small>{{ getMoneyString(addUp.expenses, { language: $i18n.locale as Locale }) }}</small>
                         </td>
                       </tr>
                       <tr>
@@ -158,14 +158,14 @@
                           <small>{{ $t('labels.advance') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ getMoneyString(addUp.advance, { language: $i18n.locale, func: (x) => 0 - x }) }}</small>
+                          <small>{{ getMoneyString(addUp.advance, { language: $i18n.locale as Locale, func: (x) => 0 - x }) }}</small>
                         </td>
                       </tr>
                     </template>
 
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale }) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale as Locale }) }}</td>
                     </tr>
                     <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
                       <td>
@@ -173,9 +173,9 @@
                       </td>
                       <td class="text-end">
                         <small>{{
-                          getMoneyString(expenseReport.project.balance, { language: $i18n.locale }) +
+                          getMoneyString(expenseReport.project.balance, { language: $i18n.locale as Locale }) +
                           ' von ' +
-                          getMoneyString(expenseReport.project.budget, { language: $i18n.locale })
+                          getMoneyString(expenseReport.project.budget, { language: $i18n.locale as Locale })
                         }}</small>
                       </td>
                     </tr>
@@ -240,7 +240,15 @@ import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { baseCurrency, BaseCurrencyMoney, Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
+import {
+  baseCurrency,
+  BaseCurrencyMoney,
+  Expense,
+  ExpenseReport,
+  expenseReportStates,
+  Locale,
+  UserSimple
+} from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 

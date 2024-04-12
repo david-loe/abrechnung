@@ -6,84 +6,84 @@
         "catering24": 30,
         "catering8": 20,
         "overnight": 95,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AF"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EG"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 130,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ET"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 166,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GQ"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AL"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 120,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DZ"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 91,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AD"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 299,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AO"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 113,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AR"
       },
       {
         "catering24": 24,
         "catering8": 16,
         "overnight": 59,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AM"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 88,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AZ"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 158,
-        "spezials": [
+        "specials": [
           {
             "catering24": 68,
             "catering8": 45,
@@ -103,63 +103,63 @@
         "catering24": 48,
         "catering8": 32,
         "overnight": 153,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BH"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 165,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BD"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 165,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BB"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 141,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BE"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BJ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BO"
       },
       {
         "catering24": 23,
         "catering8": 16,
         "overnight": 75,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BA"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 176,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BW"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 84,
-        "spezials": [
+        "specials": [
           {
             "catering24": 53,
             "catering8": 36,
@@ -185,42 +185,42 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 106,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BN"
       },
       {
         "catering24": 22,
         "catering8": 15,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BG"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 174,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BF"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 138,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BI"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 154,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CL"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 112,
-        "spezials": [
+        "specials": [
           {
             "catering24": 58,
             "catering8": 39,
@@ -258,84 +258,84 @@
         "catering24": 47,
         "catering8": 32,
         "overnight": 93,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CR"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 166,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CI"
       },
       {
         "catering24": 75,
         "catering8": 50,
         "overnight": 183,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DK"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 147,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DO"
       },
       {
         "catering24": 65,
         "catering8": 44,
         "overnight": 305,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DJ"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 103,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EC"
       },
       {
         "catering24": 65,
         "catering8": 44,
         "overnight": 161,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SV"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 91,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ER"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EE"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 69,
-        "spezials": [],
+        "specials": [],
         "countryCode": "FJ"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 136,
-        "spezials": [],
+        "specials": [],
         "countryCode": "FI"
       },
       {
         "catering24": 53,
         "catering8": 36,
         "overnight": 105,
-        "spezials": [
+        "specials": [
           {
             "catering24": 58,
             "catering8": 39,
@@ -349,35 +349,35 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 183,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GA"
       },
       {
         "catering24": 40,
         "catering8": 27,
         "overnight": 161,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GM"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 88,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GE"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 148,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GH"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 150,
-        "spezials": [
+        "specials": [
           {
             "catering24": 40,
             "catering8": 27,
@@ -391,42 +391,42 @@
         "catering24": 34,
         "catering8": 23,
         "overnight": 90,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GT"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 118,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 113,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GW"
       },
       {
         "catering24": 58,
         "catering8": 39,
         "overnight": 130,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HT"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 198,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [
+        "specials": [
           {
             "catering24": 38,
             "catering8": 25,
@@ -464,42 +464,42 @@
         "catering24": 36,
         "catering8": 24,
         "overnight": 134,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ID"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 196,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IR"
       },
       {
         "catering24": 58,
         "catering8": 39,
         "overnight": 129,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IE"
       },
       {
         "catering24": 62,
         "catering8": 41,
         "overnight": 187,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IS"
       },
       {
         "catering24": 66,
         "catering8": 44,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IL"
       },
       {
         "catering24": 40,
         "catering8": 27,
         "overnight": 135,
-        "spezials": [
+        "specials": [
           {
             "catering24": 40,
             "catering8": 27,
@@ -519,14 +519,14 @@
         "catering24": 57,
         "catering8": 38,
         "overnight": 138,
-        "spezials": [],
+        "specials": [],
         "countryCode": "JM"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 190,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -540,35 +540,35 @@
         "catering24": 24,
         "catering8": 16,
         "overnight": 95,
-        "spezials": [],
+        "specials": [],
         "countryCode": "YE"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 134,
-        "spezials": [],
+        "specials": [],
         "countryCode": "JO"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 94,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KH"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 180,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CM"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 134,
-        "spezials": [
+        "specials": [
           {
             "catering24": 50,
             "catering8": 33,
@@ -594,357 +594,357 @@
         "catering24": 30,
         "catering8": 20,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CV"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 111,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KZ"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 149,
-        "spezials": [],
+        "specials": [],
         "countryCode": "QA"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 219,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KE"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 74,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KG"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CO"
       },
       {
         "catering24": 62,
         "catering8": 41,
         "overnight": 215,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CG"
       },
       {
         "catering24": 70,
         "catering8": 47,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CD"
       },
       {
         "catering24": 28,
         "catering8": 19,
         "overnight": 92,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KP"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KR"
       },
       {
         "catering24": 24,
         "catering8": 16,
         "overnight": 71,
-        "spezials": [],
+        "specials": [],
         "countryCode": "XK"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 107,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HR"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 228,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CU"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 241,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KW"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 96,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LA"
       },
       {
         "catering24": 28,
         "catering8": 19,
         "overnight": 104,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LS"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 76,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LV"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 123,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LB"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 135,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LY"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LI"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 109,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LT"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 139,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LU"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 87,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MG"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 109,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MW"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MY"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 170,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MV"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 120,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ML"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 114,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MT"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 129,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MA"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 102,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MH"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MR"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 220,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MU"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 177,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MX"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 73,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MD"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 187,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MC"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 92,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ME"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 146,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MZ"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 155,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MM"
       },
       {
         "catering24": 30,
         "catering8": 20,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NA"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 126,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NP"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 153,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NZ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NI"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 122,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NL"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 131,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NE"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 182,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NG"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 89,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MK"
       },
       {
         "catering24": 80,
         "catering8": 53,
         "overnight": 182,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NO"
       },
       {
         "catering24": 40,
         "catering8": 27,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AT"
       },
       {
         "catering24": 64,
         "catering8": 43,
         "overnight": 141,
-        "spezials": [],
+        "specials": [],
         "countryCode": "OM"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 122,
-        "spezials": [
+        "specials": [
           {
             "catering24": 23,
             "catering8": 16,
@@ -958,49 +958,49 @@
         "catering24": 51,
         "catering8": 34,
         "overnight": 179,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PW"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 82,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PA"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 159,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PG"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PY"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PE"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 116,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PH"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 60,
-        "spezials": [
+        "specials": [
           {
             "catering24": 29,
             "catering8": 20,
@@ -1032,21 +1032,21 @@
         "catering24": 32,
         "catering8": 21,
         "overnight": 111,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PT"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 117,
-        "spezials": [],
+        "specials": [],
         "countryCode": "RW"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 89,
-        "spezials": [
+        "specials": [
           {
             "catering24": 32,
             "catering8": 21,
@@ -1060,7 +1060,7 @@
         "catering24": 24,
         "catering8": 16,
         "overnight": 58,
-        "spezials": [
+        "specials": [
           {
             "catering24": 26,
             "catering8": 17,
@@ -1086,35 +1086,35 @@
         "catering24": 38,
         "catering8": 25,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ZM"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "WS"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 79,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SM"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 80,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ST"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 181,
-        "spezials": [
+        "specials": [
           {
             "catering24": 56,
             "catering8": 37,
@@ -1134,14 +1134,14 @@
         "catering24": 66,
         "catering8": 44,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SE"
       },
       {
         "catering24": 64,
         "catering8": 43,
         "overnight": 180,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -1155,56 +1155,56 @@
         "catering24": 42,
         "catering8": 28,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SN"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 97,
-        "spezials": [],
+        "specials": [],
         "countryCode": "RS"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 161,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SL"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ZW"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 197,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SG"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 121,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SK"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 126,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SI"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 115,
-        "spezials": [
+        "specials": [
           {
             "catering24": 35,
             "catering8": 24,
@@ -1236,21 +1236,21 @@
         "catering24": 42,
         "catering8": 28,
         "overnight": 100,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LK"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 195,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SD"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 109,
-        "spezials": [
+        "specials": [
           {
             "catering24": 36,
             "catering8": 24,
@@ -1270,84 +1270,84 @@
         "catering24": 34,
         "catering8": 23,
         "overnight": 150,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SS"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SY"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 118,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TJ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TW"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 97,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TZ"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 110,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TH"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 118,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TG"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 94,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TO"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 177,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TT"
       },
       {
         "catering24": 64,
         "catering8": 43,
         "overnight": 163,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TD"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 77,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CZ"
       },
       {
         "catering24": 17,
         "catering8": 12,
         "overnight": 95,
-        "spezials": [
+        "specials": [
           {
             "catering24": 29,
             "catering8": 20,
@@ -1367,77 +1367,77 @@
         "catering24": 40,
         "catering8": 27,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TN"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TM"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UG"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 98,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UA"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HU"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 90,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UY"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 104,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UZ"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 160,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VA"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 127,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VE"
       },
       {
         "catering24": 65,
         "catering8": 44,
         "overnight": 156,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AE"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 182,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -1499,7 +1499,7 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 99,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -1513,35 +1513,35 @@
         "catering24": 41,
         "catering8": 28,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VN"
       },
       {
         "catering24": 20,
         "catering8": 13,
         "overnight": 98,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BY"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 74,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CF"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 125,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CY"
       },
       {
         "catering24": 28,
         "catering8": 14,
         "overnight": 20,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DE"
       }
     ]
@@ -1553,84 +1553,84 @@
         "catering24": 30,
         "catering8": 20,
         "overnight": 95,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AF"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EG"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 130,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ET"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 166,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GQ"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AL"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 120,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DZ"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 91,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AD"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 299,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AO"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 113,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AR"
       },
       {
         "catering24": 24,
         "catering8": 16,
         "overnight": 59,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AM"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 88,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AZ"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 173,
-        "spezials": [
+        "specials": [
           {
             "catering24": 57,
             "catering8": 38,
@@ -1650,63 +1650,63 @@
         "catering24": 48,
         "catering8": 32,
         "overnight": 153,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BH"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 165,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BD"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 206,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BB"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 141,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BE"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BJ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BO"
       },
       {
         "catering24": 23,
         "catering8": 16,
         "overnight": 75,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BA"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 176,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BW"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 88,
-        "spezials": [
+        "specials": [
           {
             "catering24": 46,
             "catering8": 31,
@@ -1732,42 +1732,42 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 106,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BN"
       },
       {
         "catering24": 22,
         "catering8": 15,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BG"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 174,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BF"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 138,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BI"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 154,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CL"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 112,
-        "spezials": [
+        "specials": [
           {
             "catering24": 58,
             "catering8": 39,
@@ -1805,84 +1805,84 @@
         "catering24": 47,
         "catering8": 32,
         "overnight": 93,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CR"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 166,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CI"
       },
       {
         "catering24": 75,
         "catering8": 50,
         "overnight": 183,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DK"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 167,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DO"
       },
       {
         "catering24": 77,
         "catering8": 52,
         "overnight": 255,
-        "spezials": [],
+        "specials": [],
         "countryCode": "DJ"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 103,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EC"
       },
       {
         "catering24": 65,
         "catering8": 44,
         "overnight": 161,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SV"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 91,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ER"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "EE"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 183,
-        "spezials": [],
+        "specials": [],
         "countryCode": "FJ"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 171,
-        "spezials": [],
+        "specials": [],
         "countryCode": "FI"
       },
       {
         "catering24": 53,
         "catering8": 36,
         "overnight": 105,
-        "spezials": [
+        "specials": [
           {
             "catering24": 58,
             "catering8": 39,
@@ -1896,35 +1896,35 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 183,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GA"
       },
       {
         "catering24": 40,
         "catering8": 27,
         "overnight": 161,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GM"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 87,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GE"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 148,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GH"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 150,
-        "spezials": [
+        "specials": [
           {
             "catering24": 40,
             "catering8": 27,
@@ -1938,42 +1938,42 @@
         "catering24": 34,
         "catering8": 23,
         "overnight": 90,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GT"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 113,
-        "spezials": [],
+        "specials": [],
         "countryCode": "GW"
       },
       {
         "catering24": 58,
         "catering8": 39,
         "overnight": 130,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HT"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 198,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [
+        "specials": [
           {
             "catering24": 38,
             "catering8": 25,
@@ -2005,42 +2005,42 @@
         "catering24": 36,
         "catering8": 24,
         "overnight": 134,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ID"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 196,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IR"
       },
       {
         "catering24": 58,
         "catering8": 39,
         "overnight": 129,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IE"
       },
       {
         "catering24": 62,
         "catering8": 41,
         "overnight": 187,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IS"
       },
       {
         "catering24": 66,
         "catering8": 44,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "IL"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 150,
-        "spezials": [
+        "specials": [
           {
             "catering24": 48,
             "catering8": 32,
@@ -2060,14 +2060,14 @@
         "catering24": 39,
         "catering8": 26,
         "overnight": 171,
-        "spezials": [],
+        "specials": [],
         "countryCode": "JM"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 190,
-        "spezials": [
+        "specials": [
           {
             "catering24": 50,
             "catering8": 33,
@@ -2081,35 +2081,35 @@
         "catering24": 24,
         "catering8": 16,
         "overnight": 95,
-        "spezials": [],
+        "specials": [],
         "countryCode": "YE"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 134,
-        "spezials": [],
+        "specials": [],
         "countryCode": "JO"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 94,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KH"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 275,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CM"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 214,
-        "spezials": [
+        "specials": [
           {
             "catering24": 63,
             "catering8": 42,
@@ -2135,357 +2135,357 @@
         "catering24": 38,
         "catering8": 25,
         "overnight": 90,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CV"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 111,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KZ"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 149,
-        "spezials": [],
+        "specials": [],
         "countryCode": "QA"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 219,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KE"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 74,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KG"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 115,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CO"
       },
       {
         "catering24": 62,
         "catering8": 41,
         "overnight": 215,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CG"
       },
       {
         "catering24": 70,
         "catering8": 47,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CD"
       },
       {
         "catering24": 28,
         "catering8": 19,
         "overnight": 92,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KP"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KR"
       },
       {
         "catering24": 24,
         "catering8": 16,
         "overnight": 71,
-        "spezials": [],
+        "specials": [],
         "countryCode": "XK"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 107,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HR"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 170,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CU"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 241,
-        "spezials": [],
+        "specials": [],
         "countryCode": "KW"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 71,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LA"
       },
       {
         "catering24": 28,
         "catering8": 19,
         "overnight": 104,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LS"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 76,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LV"
       },
       {
         "catering24": 69,
         "catering8": 46,
         "overnight": 146,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LB"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 135,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LY"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LI"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 109,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LT"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 139,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LU"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 116,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MG"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 109,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MW"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MY"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 170,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MV"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 120,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ML"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 114,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MT"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 87,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MA"
       },
       {
         "catering24": 63,
         "catering8": 42,
         "overnight": 102,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MH"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MR"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 172,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MU"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 177,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MX"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 73,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MD"
       },
       {
         "catering24": 52,
         "catering8": 35,
         "overnight": 187,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MC"
       },
       {
         "catering24": 23,
         "catering8": 16,
         "overnight": 92,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MN"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ME"
       },
       {
         "catering24": 51,
         "catering8": 34,
         "overnight": 208,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MZ"
       },
       {
         "catering24": 35,
         "catering8": 24,
         "overnight": 155,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MM"
       },
       {
         "catering24": 30,
         "catering8": 20,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NA"
       },
       {
         "catering24": 36,
         "catering8": 24,
         "overnight": 126,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NP"
       },
       {
         "catering24": 58,
         "catering8": 39,
         "overnight": 148,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NZ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NI"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 122,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NL"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 131,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NE"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 182,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NG"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 89,
-        "spezials": [],
+        "specials": [],
         "countryCode": "MK"
       },
       {
         "catering24": 75,
         "catering8": 50,
         "overnight": 139,
-        "spezials": [],
+        "specials": [],
         "countryCode": "NO"
       },
       {
         "catering24": 50,
         "catering8": 33,
         "overnight": 117,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AT"
       },
       {
         "catering24": 64,
         "catering8": 43,
         "overnight": 141,
-        "spezials": [],
+        "specials": [],
         "countryCode": "OM"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 122,
-        "spezials": [
+        "specials": [
           {
             "catering24": 23,
             "catering8": 16,
@@ -2499,49 +2499,49 @@
         "catering24": 51,
         "catering8": 34,
         "overnight": 179,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PW"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 82,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PA"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 159,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PG"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 124,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PY"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PE"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PH"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 60,
-        "spezials": [
+        "specials": [
           {
             "catering24": 29,
             "catering8": 20,
@@ -2573,21 +2573,21 @@
         "catering24": 32,
         "catering8": 21,
         "overnight": 111,
-        "spezials": [],
+        "specials": [],
         "countryCode": "PT"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 117,
-        "spezials": [],
+        "specials": [],
         "countryCode": "RW"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 89,
-        "spezials": [
+        "specials": [
           {
             "catering24": 32,
             "catering8": 21,
@@ -2601,7 +2601,7 @@
         "catering24": 24,
         "catering8": 16,
         "overnight": 58,
-        "spezials": [
+        "specials": [
           {
             "catering24": 26,
             "catering8": 17,
@@ -2627,35 +2627,35 @@
         "catering24": 38,
         "catering8": 25,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ZM"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 105,
-        "spezials": [],
+        "specials": [],
         "countryCode": "WS"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 79,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SM"
       },
       {
         "catering24": 47,
         "catering8": 32,
         "overnight": 80,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ST"
       },
       {
         "catering24": 56,
         "catering8": 37,
         "overnight": 181,
-        "spezials": [
+        "specials": [
           {
             "catering24": 56,
             "catering8": 37,
@@ -2675,14 +2675,14 @@
         "catering24": 66,
         "catering8": 44,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SE"
       },
       {
         "catering24": 64,
         "catering8": 43,
         "overnight": 180,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -2696,56 +2696,56 @@
         "catering24": 42,
         "catering8": 28,
         "overnight": 190,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SN"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 97,
-        "spezials": [],
+        "specials": [],
         "countryCode": "RS"
       },
       {
         "catering24": 57,
         "catering8": 38,
         "overnight": 145,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SL"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "ZW"
       },
       {
         "catering24": 54,
         "catering8": 36,
         "overnight": 197,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SG"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 121,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SK"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 126,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SI"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 103,
-        "spezials": [
+        "specials": [
           {
             "catering24": 44,
             "catering8": 29,
@@ -2777,21 +2777,21 @@
         "catering24": 36,
         "catering8": 24,
         "overnight": 112,
-        "spezials": [],
+        "specials": [],
         "countryCode": "LK"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 195,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SD"
       },
       {
         "catering24": 29,
         "catering8": 20,
         "overnight": 109,
-        "spezials": [
+        "specials": [
           {
             "catering24": 36,
             "catering8": 24,
@@ -2811,84 +2811,84 @@
         "catering24": 51,
         "catering8": 34,
         "overnight": 159,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SS"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 140,
-        "spezials": [],
+        "specials": [],
         "countryCode": "SY"
       },
       {
         "catering24": 27,
         "catering8": 18,
         "overnight": 118,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TJ"
       },
       {
         "catering24": 46,
         "catering8": 31,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TW"
       },
       {
         "catering24": 44,
         "catering8": 29,
         "overnight": 97,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TZ"
       },
       {
         "catering24": 38,
         "catering8": 25,
         "overnight": 110,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TH"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 118,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TG"
       },
       {
         "catering24": 39,
         "catering8": 26,
         "overnight": 94,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TO"
       },
       {
         "catering24": 66,
         "catering8": 44,
         "overnight": 203,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TT"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 155,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TD"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 77,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CZ"
       },
       {
         "catering24": 17,
         "catering8": 12,
         "overnight": 95,
-        "spezials": [
+        "specials": [
           {
             "catering24": 29,
             "catering8": 20,
@@ -2908,77 +2908,77 @@
         "catering24": 40,
         "catering8": 27,
         "overnight": 144,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TN"
       },
       {
         "catering24": 33,
         "catering8": 22,
         "overnight": 108,
-        "spezials": [],
+        "specials": [],
         "countryCode": "TM"
       },
       {
         "catering24": 41,
         "catering8": 28,
         "overnight": 143,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UG"
       },
       {
         "catering24": 26,
         "catering8": 17,
         "overnight": 98,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UA"
       },
       {
         "catering24": 32,
         "catering8": 21,
         "overnight": 85,
-        "spezials": [],
+        "specials": [],
         "countryCode": "HU"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 90,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UY"
       },
       {
         "catering24": 34,
         "catering8": 23,
         "overnight": 104,
-        "spezials": [],
+        "specials": [],
         "countryCode": "UZ"
       },
       {
         "catering24": 48,
         "catering8": 32,
         "overnight": 150,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VA"
       },
       {
         "catering24": 45,
         "catering8": 30,
         "overnight": 127,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VE"
       },
       {
         "catering24": 65,
         "catering8": 44,
         "overnight": 156,
-        "spezials": [],
+        "specials": [],
         "countryCode": "AE"
       },
       {
         "catering24": 59,
         "catering8": 40,
         "overnight": 182,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -3040,7 +3040,7 @@
         "catering24": 52,
         "catering8": 35,
         "overnight": 99,
-        "spezials": [
+        "specials": [
           {
             "catering24": 66,
             "catering8": 44,
@@ -3054,28 +3054,28 @@
         "catering24": 41,
         "catering8": 28,
         "overnight": 86,
-        "spezials": [],
+        "specials": [],
         "countryCode": "VN"
       },
       {
         "catering24": 20,
         "catering8": 13,
         "overnight": 98,
-        "spezials": [],
+        "specials": [],
         "countryCode": "BY"
       },
       {
         "catering24": 53,
         "catering8": 36,
         "overnight": 210,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CF"
       },
       {
         "catering24": 42,
         "catering8": 28,
         "overnight": 125,
-        "spezials": [],
+        "specials": [],
         "countryCode": "CY"
       }
     ]

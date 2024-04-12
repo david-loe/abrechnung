@@ -1,10 +1,17 @@
 import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
-import { Access, Token, User, accesses } from '../../common/types.js'
+import { Access, Token, User, accesses, emailRegex, locales } from '../../common/types.js'
+import Settings from './settings.js'
 
-const accessObject: { [key in Access]?: { type: BooleanConstructor; default: false } } = {}
+const settings = (await Settings.findOne().lean())!
+
+const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
 for (const access of accesses) {
-  accessObject[access] = { type: Boolean, default: false }
+  accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
 }
+
+const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
+const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
+const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
 
 interface Methods {
   isActive(): Promise<boolean>
@@ -12,19 +19,33 @@ interface Methods {
 
 type UserModel = Model<User, {}, Methods>
 
-const userSchema = new Schema<User, UserModel, Methods>({
+export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
-    microsoft: { type: String, index: true, unique: true, sparse: true },
-    ldapauth: { type: String, index: true, unique: true, sparse: true },
-    magiclogin: { type: String, index: true, unique: true, sparse: true }
+    type: {
+      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !useMicrosoft },
+      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !useLDAPauth },
+      magiclogin: {
+        type: String,
+        index: true,
+        unique: true,
+        sparse: true,
+        validate: emailRegex,
+        label: 'Magic Login Email',
+        hide: !useMagicLogin
+      }
+    },
+    required: true
   },
-  email: { type: String, unique: true, index: true, required: true },
-  name: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
-  access: accessObject,
-  loseAccessAt: { type: Date },
+  email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
+  name: {
+    type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
+    required: true
+  },
+  access: { type: accessObject, default: () => ({}) },
+  loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
-      language: { type: String, default: process.env.VITE_I18N_LOCALE },
+      language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
       projects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
@@ -34,7 +55,7 @@ const userSchema = new Schema<User, UserModel, Methods>({
     required: true,
     default: () => ({})
   },
-  vehicleRegistration: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }],
+  vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }] },
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
 })
 

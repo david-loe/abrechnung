@@ -17,31 +17,37 @@ import {
 } from '../../common/types.js'
 import '../db.js'
 
-const accessIcons = {} as { [key in Access]: { type: StringConstructor; required: true }[] }
+const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }
 for (const access of accesses) {
-  accessIcons[access] = [{ type: String, required: true }]
+  accessIcons[access] = { type: [{ type: String, required: true }], required: true, label: 'accesses.' + access }
 }
 
-const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true } } = {}
+const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
 for (const access of accesses) {
-  defaultAccess[access] = { type: Boolean, required: true }
+  defaultAccess[access] = { type: Boolean, required: true, label: 'accesses.' + access }
 }
 
-const color = { color: { type: String, required: true }, text: { type: String, required: true } }
-const stateColors = {} as { [key in TravelState | HealthCareCostState | ExpenseReportState]: typeof color }
+function color(state: string) {
+  return {
+    type: { color: { type: String, required: true }, text: { type: String, required: true } },
+    required: true,
+    label: 'states.' + state
+  }
+}
+const stateColors = {} as { [key in TravelState | HealthCareCostState | ExpenseReportState]: ReturnType<typeof color> }
 for (const state of travelStates) {
-  stateColors[state] = color
+  stateColors[state] = color(state)
 }
 for (const state of healthCareCostStates) {
-  stateColors[state] = color
+  stateColors[state] = color(state)
 }
 for (const state of expenseReportStates) {
-  stateColors[state] = color
+  stateColors[state] = color(state)
 }
 
-const distanceRefunds = {} as { [key in DistanceRefundType]: { type: NumberConstructor; min: 0; required: true } }
+const distanceRefunds = {} as { [key in DistanceRefundType]: { type: NumberConstructor; min: 0; required: true; label: string } }
 for (const refund of distanceRefundTypes) {
-  distanceRefunds[refund] = { type: Number, min: 0, required: true }
+  distanceRefunds[refund] = { type: Number, min: 0, required: true, label: 'distanceRefundTypes.' + refund }
 }
 
 const disableReportType = {} as { [key in ReportType]: { type: BooleanConstructor; required: true } }
@@ -49,31 +55,31 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
-const settingsSchema = new Schema<Settings>({
-  accessIcons: { type: accessIcons, required: true },
-  defaultAccess: { type: defaultAccess, required: true },
+export const settingsSchema = new Schema<Settings>({
   allowSpouseRefund: { type: Boolean, required: true },
+  allowTravelApplicationForThePast: { type: Boolean, required: true },
+  vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
   userCanSeeAllProjects: { type: Boolean, required: true },
+  defaultAccess: { type: defaultAccess, required: true },
+  disableReportType: { type: disableReportType, required: true },
+  maxTravelDayCount: { type: Number, min: 0, required: true },
+  toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
+  distanceRefunds: { type: distanceRefunds, required: true },
+  uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
   breakfastCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   lunchCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   dinnerCateringLumpSumCut: { type: Number, min: 0, max: 1, required: true },
   factorCateringLumpSum: { type: Number, min: 0, max: 1, required: true },
-  factorCateringLumpSumExceptions: [{ type: String, ref: 'Country' }],
+  factorCateringLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   factorOvernightLumpSum: { type: Number, min: 0, max: 1, required: true },
-  factorOvernightLumpSumExceptions: [{ type: String, ref: 'Country' }],
+  factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
-  maxTravelDayCount: { type: Number, min: 0, required: true },
-  distanceRefunds: { type: distanceRefunds, required: true },
   secoundNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
   secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
   stateColors: { type: stateColors, required: true },
-  toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
-  uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
-  allowTravelApplicationForThePast: { type: Boolean, required: true },
-  vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
-  disableReportType: { type: disableReportType, required: true },
-  version: { type: String, required: true },
-  migrateFrom: { type: String }
+  accessIcons: { type: accessIcons, required: true },
+  version: { type: String, required: true, hide: true },
+  migrateFrom: { type: String, hide: true }
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>

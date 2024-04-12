@@ -1,6 +1,6 @@
 import { HydratedDocument, Model, Schema, model } from 'mongoose'
-import Settings from './settings.js'
 import { Country, LumpSum } from '../../common/types.js'
+import Settings from './settings.js'
 
 interface Methods {
   getLumpSum(date: Date, special?: string): Promise<LumpSum>
@@ -8,35 +8,44 @@ interface Methods {
 
 type CountryModel = Model<Country, {}, Methods>
 
-const countrySchema = new Schema<Country, CountryModel, Methods>({
+export const countrySchema = new Schema<Country, CountryModel, Methods>({
+  _id: { type: String, required: true, trim: true, alias: 'code', label: 'labels.code' },
+  flag: { type: String },
   name: {
-    de: { type: String, required: true, trim: true },
-    en: { type: String, required: true, trim: true }
+    type: {
+      de: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true }
+    },
+    required: true
   },
   alias: {
-    de: [{ type: String, trim: true }],
-    en: [{ type: String, trim: true }]
-  },
-  _id: { type: String, required: true, trim: true, alias: 'code' },
-  flag: { type: String },
-  lumpSums: [
-    {
-      validFrom: { type: Date },
-      catering24: { type: Number },
-      catering8: { type: Number },
-      overnight: { type: Number },
-      spezials: [
-        {
-          city: { type: String, trim: true },
-          catering24: { type: Number },
-          catering8: { type: Number },
-          overnight: { type: Number }
-        }
-      ]
+    type: {
+      de: { type: [{ type: String, trim: true }] },
+      en: { type: [{ type: String, trim: true }] }
     }
-  ],
-  lumpSumsFrom: { type: String, trim: true },
-  currency: { type: String, ref: 'Currency' }
+  },
+  lumpSumsFrom: { type: String, ref: 'Country', trim: true },
+  currency: { type: String, ref: 'Currency' },
+  lumpSums: {
+    type: [
+      {
+        validFrom: { type: Date },
+        catering24: { type: Number, label: 'lumpSums.catering24' },
+        catering8: { type: Number, label: 'lumpSums.catering8' },
+        overnight: { type: Number, label: 'lumpSums.overnight' },
+        specials: {
+          type: [
+            {
+              city: { type: String, trim: true },
+              catering24: { type: Number, label: 'lumpSums.catering24' },
+              catering8: { type: Number, label: 'lumpSums.catering8' },
+              overnight: { type: Number, label: 'lumpSums.overnight' }
+            }
+          ]
+        }
+      }
+    ]
+  }
 })
 
 countrySchema.methods.getLumpSum = async function (date: Date, special: string | undefined = undefined): Promise<LumpSum> {
@@ -56,8 +65,8 @@ countrySchema.methods.getLumpSum = async function (date: Date, special: string |
     if (date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf() < 0) {
       throw new Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
     }
-    if (special && this.lumpSums[nearest].spezials) {
-      for (const lumpSumSpecial of this.lumpSums[nearest].spezials!) {
+    if (special && this.lumpSums[nearest].specials) {
+      for (const lumpSumSpecial of this.lumpSums[nearest].specials!) {
         if (lumpSumSpecial.city === special) {
           return lumpSumSpecial
         }

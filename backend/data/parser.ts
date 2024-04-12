@@ -11,7 +11,7 @@ interface RawLumpSum {
 }
 
 interface RawLumpSumWithCities extends RawLumpSum {
-  spezials?: {
+  specials?: {
     city: string
     catering8: string
     catering24: string
@@ -55,7 +55,7 @@ export async function parseRawLumpSums(dataStr: string): Promise<LumpSumWithCoun
   const refinedString = await fixTableSpezialties(dataStr)
   const data = csvToObjects(refinedString, '\t', ',', '')
   assertAreRawLumpSums(data)
-  const rawLumpSums = combineSpezials(data)
+  const rawLumpSums = combineSpecials(data)
   const lumpSums: LumpSumWithCountryCode[] = []
   for (const rawLumpSum of rawLumpSums) {
     lumpSums.push(await findCountryCode(convertRawLumpSum(rawLumpSum)))
@@ -63,28 +63,28 @@ export async function parseRawLumpSums(dataStr: string): Promise<LumpSumWithCoun
   return lumpSums
 }
 
-function combineSpezials(rawLumpSums: (RawLumpSum & { city?: string })[]): RawLumpSumWithCities[] {
+function combineSpecials(rawLumpSums: (RawLumpSum & { city?: string })[]): RawLumpSumWithCities[] {
   const general = /im Übrigen/i
-  const spezialStart = /^–\s{2,}(.*)/i
-  var spezials = []
+  const specialstart = /^–\s{2,}(.*)/i
+  var specials = []
   for (var i = rawLumpSums.length - 1; i >= 0; i--) {
-    const matched = rawLumpSums[i].country.match(spezialStart)
+    const matched = rawLumpSums[i].country.match(specialstart)
     if (matched && matched.length > 1) {
       rawLumpSums[i].city = matched[1]
       delete (rawLumpSums[i] as any).country
-      spezials.push(rawLumpSums[i])
+      specials.push(rawLumpSums[i])
       rawLumpSums.splice(i, 1)
-    } else if (spezials.length > 0) {
-      for (var j = spezials.length - 1; j >= 0; j--) {
-        if (general.test(spezials[j].city as string)) {
-          delete spezials[j].city
-          Object.assign(rawLumpSums[i], spezials[j])
-          spezials.splice(j, 1)
+    } else if (specials.length > 0) {
+      for (var j = specials.length - 1; j >= 0; j--) {
+        if (general.test(specials[j].city as string)) {
+          delete specials[j].city
+          Object.assign(rawLumpSums[i], specials[j])
+          specials.splice(j, 1)
           break
         }
       }
-      ;(rawLumpSums[i] as any).spezials = spezials
-      spezials = []
+      ;(rawLumpSums[i] as any).specials = specials
+      specials = []
     }
   }
   return rawLumpSums
@@ -104,10 +104,10 @@ async function findCountryCode(lumpSum: LumpSumWithCountryName, countryNameLangu
 }
 
 function convertRawLumpSum(raw: RawLumpSumWithCities): LumpSumWithCountryName {
-  const spezials: CountryLumpSum['spezials'] = []
-  if (raw.spezials) {
-    for (const spezial of raw.spezials) {
-      spezials.push({
+  const specials: CountryLumpSum['specials'] = []
+  if (raw.specials) {
+    for (const spezial of raw.specials) {
+      specials.push({
         catering24: parseInt(spezial.catering24, 10),
         catering8: parseInt(spezial.catering8, 10),
         overnight: parseInt(spezial.overnight, 10),
@@ -121,7 +121,7 @@ function convertRawLumpSum(raw: RawLumpSumWithCities): LumpSumWithCountryName {
     catering24: parseInt(raw.catering24, 10),
     catering8: parseInt(raw.catering8, 10),
     overnight: parseInt(raw.overnight, 10),
-    spezials
+    specials
   }
 }
 

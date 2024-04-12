@@ -19,11 +19,11 @@
           <th>{{ $t('labels.advance') }}</th>
           <td>
             <span>
-              {{ getMoneyString(travel.advance, { language: $i18n.locale }) }}
+              {{ getMoneyString(travel.advance, { language: $i18n.locale as Locale }) }}
             </span>
             <span v-if="travel.advance.exchangeRate" class="text-secondary">
               &nbsp;-&nbsp;
-              {{ getMoneyString(travel.advance, { language: $i18n.locale, useExchangeRate: false }) }}
+              {{ getMoneyString(travel.advance, { language: $i18n.locale as Locale, useExchangeRate: false }) }}
             </span>
           </td>
         </tr>
@@ -47,7 +47,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { datetoDateStringWithYear, getDiffInDays, getMoneyString } from '../../../../../common/scripts.js'
-import { TravelSimple, travelStates } from '../../../../../common/types.js'
+import { Locale, TravelSimple, travelStates } from '../../../../../common/types.js'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import StatePipeline from '../../elements/StatePipeline.vue'
 

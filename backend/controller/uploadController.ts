@@ -13,7 +13,7 @@ import { AuthorizationError } from './error.js'
 import { File } from './types.js'
 
 async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction) {
-  const user = await User.findOne({ _id: req.query.userId }).lean()
+  const user = await User.findOne({ _id: req.query.userId as string }).lean()
   if (!(user && user.token && user.token._id.equals(req.query.tokenId as string))) {
     throw new AuthorizationError('Token not valid')
   }

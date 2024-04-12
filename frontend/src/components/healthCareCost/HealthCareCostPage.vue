@@ -132,7 +132,7 @@
               <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
                 <td>{{ datetoDateString(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale }) }}</td>
+                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale as Locale }) }}</td>
               </tr>
             </tbody>
           </table>
@@ -149,11 +149,11 @@
                   <tbody>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale }) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale as Locale }) }}</td>
                     </tr>
                     <tr v-if="healthCareCost.state === 'refunded'">
                       <th>{{ $t('labels.refundSum') }}</th>
-                      <td class="text-end">{{ getMoneyString(healthCareCost.refundSum, { language: $i18n.locale }) }}</td>
+                      <td class="text-end">{{ getMoneyString(healthCareCost.refundSum, { language: $i18n.locale as Locale }) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -263,6 +263,7 @@ import {
   Expense,
   HealthCareCost,
   healthCareCostStates,
+  Locale,
   Organisation,
   UserSimple
 } from '../../../../common/types.js'
@@ -363,7 +364,7 @@ export default defineComponent({
           owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
           bankDetails: orga?.bankDetails,
           organisationName: orga?.name,
-          amount: getMoneyString(this.addUp.total, { language: this.$i18n.locale })
+          amount: getMoneyString(this.addUp.total, { language: this.$i18n.locale as Locale })
         })
       )
     },

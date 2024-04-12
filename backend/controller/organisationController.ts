@@ -28,7 +28,7 @@ export class OrganisationAdminController extends Controller {
   }
 
   @Post()
-  @Middlewares(fileHandler.single('[logo][data]'))
+  @Middlewares(fileHandler.single('logo[data]'))
   @Consumes('multipart/form-data')
   public async postVehicleRegistration(@Body() requestBody: SetterBody<IOrganisation>, @Request() request: ExRequest) {
     await documentFileHandler(['logo'], { multiple: false, checkOwner: false })(request)

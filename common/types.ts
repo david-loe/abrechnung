@@ -57,7 +57,7 @@ export interface CountrySimple {
 
 export interface CountryLumpSum extends LumpSum {
   validFrom: Date | string
-  spezials?: ({
+  specials?: ({
     city: string
   } & LumpSum)[]
 }
@@ -420,6 +420,9 @@ export function reportIsExpenseReport(report: TravelSimple | ExpenseReportSimple
 export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsHealthCareCost(report)
 }
+
+export const emailRegex =
+  /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
 
 export const baseCurrency: Currency = {
   _id: 'EUR',

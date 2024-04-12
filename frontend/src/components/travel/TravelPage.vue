@@ -262,7 +262,7 @@
                           ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-sun"></i>
-                        {{ getMoneyString(refund.refund, { language: $i18n.locale }) }}
+                        {{ getMoneyString(refund.refund, { language: $i18n.locale as Locale }) }}
                       </div>
                       <!-- overnight -->
                       <div
@@ -276,7 +276,7 @@
                           ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-moon"></i>
-                        {{ getMoneyString(refund.refund, { language: $i18n.locale }) }}
+                        {{ getMoneyString(refund.refund, { language: $i18n.locale as Locale }) }}
                       </div>
                     </template>
                   </template>
@@ -340,13 +340,13 @@
                 <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i class="bi bi-arrow-right mx-2"></i>
                 <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
                   <i class="bi bi-coin"></i>
-                  {{ getMoneyString((row.data as Stage).cost, { language: $i18n.locale }) }}
+                  {{ getMoneyString((row.data as Stage).cost, { language: $i18n.locale as Locale }) }}
                 </div>
                 <PlaceElement :place="(row.data as Stage).endLocation"></PlaceElement>
               </div>
               <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary d-none d-md-block">
                 <i class="bi bi-coin"></i>
-                {{ getMoneyString((row.data as Stage).cost, { language: $i18n.locale }) }}
+                {{ getMoneyString((row.data as Stage).cost, { language: $i18n.locale as Locale }) }}
               </div>
             </div>
             <!-- expense -->
@@ -361,11 +361,11 @@
               <div class="col-auto">
                 <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as TravelExpense).description }}&nbsp;
                 <div class="text-secondary d-inline d-md-none">
-                  {{ getMoneyString((row.data as TravelExpense).cost, { language: $i18n.locale }) }}
+                  {{ getMoneyString((row.data as TravelExpense).cost, { language: $i18n.locale as Locale }) }}
                 </div>
               </div>
               <div class="col-auto text-secondary d-none d-md-block">
-                {{ getMoneyString((row.data as TravelExpense).cost, { language: $i18n.locale }) }}
+                {{ getMoneyString((row.data as TravelExpense).cost, { language: $i18n.locale as Locale }) }}
               </div>
             </div>
             <!-- gap -->
@@ -402,7 +402,7 @@
                         </small>
                       </td>
                       <td class="text-end align-top">
-                        <small>{{ getMoneyString(addUp.lumpSums, { language: $i18n.locale }) }}</small>
+                        <small>{{ getMoneyString(addUp.lumpSums, { language: $i18n.locale as Locale }) }}</small>
                       </td>
                     </tr>
                     <tr>
@@ -410,7 +410,7 @@
                         <small>{{ $t('labels.expenses') }}</small>
                       </td>
                       <td class="text-end">
-                        <small>{{ getMoneyString(addUp.expenses, { language: $i18n.locale }) }}</small>
+                        <small>{{ getMoneyString(addUp.expenses, { language: $i18n.locale as Locale }) }}</small>
                       </td>
                     </tr>
                     <tr v-if="travel.advance.amount">
@@ -418,12 +418,12 @@
                         <small>{{ $t('labels.advance') }}</small>
                       </td>
                       <td class="text-end text-secondary">
-                        <small>{{ getMoneyString(addUp.advance, { language: $i18n.locale, func: (x) => 0 - x }) }}</small>
+                        <small>{{ getMoneyString(addUp.advance, { language: $i18n.locale as Locale, func: (x) => 0 - x }) }}</small>
                       </td>
                     </tr>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale }) }}</td>
+                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale as Locale }) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -489,6 +489,7 @@ import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } fr
 import {
   BaseCurrencyMoney,
   DocumentFile,
+  Locale,
   meals,
   Place,
   Record,

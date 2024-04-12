@@ -30,7 +30,7 @@
                     v-model="$i18n.locale"
                     style="max-width: 68px"
                     @change="pushUserSettings(user.settings)">
-                    <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('languages.' + lang)">
+                    <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
                       {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
                     </option>
                   </select>
@@ -198,12 +198,6 @@ export default defineComponent({
           this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
         ]).then((result) => {
           this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
-          log(this.$t('labels.user') + ':')
-          log(this.user)
-          if (this.user._id) {
-            this.$i18n.locale = this.user.settings.language
-            this.auth = true
-          }
           this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
           this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
           this.settings =
@@ -213,6 +207,14 @@ export default defineComponent({
           this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
           this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
           this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
+
+          log(this.$t('labels.user') + ':')
+          log(this.user)
+          if (this.user._id) {
+            this.$i18n.locale = this.user.settings.language
+            this.$vueform.i18n.locale = this.user.settings.language
+            this.auth = true
+          }
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
@@ -347,6 +349,7 @@ export default defineComponent({
     },
     async pushUserSettings(settings: User['settings']) {
       settings.language = this.$i18n.locale as Locale
+      this.$vueform.i18n.locale = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true

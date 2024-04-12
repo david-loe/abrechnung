@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { NextFunction, Request, Response } from 'express'
+import fs from 'fs/promises'
 import { Schema, Types } from 'mongoose'
-import { ExchangeRate as ExchangeRateI, baseCurrency } from '../common/types.js'
+import { ExchangeRate as ExchangeRateI, DocumentFile as IDocumentFile, baseCurrency } from '../common/types.js'
 import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 
@@ -95,7 +96,7 @@ export function costObject(
     type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
-    type.receipts = [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }]
+    type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }] }
     type.date = {
       type: Date,
       validate: {
@@ -152,7 +153,10 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           if (buffer) {
             reqDoc.owner = fileOwner
             reqDoc.data = buffer
-            reqDoc = await new DocumentFile(reqDoc).save()
+            const dbDoc = (await new DocumentFile(reqDoc).save()).toObject() as Partial<IDocumentFile>
+            delete dbDoc.data
+            delete reqDoc.data
+            Object.assign(reqDoc, dbDoc)
           } else {
             return undefined
           }
@@ -177,12 +181,39 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           }
         }
       } else {
-        reqDocuments = await handleFile(reqDocuments)
+        await handleFile(reqDocuments)
       }
-      console.log(reqDocuments)
     }
     if (next) {
       next()
     }
+  }
+}
+
+export async function writeToDisk(
+  filePath: string,
+  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
+) {
+  // create folders
+  var root = ''
+  var folderPath = filePath
+  if (folderPath[0] === '/') {
+    root = '/'
+    folderPath = folderPath.slice(1)
+  }
+  const folders = folderPath.split('/').slice(0, -1) // remove last item (file)
+  var cfolderPath = root
+  for (const folder of folders) {
+    cfolderPath = cfolderPath + folder + '/'
+    try {
+      await fs.access(cfolderPath)
+    } catch {
+      await fs.mkdir(cfolderPath)
+    }
+  }
+  try {
+    await fs.writeFile(filePath, data)
+  } catch (error) {
+    console.error(error)
   }
 }

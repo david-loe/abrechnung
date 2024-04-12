@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose'
-import { CountryLumpSum } from '../common/types.js'
+import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
@@ -12,7 +12,6 @@ import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
-import Settings from './models/settings.js'
 
 await connectDB()
 
@@ -32,18 +31,18 @@ export function disconnectDB() {
 }
 
 export async function initDB() {
-  const DBsettings = await Settings.findOne().lean()
+  const DBsettings = (await mongoose.connection.collection('settings').findOne({})) as ISettings | null
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
       DBsettings.migrateFrom = DBsettings.version
     }
     DBsettings.version = settings.version
     const mergedSettings = Object.assign({}, settings, DBsettings)
-    await Settings.findOneAndDelete()
-    await new Settings(mergedSettings).save()
+    await mongoose.connection.collection('settings').findOneAndDelete({})
+    await mongoose.connection.collection('settings').insertOne(mergedSettings)
     console.log(i18n.t('alerts.db.updatedSettings'))
   } else {
-    await new Settings(settings).save()
+    await mongoose.connection.collection('settings').insertOne(settings)
     console.log(i18n.t('alerts.db.createdSettings'))
   }
   await initer(Currency, 'currencies', currencies)

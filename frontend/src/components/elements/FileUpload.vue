@@ -1,29 +1,24 @@
 <template>
   <div>
     <div class="row g-2 mb-1">
-      <div v-for="(file, index) of modelValue" class="col-auto" :key="file.name" style="max-width: 110px" :title="file.name">
-        <div class="border rounded p-2">
-          <div class="row justify-content-between m-0">
-            <div class="col-auto p-0">
-              <button type="button" class="btn btn-sm btn-light" @click="showFile(index)">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-            <div class="col-auto p-0">
-              <button type="button" class="btn btn-sm btn-light" @click="disabled ? null : deleteFile(index)" :disabled="disabled">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>
+      <template v-if="modelValue !== null">
+        <template v-if="multiple">
+          <FileUploadFileElement
+            v-for="(file, index) of modelValue"
+            :file="file"
+            :disabled="disabled"
+            :key="file.name"
+            @show="showFile(file)"
+            @deleted="deleteFile(file, index)" />
+        </template>
+        <FileUploadFileElement
+          v-else
+          :file="modelValue"
+          :disabled="disabled"
+          @show="showFile(modelValue)"
+          @deleted="deleteFile(modelValue)" />
+      </template>
 
-          <div class="fs-2 text-center">
-            <i class="bi bi-file-earmark-text"></i>
-          </div>
-          <div class="text-truncate text-center">
-            {{ file.name }}
-          </div>
-        </div>
-      </div>
       <div v-if="!disabled" class="ms-auto col-auto d-none d-md-block">
         <button v-if="!token" type="button" class="btn btn-light text-center" @click="generateToken">
           <i class="bi bi-qr-code-scan"></i>
@@ -50,10 +45,10 @@
       class="form-control"
       type="file"
       :id="id"
-      accept="image/png, image/jpeg, .pdf"
+      :accept="accept"
       @change="changeFile"
       :required="required && modelValue.length == 0"
-      multiple
+      :multiple="multiple"
       :disabled="disabled" />
   </div>
 </template>
@@ -64,20 +59,24 @@ import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { resizeImage } from '../../../../common/scripts.js'
 import { DocumentFile, Token } from '../../../../common/types.js'
+import FileUploadFileElement from './FileUploadFileElement.vue'
 
 export default defineComponent({
   name: 'FileUpload',
+  components: { FileUploadFileElement },
   props: {
     modelValue: {
-      type: Array as PropType<Partial<DocumentFile>[]>,
+      type: [Array, Object] as PropType<Partial<DocumentFile>[] | Partial<DocumentFile> | null>,
       default: function () {
-        return []
+        return null
       }
     },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     id: { type: String },
-    endpointPrefix: { type: String, default: '' }
+    accept: { type: String, default: 'image/png, image/jpeg, .pdf' },
+    endpointPrefix: { type: String, default: '' },
+    multiple: { type: Boolean, default: true }
   },
   data() {
     return {
@@ -90,40 +89,47 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    async showFile(index: number): Promise<void> {
+    async showFile(file: Partial<DocumentFile>): Promise<void> {
       const windowProxy = window.open('', '_blank') as Window
-      if (this.modelValue[index]._id) {
-        const result = (
-          await this.$root.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: this.modelValue[index]._id }, { responseType: 'blob' })
-        ).ok
+      if (file._id) {
+        const result = (await this.$root.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: file._id }, { responseType: 'blob' })).ok
         if (result) {
           const fileURL = URL.createObjectURL(result.data)
           windowProxy.location.assign(fileURL)
         } else {
           windowProxy.close()
         }
-      } else if (this.modelValue[index].data) {
-        const fileURL = URL.createObjectURL(this.modelValue[index].data!)
+      } else if (file.data) {
+        const fileURL = URL.createObjectURL(file.data)
         windowProxy.location.assign(fileURL)
       }
     },
-    async deleteFile(index: number) {
+    async deleteFile(file: Partial<DocumentFile>, index?: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
-        if (this.modelValue[index]._id) {
-          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { _id: this.modelValue[index]._id! }, false)
+        if (file._id) {
+          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { _id: file._id }, false)
           if (!result) {
             return null
           }
         }
-        const files = this.modelValue
-        files.splice(index, 1)
-        this.$emit('update:modelValue', files)
+        if (Array.isArray(this.modelValue)) {
+          const files = this.modelValue
+          files.splice(index, 1)
+          this.$emit('update:modelValue', files)
+        } else {
+          this.$emit('update:modelValue', null)
+        }
       }
     },
     async changeFile(event: Event) {
       const newFiles = await this.fileEventToDocumentFiles(event)
       if (newFiles) {
-        this.$emit('update:modelValue', this.modelValue.concat(newFiles))
+        if (this.multiple) {
+          const files = Array.isArray(this.modelValue) ? this.modelValue : []
+          this.$emit('update:modelValue', files.concat(newFiles))
+        } else if (newFiles.length > 0) {
+          this.$emit('update:modelValue', newFiles[0])
+        }
       }
     },
     async fileEventToDocumentFiles(event: Event): Promise<Partial<DocumentFile>[] | null> {
@@ -168,8 +174,12 @@ export default defineComponent({
       if (result && result.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
-          const files = this.modelValue.concat(token.files)
-          this.$emit('update:modelValue', files)
+          if (this.multiple) {
+            const files = Array.isArray(this.modelValue) ? this.modelValue : []
+            this.$emit('update:modelValue', files.concat(token.files))
+          } else {
+            this.$emit('update:modelValue', token.files[0])
+          }
           this.clear()
         }
       } else {

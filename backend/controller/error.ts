@@ -40,7 +40,7 @@ export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next
   } else if (err instanceof ClientError) {
     return res.status(err.status).json(Object.assign({ message: err.message }, err))
   } else if (err instanceof Error) {
-    return res.status(500).json(err)
+    return res.status(500).json(Object.assign({ message: err.message }, err))
   }
   next(err)
 }
