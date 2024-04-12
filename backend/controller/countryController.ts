@@ -22,8 +22,8 @@ export class CountryController extends Controller {
     for (const c of allCountries) {
       const specials: string[] = []
       for (const lumpSum of c.lumpSums) {
-        if (lumpSum.spezials) {
-          for (const special of lumpSum.spezials) {
+        if (lumpSum.specials) {
+          for (const special of lumpSum.specials) {
             if (specials.indexOf(special.city) === -1) {
               specials.push(special.city)
             }

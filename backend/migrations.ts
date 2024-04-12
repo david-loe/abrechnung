@@ -154,6 +154,11 @@ async function migrate(from: string) {
         }
       )
     }
+    case '0.4.0': {
+      console.log('Apply migration from v0.4.0: Reload Countries (fix typo)')
+      await mongoose.connection.collection('countries').drop()
+      initDB()
+    }
     default:
       if (settings) {
         settings.migrateFrom = undefined

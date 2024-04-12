@@ -31,7 +31,7 @@ export const countrySchema = new Schema<Country, CountryModel, Methods>({
         catering24: { type: Number, label: 'lumpSums.catering24' },
         catering8: { type: Number, label: 'lumpSums.catering8' },
         overnight: { type: Number, label: 'lumpSums.overnight' },
-        spezials: {
+        specials: {
           type: [
             {
               city: { type: String, trim: true },
@@ -65,8 +65,8 @@ countrySchema.methods.getLumpSum = async function (date: Date, special: string |
     if (date.valueOf() - (this.lumpSums[nearest].validFrom as Date).valueOf() < 0) {
       throw new Error('No valid lumpSum found for Country: ' + this._id + ' for date: ' + date)
     }
-    if (special && this.lumpSums[nearest].spezials) {
-      for (const lumpSumSpecial of this.lumpSums[nearest].spezials!) {
+    if (special && this.lumpSums[nearest].specials) {
+      for (const lumpSumSpecial of this.lumpSums[nearest].specials!) {
         if (lumpSumSpecial.city === special) {
           return lumpSumSpecial
         }

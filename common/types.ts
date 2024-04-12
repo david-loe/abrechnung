@@ -57,7 +57,7 @@ export interface CountrySimple {
 
 export interface CountryLumpSum extends LumpSum {
   validFrom: Date | string
-  spezials?: ({
+  specials?: ({
     city: string
   } & LumpSum)[]
 }
