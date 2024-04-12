@@ -133,6 +133,7 @@ export default defineComponent({
       if (result) {
         this.countries = result.data
       }
+      this.$root.countries = (await this.$root.getter<Country[]>('country')).ok.data
     },
     async postCountry(country: Country) {
       const result = await this.$root.setter<Country>('admin/country', country)

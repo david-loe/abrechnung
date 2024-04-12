@@ -122,6 +122,7 @@ export default defineComponent({
     async postHealthInsurance(healthInsurance: HealthInsurance) {
       const result = await this.$root.setter<HealthInsurance>('admin/healthInsurance', healthInsurance)
       if (result.ok) {
+        this.$root.healthInsurances = (await this.$root.getter<HealthInsurance[]>('healthInsurance')).ok.data
         this._showForm = false
       }
       this.healthInsuranceToEdit = undefined
@@ -129,6 +130,7 @@ export default defineComponent({
     async deleteHealthInsurance(healthInsurance: HealthInsurance) {
       const result = await this.$root.deleter('admin/healthInsurance', { _id: healthInsurance._id })
       if (result) {
+        this.$root.healthInsurances = (await this.$root.getter<HealthInsurance[]>('healthInsurance')).ok.data
       }
     },
     clickFilter(header: keyof Filter<string>) {
