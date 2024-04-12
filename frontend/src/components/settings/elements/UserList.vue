@@ -22,7 +22,7 @@
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },
-        { text: $t('labels.project'), value: 'settings.project.identifier', sortable: true },
+        { text: $t('labels.projects'), value: 'settings.projects', sortable: true },
         { text: $t('labels.access'), value: 'access' },
         { value: 'buttons' }
       ]">
@@ -52,6 +52,9 @@
       </template>
       <template #item-name="{ name }">
         {{ name.givenName + ' ' + name.familyName }}
+      </template>
+      <template #item-settings.projects="{ settings }">
+        <span class="me-1" v-for="p in settings.projects">{{ p.identifier }}</span>
       </template>
       <template #item-access="user">
         <template v-for="access of accesses">
@@ -132,7 +135,15 @@ export default defineComponent({
   methods: {
     showForm(mode: 'add' | 'edit', user?: User) {
       this.userFormMode = mode
-      this.userToEdit = user
+      // reduce arrays of objects to arrays of _ids for vueform select elements
+      const formUserSettings = Object.assign({}, user.settings)
+      const formUser = Object.assign({}, user, { settings: formUserSettings })
+      if (user) {
+        formUser.settings.lastCurrencies = user.settings.lastCurrencies.map((c) => c._id)
+        formUser.settings.lastCountries = user.settings.lastCountries.map((c) => c._id)
+        formUser.settings.projects = user.settings.projects.map((p) => p._id)
+      }
+      this.userToEdit = formUser
       this._showForm = true
     },
     async postUser(user: User) {
