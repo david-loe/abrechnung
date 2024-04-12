@@ -105,10 +105,7 @@ function mapSchemaTypeToVueformElement(
     vueformElement['text'] = vueformElement['label']
     delete vueformElement['label']
   } else if (Array.isArray(schemaType.type)) {
-    if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
-      vueformElement['type'] = 'list'
-      vueformElement['object'] = mongooseSchemaToVueformSchema(schemaType.type[0], language)
-    } else if (schemaType.type[0].ref) {
+    if (schemaType.type[0].ref) {
       vueformElement['type'] = schemaType.type[0].ref.toString().toLowerCase()
       if (schemaType.type[0].ref === 'DocumentFile') {
         vueformElement['multiple'] = true
@@ -117,6 +114,9 @@ function mapSchemaTypeToVueformElement(
         vueformElement['placeholder'] = vueformElement['label']
         delete vueformElement['label']
       }
+    } else if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
+      vueformElement['type'] = 'list'
+      vueformElement['object'] = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language) }
     } else {
       vueformElement['type'] = 'list'
       vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr)
