@@ -15,7 +15,7 @@
         {
           field: 'name',
           criteria: filter.name,
-          comparison: (value: Project['name'], criteria: string): boolean => Boolean(value) && (value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1)
+          comparison: (value: Project['name'], criteria: string): boolean => (!Boolean(value) && !Boolean(criteria)) || (value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1)
         }
       ]"
       :headers="[
