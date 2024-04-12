@@ -90,6 +90,8 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "validFrom": "Gültig ab",
+    "specials": "Besonderheiten",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",

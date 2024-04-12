@@ -22,22 +22,22 @@ export const countrySchema = new Schema<Country, CountryModel, Methods>({
       en: { type: [{ type: String, trim: true }] }
     }
   },
-  _id: { type: String, required: true, trim: true, alias: 'code' },
+  _id: { type: String, required: true, trim: true, alias: 'code', label: 'labels.code' },
   flag: { type: String },
   lumpSums: {
     type: [
       {
         validFrom: { type: Date },
-        catering24: { type: Number },
-        catering8: { type: Number },
-        overnight: { type: Number },
+        catering24: { type: Number, label: 'lumpSums.catering24' },
+        catering8: { type: Number, label: 'lumpSums.catering8' },
+        overnight: { type: Number, label: 'lumpSums.overnight' },
         spezials: {
           type: [
             {
               city: { type: String, trim: true },
-              catering24: { type: Number },
-              catering8: { type: Number },
-              overnight: { type: Number }
+              catering24: { type: Number, label: 'lumpSums.catering24' },
+              catering8: { type: Number, label: 'lumpSums.catering8' },
+              overnight: { type: Number, label: 'lumpSums.overnight' }
             }
           ]
         }
