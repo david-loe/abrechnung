@@ -50,22 +50,20 @@
 
         <template v-slot:singlelabel="{ value }">
           <div class="position-absolute start-0 ms-3">
-            <span>{{ value.identifier + (value.name || '') }}</span>
+            <span>{{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
           </div>
         </template>
 
         <template v-slot:multiplelabel="{ values }">
           <div class="position-absolute start-0 ms-3">
             <span v-for="value of values" class="me-3">
-              <span>{{ value.identifier + (value.name || '') }}</span>
+              <span>{{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
             </span>
           </div>
         </template>
 
         <template v-slot:option="{ option }">
-          <div>
-            {{ option.identifier + (option.name || '') }}
-          </div>
+          <div>{{ option.identifier + (option.name ? ' ' + option.name : '') }}</div>
         </template>
       </Multiselect>
     </template>

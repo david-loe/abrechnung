@@ -2,8 +2,7 @@
   <div :class="$root.organisations.length > 1 ? 'input-group' : ''">
     <select
       v-if="$root.organisations.length > 1"
-      ref="organisationSelect"
-      class="form-select"
+      class="form-select col-3"
       id="healthCareCostFormProject"
       v-model="$root.user.settings.organisation"
       @update:model-value="$root.pushUserSettings($root.user.settings)"
@@ -15,14 +14,13 @@
 
     <v-select
       v-if="$root.user.settings.projects && $root.settings.userCanSeeAllProjects === $root.projects.length > 0"
-      ref="projectSelect"
       :options="([] as any[]).concat($root.user.settings.projects, $root.projects)"
       :modelValue="modelValue"
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
       :filter="filter"
       :disabled="disabled"
-      style="min-width: 160px">
+      class="col-9">
       <template #option="{ identifier, name }: Project">
         <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
@@ -37,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from 'vue'
+import { PropType, defineComponent, nextTick } from 'vue'
 import { Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
@@ -64,10 +62,6 @@ export default defineComponent({
         )
       })
     }
-  },
-  mounted() {
-    //TODO:proper styling
-    console.log(this.$refs.organisationSelect as Element)
   }
 })
 </script>
