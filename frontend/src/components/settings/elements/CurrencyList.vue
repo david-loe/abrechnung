@@ -125,7 +125,6 @@ export default defineComponent({
       this._showForm = true
     },
     async postCurrency(currency: Currency) {
-      console.log(currency)
       const result = await this.$root.setter<Currency>('admin/currency', currency)
       if (result.ok) {
         this._showForm = false

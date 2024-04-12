@@ -183,7 +183,6 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       } else {
         await handleFile(reqDocuments)
       }
-      console.log(reqDocuments)
     }
     if (next) {
       next()

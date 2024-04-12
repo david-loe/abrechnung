@@ -92,7 +92,6 @@ export default defineElement({
   }),
   methods: {
     customFilterFunction(option, search) {
-      console.log(option)
       const name = option.name[this.$i18n.locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
       if (name) {
         return name

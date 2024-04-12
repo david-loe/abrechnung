@@ -128,7 +128,6 @@ export default defineComponent({
       this._showForm = true
     },
     async postProject(project: Project) {
-      console.log(project)
       const result = await this.$root.setter<Project>('admin/project', project)
       if (result.ok) {
         this.getProjects()

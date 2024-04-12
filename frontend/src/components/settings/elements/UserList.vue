@@ -136,7 +136,6 @@ export default defineComponent({
       this._showForm = true
     },
     async postUser(user: User) {
-      console.log(user)
       const result = await this.$root.setter<User>('admin/user', user)
       if (result.ok) {
         this.getUsers()

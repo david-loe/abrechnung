@@ -135,7 +135,6 @@ export default defineComponent({
       }
     },
     async postCountry(country: Country) {
-      console.log(country)
       const result = await this.$root.setter<Country>('admin/country', country)
       if (result.ok) {
         this._showForm = false
