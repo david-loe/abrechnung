@@ -13,7 +13,7 @@
 
 <script>
 import { defineElement } from '@vueform/vueform'
-import FileUpload from './FileUpload.vue'
+import FileUpload from '../FileUpload.vue'
 
 export default defineElement({
   name: 'DocumentfileElement',

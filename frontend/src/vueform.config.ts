@@ -3,9 +3,9 @@ import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
 
-import CountryElement from './components/elements/CountryElement.vue'
-import DocumentfileElement from './components/elements/DocumentfileElement.vue'
-import OrganisationElement from './components/elements/OrganisationElement.vue'
+import CountryElement from './components/elements/vueform/CountryElement.vue'
+import DocumentfileElement from './components/elements/vueform/DocumentfileElement.vue'
+import OrganisationElement from './components/elements/vueform/OrganisationElement.vue'
 
 en.vueform.elements.list.add = '+ Add'
 de.vueform.elements.list.add = '+ Hinzufügen'
