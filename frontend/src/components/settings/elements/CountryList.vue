@@ -11,6 +11,11 @@
           field: 'name',
           criteria: filter.name,
           comparison: (value: Country['name'], criteria: string): boolean => value[$i18n.locale as Locale].toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+        },
+        {
+          field: '_id',
+          criteria: filter._id,
+          comparison: (value: Currency['_id'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         }
       ]"
       :headers="[
@@ -29,6 +34,18 @@
           </span>
           <div v-if="_filter.name">
             <input type="text" class="form-control" v-model="filter.name" />
+          </div>
+        </div>
+      </template>
+      <template #header-_id="header">
+        <div class="filter-column">
+          {{ header.text }}
+          <span style="cursor: pointer" @click="clickFilter('_id')">
+            <i v-if="_filter._id" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="_filter._id">
+            <input type="text" class="form-control" v-model="filter._id" />
           </div>
         </div>
       </template>
@@ -74,6 +91,7 @@ import { Country, Locale, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
   name: T
+  _id: T
 }
 export default defineComponent({
   name: 'CountryList',
@@ -85,10 +103,12 @@ export default defineComponent({
       countryFormMode: 'add' as 'add' | 'edit',
       _showForm: false,
       filter: {
-        name: ''
+        name: '',
+        _id: ''
       } as Filter<string>,
       _filter: {
-        name: false
+        name: false,
+        _id: false
       } as Filter<boolean>,
       accesses,
       schema: Object.assign({}, countryFormSchema, {

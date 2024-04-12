@@ -22,6 +22,7 @@
         <OrganisationList v-else-if="entry === 'organisations'"</OrganisationList>
         <ProjectList v-else-if="entry === 'projects'"</ProjectList>
         <CountryList v-else-if="entry === 'countries'"</CountryList>
+        <CurrencyList v-else-if="entry === 'currencies'"</CurrencyList>
 
       </div>
     </div>
@@ -30,18 +31,18 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import CountryList from './elements/CountryList.vue'
+import CurrencyList from './elements/CurrencyList.vue'
 import OrganisationList from './elements/OrganisationList.vue'
+import ProjectList from './elements/ProjectList.vue'
 import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
-import CountryList from './elements/CountryList.vue'
-import ProjectList from './elements/ProjectList.vue'
-import ModelsForm from './forms/ModelsForm.vue'
 
 const entries = ['users', 'organisations', 'projects', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, ModelsForm, SettingsForm , OrganisationList, ProjectList, CountryList},
+  components: { UserList, SettingsForm , OrganisationList, ProjectList, CountryList, CurrencyList},
   data() {
     return {
       entries,
