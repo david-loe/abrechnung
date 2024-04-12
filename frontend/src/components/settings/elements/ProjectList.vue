@@ -15,7 +15,7 @@
         {
           field: 'name',
           criteria: filter.name,
-          comparison: (value: Project['name'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: Project['name'], criteria: string): boolean => Boolean(value) && (value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1)
         }
       ]"
       :headers="[
@@ -49,7 +49,7 @@
         </div>
       </template>
       <template #item-organisation="{ organisation }">
-        {{ getById(organisation, this.$root.organisations).name }}
+        {{ getById<OrganisationSimple>(organisation, $root.organisations)?.name }}
       </template>
       <template #item-buttons="project">
         <button type="button" class="btn btn-light" @click="showForm('edit', project)">
@@ -85,7 +85,7 @@
 import { defineComponent } from 'vue'
 import projectFormSchema from '../../../../../common/forms/project.json'
 import { getById } from '../../../../../common/scripts.js'
-import { Project, accesses } from '../../../../../common/types.js'
+import { OrganisationSimple, Project, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
   name: T

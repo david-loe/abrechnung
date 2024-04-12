@@ -15,7 +15,7 @@
         {
           field: '_id',
           criteria: filter._id,
-          comparison: (value: Currency['_id'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: Country['_id'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         }
       ]"
       :headers="[
