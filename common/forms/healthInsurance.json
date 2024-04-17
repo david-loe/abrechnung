@@ -1,0 +1,1 @@
+{"name":{"rules":["required"],"placeholder":{"de":"Name","en":"Name"},"type":"text"},"email":{"rules":["required","email"],"placeholder":{"de":"Email Addresse","en":"Email address"},"type":"text"}}

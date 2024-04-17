@@ -61,19 +61,21 @@ declare global {
   }
 }
 
-await generateForms(
-  {
-    user: userSchema.obj,
-    country: countrySchema.obj,
-    currency: currencySchema.obj,
-    project: projectSchema.obj,
-    healthInsurance: healthInsuranceSchema.obj,
-    organisation: organisationSchema.obj,
-    settings: settingsSchema.obj
-  },
-  locales,
-  '../common/forms'
-)
+if (process.env.NODE_ENV === 'development') {
+  generateForms(
+    {
+      user: userSchema.obj,
+      country: countrySchema.obj,
+      currency: currencySchema.obj,
+      project: projectSchema.obj,
+      healthInsurance: healthInsuranceSchema.obj,
+      organisation: organisationSchema.obj,
+      settings: settingsSchema.obj
+    },
+    locales,
+    '../common/forms'
+  )
+}
 
 app.listen(port, () => {
   console.log(`Backend listening at ${url}`)
