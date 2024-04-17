@@ -56,6 +56,7 @@ declare global {
       readonly MONGO_URL: string
       readonly VITE_I18N_LOCALE: Locale
       readonly VITE_I18N_FALLBACK_LOCALE: Locale
+      readonly VITE_I18N_LOCALES_OVERWRITE: string
       readonly BACKEND_SAVE_REPORTS_ON_DISK: 'TRUE' | 'FALSE'
     }
   }

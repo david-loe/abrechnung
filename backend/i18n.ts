@@ -1,12 +1,13 @@
 import i18next from 'i18next'
-import de from '../common/locales/de.json' assert { type: 'json' }
-import en from '../common/locales/en.json' assert { type: 'json' }
+import { loadLocales } from '../common/locales/load.js'
+import { Locale } from '../common/types.js'
 
 function loadLocaleMessages() {
   const messages: i18next.Resource = {}
-  messages.de = { translation: de }
-  messages.en = { translation: en }
-
+  const locales = loadLocales(process.env.VITE_I18N_LOCALES_OVERWRITE)
+  for (const lang in locales) {
+    messages[lang] = { translation: locales[lang as Locale] }
+  }
   return messages
 }
 
