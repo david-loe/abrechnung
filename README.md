@@ -16,8 +16,7 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 
 ## Pauschalbeträge
 
-- Deutschland: Verpflegung [§9 Abs. 4a S. 3 EStG](https://www.gesetze-im-internet.de/estg/__9.html) - Übernachtung [§7 Abs. 1 BRKG](https://www.gesetze-im-internet.de/brkg_2005/__7.html)
-- Andere Länder: [Steuerliche Behandlung von Reisekosten und Reisekostenvergütungen](https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Steuerarten/Lohnsteuer/2022-11-23-steuerliche-behandlung-reisekosten-reisekostenverguetungen-2023.pdf)
+[pauschbetrag-api](https://github.com/david-loe/pauschbetrag-api)
 
 ## Wechselkurse
 
@@ -26,6 +25,7 @@ https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-
 Dieser statische Währungsrechner zeigt den offiziellen monatlichen Buchungskurs der Europäischen Kommission für den Euro und die durch den Rechnungsführer im Einklang mit Artikel 19 der Haushaltsordnung festgelegten Umrechnungskurse an.
 
 ## API
+
 [API Documentation](https://david-loe.github.io/abrechnung/)
 
 ## Run
