@@ -1,6 +1,8 @@
+import { CronJob } from 'cron'
 import { HydratedDocument } from 'mongoose'
 import { User as IUser, Locale, locales } from '../common/types.js'
 import app from './app.js'
+import { fetchAndUpdateLumpSums } from './db.js'
 import { countrySchema } from './models/country.js'
 import { currencySchema } from './models/currency.js'
 import { healthInsuranceSchema } from './models/healthInsurance.js'
@@ -14,7 +16,7 @@ const url = process.env.VITE_BACKEND_URL
 
 declare global {
   namespace Express {
-    interface User extends HydratedDocument<IUser> {}
+    interface User extends HydratedDocument<IUser> { }
     interface AuthInfo {
       redirect?: string
     }
@@ -76,3 +78,6 @@ await generateForms(
 app.listen(port, () => {
   console.log(`Backend listening at ${url}`)
 })
+
+// Update lump sums every day at 1 AM
+CronJob.from({ cronTime: '0 1 * * *', onTick: fetchAndUpdateLumpSums, start: true })

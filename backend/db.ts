@@ -1,10 +1,9 @@
+import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
-import iLumpSums from './data/lumpSums.json' assert { type: 'json' }
-import { LumpSumsJSON } from './data/parser.js'
 import settings from './data/settings.json' assert { type: 'json' }
 import i18n from './i18n.js'
 import Country from './models/country.js'
@@ -47,7 +46,7 @@ export async function initDB() {
   }
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
-  await addLumpSumsToCountries(iLumpSums)
+  await fetchAndUpdateLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
 
   const organisations = [{ name: 'My Organisation' }]
@@ -65,16 +64,29 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
   }
 }
 
+export async function fetchAndUpdateLumpSums() {
+  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api/ALL.json'
+  const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
+  if (res.status === 200) {
+    await addLumpSumsToCountries(res.data)
+  } else {
+    throw Error('Unable to fetch lump sums from: ' + pauschbetrag_api)
+  }
+}
+
+type LumpSumsJSON = { data: LumpSumWithCountryCode[]; validFrom: string }[]
+type LumpSumWithCountryCode = Omit<CountryLumpSum, 'validFrom'> & { countryCode: string }
 async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
-  lumpSumsJSON.sort((a, b) => a.validFrom - b.validFrom)
+  lumpSumsJSON.sort((a, b) => new Date(a.validFrom).valueOf() - new Date(b.validFrom).valueOf())
   for (const lumpSums of lumpSumsJSON) {
+    const validFrom = new Date(lumpSums.validFrom).valueOf()
     var count = 0
     for (const lumpSum of lumpSums.data) {
       const country = await Country.findOne({ _id: lumpSum.countryCode })
       if (country) {
         var newData = true
         for (const countrylumpSums of country.lumpSums) {
-          if ((countrylumpSums.validFrom as Date).valueOf() >= lumpSums.validFrom) {
+          if ((countrylumpSums.validFrom as Date).valueOf() >= validFrom) {
             newData = false
             break
           }
