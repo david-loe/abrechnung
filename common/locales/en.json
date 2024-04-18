@@ -13,6 +13,7 @@
     "user": "Home"
   },
   "alerts": {
+    "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
     "areYouSureDelete": "Are you sure that you want to delete this?",
     "countryChangeBetweenStages": "Country change between consecutive stages",
     "db": {

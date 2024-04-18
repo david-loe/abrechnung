@@ -1,6 +1,7 @@
 <template>
   <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-    <div class="row mb-3">
+  <div class="mb-3">
+    <div class="row">
       <div class="col">
         <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}<span class="text-danger">*</span></label>
         <DateInput
@@ -24,6 +25,15 @@
           required />
       </div>
     </div>
+    <div v-if="showDepartureAndArrivalOnDifferentDaysAlert" class="alert alert-warning d-flex px-2 py-1 mt-1" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span class="ms-3">
+        {{$t('alerts.departureAndArrivalOnDifferentDaysX', {X: $t('labels.' + formStage.transport.type) })}}
+      </span>
+      <button type="button" class="btn-close ms-auto" @click="showDepartureAndArrivalOnDifferentDaysAlert = false"></button>
+    </div>
+  </div>
+    
 
     <div class="row mb-3">
       <div class="col">
@@ -209,7 +219,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
-import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
+import { baseCurrency, distanceRefundTypes, Place, Stage, transportTypes } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
@@ -242,6 +252,7 @@ export default defineComponent({
       maxDate: '' as string | Date,
       loading: false,
       vehicleRegistrationChanged: false,
+      showDepartureAndArrivalOnDifferentDaysAlert: false,
       transportTypes,
       distanceRefundTypes,
       baseCurrency
@@ -274,10 +285,13 @@ export default defineComponent({
         this.formStage.startLocation.country &&
         this.formStage.endLocation.country &&
         this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
-        !isNaN(new Date(this.formStage.departure).valueOf()) &&
+        this.departureAndArrivalOnDifferentDays()
+      )
+    },
+    departureAndArrivalOnDifferentDays() {
+      return !isNaN(new Date(this.formStage.departure).valueOf()) &&
         !isNaN(new Date(this.formStage.arrival).valueOf()) &&
         datetimeToDateString(this.formStage.departure) !== datetimeToDateString(this.formStage.arrival)
-      )
     },
     calcMidnightCountries() {
       if (this.showMidnightCountries()) {
@@ -368,9 +382,11 @@ export default defineComponent({
     },
     'formStage.departure': function () {
       this.calcMidnightCountries()
+      this.showDepartureAndArrivalOnDifferentDaysAlert = this.departureAndArrivalOnDifferentDays()
     },
     'formStage.arrival': function () {
       this.calcMidnightCountries()
+      this.showDepartureAndArrivalOnDifferentDaysAlert = this.departureAndArrivalOnDifferentDays()
     }
   }
 })

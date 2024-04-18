@@ -13,6 +13,7 @@
     "user": "Home"
   },
   "alerts": {
+    "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "db": {
