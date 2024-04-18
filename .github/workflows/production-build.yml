@@ -23,5 +23,7 @@ jobs:
           find: 'NODE_ENV=development'
           replace: 'NODE_ENV=production'
           include: '.env'
-      - name: Build
+      - name: Build Backend
+        run: docker-compose build
+      - name: Build Frontend
         run: docker-compose run frontend npm run build
