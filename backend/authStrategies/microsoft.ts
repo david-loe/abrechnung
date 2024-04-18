@@ -45,7 +45,7 @@ const microsoft = new MicrosoftStrategy(
       email: email,
       name: {
         familyName: profile._json.surname || (displayNameSplit.shift() as string), // first part of displayNameSplit
-        givenName: profile._json.givenName || displayNameSplit.length > 1 ? displayNameSplit.join(' ') : '' // rest of displayNameSplit
+        givenName: profile._json.givenName || displayNameSplit.length > 1 ? displayNameSplit.join(' ') : ' ' // rest of displayNameSplit
       }
     }
     if (!user) {
