@@ -7,16 +7,16 @@
             v-for="(file, index) of modelValue"
             :file="file"
             :disabled="disabled"
-            :key="file.name"
+            :key="(file as DocumentFile).name"
             @show="showFile(file)"
             @deleted="deleteFile(file, index)" />
         </template>
         <FileUploadFileElement
           v-else
-          :file="modelValue"
+          :file="modelValue as DocumentFile"
           :disabled="disabled"
-          @show="showFile(modelValue)"
-          @deleted="deleteFile(modelValue)" />
+          @show="showFile(modelValue as Partial<DocumentFile>)"
+          @deleted="deleteFile(modelValue as Partial<DocumentFile>)" />
       </template>
 
       <div v-if="!disabled" class="ms-auto col-auto d-none d-md-block">
@@ -47,7 +47,7 @@
       :id="id"
       :accept="accept"
       @change="changeFile"
-      :required="required && modelValue.length == 0"
+      :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile>[]).length === 0"
       :multiple="multiple"
       :disabled="disabled" />
   </div>
@@ -112,7 +112,7 @@ export default defineComponent({
             return null
           }
         }
-        if (Array.isArray(this.modelValue)) {
+        if (Array.isArray(this.modelValue) && typeof index === 'number') {
           const files = this.modelValue
           files.splice(index, 1)
           this.$emit('update:modelValue', files)

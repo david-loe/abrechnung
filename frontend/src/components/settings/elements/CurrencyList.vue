@@ -127,7 +127,7 @@ export default defineComponent({
     async postCurrency(currency: Currency) {
       const result = await this.$root.setter<Currency>('admin/currency', currency)
       if (result.ok) {
-        this.$root.currencies = (await this.$root.getter<Currency[]>('currency')).ok.data
+        await this.updateRoot()
         this._showForm = false
       }
       this.currencyToEdit = undefined
@@ -135,7 +135,13 @@ export default defineComponent({
     async deleteCurrency(currency: Currency) {
       const result = await this.$root.deleter('admin/currency', { _id: currency._id })
       if (result) {
-        this.$root.currencies = (await this.$root.getter<Currency[]>('currency')).ok.data
+        await this.updateRoot()
+      }
+    },
+    async updateRoot() {
+      const rootCurrencies = (await this.$root.getter<Currency[]>('currency')).ok?.data
+      if (rootCurrencies) {
+        this.$root.currencies = rootCurrencies
       }
     },
     clickFilter(header: keyof Filter<string>) {

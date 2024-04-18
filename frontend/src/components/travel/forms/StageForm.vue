@@ -1,39 +1,38 @@
 <template>
   <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
-  <div class="mb-3">
-    <div class="row">
-      <div class="col">
-        <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}<span class="text-danger">*</span></label>
-        <DateInput
-          id="startDateInput"
-          v-model="formStage.departure"
-          :withTime="true"
-          :min="minDate"
-          :max="maxDate"
-          :disabled="disabled"
-          required />
+    <div class="mb-3">
+      <div class="row">
+        <div class="col">
+          <label for="startDateInput" class="form-label">{{ $t('labels.departure') }}<span class="text-danger">*</span></label>
+          <DateInput
+            id="startDateInput"
+            v-model="formStage.departure"
+            :withTime="true"
+            :min="minDate"
+            :max="maxDate"
+            :disabled="disabled"
+            required />
+        </div>
+        <div class="col">
+          <label for="endDateInput" class="form-label"> {{ $t('labels.arrival') }}<span class="text-danger">*</span> </label>
+          <DateInput
+            id="endDateInput"
+            v-model="formStage.arrival"
+            :withTime="true"
+            :min="formStage.departure ? formStage.departure : minDate"
+            :max="maxDate"
+            :disabled="disabled"
+            required />
+        </div>
       </div>
-      <div class="col">
-        <label for="endDateInput" class="form-label"> {{ $t('labels.arrival') }}<span class="text-danger">*</span> </label>
-        <DateInput
-          id="endDateInput"
-          v-model="formStage.arrival"
-          :withTime="true"
-          :min="formStage.departure ? formStage.departure : minDate"
-          :max="maxDate"
-          :disabled="disabled"
-          required />
+      <div v-if="showDepartureAndArrivalOnDifferentDaysAlert" class="alert alert-warning d-flex px-2 py-1 mt-1" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span class="ms-3">
+          {{ $t('alerts.departureAndArrivalOnDifferentDaysX', { X: $t('labels.' + formStage.transport.type) }) }}
+        </span>
+        <button type="button" class="btn-close ms-auto" @click="showDepartureAndArrivalOnDifferentDaysAlert = false"></button>
       </div>
     </div>
-    <div v-if="showDepartureAndArrivalOnDifferentDaysAlert" class="alert alert-warning d-flex px-2 py-1 mt-1" role="alert">
-      <i class="bi bi-exclamation-triangle-fill"></i>
-      <span class="ms-3">
-        {{$t('alerts.departureAndArrivalOnDifferentDaysX', {X: $t('labels.' + formStage.transport.type) })}}
-      </span>
-      <button type="button" class="btn-close ms-auto" @click="showDepartureAndArrivalOnDifferentDaysAlert = false"></button>
-    </div>
-  </div>
-    
 
     <div class="row mb-3">
       <div class="col">
@@ -219,7 +218,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDate, datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
-import { baseCurrency, distanceRefundTypes, Place, Stage, transportTypes } from '../../../../../common/types.js'
+import { baseCurrency, distanceRefundTypes, Place, Stage, transportTypes, DocumentFile } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
@@ -289,9 +288,11 @@ export default defineComponent({
       )
     },
     departureAndArrivalOnDifferentDays() {
-      return !isNaN(new Date(this.formStage.departure).valueOf()) &&
+      return (
+        !isNaN(new Date(this.formStage.departure).valueOf()) &&
         !isNaN(new Date(this.formStage.arrival).valueOf()) &&
         datetimeToDateString(this.formStage.departure) !== datetimeToDateString(this.formStage.arrival)
+      )
     },
     calcMidnightCountries() {
       if (this.showMidnightCountries()) {
@@ -385,8 +386,12 @@ export default defineComponent({
       this.showDepartureAndArrivalOnDifferentDaysAlert = this.departureAndArrivalOnDifferentDays()
       // auto fill arrival when departure is set
       // departure is date object when entered manually by the user
-      if(this.formStage.departure instanceof Date && !isNaN(new Date(this.formStage.departure).valueOf()) && isNaN(new Date(this.formStage.arrival).valueOf())){
-        this.formStage.arrival =  datetimeToDate(this.formStage.departure)
+      if (
+        this.formStage.departure instanceof Date &&
+        !isNaN(new Date(this.formStage.departure).valueOf()) &&
+        isNaN(new Date(this.formStage.arrival).valueOf())
+      ) {
+        this.formStage.arrival = datetimeToDate(this.formStage.departure)
       }
     },
     'formStage.arrival': function () {

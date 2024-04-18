@@ -1,6 +1,7 @@
 {
   "include": ["**/*", "../common/**/*"],
   "compilerOptions": {
+    "allowJs": true,
     "strict": true,
     "isolatedModules": true,
     "module": "NodeNext",

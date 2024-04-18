@@ -129,7 +129,10 @@ export default defineComponent({
       if (result) {
         this.organisations = result.data
       }
-      this.$root.organisations = (await this.$root.getter<Organisation[]>('organisation')).ok.data
+      const rootOrganisations = (await this.$root.getter<Organisation[]>('organisation')).ok?.data
+      if (rootOrganisations) {
+        this.$root.organisations = rootOrganisations
+      }
     },
     clickFilter(header: keyof Filter<string>) {
       if (this._filter[header]) {

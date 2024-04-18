@@ -19,13 +19,14 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import Vueform from '@vueform/vueform'
 import '@vueform/vueform/dist/vueform.css'
-import vueformConfig from './vueform.config'
+import vueformConfig from './vueform.config.js'
 
 import {
   CountrySimple,
   Currency,
   GETResponse,
   HealthInsurance,
+  Locale,
   OrganisationSimple,
   ProjectSimple,
   Settings,
@@ -46,6 +47,7 @@ axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
+    $vueform: { i18n: { locale: Locale } }
     $router: typeof router
     $root: {
       getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
@@ -75,5 +77,5 @@ app.component('vSelect', vSelect)
 app.component('EasyDataTable', Vue3EasyDataTable)
 app.use(i18n)
 app.use(router)
-app.use(Vueform, vueformConfig)
+app.use(Vueform as any, vueformConfig)
 app.mount('#app')

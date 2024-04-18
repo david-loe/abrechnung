@@ -102,13 +102,14 @@ interface Filter<T> {
   name: T
   email: T
 }
+
 export default defineComponent({
   name: 'UserList',
   components: {},
   data() {
     return {
       users: [] as User[],
-      userToEdit: undefined as User | undefined,
+      userToEdit: undefined as any | undefined,
       userFormMode: 'add' as 'add' | 'edit',
       _showForm: false,
       filter: {
@@ -135,14 +136,14 @@ export default defineComponent({
   methods: {
     showForm(mode: 'add' | 'edit', user?: User) {
       this.userFormMode = mode
-      let formUser = user
+      let formUser: any = user
       if (formUser) {
         // reduce arrays of objects to arrays of _ids for vueform select elements
         const formUserSettings = Object.assign({}, formUser.settings)
         formUser = Object.assign({}, formUser, { settings: formUserSettings })
-        formUser.settings.lastCurrencies = user.settings.lastCurrencies.map((c) => c._id)
-        formUser.settings.lastCountries = user.settings.lastCountries.map((c) => c._id)
-        formUser.settings.projects = user.settings.projects.map((p) => p._id)
+        formUser.settings.lastCurrencies = user!.settings.lastCurrencies.map((c) => c._id)
+        formUser.settings.lastCountries = user!.settings.lastCountries.map((c) => c._id)
+        formUser.settings.projects = user!.settings.projects.map((p) => p._id)
       }
       this.userToEdit = formUser
       this._showForm = true

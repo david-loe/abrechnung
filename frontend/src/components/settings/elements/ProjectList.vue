@@ -146,7 +146,10 @@ export default defineComponent({
       if (result) {
         this.projects = result.data
       }
-      this.$root.projects = (await this.$root.getter<Project[]>('project')).ok.data
+      const rootProjects = (await this.$root.getter<Project[]>('project')).ok?.data
+      if(rootProjects){
+        this.$root.projects = rootProjects
+      }
     },
     clickFilter(header: keyof Filter<string>) {
       if (this._filter[header]) {
