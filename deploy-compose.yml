@@ -5,10 +5,10 @@ services:
     depends_on:
       - db
     # volumes:
-      # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/advance:/reports/advance #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/healthCareCost:/reports/healthCareCost #BACKEND_SAVE_REPORTS_ON_DISK
+    # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
+    # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
+    # - ./reports/advance:/reports/advance #BACKEND_SAVE_REPORTS_ON_DISK
+    # - ./reports/healthCareCost:/reports/healthCareCost #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:
@@ -23,7 +23,7 @@ services:
       - ${FRONTEND_PORT}:80
     env_file:
       - .env
-  
+
   db:
     image: mongo:latest
     command: --quiet --logpath /dev/null
