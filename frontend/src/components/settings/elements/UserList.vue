@@ -135,10 +135,11 @@ export default defineComponent({
   methods: {
     showForm(mode: 'add' | 'edit', user?: User) {
       this.userFormMode = mode
-      // reduce arrays of objects to arrays of _ids for vueform select elements
-      const formUserSettings = Object.assign({}, user.settings)
-      const formUser = Object.assign({}, user, { settings: formUserSettings })
-      if (user) {
+      let formUser = user
+      if (formUser) {
+        // reduce arrays of objects to arrays of _ids for vueform select elements
+        const formUserSettings = Object.assign({}, formUser.settings)
+        formUser = Object.assign({}, formUser, { settings: formUserSettings })
         formUser.settings.lastCurrencies = user.settings.lastCurrencies.map((c) => c._id)
         formUser.settings.lastCountries = user.settings.lastCountries.map((c) => c._id)
         formUser.settings.projects = user.settings.projects.map((p) => p._id)
