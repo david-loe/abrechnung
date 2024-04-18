@@ -218,7 +218,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
+import { datetimeToDate, datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
 import { baseCurrency, distanceRefundTypes, Place, Stage, transportTypes } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
@@ -383,6 +383,11 @@ export default defineComponent({
     'formStage.departure': function () {
       this.calcMidnightCountries()
       this.showDepartureAndArrivalOnDifferentDaysAlert = this.departureAndArrivalOnDifferentDays()
+      // auto fill arrival when departure is set
+      // departure is date object when entered manually by the user
+      if(this.formStage.departure instanceof Date && !isNaN(new Date(this.formStage.departure).valueOf()) && isNaN(new Date(this.formStage.arrival).valueOf())){
+        this.formStage.arrival =  datetimeToDate(this.formStage.departure)
+      }
     },
     'formStage.arrival': function () {
       this.calcMidnightCountries()
