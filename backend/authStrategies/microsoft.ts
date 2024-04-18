@@ -4,7 +4,7 @@ import { NewUser, addAdminIfNone } from './index.js'
 
 interface msProfile {
   provider: 'microsoft'
-  name: { familyName: string; givenName: string }
+  name: { familyName: string; givenName: string } | { familyName: null; givenName: null }
   id: string
   displayName: string
   emails: { type: string; value: string }[]
@@ -13,13 +13,13 @@ interface msProfile {
     '@odata.context': string
     businessPhones: string[]
     displayName: string
-    givenName: string
+    givenName: string | null
     jobTitle: string | null
     mail: string
     mobilePhone: string | null
     officeLocation: string | null
     preferredLanguage: string | null
-    surname: string
+    surname: string | null
     userPrincipalName: string
     id: string
   }
@@ -39,10 +39,14 @@ const microsoft = new MicrosoftStrategy(
     if (!user && email) {
       user = await User.findOne({ email: email })
     }
+    let displayNameSplit = profile._json.displayName.split(' ')
     const newUser: NewUser = {
       fk: { microsoft: profile._json.id },
       email: email,
-      name: { familyName: profile._json.surname, givenName: profile._json.givenName }
+      name: {
+        familyName: profile._json.surname || (displayNameSplit.shift() as string), // first part of displayNameSplit
+        givenName: profile._json.givenName || displayNameSplit.length > 1 ? displayNameSplit.join(' ') : '' // rest of displayNameSplit
+      }
     }
     if (!user) {
       user = new User(newUser)
