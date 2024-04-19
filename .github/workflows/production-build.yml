@@ -24,6 +24,6 @@ jobs:
           replace: 'NODE_ENV=production'
           include: '.env'
       - name: Build Backend
-        run: docker compose build backend
+        run: docker compose build
       - name: Build Frontend
-        run: docker compose run frontend "npm run build"
+        run: docker run abrechnung-frontend "npm run build"
