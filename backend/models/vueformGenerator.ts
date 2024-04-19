@@ -60,7 +60,7 @@ function mapSchemaTypeToVueformElement(
   if (schemaType.info) {
     vueformElement['info'] = translate(schemaType.info, language)
   }
-  if (isFlatType(schemaType.type) && schemaType.default !== undefined) {
+  if (isFlatType(schemaType.type) && schemaType.default !== undefined && schemaType.default !== null) {
     vueformElement['default'] = schemaType.default
   }
 
@@ -88,10 +88,10 @@ function mapSchemaTypeToVueformElement(
     }
   } else if (schemaType.type === Number) {
     vueformElement['type'] = 'text'
-    vueformElement['input-type'] = 'number'
+    vueformElement['inputType'] = 'number'
     vueformElement['rules'].push('numeric')
     vueformElement['attrs'] = { step: 'any' }
-    vueformElement['force-numbers'] = true
+    vueformElement['forceNumbers'] = true
 
     vueformElement['placeholder'] = vueformElement['label']
     delete vueformElement['label']
@@ -110,7 +110,7 @@ function mapSchemaTypeToVueformElement(
       if (schemaType.type[0].ref === 'DocumentFile') {
         vueformElement['multiple'] = true
       } else {
-        vueformElement['extend-options'] = { mode: 'multiple' }
+        vueformElement['extendOptions'] = { mode: 'multiple' }
         vueformElement['placeholder'] = vueformElement['label']
         delete vueformElement['label']
       }
