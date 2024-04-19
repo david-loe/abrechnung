@@ -193,6 +193,7 @@
     "invoiceDate": "Date of invoice",
     "language": "Language",
     "lastCountries": "Last countries",
+    "lastCurrencies": "Last currencies",
     "lastPlaceOfWork": "Last place of work",
     "location": "Location",
     "logo": "Logo",
