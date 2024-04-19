@@ -1,9 +1,9 @@
-import i18next from 'i18next'
+import i18next, { Resource } from 'i18next'
 import { loadLocales } from '../common/locales/load.js'
 import { Locale } from '../common/types.js'
 
 function loadLocaleMessages() {
-  const messages: i18next.Resource = {}
+  const messages: Resource = {}
   const locales = loadLocales(process.env.VITE_I18N_LOCALES_OVERWRITE)
   for (const lang in locales) {
     messages[lang] = { translation: locales[lang as Locale] }
