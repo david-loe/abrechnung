@@ -1,11 +1,13 @@
 {
   "include": ["**/*", "../common/**/*"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "allowJs": true,
     "strict": true,
     "isolatedModules": true,
-    "module": "NodeNext",
+    "module": "ESNext",
     "target": "ES2022",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
