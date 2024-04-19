@@ -19,4 +19,6 @@ COPY frontend/ .
 
 COPY common /common
 
-CMD ["/bin/sh", "-c", "npm run build && nginx -g 'daemon off;'"]
+ENTRYPOINT [ "/bin/sh", "-c" ]
+
+CMD ["npm run build && nginx -g 'daemon off;'"]

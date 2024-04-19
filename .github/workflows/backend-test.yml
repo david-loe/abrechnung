@@ -22,4 +22,4 @@ jobs:
       - name: Wait that backend initializes db
         run: sleep 15s
       - name: Run Tests
-        run: docker compose exec -T backend npm test
+        run: docker compose exec backend npm test
