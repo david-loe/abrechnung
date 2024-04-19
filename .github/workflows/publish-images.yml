@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags: ['**']
+    branches: ['main']
 
 permissions:
   packages: write
@@ -57,6 +58,7 @@ jobs:
             davidloe/abrechnung-frontend
             ghcr.io/david-loe/abrechnung-frontend
           tags: |
+            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
