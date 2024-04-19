@@ -10,12 +10,14 @@
         {
           field: 'identifier',
           criteria: filter.identifier,
-          comparison: (value: Project['identifier'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: Project['identifier'], criteria: string): boolean =>
+            value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         },
         {
           field: 'name',
           criteria: filter.name,
-          comparison: (value: Project['name'], criteria: string): boolean => (!Boolean(value) && !Boolean(criteria)) || (value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1)
+          comparison: (value: Project['name'], criteria: string): boolean =>
+            (!Boolean(value) && !Boolean(criteria)) || value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         }
       ]"
       :headers="[
@@ -49,7 +51,7 @@
         </div>
       </template>
       <template #item-organisation="{ organisation }">
-        {{ getById<OrganisationSimple>(organisation, $root.organisations)?.name }}
+        {{ getById(organisation, $root.organisations)?.name }}
       </template>
       <template #item-buttons="project">
         <button type="button" class="btn btn-light" @click="showForm('edit', project)">
@@ -147,7 +149,7 @@ export default defineComponent({
         this.projects = result.data
       }
       const rootProjects = (await this.$root.getter<Project[]>('project')).ok?.data
-      if(rootProjects){
+      if (rootProjects) {
         this.$root.projects = rootProjects
       }
     },

@@ -94,8 +94,8 @@
           mode === 'add'
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
-            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
-            : $t('labels.save')
+              ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+              : $t('labels.save')
         }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">

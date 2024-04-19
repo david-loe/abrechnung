@@ -17,14 +17,13 @@
       </div>
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
-        <SettingsForm v-if="entry ==='settings'"></SettingsForm>
-        <UserList v-else-if="entry === 'users'"</UserList>
-        <OrganisationList v-else-if="entry === 'organisations'"</OrganisationList>
-        <ProjectList v-else-if="entry === 'projects'"</ProjectList>
-        <CountryList v-else-if="entry === 'countries'"</CountryList>
-        <CurrencyList v-else-if="entry === 'currencies'"</CurrencyList>
-        <HealthInsuranceList v-else-if="entry === 'healthInsurances'"</HealthInsuranceList>
-
+        <SettingsForm v-if="entry === 'settings'"></SettingsForm>
+        <UserList v-else-if="entry === 'users'"></UserList>
+        <OrganisationList v-else-if="entry === 'organisations'"></OrganisationList>
+        <ProjectList v-else-if="entry === 'projects'"></ProjectList>
+        <CountryList v-else-if="entry === 'countries'"></CountryList>
+        <CurrencyList v-else-if="entry === 'currencies'"></CurrencyList>
+        <HealthInsuranceList v-else-if="entry === 'healthInsurances'"></HealthInsuranceList>
       </div>
     </div>
   </div>
@@ -44,7 +43,7 @@ const entries = ['users', 'organisations', 'projects', 'countries', 'currencies'
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, SettingsForm , OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList},
+  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList },
   data() {
     return {
       entries,

@@ -138,18 +138,18 @@ import { defineComponent } from 'vue'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
-CountrySimple,
-Currency,
-GETResponse,
-HealthInsurance,
-Locale,
-OrganisationSimple,
-ProjectSimple,
-SETResponse,
-Settings,
-User,
-accesses,
-locales
+  CountrySimple,
+  Currency,
+  GETResponse,
+  HealthInsurance,
+  Locale,
+  OrganisationSimple,
+  ProjectSimple,
+  SETResponse,
+  Settings,
+  User,
+  accesses,
+  locales
 } from '../../common/types.js'
 
 export interface Alert {

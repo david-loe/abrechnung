@@ -10,12 +10,14 @@
         {
           field: 'name',
           criteria: filter.name,
-          comparison: (value: HealthInsurance['name'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: HealthInsurance['name'], criteria: string): boolean =>
+            value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         },
         {
           field: 'email',
           criteria: filter.email,
-          comparison: (value: HealthInsurance['email'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: HealthInsurance['email'], criteria: string): boolean =>
+            value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         }
       ]"
       :headers="[{ text: $t('labels.name'), value: 'name' }, { text: $t('labels.email'), value: 'email' }, { value: 'buttons' }]">

@@ -56,14 +56,14 @@ type SetterPartial<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial1<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : _SetterPartial2<T[P], U> | undefined
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial1<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : _SetterPartial2<T[P], U> | undefined
     }
   : T
 
@@ -84,14 +84,14 @@ type _SetterPartial2<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial1<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : _SetterPartial1<T[P], U> | undefined
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial1<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : _SetterPartial1<T[P], U> | undefined
     }
   : T
 
@@ -112,14 +112,14 @@ type _SetterPartial1<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial1<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : T[P]
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial1<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : T[P]
     }
   : T
 

@@ -10,7 +10,8 @@
         {
           field: 'name',
           criteria: filter.name,
-          comparison: (value: Currency['name'], criteria: string): boolean => value[$i18n.locale as Locale].toLowerCase().indexOf(criteria.toLowerCase()) !== -1
+          comparison: (value: Currency['name'], criteria: string): boolean =>
+            value[$i18n.locale as Locale].toLowerCase().indexOf(criteria.toLowerCase()) !== -1
         },
         {
           field: '_id',
