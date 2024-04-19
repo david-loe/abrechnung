@@ -45,6 +45,7 @@ jobs:
             davidloe/abrechnung-backend
             ghcr.io/david-loe/abrechnung-backend
           tags: |
+            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
