@@ -28,6 +28,14 @@ Dieser statische Währungsrechner zeigt den offiziellen monatlichen Buchungskurs
 
 [API Documentation](https://david-loe.github.io/abrechnung/)
 
+## Deploy
+
+Using prebuilt docker images:
+
+https://github.com/david-loe/abrechnung/blob/main/deploy-compose.yml
+
+ℹ Don't forget to specify [environment variables](.env.example) in a `.env` file or directly in the compose.yml.
+
 ## Run
 
 ### Gitpod

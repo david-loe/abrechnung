@@ -25,8 +25,7 @@ services:
       - .env
 
   db:
-    image: mongo:latest
-    command: --quiet --logpath /dev/null
+    image: mongo
     restart: always
     volumes:
       - db_data:/data/db
