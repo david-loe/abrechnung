@@ -42,7 +42,6 @@ export class TravelController extends Controller {
   @Post()
   public async postTravel(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
-
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
@@ -266,15 +265,15 @@ export class TravelApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
+      ; (extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
       if (!(extendedBody as TravelApplication).name && (extendedBody as TravelApplication).startDate) {
         var date = new Date((extendedBody as TravelApplication).startDate!)
-        ;(extendedBody as TravelApplication).name =
-          (extendedBody as TravelApplication).destinationPlace?.place +
-          ' ' +
-          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-          ' ' +
-          date.getUTCFullYear()
+          ; (extendedBody as TravelApplication).name =
+            (extendedBody as TravelApplication).destinationPlace?.place +
+            ' ' +
+            i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+            ' ' +
+            date.getUTCFullYear()
       }
     }
     const cb = async (travel: ITravel) => {

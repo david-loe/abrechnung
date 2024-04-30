@@ -41,86 +41,86 @@ type Data = string
 
 type SetterPartial<T, U extends string> = T extends object
   ? {
-      [P in Exclude<keyof T, U>]?: T[P] extends
-        | string
-        | number
-        | Date
-        | boolean
-        | null
-        | undefined
-        | Types.ObjectId
-        | string[]
-        | number[]
-        | Date[]
-        | boolean[]
-        | Types.ObjectId[]
-        ? T[P] | undefined | null
-        : T[P] extends Types.Buffer | null | undefined
-          ? Data | Types.Buffer | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial1<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : _SetterPartial2<T[P], U> | undefined
-    }
+    [P in Exclude<keyof T, U>]?: T[P] extends
+    | string
+    | number
+    | Date
+    | boolean
+    | null
+    | undefined
+    | Types.ObjectId
+    | string[]
+    | number[]
+    | Date[]
+    | boolean[]
+    | Types.ObjectId[]
+    ? T[P] | undefined | null
+    : T[P] extends Types.Buffer | null | undefined
+    ? Data | Types.Buffer | undefined
+    : T[P] extends (infer ElementType)[] | null | undefined
+    ? (ElementType extends { _id: infer idType extends _id | string }
+      ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+      : _SetterPartial2<ElementType, U>[] | null | undefined)
+    : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+    ? T[P] | IdDocument<idType> | null | undefined
+    : _SetterPartial2<T[P], U> | undefined
+  }
   : T
 
 type _SetterPartial2<T, U extends string> = T extends object
   ? {
-      [P in Exclude<keyof T, U>]?: T[P] extends
-        | string
-        | number
-        | Date
-        | boolean
-        | null
-        | undefined
-        | Types.ObjectId
-        | string[]
-        | number[]
-        | Date[]
-        | boolean[]
-        | Types.ObjectId[]
-        ? T[P] | undefined | null
-        : T[P] extends Types.Buffer | null | undefined
-          ? Data | Types.Buffer | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial1<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : _SetterPartial1<T[P], U> | undefined
-    }
+    [P in Exclude<keyof T, U>]?: T[P] extends
+    | string
+    | number
+    | Date
+    | boolean
+    | null
+    | undefined
+    | Types.ObjectId
+    | string[]
+    | number[]
+    | Date[]
+    | boolean[]
+    | Types.ObjectId[]
+    ? T[P] | undefined | null
+    : T[P] extends Types.Buffer | null | undefined
+    ? Data | Types.Buffer | undefined
+    : T[P] extends (infer ElementType)[] | null | undefined
+    ? (ElementType extends { _id: infer idType extends _id | string }
+      ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+      : _SetterPartial2<ElementType, U>[] | null | undefined)
+    : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+    ? T[P] | IdDocument<idType> | null | undefined
+    : _SetterPartial1<T[P], U> | undefined
+  }
   : T
 
 type _SetterPartial1<T, U extends string> = T extends object
   ? {
-      [P in Exclude<keyof T, U>]?: T[P] extends
-        | string
-        | number
-        | Date
-        | boolean
-        | null
-        | undefined
-        | Types.ObjectId
-        | string[]
-        | number[]
-        | Date[]
-        | boolean[]
-        | Types.ObjectId[]
-        ? T[P] | undefined | null
-        : T[P] extends Types.Buffer | null | undefined
-          ? Data | Types.Buffer | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial1<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial1<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : T[P]
-    }
+    [P in Exclude<keyof T, U>]?: T[P] extends
+    | string
+    | number
+    | Date
+    | boolean
+    | null
+    | undefined
+    | Types.ObjectId
+    | string[]
+    | number[]
+    | Date[]
+    | boolean[]
+    | Types.ObjectId[]
+    ? T[P] | undefined | null
+    : T[P] extends Types.Buffer | null | undefined
+    ? Data | Types.Buffer | undefined
+    : T[P] extends (infer ElementType)[] | null | undefined
+    ? (ElementType extends { _id: infer idType extends _id | string }
+      ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+      : _SetterPartial2<ElementType, U>[] | null | undefined)
+    : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+    ? T[P] | IdDocument<idType> | null | undefined
+    : T[P]
+  }
   : T
 
 export type NoPost = 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor' | 'exchangeRate' | 'state'
@@ -154,7 +154,7 @@ export interface DeleterForArrayElemetQuery extends DeleterQuery {
 
 export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType = any>
   extends DeleterOptions<ModelType>,
-    DeleterForArrayElemetQuery {
+  DeleterForArrayElemetQuery {
   arrayElementKey: keyof ModelType
   beforeDelete?(element: ArrayElementType): Promise<any>
 }
@@ -276,12 +276,12 @@ export class Controller extends TsoaController {
         throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
       }
     } else if (options.allowNew) {
-      ;(parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
+      ; (parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
     } else {
       throw new NotAllowedError(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if (options.sortFn) {
-      ;(parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
+      ; (parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
     }
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()
@@ -321,7 +321,7 @@ export class Controller extends TsoaController {
         if (options.beforeDelete) {
           await options.beforeDelete((parentObject[options.arrayElementKey] as Array<any>)[i])
         }
-        ;(parentObject[options.arrayElementKey] as Array<any>).splice(i, 1)
+        ; (parentObject[options.arrayElementKey] as Array<any>).splice(i, 1)
         break
       }
     }

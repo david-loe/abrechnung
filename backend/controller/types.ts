@@ -31,6 +31,6 @@ export interface TravelPost extends Omit<TravelSimple, 'state' | 'comments' | 'c
   days: TravelDayPost[]
 }
 
-export interface TravelDayPost extends Omit<TravelDay, 'refunds' | 'special' | 'country'> {
+export interface TravelDayPost extends Omit<TravelDay, 'refunds' | 'special' | 'country' | '_id'> {
   date: Date
 }

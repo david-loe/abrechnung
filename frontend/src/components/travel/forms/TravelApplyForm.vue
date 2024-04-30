@@ -91,7 +91,7 @@
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{
-          mode === 'add'
+          mode === 'add' && !askOwner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
               ? $t('labels.reapplyForX', { X: $t('labels.travel') })
