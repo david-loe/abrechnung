@@ -551,10 +551,22 @@
 											"type": "string"
 										},
 										"budget": {
-											"$ref": "#/components/schemas/BaseCurrencyMoney"
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
 										},
 										"balance": {
-											"$ref": "#/components/schemas/BaseCurrencyMoney"
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
 										},
 										"organisation": {
 											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -610,9 +622,6 @@
 													"type": "array"
 												}
 											},
-											"required": [
-												"de"
-											],
 											"type": "object"
 										},
 										"name": {
@@ -624,10 +633,6 @@
 													"type": "string"
 												}
 											},
-											"required": [
-												"en",
-												"de"
-											],
 											"type": "object"
 										},
 										"_id": {
@@ -660,10 +665,6 @@
 													"type": "string"
 												}
 											},
-											"required": [
-												"en",
-												"de"
-											],
 											"type": "object"
 										},
 										"_id": {
@@ -1155,10 +1156,22 @@
 													"type": "string"
 												},
 												"budget": {
-													"$ref": "#/components/schemas/BaseCurrencyMoney"
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
 												},
 												"balance": {
-													"$ref": "#/components/schemas/BaseCurrencyMoney"
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
 												},
 												"organisation": {
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -1214,9 +1227,6 @@
 															"type": "array"
 														}
 													},
-													"required": [
-														"de"
-													],
 													"type": "object"
 												},
 												"name": {
@@ -1228,10 +1238,6 @@
 															"type": "string"
 														}
 													},
-													"required": [
-														"en",
-														"de"
-													],
 													"type": "object"
 												},
 												"_id": {
@@ -1264,10 +1270,6 @@
 															"type": "string"
 														}
 													},
-													"required": [
-														"en",
-														"de"
-													],
 													"type": "object"
 												},
 												"_id": {
@@ -1452,10 +1454,22 @@
 													"type": "string"
 												},
 												"budget": {
-													"$ref": "#/components/schemas/BaseCurrencyMoney"
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
 												},
 												"balance": {
-													"$ref": "#/components/schemas/BaseCurrencyMoney"
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
 												},
 												"organisation": {
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -1511,9 +1525,6 @@
 															"type": "array"
 														}
 													},
-													"required": [
-														"de"
-													],
 													"type": "object"
 												},
 												"name": {
@@ -1525,10 +1536,6 @@
 															"type": "string"
 														}
 													},
-													"required": [
-														"en",
-														"de"
-													],
 													"type": "object"
 												},
 												"_id": {
@@ -1561,10 +1568,6 @@
 															"type": "string"
 														}
 													},
-													"required": [
-														"en",
-														"de"
-													],
 													"type": "object"
 												},
 												"_id": {
@@ -2655,51 +2658,33 @@
 						"type": "string"
 					},
 					"days": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
+						"items": {
+							"properties": {
+								"cateringNoRefund": {
 									"properties": {
-										"cateringNoRefund": {
-											"properties": {
-												"dinner": {
-													"type": "boolean"
-												},
-												"lunch": {
-													"type": "boolean"
-												},
-												"breakfast": {
-													"type": "boolean"
-												}
-											},
-											"required": [
-												"dinner",
-												"lunch",
-												"breakfast"
-											],
-											"type": "object"
+										"dinner": {
+											"type": "boolean"
 										},
-										"purpose": {
-											"$ref": "#/components/schemas/PurposeSimple"
+										"lunch": {
+											"type": "boolean"
 										},
-										"date": {
-											"type": "string",
-											"format": "date-time"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										"breakfast": {
+											"type": "boolean"
 										}
 									},
 									"type": "object"
 								},
-								"type": "array"
-							}
-						]
+								"purpose": {
+									"$ref": "#/components/schemas/PurposeSimple"
+								},
+								"date": {
+									"type": "string",
+									"format": "date-time"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					},
 					"lastPlaceOfWork": {
 						"properties": {
