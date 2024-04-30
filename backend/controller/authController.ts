@@ -25,7 +25,7 @@ const microsoftHandler = useMicrosoft
     }
   : NotImplementedMiddleware
 
-const microsoftCallbackHandler = useMicrosoft ? (req: ExRequest, res: ExResponse, next: NextFunction) => {} : NotImplementedMiddleware
+const microsoftCallbackHandler = useMicrosoft ? passport.authenticate('microsoft') : NotImplementedMiddleware
 
 const magicloginHandler = useMagicLogin
   ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {

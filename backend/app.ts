@@ -2,7 +2,6 @@ import MongoStore from 'connect-mongo'
 import cors from 'cors'
 import express, { Request as ExRequest, Response as ExResponse } from 'express'
 import session from 'express-session'
-import { MongoClient } from 'mongodb'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
@@ -26,7 +25,7 @@ app.use(
 
 app.use(
   session({
-    store: MongoStore.create({ client: mongoose.connection.getClient() as unknown as MongoClient }),
+    store: MongoStore.create({ client: mongoose.connection.getClient() }),
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
