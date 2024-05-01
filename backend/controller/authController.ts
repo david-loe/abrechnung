@@ -3,7 +3,7 @@ import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
 import magiclogin from '../authStrategies/magiclogin.js'
-import User, { UserDoc } from '../models/user.js'
+import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
@@ -30,7 +30,7 @@ const microsoftCallbackHandler = useMicrosoft ? passport.authenticate('microsoft
 const magicloginHandler = useMagicLogin
   ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
       var user = await User.findOne({ 'fk.magiclogin': req.body.destination })
-      if (user && (await (user as UserDoc).isActive())) {
+      if (user && (await user.isActive())) {
         magiclogin.send(req, res)
       } else {
         throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)

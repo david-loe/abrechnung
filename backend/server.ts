@@ -1,6 +1,5 @@
 import { CronJob } from 'cron'
-import { HydratedDocument } from 'mongoose'
-import { User as IUser, Locale, locales } from '../common/types.js'
+import { Locale, locales } from '../common/types.js'
 import app from './app.js'
 import { fetchAndUpdateLumpSums } from './db.js'
 import { countrySchema } from './models/country.js'
@@ -9,14 +8,14 @@ import { healthInsuranceSchema } from './models/healthInsurance.js'
 import { organisationSchema } from './models/organisation.js'
 import { projectSchema } from './models/project.js'
 import { settingsSchema } from './models/settings.js'
-import { userSchema } from './models/user.js'
+import { UserDoc, userSchema } from './models/user.js'
 import { generateForms } from './models/vueformGenerator.js'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 
 declare global {
   namespace Express {
-    interface User extends HydratedDocument<IUser> {}
+    interface User extends UserDoc {}
     interface AuthInfo {
       redirect?: string
     }

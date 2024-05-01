@@ -106,7 +106,7 @@ export default defineComponent({
     },
     async postOrganisation(organisation: Organisation) {
       var headers = {}
-      if (organisation.logo) {
+      if (organisation.logo && organisation.logo.data) {
         headers = {
           'Content-Type': 'multipart/form-data'
         }

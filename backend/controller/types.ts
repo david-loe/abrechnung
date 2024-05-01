@@ -3,6 +3,10 @@ import { SetterBody } from './controller.js'
 
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
+export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
+  return (doc as { _id: idType })._id || (doc as idType)
+}
+
 export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
   /**
    * @format binary
