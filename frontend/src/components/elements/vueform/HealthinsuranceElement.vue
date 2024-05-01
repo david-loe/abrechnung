@@ -6,8 +6,8 @@
       <!-- @vueform/multiselect copmonent -->
       <Multiselect
         v-bind="fieldOptions"
-        v-if="$root.organisations.length > 0"
-        :options="$root.organisations"
+        v-if="$root.healthInsurances.length > 0"
+        :options="$root.healthInsurances"
         valueProp="_id"
         searchable
         :searchFilter="customFilterFunction"
@@ -85,7 +85,7 @@ import { ref } from 'vue'
 
 export default defineElement({
   ...SelectElement, // adding props, mixins, emits
-  name: 'OrganisationElement',
+  name: 'HealthinsuranceElement',
   components: { Multiselect },
   props: Object.assign(SelectElement.props, {
     native: { type: Boolean, default: false }

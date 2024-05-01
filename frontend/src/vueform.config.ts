@@ -6,6 +6,7 @@ import en from '@vueform/vueform/locales/en'
 import CountryElement from './components/elements/vueform/CountryElement.vue'
 import CurrencyElement from './components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from './components/elements/vueform/DocumentfileElement.vue'
+import HealthinsuranceElement from './components/elements/vueform/HealthinsuranceElement.vue'
 import OrganisationElement from './components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from './components/elements/vueform/ProjectElement.vue'
 
@@ -24,7 +25,7 @@ function deepReplace(obj: any, search: any, replacement: any) {
 
 export default defineConfig({
   theme: vueform,
-  elements: [CountryElement, DocumentfileElement, OrganisationElement, CurrencyElement, ProjectElement],
+  elements: [CountryElement, DocumentfileElement, OrganisationElement, CurrencyElement, ProjectElement, HealthinsuranceElement],
   locales: { de, en },
   locale: 'de',
   env: import.meta.env.MODE,

@@ -145,6 +145,7 @@ export default defineComponent({
         formUser.settings.lastCountries = user!.settings.lastCountries.map((c) => c._id)
         formUser.settings.projects = user!.settings.projects.map((p) => p._id)
         formUser.settings.organisation = user!.settings.organisation?._id
+        formUser.settings.insurance = user!.settings.insurance?._id
       }
       this.userToEdit = formUser
       this._showForm = true
