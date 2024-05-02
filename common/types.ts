@@ -403,6 +403,11 @@ export interface SETResponse<T> {
   result: T
 }
 
+export const userReplaceCollections = ['travels', 'expensereports', 'healthcarecosts'] as const
+export type UserReplaceReferencesResult = {
+  [key in (typeof userReplaceCollections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number }
+}
+
 export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel
 export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is TravelSimple
 export function reportIsTravel(report: any): report is { travelInsideOfEU: boolean } {
@@ -423,6 +428,8 @@ export function reportIsExpenseReport(report: any): report is any {
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
+
+export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 export const baseCurrency: Currency = {
   _id: 'EUR',

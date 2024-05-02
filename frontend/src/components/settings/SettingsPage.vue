@@ -18,7 +18,12 @@
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'"></SettingsForm>
-        <UserList v-else-if="entry === 'users'"></UserList>
+        <template v-else-if="entry === 'users'">
+          <UserList class="mb-5"</UserList>
+          <h2>{{ $t('labels.mergeUsers') }}</h2>
+          <UserMerge></UserMerge>
+        </template>
+        
         <OrganisationList v-else-if="entry === 'organisations'"></OrganisationList>
         <ProjectList v-else-if="entry === 'projects'"></ProjectList>
         <CountryList v-else-if="entry === 'countries'"></CountryList>
@@ -38,12 +43,13 @@ import OrganisationList from './elements/OrganisationList.vue'
 import ProjectList from './elements/ProjectList.vue'
 import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
+import UserMerge from './elements/UserMerge.vue'
 
 const entries = ['users', 'organisations', 'projects', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList },
+  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList, UserMerge },
   data() {
     return {
       entries,

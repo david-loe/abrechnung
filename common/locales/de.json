@@ -13,14 +13,15 @@
     "user": "Home"
   },
   "alerts": {
-    "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
+    "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "db": {
       "createdSettings": "Einstellungen wurden vom Standard erstellt",
       "success": "Erfolgreich mit der Datenbank verbunden.",
       "updatedSettings": "Einstellungen wurden aktualisiert"
     },
+    "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
@@ -47,6 +48,7 @@
     "notAllowed": "Nicht erlaubt!",
     "notFound": "Nichts gefunden!",
     "NotImplemented": "Nicht implementiert!",
+    "reloadRequired": "Neuladen erforderlich",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "successDeleting": "Gelöscht",
     "successSaving": "Gespeichert",
@@ -140,6 +142,7 @@
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
     "deleteX": "{X} löschen",
+    "delOverwritten": "Soll der zu überschreibende Benutzer gelöscht werden?",
     "departure": "Abfahrt /-flug",
     "description": "Beschreibung",
     "destinationPlace": "Reiseziel",
@@ -204,6 +207,7 @@
     "lunchCateringLumpSumCut": "Verpflegungspauschalenkürung fürs Mittagessen",
     "mailToInsurance": "E-Mail an Versicherung",
     "maxTravelDayCount": "Maximale Länge eine Dienstreise [Tage]",
+    "mergeUsers": "Benutzer zusammenführen",
     "midnight": "24 Uhr",
     "midnightCountries": "Erreichte Länder um Mitternacht",
     "mixed": "Gemischt",
@@ -296,6 +300,7 @@
     "userCanSeeAllProjects": "Benutzer können ALLE Projekte sehen",
     "username": "Benutzername",
     "users": "Benutzer",
+    "userToOverwrite": "Benutzer der überschrieben werden soll",
     "validFrom": "Gültig ab",
     "vehicleRegistration": "Fahrzeugschein",
     "vehicleRegistrationWhenUsingOwnCar": "Fahrzeugschein wenn mit eigenem Auto unterwegs",
