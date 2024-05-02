@@ -70,7 +70,7 @@ export default defineComponent({
       hasData: false,
       hasMeta: false,
       data: [] as any[],
-      meta: { countPages: -1, page: -1 },
+      meta: { countPages: -1, page: -1, limit: 12 },
       search: false,
       searchFilter: this.default()
     }
@@ -108,7 +108,7 @@ export default defineComponent({
       delete queryParams.filter
       queryParams.filterJSON = filterJSON !== 'e30=' ? filterJSON : undefined
 
-      var result = (await this.$root.getter<any[]>(this.endpoint, Object.assign({}, queryParams, { page }))).ok
+      var result = (await this.$root.getter<any[]>(this.endpoint, Object.assign({}, queryParams, { page, limit: this.meta.limit }))).ok
       if (result) {
         this.data = result.data
         this.hasData = true
