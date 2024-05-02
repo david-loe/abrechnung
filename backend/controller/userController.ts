@@ -73,6 +73,7 @@ export class UserController extends Controller {
 @Security('cookieAuth', ['user', 'examine/expenseReport'])
 @Security('cookieAuth', ['user', 'examine/healthCareCost'])
 @Security('cookieAuth', ['user', 'confirm/healthCareCost'])
+@Security('cookieAuth', ['user', 'admin'])
 export class UsersController extends Controller {
   @Get()
   public async getUsers(@Queries() query: GetterQuery<IUser>) {
