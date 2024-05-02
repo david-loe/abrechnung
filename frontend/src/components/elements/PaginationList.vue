@@ -20,7 +20,10 @@
                       </div>
                     </div>
                     <div class="col-auto">
-                      <UserSelector v-model="searchFilter.owner" @update:model-value="getData(meta.page)"></UserSelector>
+                      <UserSelector
+                        v-model="searchFilter.owner"
+                        @update:model-value="getData(meta.page)"
+                        :placeholder="$t('labels.owner')"></UserSelector>
                     </div>
                   </div>
                 </form>

@@ -13,14 +13,15 @@
     "user": "Home"
   },
   "alerts": {
-    "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
     "areYouSureDelete": "Are you sure that you want to delete this?",
+    "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "countryChangeBetweenStages": "Country change between consecutive stages",
     "db": {
       "createdSettings": "Created Settings from Default",
       "success": "Successfully connected to the Database.",
       "updatedSettings": "Updated Settings"
     },
+    "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
     "fillOut": "Please provide the following information so we can better match your statements.",
@@ -47,6 +48,7 @@
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
     "NotImplemented": "Not implemented!",
+    "reloadRequired": "Reload required",
     "stagesOverlapping": "Stages are overlapping",
     "successDeleting": "Deleted successfully",
     "successSaving": "Saved successfully",
@@ -140,6 +142,7 @@
     "defaultAccess": "Default access rights",
     "delete": "Delete",
     "deleteX": "Delete {X}",
+    "delOverwritten": "Should the overwritten user be deleted?",
     "departure": "Departure",
     "description": "Description",
     "destinationPlace": "Destination place",
@@ -204,6 +207,7 @@
     "lunchCateringLumpSumCut": "Catering lump sum cut for lunch",
     "mailToInsurance": "Mail to insurance",
     "maxTravelDayCount": "Maximum length of a business trip [days]",
+    "mergeUsers": "Merge Users",
     "midnight": "12AM",
     "midnightCountries": "Countries reached by midnight",
     "mixed": "Mixed",
@@ -296,6 +300,7 @@
     "userCanSeeAllProjects": "Users can see ALL projects",
     "username": "User name",
     "users": "Users",
+    "userToOverwrite": "User to overwrite",
     "validFrom": "Valid from",
     "vehicleRegistration": "Vehicle Registration",
     "vehicleRegistrationWhenUsingOwnCar": "Vehicle registration if traveling with own car",

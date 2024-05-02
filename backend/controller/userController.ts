@@ -10,7 +10,7 @@ import { sendMail } from '../mail/mail.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { NotFoundError } from './error.js'
+import { NotAllowedError, NotFoundError } from './error.js'
 import { File, IdDocument, idDocumentToId } from './types.js'
 
 const fileHandler = multer({ limits: { fileSize: 16000000 } })
@@ -117,6 +117,9 @@ export class UserAdminController extends Controller {
 
   @Post('merge')
   public async mergeUsers(@Body() requestBody: { userId: IdDocument; userIdToOverwrite: IdDocument }, @Query() delOverwritten?: boolean) {
+    if (idDocumentToId(requestBody.userId) === idDocumentToId(requestBody.userIdToOverwrite)) {
+      throw new NotAllowedError(`Users are the same.`)
+    }
     const user = await User.findOne({ _id: idDocumentToId(requestBody.userId) })
     if (user) {
       const userIdToOverwrite = new Types.ObjectId(idDocumentToId(requestBody.userIdToOverwrite))
@@ -134,7 +137,7 @@ export class UserAdminController extends Controller {
 
       const replacedReferences = await user.replaceReferences(userIdToOverwrite)
 
-      return { mergedUser, replacedReferences, deleteResult }
+      return { result: { mergedUser, replacedReferences, deleteResult }, message: 'alerts.successSaving' }
     } else {
       throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
     }

@@ -1,5 +1,14 @@
 import mongoose, { Document, HydratedDocument, Model, Query, Schema, Types, model } from 'mongoose'
-import { Access, Token, User, accesses, emailRegex, locales } from '../../common/types.js'
+import {
+  Access,
+  Token,
+  User,
+  accesses,
+  emailRegex,
+  locales,
+  userReplaceCollections,
+  UserReplaceReferencesResult
+} from '../../common/types.js'
 import Settings from './settings.js'
 
 const settings = (await Settings.findOne().lean())!
@@ -15,7 +24,7 @@ const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() 
 
 interface Methods {
   isActive(): Promise<boolean>
-  replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<ReplaceReferencesResult>
+  replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
   merge(userToOverwrite: Partial<User>, mergeFk: boolean): Promise<User>
 }
 
@@ -104,9 +113,6 @@ userSchema.methods.isActive = async function (this: UserDoc) {
   return false
 }
 
-const collections = ['travels', 'expensereports', 'healthcarecosts'] as const
-type ReplaceReferencesResult = { [key in (typeof collections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number } }
-
 userSchema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
     let filter: any = {}
@@ -129,8 +135,8 @@ userSchema.methods.replaceReferences = async function (this: UserDoc, userIdToOv
     arrayFilter.arrayFilters.push(filter)
     return arrayFilter
   }
-  const result: ReplaceReferencesResult = {}
-  for (const collection of collections) {
+  const result: UserReplaceReferencesResult = {}
+  for (const collection of userReplaceCollections) {
     result[collection] = await mongoose.connection.collection(collection).updateMany(filter('owner'), update('owner'))
     await mongoose.connection.collection(collection).updateMany(filter('editor'), update('editor'))
     await mongoose.connection

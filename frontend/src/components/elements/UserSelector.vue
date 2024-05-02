@@ -3,7 +3,7 @@
     v-if="$root.users.length > 0"
     :options="$root.users"
     :modelValue="modelValue"
-    :placeholder="$t('labels.owner')"
+    :placeholder="placeholder"
     @update:modelValue="(_id: string) => $emit('update:modelValue', _id)"
     :reduce="(u: UserWithName) => u._id"
     :filter="filter"
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { User } from '../../../../common/types.js'
 
 interface UserWithName {
@@ -30,15 +30,16 @@ interface UserWithName {
   _id: string
 }
 export default defineComponent({
-  name: 'CountrySelector',
+  name: 'UserSelector',
   data() {
     return {}
   },
   components: {},
   props: {
-    modelValue: { type: String },
+    modelValue: { type: String as PropType<string | null> },
     required: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false }
+    disabled: { type: Boolean, default: false },
+    placeholder: { type: String, default: '' }
   },
   emits: ['update:modelValue'],
   methods: {
