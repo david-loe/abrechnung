@@ -66,11 +66,14 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
 
 export async function fetchAndUpdateLumpSums() {
   const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api/ALL.json'
-  const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
-  if (res.status === 200) {
-    await addLumpSumsToCountries(res.data)
-  } else {
-    throw Error('Unable to fetch lump sums from: ' + pauschbetrag_api)
+  try {
+    const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
+    if (res.status === 200) {
+      await addLumpSumsToCountries(res.data)
+    }
+  } catch (error) {
+    console.log('Unable to fetch lump sums from: ' + pauschbetrag_api)
+    console.log(error)
   }
 }
 
