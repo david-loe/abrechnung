@@ -1646,6 +1646,97 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"UserReplaceReferencesResult": {
+				"properties": {
+					"travels": {
+						"properties": {
+							"modifiedCount": {
+								"type": "number",
+								"format": "double"
+							},
+							"matchedCount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"modifiedCount",
+							"matchedCount"
+						],
+						"type": "object"
+					},
+					"expensereports": {
+						"properties": {
+							"modifiedCount": {
+								"type": "number",
+								"format": "double"
+							},
+							"matchedCount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"modifiedCount",
+							"matchedCount"
+						],
+						"type": "object"
+					},
+					"healthcarecosts": {
+						"properties": {
+							"modifiedCount": {
+								"type": "number",
+								"format": "double"
+							},
+							"matchedCount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"modifiedCount",
+							"matchedCount"
+						],
+						"type": "object"
+					},
+					"documentfiles": {
+						"properties": {
+							"modifiedCount": {
+								"type": "number",
+								"format": "double"
+							},
+							"matchedCount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"modifiedCount",
+							"matchedCount"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"IdDocument": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/_id"
+					},
+					{
+						"properties": {
+							"_id": {
+								"$ref": "#/components/schemas/_id"
+							}
+						},
+						"required": [
+							"_id"
+						],
+						"type": "object"
+					}
+				]
+			},
 			"Place": {
 				"properties": {
 					"place": {
@@ -3678,24 +3769,6 @@
 				},
 				"type": "object",
 				"additionalProperties": false
-			},
-			"IdDocument": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/_id"
-					},
-					{
-						"properties": {
-							"_id": {
-								"$ref": "#/components/schemas/_id"
-							}
-						},
-						"required": [
-							"_id"
-						],
-						"type": "object"
-					}
-				]
 			},
 			"Settings": {
 				"properties": {
@@ -6732,6 +6805,101 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/user/merge": {
+			"post": {
+				"operationId": "MergeUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										},
+										"result": {
+											"properties": {
+												"deleteResult": {
+													"$ref": "#/components/schemas/DeleteResult"
+												},
+												"replacedReferences": {
+													"$ref": "#/components/schemas/UserReplaceReferencesResult"
+												},
+												"mergedUser": {
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/User"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														}
+													]
+												}
+											},
+											"required": [
+												"deleteResult",
+												"replacedReferences",
+												"mergedUser"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"message",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "delOverwritten",
+						"required": false,
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"userIdToOverwrite": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"userId": {
+										"$ref": "#/components/schemas/IdDocument"
+									}
+								},
+								"required": [
+									"userIdToOverwrite",
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/upload/new": {
