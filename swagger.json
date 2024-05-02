@@ -6568,6 +6568,12 @@
 							"user",
 							"confirm/healthCareCost"
 						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"admin"
+						]
 					}
 				],
 				"parameters": [
