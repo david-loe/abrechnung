@@ -21,6 +21,7 @@
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
+              :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
               @add="postExpense"
               @edit="postExpense"
               @deleted="deleteExpense"
@@ -221,8 +222,8 @@
                 <button
                   v-if="expenseReport.state === 'underExamination'"
                   class="btn btn-secondary"
-                  @click="expenseReport.editor._id !== $root.user._id ? null : backToInWork()"
-                  :disabled="expenseReport.editor._id !== $root.user._id">
+                  @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
+                  :disabled="expenseReport.editor._id !== expenseReport.owner._id">
                   <i class="bi bi-arrow-counterclockwise"></i>
                   <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                 </button>
@@ -241,13 +242,13 @@ import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  baseCurrency,
-  BaseCurrencyMoney,
-  Expense,
-  ExpenseReport,
-  expenseReportStates,
+baseCurrency,
+BaseCurrencyMoney,
+Expense,
+ExpenseReport,
+expenseReportStates,
   Locale,
-  UserSimple
+UserSimple
 } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
@@ -399,6 +400,9 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
+    console.log(this.expenseReport.editor._id !== this.$root.user._id)
+    console.log(this.$root.user._id)
+    console.log(this.expenseReport.editor._id)
   },
   mounted() {
     const modalEl = document.getElementById('modal')

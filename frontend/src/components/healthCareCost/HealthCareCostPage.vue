@@ -21,6 +21,7 @@
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
+              :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
               @add="postExpense"
               @edit="postExpense"
               @deleted="deleteExpense"
@@ -207,8 +208,8 @@
                   </a>
                   <button
                     class="btn btn-secondary"
-                    @click="healthCareCost.editor._id !== $root.user._id ? null : backToInWork()"
-                    :disabled="healthCareCost.editor._id !== $root.user._id">
+                    @click="healthCareCost.editor._id !== healthCareCost.owner._id ? null : backToInWork()"
+                    :disabled="healthCareCost.editor._id !== healthCareCost.owner._id">
                     <i class="bi bi-arrow-counterclockwise"></i>
                     <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                   </button>
@@ -236,7 +237,8 @@
                       ref="fileUpload"
                       id="expenseFormFile"
                       v-model="healthCareCost.refundSum.receipts as DocumentFile[] | undefined"
-                      :endpointPrefix="endpointPrefix" />
+                      :endpointPrefix="endpointPrefix"
+                      :ownerId="healthCareCost.owner._id" />
                   </div>
                   <button type="submit" class="btn btn-success">
                     <i class="bi bi-coin"></i>
@@ -258,14 +260,14 @@ import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, datetoDateString, getById, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  BaseCurrencyMoney,
+BaseCurrencyMoney,
   DocumentFile,
-  Expense,
-  HealthCareCost,
-  healthCareCostStates,
-  Locale,
-  Organisation,
-  UserSimple
+Expense,
+HealthCareCost,
+healthCareCostStates,
+Locale,
+Organisation,
+UserSimple
 } from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'

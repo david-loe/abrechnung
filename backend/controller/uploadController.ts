@@ -9,7 +9,7 @@ import i18n from '../i18n.js'
 import Settings from '../models/settings.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
-import { AuthorizationError } from './error.js'
+import { AuthorizationError, NotFoundError } from './error.js'
 import { File } from './types.js'
 
 async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction) {
@@ -28,13 +28,21 @@ export class UploadController extends Controller {
   @Middlewares(validateToken)
   @Produces('text/html')
   @SuccessResponse(200)
-  public async uploadPage(@Query() userId: string, @Query() tokenId: string, @Request() req: ExRequest): Promise<void> {
+  public async uploadPage(@Request() req: ExRequest, @Query() userId: string, @Query() tokenId: string, @Query() ownerId?: string): Promise<void> {
     const settings = (await Settings.findOne().lean())!
     const user = await User.findOne({ _id: userId }).lean()
     const template = await fs.readFile('./templates/upload.ejs', { encoding: 'utf-8' })
     const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')
     url.searchParams.append('userId', userId)
     url.searchParams.append('tokenId', tokenId)
+    if (ownerId) {
+      const owner = await User.findOne({ _id: ownerId }).lean()
+      if (owner) {
+        url.searchParams.append('ownerId', ownerId)
+      } else {
+        throw new NotFoundError(`No user found for ownerId: ${ownerId}`)
+      }
+    }
     const secondsLeft = Math.round(
       (new Date(user!.token!.createdAt).valueOf() + settings.uploadTokenExpireAfterSeconds * 1000 - new Date().valueOf()) / 1000
     )
@@ -59,15 +67,16 @@ export class UploadController extends Controller {
   @Middlewares(validateToken, fileHandler.any())
   @Consumes('multipart/form-data')
   public async upload(
+    @Request() req: ExRequest,
+    @Body() requestBody: { files: File[] },
     @Query() userId: string,
     @Query() tokenId: string,
-    @Body() requestBody: { files: File[] },
-    @Request() req: ExRequest
+    @Query() ownerId?: string
   ) {
     const token = await Token.findOne({ _id: tokenId })
     if (token) {
       if (true) {
-        await documentFileHandler(['files'], { checkOwner: false, owner: userId })(req)
+        await documentFileHandler(['files'], { owner: ownerId ? ownerId : userId })(req)
         token.files = token.files.concat(requestBody.files as unknown as _id[])
         token.markModified('files')
         await token.save()

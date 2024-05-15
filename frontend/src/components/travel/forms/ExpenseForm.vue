@@ -29,7 +29,8 @@
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
         :required="true"
-        :endpointPrefix="endpointPrefix" />
+        :endpointPrefix="endpointPrefix"
+        :ownerId="ownerId" />
     </div>
 
     <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
@@ -89,7 +90,8 @@ export default defineComponent({
       required: true
     },
     disabled: { type: Boolean, default: false },
-    endpointPrefix: { type: String, default: '' }
+    endpointPrefix: { type: String, default: '' },
+    ownerId: {type: String}
   },
   data() {
     return {

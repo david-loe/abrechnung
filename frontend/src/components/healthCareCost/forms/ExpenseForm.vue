@@ -31,7 +31,8 @@
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
         :required="true"
-        :endpointPrefix="endpointPrefix" />
+        :endpointPrefix="endpointPrefix"
+        :ownerId="ownerId" />
     </div>
 
     <div class="mb-3">
@@ -85,7 +86,8 @@ export default defineComponent({
       required: true
     },
     disabled: { type: Boolean, default: false },
-    endpointPrefix: { type: String, default: '' }
+    endpointPrefix: { type: String, default: '' },
+    ownerId: {type: String}
   },
   data() {
     return {
