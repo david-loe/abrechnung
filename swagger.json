@@ -6936,6 +6936,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "ownerId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -6963,6 +6971,14 @@
 						"in": "query",
 						"name": "tokenId",
 						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerId",
+						"required": false,
 						"schema": {
 							"type": "string"
 						}
