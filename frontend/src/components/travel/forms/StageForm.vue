@@ -129,7 +129,8 @@
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'"
-          :endpointPrefix="endpointPrefix" />
+          :endpointPrefix="endpointPrefix"
+          :ownerId="ownerId" />
       </div>
     </template>
 
@@ -175,7 +176,8 @@
           v-model="formStage.cost.receipts"
           :disabled="disabled"
           :required="Boolean(formStage.cost.amount)"
-          :endpointPrefix="endpointPrefix" />
+          :endpointPrefix="endpointPrefix"
+          :ownerId="ownerId" />
       </div>
     </template>
 
@@ -242,7 +244,8 @@ export default defineComponent({
     travelStartDate: { type: [String, Date], required: true },
     travelEndDate: { type: [String, Date], required: true },
     showVehicleRegistration: { type: Boolean, default: true },
-    endpointPrefix: { type: String, default: '' }
+    endpointPrefix: { type: String, default: '' },
+    ownerId: {type: String}
   },
   data() {
     return {

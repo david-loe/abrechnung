@@ -26,6 +26,7 @@
               :disabled="isReadOnly"
               :showVehicleRegistration="travel.state === 'approved'"
               :endpointPrefix="endpointPrefix"
+              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
               @add="postStage"
               @edit="postStage"
               @deleted="deleteStage"
@@ -39,6 +40,7 @@
               :disabled="isReadOnly"
               :mode="modalMode"
               :endpointPrefix="endpointPrefix"
+              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
               @add="postExpense"
               @edit="postExpense"
               @deleted="deleteExpense"
@@ -467,8 +469,8 @@
                 <button
                   v-if="travel.state === 'underExamination'"
                   class="btn btn-secondary"
-                  @click="travel.editor._id !== $root.user._id ? null : backToApproved()"
-                  :disabled="travel.editor._id !== $root.user._id">
+                  @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
+                  :disabled="travel.editor._id !== travel.owner._id">
                   <i class="bi bi-arrow-counterclockwise"></i>
                   <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                 </button>
@@ -487,21 +489,21 @@ import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  BaseCurrencyMoney,
-  DocumentFile,
-  Locale,
-  meals,
-  Place,
-  Record,
-  RecordType,
-  Stage,
-  Travel,
-  TravelDay,
-  TravelExpense,
-  TravelSimple,
-  travelStates,
-  User,
-  UserSimple
+BaseCurrencyMoney,
+DocumentFile,
+Locale,
+meals,
+Place,
+Record,
+RecordType,
+Stage,
+Travel,
+TravelDay,
+TravelExpense,
+TravelSimple,
+travelStates,
+User,
+UserSimple
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'

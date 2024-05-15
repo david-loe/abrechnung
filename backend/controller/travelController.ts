@@ -362,7 +362,7 @@ export class TravelExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
-          await documentFileHandler(['cost', 'receipts'])(request)
+          await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
           return false
@@ -382,7 +382,7 @@ export class TravelExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'underExamination') {
-          await documentFileHandler(['cost', 'receipts'])(request)
+          await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
           return false
