@@ -188,9 +188,10 @@ travelSchema.pre('deleteOne', { document: true, query: false }, function (this: 
 travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
   const doc: any = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
+  doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('Travel').create(doc)
-  this.history.push(old)
+  const old = await model('Travel').create([doc], { timestamps: false })
+  this.history.push(old[0]._id)
   this.markModified('history')
   switch (this.state) {
     case 'approved':

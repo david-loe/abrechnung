@@ -91,9 +91,10 @@ healthCareCostSchema.pre('deleteOne', { document: true, query: false }, function
 healthCareCostSchema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
   const doc: any = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
+  doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('HealthCareCost').create(doc)
-  this.history.push(old)
+  const old = await model('HealthCareCost').create([doc], { timestamps: false })
+  this.history.push(old[0]._id)
   this.markModified('history')
 }
 
