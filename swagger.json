@@ -2029,11 +2029,15 @@
 					},
 					"refund": {
 						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
 				"required": [
 					"type",
-					"refund"
+					"refund",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -6235,7 +6239,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.1.0",
+		"version": "1.1.1",
 		"contact": {}
 	},
 	"paths": {
