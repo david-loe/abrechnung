@@ -1,7 +1,7 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { addUp, dateTimeToString, datetoDateString, getDetailedMoneyString } from '../../common/scripts.js'
+import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -18,6 +18,7 @@ import {
   TravelExpense,
   baseCurrency
 } from '../../common/types.js'
+import { getDateOfSubmission } from '../helper.js'
 import i18n from '../i18n.js'
 import Settings from '../models/settings.js'
 import {
@@ -64,10 +65,18 @@ export async function generateTravelReport(travel: Travel, language: Locale) {
   const result = getReceiptMap(travel.stages)
   const receiptMap = Object.assign(result.map, getReceiptMap(travel.expenses, result.number).map)
 
-  y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  let yDates = await drawDates(getLastPage(), newPage, travel, {
+    font: font,
+    xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
+    yStart: y - 16,
+    fontSize: 9,
+    language
+  })
+  y = await drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = y < yDates ? y : yDates
   y = await drawStages(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
-  y = drawExpenses(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
-  y = drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
+  y = await drawExpenses(getLastPage(), newPage, travel, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
+  y = await drawDays(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
 
   await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16, language })
 
@@ -134,11 +143,11 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(travel.startDate).toLocaleDateString(opts.language) +
+    new Date(travel.startDate).toLocaleDateString(opts.language, { timeZone: 'UTC' }) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(travel.endDate).toLocaleDateString(opts.language)
+    new Date(travel.endDate).toLocaleDateString(opts.language, { timeZone: 'UTC' })
   if (travel.professionalShare !== 1) {
     text =
       text + '    ' + i18n.t('labels.professionalShare', { lng: opts.language }) + ': ' + Math.round(travel.professionalShare! * 100) + '%'
@@ -156,7 +165,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   return y
 }
 
-function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, options: Options) {
+async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, options: Options) {
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
@@ -189,7 +198,33 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
   tabelOptions.yStart -= fontSize * 1.25
   tabelOptions.firstRow = false
 
-  return drawTable(page, newPageFn, summary, columns, tabelOptions)
+  return await drawTable(page, newPageFn, summary, columns, tabelOptions)
+}
+
+async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, options: Options) {
+  const columns: Column[] = []
+  columns.push({ key: 'reference', width: 80, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
+  columns.push({
+    key: 'date',
+    width: 55,
+    alignment: pdf_lib.TextAlignment.Right,
+    title: 'date',
+    fn: (d: Date) => d.toLocaleDateString(options.language, { timeZone: 'UTC' })
+  })
+
+  const summary = []
+  summary.push({ reference: i18n.t('labels.appliedForOn', { lng: options.language }), date: travel.createdAt })
+  summary.push({
+    reference: i18n.t('labels.approvedOn', { lng: options.language }),
+    date: (await getDateOfSubmission(travel, 'appliedFor')) || travel.createdAt
+  })
+  summary.push({ reference: i18n.t('labels.submittedOn', { lng: options.language }), date: await getDateOfSubmission(travel) })
+  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), date: travel.updatedAt })
+
+  const tabelOptions: TabelOptions = options
+  tabelOptions.firstRow = false
+
+  return await drawTable(page, newPageFn, summary, columns, tabelOptions)
 }
 
 async function drawStages(
@@ -209,14 +244,16 @@ async function drawStages(
     width: 45,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.departure', { lng: options.language }),
-    fn: (d: Date) => dateTimeToString(d)
+    fn: (d: Date) =>
+      d.toLocaleString(options.language, { timeZone: 'UTC', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })
   })
   columns.push({
     key: 'arrival',
     width: 45,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.arrival', { lng: options.language }),
-    fn: (d: Date) => dateTimeToString(d)
+    fn: (d: Date) =>
+      d.toLocaleString(options.language, { timeZone: 'UTC', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })
   })
   columns.push({
     key: 'startLocation',
@@ -298,10 +335,16 @@ async function drawStages(
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, travel.stages, columns, options)
+  return await drawTable(page, newPageFn, travel.stages, columns, options)
 }
 
-function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, receiptMap: ReceiptMap, options: Options) {
+async function drawExpenses(
+  page: pdf_lib.PDFPage,
+  newPageFn: () => pdf_lib.PDFPage,
+  travel: Travel,
+  receiptMap: ReceiptMap,
+  options: Options
+) {
   if (travel.expenses.length == 0) {
     return options.yStart
   }
@@ -332,7 +375,7 @@ function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, t
     width: 90,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.invoiceDate', { lng: options.language }),
-    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language)
+    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language, { timeZone: 'UTC' })
   })
   columns.push({
     key: 'note',
@@ -358,10 +401,10 @@ function drawExpenses(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, t
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, travel.expenses, columns, options)
+  return await drawTable(page, newPageFn, travel.expenses, columns, options)
 }
 
-function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, options: Options) {
+async function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: Travel, options: Options) {
   if (travel.days.length == 0) {
     return options.yStart
   }
@@ -371,7 +414,7 @@ function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, trave
     width: 70,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.date', { lng: options.language }),
-    fn: (d: Date) => datetoDateString(d)
+    fn: (d: Date) => d.toLocaleDateString(options.language, { timeZone: 'UTC' })
   })
   columns.push({
     key: 'country',
@@ -440,5 +483,5 @@ function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, trave
   )
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, travel.days, columns, options)
+  return await drawTable(page, newPageFn, travel.days, columns, options)
 }

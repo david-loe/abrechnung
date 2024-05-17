@@ -109,7 +109,7 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
     if (receipt.noNumberPrint) {
       return
     }
-    const text = '#' + receipt.number + ' - ' + receipt.date.toLocaleDateString(opts.language)
+    const text = '#' + receipt.number + ' - ' + receipt.date.toLocaleDateString(opts.language, { timeZone: 'UTC' })
     const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
     page.drawRectangle({
       x: 2,
@@ -196,7 +196,7 @@ export async function drawPlace(page: pdf_lib.PDFPage, place: { country: Country
   })
 
   opts.xStart = flagX
-  drawFlag(page, place.country._id, opts)
+  await drawFlag(page, place.country._id, opts)
 }
 
 export async function drawFlag(page: pdf_lib.PDFPage, countryCode: string, options: Options) {
@@ -313,7 +313,13 @@ export function drawLink(page: pdf_lib.PDFPage, url: string, options: { xStart: 
   page.node.set(PDFName.of('Annots'), page.doc.context.obj([linkAnnotationRef]))
 }
 
-export function drawTable(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, data: any[], columns: Column[], options: TabelOptions) {
+export async function drawTable(
+  page: pdf_lib.PDFPage,
+  newPageFn: () => pdf_lib.PDFPage,
+  data: any[],
+  columns: Column[],
+  options: TabelOptions
+) {
   if (data.length < 0) {
     return options.yStart
   }
@@ -463,7 +469,7 @@ export function drawTable(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPag
       page.drawText(text.text, text.options)
       if (text.cb) {
         text.pseudoSuffixWidth = text.pseudoSuffixWidth ? text.pseudoSuffixWidth : 0
-        text.cb(page, text.cbValue, {
+        await text.cb(page, text.cbValue, {
           yStart: text.options.y,
           xStart: text.options.x + text.options.width - text.pseudoSuffixWidth,
           fontSize: opts.fontSize

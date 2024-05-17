@@ -1,8 +1,19 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
-import { Types } from 'mongoose'
-import { DocumentFile as IDocumentFile } from '../common/types.js'
+import { Model, Types } from 'mongoose'
+import {
+  AnyState,
+  DocumentFile as IDocumentFile,
+  ExpenseReport as IExpenseReport,
+  HealthCareCost as IHealthCareCost,
+  Travel as ITravel,
+  reportIsHealthCareCost,
+  reportIsTravel
+} from '../common/types.js'
 import DocumentFile from './models/documentFile.js'
+import ExpenseReport from './models/expenseReport.js'
+import HealthCareCost from './models/healthCareCost.js'
+import Travel from './models/travel.js'
 
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
   var keys: string[] = []
@@ -138,4 +149,28 @@ export async function writeToDisk(
   } catch (error) {
     console.error(error)
   }
+}
+
+export async function getDateOfSubmission(
+  report: ITravel | IExpenseReport | IHealthCareCost,
+  overwriteQueryState?: AnyState
+): Promise<Date | null> {
+  let model: Model<{ updatedAt: Date; state: AnyState }> = ExpenseReport as any
+  let state: AnyState = 'inWork'
+  if (reportIsTravel(report)) {
+    model = Travel as any
+    state = 'approved'
+  } else if (reportIsHealthCareCost(report)) {
+    model = HealthCareCost as any
+  }
+  if (overwriteQueryState) {
+    state = overwriteQueryState
+  }
+  for (var i = 0; i < report.history.length; i++) {
+    const historyReport = await model.findOne({ _id: report.history[i] }).lean()
+    if (historyReport && historyReport.state === state) {
+      return historyReport.updatedAt as Date
+    }
+  }
+  return null
 }

@@ -33,7 +33,7 @@ export async function generateAdvanceReport(travel: TravelSimple, language: Loca
   y = y - edge
   y = drawGeneralAdvanceInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
 
-  y = drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = await drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
 
   return await pdfDoc.save()
 }
@@ -98,11 +98,11 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(travel.startDate).toLocaleDateString(opts.language) +
+    new Date(travel.startDate).toLocaleDateString(opts.language, { timeZone: 'UTC' }) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(travel.endDate).toLocaleDateString(opts.language)
+    new Date(travel.endDate).toLocaleDateString(opts.language, { timeZone: 'UTC' })
   var y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
@@ -114,7 +114,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   return y
 }
 
-function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: TravelSimple, options: Options) {
+async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, travel: TravelSimple, options: Options) {
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
@@ -140,12 +140,12 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, tr
   tabelOptions.yStart -= fontSize * 1.25
   tabelOptions.firstRow = false
 
-  const y = drawTable(page, newPageFn, summary, columns, tabelOptions) - 16
+  const y = (await drawTable(page, newPageFn, summary, columns, tabelOptions)) - 16
 
   page.drawText(
     i18n.t('report.advance.approvedXY', {
       lng: options.language,
-      X: (travel.updatedAt as Date).toLocaleDateString(options.language),
+      X: (travel.updatedAt as Date).toLocaleDateString(options.language, { timeZone: 'UTC' }),
       Y: travel.editor.name.givenName + ' ' + travel.editor.name.familyName
     }),
     {

@@ -93,6 +93,10 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "appliedForOn": "Beantragt am",
+    "approvedOn": "Genehmigt am",
+    "submittedOn": "Eingereicht am",
+    "examinedOn": "Geprüft am",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",

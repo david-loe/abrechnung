@@ -93,6 +93,10 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "appliedForOn": "Applied for on",
+    "approvedOn": "Approved on",
+    "submittedOn": "Submitted on",
+    "examinedOn": "Examined on",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",
