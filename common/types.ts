@@ -266,6 +266,7 @@ export type Transport =
 export interface Refund {
   type: LumpsumType
   refund: BaseCurrencyMoney
+  _id: Types.ObjectId
 }
 
 export interface TravelDay {
