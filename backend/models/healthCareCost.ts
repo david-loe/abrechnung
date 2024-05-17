@@ -7,7 +7,7 @@ import {
   baseCurrency,
   healthCareCostStates
 } from '../../common/types.js'
-import { convertCurrency, costObject } from '../helper.js'
+import { convertCurrency, costObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {

@@ -19,9 +19,9 @@ import {
   transportTypes,
   travelStates
 } from '../../common/types.js'
-import { convertCurrency, costObject } from '../helper.js'
 import Country, { CountryDoc } from './country.js'
 import DocumentFile from './documentFile.js'
+import { convertCurrency, costObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -342,8 +342,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     ) {
       bXIndex++
     }
-    ; (day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
-      ; (day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
+    ;(day as Partial<TravelDay>).country = borderCrossings[bXIndex].country
+    ;(day as Partial<TravelDay>).special = borderCrossings[bXIndex].special
   }
 
   // change days according to last place of work
@@ -356,8 +356,8 @@ travelSchema.methods.calculateDays = async function (this: TravelDoc) {
     }
     for (const day of days) {
       if (day.date.valueOf() >= dateOfLastPlaceOfWork.valueOf()) {
-        ; (day as Partial<TravelDay>).country = dbCountry
-          ; (day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
+        ;(day as Partial<TravelDay>).country = dbCountry
+        ;(day as Partial<TravelDay>).special = this.lastPlaceOfWork.special
       }
     }
   }
@@ -383,9 +383,9 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
         amount:
           Math.round(
             amount *
-            leftover *
-            ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
-            100
+              leftover *
+              ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
+              100
           ) / 100
       }
       if (settings.allowSpouseRefund && this.claimSpouseRefund) {
@@ -421,8 +421,8 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
           amount:
             Math.round(
               amount *
-              (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
-              100
+                (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
+                100
             ) / 100
         }
         if (settings.allowSpouseRefund && this.claimSpouseRefund) {
@@ -590,10 +590,10 @@ travelSchema.pre('validate', async function (this: TravelDoc, next) {
 
 travelSchema.post('save', async function (this: TravelDoc) {
   if (this.state === 'refunded') {
-    ; (this.project as ProjectDoc).updateBalance()
+    ;(this.project as ProjectDoc).updateBalance()
   }
 })
 
 export default model<Travel, TravelModel>('Travel', travelSchema)
 
-export interface TravelDoc extends Methods, HydratedDocument<Travel> { }
+export interface TravelDoc extends Methods, HydratedDocument<Travel> {}

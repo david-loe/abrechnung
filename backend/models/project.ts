@@ -1,7 +1,7 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { ExpenseReport, HealthCareCost, Project, Travel, _id } from '../../common/types.js'
-import { costObject } from '../helper.js'
+import { costObject } from './helper.js'
 
 interface Methods {
   updateBalance(): Promise<void>
