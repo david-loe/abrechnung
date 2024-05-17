@@ -1,6 +1,6 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
-import { convertCurrency, costObject } from '../helper.js'
+import { convertCurrency, costObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -80,9 +80,10 @@ expenseReportSchema.pre('deleteOne', { document: true, query: false }, function 
 expenseReportSchema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
   const doc: any = await model<ExpenseReport, ExpenseReportModel>('ExpenseReport').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
+  doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('ExpenseReport').create(doc)
-  this.history.push(old)
+  const old = await model('ExpenseReport').create([doc], { timestamps: false })
+  this.history.push(old[0]._id)
   this.markModified('history')
 }
 

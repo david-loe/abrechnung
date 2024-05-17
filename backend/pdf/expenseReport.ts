@@ -3,6 +3,7 @@ import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
 import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
 import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
+import { getDateOfSubmission } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,
@@ -44,9 +45,22 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   y = y - edge
   y = drawGeneralInformation(getLastPage(), expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
   const receiptMap = getReceiptMap(expenseReport.expenses).map
-
-  y = drawSummary(getLastPage(), newPage, expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
-  y = drawExpenses(getLastPage(), newPage, expenseReport, receiptMap, { font: font, xStart: edge, yStart: y - 16, fontSize: 9, language })
+  let yDates = await drawDates(getLastPage(), newPage, expenseReport, {
+    font: font,
+    xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
+    yStart: y - 16,
+    fontSize: 9,
+    language
+  })
+  y = await drawSummary(getLastPage(), newPage, expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = y < yDates ? y : yDates
+  y = await drawExpenses(getLastPage(), newPage, expenseReport, receiptMap, {
+    font: font,
+    xStart: edge,
+    yStart: y - 16,
+    fontSize: 9,
+    language
+  })
 
   await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16, language })
 
@@ -95,11 +109,11 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(expenseReport.expenses[0].cost.date).toLocaleDateString(opts.language) +
+    new Date(expenseReport.expenses[0].cost.date).toLocaleDateString(opts.language, { timeZone: 'UTC' }) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(expenseReport.expenses[expenseReport.expenses.length - 1].cost.date).toLocaleDateString(opts.language)
+    new Date(expenseReport.expenses[expenseReport.expenses.length - 1].cost.date).toLocaleDateString(opts.language, { timeZone: 'UTC' })
   var y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
@@ -111,7 +125,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
   return y
 }
 
-function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, expenseReport: ExpenseReport, options: Options) {
+async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, expenseReport: ExpenseReport, options: Options) {
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
@@ -143,10 +157,31 @@ function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, ex
   tabelOptions.yStart -= fontSize * 1.25
   tabelOptions.firstRow = false
 
-  return drawTable(page, newPageFn, summary, columns, tabelOptions)
+  return await drawTable(page, newPageFn, summary, columns, tabelOptions)
 }
 
-function drawExpenses(
+async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage, expenseReport: ExpenseReport, options: Options) {
+  const columns: Column[] = []
+  columns.push({ key: 'reference', width: 80, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
+  columns.push({
+    key: 'date',
+    width: 55,
+    alignment: pdf_lib.TextAlignment.Right,
+    title: 'date',
+    fn: (d: Date) => d.toLocaleDateString(options.language, { timeZone: 'UTC' })
+  })
+
+  const summary = []
+  summary.push({ reference: i18n.t('labels.submittedOn', { lng: options.language }), date: await getDateOfSubmission(expenseReport) })
+  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), date: expenseReport.updatedAt })
+
+  const tabelOptions: TabelOptions = options
+  tabelOptions.firstRow = false
+
+  return await drawTable(page, newPageFn, summary, columns, tabelOptions)
+}
+
+async function drawExpenses(
   page: pdf_lib.PDFPage,
   newPageFn: () => pdf_lib.PDFPage,
   expenseReport: ExpenseReport,
@@ -175,7 +210,7 @@ function drawExpenses(
     width: 90,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.invoiceDate', { lng: options.language }),
-    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language)
+    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language, { timeZone: 'UTC' })
   })
   columns.push({
     key: 'note',
@@ -201,5 +236,5 @@ function drawExpenses(
   })
   options.yStart -= fontSize * 1.25
 
-  return drawTable(page, newPageFn, expenseReport.expenses, columns, options)
+  return await drawTable(page, newPageFn, expenseReport.expenses, columns, options)
 }

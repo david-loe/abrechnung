@@ -159,6 +159,25 @@ async function migrate(from: string) {
       await mongoose.connection.collection('countries').drop()
       await initDB()
     }
+    case '1.1.0': {
+      console.log('Apply migration from v1.1.0: Rewrite history dates to reflect submission date')
+      async function rewriteSubmissionDate(collection: string, state: string) {
+        const allReports = mongoose.connection.collection(collection).find({ historic: false })
+        for await (const report of allReports) {
+          for (var i = 0; i < report.history.length; i++) {
+            const history = await mongoose.connection.collection(collection).findOne({ _id: report.history[i] })
+            if (history && history.state === state) {
+              let submissionDate = report.updatedAt
+              mongoose.connection.collection(collection).updateOne({ _id: report.history[i] }, { $set: { updatedAt: submissionDate } })
+              break
+            }
+          }
+        }
+      }
+      await rewriteSubmissionDate('travels', 'approved')
+      await rewriteSubmissionDate('expensereports', 'inWork')
+      await rewriteSubmissionDate('healthcarecosts', 'inWork')
+    }
     default:
       if (settings) {
         settings.migrateFrom = undefined
