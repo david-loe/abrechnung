@@ -32,6 +32,7 @@ import {
   Settings,
   User
 } from '../../common/types.js'
+import formatter from './formatter.js'
 import i18n from './i18n.js'
 
 // find windows user to give country flag web font on them
@@ -76,6 +77,7 @@ const app = createApp(App)
 app.component('vSelect', vSelect)
 app.component('EasyDataTable', Vue3EasyDataTable)
 app.use(i18n)
+app.use(formatter)
 app.use(router)
 app.use(Vueform as any, vueformConfig)
 app.mount('#app')
