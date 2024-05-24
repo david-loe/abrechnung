@@ -1,4 +1,4 @@
-import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Travel, baseCurrency, reportIsTravel } from './types.js'
+import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Money, Travel, baseCurrency, reportIsTravel } from './types.js'
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {
@@ -116,63 +116,6 @@ export function getDayList(startDate: Date | string | number, endDate: Date | st
 
 export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
-}
-
-type MoneyStringOptions = { language: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
-export function getMoneyString(baseMoney: BaseCurrencyMoney | Money, options: MoneyStringOptions): string {
-  const opts = Object.assign({ useExchangeRate: true, warning: false, func: (x: number) => x }, options)
-  var amount = 0
-  const money = baseCurrencyMoneyToMoney(baseMoney)
-  var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
-  if (opts.useExchangeRate && money.exchangeRate) {
-    amount = money.exchangeRate.amount
-    currency = baseCurrency._id
-  } else {
-    if (money.amount !== null) {
-      amount = money.amount
-    }
-    if (opts.useExchangeRate && !money.exchangeRate && currency !== baseCurrency._id) {
-      opts.warning = true
-    }
-  }
-  return (
-    opts.func(amount).toLocaleString(opts.language, {
-      style: 'currency',
-      currency: currency
-    }) + (opts.warning ? ' ⚠' : '')
-  )
-}
-
-export function getDetailedMoneyString(baseMoney: Money | BaseCurrencyMoney, locale: Locale, printZero = false): string {
-  const money = baseCurrencyMoneyToMoney(baseMoney)
-  if (!money || (money && (typeof money.amount !== 'number' || (!money.amount && !printZero)))) {
-    return ''
-  }
-  var str = money.amount!.toLocaleString(locale, {
-    style: 'currency',
-    currency: money.currency._id
-  })
-  if (money.exchangeRate && money.exchangeRate.rate) {
-    str = str + ' / ' + money.exchangeRate.rate.toLocaleString(locale, { maximumFractionDigits: 4 }) + ' = '
-    str =
-      str +
-      money.exchangeRate.amount.toLocaleString(locale, {
-        style: 'currency',
-        currency: baseCurrency._id
-      })
-  }
-  return str
-}
-
-export function dateToTimeString(date: string | number | Date): string {
-  const dateObject = isValidDate(date)
-  if (dateObject) {
-    const hour = dateObject.getUTCHours().toString().padStart(2, '0')
-    const minute = dateObject.getUTCMinutes().toString().padStart(2, '0')
-    return hour + ':' + minute
-  } else {
-    return ''
-  }
 }
 
 function getLumpSumsSum(travel: Travel) {

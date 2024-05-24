@@ -1,7 +1,8 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { addUp, getDetailedMoneyString } from '../../common/scripts.js'
+import Formatter from '../../common/formatter.js'
+import { addUp } from '../../common/scripts.js'
 import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
 import { getDateOfSubmission } from '../helper.js'
 import i18n from '../i18n.js'
@@ -18,6 +19,7 @@ import {
 } from './helper.js'
 
 export async function generateExpenseReportReport(expenseReport: ExpenseReport, language: Locale) {
+  const formatter = new Formatter(language)
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
@@ -34,7 +36,7 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   newPage()
 
   var y = getLastPage().getSize().height
-  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), expenseReport.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
     yStart: y - 66,
@@ -43,26 +45,42 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   })
 
   y = y - edge
-  y = drawGeneralInformation(getLastPage(), expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
+  y = drawGeneralInformation(getLastPage(), expenseReport, {
+    font: font,
+    xStart: edge,
+    yStart: y - 16,
+    fontSize: fontSize,
+    language,
+    formatter
+  })
   const receiptMap = getReceiptMap(expenseReport.expenses).map
   let yDates = await drawDates(getLastPage(), newPage, expenseReport, {
     font: font,
     xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
     yStart: y - 16,
     fontSize: 9,
-    language
+    language,
+    formatter
   })
-  y = await drawSummary(getLastPage(), newPage, expenseReport, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = await drawSummary(getLastPage(), newPage, expenseReport, {
+    font: font,
+    xStart: edge,
+    yStart: y - 16,
+    fontSize: 10,
+    language,
+    formatter
+  })
   y = y < yDates ? y : yDates
   y = await drawExpenses(getLastPage(), newPage, expenseReport, receiptMap, {
     font: font,
     xStart: edge,
     yStart: y - 16,
     fontSize: 9,
-    language
+    language,
+    formatter
   })
 
-  await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16, language })
+  await attachReceipts(pdfDoc, receiptMap, { font: font, edge: edge / 2, fontSize: 16, language, formatter })
 
   return await pdfDoc.save()
 }
@@ -109,11 +127,11 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(expenseReport.expenses[0].cost.date).toLocaleDateString(opts.language, { timeZone: 'UTC' }) +
+    options.formatter.date(expenseReport.expenses[0].cost.date) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(expenseReport.expenses[expenseReport.expenses.length - 1].cost.date).toLocaleDateString(opts.language, { timeZone: 'UTC' })
+    options.formatter.date(expenseReport.expenses[expenseReport.expenses.length - 1].cost.date)
   var y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
@@ -133,7 +151,7 @@ async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPa
     width: 65,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'sum',
-    fn: (m: Money) => getDetailedMoneyString(m, options.language, true)
+    fn: (m: Money) => options.formatter.detailedMoney(m, true)
   })
 
   const addedUp = addUp(expenseReport)
@@ -168,7 +186,7 @@ async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage
     width: 55,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'date',
-    fn: (d: Date) => d.toLocaleDateString(options.language, { timeZone: 'UTC' })
+    fn: (d: Date) => options.formatter.date(d)
   })
 
   const summary = []
@@ -203,14 +221,14 @@ async function drawExpenses(
     width: 160,
     alignment: pdf_lib.TextAlignment.Right,
     title: i18n.t('labels.cost', { lng: options.language }),
-    fn: (m: Cost) => getDetailedMoneyString(m, options.language)
+    fn: (m: Cost) => options.formatter.detailedMoney(m)
   })
   columns.push({
     key: 'cost',
     width: 90,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.invoiceDate', { lng: options.language }),
-    fn: (c: Cost) => new Date(c.date).toLocaleDateString(options.language, { timeZone: 'UTC' })
+    fn: (c: Cost) => options.formatter.date(c.date)
   })
   columns.push({
     key: 'note',

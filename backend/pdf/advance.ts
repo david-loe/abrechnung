@@ -1,12 +1,13 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import { getDetailedMoneyString } from '../../common/scripts.js'
+import Formatter from '../../common/formatter.js'
 import { Locale, Money, TravelSimple } from '../../common/types.js'
 import i18n from '../i18n.js'
 import { Column, Options, TabelOptions, drawLogo, drawOrganisationLogo, drawPlace, drawTable } from './helper.js'
 
 export async function generateAdvanceReport(travel: TravelSimple, language: Locale) {
+  const formatter = new Formatter(language)
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')
@@ -23,7 +24,7 @@ export async function generateAdvanceReport(travel: TravelSimple, language: Loca
   newPage()
 
   var y = getLastPage().getSize().height
-  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language })
+  await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), travel.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
     yStart: y - 66,
@@ -31,9 +32,16 @@ export async function generateAdvanceReport(travel: TravelSimple, language: Loca
     maxWidth: 150
   })
   y = y - edge
-  y = drawGeneralAdvanceInformation(getLastPage(), travel, { font: font, xStart: edge, yStart: y - 16, fontSize: fontSize, language })
+  y = drawGeneralAdvanceInformation(getLastPage(), travel, {
+    font: font,
+    xStart: edge,
+    yStart: y - 16,
+    fontSize: fontSize,
+    language,
+    formatter
+  })
 
-  y = await drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language })
+  y = await drawSummary(getLastPage(), newPage, travel, { font: font, xStart: edge, yStart: y - 16, fontSize: 10, language, formatter })
 
   return await pdfDoc.save()
 }
@@ -98,11 +106,11 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    new Date(travel.startDate).toLocaleDateString(opts.language, { timeZone: 'UTC' }) +
+    options.formatter.date(travel.startDate) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    new Date(travel.endDate).toLocaleDateString(opts.language, { timeZone: 'UTC' })
+    options.formatter.date(travel.endDate)
   var y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
@@ -122,7 +130,7 @@ async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPa
     width: 180,
     alignment: pdf_lib.TextAlignment.Right,
     title: 'sum',
-    fn: (m: Money) => getDetailedMoneyString(m, options.language, true)
+    fn: (m: Money) => options.formatter.detailedMoney(m, true)
   })
 
   const summary = []
@@ -145,7 +153,7 @@ async function drawSummary(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPa
   page.drawText(
     i18n.t('report.advance.approvedXY', {
       lng: options.language,
-      X: (travel.updatedAt as Date).toLocaleDateString(options.language, { timeZone: 'UTC' }),
+      X: options.formatter.date(travel.updatedAt),
       Y: travel.editor.name.givenName + ' ' + travel.editor.name.familyName
     }),
     {

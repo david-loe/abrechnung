@@ -133,7 +133,7 @@
               <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
                 <td>{{ $formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ getMoneyString(expense.cost, { language: $i18n.locale as Locale }) }}</td>
+                <td>{{ $formatter.money(expense.cost) }}</td>
               </tr>
             </tbody>
           </table>
@@ -150,11 +150,11 @@
                   <tbody>
                     <tr>
                       <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ getMoneyString(addUp.total, { language: $i18n.locale as Locale }) }}</td>
+                      <td class="text-end">{{ $formatter.money(addUp.total) }}</td>
                     </tr>
                     <tr v-if="healthCareCost.state === 'refunded'">
                       <th>{{ $t('labels.refundSum') }}</th>
-                      <td class="text-end">{{ getMoneyString(healthCareCost.refundSum, { language: $i18n.locale as Locale }) }}</td>
+                      <td class="text-end">{{ $formatter.money(healthCareCost.refundSum) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -258,7 +258,7 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { addUp, getById, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { addUp, getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
   BaseCurrencyMoney,
   DocumentFile,
@@ -366,7 +366,7 @@ export default defineComponent({
           owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
           bankDetails: orga?.bankDetails,
           organisationName: orga?.name,
-          amount: getMoneyString(this.addUp.total, { language: this.$i18n.locale as Locale })
+          amount: this.$formatter.money(this.addUp.total)
         })
       )
     },
@@ -440,8 +440,7 @@ export default defineComponent({
         return result.data.map((x) => x.email)
       }
       return []
-    },
-    getMoneyString
+    }
   },
   async created() {
     await this.$root.load()
