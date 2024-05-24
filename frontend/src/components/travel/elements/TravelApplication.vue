@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { datetoDateStringWithYear, getDiffInDays, getMoneyString } from '../../../../../common/scripts.js'
+import { getDiffInDays, getMoneyString } from '../../../../../common/scripts.js'
 import { Locale, TravelSimple, travelStates } from '../../../../../common/types.js'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import StatePipeline from '../../elements/StatePipeline.vue'
@@ -80,10 +80,10 @@ export default defineComponent({
     displayKey(key: keyof TravelSimple): string {
       switch (key) {
         case 'startDate':
-          return datetoDateStringWithYear(this.travel[key])
+          return this.$formatter.date(this.travel[key])
         case 'endDate':
           const dif = getDiffInDays(this.travel.startDate, this.travel.endDate) + 1
-          return datetoDateStringWithYear(this.travel[key]) + ' (' + dif + ' ' + this.$t('labels.' + (dif == 1 ? 'day' : 'days')) + ')'
+          return this.$formatter.date(this.travel[key]) + ' (' + dif + ' ' + this.$t('labels.' + (dif == 1 ? 'day' : 'days')) + ')'
         case 'state':
           return this.$t('states.' + this.travel[key])
         case 'editor':

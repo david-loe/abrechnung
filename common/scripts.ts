@@ -175,18 +175,6 @@ export function dateToTimeString(date: string | number | Date): string {
   }
 }
 
-export function datetoDateStringWithYear(date: string | number | Date): string {
-  const dateObject = isValidDate(date)
-  if (dateObject) {
-    const year = dateObject.getUTCFullYear().toString()
-    const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
-    const day = dateObject.getUTCDate().toString().padStart(2, '0')
-    return day + '.' + month + '.' + year
-  } else {
-    return ''
-  }
-}
-
 function getLumpSumsSum(travel: Travel) {
   var sum = 0
   for (const day of travel.days) {
