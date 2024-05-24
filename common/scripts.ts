@@ -175,21 +175,6 @@ export function dateToTimeString(date: string | number | Date): string {
   }
 }
 
-export function datetoDateString(date: string | number | Date): string {
-  const dateObject = isValidDate(date)
-  if (dateObject) {
-    const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0')
-    const day = dateObject.getUTCDate().toString().padStart(2, '0')
-    return day + '.' + month
-  } else {
-    return ''
-  }
-}
-
-export function dateTimeToString(datetime: string | number | Date): string {
-  return datetoDateString(datetime) + ' ' + dateToTimeString(datetime)
-}
-
 export function datetoDateStringWithYear(date: string | number | Date): string {
   const dateObject = isValidDate(date)
   if (dateObject) {

@@ -92,7 +92,9 @@
             <h1 class="m-0">{{ travel.name }}</h1>
           </div>
           <div class="col">
-            <h4 class="text-secondary m-0">{{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}</h4>
+            <h4 class="text-secondary m-0">
+              {{ $formatter.simpleDate(travel.startDate) + ' - ' + $formatter.simpleDate(travel.endDate) }}
+            </h4>
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -244,7 +246,7 @@
                     :title="$t('labels.private')"
                     style="margin-left: -1.25rem; margin-right: 0.156rem">
                     <i class="bi bi-file-person"></i> </small
-                  >{{ datetoDateString((row.data as Day).date) }}
+                  >{{ $formatter.simpleDate((row.data as Day).date) }}
                 </h5>
               </div>
               <div class="col">
@@ -487,23 +489,23 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { addUp, datetoDateString, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { addUp, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-BaseCurrencyMoney,
-DocumentFile,
-Locale,
-meals,
-Place,
-Record,
-RecordType,
-Stage,
-Travel,
-TravelDay,
-TravelExpense,
-TravelSimple,
-travelStates,
-User,
-UserSimple
+  BaseCurrencyMoney,
+  DocumentFile,
+  Locale,
+  meals,
+  Place,
+  Record,
+  RecordType,
+  Stage,
+  Travel,
+  TravelDay,
+  TravelExpense,
+  TravelSimple,
+  travelStates,
+  User,
+  UserSimple
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
@@ -826,8 +828,7 @@ export default defineComponent({
       }
       return list
     },
-    getMoneyString,
-    datetoDateString
+    getMoneyString
   },
   async created() {
     await this.$root.load()

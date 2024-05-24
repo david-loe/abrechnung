@@ -1,4 +1,4 @@
-import { baseCurrencyMoneyToMoney } from './scripts.js'
+import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
 import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
@@ -35,17 +35,32 @@ class Formatter {
       this.#floatFormat = new Intl.NumberFormat(locale, this.#floatFormatOptions)
     }
   }
-  date(date: Date, locale?: Locale) {
+  date(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
-    return this.#dateFormat.format(date)
+    const validDate = isValidDate(date)
+    if (validDate) {
+      return this.#dateFormat.format()
+    } else {
+      return ''
+    }
   }
-  simpleDate(date: Date, locale?: Locale) {
+  simpleDate(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
-    return this.#simpleDateFormat.format(date)
+    const validDate = isValidDate(date)
+    if (validDate) {
+      return this.#simpleDateFormat.format(validDate)
+    } else {
+      return ''
+    }
   }
-  simpleDateTime(date: Date, locale?: Locale) {
+  simpleDateTime(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
-    return this.#simpleDateTimeFormat.format(date)
+    const validDate = isValidDate(date)
+    if (validDate) {
+      return this.#simpleDateTimeFormat.format(validDate)
+    } else {
+      return ''
+    }
   }
   baseCurrency(number: number) {
     return this.#baseCurrencyFormat.format(number)

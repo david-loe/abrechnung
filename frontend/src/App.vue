@@ -348,6 +348,7 @@ export default defineComponent({
       )
     },
     async pushUserSettings(settings: User['settings']) {
+      this.$formatter.setLocale(this.$i18n.locale as Locale)
       settings.language = this.$i18n.locale as Locale
       this.$vueform.i18n.locale = this.$i18n.locale as Locale
       try {

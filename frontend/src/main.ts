@@ -21,6 +21,7 @@ import Vueform from '@vueform/vueform'
 import '@vueform/vueform/dist/vueform.css'
 import vueformConfig from './vueform.config.js'
 
+import Formatter from '../../common/formatter'
 import {
   CountrySimple,
   Currency,
@@ -48,6 +49,7 @@ axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
+    $formatter: Formatter
     $vueform: { i18n: { locale: Locale } }
     $router: typeof router
     $root: {

@@ -131,7 +131,7 @@
             </thead>
             <tbody>
               <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
-                <td>{{ datetoDateString(expense.cost.date) }}</td>
+                <td>{{ $formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
                 <td>{{ getMoneyString(expense.cost, { language: $i18n.locale as Locale }) }}</td>
               </tr>
@@ -258,16 +258,16 @@
 import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
-import { addUp, datetoDateString, getById, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { addUp, getById, getMoneyString, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-BaseCurrencyMoney,
+  BaseCurrencyMoney,
   DocumentFile,
-Expense,
-HealthCareCost,
-healthCareCostStates,
-Locale,
-Organisation,
-UserSimple
+  Expense,
+  HealthCareCost,
+  healthCareCostStates,
+  Locale,
+  Organisation,
+  UserSimple
 } from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
@@ -441,8 +441,7 @@ export default defineComponent({
       }
       return []
     },
-    getMoneyString,
-    datetoDateString
+    getMoneyString
   },
   async created() {
     await this.$root.load()

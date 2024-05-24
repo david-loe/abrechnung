@@ -72,7 +72,7 @@
       <div class="row mb-3" id="stageFormMidnightCountries">
         <div v-for="midnightCountry of formStage.midnightCountries" class="col-auto" :key="midnightCountry.date.toString()">
           <label for="stageFormLocation" class="form-label">
-            {{ datetoDateString(midnightCountry.date) }}
+            {{ $formatter.simpleDate(midnightCountry.date) }}
             {{ $t('labels.midnight') }}
           </label>
           <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled" :required="true">
@@ -219,8 +219,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDate, datetimeToDateString, datetoDateString, getDayList } from '../../../../../common/scripts.js'
-import { baseCurrency, distanceRefundTypes, Place, Stage, transportTypes, DocumentFile } from '../../../../../common/types.js'
+import { datetimeToDate, datetimeToDateString, getDayList } from '../../../../../common/scripts.js'
+import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
@@ -245,7 +245,7 @@ export default defineComponent({
     travelEndDate: { type: [String, Date], required: true },
     showVehicleRegistration: { type: Boolean, default: true },
     endpointPrefix: { type: String, default: '' },
-    ownerId: {type: String}
+    ownerId: { type: String }
   },
   data() {
     return {
@@ -364,8 +364,7 @@ export default defineComponent({
       )
 
       return Object.assign({}, this.default(), this.stage)
-    },
-    datetoDateString
+    }
   },
   created() {
     this.formStage = this.input()
