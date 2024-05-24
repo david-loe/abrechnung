@@ -50,20 +50,20 @@ export default defineComponent({
   methods: {
     filter(options: CountrySimple[], search: string): CountrySimple[] {
       return options.filter((option) => {
-        const name = option.name[this.$i18n.locale as Locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const name = option.name[this.$i18n.locale as Locale].toLowerCase().indexOf(search.toLowerCase()) > -1
         if (name) {
           return name
         }
         if (option.alias && option.alias[this.$i18n.locale as Locale]) {
           for (const alias of option.alias[this.$i18n.locale as Locale]!) {
-            const result = alias.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+            const result = alias.toLowerCase().indexOf(search.toLowerCase()) > -1
             if (result) {
               return result
             }
           }
         }
 
-        const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const code = option._id.toLowerCase().indexOf(search.toLowerCase()) > -1
         return code
       })
     }

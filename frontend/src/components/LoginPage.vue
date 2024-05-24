@@ -79,8 +79,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
 import axios from 'axios'
+import { defineComponent } from 'vue'
 
 type Strategy = 'ldapauth' | 'magiclogin'
 
@@ -91,11 +91,11 @@ export default defineComponent({
       strategy: '' as Strategy,
       passwordLDAP: '',
       usernameLDAP: '',
-      useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true',
-      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true',
+      useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true',
+      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true',
       magicLoginMail: '',
       magicLoginSend: false,
-      useMagicLogin: import.meta.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
+      useMagicLogin: import.meta.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
     }
   },
   methods: {

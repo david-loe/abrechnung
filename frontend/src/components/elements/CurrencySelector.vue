@@ -58,11 +58,11 @@ export default defineComponent({
   methods: {
     filter(options: Currency[], search: string): Currency[] {
       return options.filter((option) => {
-        const name = option.name[this.$i18n.locale as Locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const name = option.name[this.$i18n.locale as Locale].toLowerCase().indexOf(search.toLowerCase()) > -1
         if (name) {
           return name
         }
-        const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const code = option._id.toLowerCase().indexOf(search.toLowerCase()) > -1
         return code
       })
     }
