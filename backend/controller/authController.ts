@@ -7,9 +7,9 @@ import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
-const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
-const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
-const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
+const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true'
+const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true'
+const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
 
 const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
   throw new NotImplementedError(disabledMessage)

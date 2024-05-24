@@ -45,15 +45,15 @@ export default defineComponent({
   methods: {
     filter(options: UserWithName[], search: string): UserWithName[] {
       return options.filter((option) => {
-        const givenName = option.name.givenName.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const givenName = option.name.givenName.toLowerCase().indexOf(search.toLowerCase()) > -1
         if (givenName) {
           return givenName
         }
-        const familyName = option.name.familyName.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        const familyName = option.name.familyName.toLowerCase().indexOf(search.toLowerCase()) > -1
         if (familyName) {
           return familyName
         }
-        return (option.name.givenName + ' ' + option.name.familyName).toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+        return (option.name.givenName + ' ' + option.name.familyName).toLowerCase().indexOf(search.toLowerCase()) > -1
       })
     }
   }

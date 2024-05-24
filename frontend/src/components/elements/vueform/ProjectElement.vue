@@ -90,12 +90,12 @@ export default defineElement({
   }),
   methods: {
     customFilterFunction(option, search) {
-      const identifier = option.identifier.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+      const identifier = option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1
       if (identifier) {
         return identifier
       }
 
-      const name = option.name.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+      const name = option.name.toLowerCase().indexOf(search.toLowerCase()) > -1
       return name
     }
   },

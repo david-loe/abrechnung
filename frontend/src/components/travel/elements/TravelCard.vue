@@ -24,7 +24,7 @@
     <template #details>
       <div class="col-auto">
         <span class="fs-6 fw-medium text-muted">
-          {{ datetoDateString(travel.startDate) + ' - ' + datetoDateString(travel.endDate) }}
+          {{ $formatter.simpleDate(travel.startDate) + ' - ' + $formatter.simpleDate(travel.endDate) }}
         </span>
       </div>
       <div v-if="travel.claimSpouseRefund" :title="$t('labels.claimSpouseRefund')" class="col-auto">
@@ -36,7 +36,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { datetoDateString } from '../../../../../common/scripts.js'
 import { TravelSimple } from '../../../../../common/types.js'
 import CardElement from '../../elements/CardElement.vue'
 import ProgressCircle from '../../elements/ProgressCircle.vue'
@@ -50,9 +49,7 @@ export default defineComponent({
     showOwner: { type: Boolean, default: false },
     showDropdown: { type: Boolean, default: false }
   },
-  methods: {
-    datetoDateString
-  }
+  methods: {}
 })
 </script>
 

@@ -92,7 +92,7 @@ export default defineElement({
   }),
   methods: {
     customFilterFunction(option, search) {
-      return option.name.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+      return option.name.toLowerCase().indexOf(search.toLowerCase()) > -1
     }
   },
   setup(props, context) {

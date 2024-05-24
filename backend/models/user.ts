@@ -3,11 +3,11 @@ import {
   Access,
   Token,
   User,
+  UserReplaceReferencesResult,
   accesses,
   emailRegex,
   locales,
-  userReplaceCollections,
-  UserReplaceReferencesResult
+  userReplaceCollections
 } from '../../common/types.js'
 import Settings from './settings.js'
 
@@ -18,9 +18,9 @@ for (const access of accesses) {
   accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
 }
 
-const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLocaleLowerCase() === 'true'
-const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLocaleLowerCase() === 'true'
-const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLocaleLowerCase() === 'true'
+const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true'
+const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true'
+const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
 
 interface Methods {
   isActive(): Promise<boolean>

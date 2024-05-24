@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
 import { Types, mongo } from 'mongoose'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
-import { addUp, getMoneyString } from '../../common/scripts.js'
+import Formatter from '../../common/formatter.js'
+import { addUp } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -34,7 +35,8 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   } else {
     path += 'expenseReport/'
   }
-  const totalSum = getMoneyString(addUp(report).total, { language: i18n.language as Locale })
+  const formatter = new Formatter(i18n.language as Locale)
+  const totalSum = formatter.money(addUp(report).total)
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
@@ -49,6 +51,7 @@ export interface Options {
   textColor?: pdf_lib.Color
   edge?: number
   language: Locale
+  formatter: Formatter
 }
 
 export interface TabelOptions extends Options {
@@ -109,7 +112,7 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
     if (receipt.noNumberPrint) {
       return
     }
-    const text = '#' + receipt.number + ' - ' + receipt.date.toLocaleDateString(opts.language, { timeZone: 'UTC' })
+    const text = '#' + receipt.number + ' - ' + opts.formatter.date(receipt.date)
     const width = opts.font.widthOfTextAtSize(text, opts.fontSize)
     page.drawRectangle({
       x: 2,

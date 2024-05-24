@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, nextTick } from 'vue'
+import { PropType, defineComponent } from 'vue'
 import { Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
@@ -75,8 +75,8 @@ export default defineComponent({
           return false
         }
         return (
-          option.identifier.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1 ||
-          ((option as Project).name && (option as Project).name!.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1)
+          option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1 ||
+          ((option as Project).name && (option as Project).name!.toLowerCase().indexOf(search.toLowerCase()) > -1)
         )
       })
     }

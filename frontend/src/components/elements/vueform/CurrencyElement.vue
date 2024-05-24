@@ -108,11 +108,11 @@ export default defineElement({
   }),
   methods: {
     customFilterFunction(option, search) {
-      const name = option.name[this.$i18n.locale].toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+      const name = option.name[this.$i18n.locale].toLowerCase().indexOf(search.toLowerCase()) > -1
       if (name) {
         return name
       }
-      const code = option._id.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1
+      const code = option._id.toLowerCase().indexOf(search.toLowerCase()) > -1
       return code
     }
   },

@@ -213,6 +213,7 @@ export default defineComponent({
           if (this.user._id) {
             this.$i18n.locale = this.user.settings.language
             this.$vueform.i18n.locale = this.user.settings.language
+            this.$formatter.setLocale(this.user.settings.language)
             this.auth = true
           }
           this.loadState = 'LOADED'
@@ -348,6 +349,7 @@ export default defineComponent({
       )
     },
     async pushUserSettings(settings: User['settings']) {
+      this.$formatter.setLocale(this.$i18n.locale as Locale)
       settings.language = this.$i18n.locale as Locale
       this.$vueform.i18n.locale = this.$i18n.locale as Locale
       try {
