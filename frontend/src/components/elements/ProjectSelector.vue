@@ -5,7 +5,7 @@
       class="form-select col-3"
       id="healthCareCostFormProject"
       v-model="$root.user.settings.organisation"
-      @update:model-value="$root.pushUserSettings($root.user.settings)"
+      @update:model-value="changeOrganisation($root.user.settings.organisation!)"
       :disabled="disabled">
       <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
         {{ organisation.name }}
@@ -14,7 +14,7 @@
 
     <v-select
       v-if="$root.user.settings.projects && $root.settings.userCanSeeAllProjects === $root.projects.length > 0"
-      :options="getProjects()"
+      :options="projects"
       :modelValue="modelValue"
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
@@ -36,12 +36,14 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue'
-import { Project, ProjectSimple } from '../../../../common/types.js'
+import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ProjectSelector',
   data() {
-    return {}
+    return {
+      projects: [] as ProjectSimple[]
+    }
   },
   components: {},
   props: {
@@ -51,8 +53,18 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    getProjects() {
-      const projects: ProjectSimple[] = [...this.$root.user.settings.projects]
+    changeOrganisation(newOrga: OrganisationSimple) {
+      this.getProjects(newOrga._id)
+      this.$root.pushUserSettings(this.$root.user.settings)
+    },
+    getProjects(orgaId?: string) {
+      const projects: ProjectSimple[] = []
+      for (const project of this.$root.user.settings.projects) {
+        if (!orgaId || project.organisation === orgaId) {
+          projects.push(project)
+        }
+      }
+
       if (this.$root.settings.userCanSeeAllProjects) {
         for (const project of this.$root.projects) {
           let alreadyIn = false
@@ -63,23 +75,25 @@ export default defineComponent({
             }
           }
           if (!alreadyIn) {
-            projects.push(project)
+            if (!orgaId || project.organisation === orgaId) {
+              projects.push(project)
+            }
           }
         }
       }
-      return projects
+      this.projects = projects
     },
     filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
       return options.filter((option) => {
-        if (this.$root.user.settings.organisation && option.organisation !== this.$root.user.settings.organisation._id) {
-          return false
-        }
         return (
           option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1 ||
           ((option as Project).name && (option as Project).name!.toLowerCase().indexOf(search.toLowerCase()) > -1)
         )
       })
     }
+  },
+  beforeMount() {
+    this.getProjects(this.$root.user.settings.organisation?._id)
   }
 })
 </script>
