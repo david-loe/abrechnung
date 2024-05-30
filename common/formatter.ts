@@ -39,7 +39,7 @@ class Formatter {
     this.setLocale(locale)
     const validDate = isValidDate(date)
     if (validDate) {
-      return this.#dateFormat.format()
+      return this.#dateFormat.format(validDate)
     } else {
       return ''
     }
