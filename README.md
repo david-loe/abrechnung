@@ -12,7 +12,9 @@
 
 digital und einfach möglich macht.
 
-https://github.com/david-loe/abrechnung/assets/56305409/490dbb36-afc3-4cd5-a60b-2ecab49b7bd2
+
+https://github.com/david-loe/abrechnung/assets/56305409/8b31b6a1-e6c4-4bd9-bb76-3871e046a201
+
 
 ## Pauschalbeträge
 
