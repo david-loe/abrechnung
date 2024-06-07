@@ -16,7 +16,14 @@ const routes = [
   {
     path: '/login',
     component: LoginPage,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
+    beforeEnter: async (to: RouteLocationNormalized) => {
+      if (await auth()) {
+        return { path: '/user', query: { redirect: to.fullPath } }
+      } else {
+        return true;
+      }
+    }
   },
   {
     path: '/settings',
