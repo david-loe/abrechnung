@@ -1,62 +1,64 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.' + modalObjectType)
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="travel._id" class="modal-body">
-            <ErrorBanner :error="error"></ErrorBanner>
-            <StageForm
-              v-if="modalObjectType === 'stage'"
-              ref="stageForm"
-              :mode="modalMode"
-              :stage="modalObject as Partial<Stage> | Gap | undefined"
-              :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate"
-              :disabled="isReadOnly"
-              :showVehicleRegistration="travel.state === 'approved'"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postStage"
-              @edit="postStage"
-              @deleted="deleteStage"
-              @cancel="hideModal"
-              @postVehicleRegistration="postVehicleRegistration">
-            </StageForm>
-            <ExpenseForm
-              v-else-if="modalObjectType === 'expense'"
-              ref="expenseForm"
-              :expense="modalObject as Partial<TravelExpense> | undefined"
-              :disabled="isReadOnly"
-              :mode="modalMode"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postExpense"
-              @edit="postExpense"
-              @deleted="deleteExpense"
-              @cancel="hideModal">
-            </ExpenseForm>
-            <TravelApplyForm
-              v-else-if="modalObjectType === 'travel'"
-              :mode="modalMode"
-              @cancel="hideModal"
-              :travel="modalObject as TravelSimple"
-              @edit="applyForTravel"
-              ref="travelApplyForm"></TravelApplyForm>
+    <ModalComponent @hideModel="hideModal()">
+      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 v-if="modalMode === 'add'" class="modal-title">
+                {{
+                  $t('labels.newX', {
+                    X: $t('labels.' + modalObjectType)
+                  })
+                }}
+              </h5>
+              <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
+              <button type="button" class="btn-close" @click="hideModal"></button>
+            </div>
+            <div v-if="travel._id" class="modal-body">
+              <ErrorBanner :error="error"></ErrorBanner>
+              <StageForm
+                v-if="modalObjectType === 'stage'"
+                ref="stageForm"
+                :mode="modalMode"
+                :stage="modalObject as Partial<Stage> | Gap | undefined"
+                :travelStartDate="travel.startDate"
+                :travelEndDate="travel.endDate"
+                :disabled="isReadOnly"
+                :showVehicleRegistration="travel.state === 'approved'"
+                :endpointPrefix="endpointPrefix"
+                :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+                @add="postStage"
+                @edit="postStage"
+                @deleted="deleteStage"
+                @cancel="hideModal"
+                @postVehicleRegistration="postVehicleRegistration">
+              </StageForm>
+              <ExpenseForm
+                v-else-if="modalObjectType === 'expense'"
+                ref="expenseForm"
+                :expense="modalObject as Partial<TravelExpense> | undefined"
+                :disabled="isReadOnly"
+                :mode="modalMode"
+                :endpointPrefix="endpointPrefix"
+                :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+                @add="postExpense"
+                @edit="postExpense"
+                @deleted="deleteExpense"
+                @cancel="hideModal">
+              </ExpenseForm>
+              <TravelApplyForm
+                v-else-if="modalObjectType === 'travel'"
+                :mode="modalMode"
+                @cancel="hideModal"
+                :travel="modalObject as TravelSimple"
+                @edit="applyForTravel"
+                ref="travelApplyForm"></TravelApplyForm>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container" v-if="travel._id">
       <div class="row">
         <div class="col">
@@ -258,12 +260,11 @@
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="
-                          (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
-                          ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') +
+                        $t('lumpSums.' + refund.type) +
+                        ' ' +
+                        (row.data as Day).country.flag +
+                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-sun"></i>
                         {{ $formatter.money(refund.refund) }}
@@ -272,12 +273,11 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="
-                          (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
-                          ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        :title="(travel.claimSpouseRefund ? '2x ' : '') +
+                        $t('lumpSums.' + refund.type) +
+                        ' ' +
+                        (row.data as Day).country.flag +
+                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-moon"></i>
                         {{ $formatter.money(refund.refund) }}
@@ -518,6 +518,7 @@ import {
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
+import ModalComponent from '../elements/ModalComponent.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StatePipeline from '../elements/StatePipeline.vue'

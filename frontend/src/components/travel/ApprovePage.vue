@@ -1,36 +1,30 @@
 <template>
   <div>
-    <div class="modal fade" id="approveTravelModal" tabindex="-1" aria-labelledby="approveTravelModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalTravel" class="modal-title">
-              {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
-            </h5>
-            <button type="button" class="btn-close" @click="hideModal()"></button>
-          </div>
-          <div v-if="modalTravel" class="modal-body">
-            <TravelApproveForm
-              v-if="modalTravel.state === 'appliedFor'"
-              ref="travelApproveForm"
-              :travel="modalTravel"
-              @cancel="hideModal()"
-              @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
-            <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
-            <TravelApplyForm
-              v-else-if="modalMode !== 'view'"
-              :mode="modalMode"
-              @cancel="hideModal()"
-              :travel="modalTravel as Partial<TravelSimple>"
-              @add="(t) => approveTravel(t, 'approved')"
-              @edit="(t) => approveTravel(t, 'approved')"
-              ref="travelApplyForm"
-              minStartDate=""
-              askOwner></TravelApplyForm>
+    <ModalComponent @hideModal="hideModal()">
+      <div class="modal fade" id="approveTravelModal" tabindex="-1" aria-labelledby="approveTravelModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 v-if="modalTravel" class="modal-title">
+                {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
+              </h5>
+              <button type="button" class="btn-close" @click="hideModal()"></button>
+            </div>
+            <div v-if="modalTravel" class="modal-body">
+              <TravelApproveForm v-if="modalTravel.state === 'appliedFor'" ref="travelApproveForm" :travel="modalTravel"
+                @cancel="hideModal()" @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
+              <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false">
+              </TravelApply>
+              <TravelApplyForm v-else-if="modalMode !== 'view'" :mode="modalMode" @cancel="hideModal()"
+                :travel="modalTravel as Partial<TravelSimple>" @add="(t) => approveTravel(t, 'approved')"
+                @edit="(t) => approveTravel(t, 'approved')" ref="travelApplyForm" minStartDate="" askOwner>
+              </TravelApplyForm>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -43,14 +37,8 @@
           </button>
         </div>
       </div>
-      <TravelCardList
-        class="mb-5"
-        ref="travelCardListRef"
-        endpoint="approve/travel"
-        :params="params('appliedFor')"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => showModal(t)"></TravelCardList>
+      <TravelCardList class="mb-5" ref="travelCardListRef" endpoint="approve/travel" :params="params('appliedFor')"
+        :showOwner="true" :showSearch="true" @clicked="(t) => showModal(t)"></TravelCardList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -59,11 +47,7 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelCardList
-          endpoint="approve/travel"
-          :params="params('approved')"
-          :showOwner="true"
-          :showSearch="true"
+        <TravelCardList endpoint="approve/travel" :params="params('approved')" :showOwner="true" :showSearch="true"
           @clicked="(t) => showModal(t)">
         </TravelCardList>
       </template>
@@ -75,6 +59,7 @@
 import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
 import TravelCardList from './elements/TravelCardList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
@@ -82,7 +67,7 @@ import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm },
+  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
   props: { _id: { type: String } },
   data() {
     return {
@@ -105,10 +90,10 @@ export default defineComponent({
         this.approveTravelModal.hide()
       }
       if (this.$refs.travelApproveForm) {
-        ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
+        ; (this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }
       if (this.$refs.travelApplyForm) {
-        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
+        ; (this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
       }
       this.modalTravel = undefined
     },
@@ -117,10 +102,10 @@ export default defineComponent({
         travel.comment = comment
         const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
-          ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
+          ; (this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
         } else {
-          ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
+          ; (this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
         }
       }
     },
