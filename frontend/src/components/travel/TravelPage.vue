@@ -1,62 +1,42 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.' + modalObjectType)
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="travel._id" class="modal-body">
-            <ErrorBanner :error="error"></ErrorBanner>
-            <StageForm
-              v-if="modalObjectType === 'stage'"
-              ref="stageForm"
-              :mode="modalMode"
-              :stage="modalObject as Partial<Stage> | Gap | undefined"
-              :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate"
-              :disabled="isReadOnly"
-              :showVehicleRegistration="travel.state === 'approved'"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postStage"
-              @edit="postStage"
-              @deleted="deleteStage"
-              @cancel="hideModal"
-              @postVehicleRegistration="postVehicleRegistration">
-            </StageForm>
-            <ExpenseForm
-              v-else-if="modalObjectType === 'expense'"
-              ref="expenseForm"
-              :expense="modalObject as Partial<TravelExpense> | undefined"
-              :disabled="isReadOnly"
-              :mode="modalMode"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postExpense"
-              @edit="postExpense"
-              @deleted="deleteExpense"
-              @cancel="hideModal">
-            </ExpenseForm>
-            <TravelApplyForm
-              v-else-if="modalObjectType === 'travel'"
-              :mode="modalMode"
-              @cancel="hideModal"
-              :travel="modalObject as TravelSimple"
-              @edit="applyForTravel"
-              ref="travelApplyForm"></TravelApplyForm>
+    <ModalComponent @hideModel="hideModal()">
+      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 v-if="modalMode === 'add'" class="modal-title">
+                {{
+                  $t('labels.newX', {
+                    X: $t('labels.' + modalObjectType)
+                  })
+                }}
+              </h5>
+              <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
+              <button type="button" class="btn-close" @click="hideModal"></button>
+            </div>
+            <div v-if="travel._id" class="modal-body">
+              <ErrorBanner :error="error"></ErrorBanner>
+              <StageForm v-if="modalObjectType === 'stage'" ref="stageForm" :mode="modalMode"
+                :stage="modalObject as Partial<Stage> | Gap | undefined" :travelStartDate="travel.startDate"
+                :travelEndDate="travel.endDate" :disabled="isReadOnly"
+                :showVehicleRegistration="travel.state === 'approved'" :endpointPrefix="endpointPrefix"
+                :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined" @add="postStage"
+                @edit="postStage" @deleted="deleteStage" @cancel="hideModal"
+                @postVehicleRegistration="postVehicleRegistration">
+              </StageForm>
+              <ExpenseForm v-else-if="modalObjectType === 'expense'" ref="expenseForm"
+                :expense="modalObject as Partial<TravelExpense> | undefined" :disabled="isReadOnly" :mode="modalMode"
+                :endpointPrefix="endpointPrefix" :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+                @add="postExpense" @edit="postExpense" @deleted="deleteExpense" @cancel="hideModal">
+              </ExpenseForm>
+              <TravelApplyForm v-else-if="modalObjectType === 'travel'" :mode="modalMode" @cancel="hideModal"
+                :travel="modalObject as TravelSimple" @edit="applyForTravel" ref="travelApplyForm"></TravelApplyForm>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container" v-if="travel._id">
       <div class="row">
         <div class="col">
@@ -79,7 +59,8 @@
                 <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
               </li>
               <li>
-                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i
+                    class="bi bi-microsoft-teams me-1"></i>Teams</a>
               </li>
             </ul>
           </div>
@@ -98,7 +79,8 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+              <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#"
+                role="button">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -106,7 +88,8 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel"
+                          v-model="isReadOnly" />
                         <label class="form-check-label text-nowrap" for="editTravel">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ $t('labels.readOnly') }}</span>
@@ -119,16 +102,15 @@
                   </li>
                 </template>
                 <li>
-                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', travel, 'travel')">
+                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#"
+                    @click="showModal('edit', travel, 'travel')">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
                   </a>
                 </li>
                 <li>
-                  <a
-                    :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')"
-                    href="#"
-                    @click="isReadOnly && endpointPrefix === 'examine/' ? null : deleteTravel()">
+                  <a :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')"
+                    href="#" @click="isReadOnly && endpointPrefix === 'examine/' ? null : deleteTravel()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ $t('labels.delete') }}</span>
                   </a>
@@ -147,15 +129,10 @@
       <div class="row gx-5 justify-content-center align-items-center mb-5">
         <div class="col-auto">
           <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="travelClaimOvernightLumpSum"
-              v-model="travel.claimOvernightLumpSum"
-              @change="postTravelSettings"
-              :disabled="isReadOnly" />
-            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum') }}</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="travelClaimOvernightLumpSum"
+              v-model="travel.claimOvernightLumpSum" @change="postTravelSettings" :disabled="isReadOnly" />
+            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum')
+              }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
           </div>
         </div>
@@ -165,12 +142,10 @@
               <label class="form-lable mb-0">{{ $t('labels.lastPlaceOfWork') }}</label>
             </div>
             <div class="col-auto p-0">
-              <select
-                class="form-select form-select-sm"
-                @change="postTravelSettings"
-                v-model="travel.lastPlaceOfWork"
+              <select class="form-select form-select-sm" @change="postTravelSettings" v-model="travel.lastPlaceOfWork"
                 :disabled="isReadOnly">
-                <option v-for="place of getLastPaceOfWorkList(travel)" :value="place" :key="place.country._id + place.special">
+                <option v-for="place of getLastPaceOfWorkList(travel)" :value="place"
+                  :key="place.country._id + place.special">
                   <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
                 </option>
               </select>
@@ -180,13 +155,13 @@
             </div>
           </div>
         </div>
-        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
+        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1"
+          class="col-auto">
           <label class="form-check-label me-2" for="travelProfessionalShare">
             {{ $t('labels.professionalShare') + ':' }}
           </label>
           <span id="travelProfessionalShare" :class="travel.professionalShare <= 0.5 ? 'text-danger' : ''">
-            {{ Math.round(travel.professionalShare * 100) + '%' }}</span
-          >
+            {{ Math.round(travel.professionalShare * 100) + '%' }}</span>
           <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />
         </div>
       </div>
@@ -195,14 +170,16 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-2">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
                 <span class="ms-1 d-md-none">{{ $t('labels.stage') }}</span>
               </button>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ $t('labels.expense') }}</span>
@@ -211,18 +188,14 @@
           </div>
           <div class="row mb-2">
             <div class="col-auto">
-              <button
-                class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => ((d as Day).showSettings = true))"
+              <button class="btn btn-link btn-sm" @click="travel.days.map((d) => ((d as Day).showSettings = true))"
                 :disabled="travel.stages.length == 0">
                 {{ $t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
               </button>
             </div>
             <div class="col-auto">
-              <button
-                class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => ((d as Day).showSettings = false))"
+              <button class="btn btn-link btn-sm" @click="travel.days.map((d) => ((d as Day).showSettings = false))"
                 :disabled="travel.stages.length == 0">
                 {{ $t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
@@ -233,20 +206,15 @@
             {{ $t('alerts.noData.stage') }}
           </div>
 
-          <div
-            v-for="row of table"
-            class="mb-2"
+          <div v-for="row of table" class="mb-2"
             :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as Record | Day)._id">
             <!-- day -->
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
                 <h5 class="m-0">
-                  <small
-                    v-if="(row.data as Day).purpose === 'private'"
-                    :title="$t('labels.private')"
+                  <small v-if="(row.data as Day).purpose === 'private'" :title="$t('labels.private')"
                     style="margin-left: -1.25rem; margin-right: 0.156rem">
-                    <i class="bi bi-file-person"></i> </small
-                  >{{ $formatter.simpleDate((row.data as Day).date) }}
+                    <i class="bi bi-file-person"></i> </small>{{ $formatter.simpleDate((row.data as Day).date) }}
                 </h5>
               </div>
               <div class="col">
@@ -255,29 +223,21 @@
                   <template v-if="!(row.data as Day).showSettings">
                     <template v-for="refund of (row.data as Day).refunds" :key="refund._id">
                       <!-- catering -->
-                      <div
-                        v-if="refund.type.indexOf('catering') == 0"
-                        class="col-auto text-secondary"
-                        :title="
-                          (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
-                          ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                      <div v-if="refund.type.indexOf('catering') == 0" class="col-auto text-secondary" :title="(travel.claimSpouseRefund ? '2x ' : '') +
+                        $t('lumpSums.' + refund.type) +
+                        ' ' +
+                        (row.data as Day).country.flag +
+                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-sun"></i>
                         {{ $formatter.money(refund.refund) }}
                       </div>
                       <!-- overnight -->
-                      <div
-                        v-else
-                        class="col-auto text-secondary"
-                        :title="
-                          (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
-                          ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                      <div v-else class="col-auto text-secondary" :title="(travel.claimSpouseRefund ? '2x ' : '') +
+                        $t('lumpSums.' + refund.type) +
+                        ' ' +
+                        (row.data as Day).country.flag +
+                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-moon"></i>
                         {{ $formatter.money(refund.refund) }}
@@ -289,14 +249,10 @@
                       <InfoPoint :text="$t('info.cateringNoRefund')" />
                     </div>
                     <div v-for="key of meals" class="form-check col-auto" :key="key">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        role="switch"
+                      <input class="form-check-input" type="checkbox" role="switch"
                         :id="'configCateringRefund' + key + (row.data as Day).date"
                         v-model="((row.data as Day).cateringNoRefund as any)[key]"
-                        @change="isReadOnly ? null : postTravelSettings()"
-                        :disabled="isReadOnly" />
+                        @change="isReadOnly ? null : postTravelSettings()" :disabled="isReadOnly" />
                       <label class="form-check-label" :for="'configCateringRefund' + key + (row.data as Day).date">
                         {{ $t('labels.' + key) }}
                       </label>
@@ -307,12 +263,8 @@
                           <InfoPoint :text="$t('info.purpose')" />
                         </div>
                         <div class="col-auto ps-0">
-                          <select
-                            class="form-select form-select-sm"
-                            v-model="(row.data as Day).purpose"
-                            @change="isReadOnly ? null : postTravelSettings()"
-                            :disabled="isReadOnly"
-                            required>
+                          <select class="form-select form-select-sm" v-model="(row.data as Day).purpose"
+                            @change="isReadOnly ? null : postTravelSettings()" :disabled="isReadOnly" required>
                             <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
                               {{ $t('labels.' + purpose) }}
                             </option>
@@ -324,24 +276,20 @@
                 </div>
               </div>
               <div class="col-auto ms-auto">
-                <i
-                  :class="(row.data as Day).showSettings ? 'bi bi-x-lg' : 'bi bi-sliders'"
-                  style="cursor: pointer"
-                  @click=";(row.data as Day).showSettings = !(row.data as Day).showSettings"></i>
+                <i :class="(row.data as Day).showSettings ? 'bi bi-x-lg' : 'bi bi-sliders'" style="cursor: pointer"
+                  @click="; (row.data as Day).showSettings = !(row.data as Day).showSettings"></i>
               </div>
             </div>
             <!-- Stage -->
-            <div
-              v-else-if="row.type === 'stage'"
-              class="row align-items-center ps-lg-4 mb-1"
-              style="cursor: pointer"
+            <div v-else-if="row.type === 'stage'" class="row align-items-center ps-lg-4 mb-1" style="cursor: pointer"
               @click="showModal('edit', row.data as Stage, 'stage')">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i :class="getStageIcon(row.data as Stage)"></i>
               </div>
               <div class="col-auto text-truncate">
                 <PlaceElement :place="(row.data as Stage).startLocation"></PlaceElement>
-                <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i class="bi bi-arrow-right mx-2"></i>
+                <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i
+                  class="bi bi-arrow-right mx-2"></i>
                 <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
                   <i class="bi bi-coin"></i>
                   {{ $formatter.money((row.data as Stage).cost) }}
@@ -354,10 +302,7 @@
               </div>
             </div>
             <!-- expense -->
-            <div
-              v-else-if="row.type === 'expense'"
-              class="row align-items-center ps-lg-4 mb-1"
-              style="cursor: pointer"
+            <div v-else-if="row.type === 'expense'" class="row align-items-center ps-lg-4 mb-1" style="cursor: pointer"
               @click="showModal('edit', row.data as TravelExpense, 'expense')">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i class="bi bi-coin"></i>
@@ -375,7 +320,8 @@
             <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.data as Gap, 'stage')" style="border-radius: 50%">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.data as Gap, 'stage')"
+                  style="border-radius: 50%">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -442,11 +388,7 @@
                 <template v-if="travel.state !== 'refunded'">
                   <div class="mb-3">
                     <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
-                    <textarea
-                      class="form-control"
-                      id="comment"
-                      rows="1"
-                      v-model="travel.comment"
+                    <textarea class="form-control" id="comment" rows="1" v-model="travel.comment"
                       :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                   </div>
                   <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
@@ -460,21 +402,18 @@
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
                 </template>
-                <button
-                  v-if="travel.state === 'approved'"
-                  class="btn btn-primary"
-                  @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || travel.stages.length < 1">
+                <button v-if="travel.state === 'approved'" class="btn btn-primary"
+                  @click="isReadOnly ? null : toExamination()" :disabled="isReadOnly || travel.stages.length < 1">
                   <i class="bi bi-pencil-square"></i>
                   <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                 </button>
-                <button
-                  v-if="travel.state === 'underExamination'"
-                  class="btn btn-secondary"
+                <button v-if="travel.state === 'underExamination'" class="btn btn-secondary"
                   @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
                   :disabled="travel.editor._id !== travel.owner._id">
                   <i class="bi bi-arrow-counterclockwise"></i>
-                  <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                  <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' :
+                    'labels.editAgain')
+                    }}</span>
                 </button>
               </div>
             </div>
@@ -508,6 +447,7 @@ import {
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
+import ModalComponent from '../elements/ModalComponent.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
@@ -566,10 +506,10 @@ export default defineComponent({
         this.modal.hide()
       }
       if (this.$refs.stageForm) {
-        ;(this.$refs.stageForm as typeof StageForm).clear()
+        ; (this.$refs.stageForm as typeof StageForm).clear()
       }
       if (this.$refs.expenseForm) {
-        ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
+        ; (this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
       this.modalObject = undefined
       this.error = undefined
@@ -654,7 +594,7 @@ export default defineComponent({
         this.hideModal()
       } else if (result.error) {
         this.error = result.error
-        ;(this.$refs.stageForm as typeof StageForm).loading = false
+          ; (this.$refs.stageForm as typeof StageForm).loading = false
         const modalEl = document.getElementById('modal')
         if (modalEl) {
           modalEl.scrollTo({ top: 0, behavior: 'smooth' })
@@ -683,7 +623,7 @@ export default defineComponent({
         this.setTravel(result.ok)
         this.hideModal()
       } else {
-        ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
+        ; (this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
     },
     async deleteExpense(_id: string) {
@@ -783,7 +723,7 @@ export default defineComponent({
           if ((oldDay as Day).showSettings) {
             for (const newDay of this.travel.days) {
               if (new Date(newDay.date).valueOf() == new Date(oldDay.date).valueOf()) {
-                ;(newDay as Day).showSettings = true
+                ; (newDay as Day).showSettings = true
               }
             }
           }

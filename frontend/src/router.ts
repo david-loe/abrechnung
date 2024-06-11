@@ -159,16 +159,4 @@ router.beforeEach(async (to) => {
   }
 })
 
-// removes .'modal-backdrop' divs if they are left before entering a route 
-router.beforeEach((to, from, next) => {
-  const modalLeftovers = document.getElementsByClassName('modal-backdrop');
-  for (let i = 0; i <= modalLeftovers.length; i++) {
-    if (document.getElementsByClassName('modal-backdrop')[i]) {
-      document.getElementsByClassName('modal-backdrop')[i].remove()
-
-    }
-  }
-  next()
-});
-
 export default router

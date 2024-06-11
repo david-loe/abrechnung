@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ModalComponent @hideModal="hideModal()">
     <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content">
@@ -31,6 +32,7 @@
         </div>
       </div>
     </div>
+  </ModalComponent>
     <div class="container" v-if="expenseReport._id">
       <div class="row">
         <div class="col">
@@ -240,6 +242,7 @@ import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { baseCurrency, BaseCurrencyMoney, Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
@@ -261,7 +264,7 @@ export default defineComponent({
       baseCurrency
     }
   },
-  components: { StatePipeline, ExpenseForm },
+  components: { StatePipeline, ExpenseForm, ModalComponent },
   props: {
     _id: { type: String, required: true },
     parentPages: {
