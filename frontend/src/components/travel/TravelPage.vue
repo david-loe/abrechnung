@@ -1,62 +1,56 @@
 <template>
   <div>
     <ModalComponent @hideModel="hideModal()">
-      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 v-if="modalMode === 'add'" class="modal-title">
-                {{
-                  $t('labels.newX', {
-                    X: $t('labels.' + modalObjectType)
-                  })
-                }}
-              </h5>
-              <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-              <button type="button" class="btn-close" @click="hideModal"></button>
-            </div>
-            <div v-if="travel._id" class="modal-body">
-              <ErrorBanner :error="error"></ErrorBanner>
-              <StageForm
-                v-if="modalObjectType === 'stage'"
-                ref="stageForm"
-                :mode="modalMode"
-                :stage="modalObject as Partial<Stage> | Gap | undefined"
-                :travelStartDate="travel.startDate"
-                :travelEndDate="travel.endDate"
-                :disabled="isReadOnly"
-                :showVehicleRegistration="travel.state === 'approved'"
-                :endpointPrefix="endpointPrefix"
-                :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-                @add="postStage"
-                @edit="postStage"
-                @deleted="deleteStage"
-                @cancel="hideModal"
-                @postVehicleRegistration="postVehicleRegistration">
-              </StageForm>
-              <ExpenseForm
-                v-else-if="modalObjectType === 'expense'"
-                ref="expenseForm"
-                :expense="modalObject as Partial<TravelExpense> | undefined"
-                :disabled="isReadOnly"
-                :mode="modalMode"
-                :endpointPrefix="endpointPrefix"
-                :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-                @add="postExpense"
-                @edit="postExpense"
-                @deleted="deleteExpense"
-                @cancel="hideModal">
-              </ExpenseForm>
-              <TravelApplyForm
-                v-else-if="modalObjectType === 'travel'"
-                :mode="modalMode"
-                @cancel="hideModal"
-                :travel="modalObject as TravelSimple"
-                @edit="applyForTravel"
-                ref="travelApplyForm"></TravelApplyForm>
-            </div>
-          </div>
-        </div>
+      <div class="modal-header">
+        <h5 v-if="modalMode === 'add'" class="modal-title">
+          {{
+            $t('labels.newX', {
+              X: $t('labels.' + modalObjectType)
+            })
+          }}
+        </h5>
+        <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
+        <button type="button" class="btn-close" @click="hideModal"></button>
+      </div>
+      <div v-if="travel._id" class="modal-body">
+        <ErrorBanner :error="error"></ErrorBanner>
+        <StageForm
+          v-if="modalObjectType === 'stage'"
+          ref="stageForm"
+          :mode="modalMode"
+          :stage="modalObject as Partial<Stage> | Gap | undefined"
+          :travelStartDate="travel.startDate"
+          :travelEndDate="travel.endDate"
+          :disabled="isReadOnly"
+          :showVehicleRegistration="travel.state === 'approved'"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          @add="postStage"
+          @edit="postStage"
+          @deleted="deleteStage"
+          @cancel="hideModal"
+          @postVehicleRegistration="postVehicleRegistration">
+        </StageForm>
+        <ExpenseForm
+          v-else-if="modalObjectType === 'expense'"
+          ref="expenseForm"
+          :expense="modalObject as Partial<TravelExpense> | undefined"
+          :disabled="isReadOnly"
+          :mode="modalMode"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          @add="postExpense"
+          @edit="postExpense"
+          @deleted="deleteExpense"
+          @cancel="hideModal">
+        </ExpenseForm>
+        <TravelApplyForm
+          v-else-if="modalObjectType === 'travel'"
+          :mode="modalMode"
+          @cancel="hideModal"
+          :travel="modalObject as TravelSimple"
+          @edit="applyForTravel"
+          ref="travelApplyForm"></TravelApplyForm>
       </div>
     </ModalComponent>
     <div class="container" v-if="travel._id">

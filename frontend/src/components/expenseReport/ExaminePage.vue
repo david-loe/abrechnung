@@ -1,27 +1,21 @@
 <template>
   <div>
     <ModalComponent @hideModal="hideModal()">
-      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 v-if="modalMode === 'add'" class="modal-title">
-                {{
-                  $t('labels.newX', {
-                    X: $t('labels.expenseReport')
-                  })
-                }}
-              </h5>
-              <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expenseReport') }) }}</h5>
-              <button type="button" class="btn-close" @click="hideModal"></button>
-            </div>
-            <div v-if="modalExpenseReport" class="modal-body">
-              <ExpenseReportForm ref="expenseReportForm" :mode="modalMode" :expenseReport="modalExpenseReport"
-                @cancel="hideModal()" @add="addExpenseReport" askOwner>
-              </ExpenseReportForm>
-            </div>
-          </div>
-        </div>
+      <div class="modal-header">
+        <h5 v-if="modalMode === 'add'" class="modal-title">
+          {{
+            $t('labels.newX', {
+              X: $t('labels.expenseReport')
+            })
+          }}
+        </h5>
+        <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expenseReport') }) }}</h5>
+        <button type="button" class="btn-close" @click="hideModal"></button>
+      </div>
+      <div v-if="modalExpenseReport" class="modal-body">
+        <ExpenseReportForm ref="expenseReportForm" :mode="modalMode" :expenseReport="modalExpenseReport"
+          @cancel="hideModal()" @add="addExpenseReport" askOwner>
+        </ExpenseReportForm>
       </div>
     </ModalComponent>
     <div class="container">

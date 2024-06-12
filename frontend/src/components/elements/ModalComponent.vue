@@ -1,6 +1,10 @@
 <template>
-  <div>
-    <slot></slot>
+  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <slot></slot>
+      </div>
+    </div>
   </div>
 </template>
 <script lang="ts">
