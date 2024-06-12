@@ -1,17 +1,8 @@
 <template>
   <div>
-    <ModalComponent @hideModel="hideModal()">
-      <div class="modal-header">
-        <h5 v-if="modalMode === 'add'" class="modal-title">
-          {{
-            $t('labels.newX', {
-              X: $t('labels.' + modalObjectType)
-            })
-          }}
-        </h5>
-        <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-        <button type="button" class="btn-close" @click="hideModal"></button>
-      </div>
+    <ModalComponent @hideModal="hideModal()"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : $t('labels.editX', { X: $t('labels.' + modalObjectType) })">
+
       <div v-if="travel._id" class="modal-body">
         <ErrorBanner :error="error"></ErrorBanner>
         <StageForm v-if="modalObjectType === 'stage'" ref="stageForm" :mode="modalMode"
@@ -476,7 +467,7 @@ export default defineComponent({
       addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney }
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
+  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner, ModalComponent },
   props: {
     _id: { type: String, required: true },
     parentPages: {
