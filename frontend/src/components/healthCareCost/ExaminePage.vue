@@ -1,32 +1,23 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.healthCareCost')
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.healthCareCost') }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="modalHealthCareCost" class="modal-body">
-            <HealthCareCostForm
-              ref="healthCareCostForm"
-              :mode="modalMode"
-              :healthCareCost="modalHealthCareCost"
-              @cancel="hideModal()"
-              @add="addHealthCareCost"
-              askOwner>
-            </HealthCareCostForm>
-          </div>
-        </div>
+    <ModalComponent @hideModal="hideModal()">
+      <div class="modal-header">
+        <h5 v-if="modalMode === 'add'" class="modal-title">
+          {{
+            $t('labels.newX', {
+              X: $t('labels.healthCareCost')
+            })
+          }}
+        </h5>
+        <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.healthCareCost') }) }}</h5>
+        <button type="button" class="btn-close" @click="hideModal"></button>
       </div>
-    </div>
+      <div v-if="modalHealthCareCost" class="modal-body">
+        <HealthCareCostForm ref="healthCareCostForm" :mode="modalMode" :healthCareCost="modalHealthCareCost"
+          @cancel="hideModal()" @add="addHealthCareCost" askOwner>
+        </HealthCareCostForm>
+      </div>
+    </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -39,28 +30,21 @@
           </button>
         </div>
       </div>
-      <HealthCareCostCardList
-        class="mb-5"
-        endpoint="examine/healthCareCost"
-        :params="params('underExamination')"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
+      <HealthCareCostCardList class="mb-5" endpoint="examine/healthCareCost" :params="params('underExamination')"
+        :showOwner="true" :showSearch="true" @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
       </HealthCareCostCardList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-        {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
+        {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i
+          class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="showRefunded = false">
-          {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
+          {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i
+            class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <HealthCareCostCardList
-          endpoint="examine/healthCareCost"
-          :params="params('underExaminationByInsurance')"
-          :showOwner="true"
-          :showSearch="true"
-          @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
+        <HealthCareCostCardList endpoint="examine/healthCareCost" :params="params('underExaminationByInsurance')"
+          :showOwner="true" :showSearch="true" @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
         </HealthCareCostCardList>
       </template>
     </div>
@@ -71,6 +55,7 @@
 import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { HealthCareCostSimple, HealthCareCostState } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import HealthCareCostCardList from './elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './forms/HealthCareCostForm.vue'
 
@@ -78,7 +63,7 @@ type ModalMode = 'add' | 'edit'
 
 export default defineComponent({
   name: 'ExaminePage',
-  components: { HealthCareCostCardList, HealthCareCostForm },
+  components: { HealthCareCostCardList, HealthCareCostForm, ModalComponent },
   props: [],
   data() {
     return {
@@ -106,7 +91,7 @@ export default defineComponent({
         this.modal.hide()
       }
       if (this.$refs.healthCareCostForm) {
-        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
+        ; (this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
       }
       this.modalHealthCareCost = undefined
     },
@@ -115,7 +100,7 @@ export default defineComponent({
       if (result.ok) {
         this.hideModal()
       } else {
-        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
+        ; (this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
     }
   },

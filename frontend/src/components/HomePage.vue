@@ -1,37 +1,28 @@
 <template>
   <div>
     <ModalComponent @hideModal="hideModal()">
-      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="newTravelModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', {
-                X: $t('labels.' +
-                  modalObjectType)
-              }) }}</h5>
-              <h5 v-else-if="modalObject" class="modal-title">{{ modalObject.name }}</h5>
-              <button type="button" class="btn-close" @click="hideModal()"></button>
-            </div>
-            <div v-if="modalObject" class="modal-body">
-              <template v-if="modalObjectType === 'travel'">
-                <TravelApplication v-if="modalMode === 'view'" :travel="modalObject as TravelSimple"
-                  @cancel="hideModal()" @edit="showModal('edit', modalObject, 'travel')" @deleted="deleteTravel">
-                </TravelApplication>
-                <TravelApplyForm v-else :mode="modalMode" @cancel="hideModal()"
-                  :travel="modalObject as Partial<TravelSimple>" @add="applyForTravel" @edit="applyForTravel"
-                  ref="travelApplyForm"></TravelApplyForm>
-              </template>
-              <ExpenseReportForm v-else-if="modalObjectType === 'expenseReport'" :mode="modalMode as 'add' | 'edit'"
-                :expenseReport="modalObject as Partial<ExpenseReportSimple>" @cancel="hideModal()"
-                @add="addExpenseReport">
-              </ExpenseReportForm>
-              <HealthCareCostForm v-else :mode="modalMode as 'add' | 'edit'"
-                :healthCareCost="modalObject as Partial<HealthCareCostSimple>" @cancel="hideModal()"
-                @add="addHealthCareCost">
-              </HealthCareCostForm>
-            </div>
-          </div>
-        </div>
+      <div class="modal-header">
+        <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', {
+          X: $t('labels.' +
+            modalObjectType)
+        }) }}</h5>
+        <h5 v-else-if="modalObject" class="modal-title">{{ modalObject.name }}</h5>
+        <button type="button" class="btn-close" @click="hideModal()"></button>
+      </div>
+      <div v-if="modalObject" class="modal-body">
+        <template v-if="modalObjectType === 'travel'">
+          <TravelApplication v-if="modalMode === 'view'" :travel="modalObject as TravelSimple" @cancel="hideModal()"
+            @edit="showModal('edit', modalObject, 'travel')" @deleted="deleteTravel">
+          </TravelApplication>
+          <TravelApplyForm v-else :mode="modalMode" @cancel="hideModal()" :travel="modalObject as Partial<TravelSimple>"
+            @add="applyForTravel" @edit="applyForTravel" ref="travelApplyForm"></TravelApplyForm>
+        </template>
+        <ExpenseReportForm v-else-if="modalObjectType === 'expenseReport'" :mode="modalMode as 'add' | 'edit'"
+          :expenseReport="modalObject as Partial<ExpenseReportSimple>" @cancel="hideModal()" @add="addExpenseReport">
+        </ExpenseReportForm>
+        <HealthCareCostForm v-else :mode="modalMode as 'add' | 'edit'"
+          :healthCareCost="modalObject as Partial<HealthCareCostSimple>" @cancel="hideModal()" @add="addHealthCareCost">
+        </HealthCareCostForm>
       </div>
     </ModalComponent>
     <div v-if="$root.settings._id" class="container">
