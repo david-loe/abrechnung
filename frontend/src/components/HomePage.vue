@@ -1,6 +1,7 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()">
+    <ModalComponent @hideModal="hideModal()"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : (modalObject ? modalObject.name : '')">
       <div class="modal-header">
         <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', {
           X: $t('labels.' +

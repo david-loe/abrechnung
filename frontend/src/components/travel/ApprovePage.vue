@@ -1,13 +1,8 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()">
-      <div class="modal-header">
-        <h5 v-if="modalTravel" class="modal-title">
-          {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
-        </h5>
-        <button type="button" class="btn-close" @click="hideModal()"></button>
-      </div>
-      <div v-if="modalTravel" class="modal-body">
+    <ModalComponent v-if="modalTravel" @hideModal="hideModal()"
+      :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })">
+      <div class="modal-body">
         <TravelApproveForm v-if="modalTravel.state === 'appliedFor'" ref="travelApproveForm" :travel="modalTravel"
           @cancel="hideModal()" @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
         <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false">

@@ -2,6 +2,10 @@
   <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
       <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ $props.header }}</h5>
+          <button type="button" class="btn-close" @click="$emit('hideModal')"></button>
+        </div>
         <slot></slot>
       </div>
     </div>
@@ -15,6 +19,9 @@ export default defineComponent({
   emits: ['hideModal'],
   beforeUnmount() {
     this.$emit('hideModal')
+  },
+  props: {
+    header: String
   }
 }) 
 </script>

@@ -1,17 +1,7 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()">
-      <div class="modal-header">
-        <h5 v-if="modalMode === 'add'" class="modal-title">
-          {{
-            $t('labels.newX', {
-              X: $t('labels.expenseReport')
-            })
-          }}
-        </h5>
-        <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expenseReport') }) }}</h5>
-        <button type="button" class="btn-close" @click="hideModal"></button>
-      </div>
+    <ModalComponent @hideModal="hideModal()"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })">
       <div v-if="modalExpenseReport" class="modal-body">
         <ExpenseReportForm ref="expenseReportForm" :mode="modalMode" :expenseReport="modalExpenseReport"
           @cancel="hideModal()" @add="addExpenseReport" askOwner>
