@@ -461,16 +461,15 @@
                   </a>
                 </template>
 
-                <!--  hier ist der anzupassede / aktionzuversehende Button -->
-                <div v-if="isReadOnly || travel.stages.length < 1">
-                  <div :data-bs-title="$t('info.noStages')" ref="tt" tabindex="0" class="tooltip-width">
+                <div :data-bs-title="$t('info.noStages')" ref="tt" tabindex="0" class="tooltip-width">
+                  <div v-if="isReadOnly || travel.stages.length < 1">
                     <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                     </button>
                   </div>
                 </div>
-                <div v-else>
+                <div v-if="!(isReadOnly || travel.stages.length < 1)">
                   <button v-if="travel.state === 'approved'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ $t('labels.toExamination') }}</span>
@@ -495,14 +494,13 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
-import { defineComponent, PropType } from 'vue'
+import { Modal, Tooltip } from 'bootstrap'
+import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
   BaseCurrencyMoney,
   DocumentFile,
-  meals,
   Place,
   Record,
   RecordType,
@@ -511,9 +509,10 @@ import {
   TravelDay,
   TravelExpense,
   TravelSimple,
-  travelStates,
   User,
-  UserSimple
+  UserSimple,
+  meals,
+  travelStates
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
@@ -549,7 +548,8 @@ export default defineComponent({
       mailToLink: '',
       msTeamsToLink: '',
       error: undefined as any,
-      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney }
+      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
+      tooltip: undefined as Tooltip | undefined
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
@@ -848,6 +848,9 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
+    if (this.$refs.tt) {
+      this.tooltip = new Tooltip(this.$refs.tt as Element)
+    }
   },
   mounted() {
     const modalEl = document.getElementById('modal')
