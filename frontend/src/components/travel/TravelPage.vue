@@ -460,14 +460,23 @@
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
                 </template>
-                <button
-                  v-if="travel.state === 'approved'"
-                  class="btn btn-primary"
-                  @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || travel.stages.length < 1">
-                  <i class="bi bi-pencil-square"></i>
-                  <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                </button>
+
+                <!--  hier ist der anzupassede / aktionzuversehende Button -->
+                <div v-if="isReadOnly || travel.stages.length < 1">
+                  <div :data-bs-title="$t('info.noStages')" ref="tt" tabindex="0" class="tooltip-width">
+                    <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled>
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                    </button>
+                  </div>
+                </div>
+                <div v-else>
+                  <button v-if="travel.state === 'approved'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                  </button>
+                </div>
+
                 <button
                   v-if="travel.state === 'underExamination'"
                   class="btn btn-secondary"
