@@ -2,14 +2,6 @@
   <div>
     <ModalComponent @hideModal="hideModal()"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : (modalObject ? modalObject.name : '')">
-      <div class="modal-header">
-        <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', {
-          X: $t('labels.' +
-            modalObjectType)
-        }) }}</h5>
-        <h5 v-else-if="modalObject" class="modal-title">{{ modalObject.name }}</h5>
-        <button type="button" class="btn-close" @click="hideModal()"></button>
-      </div>
       <div v-if="modalObject" class="modal-body">
         <template v-if="modalObjectType === 'travel'">
           <TravelApplication v-if="modalMode === 'view'" :travel="modalObject as TravelSimple" @cancel="hideModal()"
