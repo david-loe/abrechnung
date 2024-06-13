@@ -1,11 +1,18 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })">
-
+    <ModalComponent
+      @hideModal="hideModal()"
+      :header="
+        modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })
+      ">
       <div v-if="modalHealthCareCost" class="modal-body">
-        <HealthCareCostForm ref="healthCareCostForm" :mode="modalMode" :healthCareCost="modalHealthCareCost"
-          @cancel="hideModal()" @add="addHealthCareCost" askOwner>
+        <HealthCareCostForm
+          ref="healthCareCostForm"
+          :mode="modalMode"
+          :healthCareCost="modalHealthCareCost"
+          @cancel="hideModal()"
+          @add="addHealthCareCost"
+          askOwner>
         </HealthCareCostForm>
       </div>
     </ModalComponent>
@@ -21,21 +28,28 @@
           </button>
         </div>
       </div>
-      <HealthCareCostCardList class="mb-5" endpoint="examine/healthCareCost" :params="params('underExamination')"
-        :showOwner="true" :showSearch="true" @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
+      <HealthCareCostCardList
+        class="mb-5"
+        endpoint="examine/healthCareCost"
+        :params="params('underExamination')"
+        :showOwner="true"
+        :showSearch="true"
+        @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
       </HealthCareCostCardList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-        {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i
-          class="bi bi-chevron-down"></i>
+        {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="showRefunded = false">
-          {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i
-            class="bi bi-chevron-up"></i>
+          {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <HealthCareCostCardList endpoint="examine/healthCareCost" :params="params('underExaminationByInsurance')"
-          :showOwner="true" :showSearch="true" @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
+        <HealthCareCostCardList
+          endpoint="examine/healthCareCost"
+          :params="params('underExaminationByInsurance')"
+          :showOwner="true"
+          :showSearch="true"
+          @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
         </HealthCareCostCardList>
       </template>
     </div>
@@ -82,7 +96,7 @@ export default defineComponent({
         this.modal.hide()
       }
       if (this.$refs.healthCareCostForm) {
-        ; (this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
+        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
       }
       this.modalHealthCareCost = undefined
     },
@@ -91,7 +105,7 @@ export default defineComponent({
       if (result.ok) {
         this.hideModal()
       } else {
-        ; (this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
+        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
     }
   },

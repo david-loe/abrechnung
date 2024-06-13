@@ -1,10 +1,18 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })">
+    <ModalComponent
+      @hideModal="hideModal()"
+      :header="
+        modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
+      ">
       <div v-if="modalExpenseReport" class="modal-body">
-        <ExpenseReportForm ref="expenseReportForm" :mode="modalMode" :expenseReport="modalExpenseReport"
-          @cancel="hideModal()" @add="addExpenseReport" askOwner>
+        <ExpenseReportForm
+          ref="expenseReportForm"
+          :mode="modalMode"
+          :expenseReport="modalExpenseReport"
+          @cancel="hideModal()"
+          @add="addExpenseReport"
+          askOwner>
         </ExpenseReportForm>
       </div>
     </ModalComponent>
@@ -20,8 +28,13 @@
           </button>
         </div>
       </div>
-      <ExpenseReportCardList class="mb-5" endpoint="examine/expenseReport" :params="params('underExamination')"
-        :showOwner="true" :showSearch="true" @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
+      <ExpenseReportCardList
+        class="mb-5"
+        endpoint="examine/expenseReport"
+        :params="params('underExamination')"
+        :showOwner="true"
+        :showSearch="true"
+        @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
       </ExpenseReportCardList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
@@ -31,8 +44,12 @@
           {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <ExpenseReportCardList endpoint="examine/expenseReport" :params="params('refunded')" :showOwner="true"
-          :showSearch="true" @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
+        <ExpenseReportCardList
+          endpoint="examine/expenseReport"
+          :params="params('refunded')"
+          :showOwner="true"
+          :showSearch="true"
+          @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
         </ExpenseReportCardList>
       </template>
     </div>
@@ -76,7 +93,7 @@ export default defineComponent({
         this.modal.hide()
       }
       if (this.$refs.expenseReportForm) {
-        ; (this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
+        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
       }
       this.modalExpenseReport = undefined
     },
@@ -85,7 +102,7 @@ export default defineComponent({
       if (result.ok) {
         this.hideModal()
       } else {
-        ; (this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
+        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
     }
   },

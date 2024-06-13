@@ -1,8 +1,12 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : $t('labels.editX', { X: $t('labels.' + modalObjectType) })">
-
+    <ModalComponent
+      @hideModal="hideModal()"
+      :header="
+        modalMode === 'add'
+          ? $t('labels.newX', { X: $t('labels.' + modalObjectType) })
+          : $t('labels.editX', { X: $t('labels.' + modalObjectType) })
+      ">
       <div v-if="travel._id" class="modal-body">
         <ErrorBanner :error="error"></ErrorBanner>
         <StageForm
@@ -245,11 +249,12 @@
                       <div
                         v-if="refund.type.indexOf('catering') == 0"
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') +
-                        $t('lumpSums.' + refund.type) +
-                        ' ' +
-                        (row.data as Day).country.flag +
-                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-sun"></i>
                         {{ $formatter.money(refund.refund) }}
@@ -258,11 +263,12 @@
                       <div
                         v-else
                         class="col-auto text-secondary"
-                        :title="(travel.claimSpouseRefund ? '2x ' : '') +
-                        $t('lumpSums.' + refund.type) +
-                        ' ' +
-                        (row.data as Day).country.flag +
-                        ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                        :title="
+                          (travel.claimSpouseRefund ? '2x ' : '') +
+                          $t('lumpSums.' + refund.type) +
+                          ' ' +
+                          (row.data as Day).country.flag +
+                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-moon"></i>
                         {{ $formatter.money(refund.refund) }}
@@ -540,7 +546,17 @@ export default defineComponent({
       tooltip: undefined as Tooltip | undefined
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner, ModalComponent },
+  components: {
+    StatePipeline,
+    StageForm,
+    InfoPoint,
+    PlaceElement,
+    ProgressCircle,
+    ExpenseForm,
+    TravelApplyForm,
+    ErrorBanner,
+    ModalComponent
+  },
   props: {
     _id: { type: String, required: true },
     parentPages: {

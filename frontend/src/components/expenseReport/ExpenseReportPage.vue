@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ModalComponent @hideModal="hideModal()"
-      :header="(modalMode === 'add') ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
-
+    <ModalComponent
+      @hideModal="hideModal()"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
       <div v-if="expenseReport._id" class="modal-body">
         <ExpenseForm
           ref="expenseForm"
@@ -17,7 +17,6 @@
           @cancel="hideModal">
         </ExpenseForm>
       </div>
-
     </ModalComponent>
     <div class="container" v-if="expenseReport._id">
       <div class="row">

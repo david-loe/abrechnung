@@ -12,7 +12,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ModalComponent',
@@ -23,8 +23,6 @@ export default defineComponent({
   props: {
     header: String
   }
-}) 
+})
 </script>
-<style lang="">
-
-</style>
+<style lang=""></style>

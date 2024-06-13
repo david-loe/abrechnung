@@ -1,15 +1,27 @@
 <template>
   <div>
-    <ModalComponent v-if="modalTravel" @hideModal="hideModal()"
+    <ModalComponent
+      v-if="modalTravel"
+      @hideModal="hideModal()"
       :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })">
       <div class="modal-body">
-        <TravelApproveForm v-if="modalTravel.state === 'appliedFor'" ref="travelApproveForm" :travel="modalTravel"
-          @cancel="hideModal()" @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
-        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false">
-        </TravelApply>
-        <TravelApplyForm v-else-if="modalMode !== 'view'" :mode="modalMode" @cancel="hideModal()"
-          :travel="modalTravel as Partial<TravelSimple>" @add="(t) => approveTravel(t, 'approved')"
-          @edit="(t) => approveTravel(t, 'approved')" ref="travelApplyForm" minStartDate="" askOwner>
+        <TravelApproveForm
+          v-if="modalTravel.state === 'appliedFor'"
+          ref="travelApproveForm"
+          :travel="modalTravel"
+          @cancel="hideModal()"
+          @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
+        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"> </TravelApply>
+        <TravelApplyForm
+          v-else-if="modalMode !== 'view'"
+          :mode="modalMode"
+          @cancel="hideModal()"
+          :travel="modalTravel as Partial<TravelSimple>"
+          @add="(t) => approveTravel(t, 'approved')"
+          @edit="(t) => approveTravel(t, 'approved')"
+          ref="travelApplyForm"
+          minStartDate=""
+          askOwner>
         </TravelApplyForm>
       </div>
     </ModalComponent>
@@ -25,8 +37,14 @@
           </button>
         </div>
       </div>
-      <TravelCardList class="mb-5" ref="travelCardListRef" endpoint="approve/travel" :params="params('appliedFor')"
-        :showOwner="true" :showSearch="true" @clicked="(t) => showModal(t)"></TravelCardList>
+      <TravelCardList
+        class="mb-5"
+        ref="travelCardListRef"
+        endpoint="approve/travel"
+        :params="params('appliedFor')"
+        :showOwner="true"
+        :showSearch="true"
+        @clicked="(t) => showModal(t)"></TravelCardList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -35,7 +53,11 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelCardList endpoint="approve/travel" :params="params('approved')" :showOwner="true" :showSearch="true"
+        <TravelCardList
+          endpoint="approve/travel"
+          :params="params('approved')"
+          :showOwner="true"
+          :showSearch="true"
           @clicked="(t) => showModal(t)">
         </TravelCardList>
       </template>
@@ -78,10 +100,10 @@ export default defineComponent({
         this.approveTravelModal.hide()
       }
       if (this.$refs.travelApproveForm) {
-        ; (this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
+        ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }
       if (this.$refs.travelApplyForm) {
-        ; (this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
+        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
       }
       this.modalTravel = undefined
     },
@@ -90,10 +112,10 @@ export default defineComponent({
         travel.comment = comment
         const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
-          ; (this.$refs.travelCardListRef as typeof TravelCardList).getData()
+          ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           this.hideModal()
         } else {
-          ; (this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
+          ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
         }
       }
     },
