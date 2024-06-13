@@ -4,17 +4,16 @@
       @hideModal="hideModal()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })
-      ">
-      <div v-if="modalHealthCareCost" class="modal-body">
-        <HealthCareCostForm
-          ref="healthCareCostForm"
-          :mode="modalMode"
-          :healthCareCost="modalHealthCareCost"
-          @cancel="hideModal()"
-          @add="addHealthCareCost"
-          askOwner>
-        </HealthCareCostForm>
-      </div>
+      "
+      :showModalBody="modalHealthCareCost ? true : false">
+      <HealthCareCostForm
+        ref="healthCareCostForm"
+        :mode="modalMode"
+        :healthCareCost="modalHealthCareCost"
+        @cancel="hideModal()"
+        @add="addHealthCareCost"
+        askOwner>
+      </HealthCareCostForm>
     </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">

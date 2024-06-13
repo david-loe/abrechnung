@@ -6,7 +6,9 @@
           <h5 class="modal-title">{{ $props.header }}</h5>
           <button type="button" class="btn-close" @click="$emit('hideModal')"></button>
         </div>
-        <slot></slot>
+        <div v-if="showModalBody" class="modal-body">
+          <slot></slot>
+        </div>
       </div>
     </div>
   </div>
@@ -21,7 +23,11 @@ export default defineComponent({
     this.$emit('hideModal')
   },
   props: {
-    header: String
+    header: String,
+    showModalBody: {
+      type: Boolean,
+      default: true
+    }
   }
 })
 </script>

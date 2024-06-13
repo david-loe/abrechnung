@@ -4,17 +4,16 @@
       @hideModal="hideModal()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
-      ">
-      <div v-if="modalExpenseReport" class="modal-body">
-        <ExpenseReportForm
-          ref="expenseReportForm"
-          :mode="modalMode"
-          :expenseReport="modalExpenseReport"
-          @cancel="hideModal()"
-          @add="addExpenseReport"
-          askOwner>
-        </ExpenseReportForm>
-      </div>
+      "
+      :showModalBody="modalExpenseReport ? true : false">
+      <ExpenseReportForm
+        ref="expenseReportForm"
+        :mode="modalMode"
+        :expenseReport="modalExpenseReport"
+        @cancel="hideModal()"
+        @add="addExpenseReport"
+        askOwner>
+      </ExpenseReportForm>
     </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
