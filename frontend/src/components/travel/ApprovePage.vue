@@ -1,28 +1,36 @@
 <template>
   <div>
-    <ModalComponent
-      v-if="modalTravel"
-      @hideModal="hideModal()"
-      :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })">
-      <TravelApproveForm
-        v-if="modalTravel.state === 'appliedFor'"
-        ref="travelApproveForm"
-        :travel="modalTravel"
-        @cancel="hideModal()"
-        @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
-      <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"> </TravelApply>
-      <TravelApplyForm
-        v-else-if="modalMode !== 'view'"
-        :mode="modalMode"
-        @cancel="hideModal()"
-        :travel="modalTravel as Partial<TravelSimple>"
-        @add="(t) => approveTravel(t, 'approved')"
-        @edit="(t) => approveTravel(t, 'approved')"
-        ref="travelApplyForm"
-        minStartDate=""
-        askOwner>
-      </TravelApplyForm>
-    </ModalComponent>
+    <div class="modal fade" id="approveTravelModal" tabindex="-1" aria-labelledby="approveTravelModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 v-if="modalTravel" class="modal-title">
+              {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
+            </h5>
+            <button type="button" class="btn-close" @click="hideModal()"></button>
+          </div>
+          <div v-if="modalTravel" class="modal-body">
+            <TravelApproveForm
+              v-if="modalTravel.state === 'appliedFor'"
+              ref="travelApproveForm"
+              :travel="modalTravel"
+              @cancel="hideModal()"
+              @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
+            <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
+            <TravelApplyForm
+              v-else-if="modalMode !== 'view'"
+              :mode="modalMode"
+              @cancel="hideModal()"
+              :travel="modalTravel as Partial<TravelSimple>"
+              @add="(t) => approveTravel(t, 'approved')"
+              @edit="(t) => approveTravel(t, 'approved')"
+              ref="travelApplyForm"
+              minStartDate=""
+              askOwner></TravelApplyForm>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -67,7 +75,6 @@
 import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
-import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
 import TravelCardList from './elements/TravelCardList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
@@ -75,7 +82,7 @@ import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
+  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm },
   props: { _id: { type: String } },
   data() {
     return {
