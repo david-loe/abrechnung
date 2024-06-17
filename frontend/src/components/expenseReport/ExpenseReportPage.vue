@@ -197,14 +197,22 @@
                     v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
-                <button
-                  v-if="expenseReport.state === 'inWork'"
-                  class="btn btn-primary"
-                  @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || expenseReport.expenses.length < 1">
-                  <i class="bi bi-pencil-square"></i>
-                  <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                </button>
+
+                <div :data-bs-title="$t('info.noExpenses')" ref="tooltip" tabindex="0" class="tooltip-width">
+                  <div v-if="isReadOnly || expenseReport.expenses.length < 1">
+                    <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" disabled style="min-width: max-content">
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="!(isReadOnly || expenseReport.expenses.length < 1)">
+                  <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                  </button>
+                </div>
+
                 <a
                   v-if="expenseReport.state === 'refunded'"
                   class="btn btn-primary"
@@ -235,11 +243,11 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
-import { defineComponent, PropType } from 'vue'
+import { Modal, Tooltip } from 'bootstrap'
+import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { baseCurrency, BaseCurrencyMoney, Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
+import { BaseCurrencyMoney, Expense, ExpenseReport, UserSimple, baseCurrency, expenseReportStates } from '../../../../common/types.js'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
@@ -258,7 +266,8 @@ export default defineComponent({
       mailToLink: '',
       msTeamsToLink: '',
       addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney },
-      baseCurrency
+      baseCurrency,
+      tooltip: undefined as Tooltip | undefined
     }
   },
   components: { StatePipeline, ExpenseForm },
@@ -391,6 +400,9 @@ export default defineComponent({
     console.log(this.expenseReport.editor._id !== this.$root.user._id)
     console.log(this.$root.user._id)
     console.log(this.expenseReport.editor._id)
+    if (this.$refs.tooltip) {
+      this.tooltip = new Tooltip(this.$refs.tooltip as Element)
+    }
   },
   mounted() {
     const modalEl = document.getElementById('modal')
@@ -401,4 +413,8 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
+<style>
+.tooltip-width {
+  max-width: min-content;
+}
+</style>

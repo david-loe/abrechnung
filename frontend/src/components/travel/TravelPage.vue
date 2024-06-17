@@ -461,9 +461,9 @@
                   </a>
                 </template>
 
-                <div :data-bs-title="$t('info.noStages')" ref="tt" tabindex="0" class="tooltip-width">
+                <div :data-bs-title="$t('info.noStages')" ref="tooltip" tabindex="0" class="tooltip-width">
                   <div v-if="isReadOnly || travel.stages.length < 1">
-                    <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled>
+                    <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled style="min-width: max-content">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                     </button>
@@ -848,8 +848,8 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
-    if (this.$refs.tt) {
-      this.tooltip = new Tooltip(this.$refs.tt as Element)
+    if (this.$refs.tooltip) {
+      this.tooltip = new Tooltip(this.$refs.tooltip as Element)
     }
   },
   mounted() {
@@ -861,4 +861,8 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
+<style>
+.tooltip-width {
+  max-width: min-content;
+}
+</style>

@@ -82,6 +82,8 @@
     "lastPlaceOfWork": "Wähle hier deinen letzten Tätigkeitsort aus, dieser ist maßgebend für die Pauschalen deiner Abreise.",
     "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu abrechnung🧾 haben soll.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
+    "noExpenses": "Du musst mindestens eine Auslage zu deiner Abrechnung hinzufügen, um die Auslagenabrechnung prüfen zu lassen.",
+    "noStages": "Du musst mindestens eine Etappe zu deiner Reise hinzufügen, um die Reise prüfen zu lassen.",
     "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
     "professionalShare": "Eine Dienstreise darf auch private Anteile haben, der berufliche Anteil muss aber über 50% liegen.",
     "project": "Wähle das Projekt über das abgerechnet werden soll.",

@@ -82,6 +82,8 @@
     "lastPlaceOfWork": "Select your last place of work here, this is decisive for the lump sums of your departure.",
     "loseAccessAt": "Set a date here from which the user should no longer have access to abrechnung🧾",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
+    "noExpenses": "You must add at least one expense to your expense report to have the report reviewed.",
+    "noStages": "You must add at least one stage to your trip to have the trip reviewed.",
     "patientName": "Enter the name of the person for whom the costs were incurred.",
     "professionalShare": "A business trip may also have private components, but these may not account for 50% or more.",
     "project": "Select the project to be billed.",
