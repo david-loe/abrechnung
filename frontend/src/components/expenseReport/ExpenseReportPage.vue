@@ -2,20 +2,22 @@
   <div>
     <ModalComponent
       @hideModal="hideModal()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })"
-      :showModalBody="expenseReport._id ? true : false">
-      <ExpenseForm
-        ref="expenseForm"
-        :expense="modalExpense as Partial<Expense> | undefined"
-        :disabled="isReadOnly"
-        :mode="modalMode"
-        :endpointPrefix="endpointPrefix"
-        :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-        @add="postExpense"
-        @edit="postExpense"
-        @deleted="deleteExpense"
-        @cancel="hideModal">
-      </ExpenseForm>
+      ref="modalComp"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
+      <div v-if="expenseReport._id">
+        <ExpenseForm
+          ref="expenseForm"
+          :expense="modalExpense as Partial<Expense> | undefined"
+          :disabled="isReadOnly"
+          :mode="modalMode"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
+          @add="postExpense"
+          @edit="postExpense"
+          @deleted="deleteExpense"
+          @cancel="hideModal">
+        </ExpenseForm>
+      </div>
     </ModalComponent>
     <div class="container" v-if="expenseReport._id">
       <div class="row">

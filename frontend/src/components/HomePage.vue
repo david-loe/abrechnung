@@ -1,40 +1,42 @@
 <template>
   <div>
     <ModalComponent
+      ref="modalComp"
       @hideModal="hideModal()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
-      :showModalBody="modalObject ? true : false">
-      <template v-if="modalObjectType === 'travel'">
-        <TravelApplication
-          v-if="modalMode === 'view'"
-          :travel="modalObject as TravelSimple"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''">
+      <div v-if="modalObject">
+        <template v-if="modalObjectType === 'travel'">
+          <TravelApplication
+            v-if="modalMode === 'view'"
+            :travel="modalObject as TravelSimple"
+            @cancel="hideModal()"
+            @edit="showModal('edit', modalObject, 'travel')"
+            @deleted="deleteTravel">
+          </TravelApplication>
+          <TravelApplyForm
+            v-else
+            :mode="modalMode"
+            @cancel="hideModal()"
+            :travel="modalObject as Partial<TravelSimple>"
+            @add="applyForTravel"
+            @edit="applyForTravel"
+            ref="travelApplyForm"></TravelApplyForm>
+        </template>
+        <ExpenseReportForm
+          v-else-if="modalObjectType === 'expenseReport'"
+          :mode="modalMode as 'add' | 'edit'"
+          :expenseReport="modalObject as Partial<ExpenseReportSimple>"
           @cancel="hideModal()"
-          @edit="showModal('edit', modalObject, 'travel')"
-          @deleted="deleteTravel">
-        </TravelApplication>
-        <TravelApplyForm
+          @add="addExpenseReport">
+        </ExpenseReportForm>
+        <HealthCareCostForm
           v-else
-          :mode="modalMode"
+          :mode="modalMode as 'add' | 'edit'"
+          :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
           @cancel="hideModal()"
-          :travel="modalObject as Partial<TravelSimple>"
-          @add="applyForTravel"
-          @edit="applyForTravel"
-          ref="travelApplyForm"></TravelApplyForm>
-      </template>
-      <ExpenseReportForm
-        v-else-if="modalObjectType === 'expenseReport'"
-        :mode="modalMode as 'add' | 'edit'"
-        :expenseReport="modalObject as Partial<ExpenseReportSimple>"
-        @cancel="hideModal()"
-        @add="addExpenseReport">
-      </ExpenseReportForm>
-      <HealthCareCostForm
-        v-else
-        :mode="modalMode as 'add' | 'edit'"
-        :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
-        @cancel="hideModal()"
-        @add="addHealthCareCost">
-      </HealthCareCostForm>
+          @add="addHealthCareCost">
+        </HealthCareCostForm>
+      </div>
     </ModalComponent>
     <div v-if="$root.settings._id" class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">

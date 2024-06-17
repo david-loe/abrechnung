@@ -2,18 +2,21 @@
   <div>
     <ModalComponent
       @hideModal="hideModal()"
+      ref="modalComp"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
       "
       :showModalBody="modalExpenseReport ? true : false">
-      <ExpenseReportForm
-        ref="expenseReportForm"
-        :mode="modalMode"
-        :expenseReport="modalExpenseReport"
-        @cancel="hideModal()"
-        @add="addExpenseReport"
-        askOwner>
-      </ExpenseReportForm>
+      <div v-if="modalExpenseReport">
+        <ExpenseReportForm
+          ref="expenseReportForm"
+          :mode="modalMode"
+          :expenseReport="modalExpenseReport"
+          @cancel="hideModal()"
+          @add="addExpenseReport"
+          askOwner>
+        </ExpenseReportForm>
+      </div>
     </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
