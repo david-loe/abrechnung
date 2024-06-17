@@ -2,7 +2,6 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @hideModal="hideModal()"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''">
       <div v-if="modalObject">
         <template v-if="modalObjectType === 'travel'">
@@ -94,7 +93,6 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
@@ -125,7 +123,6 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      modal: undefined as Modal | undefined,
       modalMode: 'add' as ModalMode,
       modalObject: undefined as ModalObject,
       modalObjectType: 'travel'
@@ -143,13 +140,13 @@ export default defineComponent({
       this.modalObjectType = type
       this.modalObject = object
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.travelApplyForm) {
         ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
@@ -162,7 +159,7 @@ export default defineComponent({
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
@@ -171,7 +168,7 @@ export default defineComponent({
         if (this.$refs.expenseReportList) {
           ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/expenseReport/' + result._id)
       }
     },
@@ -181,7 +178,7 @@ export default defineComponent({
         if (this.$refs.healthCareCostList) {
           ;(this.$refs.healthCareCostList as typeof HealthCareCostCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/healthCareCost/' + result._id)
       }
     },
@@ -191,14 +188,8 @@ export default defineComponent({
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
-    }
-  },
-  mounted() {
-    const modalEL = document.getElementById('modal')
-    if (modalEL) {
-      this.modal = new Modal(modalEL, {})
     }
   },
   async created() {

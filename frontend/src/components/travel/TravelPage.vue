@@ -1,7 +1,6 @@
 <template>
   <div>
     <ModalComponent
-      @hideModal="hideModal()"
       ref="modalComp"
       :header="
         modalMode === 'add'
@@ -528,7 +527,6 @@ export default defineComponent({
   data() {
     return {
       travel: {} as Travel,
-      modal: undefined as Modal | undefined,
       modalObject: undefined as ModalObject,
       modalMode: 'add' as ModalMode,
       modalObjectType: 'stage' as ModalObjectType,
@@ -571,13 +569,13 @@ export default defineComponent({
       this.modalObjectType = type
       this.modalObject = object
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.stageForm) {
         ;(this.$refs.stageForm as typeof StageForm).clear()
@@ -606,7 +604,7 @@ export default defineComponent({
       if (confirm(this.$t('alerts.warningReapply'))) {
         const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
-          this.hideModal()
+          ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
           this.$router.push({ path: '/' })
         } else {
           await this.getTravel()
@@ -665,7 +663,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else if (result.error) {
         this.error = result.error
         ;(this.$refs.stageForm as typeof StageForm).loading = false
@@ -679,7 +677,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async postExpense(expense: TravelExpense) {
@@ -695,7 +693,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -704,7 +702,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {

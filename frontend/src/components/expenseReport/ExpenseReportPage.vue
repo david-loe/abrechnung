@@ -1,7 +1,6 @@
 <template>
   <div>
     <ModalComponent
-      @hideModal="hideModal()"
       ref="modalComp"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
       <div v-if="expenseReport._id">
@@ -249,7 +248,6 @@ export default defineComponent({
   data() {
     return {
       expenseReport: {} as ExpenseReport,
-      modal: undefined as Modal | undefined,
       modalExpense: undefined as Expense | undefined,
       modalMode: 'add' as ModalMode,
       isReadOnly: false,
@@ -274,13 +272,13 @@ export default defineComponent({
     showModal(mode: ModalMode, expense: Expense | undefined) {
       this.modalExpense = expense
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.expenseForm) {
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
@@ -341,7 +339,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setExpenseReport(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -350,7 +348,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
       if (result) {
         this.setExpenseReport(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async getExpenseReport() {

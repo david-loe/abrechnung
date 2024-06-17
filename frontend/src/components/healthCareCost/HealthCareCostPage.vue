@@ -1,7 +1,6 @@
 <template>
   <div>
     <ModalComponent
-      @hideModal="hideModal()"
       ref="modalComp"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
       <div v-if="healthCareCost._id">
@@ -243,7 +242,6 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
@@ -269,7 +267,6 @@ export default defineComponent({
   data() {
     return {
       healthCareCost: {} as HealthCareCost,
-      modal: undefined as Modal | undefined,
       modalExpense: undefined as Expense | undefined,
       modalMode: 'add' as ModalMode,
       isReadOnly: false,
@@ -293,13 +290,13 @@ export default defineComponent({
     showModal(mode: ModalMode, expense: Expense | undefined) {
       this.modalExpense = expense
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.expenseForm) {
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
@@ -394,7 +391,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setHealthCareCost(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -403,7 +400,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
       if (result) {
         this.setHealthCareCost(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async getHealthCareCost() {
@@ -447,12 +444,6 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>

@@ -1,7 +1,6 @@
 <template>
   <div>
     <ModalComponent
-      @hideModal="hideModal()"
       ref="modalComp"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })
@@ -58,7 +57,6 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { HealthCareCostSimple, HealthCareCostState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -73,7 +71,6 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      modal: undefined as Modal | undefined,
       modalHealthCareCost: undefined as HealthCareCostSimple | undefined,
       modalMode: 'add' as ModalMode,
       showRefunded: false
@@ -88,13 +85,13 @@ export default defineComponent({
     showModal(mode: ModalMode, healthCareCost: HealthCareCostSimple | undefined) {
       this.modalHealthCareCost = healthCareCost
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.healthCareCostForm) {
         ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
@@ -104,7 +101,7 @@ export default defineComponent({
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
       const result = await this.$root.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
       if (result.ok) {
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
@@ -112,12 +109,6 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>

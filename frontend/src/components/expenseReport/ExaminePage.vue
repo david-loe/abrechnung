@@ -1,7 +1,6 @@
 <template>
   <div>
     <ModalComponent
-      @hideModal="hideModal()"
       ref="modalComp"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
@@ -59,7 +58,6 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -74,7 +72,6 @@ export default defineComponent({
   data() {
     return {
       showRefunded: false,
-      modal: undefined as Modal | undefined,
       modalExpenseReport: undefined as ExpenseReportSimple | undefined,
       modalMode: 'add' as ModalMode
     }
@@ -86,13 +83,13 @@ export default defineComponent({
     showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
       this.modalExpenseReport = expenseReport
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.expenseReportForm) {
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
@@ -102,7 +99,7 @@ export default defineComponent({
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
       const result = await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
       if (result.ok) {
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
@@ -110,12 +107,6 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>
