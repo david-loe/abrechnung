@@ -1,36 +1,26 @@
 <template>
   <div>
-    <div class="modal fade" id="approveTravelModal" tabindex="-1" aria-labelledby="approveTravelModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalTravel" class="modal-title">
-              {{ modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') }) }}
-            </h5>
-            <button type="button" class="btn-close" @click="hideModal()"></button>
-          </div>
-          <div v-if="modalTravel" class="modal-body">
-            <TravelApproveForm
-              v-if="modalTravel.state === 'appliedFor'"
-              ref="travelApproveForm"
-              :travel="modalTravel"
-              @cancel="hideModal()"
-              @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
-            <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
-            <TravelApplyForm
-              v-else-if="modalMode !== 'view'"
-              :mode="modalMode"
-              @cancel="hideModal()"
-              :travel="modalTravel as Partial<TravelSimple>"
-              @add="(t) => approveTravel(t, 'approved')"
-              @edit="(t) => approveTravel(t, 'approved')"
-              ref="travelApplyForm"
-              minStartDate=""
-              askOwner></TravelApplyForm>
-          </div>
-        </div>
+    <ModalComponent :header="'Öhhhhh'" ref="modalComp">
+      <div v-if="modalTravel">
+        <TravelApproveForm
+          v-if="modalTravel.state === 'appliedFor'"
+          ref="travelApproveForm"
+          :travel="modalTravel"
+          @cancel="hideModal()"
+          @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
+        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
+        <TravelApplyForm
+          v-else-if="modalMode !== 'view'"
+          :mode="modalMode"
+          @cancel="hideModal()"
+          :travel="modalTravel as Partial<TravelSimple>"
+          @add="(t) => approveTravel(t, 'approved')"
+          @edit="(t) => approveTravel(t, 'approved')"
+          ref="travelApplyForm"
+          minStartDate=""
+          askOwner></TravelApplyForm>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -75,6 +65,7 @@
 import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
 import TravelCardList from './elements/TravelCardList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
@@ -82,7 +73,7 @@ import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm },
+  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
   props: { _id: { type: String } },
   data() {
     return {
@@ -96,13 +87,13 @@ export default defineComponent({
     showModal(travel: TravelSimple, mode: 'view' | 'add' | 'edit' = 'view') {
       this.modalTravel = travel
       this.modalMode = mode
-      if (this.approveTravelModal) {
-        this.approveTravelModal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.approveTravelModal) {
-        this.approveTravelModal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
       if (this.$refs.travelApproveForm) {
         ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
@@ -118,7 +109,7 @@ export default defineComponent({
         const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
           ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
-          this.hideModal()
+          ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         } else {
           ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
         }
@@ -129,10 +120,6 @@ export default defineComponent({
     }
   },
   async mounted() {
-    const modalEl = document.getElementById('approveTravelModal')
-    if (modalEl) {
-      this.approveTravelModal = new Modal(modalEl, {})
-    }
     if (this._id) {
       const result = await this.$root.getter<TravelSimple>('approve/travel', { _id: this._id })
       if (result.ok) {
