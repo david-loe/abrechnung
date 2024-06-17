@@ -79,7 +79,16 @@ export const settingsSchema = new Schema<Settings>({
   stateColors: { type: stateColors, required: true },
   accessIcons: { type: accessIcons, required: true },
   version: { type: String, required: true, hide: true },
-  migrateFrom: { type: String, hide: true }
+  migrateFrom: { type: String, hide: true },
+  deleteRefundedTravelAfterXDays: { type: Number, min: 10, required: true },
+  deleteRefundedExpenseReportAfterXDays: { type: Number, min: 10, required: true },
+  deleteRefundedHealthReportAfterXDays: { type: Number, min: 10, required: true },
+  deleteApprovedTravelAfterXDaysUnused: { type: Number, min: 10, required: true },
+  deleteInWorkExpenseReportAfterXDaysUnused: { type: Number, min: 10, required: true },
+  deleteInWorkHealthReportAfterXDaysUnused: { type: Number, min: 10, required: true },
+  mailXDaysBeforeRefundedTravelDeletion: { type: Number, min: 1, required: true },
+  mailXDaysBeforeRefundedExpenseReportDeletion: { type: Number, min: 1, required: true },
+  mailXDaysBeforeRefundedHealtReportDeletion: { type: Number, min: 1, required: true }
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>

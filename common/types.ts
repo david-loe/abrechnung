@@ -29,6 +29,15 @@ export interface Settings {
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   disableReportType: { [key in ReportType]: boolean }
   version: string
+  deleteRefundedTravelAfterXDays: number
+  deleteRefundedExpenseReportAfterXDays: number
+  deleteRefundedHealthReportAfterXDays: number
+  deleteApprovedTravelAfterXDaysUnused: number
+  deleteInWorkExpenseReportAfterXDaysUnused: number
+  deleteInWorkHealthReportAfterXDaysUnused: number
+  mailXDaysBeforeRefundedTravelDeletion: number
+  mailXDaysBeforeRefundedExpenseReportDeletion: number
+  mailXDaysBeforeRefundedHealtReportDeletion: number
   /**
    * @Hidden
    */
