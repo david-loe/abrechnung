@@ -198,16 +198,20 @@
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
 
-                <div :data-bs-title="$t('info.noExpenses')" ref="tooltip" tabindex="0" style="max-width: min-content">
-                  <div v-if="isReadOnly || expenseReport.expenses.length < 1">
+                <div :data-bs-title="$t('alerts.noData.expense')" ref="tooltip" tabindex="0" style="max-width: min-content">
+                  <div v-if="expenseReport.expenses.length < 1">
                     <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" disabled style="min-width: max-content">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                     </button>
                   </div>
                 </div>
-                <div v-if="!(isReadOnly || expenseReport.expenses.length < 1)">
-                  <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" @click="isReadOnly ? null : toExamination()">
+                <div v-if="expenseReport.expenses.length >= 1">
+                  <button
+                    v-if="expenseReport.state === 'inWork'"
+                    class="btn btn-primary"
+                    @click="isReadOnly ? null : toExamination()"
+                    :disabled="isReadOnly">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                   </button>
