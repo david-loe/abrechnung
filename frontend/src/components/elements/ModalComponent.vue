@@ -19,26 +19,23 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ModalComponent',
+  emits: ['reset'],
   data() {
     return {
       modal: undefined as Modal | undefined
     }
   },
   props: {
-    header: String,
-    showModalBody: {
-      type: Boolean,
-      default: true
-    }
+    header: String
   },
   methods: {
     hideModal() {
       this.modal?.hide()
+      this.$emit('reset')
     }
   },
   mounted() {
     const modalEl = document.getElementById('modal')
-    console.log('mounted in ModalComponent')
     if (modalEl) {
       this.modal = new Modal(modalEl, {})
     }

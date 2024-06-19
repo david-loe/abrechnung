@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalComponent :header="'Öhhhhh'" ref="modalComp">
+    <ModalComponent :header="'Öhhhhh'" ref="modalComp" @reset="reset()">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
@@ -95,6 +95,8 @@ export default defineComponent({
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    reset() {
       if (this.$refs.travelApproveForm) {
         ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }

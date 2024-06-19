@@ -2,7 +2,8 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''">
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
+      @reset="reset()">
       <div v-if="modalObject">
         <template v-if="modalObjectType === 'travel'">
           <TravelApplication
@@ -148,6 +149,8 @@ export default defineComponent({
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    reset() {
       if (this.$refs.travelApplyForm) {
         ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
       }

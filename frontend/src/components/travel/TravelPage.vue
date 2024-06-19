@@ -2,6 +2,7 @@
   <div>
     <ModalComponent
       ref="modalComp"
+      @reset="reset()"
       :header="
         modalMode === 'add'
           ? $t('labels.newX', { X: $t('labels.' + modalObjectType) })
@@ -577,6 +578,8 @@ export default defineComponent({
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    reset() {
       if (this.$refs.stageForm) {
         ;(this.$refs.stageForm as typeof StageForm).clear()
       }
