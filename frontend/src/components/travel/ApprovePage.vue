@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ModalComponent :header="'Öhhhhh'" ref="modalComp" @reset="reset()">
+    <ModalComponent
+      :header="modalTravel && modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
+      ref="modalComp"
+      @reset="reset()">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
