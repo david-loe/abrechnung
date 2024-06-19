@@ -461,7 +461,7 @@
                   </a>
                 </template>
 
-                <div :data-bs-title="$t('info.noStages')" ref="tooltip" tabindex="0" class="tooltip-width">
+                <div :data-bs-title="$t('info.noStages')" ref="tooltip" tabindex="0" style="max-width: min-content">
                   <div v-if="isReadOnly || travel.stages.length < 1">
                     <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled style="min-width: max-content">
                       <i class="bi bi-pencil-square"></i>
@@ -860,9 +860,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style>
-.tooltip-width {
-  max-width: min-content;
-}
-</style>

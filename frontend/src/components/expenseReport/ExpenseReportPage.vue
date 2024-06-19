@@ -198,7 +198,7 @@
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
 
-                <div :data-bs-title="$t('info.noExpenses')" ref="tooltip" tabindex="0" class="tooltip-width">
+                <div :data-bs-title="$t('info.noExpenses')" ref="tooltip" tabindex="0" style="max-width: min-content">
                   <div v-if="isReadOnly || expenseReport.expenses.length < 1">
                     <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" disabled style="min-width: max-content">
                       <i class="bi bi-pencil-square"></i>
@@ -412,9 +412,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style>
-.tooltip-width {
-  max-width: min-content;
-}
-</style>
