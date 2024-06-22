@@ -53,7 +53,7 @@ declare module '@vue/runtime-core' {
     $vueform: { i18n: { locale: Locale } }
     $router: typeof router
     $root: {
-      getter: <T>(endpoint: string, params?: any, config?: any) => Promise<{ ok?: GETResponse<T>; error?: any }>
+      getter: <T>(endpoint: string, params?: any, config?: any, showAlert?: boolean) => Promise<{ ok?: GETResponse<T>; error?: any }>
       setter: <T>(endpoint: string, data: any, config?: AxiosRequestConfig<any>, showAlert?: Boolean) => Promise<{ ok?: T; error?: any }>
       deleter: (endpoint: string, params: { [key: string]: any; _id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean | any>
       addAlert(alert: Alert): void

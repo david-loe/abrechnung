@@ -148,7 +148,7 @@ export default defineComponent({
       if (result) {
         this.projects = result.data
       }
-      const rootProjects = (await this.$root.getter<Project[]>('project')).ok?.data
+      const rootProjects = (await this.$root.getter<Project[]>('project', {}, {}, false)).ok?.data
       if (rootProjects) {
         this.$root.projects = rootProjects
       }
