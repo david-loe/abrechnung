@@ -80,7 +80,6 @@ export default defineComponent({
   props: { _id: { type: String } },
   data() {
     return {
-      approveTravelModal: undefined as Modal | undefined,
       modalTravel: undefined as TravelSimple | undefined,
       modalMode: 'view' as 'view' | 'add' | 'edit',
       showApproved: false
