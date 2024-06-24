@@ -5,6 +5,7 @@ import {
   ExpenseReportState,
   HealthCareCostState,
   ReportType,
+  RetentionType,
   Settings,
   TravelState,
   _id,
@@ -13,6 +14,7 @@ import {
   expenseReportStates,
   healthCareCostStates,
   reportTypes,
+  retention,
   travelStates
 } from '../../common/types.js'
 import '../db.js'
@@ -55,6 +57,13 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
+const retentionPolicy: Record<RetentionType, { type: NumberConstructor; required: true }> = {} as Record<
+  RetentionType,
+  { type: NumberConstructor; required: true }
+>
+for (const policy of retention) {
+  retentionPolicy[policy] = { type: Number, required: true }
+}
 export const settingsSchema = new Schema<Settings>({
   allowSpouseRefund: { type: Boolean, required: true },
   allowTravelApplicationForThePast: { type: Boolean, required: true },
@@ -80,15 +89,7 @@ export const settingsSchema = new Schema<Settings>({
   accessIcons: { type: accessIcons, required: true },
   version: { type: String, required: true, hide: true },
   migrateFrom: { type: String, hide: true },
-  deleteRefundedTravelAfterXDays: { type: Number, min: 1, required: true },
-  deleteRefundedExpenseReportAfterXDays: { type: Number, min: 1, required: true },
-  deleteRefundedHealthReportAfterXDays: { type: Number, min: 1, required: true },
-  deleteApprovedTravelAfterXDaysUnused: { type: Number, min: 1, required: true },
-  deleteInWorkExpenseReportAfterXDaysUnused: { type: Number, min: 1, required: true },
-  deleteInWorkHealthReportAfterXDaysUnused: { type: Number, min: 1, required: true },
-  mailXDaysBeforeRefundedTravelDeletion: { type: Number, min: 1, required: true },
-  mailXDaysBeforeRefundedExpenseReportDeletion: { type: Number, min: 1, required: true },
-  mailXDaysBeforeRefundedHealtReportDeletion: { type: Number, min: 1, required: true }
+  retentionPolicy: { type: retentionPolicy, required: true }
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>

@@ -29,21 +29,23 @@ export interface Settings {
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   disableReportType: { [key in ReportType]: boolean }
   version: string
-  deleteRefundedTravelAfterXDays: number
-  deleteRefundedExpenseReportAfterXDays: number
-  deleteRefundedHealthReportAfterXDays: number
-  deleteApprovedTravelAfterXDaysUnused: number
-  deleteInWorkExpenseReportAfterXDaysUnused: number
-  deleteInWorkHealthReportAfterXDaysUnused: number
-  mailXDaysBeforeRefundedTravelDeletion: number
-  mailXDaysBeforeRefundedExpenseReportDeletion: number
-  mailXDaysBeforeRefundedHealtReportDeletion: number
+  retentionPolicy: {
+    [key in RetentionType]: number
+  }
+
   /**
    * @Hidden
    */
   migrateFrom?: string | null
   _id: _id
 }
+export const retention = [
+  'deleteRefundedAfterXDays',
+  'deleteApprovedTravelAfterXDaysUnused',
+  'deleteInWorkReportsAfterXDaysUnused',
+  'mailXDaysBeforeDeletion'
+] as const
+export type RetentionType = (typeof retention)[number]
 
 /**
  * @pattern ^[A-Z]{2}$
