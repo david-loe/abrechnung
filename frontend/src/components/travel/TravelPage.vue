@@ -461,25 +461,24 @@
                   </a>
                 </template>
 
-                <div :data-bs-title="$t('alerts.noData.stage')" ref="tooltip" tabindex="0" style="max-width: min-content">
-                  <div v-if="travel.stages.length < 1">
-                    <button v-if="travel.state === 'approved'" class="btn btn-primary" disabled style="min-width: max-content">
-                      <i class="bi bi-pencil-square"></i>
-                      <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                    </button>
-                  </div>
-                </div>
-                <div v-if="travel.stages.length >= 1">
+                <div style="width: max-content; position: relative">
+                  <div
+                    :data-bs-title="$t('alerts.noData.stage')"
+                    ref="tooltip"
+                    tabindex="0"
+                    style="width: 100%; height: 100%; position: absolute"
+                    :class="travel.stages.length < 1 ? 'visible' : 'invisible'"></div>
+
                   <button
                     v-if="travel.state === 'approved'"
-                    class="btn btn-primary"
                     @click="isReadOnly ? null : toExamination()"
-                    :disabled="isReadOnly">
+                    class="btn btn-primary"
+                    :disabled="travel.stages.length < 1 || isReadOnly"
+                    style="min-width: max-content">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                   </button>
                 </div>
-
                 <button
                   v-if="travel.state === 'underExamination'"
                   class="btn btn-secondary"
@@ -864,3 +863,4 @@ export default defineComponent({
   }
 })
 </script>
+<style></style>

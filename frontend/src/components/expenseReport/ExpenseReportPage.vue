@@ -197,21 +197,20 @@
                     v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
+                <div style="width: max-content; position: relative">
+                  <div
+                    :data-bs-title="$t('alerts.noData.expense')"
+                    ref="tooltip"
+                    tabindex="0"
+                    style="width: 100%; height: 100%; position: absolute"
+                    :class="expenseReport.expenses.length < 1 ? 'visible;' : 'invisible'"></div>
 
-                <div :data-bs-title="$t('alerts.noData.expense')" ref="tooltip" tabindex="0" style="max-width: min-content">
-                  <div v-if="expenseReport.expenses.length < 1">
-                    <button v-if="expenseReport.state === 'inWork'" class="btn btn-primary" disabled style="min-width: max-content">
-                      <i class="bi bi-pencil-square"></i>
-                      <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                    </button>
-                  </div>
-                </div>
-                <div v-if="expenseReport.expenses.length >= 1">
                   <button
                     v-if="expenseReport.state === 'inWork'"
-                    class="btn btn-primary"
                     @click="isReadOnly ? null : toExamination()"
-                    :disabled="isReadOnly">
+                    class="btn btn-primary"
+                    :disabled="expenseReport.expenses.length < 1 || isReadOnly"
+                    style="min-width: max-content">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ $t('labels.toExamination') }}</span>
                   </button>
@@ -416,3 +415,4 @@ export default defineComponent({
   }
 })
 </script>
+<style></style>
