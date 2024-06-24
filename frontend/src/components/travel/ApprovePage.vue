@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalTravel && modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @reset="reset()">
+      @reset="resetModal()">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
@@ -99,7 +99,7 @@ export default defineComponent({
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
-    reset() {
+    resetModal() {
       if (this.$refs.travelApproveForm) {
         ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }
