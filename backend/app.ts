@@ -11,7 +11,6 @@ import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
 import i18n from './i18n.js'
 import './migrations.js'
-import './retentionpolicy.js'
 
 const app = express()
 

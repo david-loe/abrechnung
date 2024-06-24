@@ -10,6 +10,7 @@ import { projectSchema } from './models/project.js'
 import { settingsSchema } from './models/settings.js'
 import { UserDoc, userSchema } from './models/user.js'
 import { generateForms } from './models/vueformGenerator.js'
+import { retentionPolicy } from './retentionpolicy.js'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 
@@ -83,3 +84,5 @@ app.listen(port, () => {
 
 // Update lump sums every day at 1 AM
 CronJob.from({ cronTime: '0 1 * * *', onTick: fetchAndUpdateLumpSums, start: true })
+// Check retention policy and trigger automatic deletion every day at 1 AM
+CronJob.from({ cronTime: '0 1 * * *', onTick: retentionPolicy, start: true })
