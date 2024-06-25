@@ -84,5 +84,5 @@ app.listen(port, () => {
 
 // Update lump sums every day at 1 AM
 CronJob.from({ cronTime: '0 1 * * *', onTick: fetchAndUpdateLumpSums, start: true })
-// Check retention policy and trigger automatic deletion every day at 1 AM
+// Trigger automatic deletion and notification mails for upcoming deletions every day at 1 AM
 CronJob.from({ cronTime: '0 1 * * *', onTick: retentionPolicy, start: true })
