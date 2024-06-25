@@ -13,20 +13,52 @@ import Settings from './models/settings.js'
 import Travel from './models/travel.js'
 import User from './models/user.js'
 
+async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: ReportType) {
+  let countOldVersions = 0
+  let result: any
+  for (let i = 0; i < reports.length; i++) {
+    console.log(reports[i].history)
+    if (schema === 'travel') {
+      result = await Travel.deleteMany({ _id: reports[i].history })
+      countOldVersions = result.deletedCount
+      result = await Travel.deleteOne({ _id: reports[i]._id })
+    } else if (schema === 'expenseReport') {
+      result = await ExpenseReport.deleteMany({ _id: reports[i].history })
+      countOldVersions = result.deletedCount
+      result = await ExpenseReport.deleteOne({ _id: reports[i]._id })
+    } else if (schema === 'healthCareCost') {
+      result = await HealthCareCost.deleteMany({ _id: reports[i].history })
+      countOldVersions = result.deletedCount
+      result = await HealthCareCost.deleteOne({ _id: reports[i]._id })
+    }
+    if (result && result.deletedCount == 1) {
+      console.log(`Deleted ${schema} with id ${reports[i]._id} including ${countOldVersions} older versions of this ${schema}.`)
+    }
+  }
+}
+
 // deletes travels, expense reports and helth car costs refunded before $days
 // set days to -1 for no automaic deletion
-async function deleteOld(days: number) {
+async function getRefundedForDeletion(days: number) {
   if (days != -1) {
-    const dateThreshold = new Date()
+    let dateThreshold = new Date()
+    dateThreshold.setHours(23, 59, 0, 0)
+
     dateThreshold.setDate(dateThreshold.getDate() - days)
-    dateThreshold.setHours(0, 0, 0, 0)
+    console.log('datumsschwelle für Löschung: ', dateThreshold)
     try {
-      let result = await Travel.deleteMany({ state: 'refunded', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} travels older than ${days} days`)
-      result = await ExpenseReport.deleteMany({ state: 'refunded', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} expense reports older than ${days} days`)
-      result = await HealthCareCost.deleteMany({ state: 'refunded', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} health care reports older than ${days} days`)
+      let result = await Travel.find({ state: 'refunded', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'travel')
+      }
+      result = await ExpenseReport.find({ state: 'refunded', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'expenseReport')
+      }
+      result = await HealthCareCost.find({ state: 'refunded', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'healthCareCost')
+      }
     } catch (error) {
       console.error('Error deleting during deletion: ', error)
     }
@@ -35,32 +67,41 @@ async function deleteOld(days: number) {
 
 //deletes approved travel if they have not been updated since $days
 // set days to -1 for no automaic deletion
-async function deleteApprovedTravel(days: number) {
+async function getApprovedForDeletion(days: number) {
   if (days != -1) {
-    const dateThreshold = new Date()
+    let dateThreshold = new Date()
+    dateThreshold.setHours(23, 59, 0, 0)
+
     dateThreshold.setDate(dateThreshold.getDate() - days)
-    dateThreshold.setHours(0, 0, 0, 0)
+    console.log('datumsschwelle für Löschung: ', dateThreshold)
     try {
-      const result = await Travel.deleteMany({ state: 'approved', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} travels not updated for ${days} days`)
+      let result = await Travel.find({ state: 'approved', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'travel')
+      }
     } catch (error) {
       console.error('Error deleting travels:', error)
     }
   }
 }
 
-//deletes 'inWork' expense and  health care cost reports if they have not been updated since $days
+//gets and deletes 'inWork' expense and  health care cost reports if they have not been updated since $days
 // set days to -1 for no automaic deletion
-async function deleteUnusedReport(days: number) {
+async function getInWorkForDeletion(days: number) {
   if (days != -1) {
-    const dateThreshold = new Date()
+    let dateThreshold = new Date()
+    dateThreshold.setHours(23, 59, 0, 0)
     dateThreshold.setDate(dateThreshold.getDate() - days)
-    dateThreshold.setHours(0, 0, 0, 0)
+    console.log('datumsschwelle für Löschung: ', dateThreshold)
     try {
-      let result = await ExpenseReport.deleteMany({ state: 'inWork', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} expense reports not updated for ${days} days`)
-      result = await HealthCareCost.deleteMany({ state: 'inWork', updatedAt: { $lt: dateThreshold } })
-      console.log(`Deleted ${result.deletedCount} health care reports not updated for ${days} days`)
+      let result = await ExpenseReport.find({ state: 'inWork', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'expenseReport')
+      }
+      result = await HealthCareCost.find({ state: 'inWork', updatedAt: { $lt: dateThreshold }, historic: false })
+      if (result.length > 0) {
+        await deleteAny(result, 'healthCareCost')
+      }
     } catch (error) {
       console.error('Error deleting expense reports:', error)
     }
@@ -96,6 +137,8 @@ async function getReportsAndSendNotification(schema: ReportType, state: AnyState
     if (reports.length != 0) {
       for (let i = 0; i < reports.length; i++) {
         sendNotificationMails(reports[i], daysUntilDeletion)
+        console.log(reports[i].updatedAt)
+        console.log(deletionPeriod - daysUntilDeletion)
         console.log(`send notification for ${schema} with ID: ${reports[i]._id} - will be deleted in ${daysUntilDeletion} days`)
       }
     }
@@ -106,19 +149,20 @@ async function getReportsForNotifikationMail(schema: String, state: String, days
   const date = new Date()
   let result: Array<ITravel | IExpenseReport | IHealthCareCost> = []
   date.setDate(date.getDate() - days)
-  date.setHours(0, 0, 0, 0)
+  date.setHours(23, 59, 0, 0)
+  console.log('datumsschwelle für Mailversand: ', date)
   if (schema === 'travel') {
-    result = await Travel.find({ state: state, updatedAt: { $lt: date } }).lean()
+    result = await Travel.find({ state: state, updatedAt: { $lt: date }, historic: false }).lean()
     if (result) {
       return result
     }
   } else if (schema === 'expenseReport') {
-    result = await ExpenseReport.find({ state: state, updatedAt: { $lt: date } }).lean()
+    result = await ExpenseReport.find({ state: state, updatedAt: { $lt: date }, historic: false }).lean()
     if (result) {
       return result
     }
   } else if (schema === 'healthCareCost') {
-    result = await HealthCareCost.find({ state: state, updatedAt: { $lt: date } }).lean()
+    result = await HealthCareCost.find({ state: state, updatedAt: { $lt: date }, historic: false }).lean()
     if (result) {
       return result
     }
@@ -159,9 +203,9 @@ export async function retentionPolicy() {
         settings.retentionPolicy.deleteApprovedTravelAfterXDaysUnused,
         settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused
       )
-      await deleteOld(settings.retentionPolicy.deleteRefundedAfterXDays)
-      await deleteApprovedTravel(settings.retentionPolicy.deleteApprovedTravelAfterXDaysUnused)
-      await deleteUnusedReport(settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused)
+      await getRefundedForDeletion(settings.retentionPolicy.deleteRefundedAfterXDays)
+      await getApprovedForDeletion(settings.retentionPolicy.deleteApprovedTravelAfterXDaysUnused)
+      await getInWorkForDeletion(settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused)
     } catch (error) {
       console.log('Error in retention policy:', error)
     }
