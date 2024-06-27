@@ -340,10 +340,18 @@
         "paragraph": "Eine neue Auslagenabrechnung wurden für dich erstellt.",
         "subject": "🆕 Auslagenabrechnung"
       },
+      "inWorkDeletedSoon": {
+        "paragraph": "Eine angelegte Auslagenabrechnung wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wird erstattet.",
         "subject": "💲 Auslagen erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Eine erstattete Auslagenabrechnung wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -367,10 +375,18 @@
         "paragraph": "Eine neue Krankenkostenabrechnung wurden für dich erstellt.",
         "subject": "🆕 Krankenkosten"
       },
+      "inWorkDeletedSoon": {
+        "paragraph": "Eine angelegte Krankenkostenabrechnung wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
         "subject": "💲 Krankenkosten erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Ein erstatteter Krankenkostenantrag wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -412,6 +428,10 @@
         "paragraph": "Dein Reiseantrag wurde genehmigt.",
         "subject": "✅ Reise genehmigt"
       },
+      "approvedDeletedSoon": {
+        "paragraph": "Ein genehmigte Reise wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "backToApproved": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Reisekosten wurden dir zum Überarbeiten zurückgeschickt.",
@@ -421,6 +441,10 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Reisekosten werden erstattet.",
         "subject": "💲 Reisekosten erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Eine erstattete Reise wird in {days} Tagen automatisch gelöscht.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

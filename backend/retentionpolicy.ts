@@ -4,8 +4,12 @@ import {
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
   User as IUser,
-  ReportType
+  Locale,
+  ReportType,
+  reportIsHealthCareCost,
+  reportIsTravel
 } from '../common/types.js'
+import i18n from './i18n.js'
 import { sendMail } from './mail/mail.js'
 import ExpenseReport from './models/expenseReport.js'
 import HealthCareCost from './models/healthCareCost.js'
@@ -138,7 +142,6 @@ async function getReportsAndSendNotification(schema: ReportType, state: AnyState
       for (let i = 0; i < reports.length; i++) {
         sendNotificationMails(reports[i], daysUntilDeletion)
         console.log(reports[i].updatedAt)
-        console.log(deletionPeriod - daysUntilDeletion)
         console.log(`send notification for ${schema} with ID: ${reports[i]._id} - will be deleted in ${daysUntilDeletion} days`)
       }
     }
@@ -177,15 +180,38 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
     } catch (err) {
       console.log(err)
     }
-    // missing a little bit logic for creating link an etc.
-    // needing $t locales for creating the template correctly
     if (owner) {
       let recipients: Array<IUser> = [owner as IUser]
-      let subject = 'Deletion Warning'
-      let paragaph = `Hinweis: Ihr Report ${report.name} wird in ${daysUntilDeletion} gelöscht. Laden Sie noch ihren Bericht herunter.`
-      let button = { text: 'Hier gehts zum Report', link: 'xyz' }
-      let lastParagraph = 'Tschau Tschüss'
-      sendMail(recipients, subject, paragaph, button, lastParagraph)
+
+      var reportType: ReportType
+      if (reportIsTravel(report)) {
+        reportType = 'travel'
+      } else if (reportIsHealthCareCost(report)) {
+        reportType = 'healthCareCost'
+      } else {
+        reportType = 'expenseReport'
+      }
+      const button = {
+        text: '',
+        link: ''
+      }
+      const userFilter: any = {}
+
+      userFilter['_id'] = report.owner._id
+      button.link = `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
+
+      const language = recipients[0].settings.language
+      const interpolation: { owner: string; lng: Locale; days: number } = {
+        owner: report.owner.name.givenName,
+        lng: language,
+        days: daysUntilDeletion
+      }
+
+      button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
+
+      const subject = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.subject`, interpolation)
+      const paragraph = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.paragraph`, interpolation)
+      sendMail(recipients, subject, paragraph, button, '')
     }
   }
 }
