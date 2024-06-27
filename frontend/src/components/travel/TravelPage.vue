@@ -460,14 +460,24 @@
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
                 </template>
-                <button
-                  v-if="travel.state === 'approved'"
-                  class="btn btn-primary"
-                  @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || travel.stages.length < 1">
-                  <i class="bi bi-pencil-square"></i>
-                  <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                </button>
+
+                <div v-if="travel.state === 'approved'" style="width: max-content; position: relative">
+                  <div
+                    :data-bs-title="$t('alerts.noData.stage')"
+                    ref="tooltip"
+                    tabindex="0"
+                    style="width: 100%; height: 100%; position: absolute"
+                    :class="travel.stages.length < 1 ? 'visible' : 'invisible'"></div>
+
+                  <button
+                    @click="isReadOnly ? null : toExamination()"
+                    class="btn btn-primary"
+                    :disabled="travel.stages.length < 1 || isReadOnly"
+                    style="min-width: max-content">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                  </button>
+                </div>
                 <button
                   v-if="travel.state === 'underExamination'"
                   class="btn btn-secondary"
@@ -486,14 +496,13 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
-import { defineComponent, PropType } from 'vue'
+import { Modal, Tooltip } from 'bootstrap'
+import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
   BaseCurrencyMoney,
   DocumentFile,
-  meals,
   Place,
   Record,
   RecordType,
@@ -502,9 +511,10 @@ import {
   TravelDay,
   TravelExpense,
   TravelSimple,
-  travelStates,
   User,
-  UserSimple
+  UserSimple,
+  meals,
+  travelStates
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
@@ -540,7 +550,8 @@ export default defineComponent({
       mailToLink: '',
       msTeamsToLink: '',
       error: undefined as any,
-      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney }
+      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
+      tooltip: undefined as Tooltip | undefined
     }
   },
   components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
@@ -839,6 +850,9 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
+    if (this.$refs.tooltip) {
+      this.tooltip = new Tooltip(this.$refs.tooltip as Element)
+    }
   },
   mounted() {
     const modalEl = document.getElementById('modal')
@@ -848,5 +862,4 @@ export default defineComponent({
   }
 })
 </script>
-
 <style></style>
