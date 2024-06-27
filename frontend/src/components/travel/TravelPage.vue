@@ -461,7 +461,7 @@
                   </a>
                 </template>
 
-                <div style="width: max-content; position: relative">
+                <div v-if="travel.state === 'approved'" style="width: max-content; position: relative">
                   <div
                     :data-bs-title="$t('alerts.noData.stage')"
                     ref="tooltip"
@@ -470,7 +470,6 @@
                     :class="travel.stages.length < 1 ? 'visible' : 'invisible'"></div>
 
                   <button
-                    v-if="travel.state === 'approved'"
                     @click="isReadOnly ? null : toExamination()"
                     class="btn btn-primary"
                     :disabled="travel.stages.length < 1 || isReadOnly"

@@ -197,7 +197,7 @@
                     v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && endpointPrefix !== 'examine/'"></textarea>
                 </div>
-                <div style="width: max-content; position: relative">
+                <div v-if="expenseReport.state === 'inWork'" style="width: max-content; position: relative">
                   <div
                     :data-bs-title="$t('alerts.noData.expense')"
                     ref="tooltip"
@@ -206,7 +206,6 @@
                     :class="expenseReport.expenses.length < 1 ? 'visible;' : 'invisible'"></div>
 
                   <button
-                    v-if="expenseReport.state === 'inWork'"
                     @click="isReadOnly ? null : toExamination()"
                     class="btn btn-primary"
                     :disabled="expenseReport.expenses.length < 1 || isReadOnly"
