@@ -57,13 +57,11 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
-const retentionPolicy: Record<RetentionType, { type: NumberConstructor; min: number; required: true }> = {} as Record<
-  RetentionType,
-  { type: NumberConstructor; min: number; required: true }
->
+const retentionPolicy = {} as { [key in RetentionType]: { type: NumberConstructor; required: true } }
 for (const policy of retention) {
-  retentionPolicy[policy] = { type: Number, min: -1, required: true }
+  retentionPolicy[policy] = { type: Number, required: true }
 }
+
 export const settingsSchema = new Schema<Settings>({
   allowSpouseRefund: { type: Boolean, required: true },
   allowTravelApplicationForThePast: { type: Boolean, required: true },
