@@ -1,46 +1,43 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="newTravelModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">{{ $t('labels.newX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-            <h5 v-else-if="modalObject" class="modal-title">{{ modalObject.name }}</h5>
-            <button type="button" class="btn-close" @click="hideModal()"></button>
-          </div>
-          <div v-if="modalObject" class="modal-body">
-            <template v-if="modalObjectType === 'travel'">
-              <TravelApplication
-                v-if="modalMode === 'view'"
-                :travel="modalObject as TravelSimple"
-                @cancel="hideModal()"
-                @edit="showModal('edit', modalObject, 'travel')"
-                @deleted="deleteTravel"></TravelApplication>
-              <TravelApplyForm
-                v-else
-                :mode="modalMode"
-                @cancel="hideModal()"
-                :travel="modalObject as Partial<TravelSimple>"
-                @add="applyForTravel"
-                @edit="applyForTravel"
-                ref="travelApplyForm"></TravelApplyForm>
-            </template>
-            <ExpenseReportForm
-              v-else-if="modalObjectType === 'expenseReport'"
-              :mode="modalMode as 'add' | 'edit'"
-              :expenseReport="modalObject as Partial<ExpenseReportSimple>"
-              @cancel="hideModal()"
-              @add="addExpenseReport"></ExpenseReportForm>
-            <HealthCareCostForm
-              v-else
-              :mode="modalMode as 'add' | 'edit'"
-              :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
-              @cancel="hideModal()"
-              @add="addHealthCareCost"></HealthCareCostForm>
-          </div>
-        </div>
+    <ModalComponent
+      ref="modalComp"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
+      @reset="resetForms()">
+      <div v-if="modalObject">
+        <template v-if="modalObjectType === 'travel'">
+          <TravelApplication
+            v-if="modalMode === 'view'"
+            :travel="modalObject as TravelSimple"
+            @cancel="hideModal()"
+            @edit="showModal('edit', modalObject, 'travel')"
+            @deleted="deleteTravel">
+          </TravelApplication>
+          <TravelApplyForm
+            v-else
+            :mode="modalMode"
+            @cancel="hideModal()"
+            :travel="modalObject as Partial<TravelSimple>"
+            @add="applyForTravel"
+            @edit="applyForTravel"
+            ref="travelApplyForm"></TravelApplyForm>
+        </template>
+        <ExpenseReportForm
+          v-else-if="modalObjectType === 'expenseReport'"
+          :mode="modalMode as 'add' | 'edit'"
+          :expenseReport="modalObject as Partial<ExpenseReportSimple>"
+          @cancel="hideModal()"
+          @add="addExpenseReport">
+        </ExpenseReportForm>
+        <HealthCareCostForm
+          v-else
+          :mode="modalMode as 'add' | 'edit'"
+          :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
+          @cancel="hideModal()"
+          @add="addHealthCareCost">
+        </HealthCareCostForm>
       </div>
-    </div>
+    </ModalComponent>
     <div v-if="$root.settings._id" class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -97,9 +94,9 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
+import ModalComponent from './elements/ModalComponent.vue'
 import ExpenseReportCardList from './expenseReport/elements/ExpenseReportCardList.vue'
 import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostCardList from './healthCareCost/elements/HealthCareCostCardList.vue'
@@ -121,12 +118,12 @@ export default defineComponent({
     ExpenseReportCardList,
     ExpenseReportForm,
     HealthCareCostCardList,
-    HealthCareCostForm
+    HealthCareCostForm,
+    ModalComponent
   },
   props: [],
   data() {
     return {
-      modal: undefined as Modal | undefined,
       modalMode: 'add' as ModalMode,
       modalObject: undefined as ModalObject,
       modalObjectType: 'travel'
@@ -144,14 +141,16 @@ export default defineComponent({
       this.modalObjectType = type
       this.modalObject = object
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    resetForms() {
       if (this.$refs.travelApplyForm) {
         ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
       }
@@ -163,7 +162,7 @@ export default defineComponent({
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
@@ -172,7 +171,7 @@ export default defineComponent({
         if (this.$refs.expenseReportList) {
           ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/expenseReport/' + result._id)
       }
     },
@@ -182,7 +181,7 @@ export default defineComponent({
         if (this.$refs.healthCareCostList) {
           ;(this.$refs.healthCareCostList as typeof HealthCareCostCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/healthCareCost/' + result._id)
       }
     },
@@ -192,14 +191,8 @@ export default defineComponent({
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()
         }
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
-    }
-  },
-  mounted() {
-    const modalEL = document.getElementById('modal')
-    if (modalEL) {
-      this.modal = new Modal(modalEL, {})
     }
   },
   async created() {

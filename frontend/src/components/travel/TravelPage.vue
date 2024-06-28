@@ -1,62 +1,54 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.' + modalObjectType)
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.' + modalObjectType) }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="travel._id" class="modal-body">
-            <ErrorBanner :error="error"></ErrorBanner>
-            <StageForm
-              v-if="modalObjectType === 'stage'"
-              ref="stageForm"
-              :mode="modalMode"
-              :stage="modalObject as Partial<Stage> | Gap | undefined"
-              :travelStartDate="travel.startDate"
-              :travelEndDate="travel.endDate"
-              :disabled="isReadOnly"
-              :showVehicleRegistration="travel.state === 'approved'"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postStage"
-              @edit="postStage"
-              @deleted="deleteStage"
-              @cancel="hideModal"
-              @postVehicleRegistration="postVehicleRegistration">
-            </StageForm>
-            <ExpenseForm
-              v-else-if="modalObjectType === 'expense'"
-              ref="expenseForm"
-              :expense="modalObject as Partial<TravelExpense> | undefined"
-              :disabled="isReadOnly"
-              :mode="modalMode"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
-              @add="postExpense"
-              @edit="postExpense"
-              @deleted="deleteExpense"
-              @cancel="hideModal">
-            </ExpenseForm>
-            <TravelApplyForm
-              v-else-if="modalObjectType === 'travel'"
-              :mode="modalMode"
-              @cancel="hideModal"
-              :travel="modalObject as TravelSimple"
-              @edit="applyForTravel"
-              ref="travelApplyForm"></TravelApplyForm>
-          </div>
-        </div>
+    <ModalComponent
+      ref="modalComp"
+      @reset="resetForms()"
+      :header="
+        modalMode === 'add'
+          ? $t('labels.newX', { X: $t('labels.' + modalObjectType) })
+          : $t('labels.editX', { X: $t('labels.' + modalObjectType) })
+      ">
+      <div v-if="travel._id">
+        <ErrorBanner :error="error"></ErrorBanner>
+        <StageForm
+          v-if="modalObjectType === 'stage'"
+          ref="stageForm"
+          :mode="modalMode"
+          :stage="modalObject as Partial<Stage> | Gap | undefined"
+          :travelStartDate="travel.startDate"
+          :travelEndDate="travel.endDate"
+          :disabled="isReadOnly"
+          :showVehicleRegistration="travel.state === 'approved'"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          @add="postStage"
+          @edit="postStage"
+          @deleted="deleteStage"
+          @cancel="hideModal"
+          @postVehicleRegistration="postVehicleRegistration">
+        </StageForm>
+        <ExpenseForm
+          v-else-if="modalObjectType === 'expense'"
+          ref="expenseForm"
+          :expense="modalObject as Partial<TravelExpense> | undefined"
+          :disabled="isReadOnly"
+          :mode="modalMode"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          @add="postExpense"
+          @edit="postExpense"
+          @deleted="deleteExpense"
+          @cancel="hideModal">
+        </ExpenseForm>
+        <TravelApplyForm
+          v-else-if="modalObjectType === 'travel'"
+          :mode="modalMode"
+          @cancel="hideModal"
+          :travel="modalObject as TravelSimple"
+          @edit="applyForTravel"
+          ref="travelApplyForm"></TravelApplyForm>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container" v-if="travel._id">
       <div class="row">
         <div class="col">
@@ -496,7 +488,7 @@
 </template>
 
 <script lang="ts">
-import { Modal, Tooltip } from 'bootstrap'
+import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
@@ -518,6 +510,7 @@ import {
 } from '../../../../common/types.js'
 import ErrorBanner from '../elements/ErrorBanner.vue'
 import InfoPoint from '../elements/InfoPoint.vue'
+import ModalComponent from '../elements/ModalComponent.vue'
 import PlaceElement from '../elements/PlaceElement.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
@@ -535,7 +528,6 @@ export default defineComponent({
   data() {
     return {
       travel: {} as Travel,
-      modal: undefined as Modal | undefined,
       modalObject: undefined as ModalObject,
       modalMode: 'add' as ModalMode,
       modalObjectType: 'stage' as ModalObjectType,
@@ -554,7 +546,17 @@ export default defineComponent({
       tooltip: undefined as Tooltip | undefined
     }
   },
-  components: { StatePipeline, StageForm, InfoPoint, PlaceElement, ProgressCircle, ExpenseForm, TravelApplyForm, ErrorBanner },
+  components: {
+    StatePipeline,
+    StageForm,
+    InfoPoint,
+    PlaceElement,
+    ProgressCircle,
+    ExpenseForm,
+    TravelApplyForm,
+    ErrorBanner,
+    ModalComponent
+  },
   props: {
     _id: { type: String, required: true },
     parentPages: {
@@ -568,14 +570,16 @@ export default defineComponent({
       this.modalObjectType = type
       this.modalObject = object
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    resetForms() {
       if (this.$refs.stageForm) {
         ;(this.$refs.stageForm as typeof StageForm).clear()
       }
@@ -603,7 +607,7 @@ export default defineComponent({
       if (confirm(this.$t('alerts.warningReapply'))) {
         const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
-          this.hideModal()
+          ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
           this.$router.push({ path: '/' })
         } else {
           await this.getTravel()
@@ -662,7 +666,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else if (result.error) {
         this.error = result.error
         ;(this.$refs.stageForm as typeof StageForm).loading = false
@@ -676,7 +680,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async postExpense(expense: TravelExpense) {
@@ -692,7 +696,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -701,7 +705,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
@@ -852,12 +856,6 @@ export default defineComponent({
     this.msTeamsToLink = msTeamsToLink(mails)
     if (this.$refs.tooltip) {
       this.tooltip = new Tooltip(this.$refs.tooltip as Element)
-    }
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
     }
   }
 })

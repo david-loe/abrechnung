@@ -1,32 +1,23 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.expenseReport')
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expenseReport') }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="modalExpenseReport" class="modal-body">
-            <ExpenseReportForm
-              ref="expenseReportForm"
-              :mode="modalMode"
-              :expenseReport="modalExpenseReport"
-              @cancel="hideModal()"
-              @add="addExpenseReport"
-              askOwner>
-            </ExpenseReportForm>
-          </div>
-        </div>
+    <ModalComponent
+      ref="modalComp"
+      @reset="resetForms()"
+      :header="
+        modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
+      "
+      :showModalBody="modalExpenseReport ? true : false">
+      <div v-if="modalExpenseReport">
+        <ExpenseReportForm
+          ref="expenseReportForm"
+          :mode="modalMode"
+          :expenseReport="modalExpenseReport"
+          @cancel="hideModal()"
+          @add="addExpenseReport"
+          askOwner>
+        </ExpenseReportForm>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -68,21 +59,20 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
 import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
 type ModalMode = 'add' | 'edit'
 export default defineComponent({
   name: 'ExaminePage',
-  components: { ExpenseReportCardList, ExpenseReportForm },
+  components: { ExpenseReportCardList, ExpenseReportForm, ModalComponent },
   props: [],
   data() {
     return {
       showRefunded: false,
-      modal: undefined as Modal | undefined,
       modalExpenseReport: undefined as ExpenseReportSimple | undefined,
       modalMode: 'add' as ModalMode
     }
@@ -94,14 +84,16 @@ export default defineComponent({
     showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
       this.modalExpenseReport = expenseReport
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    resetForms() {
       if (this.$refs.expenseReportForm) {
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
       }
@@ -110,7 +102,7 @@ export default defineComponent({
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
       const result = await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
       if (result.ok) {
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
@@ -118,12 +110,6 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>

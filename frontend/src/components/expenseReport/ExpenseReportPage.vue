@@ -1,36 +1,24 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.expense')
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.expense') }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="expenseReport._id" class="modal-body">
-            <ExpenseForm
-              ref="expenseForm"
-              :expense="modalExpense as Partial<Expense> | undefined"
-              :disabled="isReadOnly"
-              :mode="modalMode"
-              :endpointPrefix="endpointPrefix"
-              :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-              @add="postExpense"
-              @edit="postExpense"
-              @deleted="deleteExpense"
-              @cancel="hideModal">
-            </ExpenseForm>
-          </div>
-        </div>
+    <ModalComponent
+      ref="modalComp"
+      @reset="resetForms()"
+      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
+      <div v-if="expenseReport._id">
+        <ExpenseForm
+          ref="expenseForm"
+          :expense="modalExpense as Partial<Expense> | undefined"
+          :disabled="isReadOnly"
+          :mode="modalMode"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
+          @add="postExpense"
+          @edit="postExpense"
+          @deleted="deleteExpense"
+          @cancel="hideModal">
+        </ExpenseForm>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container" v-if="expenseReport._id">
       <div class="row">
         <div class="col">
@@ -245,11 +233,12 @@
 </template>
 
 <script lang="ts">
-import { Modal, Tooltip } from 'bootstrap'
+import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { BaseCurrencyMoney, Expense, ExpenseReport, UserSimple, baseCurrency, expenseReportStates } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
@@ -260,7 +249,6 @@ export default defineComponent({
   data() {
     return {
       expenseReport: {} as ExpenseReport,
-      modal: undefined as Modal | undefined,
       modalExpense: undefined as Expense | undefined,
       modalMode: 'add' as ModalMode,
       isReadOnly: false,
@@ -272,7 +260,7 @@ export default defineComponent({
       tooltip: undefined as Tooltip | undefined
     }
   },
-  components: { StatePipeline, ExpenseForm },
+  components: { StatePipeline, ExpenseForm, ModalComponent },
   props: {
     _id: { type: String, required: true },
     parentPages: {
@@ -285,14 +273,16 @@ export default defineComponent({
     showModal(mode: ModalMode, expense: Expense | undefined) {
       this.modalExpense = expense
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    resetForms() {
       if (this.$refs.expenseForm) {
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
@@ -352,7 +342,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setExpenseReport(result.ok)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -361,7 +351,7 @@ export default defineComponent({
       const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
       if (result) {
         this.setExpenseReport(result)
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async getExpenseReport() {
@@ -404,12 +394,6 @@ export default defineComponent({
     console.log(this.expenseReport.editor._id)
     if (this.$refs.tooltip) {
       this.tooltip = new Tooltip(this.$refs.tooltip as Element)
-    }
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
     }
   }
 })

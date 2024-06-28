@@ -1,32 +1,22 @@
 <template>
   <div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="modalMode === 'add'" class="modal-title">
-              {{
-                $t('labels.newX', {
-                  X: $t('labels.healthCareCost')
-                })
-              }}
-            </h5>
-            <h5 v-else class="modal-title">{{ $t('labels.editX', { X: $t('labels.healthCareCost') }) }}</h5>
-            <button type="button" class="btn-close" @click="hideModal"></button>
-          </div>
-          <div v-if="modalHealthCareCost" class="modal-body">
-            <HealthCareCostForm
-              ref="healthCareCostForm"
-              :mode="modalMode"
-              :healthCareCost="modalHealthCareCost"
-              @cancel="hideModal()"
-              @add="addHealthCareCost"
-              askOwner>
-            </HealthCareCostForm>
-          </div>
-        </div>
+    <ModalComponent
+      ref="modalComp"
+      @reset="resetForms()"
+      :header="
+        modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })
+      ">
+      <div v-if="modalHealthCareCost">
+        <HealthCareCostForm
+          ref="healthCareCostForm"
+          :mode="modalMode"
+          :healthCareCost="modalHealthCareCost"
+          @cancel="hideModal()"
+          @add="addHealthCareCost"
+          askOwner>
+        </HealthCareCostForm>
       </div>
-    </div>
+    </ModalComponent>
     <div class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
@@ -68,9 +58,9 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
 import { defineComponent } from 'vue'
 import { HealthCareCostSimple, HealthCareCostState } from '../../../../common/types.js'
+import ModalComponent from '../elements/ModalComponent.vue'
 import HealthCareCostCardList from './elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './forms/HealthCareCostForm.vue'
 
@@ -78,11 +68,10 @@ type ModalMode = 'add' | 'edit'
 
 export default defineComponent({
   name: 'ExaminePage',
-  components: { HealthCareCostCardList, HealthCareCostForm },
+  components: { HealthCareCostCardList, HealthCareCostForm, ModalComponent },
   props: [],
   data() {
     return {
-      modal: undefined as Modal | undefined,
       modalHealthCareCost: undefined as HealthCareCostSimple | undefined,
       modalMode: 'add' as ModalMode,
       showRefunded: false
@@ -97,14 +86,16 @@ export default defineComponent({
     showModal(mode: ModalMode, healthCareCost: HealthCareCostSimple | undefined) {
       this.modalHealthCareCost = healthCareCost
       this.modalMode = mode
-      if (this.modal) {
-        this.modal.show()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
       }
     },
     hideModal() {
-      if (this.modal) {
-        this.modal.hide()
+      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
+    },
+    resetForms() {
       if (this.$refs.healthCareCostForm) {
         ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
       }
@@ -113,7 +104,7 @@ export default defineComponent({
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
       const result = await this.$root.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
       if (result.ok) {
-        this.hideModal()
+        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {
         ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
@@ -121,12 +112,6 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>
