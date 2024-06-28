@@ -1,16 +1,16 @@
+import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
+import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
+import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
+import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
+import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
+import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
+import HomePage from './components/HomePage.vue'
 import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
-import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
-import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
-import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
-import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
-import HomePage from './components/HomePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
-import axios from 'axios'
-import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 
 const routes = [
   {
@@ -19,9 +19,9 @@ const routes = [
     meta: { requiresAuth: false },
     beforeEnter: async (to: RouteLocationNormalized) => {
       if (await auth()) {
-        return { path: '/user', query: { redirect: to.fullPath } }
+        return { path: '/user' }
       } else {
-        return true;
+        return true
       }
     }
   },
