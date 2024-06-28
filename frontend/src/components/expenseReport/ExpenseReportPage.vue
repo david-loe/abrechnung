@@ -395,12 +395,6 @@ export default defineComponent({
     if (this.$refs.tooltip) {
       this.tooltip = new Tooltip(this.$refs.tooltip as Element)
     }
-  },
-  mounted() {
-    const modalEl = document.getElementById('modal')
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-    }
   }
 })
 </script>
