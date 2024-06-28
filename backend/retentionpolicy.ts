@@ -1,5 +1,6 @@
 import { model } from 'mongoose'
 import {
+  AnyState,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
@@ -7,14 +8,15 @@ import {
   Locale,
   ReportType,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  schemaNames
 } from '../common/types.js'
 import i18n from './i18n.js'
 import { sendMail } from './mail/mail.js'
 import Settings from './models/settings.js'
 import User from './models/user.js'
 
-async function getForRetentionPolicy(schema: string, date: Date, state: string) {
+async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState) {
   return await model(schema).find({ state: state, updatedAt: { $lt: date }, historic: false })
 }
 
@@ -30,7 +32,7 @@ async function triggerDeletion(retentionSettings: {
   deleteApprovedTravelAfterXDaysUnused: number
   deleteInWorkReportsAfterXDaysUnused: number
 }) {
-  let deletions = [
+  let deletions: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
     { schema: 'Travel', state: 'refunded', deletionPeriod: retentionSettings.deleteRefundedAfterXDays },
     { schema: 'Travel', state: 'approved', deletionPeriod: retentionSettings.deleteApprovedTravelAfterXDaysUnused },
     { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: retentionSettings.deleteRefundedAfterXDays },
@@ -50,7 +52,7 @@ async function triggerDeletion(retentionSettings: {
   }
 }
 
-async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: string) {
+async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: schemaNames) {
   let result: any
   for (let i = 0; i < reports.length; i++) {
     result = await model(schema).deleteOne({ _id: reports[i]._id })
@@ -66,7 +68,7 @@ async function notificationMailForDeletions(
   deletionPeriodApprovedTravel: number,
   deletionPeriodInWorkReport: number
 ) {
-  let notifications = [
+  let notifications: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
     { schema: 'Travel', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
     { schema: 'Travel', state: 'approved', deletionPeriod: deletionPeriodApprovedTravel },
     { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
@@ -157,9 +159,6 @@ export async function retentionPolicy() {
         settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused
       )
       await triggerDeletion(settings.retentionPolicy)
-      // await getRefundedForDeletion(settings.retentionPolicy.deleteRefundedAfterXDays)
-      // await getApprovedForDeletion(settings.retentionPolicy.deleteApprovedTravelAfterXDaysUnused)
-      // await getInWorkForDeletion(settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused)
     } catch (error) {
       console.log('Error in retention policy:', error)
     }
