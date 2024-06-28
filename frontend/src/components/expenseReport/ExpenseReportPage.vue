@@ -233,7 +233,7 @@
 </template>
 
 <script lang="ts">
-import { Modal, Tooltip } from 'bootstrap'
+import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
