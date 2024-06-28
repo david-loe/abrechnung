@@ -258,7 +258,7 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "required": "erforderlich",
-    "retentionPolicy": "automatisches Löschen - in Tagen (-1 für nie)",
+    "retentionPolicy": "automatisches Löschen - in Tagen (0 eintragen für nie)",
     "route": "Strecke",
     "save": "Speichern",
     "saveX": "{X} speichern",

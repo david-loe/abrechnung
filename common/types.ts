@@ -39,13 +39,6 @@ export interface Settings {
   migrateFrom?: string | null
   _id: _id
 }
-export const retention = [
-  'deleteRefundedAfterXDays',
-  'deleteApprovedTravelAfterXDaysUnused',
-  'deleteInWorkReportsAfterXDaysUnused',
-  'mailXDaysBeforeDeletion'
-] as const
-export type RetentionType = (typeof retention)[number]
 
 /**
  * @pattern ^[A-Z]{2}$
@@ -371,6 +364,14 @@ export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
 export type ReportType = (typeof reportTypes)[number]
+
+export const retention = [
+  'deleteRefundedAfterXDays',
+  'deleteApprovedTravelAfterXDaysUnused',
+  'deleteInWorkReportsAfterXDaysUnused',
+  'mailXDaysBeforeDeletion'
+] as const
+export type RetentionType = (typeof retention)[number]
 
 export const accesses = [
   'user',

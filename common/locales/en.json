@@ -258,7 +258,7 @@
     "reject": "Reject",
     "report": "Report",
     "required": "required",
-    "retentionPolicy": "automatic deletion - in days (type -1 for never)",
+    "retentionPolicy": "automatic deletion - in days (type 0 for never)",
     "route": "Route",
     "save": "Save",
     "saveX": "Save {X}",

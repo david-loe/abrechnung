@@ -39,12 +39,14 @@ async function triggerDeletion(retentionSettings: {
     { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: retentionSettings.deleteInWorkReportsAfterXDaysUnused }
   ]
   for (let i = 0; i < deletions.length; i++) {
-    let date = getDateThreshold(deletions[i].deletionPeriod)
-    let result = await getForRetentionPolicy(deletions[i].schema, date, deletions[i].state)
-    if (result.length > 0) {
-      await deleteAny(result, deletions[i].schema)
+    if (deletions[i].deletionPeriod > 0) {
+      let date = getDateThreshold(deletions[i].deletionPeriod)
+      let result = await getForRetentionPolicy(deletions[i].schema, date, deletions[i].state)
+      if (result.length > 0) {
+        await deleteAny(result, deletions[i].schema)
+      }
+      console.log(`Triggered deletion of ${deletions[i].state} ${deletions[i].schema} older than the ${deletions[i].deletionPeriod} days.`)
     }
-    console.log(`Triggered deletion of ${deletions[i].state} ${deletions[i].schema} older than the ${deletions[i].deletionPeriod} days.`)
   }
 }
 
@@ -72,7 +74,7 @@ async function notificationMailForDeletions(
     { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
     { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: deletionPeriodInWorkReport }
   ]
-  if (daysUntilDeletion != -1) {
+  if (daysUntilDeletion > 0) {
     try {
       for (let i = 0; i < notifications.length; i++) {
         let date = getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletion)

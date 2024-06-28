@@ -57,9 +57,19 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
-const retentionPolicy = {} as { [key in RetentionType]: { type: NumberConstructor; required: true } }
+const retentionPolicy = {} as {
+  [key in RetentionType]: { type: NumberConstructor; min: number; required: true; validate: { validator: any; message: string } }
+}
 for (const policy of retention) {
-  retentionPolicy[policy] = { type: Number, required: true }
+  retentionPolicy[policy] = {
+    type: Number,
+    min: 0,
+    required: true,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Must be Integer'
+    }
+  }
 }
 
 export const settingsSchema = new Schema<Settings>({
