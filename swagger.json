@@ -298,7 +298,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"User": {
+			"IUser": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -751,61 +751,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Meta": {
-				"properties": {
-					"count": {
-						"type": "number",
-						"format": "double"
-					},
-					"page": {
-						"type": "number",
-						"format": "double"
-					},
-					"limit": {
-						"type": "number",
-						"format": "double"
-					},
-					"countPages": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"count",
-					"page",
-					"limit",
-					"countPages"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_User-or-User-Array_": {
-				"properties": {
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/User"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/User"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"meta": {
-						"$ref": "#/components/schemas/Meta"
-					}
-				},
-				"required": [
-					"data",
-					"meta"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"IUser": {
+			"User": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -979,6 +925,60 @@
 					"fk",
 					"access",
 					"settings"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Meta": {
+				"properties": {
+					"count": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"countPages": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"count",
+					"page",
+					"limit",
+					"countPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_User-or-User-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/User"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/User"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -3774,6 +3774,413 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ISettings": {
+				"properties": {
+					"accessIcons": {
+						"properties": {
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"defaultAccess": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"userCanSeeAllProjects": {
+						"type": "boolean"
+					},
+					"breakfastCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"lunchCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"dinnerCateringLumpSumCut": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"factorOvernightLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorOvernightLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"fallBackLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"maxTravelDayCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"distanceRefunds": {
+						"properties": {
+							"car": {
+								"type": "number",
+								"format": "double"
+							},
+							"motorcycle": {
+								"type": "number",
+								"format": "double"
+							},
+							"halfCar": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"car",
+							"motorcycle",
+							"halfCar"
+						],
+						"type": "object"
+					},
+					"secoundNightOnAirplaneLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"secoundNightOnShipOrFerryLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"stateColors": {
+						"properties": {
+							"rejected": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"appliedFor": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"approved": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"underExamination": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"refunded": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"inWork": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"underExaminationByInsurance": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							}
+						},
+						"required": [
+							"rejected",
+							"appliedFor",
+							"approved",
+							"underExamination",
+							"refunded",
+							"inWork",
+							"underExaminationByInsurance"
+						],
+						"type": "object"
+					},
+					"toleranceStageDatesToApprovedTravelDates": {
+						"type": "number",
+						"format": "double"
+					},
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
+					},
+					"allowTravelApplicationForThePast": {
+						"type": "boolean"
+					},
+					"vehicleRegistrationWhenUsingOwnCar": {
+						"type": "string",
+						"enum": [
+							"required",
+							"optional",
+							"none"
+						]
+					},
+					"disableReportType": {
+						"properties": {
+							"travel": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"healthCareCost": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost"
+						],
+						"type": "object"
+					},
+					"version": {
+						"type": "string"
+					},
+					"migrateFrom": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"accessIcons",
+					"defaultAccess",
+					"allowSpouseRefund",
+					"userCanSeeAllProjects",
+					"breakfastCateringLumpSumCut",
+					"lunchCateringLumpSumCut",
+					"dinnerCateringLumpSumCut",
+					"factorCateringLumpSum",
+					"factorCateringLumpSumExceptions",
+					"factorOvernightLumpSum",
+					"factorOvernightLumpSumExceptions",
+					"fallBackLumpSumCountry",
+					"maxTravelDayCount",
+					"distanceRefunds",
+					"secoundNightOnAirplaneLumpSumCountry",
+					"secoundNightOnShipOrFerryLumpSumCountry",
+					"stateColors",
+					"toleranceStageDatesToApprovedTravelDates",
+					"uploadTokenExpireAfterSeconds",
+					"allowTravelApplicationForThePast",
+					"vehicleRegistrationWhenUsingOwnCar",
+					"disableReportType",
+					"version",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Settings": {
 				"properties": {
 					"accessIcons": {
@@ -6239,7 +6646,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.1.2",
+		"version": "1.1.3",
 		"contact": {}
 	},
 	"paths": {
@@ -6254,7 +6661,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/User"
+											"$ref": "#/components/schemas/IUser"
 										}
 									},
 									"required": [
@@ -8523,7 +8930,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/Settings"
+											"$ref": "#/components/schemas/ISettings"
 										}
 									},
 									"required": [
