@@ -57,6 +57,12 @@
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "wrongPassword": "Wrong Password"
   },
+  "description": {
+    "deleteApprovedTravelAfterXDaysUnused": "enter 0 to prevent automatic deletion",
+    "deleteInWorkReportsAfterXDaysUnused": "enter 0 to prevent automatic deletion",
+    "deleteRefundedAfterXDays": "enter 0 to prevent automatic deletion",
+    "mailXDaysBeforeDeletion": "enter 0 to prevent reminder email"
+  },
   "distanceRefundTypes": {
     "car": "Car 🚗",
     "halfCar": "Way to Work 🚗",

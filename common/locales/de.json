@@ -57,6 +57,12 @@
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"
   },
+  "description": {
+    "deleteApprovedTravelAfterXDaysUnused": "um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteInWorkReportsAfterXDaysUnused": "um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteRefundedAfterXDays": "um keine automatische  Löschung durchzuführen 0 eingeben",
+    "mailXDaysBeforeDeletion": "um keine Hinweismail zuversenden 0 eingeben"
+  },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
     "halfCar": "Weg zur Arbeit 🚗",
@@ -258,7 +264,7 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "required": "erforderlich",
-    "retentionPolicy": "automatisches Löschen - in Tagen (0 eintragen für nie)",
+    "retentionPolicy": "automatisches Löschen - in Tagen",
     "route": "Strecke",
     "save": "Speichern",
     "saveX": "{X} speichern",

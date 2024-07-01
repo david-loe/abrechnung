@@ -58,7 +58,13 @@ for (const report of reportTypes) {
 }
 
 const retentionPolicy = {} as {
-  [key in RetentionType]: { type: NumberConstructor; min: number; required: true; validate: { validator: any; message: string } }
+  [key in RetentionType]: {
+    type: NumberConstructor
+    min: number
+    required: true
+    validate: { validator: any; message: string }
+    description: string
+  }
 }
 for (const policy of retention) {
   retentionPolicy[policy] = {
@@ -68,7 +74,8 @@ for (const policy of retention) {
     validate: {
       validator: Number.isInteger,
       message: 'Must be Integer'
-    }
+    },
+    description: ''
   }
 }
 
