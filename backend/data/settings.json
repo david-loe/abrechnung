@@ -82,5 +82,12 @@
     "expenseReport": false,
     "healthCareCost": false
   },
+  "retentionPolicy": {
+    "deleteRefundedAfterXDays": 100,
+    "deleteApprovedTravelAfterXDaysUnused": 100,
+    "deleteInWorkReportsAfterXDaysUnused": 100,
+    "mailXDaysBeforeDeletion": 7
+  },
+
   "version": "1.1.3"
 }

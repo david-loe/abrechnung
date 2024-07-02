@@ -52,6 +52,10 @@ function mapSchemaTypeToVueformElement(
     vueformElement['rules'].push('max:' + schemaType.max)
   }
 
+  if (schemaType.description !== undefined) {
+    vueformElement['description'] = translate('description.' + labelStr, language)
+  }
+
   if (schemaType.label) {
     vueformElement['label'] = translate(schemaType.label, language)
   } else if (labelStr) {
