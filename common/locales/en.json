@@ -347,7 +347,7 @@
         "subject": "🆕 Expense Report"
       },
       "inWorkDeletedSoon": {
-        "paragraph": "A created expense report will be automatically deleted in {days} days due to inactivity.",
+        "paragraph": "Your created expense report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
       "refunded": {
@@ -356,7 +356,7 @@
         "subject": "💲 Expense report refunded"
       },
       "refundedDeletedSoon": {
-        "paragraph": "A refunded expense report will be automatically deleted in {days} days. You can download the report until then.",
+        "paragraph": "Your refunded expense report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
       "rejected": {
@@ -382,7 +382,7 @@
         "subject": "🆕 Health care cost"
       },
       "inWorkDeletedSoon": {
-        "paragraph": "A created health care cost report will be automatically deleted in {days} days due to inactivity.",
+        "paragraph": "Your created health care cost report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
       "refunded": {
@@ -391,7 +391,7 @@
         "subject": "💲 Health care costs refunded"
       },
       "refundedDeletedSoon": {
-        "paragraph": "A refunded health care cost report will be automatically deleted in {days} days. You can download the report until then.",
+        "paragraph": "Your refunded health care cost report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
       "rejected": {
@@ -435,7 +435,7 @@
         "subject": "✅ Travel approved"
       },
       "approvedDeletedSoon": {
-        "paragraph": "An approved travel will be automatically deleted in {days} days due to inactivity.",
+        "paragraph": "Your approved travel '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
       "backToApproved": {
@@ -449,7 +449,7 @@
         "subject": "💲 Travel refunded"
       },
       "refundedDeletedSoon": {
-        "paragraph": "A refunded travel will be automatically deleted in {days} days. You can download the report until then.",
+        "paragraph": "Your refunded travel '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
       "rejected": {

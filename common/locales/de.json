@@ -347,7 +347,7 @@
         "subject": "🆕 Auslagenabrechnung"
       },
       "inWorkDeletedSoon": {
-        "paragraph": "Eine angelegte Auslagenabrechnung wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "paragraph": "Deine angelegte Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
       "refunded": {
@@ -356,7 +356,7 @@
         "subject": "💲 Auslagen erstattet"
       },
       "refundedDeletedSoon": {
-        "paragraph": "Eine erstattete Auslagenabrechnung wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}'  wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
@@ -382,7 +382,7 @@
         "subject": "🆕 Krankenkosten"
       },
       "inWorkDeletedSoon": {
-        "paragraph": "Eine angelegte Krankenkostenabrechnung wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "paragraph": "Deine angelegte Krankenkostenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
       "refunded": {
@@ -391,7 +391,7 @@
         "subject": "💲 Krankenkosten erstattet"
       },
       "refundedDeletedSoon": {
-        "paragraph": "Ein erstatteter Krankenkostenantrag wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "paragraph": "Deine erstatteter Krankenkostenantrag  '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
@@ -435,7 +435,7 @@
         "subject": "✅ Reise genehmigt"
       },
       "approvedDeletedSoon": {
-        "paragraph": "Ein genehmigte Reise wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "paragraph": "Deine genehmigte Reise  '{reportName}'  wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
       "backToApproved": {
@@ -449,7 +449,7 @@
         "subject": "💲 Reisekosten erstattet"
       },
       "refundedDeletedSoon": {
-        "paragraph": "Eine erstattete Reise wird in {days} Tagen automatisch gelöscht.",
+        "paragraph": "Deine erstattete Reise '{reportName}' wird in {days} Tagen automatisch gelöscht.",
         "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {

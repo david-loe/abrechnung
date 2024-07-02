@@ -22,7 +22,7 @@ async function getForRetentionPolicy(schema: schemaNames, date: Date, state: Any
 
 function getDateThreshold(days: number) {
   let dateThreshold = new Date()
-  dateThreshold.setHours(23, 59, 0, 0)
+  dateThreshold.setHours(0, 0, 0, 0)
   dateThreshold.setDate(dateThreshold.getDate() - days)
   return dateThreshold
 }
@@ -79,17 +79,18 @@ async function notificationMailForDeletions(
   if (daysUntilDeletion > 0) {
     try {
       for (let i = 0; i < notifications.length; i++) {
-        let date = getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletion)
+        let daysUntilDeletionTemp =
+          daysUntilDeletion < notifications[i].deletionPeriod ? daysUntilDeletion : notifications[i].deletionPeriod
+        console.log(notifications[i].deletionPeriod - daysUntilDeletionTemp)
+        let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
         let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state)
         console.log(
-          `searched for ${notifications[i].schema} with state ${notifications[i].state}  - and deletion in ${daysUntilDeletion} days`
+          `searched for ${notifications[i].schema} with state ${notifications[i].state}  - and deletion in ${daysUntilDeletionTemp} or less days`
         )
         if (result.length > 0) {
-          for (let i = 0; i < result.length; i++) {
-            sendNotificationMails(result[i], daysUntilDeletion)
-            console.log(
-              `send notification for ${notifications[i].schema} with ID: ${result[i]._id} - will be deleted in ${daysUntilDeletion} days`
-            )
+          for (let p = 0; p < result.length; p++) {
+            await sendNotificationMails(result[p], notifications[i].deletionPeriod)
+            console.log(`sent notification mail for ${notifications[i].schema} with ID: ${result[p]._id}`)
           }
         }
       }
@@ -101,7 +102,7 @@ async function notificationMailForDeletions(
   }
 }
 
-async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, daysUntilDeletion: number) {
+async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, deletionPeriod: number) {
   if (report) {
     let owner
     try {
@@ -120,27 +121,38 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
       } else {
         reportType = 'expenseReport'
       }
+      //get days until deletion depending on the deletion Period.
+      let date = new Date(report.updatedAt)
+      date.setDate(date.getDate() + deletionPeriod)
+      date.setHours(0, 0, 0, 0)
+      let today = new Date()
+      today.setHours(0, 0, 0, 0)
+      console.log(report.updatedAt)
+      console.log(date, '  ', today)
+      let differenceInTime = date.getTime() - today.getTime()
+      let daysUntilDeletion = differenceInTime / (1000 * 3600 * 24)
+
+      const language = recipients[0].settings.language
+
+      const interpolation: { owner: string; lng: Locale; days: number; reportName: string } = {
+        owner: report.owner.name.givenName,
+        lng: language,
+        days: daysUntilDeletion,
+        reportName: report.name
+      }
+
       const button = {
         text: '',
         link: ''
       }
-      const userFilter: any = {}
 
-      userFilter['_id'] = report.owner._id
       button.link = `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
-
-      const language = recipients[0].settings.language
-      const interpolation: { owner: string; lng: Locale; days: number } = {
-        owner: report.owner.name.givenName,
-        lng: language,
-        days: daysUntilDeletion
-      }
 
       button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
 
       const subject = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.subject`, interpolation)
       const paragraph = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.paragraph`, interpolation)
-      sendMail(recipients, subject, paragraph, button, '')
+      await sendMail(recipients, subject, paragraph, button, '')
     }
   }
 }
