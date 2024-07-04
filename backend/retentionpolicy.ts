@@ -57,7 +57,9 @@ async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCo
   for (let i = 0; i < reports.length; i++) {
     result = await model(schema).deleteOne({ _id: reports[i]._id })
     if (result && result.deletedCount == 1) {
-      console.log(`Deleted ${schema} with id ${reports[i]._id} including ${reports[i].history.length} older versions of this ${schema}.`)
+      console.log(
+        `Deleted ${schema} from owner ${reports[i].owner.name.givenName} ${reports[i].owner.name.familyName} with name ${reports[i].name}.`
+      )
     }
   }
 }
