@@ -4,9 +4,9 @@ import {
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
-  User as IUser,
   Locale,
   ReportType,
+  RetentionType,
   reportIsHealthCareCost,
   reportIsTravel,
   schemaNames
@@ -26,20 +26,20 @@ function getDateThreshold(days: number) {
   dateThreshold.setDate(dateThreshold.getDate() - days)
   return dateThreshold
 }
-
-async function triggerDeletion(retentionSettings: {
-  deleteRefundedAfterXDays: number
-  deleteApprovedTravelAfterXDaysUnused: number
-  deleteInWorkReportsAfterXDaysUnused: number
-}) {
-  let deletions: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
-    { schema: 'Travel', state: 'refunded', deletionPeriod: retentionSettings.deleteRefundedAfterXDays },
-    { schema: 'Travel', state: 'approved', deletionPeriod: retentionSettings.deleteApprovedTravelAfterXDaysUnused },
-    { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: retentionSettings.deleteRefundedAfterXDays },
-    { schema: 'ExpenseReport', state: 'inWork', deletionPeriod: retentionSettings.deleteInWorkReportsAfterXDaysUnused },
-    { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: retentionSettings.deleteRefundedAfterXDays },
-    { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: retentionSettings.deleteInWorkReportsAfterXDaysUnused }
+async function getPolicyElements(retentionPolicy: { [key in RetentionType]: number }) {
+  const elements: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
+    { schema: 'Travel', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'Travel', state: 'approved', deletionPeriod: retentionPolicy.deleteApprovedTravelAfterXDaysUnused },
+    { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'ExpenseReport', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused },
+    { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused }
   ]
+  return elements
+}
+
+async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number }) {
+  let deletions = await getPolicyElements(retentionPolicy)
   for (let i = 0; i < deletions.length; i++) {
     if (deletions[i].deletionPeriod > 0) {
       let date = getDateThreshold(deletions[i].deletionPeriod)
@@ -62,56 +62,31 @@ async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCo
   }
 }
 
-async function notificationMailForDeletions(
-  daysUntilDeletion: number,
-  deletionPeriodRefunded: number,
-  deletionPeriodApprovedTravel: number,
-  deletionPeriodInWorkReport: number
-) {
-  let notifications: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
-    { schema: 'Travel', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
-    { schema: 'Travel', state: 'approved', deletionPeriod: deletionPeriodApprovedTravel },
-    { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
-    { schema: 'ExpenseReport', state: 'inWork', deletionPeriod: deletionPeriodInWorkReport },
-    { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: deletionPeriodRefunded },
-    { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: deletionPeriodInWorkReport }
-  ]
-  if (daysUntilDeletion > 0) {
-    try {
-      for (let i = 0; i < notifications.length; i++) {
-        let daysUntilDeletionTemp =
-          daysUntilDeletion < notifications[i].deletionPeriod ? daysUntilDeletion : notifications[i].deletionPeriod
-        console.log(notifications[i].deletionPeriod - daysUntilDeletionTemp)
-        let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
-        let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state)
-        console.log(
-          `searched for ${notifications[i].schema} with state ${notifications[i].state}  - and deletion in ${daysUntilDeletionTemp} or less days`
-        )
-        if (result.length > 0) {
-          for (let p = 0; p < result.length; p++) {
-            await sendNotificationMails(result[p], notifications[i].deletionPeriod)
-            console.log(`sent notification mail for ${notifications[i].schema} with ID: ${result[p]._id}`)
-          }
+async function notificationMailForDeletions(retentionPolicy: { [key in RetentionType]: number }) {
+  let notifications = await getPolicyElements(retentionPolicy)
+  if (retentionPolicy.mailXDaysBeforeDeletion > 0) {
+    for (let i = 0; i < notifications.length; i++) {
+      let daysUntilDeletionTemp =
+        retentionPolicy.mailXDaysBeforeDeletion < notifications[i].deletionPeriod
+          ? retentionPolicy.mailXDaysBeforeDeletion
+          : notifications[i].deletionPeriod
+      let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
+      let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state)
+      if (result.length > 0) {
+        for (let p = 0; p < result.length; p++) {
+          await sendNotificationMails(result[p], notifications[i].deletionPeriod)
         }
       }
-    } catch (error) {
-      console.log('Error during sending of notification mails:', error)
     }
-  } else {
-    console.log('Warning: setting for notification mails before deletion is set to infinite.')
   }
 }
 
 async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, deletionPeriod: number) {
   if (report) {
     let owner
-    try {
-      owner = await User.findOne({ _id: report.owner._id })
-    } catch (err) {
-      console.log(err)
-    }
+    owner = await User.findOne({ _id: report.owner._id }).lean()
     if (owner) {
-      let recipients: Array<IUser> = [owner as IUser]
+      let recipients = [owner]
 
       var reportType: ReportType
       if (reportIsTravel(report)) {
@@ -127,8 +102,6 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
       date.setHours(0, 0, 0, 0)
       let today = new Date()
       today.setHours(0, 0, 0, 0)
-      console.log(report.updatedAt)
-      console.log(date, '  ', today)
       let differenceInTime = date.getTime() - today.getTime()
       let daysUntilDeletion = differenceInTime / (1000 * 3600 * 24)
 
@@ -163,17 +136,8 @@ async function getSettings() {
 export async function retentionPolicy() {
   const settings = await getSettings()
   if (settings) {
-    try {
-      await notificationMailForDeletions(
-        settings.retentionPolicy.mailXDaysBeforeDeletion,
-        settings.retentionPolicy.deleteRefundedAfterXDays,
-        settings.retentionPolicy.deleteApprovedTravelAfterXDaysUnused,
-        settings.retentionPolicy.deleteInWorkReportsAfterXDaysUnused
-      )
-      await triggerDeletion(settings.retentionPolicy)
-    } catch (error) {
-      console.log('Error in retention policy:', error)
-    }
+    await notificationMailForDeletions(settings.retentionPolicy)
+    await triggerDeletion(settings.retentionPolicy)
   } else {
     console.error('Settings not found!')
   }
