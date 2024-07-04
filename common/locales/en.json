@@ -58,10 +58,10 @@
     "wrongPassword": "Wrong Password"
   },
   "description": {
-    "deleteApprovedTravelAfterXDaysUnused": "enter 0 to prevent automatic deletion",
-    "deleteInWorkReportsAfterXDaysUnused": "enter 0 to prevent automatic deletion",
-    "deleteRefundedAfterXDays": "enter 0 to prevent automatic deletion",
-    "mailXDaysBeforeDeletion": "enter 0 to prevent reminder email"
+    "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
+    "deleteInWorkReportsAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
+    "deleteRefundedAfterXDays": "Enter 0 to prevent automatic deletion",
+    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email"
   },
   "distanceRefundTypes": {
     "car": "Car 🚗",
@@ -151,9 +151,9 @@
     "de": "German 🇩🇪",
     "defaultAccess": "Default access rights",
     "delete": "Delete",
-    "deleteRefundedAfterXDays": "for refunded reports and trips",
-    "deleteApprovedTravelAfterXDaysUnused": "for approved, unused trips",
-    "deleteInWorkReportsAfterXDaysUnused": "for unused expense and healthcare cost reports",
+    "deleteRefundedAfterXDays": "Delete refunded reports and trips - in days",
+    "deleteApprovedTravelAfterXDaysUnused": "Delete approved, unused trips - in days",
+    "deleteInWorkReportsAfterXDaysUnused": "Delete unused expense and healthcare cost reports - in days",
     "deleteX": "Delete {X}",
     "delOverwritten": "Should the overwritten user be deleted?",
     "departure": "Departure",
@@ -219,7 +219,7 @@
     "lunch": "Lunch",
     "lunchCateringLumpSumCut": "Catering lump sum cut for lunch",
     "mailToInsurance": "Mail to insurance",
-    "mailXDaysBeforeDeletion": "Receive notification mail before deletion",
+    "mailXDaysBeforeDeletion": "Receive notification mail before deletion - in days",
     "maxTravelDayCount": "Maximum length of a business trip [days]",
     "mergeUsers": "Merge Users",
     "midnight": "12AM",
@@ -264,7 +264,7 @@
     "reject": "Reject",
     "report": "Report",
     "required": "required",
-    "retentionPolicy": "automatic deletion - in days (type 0 for never)",
+    "retentionPolicy": "Retention policy",
     "route": "Route",
     "save": "Save",
     "saveX": "Save {X}",

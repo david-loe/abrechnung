@@ -58,10 +58,10 @@
     "wrongPassword": "Falsches Passwort"
   },
   "description": {
-    "deleteApprovedTravelAfterXDaysUnused": "um keine automatische  Löschung durchzuführen 0 eingeben",
-    "deleteInWorkReportsAfterXDaysUnused": "um keine automatische  Löschung durchzuführen 0 eingeben",
-    "deleteRefundedAfterXDays": "um keine automatische  Löschung durchzuführen 0 eingeben",
-    "mailXDaysBeforeDeletion": "um keine Hinweismail zuversenden 0 eingeben"
+    "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteRefundedAfterXDays": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "mailXDaysBeforeDeletion": "Um keine Hinweismail zuversenden 0 eingeben"
   },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
@@ -151,9 +151,9 @@
     "de": "Deutsch 🇩🇪",
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
-    "deleteRefundedAfterXDays": "für erstattete Anträge und Reisen",
-    "deleteApprovedTravelAfterXDaysUnused": "für genehmigte, ungenutzte Reisen",
-    "deleteInWorkReportsAfterXDaysUnused": "für ungenutze Auslagen- und Krankenkostenanträgen",
+    "deleteRefundedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
+    "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
+    "deleteInWorkReportsAfterXDaysUnused": "Löschen von ungenutzen Auslagen- und Krankenkostenanträgen - in Tagen",
     "deleteX": "{X} löschen",
     "delOverwritten": "Soll der zu überschreibende Benutzer gelöscht werden?",
     "departure": "Abfahrt /-flug",
@@ -219,7 +219,7 @@
     "lunch": "Mittagessen",
     "lunchCateringLumpSumCut": "Verpflegungspauschalenkürung fürs Mittagessen",
     "mailToInsurance": "E-Mail an Versicherung",
-    "mailXDaysBeforeDeletion": "Informationsmail vor dem Löschen erhalten",
+    "mailXDaysBeforeDeletion": "Informationsmail vor dem Löschen - in Tagen",
     "maxTravelDayCount": "Maximale Länge eine Dienstreise [Tage]",
     "mergeUsers": "Benutzer zusammenführen",
     "midnight": "24 Uhr",
@@ -264,7 +264,7 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "required": "erforderlich",
-    "retentionPolicy": "automatisches Löschen - in Tagen",
+    "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
     "save": "Speichern",
     "saveX": "{X} speichern",
@@ -435,7 +435,7 @@
         "subject": "✅ Reise genehmigt"
       },
       "approvedDeletedSoon": {
-        "paragraph": "Deine genehmigte Reise  '{reportName}'  wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "paragraph": "Deine genehmigte Reise  '{reportName}'  wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
         "subject": "Automatische Löschung steht bevor"
       },
       "backToApproved": {
