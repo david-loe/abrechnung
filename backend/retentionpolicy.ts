@@ -55,7 +55,6 @@ async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number
       if (result.length > 0) {
         await deleteAny(result, deletions[i].schema)
       }
-      console.log(`Triggered deletion of ${deletions[i].state} ${deletions[i].schema} older than the ${deletions[i].deletionPeriod} days.`)
     }
   }
 }
