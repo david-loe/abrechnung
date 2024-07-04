@@ -16,8 +16,15 @@ import { sendMail } from './mail/mail.js'
 import Settings from './models/settings.js'
 import User from './models/user.js'
 
-async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState) {
-  return await model(schema).find({ state: state, updatedAt: { $lt: date }, historic: false })
+async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState, startDate?: Date) {
+  let res
+  if (startDate) {
+    res = await model(schema).find({ state: state, updatedAt: { $gte: startDate, $lt: date }, historic: false })
+  } else {
+    res = await model(schema).find({ state: state, updatedAt: { $lt: date }, historic: false })
+  }
+
+  return res
 }
 
 function getDateThreshold(days: number) {
@@ -26,6 +33,7 @@ function getDateThreshold(days: number) {
   dateThreshold.setDate(dateThreshold.getDate() - days)
   return dateThreshold
 }
+
 async function getPolicyElements(retentionPolicy: { [key in RetentionType]: number }) {
   const elements: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
     { schema: 'Travel', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
@@ -73,17 +81,19 @@ async function notificationMailForDeletions(retentionPolicy: { [key in Retention
           ? retentionPolicy.mailXDaysBeforeDeletion
           : notifications[i].deletionPeriod
       let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
-      let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state)
+      let startDate = new Date(date)
+      startDate.setDate(startDate.getDate() - 1)
+      let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state, startDate)
       if (result.length > 0) {
         for (let p = 0; p < result.length; p++) {
-          await sendNotificationMails(result[p], notifications[i].deletionPeriod)
+          await sendNotificationMails(result[p], daysUntilDeletionTemp)
         }
       }
     }
   }
 }
 
-async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, deletionPeriod: number) {
+async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, daysUntilDeletion: number) {
   if (report) {
     let owner
     owner = await User.findOne({ _id: report.owner._id }).lean()
@@ -98,14 +108,6 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
       } else {
         reportType = 'expenseReport'
       }
-      //get days until deletion depending on the deletion Period.
-      let date = new Date(report.updatedAt)
-      date.setDate(date.getDate() + deletionPeriod)
-      date.setHours(0, 0, 0, 0)
-      let today = new Date()
-      today.setHours(0, 0, 0, 0)
-      let differenceInTime = date.getTime() - today.getTime()
-      let daysUntilDeletion = differenceInTime / (1000 * 3600 * 24)
 
       const language = recipients[0].settings.language
 
