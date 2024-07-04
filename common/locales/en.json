@@ -38,7 +38,7 @@
       "examine/healthCareCost": "There are no health care costs to examine",
       "examine/healthCareCost/underExaminationByInsurance": "There are no health care costs under examination by health insurances.",
       "examine/travel": "There are no travels to examine",
-      "examine/travefl/refunded": "There are no refunded travels",
+      "examine/travel/refunded": "There are no refunded travels",
       "expense": "There are no expenses jet. Add one!",
       "expenseReport": "You have not added an expense report yet. Create your first expense report!",
       "healthCareCost": "You have not submitted any health care costs yet.",
