@@ -52,8 +52,17 @@ function mapSchemaTypeToVueformElement(
     vueformElement['rules'].push('max:' + schemaType.max)
   }
 
-  if (schemaType.description !== undefined) {
-    vueformElement['description'] = translate('description.' + labelStr, language)
+  if (schemaType.description) {
+    vueformElement['description'] = translate(schemaType.description, language)
+  } else if (labelStr) {
+    let description = translate('description.' + labelStr, language) as { de: string; en: string }
+    if (description.de) {
+      console.log(description.de)
+      console.log('description.' + labelStr)
+      if (!(description.de === 'description.' + labelStr)) {
+        vueformElement['description'] = translate('description.' + labelStr, language)
+      }
+    }
   }
 
   if (schemaType.label) {
@@ -61,6 +70,7 @@ function mapSchemaTypeToVueformElement(
   } else if (labelStr) {
     vueformElement['label'] = translate('labels.' + labelStr, language)
   }
+
   if (schemaType.info) {
     vueformElement['info'] = translate(schemaType.info, language)
   }
