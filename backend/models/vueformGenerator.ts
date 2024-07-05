@@ -60,7 +60,7 @@ function mapSchemaTypeToVueformElement(
       console.log(description.de)
       console.log('description.' + labelStr)
       if (!(description.de === 'description.' + labelStr)) {
-        vueformElement['description'] = translate('description.' + labelStr, language)
+        vueformElement['description'] = description
       }
     }
   }
