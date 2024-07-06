@@ -63,6 +63,7 @@ const retentionPolicy = {} as {
     min: number
     required: true
     validate: { validator: any; message: string }
+    description: string
   }
 }
 for (const policy of retention) {
@@ -73,7 +74,8 @@ for (const policy of retention) {
     validate: {
       validator: Number.isInteger,
       message: 'Must be Integer'
-    }
+    },
+    description: 'description.' + policy
   }
 }
 
