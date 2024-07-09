@@ -79,17 +79,19 @@ async function notificationMailForDeletions(retentionPolicy: { [key in Retention
   let notifications = await getPolicyElements(retentionPolicy)
   if (retentionPolicy.mailXDaysBeforeDeletion > 0) {
     for (let i = 0; i < notifications.length; i++) {
-      let daysUntilDeletionTemp =
-        retentionPolicy.mailXDaysBeforeDeletion < notifications[i].deletionPeriod
-          ? retentionPolicy.mailXDaysBeforeDeletion
-          : notifications[i].deletionPeriod
-      let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
-      let startDate = new Date(date)
-      startDate.setDate(startDate.getDate() - 1)
-      let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state, startDate)
-      if (result.length > 0) {
-        for (let p = 0; p < result.length; p++) {
-          await sendNotificationMails(result[p], daysUntilDeletionTemp)
+      if (notifications[i].deletionPeriod != 0) {
+        let daysUntilDeletionTemp =
+          retentionPolicy.mailXDaysBeforeDeletion < notifications[i].deletionPeriod
+            ? retentionPolicy.mailXDaysBeforeDeletion
+            : notifications[i].deletionPeriod
+        let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
+        let startDate = new Date(date)
+        startDate.setDate(startDate.getDate() - 1)
+        let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state, startDate)
+        if (result.length > 0) {
+          for (let p = 0; p < result.length; p++) {
+            await sendNotificationMails(result[p], daysUntilDeletionTemp)
+          }
         }
       }
     }
