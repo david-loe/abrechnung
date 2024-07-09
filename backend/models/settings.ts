@@ -5,6 +5,7 @@ import {
   ExpenseReportState,
   HealthCareCostState,
   ReportType,
+  RetentionType,
   Settings,
   TravelState,
   _id,
@@ -13,6 +14,7 @@ import {
   expenseReportStates,
   healthCareCostStates,
   reportTypes,
+  retention,
   travelStates
 } from '../../common/types.js'
 import '../db.js'
@@ -55,6 +57,28 @@ for (const report of reportTypes) {
   disableReportType[report] = { type: Boolean, required: true }
 }
 
+const retentionPolicy = {} as {
+  [key in RetentionType]: {
+    type: NumberConstructor
+    min: number
+    required: true
+    validate: { validator: any; message: string }
+    description: string
+  }
+}
+for (const policy of retention) {
+  retentionPolicy[policy] = {
+    type: Number,
+    min: 0,
+    required: true,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Must be Integer'
+    },
+    description: 'description.' + policy
+  }
+}
+
 export const settingsSchema = new Schema<Settings>({
   allowSpouseRefund: { type: Boolean, required: true },
   allowTravelApplicationForThePast: { type: Boolean, required: true },
@@ -79,7 +103,8 @@ export const settingsSchema = new Schema<Settings>({
   stateColors: { type: stateColors, required: true },
   accessIcons: { type: accessIcons, required: true },
   version: { type: String, required: true, hide: true },
-  migrateFrom: { type: String, hide: true }
+  migrateFrom: { type: String, hide: true },
+  retentionPolicy: { type: retentionPolicy, required: true }
 })
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
