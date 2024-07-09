@@ -4144,6 +4144,33 @@
 					"version": {
 						"type": "string"
 					},
+					"retentionPolicy": {
+						"properties": {
+							"deleteRefundedAfterXDays": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteApprovedTravelAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"mailXDaysBeforeDeletion": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"deleteRefundedAfterXDays",
+							"deleteApprovedTravelAfterXDaysUnused",
+							"deleteInWorkReportsAfterXDaysUnused",
+							"mailXDaysBeforeDeletion"
+						],
+						"type": "object"
+					},
 					"migrateFrom": {
 						"type": "string",
 						"nullable": true
@@ -4176,6 +4203,7 @@
 					"vehicleRegistrationWhenUsingOwnCar",
 					"disableReportType",
 					"version",
+					"retentionPolicy",
 					"_id"
 				],
 				"type": "object",
@@ -4551,6 +4579,33 @@
 					"version": {
 						"type": "string"
 					},
+					"retentionPolicy": {
+						"properties": {
+							"deleteRefundedAfterXDays": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteApprovedTravelAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"mailXDaysBeforeDeletion": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"deleteRefundedAfterXDays",
+							"deleteApprovedTravelAfterXDaysUnused",
+							"deleteInWorkReportsAfterXDaysUnused",
+							"mailXDaysBeforeDeletion"
+						],
+						"type": "object"
+					},
 					"migrateFrom": {
 						"type": "string",
 						"nullable": true
@@ -4583,6 +4638,7 @@
 					"vehicleRegistrationWhenUsingOwnCar",
 					"disableReportType",
 					"version",
+					"retentionPolicy",
 					"_id"
 				],
 				"type": "object",
@@ -4592,6 +4648,27 @@
 				"properties": {
 					"migrateFrom": {
 						"type": "string"
+					},
+					"retentionPolicy": {
+						"properties": {
+							"mailXDaysBeforeDeletion": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteApprovedTravelAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteRefundedAfterXDays": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
 					},
 					"version": {
 						"type": "string"
