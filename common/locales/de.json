@@ -57,6 +57,12 @@
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"
   },
+  "description": {
+    "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteRefundedAfterXDays": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "mailXDaysBeforeDeletion": "Um keine Hinweismail zuversenden 0 eingeben"
+  },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
     "halfCar": "Weg zur Arbeit 🚗",
@@ -145,6 +151,9 @@
     "de": "Deutsch 🇩🇪",
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
+    "deleteRefundedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
+    "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
+    "deleteInWorkReportsAfterXDaysUnused": "Löschen von ungenutzen Auslagen- und Krankenkostenanträgen - in Tagen",
     "deleteX": "{X} löschen",
     "delOverwritten": "Soll der zu überschreibende Benutzer gelöscht werden?",
     "departure": "Abfahrt /-flug",
@@ -210,6 +219,7 @@
     "lunch": "Mittagessen",
     "lunchCateringLumpSumCut": "Verpflegungspauschalenkürung fürs Mittagessen",
     "mailToInsurance": "E-Mail an Versicherung",
+    "mailXDaysBeforeDeletion": "Informationsmail vor dem Löschen - in Tagen",
     "maxTravelDayCount": "Maximale Länge eine Dienstreise [Tage]",
     "mergeUsers": "Benutzer zusammenführen",
     "midnight": "24 Uhr",
@@ -254,6 +264,7 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "required": "erforderlich",
+    "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
     "save": "Speichern",
     "saveX": "{X} speichern",
@@ -335,10 +346,18 @@
         "paragraph": "Eine neue Auslagenabrechnung wurden für dich erstellt.",
         "subject": "🆕 Auslagenabrechnung"
       },
+      "inWorkDeletedSoon": {
+        "paragraph": "Deine angelegte Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wird erstattet.",
         "subject": "💲 Auslagen erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}'  wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -362,10 +381,18 @@
         "paragraph": "Eine neue Krankenkostenabrechnung wurden für dich erstellt.",
         "subject": "🆕 Krankenkosten"
       },
+      "inWorkDeletedSoon": {
+        "paragraph": "Deine angelegte Krankenkostenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "refunded": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
         "subject": "💲 Krankenkosten erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Deine erstatteter Krankenkostenantrag  '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -407,6 +434,10 @@
         "paragraph": "Dein Reiseantrag wurde genehmigt.",
         "subject": "✅ Reise genehmigt"
       },
+      "approvedDeletedSoon": {
+        "paragraph": "Deine genehmigte Reise  '{reportName}'  wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "backToApproved": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Reisekosten wurden dir zum Überarbeiten zurückgeschickt.",
@@ -416,6 +447,10 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Reisekosten werden erstattet.",
         "subject": "💲 Reisekosten erstattet"
+      },
+      "refundedDeletedSoon": {
+        "paragraph": "Deine erstattete Reise '{reportName}' wird in {days} Tagen automatisch gelöscht.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "rejected": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

@@ -29,6 +29,10 @@ export interface Settings {
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
   disableReportType: { [key in ReportType]: boolean }
   version: string
+  retentionPolicy: {
+    [key in RetentionType]: number
+  }
+
   /**
    * @Hidden
    */
@@ -360,6 +364,16 @@ export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
 export type ReportType = (typeof reportTypes)[number]
+
+export const retention = [
+  'deleteRefundedAfterXDays',
+  'deleteApprovedTravelAfterXDaysUnused',
+  'deleteInWorkReportsAfterXDaysUnused',
+  'mailXDaysBeforeDeletion'
+] as const
+export type RetentionType = (typeof retention)[number]
+
+export type schemaNames = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 
 export const accesses = [
   'user',
