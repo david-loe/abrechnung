@@ -186,6 +186,24 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
       prefix: text + '    ' + i18n.t('labels.lastPlaceOfWork', { lng: opts.language }) + ': '
     })
   )
+
+  //Project identifier and name
+  var y = y - opts.fontSize * 1.5
+  page.drawText(
+    i18n.t('labels.project', { lng: opts.language }) +
+      ': ' +
+      travel.project.identifier +
+      ' - ' +
+      (travel.project.name ? travel.project.name : ''),
+    {
+      x: opts.xStart,
+      y: y,
+      size: opts.fontSize,
+      font: opts.font,
+      color: opts.textColor
+    }
+  )
+
   return y
 }
 
