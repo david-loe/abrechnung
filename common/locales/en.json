@@ -57,12 +57,6 @@
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "wrongPassword": "Wrong Password"
   },
-  "description": {
-    "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
-    "deleteInWorkReportsAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
-    "deleteRefundedAfterXDays": "Enter 0 to prevent automatic deletion",
-    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email"
-  },
   "distanceRefundTypes": {
     "car": "Car 🚗",
     "halfCar": "Way to Work 🚗",
@@ -151,9 +145,6 @@
     "de": "German 🇩🇪",
     "defaultAccess": "Default access rights",
     "delete": "Delete",
-    "deleteRefundedAfterXDays": "Delete refunded reports and trips - in days",
-    "deleteApprovedTravelAfterXDaysUnused": "Delete approved, unused trips - in days",
-    "deleteInWorkReportsAfterXDaysUnused": "Delete unused expense and healthcare cost reports - in days",
     "deleteX": "Delete {X}",
     "delOverwritten": "Should the overwritten user be deleted?",
     "departure": "Departure",
@@ -219,7 +210,6 @@
     "lunch": "Lunch",
     "lunchCateringLumpSumCut": "Catering lump sum cut for lunch",
     "mailToInsurance": "Mail to insurance",
-    "mailXDaysBeforeDeletion": "Receive notification mail before deletion - in days",
     "maxTravelDayCount": "Maximum length of a business trip [days]",
     "mergeUsers": "Merge Users",
     "midnight": "12AM",
@@ -264,7 +254,6 @@
     "reject": "Reject",
     "report": "Report",
     "required": "required",
-    "retentionPolicy": "Retention policy",
     "route": "Route",
     "save": "Save",
     "saveX": "Save {X}",
@@ -346,18 +335,10 @@
         "paragraph": "A new expense report was created for you.",
         "subject": "🆕 Expense Report"
       },
-      "inWorkDeletedSoon": {
-        "paragraph": "Your created expense report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
-        "subject": "Automatic deletion soon"
-      },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your expense report gets refunded.",
         "subject": "💲 Expense report refunded"
-      },
-      "refundedDeletedSoon": {
-        "paragraph": "Your refunded expense report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
-        "subject": "Automatic deletion soon"
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
@@ -381,18 +362,10 @@
         "paragraph": "A new health care cost was created for you.",
         "subject": "🆕 Health care cost"
       },
-      "inWorkDeletedSoon": {
-        "paragraph": "Your created health care cost report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
-        "subject": "Automatic deletion soon"
-      },
       "refunded": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs got reimbursed in the amount of {refundSum} by the insurance.",
         "subject": "💲 Health care costs refunded"
-      },
-      "refundedDeletedSoon": {
-        "paragraph": "Your refunded health care cost report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
-        "subject": "Automatic deletion soon"
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
@@ -434,10 +407,6 @@
         "paragraph": "Your travel application got approved.",
         "subject": "✅ Travel approved"
       },
-      "approvedDeletedSoon": {
-        "paragraph": "Your approved travel '{reportName}' will be automatically deleted in {days} days due to inactivity.",
-        "subject": "Automatic deletion soon"
-      },
       "backToApproved": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel expenses have been sent back to you for revision.",
@@ -447,10 +416,6 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel expenses get refunded.",
         "subject": "💲 Travel refunded"
-      },
-      "refundedDeletedSoon": {
-        "paragraph": "Your refunded travel '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
-        "subject": "Automatic deletion soon"
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
