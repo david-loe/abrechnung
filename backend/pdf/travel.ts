@@ -133,8 +133,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
     i18n.t('labels.project', { lng: opts.language }) +
       ': ' +
       travel.project.identifier +
-      ' - ' +
-      (travel.project.name ? travel.project.name : ''),
+      (travel.project.name ? ' - ' + travel.project.name : ''),
     {
       x: opts.xStart,
       y: y,

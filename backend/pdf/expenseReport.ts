@@ -111,8 +111,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     i18n.t('labels.project', { lng: opts.language }) +
       ': ' +
       expenseReport.project.identifier +
-      ' - ' +
-      (expenseReport.project.name ? expenseReport.project.name : ''),
+      (expenseReport.project.name ? ' - ' + expenseReport.project.name : ''),
     {
       x: opts.xStart,
       y: y,
