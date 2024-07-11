@@ -105,7 +105,21 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     font: opts.font,
     color: opts.textColor
   })
-
+  //Project identifier and name
+  var y = y - opts.fontSize * 1.5
+  page.drawText(
+    i18n.t('labels.project', { lng: opts.language }) +
+      ': ' +
+      expenseReport.project.identifier +
+      (expenseReport.project.name ? ' - ' + expenseReport.project.name : ''),
+    {
+      x: opts.xStart,
+      y: y,
+      size: opts.fontSize,
+      font: opts.font,
+      color: opts.textColor
+    }
+  )
   // Traveler
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
@@ -140,6 +154,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     font: opts.font,
     color: opts.textColor
   })
+
   return y
 }
 

@@ -117,6 +117,21 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
     color: opts.textColor
   })
 
+  //Project identifier and name
+  var y = y - opts.fontSize * 1.5
+  page.drawText(
+    i18n.t('labels.project', { lng: opts.language }) +
+      ': ' +
+      healthCareCost.project.identifier +
+      (healthCareCost.project.name ? ' - ' + healthCareCost.project.name : ''),
+    {
+      x: opts.xStart,
+      y: y,
+      size: opts.fontSize,
+      font: opts.font,
+      color: opts.textColor
+    }
+  )
   // Isurance + patientName
   var y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
