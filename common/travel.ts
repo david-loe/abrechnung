@@ -1,5 +1,5 @@
 import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
-import { CountrySimple, Travel as ITravel, Meal, Place, PurposeSimple, Refund, TravelDay } from './types.js'
+import { CountryCode, CountrySimple, Travel as ITravel, Meal, Place, PurposeSimple, Refund, TravelDay } from './types.js'
 
 interface Travel extends ITravel {}
 class Travel {
@@ -43,12 +43,12 @@ class Travel {
     }
   }
 
-  async getBorderCrossings(): Promise<{ date: Date; country: CountrySimple; special?: string }[]> {
+  async getBorderCrossings() {
+    const borderCrossings: { date: Date; country: { _id: CountryCode }; special?: string }[] = []
     if (this.stages.length > 0) {
       const startCountry = this.stages[0].startLocation.country
-      const borderCrossings: { date: Date; country: CountrySimple; special?: string }[] = [
-        { date: new Date(this.stages[0].departure), country: startCountry }
-      ]
+      borderCrossings.push({ date: new Date(this.stages[0].departure), country: startCountry })
+
       for (var i = 0; i < this.stages.length; i++) {
         const stage = this.stages[i]
         // Country Change (or special change)
@@ -62,36 +62,22 @@ class Travel {
             if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
               if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
             } else if (stage.transport.type === 'airplane') {
-              const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }).lean()
-              if (country) {
-                borderCrossings.push({
-                  date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-                  country
-                })
-              } else {
-                throw new Error('secoundNightOnAirplaneLumpSumCountry(' + settings.secoundNightOnAirplaneLumpSumCountry + ') not found')
-              }
+              borderCrossings.push({
+                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                country: { _id: settings.secoundNightOnAirplaneLumpSumCountry }
+              })
             } else if (stage.transport.type === 'shipOrFerry') {
-              const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }).lean()
-              if (country) {
-                borderCrossings.push({
-                  date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-                  country
-                })
-              } else {
-                throw new Error(
-                  'secoundNightOnShipOrFerryLumpSumCountry(' + settings.secoundNightOnShipOrFerryLumpSumCountry + ') not found'
-                )
-              }
+              borderCrossings.push({
+                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                country: { _id: settings.secoundNightOnShipOrFerryLumpSumCountry }
+              })
             }
           }
           borderCrossings.push({ date: new Date(stage.arrival), country: stage.endLocation.country, special: stage.endLocation.special })
         }
       }
-      return borderCrossings
-    } else {
-      return []
     }
+    return borderCrossings
   }
 
   getDateOfLastPlaceOfWork() {
