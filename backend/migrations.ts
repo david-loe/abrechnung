@@ -178,6 +178,35 @@ async function migrate(from: string) {
       await rewriteSubmissionDate('expensereports', 'inWork')
       await rewriteSubmissionDate('healthcarecosts', 'inWork')
     }
+    case '1.2.0': {
+      console.log('Apply migration from v1.2.0: New settings structure')
+      const oldSettings = await mongoose.connection.collection('settings').findOne()
+      if (settings && oldSettings) {
+        settings.travelSettings = {
+          maxTravelDayCount: oldSettings.maxTravelDayCount,
+          allowSpouseRefund: oldSettings.allowSpouseRefund,
+          allowTravelApplicationForThePast: oldSettings.allowTravelApplicationForThePast,
+          toleranceStageDatesToApprovedTravelDates: oldSettings.toleranceStageDatesToApprovedTravelDates,
+          distanceRefunds: oldSettings.distanceRefunds,
+          vehicleRegistrationWhenUsingOwnCar: oldSettings.vehicleRegistrationWhenUsingOwnCar,
+          lumpSumCut: {
+            breakfast: oldSettings.breakfastCateringLumpSumCut,
+            lunch: oldSettings.lunchCateringLumpSumCut,
+            dinner: oldSettings.dinnerCateringLumpSumCut
+          },
+          factorCateringLumpSum: oldSettings.factorCateringLumpSum,
+          factorCateringLumpSumExceptions: oldSettings.factorCateringLumpSumExceptions,
+          factorOvernightLumpSum: oldSettings.factorOvernightLumpSum,
+          factorOvernightLumpSumExceptions: oldSettings.factorOvernightLumpSumExceptions,
+          fallBackLumpSumCountry: oldSettings.fallBackLumpSumCountry,
+          secoundNightOnAirplaneLumpSumCountry: oldSettings.secoundNightOnAirplaneLumpSumCountry,
+          secoundNightOnShipOrFerryLumpSumCountry: oldSettings.secoundNightOnShipOrFerryLumpSumCountry
+        }
+        await settings.save()
+      } else {
+        throw Error("Couldn't find settings")
+      }
+    }
     default:
       if (settings) {
         settings.migrateFrom = undefined

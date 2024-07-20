@@ -320,7 +320,7 @@ async function drawStages(
       t.type === 'ownCar'
         ? i18n.t('distanceRefundTypes.' + t.distanceRefundType, { lng: options.language }) +
           ' (' +
-          settings.distanceRefunds[t.distanceRefundType] +
+          settings.travelSettings.distanceRefunds[t.distanceRefundType] +
           ' ' +
           baseCurrency.symbol +
           '/km)'

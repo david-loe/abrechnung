@@ -39,7 +39,7 @@
         <DateInput
           id="startDateInput"
           v-model="formTravel.startDate"
-          :min="$root.settings.allowTravelApplicationForThePast ? undefined : minStartDate"
+          :min="$root.settings.travelSettings.allowTravelApplicationForThePast ? undefined : minStartDate"
           required />
       </div>
       <div class="col-auto">
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <template v-if="$root.settings.allowSpouseRefund">
+    <template v-if="$root.settings.travelSettings.allowSpouseRefund">
       <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
         <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
@@ -180,7 +180,7 @@ export default defineComponent({
     getMaxDate() {
       const date = isValidDate(this.formTravel.startDate as string)
       if (date) {
-        return datetimeToDateString(date.valueOf() + this.$root.settings.maxTravelDayCount * 1000 * 60 * 60 * 24)
+        return datetimeToDateString(date.valueOf() + this.$root.settings.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       } else {
         return ''
       }

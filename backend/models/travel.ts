@@ -140,7 +140,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
   { timestamps: true }
 )
 
-if (settings.allowSpouseRefund) {
+if (settings.travelSettings.allowSpouseRefund) {
   travelSchema.add({ claimSpouseRefund: { type: Boolean, default: false }, fellowTravelersNames: { type: String } })
 }
 
@@ -277,24 +277,28 @@ travelSchema.methods.getBorderCrossings = async function (
           if (['ownCar', 'otherTransport'].indexOf(stage.transport.type) !== -1) {
             if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
           } else if (stage.transport.type === 'airplane') {
-            const country = await Country.findOne({ _id: settings.secoundNightOnAirplaneLumpSumCountry }).lean()
+            const country = await Country.findOne({ _id: settings.travelSettings.secoundNightOnAirplaneLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
                 country
               })
             } else {
-              throw new Error('secoundNightOnAirplaneLumpSumCountry(' + settings.secoundNightOnAirplaneLumpSumCountry + ') not found')
+              throw new Error(
+                'secoundNightOnAirplaneLumpSumCountry(' + settings.travelSettings.secoundNightOnAirplaneLumpSumCountry + ') not found'
+              )
             }
           } else if (stage.transport.type === 'shipOrFerry') {
-            const country = await Country.findOne({ _id: settings.secoundNightOnShipOrFerryLumpSumCountry }).lean()
+            const country = await Country.findOne({ _id: settings.travelSettings.secoundNightOnShipOrFerryLumpSumCountry }).lean()
             if (country) {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
                 country
               })
             } else {
-              throw new Error('secoundNightOnShipOrFerryLumpSumCountry(' + settings.secoundNightOnShipOrFerryLumpSumCountry + ') not found')
+              throw new Error(
+                'secoundNightOnShipOrFerryLumpSumCountry(' + settings.travelSettings.secoundNightOnShipOrFerryLumpSumCountry + ') not found'
+              )
             }
           }
         }
@@ -376,20 +380,22 @@ travelSchema.methods.addCateringRefunds = async function (this: TravelDoc) {
       }
       var amount = (await (day.country as CountryDoc).getLumpSum(day.date as Date, day.special))[result.type!]
       var leftover = 1
-      if (day.cateringNoRefund.breakfast) leftover -= settings.breakfastCateringLumpSumCut
-      if (day.cateringNoRefund.lunch) leftover -= settings.lunchCateringLumpSumCut
-      if (day.cateringNoRefund.dinner) leftover -= settings.dinnerCateringLumpSumCut
+      if (day.cateringNoRefund.breakfast) leftover -= settings.travelSettings.lumpSumCut.breakfast
+      if (day.cateringNoRefund.lunch) leftover -= settings.travelSettings.lumpSumCut.lunch
+      if (day.cateringNoRefund.dinner) leftover -= settings.travelSettings.lumpSumCut.dinner
 
       result.refund = {
         amount:
           Math.round(
             amount *
               leftover *
-              ((settings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1 ? settings.factorCateringLumpSum : 1) *
+              ((settings.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1
+                ? settings.travelSettings.factorCateringLumpSum
+                : 1) *
               100
           ) / 100
       }
-      if (settings.allowSpouseRefund && this.claimSpouseRefund) {
+      if (settings.travelSettings.allowSpouseRefund && this.claimSpouseRefund) {
         result.refund.amount! *= 2
       }
       day.refunds.push(result as Refund)
@@ -422,11 +428,13 @@ travelSchema.methods.addOvernightRefunds = async function (this: TravelDoc) {
           amount:
             Math.round(
               amount *
-                (settings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1 ? settings.factorOvernightLumpSum : 1) *
+                (settings.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) == -1
+                  ? settings.travelSettings.factorOvernightLumpSum
+                  : 1) *
                 100
             ) / 100
         }
-        if (settings.allowSpouseRefund && this.claimSpouseRefund) {
+        if (settings.travelSettings.allowSpouseRefund && this.claimSpouseRefund) {
           result.refund.amount! *= 2
         }
         day.refunds.push(result as Refund)
@@ -500,7 +508,8 @@ travelSchema.methods.calculateRefundforOwnCar = function (this: TravelDoc) {
     if (stage.transport.type === 'ownCar') {
       if (stage.transport.distance && stage.transport.distanceRefundType) {
         stage.cost = Object.assign(stage.cost, {
-          amount: Math.round(stage.transport.distance * settings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
+          amount:
+            Math.round(stage.transport.distance * settings.travelSettings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
           currency: baseCurrency
         })
       }

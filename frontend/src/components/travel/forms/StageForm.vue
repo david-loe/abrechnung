@@ -94,7 +94,7 @@
             {{
               $t('distanceRefundTypes.' + distanceRefundType) +
               ' (' +
-              $root.settings.distanceRefunds[distanceRefundType] +
+              $root.settings.travelSettings.distanceRefunds[distanceRefundType] +
               ' ' +
               baseCurrency.symbol +
               '/km)'
@@ -116,10 +116,10 @@
           :disabled="disabled"
           required />
       </div>
-      <div class="mb-3" v-if="showVehicleRegistration && $root.settings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
+      <div class="mb-3" v-if="showVehicleRegistration && $root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
           {{ $t('labels.vehicleRegistration') }}
-          <span v-if="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'" class="text-danger">*</span>
+          <span v-if="$root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'" class="text-danger">*</span>
         </label>
         <InfoPoint :text="$t('info.vehicleRegistration')" />
         <FileUpload
@@ -128,7 +128,7 @@
           v-model="$root.user.vehicleRegistration as DocumentFile[] | undefined"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
-          :required="$root.settings.vehicleRegistrationWhenUsingOwnCar === 'required'"
+          :required="$root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'"
           :endpointPrefix="endpointPrefix"
           :ownerId="ownerId" />
       </div>
@@ -354,12 +354,13 @@ export default defineComponent({
       this.loading = false
 
       this.minDate = new Date(
-        new Date(this.travelStartDate).valueOf() - this.$root.settings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+        new Date(this.travelStartDate).valueOf() -
+          this.$root.settings.travelSettings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
       )
 
       this.maxDate = new Date(
         new Date(this.travelEndDate).valueOf() +
-          (this.$root.settings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
+          (this.$root.settings.travelSettings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
           1
       )
 

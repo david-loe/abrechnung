@@ -53,7 +53,7 @@ countrySchema.methods.getLumpSum = async function (date: Date, special: string |
     return (await model('Country').findOne({ _id: this.lumpSumsFrom })).getLumpSum(date)
   } else if (this.lumpSums.length == 0) {
     const settings = (await Settings.findOne().lean())!
-    return (await model('Country').findOne({ _id: settings.fallBackLumpSumCountry })).getLumpSum(date)
+    return (await model('Country').findOne({ _id: settings.travelSettings.fallBackLumpSumCountry })).getLumpSum(date)
   } else {
     var nearest = 0
     for (var i = 0; i < this.lumpSums.length; i++) {
