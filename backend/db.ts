@@ -12,8 +12,6 @@ import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
 
-await connectDB()
-
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {

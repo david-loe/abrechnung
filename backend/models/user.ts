@@ -9,9 +9,9 @@ import {
   locales,
   userReplaceCollections
 } from '../../common/types.js'
-import Settings from './settings.js'
+import { getSettings } from '../helper.js'
 
-const settings = (await Settings.findOne().lean())!
+const settings = await getSettings()
 
 const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
 for (const access of accesses) {

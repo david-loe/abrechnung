@@ -11,9 +11,9 @@ import {
   reportIsTravel,
   schemaNames
 } from '../common/types.js'
+import { getSettings } from './helper.js'
 import i18n from './i18n.js'
 import { sendMail } from './mail/mail.js'
-import Settings from './models/settings.js'
 import User from './models/user.js'
 
 async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState, startDate?: Date) {
@@ -138,16 +138,10 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
     }
   }
 }
-async function getSettings() {
-  return await Settings.findOne({}).lean()
-}
 
 export async function retentionPolicy() {
   const settings = await getSettings()
-  if (settings) {
-    await notificationMailForDeletions(settings.retentionPolicy)
-    await triggerDeletion(settings.retentionPolicy)
-  } else {
-    console.error('Settings not found!')
-  }
+
+  await notificationMailForDeletions(settings.retentionPolicy)
+  await triggerDeletion(settings.retentionPolicy)
 }

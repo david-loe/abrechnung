@@ -1,48 +1,41 @@
 {
   "accessIcons": {
-    "user": ["bi-card-list"],
-    "inWork:expenseReport": ["bi-coin", "bi-plus"],
-    "inWork:healthCareCost": ["bi-hospital", "bi-plus"],
-    "appliedFor:travel": ["bi-airplane", "bi-plus"],
-    "approved:travel": ["bi-airplane", "bi-plus", "bi-calendar-check"],
     "admin": ["bi-person-fill"],
+    "appliedFor:travel": ["bi-airplane", "bi-plus"],
     "approve/travel": ["bi-calendar-check"],
-    "confirm/healthCareCost": ["bi-hospital", "bi-check-square"],
+    "approved:travel": ["bi-airplane", "bi-calendar-check", "bi-plus"],
+    "confirm/healthCareCost": ["bi-check-square", "bi-hospital"],
     "examine/expenseReport": ["bi-coin", "bi-pencil-square"],
     "examine/healthCareCost": ["bi-hospital", "bi-pencil-square"],
-    "examine/travel": ["bi-airplane", "bi-pencil-square"]
+    "examine/travel": ["bi-airplane", "bi-pencil-square"],
+    "inWork:expenseReport": ["bi-coin", "bi-plus"],
+    "inWork:healthCareCost": ["bi-hospital", "bi-plus"],
+    "user": ["bi-card-list"]
   },
   "defaultAccess": {
-    "user": true,
-    "inWork:expenseReport": true,
-    "inWork:healthCareCost": true,
-    "appliedFor:travel": true,
-    "approved:travel": false,
     "admin": false,
+    "appliedFor:travel": true,
     "approve/travel": false,
+    "approved:travel": false,
     "confirm/healthCareCost": false,
     "examine/expenseReport": false,
     "examine/healthCareCost": false,
-    "examine/travel": false
+    "examine/travel": false,
+    "inWork:expenseReport": true,
+    "inWork:healthCareCost": true,
+    "user": true
   },
-  "allowSpouseRefund": false,
-  "userCanSeeAllProjects": true,
-  "breakfastCateringLumpSumCut": 0.2,
-  "dinnerCateringLumpSumCut": 0.4,
-  "factorCateringLumpSum": 1,
-  "factorCateringLumpSumExceptions": [],
-  "factorOvernightLumpSum": 1,
-  "factorOvernightLumpSumExceptions": [],
-  "fallBackLumpSumCountry": "LU",
-  "lunchCateringLumpSumCut": 0.4,
-  "maxTravelDayCount": 92,
-  "distanceRefunds": {
-    "car": 0.3,
-    "motorcycle": 0.2,
-    "halfCar": 0.15
+  "disableReportType": {
+    "expenseReport": false,
+    "healthCareCost": false,
+    "travel": false
   },
-  "secoundNightOnAirplaneLumpSumCountry": "AT",
-  "secoundNightOnShipOrFerryLumpSumCountry": "LU",
+  "retentionPolicy": {
+    "deleteApprovedTravelAfterXDaysUnused": 0,
+    "deleteInWorkReportsAfterXDaysUnused": 0,
+    "deleteRefundedAfterXDays": 0,
+    "mailXDaysBeforeDeletion": 7
+  },
   "stateColors": {
     "appliedFor": {
       "color": "#cae5ff",
@@ -73,21 +66,31 @@
       "text": "white"
     }
   },
-  "toleranceStageDatesToApprovedTravelDates": 3,
-  "allowTravelApplicationForThePast": false,
-  "vehicleRegistrationWhenUsingOwnCar": "optional",
+  "travelSettings": {
+    "allowSpouseRefund": false,
+    "allowTravelApplicationForThePast": false,
+    "distanceRefunds": {
+      "car": 0.3,
+      "halfCar": 0.15,
+      "motorcycle": 0.2
+    },
+    "factorCateringLumpSum": 1,
+    "factorCateringLumpSumExceptions": [],
+    "factorOvernightLumpSum": 1,
+    "factorOvernightLumpSumExceptions": [],
+    "fallBackLumpSumCountry": "LU",
+    "lumpSumCut": {
+      "breakfast": 0.2,
+      "dinner": 0.4,
+      "lunch": 0.4
+    },
+    "maxTravelDayCount": 92,
+    "secoundNightOnAirplaneLumpSumCountry": "AT",
+    "secoundNightOnShipOrFerryLumpSumCountry": "LU",
+    "toleranceStageDatesToApprovedTravelDates": 3,
+    "vehicleRegistrationWhenUsingOwnCar": "optional"
+  },
   "uploadTokenExpireAfterSeconds": 600,
-  "disableReportType": {
-    "travel": false,
-    "expenseReport": false,
-    "healthCareCost": false
-  },
-  "retentionPolicy": {
-    "deleteRefundedAfterXDays": 0,
-    "deleteApprovedTravelAfterXDaysUnused": 0,
-    "deleteInWorkReportsAfterXDaysUnused": 0,
-    "mailXDaysBeforeDeletion": 7
-  },
-
-  "version": "1.2.0"
+  "userCanSeeAllProjects": true,
+  "version": "1.2.1"
 }

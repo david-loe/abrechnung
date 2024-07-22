@@ -6,11 +6,14 @@ import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { errorHandler } from './controller/error.js'
-import './db.js'
+import { connectDB } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
 import i18n from './i18n.js'
-import './migrations.js'
+import { checkForMigrations } from './migrations.js'
+
+await connectDB()
+await checkForMigrations()
 
 const app = express()
 

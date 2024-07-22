@@ -4,9 +4,8 @@ import multer from 'multer'
 import fs from 'node:fs/promises'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
 import { _id } from '../../common/types.js'
-import { documentFileHandler } from '../helper.js'
+import { documentFileHandler, getSettings } from '../helper.js'
 import i18n from '../i18n.js'
-import Settings from '../models/settings.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
 import { AuthorizationError, NotFoundError } from './error.js'
@@ -28,8 +27,13 @@ export class UploadController extends Controller {
   @Middlewares(validateToken)
   @Produces('text/html')
   @SuccessResponse(200)
-  public async uploadPage(@Request() req: ExRequest, @Query() userId: string, @Query() tokenId: string, @Query() ownerId?: string): Promise<void> {
-    const settings = (await Settings.findOne().lean())!
+  public async uploadPage(
+    @Request() req: ExRequest,
+    @Query() userId: string,
+    @Query() tokenId: string,
+    @Query() ownerId?: string
+  ): Promise<void> {
+    const settings = await getSettings()
     const user = await User.findOne({ _id: userId }).lean()
     const template = await fs.readFile('./templates/upload.ejs', { encoding: 'utf-8' })
     const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')

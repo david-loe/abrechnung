@@ -19,9 +19,8 @@ import {
   TravelExpense,
   baseCurrency
 } from '../../common/types.js'
-import { getDateOfSubmission } from '../helper.js'
+import { getDateOfSubmission, getSettings } from '../helper.js'
 import i18n from '../i18n.js'
-import Settings from '../models/settings.js'
 import {
   Column,
   Options,
@@ -272,7 +271,7 @@ async function drawStages(
   receiptMap: ReceiptMap,
   options: Options
 ) {
-  const settings = (await Settings.findOne().lean())!
+  const settings = await getSettings()
   if (travel.stages.length == 0) {
     return options.yStart
   }
@@ -320,7 +319,7 @@ async function drawStages(
       t.type === 'ownCar'
         ? i18n.t('distanceRefundTypes.' + t.distanceRefundType, { lng: options.language }) +
           ' (' +
-          settings.distanceRefunds[t.distanceRefundType] +
+          settings.travelSettings.distanceRefunds[t.distanceRefundType] +
           ' ' +
           baseCurrency.symbol +
           '/km)'

@@ -6,38 +6,39 @@ import { Types } from 'mongoose'
 export type _id = Types.ObjectId
 
 export interface Settings {
-  accessIcons: { [key in Access]: string[] }
-  defaultAccess: { [key in Access]: boolean }
-  allowSpouseRefund: boolean
   userCanSeeAllProjects: boolean
-  breakfastCateringLumpSumCut: number
-  lunchCateringLumpSumCut: number
-  dinnerCateringLumpSumCut: number
-  factorCateringLumpSum: number
-  factorCateringLumpSumExceptions: CountryCode[]
-  factorOvernightLumpSum: number
-  factorOvernightLumpSumExceptions: CountryCode[]
-  fallBackLumpSumCountry: CountryCode
-  maxTravelDayCount: number
-  distanceRefunds: { [key in DistanceRefundType]: number }
-  secoundNightOnAirplaneLumpSumCountry: CountryCode
-  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
-  stateColors: { [key in AnyState]: { color: string; text: string } }
-  toleranceStageDatesToApprovedTravelDates: number
-  uploadTokenExpireAfterSeconds: number
-  allowTravelApplicationForThePast: boolean
-  vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
+  defaultAccess: { [key in Access]: boolean }
   disableReportType: { [key in ReportType]: boolean }
-  version: string
   retentionPolicy: {
     [key in RetentionType]: number
   }
-
+  travelSettings: SettingsTravel
+  uploadTokenExpireAfterSeconds: number
+  stateColors: { [key in AnyState]: { color: string; text: string } }
+  accessIcons: { [key in Access]: string[] }
+  version: string
   /**
    * @Hidden
    */
   migrateFrom?: string | null
   _id: _id
+}
+
+export interface SettingsTravel {
+  maxTravelDayCount: number
+  allowSpouseRefund: boolean
+  allowTravelApplicationForThePast: boolean
+  toleranceStageDatesToApprovedTravelDates: number
+  distanceRefunds: { [key in DistanceRefundType]: number }
+  vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
+  lumpSumCut: { [key in Meal]: number }
+  factorCateringLumpSum: number
+  factorCateringLumpSumExceptions: CountryCode[]
+  factorOvernightLumpSum: number
+  factorOvernightLumpSumExceptions: CountryCode[]
+  fallBackLumpSumCountry: CountryCode
+  secoundNightOnAirplaneLumpSumCountry: CountryCode
+  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
 }
 
 /**
@@ -271,6 +272,10 @@ export interface Refund {
   type: LumpsumType
   refund: BaseCurrencyMoney
   _id: Types.ObjectId
+}
+
+export interface TravelDayFullCountry extends Omit<TravelDay, 'country'> {
+  country: Country
 }
 
 export interface TravelDay {
