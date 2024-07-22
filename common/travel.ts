@@ -10,18 +10,42 @@ import {
   PurposeSimple,
   Refund,
   SettingsTravel,
+  Stage,
   Travel,
-  TravelDayFullCountry
+  TravelDayFullCountry,
+  TravelExpense
 } from './types.js'
 
 export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>
-  lumpSumCalculator: LumpSumCalculator
-  travelSettings: SettingsTravel
+  lumpSumCalculator!: LumpSumCalculator
+  travelSettings!: SettingsTravel
+  stagesCompareFn = (a: Stage, b: Stage) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
+  expensesCompareFn = (a: TravelExpense, b: TravelExpense) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: SettingsTravel) {
     this.getCountryById = getCountryById
+    this.updateSettings(travelSettings)
+  }
+
+  async calc(travel: Travel) {
+    this.sort(travel)
+    this.calculateProgress(travel)
+    await this.calculateDays(travel)
+    this.calculateProfessionalShare(travel)
+    this.calculateRefundforOwnCar(travel)
+    await this.addCateringRefunds(travel)
+    await this.addOvernightRefunds(travel)
+  }
+
+  updateSettings(travelSettings: SettingsTravel) {
     this.travelSettings = travelSettings
-    this.lumpSumCalculator = new LumpSumCalculator(getCountryById, travelSettings.fallBackLumpSumCountry)
+    this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallBackLumpSumCountry)
+  }
+
+  sort(travel: Travel) {
+    travel.stages.sort(this.stagesCompareFn)
+    travel.expenses.sort(this.expensesCompareFn)
   }
 
   calculateProgress(travel: Travel) {
@@ -258,9 +282,15 @@ export class TravelCalculator {
   }
 }
 
+type Invalid = { path: string; err: string | Error; val?: any }
+
 export class TravelValidator {
-  validateDates(travel: Travel) {
-    const conflicts = new Set<string>()
+  validate(travel: Travel): Invalid[] {
+    return this.validateDates(travel).concat(this.validateCountries(travel))
+  }
+
+  validateDates(travel: Travel): Invalid[] {
+    const conflicts = new Set<Invalid>()
     for (var i = 0; i < travel.stages.length; i++) {
       for (var j = 0; j < travel.stages.length; j++) {
         if (i !== j) {
@@ -270,23 +300,23 @@ export class TravelValidator {
             } else {
               if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
                 // end of [i] inside of [j]
-                conflicts.add('stages.' + i + '.arrival')
-                conflicts.add('stages.' + j + '.departure')
+                conflicts.add({ path: 'stages.' + i + '.arrival', err: 'stagesOverlapping' })
+                conflicts.add({ path: 'stages.' + j + '.departure', err: 'stagesOverlapping' })
               } else {
                 // [j] inside of [i]
-                conflicts.add('stages.' + j + '.arrival')
-                conflicts.add('stages.' + j + '.departure')
+                conflicts.add({ path: 'stages.' + j + '.arrival', err: 'stagesOverlapping' })
+                conflicts.add({ path: 'stages.' + j + '.departure', err: 'stagesOverlapping' })
               }
             }
           } else if (travel.stages[i].departure.valueOf() < travel.stages[j].arrival.valueOf()) {
             if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
               // [i] inside of [j]
-              conflicts.add('stages.' + i + '.arrival')
-              conflicts.add('stages.' + i + '.departure')
+              conflicts.add({ path: 'stages.' + i + '.arrival', err: 'stagesOverlapping' })
+              conflicts.add({ path: 'stages.' + i + '.departure', err: 'stagesOverlapping' })
             } else {
               // end of [j] inside of [i]
-              conflicts.add('stages.' + j + '.arrival')
-              conflicts.add('stages.' + i + '.departure')
+              conflicts.add({ path: 'stages.' + j + '.arrival', err: 'stagesOverlapping' })
+              conflicts.add({ path: 'stages.' + i + '.departure', err: 'stagesOverlapping' })
             }
           } else {
             continue
@@ -294,23 +324,17 @@ export class TravelValidator {
         }
       }
     }
-    for (const conflict of conflicts) {
-      this.invalidate(conflict, 'stagesOverlapping')
-    }
+    return Array.from(conflicts)
   }
 
-  validateCountries(travel: Travel) {
-    const conflicts = []
+  validateCountries(travel: Travel): Invalid[] {
+    const conflicts: Invalid[] = []
     for (var i = 1; i < travel.stages.length; i++) {
       if (travel.stages[i - 1].endLocation.country._id !== travel.stages[i].startLocation.country._id) {
-        conflicts.push('stages.' + (i - 1) + '.endLocation.country')
-        conflicts.push('stages.' + i + '.startLocation.country')
+        conflicts.push({ path: 'stages.' + (i - 1) + '.endLocation.country', err: 'countryChangeBetweenStages' })
+        conflicts.push({ path: 'stages.' + i + '.startLocation.country', err: 'countryChangeBetweenStages' })
       }
     }
-    for (const conflict of conflicts) {
-      this.invalidate(conflict, 'countryChangeBetweenStages')
-    }
+    return conflicts
   }
-
-  invalidate(path: string, err: string | Error, val?: any) {}
 }
