@@ -1,8 +1,8 @@
 import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Project as IProject, ProjectSimple, _id } from '../../common/types.js'
+import { getSettings } from '../helper.js'
 import Project from '../models/project.js'
-import Settings from '../models/settings.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
@@ -12,7 +12,7 @@ import { AuthorizationError } from './error.js'
 export class ProjectController extends Controller {
   @Get()
   public async getProject(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
-    const settings = (await Settings.findOne().lean())!
+    const settings = await getSettings()
     if (
       !settings.userCanSeeAllProjects &&
       !request.user?.access['approve/travel'] &&

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
-import Settings from './settings.js'
+import { getSettings } from '../helper.js'
 
-const settings = (await Settings.findOne().lean())!
+const settings = await getSettings()
 
 const tokenSchema = new Schema(
   {

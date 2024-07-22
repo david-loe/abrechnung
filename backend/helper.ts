@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
-import { Model, Types } from 'mongoose'
+import mongoose, { Model, Types } from 'mongoose'
 import {
   AnyState,
   DocumentFile as IDocumentFile,
@@ -8,7 +8,8 @@ import {
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  Settings
 } from '../common/types.js'
 import DocumentFile from './models/documentFile.js'
 import ExpenseReport from './models/expenseReport.js'
@@ -173,4 +174,13 @@ export async function getDateOfSubmission(
     }
   }
   return null
+}
+
+export async function getSettings(): Promise<Settings> {
+  const settings = (await mongoose.connection.collection('settings').findOne()) as Settings | null
+  if (settings) {
+    return settings
+  } else {
+    throw Error('Settings not found')
+  }
 }
