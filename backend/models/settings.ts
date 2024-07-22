@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model } from 'mongoose'
+import { HydratedDocument, InferSchemaType, Schema, model } from 'mongoose'
 import {
   Access,
   DistanceRefundType,
@@ -20,6 +20,7 @@ import {
   travelStates
 } from '../../common/types.js'
 import '../db.js'
+import { travelCalculator } from './travel.js'
 
 const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }
 for (const access of accesses) {
@@ -120,5 +121,9 @@ export const settingsSchema = new Schema<Settings>({
 
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
 export type ISettings = SettingsSchema & { _id: _id }
+
+settingsSchema.post('save', async function (this: HydratedDocument<Settings>) {
+  travelCalculator.updateSettings(this.travelSettings)
+})
 
 export default model('Settings', settingsSchema)

@@ -19,23 +19,29 @@ import {
 export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>
   lumpSumCalculator!: LumpSumCalculator
+  validator: TravelValidator
   travelSettings!: SettingsTravel
   stagesCompareFn = (a: Stage, b: Stage) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
   expensesCompareFn = (a: TravelExpense, b: TravelExpense) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
 
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: SettingsTravel) {
     this.getCountryById = getCountryById
+    this.validator = new TravelValidator()
     this.updateSettings(travelSettings)
   }
 
-  async calc(travel: Travel) {
+  async calc(travel: Travel): Promise<Invalid[]> {
     this.sort(travel)
-    this.calculateProgress(travel)
-    await this.calculateDays(travel)
-    this.calculateProfessionalShare(travel)
-    this.calculateRefundforOwnCar(travel)
-    await this.addCateringRefunds(travel)
-    await this.addOvernightRefunds(travel)
+    const conflicts = this.validator.validate(travel)
+    if (conflicts.length === 0) {
+      this.calculateProgress(travel)
+      await this.calculateDays(travel)
+      this.calculateProfessionalShare(travel)
+      this.calculateRefundforOwnCar(travel)
+      await this.addCateringRefunds(travel)
+      await this.addOvernightRefunds(travel)
+    }
+    return conflicts
   }
 
   updateSettings(travelSettings: SettingsTravel) {
