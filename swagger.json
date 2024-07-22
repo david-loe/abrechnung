@@ -3774,91 +3774,127 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ISettings": {
+			"SettingsTravel": {
 				"properties": {
-					"accessIcons": {
+					"maxTravelDayCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"allowTravelApplicationForThePast": {
+						"type": "boolean"
+					},
+					"toleranceStageDatesToApprovedTravelDates": {
+						"type": "number",
+						"format": "double"
+					},
+					"distanceRefunds": {
 						"properties": {
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+							"car": {
+								"type": "number",
+								"format": "double"
 							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+							"motorcycle": {
+								"type": "number",
+								"format": "double"
 							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
+							"halfCar": {
+								"type": "number",
+								"format": "double"
 							}
 						},
 						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"confirm/healthCareCost",
-							"admin"
+							"car",
+							"motorcycle",
+							"halfCar"
 						],
 						"type": "object"
+					},
+					"vehicleRegistrationWhenUsingOwnCar": {
+						"type": "string",
+						"enum": [
+							"required",
+							"optional",
+							"none"
+						]
+					},
+					"lumpSumCut": {
+						"properties": {
+							"breakfast": {
+								"type": "number",
+								"format": "double"
+							},
+							"lunch": {
+								"type": "number",
+								"format": "double"
+							},
+							"dinner": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"breakfast",
+							"lunch",
+							"dinner"
+						],
+						"type": "object"
+					},
+					"factorCateringLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"factorOvernightLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorOvernightLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"fallBackLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"secoundNightOnAirplaneLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"secoundNightOnShipOrFerryLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					}
+				},
+				"required": [
+					"maxTravelDayCount",
+					"allowSpouseRefund",
+					"allowTravelApplicationForThePast",
+					"toleranceStageDatesToApprovedTravelDates",
+					"distanceRefunds",
+					"vehicleRegistrationWhenUsingOwnCar",
+					"lumpSumCut",
+					"factorCateringLumpSum",
+					"factorCateringLumpSumExceptions",
+					"factorOvernightLumpSum",
+					"factorOvernightLumpSumExceptions",
+					"fallBackLumpSumCountry",
+					"secoundNightOnAirplaneLumpSumCountry",
+					"secoundNightOnShipOrFerryLumpSumCountry"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ISettings": {
+				"properties": {
+					"userCanSeeAllProjects": {
+						"type": "boolean"
 					},
 					"defaultAccess": {
 						"properties": {
@@ -3911,78 +3947,58 @@
 						],
 						"type": "object"
 					},
-					"allowSpouseRefund": {
-						"type": "boolean"
-					},
-					"userCanSeeAllProjects": {
-						"type": "boolean"
-					},
-					"breakfastCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"lunchCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"dinnerCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"factorOvernightLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorOvernightLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"fallBackLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
-					"maxTravelDayCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"distanceRefunds": {
+					"disableReportType": {
 						"properties": {
-							"car": {
+							"travel": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"healthCareCost": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost"
+						],
+						"type": "object"
+					},
+					"retentionPolicy": {
+						"properties": {
+							"deleteRefundedAfterXDays": {
 								"type": "number",
 								"format": "double"
 							},
-							"motorcycle": {
+							"deleteApprovedTravelAfterXDaysUnused": {
 								"type": "number",
 								"format": "double"
 							},
-							"halfCar": {
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"mailXDaysBeforeDeletion": {
 								"type": "number",
 								"format": "double"
 							}
 						},
 						"required": [
-							"car",
-							"motorcycle",
-							"halfCar"
+							"deleteRefundedAfterXDays",
+							"deleteApprovedTravelAfterXDaysUnused",
+							"deleteInWorkReportsAfterXDaysUnused",
+							"mailXDaysBeforeDeletion"
 						],
 						"type": "object"
 					},
-					"secoundNightOnAirplaneLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
+					"travelSettings": {
+						"$ref": "#/components/schemas/SettingsTravel"
 					},
-					"secoundNightOnShipOrFerryLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
 					},
 					"stateColors": {
 						"properties": {
@@ -4103,73 +4119,92 @@
 						],
 						"type": "object"
 					},
-					"toleranceStageDatesToApprovedTravelDates": {
-						"type": "number",
-						"format": "double"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"allowTravelApplicationForThePast": {
-						"type": "boolean"
-					},
-					"vehicleRegistrationWhenUsingOwnCar": {
-						"type": "string",
-						"enum": [
-							"required",
-							"optional",
-							"none"
-						]
-					},
-					"disableReportType": {
+					"accessIcons": {
 						"properties": {
-							"travel": {
-								"type": "boolean"
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"expenseReport": {
-								"type": "boolean"
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"healthCareCost": {
-								"type": "boolean"
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							}
 						},
 						"required": [
-							"travel",
-							"expenseReport",
-							"healthCareCost"
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
 						],
 						"type": "object"
 					},
 					"version": {
 						"type": "string"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteRefundedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteRefundedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
 					},
 					"migrateFrom": {
 						"type": "string",
@@ -4180,30 +4215,15 @@
 					}
 				},
 				"required": [
-					"accessIcons",
-					"defaultAccess",
-					"allowSpouseRefund",
 					"userCanSeeAllProjects",
-					"breakfastCateringLumpSumCut",
-					"lunchCateringLumpSumCut",
-					"dinnerCateringLumpSumCut",
-					"factorCateringLumpSum",
-					"factorCateringLumpSumExceptions",
-					"factorOvernightLumpSum",
-					"factorOvernightLumpSumExceptions",
-					"fallBackLumpSumCountry",
-					"maxTravelDayCount",
-					"distanceRefunds",
-					"secoundNightOnAirplaneLumpSumCountry",
-					"secoundNightOnShipOrFerryLumpSumCountry",
-					"stateColors",
-					"toleranceStageDatesToApprovedTravelDates",
-					"uploadTokenExpireAfterSeconds",
-					"allowTravelApplicationForThePast",
-					"vehicleRegistrationWhenUsingOwnCar",
+					"defaultAccess",
 					"disableReportType",
-					"version",
 					"retentionPolicy",
+					"travelSettings",
+					"uploadTokenExpireAfterSeconds",
+					"stateColors",
+					"accessIcons",
+					"version",
 					"_id"
 				],
 				"type": "object",
@@ -4211,89 +4231,8 @@
 			},
 			"Settings": {
 				"properties": {
-					"accessIcons": {
-						"properties": {
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"confirm/healthCareCost",
-							"admin"
-						],
-						"type": "object"
+					"userCanSeeAllProjects": {
+						"type": "boolean"
 					},
 					"defaultAccess": {
 						"properties": {
@@ -4346,78 +4285,58 @@
 						],
 						"type": "object"
 					},
-					"allowSpouseRefund": {
-						"type": "boolean"
-					},
-					"userCanSeeAllProjects": {
-						"type": "boolean"
-					},
-					"breakfastCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"lunchCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"dinnerCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"factorOvernightLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorOvernightLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"fallBackLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
-					"maxTravelDayCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"distanceRefunds": {
+					"disableReportType": {
 						"properties": {
-							"car": {
+							"travel": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"healthCareCost": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost"
+						],
+						"type": "object"
+					},
+					"retentionPolicy": {
+						"properties": {
+							"deleteRefundedAfterXDays": {
 								"type": "number",
 								"format": "double"
 							},
-							"motorcycle": {
+							"deleteApprovedTravelAfterXDaysUnused": {
 								"type": "number",
 								"format": "double"
 							},
-							"halfCar": {
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"mailXDaysBeforeDeletion": {
 								"type": "number",
 								"format": "double"
 							}
 						},
 						"required": [
-							"car",
-							"motorcycle",
-							"halfCar"
+							"deleteRefundedAfterXDays",
+							"deleteApprovedTravelAfterXDaysUnused",
+							"deleteInWorkReportsAfterXDaysUnused",
+							"mailXDaysBeforeDeletion"
 						],
 						"type": "object"
 					},
-					"secoundNightOnAirplaneLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
+					"travelSettings": {
+						"$ref": "#/components/schemas/SettingsTravel"
 					},
-					"secoundNightOnShipOrFerryLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
 					},
 					"stateColors": {
 						"properties": {
@@ -4538,73 +4457,92 @@
 						],
 						"type": "object"
 					},
-					"toleranceStageDatesToApprovedTravelDates": {
-						"type": "number",
-						"format": "double"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"allowTravelApplicationForThePast": {
-						"type": "boolean"
-					},
-					"vehicleRegistrationWhenUsingOwnCar": {
-						"type": "string",
-						"enum": [
-							"required",
-							"optional",
-							"none"
-						]
-					},
-					"disableReportType": {
+					"accessIcons": {
 						"properties": {
-							"travel": {
-								"type": "boolean"
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"expenseReport": {
-								"type": "boolean"
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"healthCareCost": {
-								"type": "boolean"
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							}
 						},
 						"required": [
-							"travel",
-							"expenseReport",
-							"healthCareCost"
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"admin"
 						],
 						"type": "object"
 					},
 					"version": {
 						"type": "string"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteRefundedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteRefundedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
 					},
 					"migrateFrom": {
 						"type": "string",
@@ -4615,30 +4553,15 @@
 					}
 				},
 				"required": [
-					"accessIcons",
-					"defaultAccess",
-					"allowSpouseRefund",
 					"userCanSeeAllProjects",
-					"breakfastCateringLumpSumCut",
-					"lunchCateringLumpSumCut",
-					"dinnerCateringLumpSumCut",
-					"factorCateringLumpSum",
-					"factorCateringLumpSumExceptions",
-					"factorOvernightLumpSum",
-					"factorOvernightLumpSumExceptions",
-					"fallBackLumpSumCountry",
-					"maxTravelDayCount",
-					"distanceRefunds",
-					"secoundNightOnAirplaneLumpSumCountry",
-					"secoundNightOnShipOrFerryLumpSumCountry",
-					"stateColors",
-					"toleranceStageDatesToApprovedTravelDates",
-					"uploadTokenExpireAfterSeconds",
-					"allowTravelApplicationForThePast",
-					"vehicleRegistrationWhenUsingOwnCar",
+					"defaultAccess",
 					"disableReportType",
-					"version",
 					"retentionPolicy",
+					"travelSettings",
+					"uploadTokenExpireAfterSeconds",
+					"stateColors",
+					"accessIcons",
+					"version",
 					"_id"
 				],
 				"type": "object",
@@ -4649,62 +4572,79 @@
 					"migrateFrom": {
 						"type": "string"
 					},
-					"retentionPolicy": {
-						"properties": {
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteRefundedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"type": "object"
-					},
 					"version": {
 						"type": "string"
 					},
-					"disableReportType": {
+					"accessIcons": {
 						"properties": {
-							"healthCareCost": {
-								"type": "boolean"
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"expenseReport": {
-								"type": "boolean"
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							},
-							"travel": {
-								"type": "boolean"
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							}
 						},
 						"type": "object"
-					},
-					"vehicleRegistrationWhenUsingOwnCar": {
-						"type": "string",
-						"enum": [
-							"required",
-							"optional",
-							"none"
-						]
-					},
-					"allowTravelApplicationForThePast": {
-						"type": "boolean"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"toleranceStageDatesToApprovedTravelDates": {
-						"type": "number",
-						"format": "double"
 					},
 					"stateColors": {
 						"properties": {
@@ -4788,73 +4728,134 @@
 						},
 						"type": "object"
 					},
-					"secoundNightOnShipOrFerryLumpSumCountry": {
-						"type": "string"
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
 					},
-					"secoundNightOnAirplaneLumpSumCountry": {
-						"type": "string"
-					},
-					"distanceRefunds": {
+					"travelSettings": {
 						"properties": {
-							"halfCar": {
+							"secoundNightOnShipOrFerryLumpSumCountry": {
+								"type": "string"
+							},
+							"secoundNightOnAirplaneLumpSumCountry": {
+								"type": "string"
+							},
+							"fallBackLumpSumCountry": {
+								"type": "string"
+							},
+							"factorOvernightLumpSumExceptions": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"factorOvernightLumpSum": {
 								"type": "number",
 								"format": "double"
 							},
-							"motorcycle": {
+							"factorCateringLumpSumExceptions": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"factorCateringLumpSum": {
 								"type": "number",
 								"format": "double"
 							},
-							"car": {
+							"lumpSumCut": {
+								"properties": {
+									"dinner": {
+										"type": "number",
+										"format": "double"
+									},
+									"lunch": {
+										"type": "number",
+										"format": "double"
+									},
+									"breakfast": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"type": "object"
+							},
+							"vehicleRegistrationWhenUsingOwnCar": {
+								"type": "string",
+								"enum": [
+									"required",
+									"optional",
+									"none"
+								]
+							},
+							"distanceRefunds": {
+								"properties": {
+									"halfCar": {
+										"type": "number",
+										"format": "double"
+									},
+									"motorcycle": {
+										"type": "number",
+										"format": "double"
+									},
+									"car": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"type": "object"
+							},
+							"toleranceStageDatesToApprovedTravelDates": {
+								"type": "number",
+								"format": "double"
+							},
+							"allowTravelApplicationForThePast": {
+								"type": "boolean"
+							},
+							"allowSpouseRefund": {
+								"type": "boolean"
+							},
+							"maxTravelDayCount": {
 								"type": "number",
 								"format": "double"
 							}
 						},
 						"type": "object"
 					},
-					"maxTravelDayCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"fallBackLumpSumCountry": {
-						"type": "string"
-					},
-					"factorOvernightLumpSumExceptions": {
-						"items": {
-							"type": "string"
+					"retentionPolicy": {
+						"properties": {
+							"mailXDaysBeforeDeletion": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteApprovedTravelAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteRefundedAfterXDays": {
+								"type": "number",
+								"format": "double"
+							}
 						},
-						"type": "array"
+						"type": "object"
 					},
-					"factorOvernightLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSumExceptions": {
-						"items": {
-							"type": "string"
+					"disableReportType": {
+						"properties": {
+							"healthCareCost": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"travel": {
+								"type": "boolean"
+							}
 						},
-						"type": "array"
-					},
-					"factorCateringLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"dinnerCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"lunchCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"breakfastCateringLumpSumCut": {
-						"type": "number",
-						"format": "double"
-					},
-					"userCanSeeAllProjects": {
-						"type": "boolean"
-					},
-					"allowSpouseRefund": {
-						"type": "boolean"
+						"type": "object"
 					},
 					"defaultAccess": {
 						"properties": {
@@ -4894,76 +4895,8 @@
 						},
 						"type": "object"
 					},
-					"accessIcons": {
-						"properties": {
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"type": "object"
+					"userCanSeeAllProjects": {
+						"type": "boolean"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
