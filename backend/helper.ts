@@ -11,6 +11,7 @@ import {
   reportIsTravel,
   Settings
 } from '../common/types.js'
+import { connectDB } from './db.js'
 import DocumentFile from './models/documentFile.js'
 import ExpenseReport from './models/expenseReport.js'
 import HealthCareCost from './models/healthCareCost.js'
@@ -177,6 +178,7 @@ export async function getDateOfSubmission(
 }
 
 export async function getSettings(): Promise<Settings> {
+  await connectDB()
   const settings = (await mongoose.connection.collection('settings').findOne()) as Settings | null
   if (settings) {
     return settings
