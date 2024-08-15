@@ -180,11 +180,11 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   var text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
-    options.formatter.date(travel.startDate) +
+    options.formatter.dateTime(travel.startDate) +
     '    ' +
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
-    options.formatter.date(travel.endDate)
+    options.formatter.dateTime(travel.endDate)
   if (travel.professionalShare !== 1) {
     text =
       text + '    ' + i18n.t('labels.professionalShare', { lng: opts.language }) + ': ' + Math.round(travel.professionalShare! * 100) + '%'

@@ -1,16 +1,25 @@
-import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
-import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js'
+import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js';
+import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js';
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
 class Formatter {
   #dateFormat!: Intl.DateTimeFormat
   #simpleDateFormat!: Intl.DateTimeFormat
+  #dateTimeFormat!: Intl.DateTimeFormat
   #simpleDateTimeFormat!: Intl.DateTimeFormat
   #baseCurrencyFormat!: Intl.NumberFormat
   #floatFormat!: Intl.NumberFormat
   #dateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric', year: 'numeric' }
   #simpleDateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric' }
+  #dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+    timeZone: 'UTC',
+     year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  }
   #simpleDateTimeFormatOptions: Intl.DateTimeFormatOptions = {
     timeZone: 'UTC',
     month: 'numeric',
@@ -30,11 +39,15 @@ class Formatter {
       this.locale = locale
       this.#dateFormat = new Intl.DateTimeFormat(locale, this.#dateFormatOptions)
       this.#simpleDateFormat = new Intl.DateTimeFormat(locale, this.#simpleDateFormatOptions)
+      this.#dateTimeFormat = new Intl.DateTimeFormat(locale, this.#dateTimeFormatOptions)
       this.#simpleDateTimeFormat = new Intl.DateTimeFormat(locale, this.#simpleDateTimeFormatOptions)
       this.#baseCurrencyFormat = new Intl.NumberFormat(locale, this.#baseCurrencyFormatOptions)
       this.#floatFormat = new Intl.NumberFormat(locale, this.#floatFormatOptions)
     }
   }
+  /**
+   * Day + Month + Year
+   */
   date(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
     const validDate = isValidDate(date)
@@ -44,6 +57,9 @@ class Formatter {
       return ''
     }
   }
+  /**
+   * Day + Month
+   */
   simpleDate(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
     const validDate = isValidDate(date)
@@ -53,6 +69,21 @@ class Formatter {
       return ''
     }
   }
+  /**
+   * Day + Month + Year + Hour + Minute
+   */
+  dateTime(date: string | number | Date, locale?: Locale) {
+    this.setLocale(locale)
+    const validDate = isValidDate(date)
+    if (validDate) {
+      return this.#dateTimeFormat.format(validDate)
+    } else {
+      return ''
+    }
+  }
+  /**
+   * Day + Month + Hour + Minute
+   */
   simpleDateTime(date: string | number | Date, locale?: Locale) {
     this.setLocale(locale)
     const validDate = isValidDate(date)
