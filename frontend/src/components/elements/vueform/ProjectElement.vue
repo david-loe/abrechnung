@@ -95,7 +95,7 @@ export default defineElement({
         return identifier
       }
 
-      const name = option.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+      const name = option.name && option.name.toLowerCase().indexOf(search.toLowerCase()) > -1
       return name
     }
   },
