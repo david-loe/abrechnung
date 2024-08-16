@@ -1,5 +1,6 @@
 import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
+import { mergeDeep } from '../common/scripts.js'
 import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
@@ -28,13 +29,13 @@ export function disconnectDB() {
 }
 
 export async function initDB() {
-  const DBsettings = (await mongoose.connection.collection('settings').findOne({})) as ISettings | null
+  const DBsettings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
       DBsettings.migrateFrom = DBsettings.version
     }
     DBsettings.version = settings.version
-    const mergedSettings = Object.assign({}, settings, DBsettings)
+    const mergedSettings = mergeDeep({}, settings, DBsettings)
     await mongoose.connection.collection('settings').findOneAndDelete({})
     await mongoose.connection.collection('settings').insertOne(mergedSettings)
     console.log(i18n.t('alerts.db.updatedSettings'))

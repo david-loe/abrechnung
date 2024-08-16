@@ -26,7 +26,8 @@ export class TravelCalculator {
 
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: SettingsTravel) {
     this.getCountryById = getCountryById
-    this.validator = new TravelValidator()
+    this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallBackLumpSumCountry)
+    this.validator = new TravelValidator(travelSettings)
     this.updateSettings(travelSettings)
   }
 
@@ -46,7 +47,8 @@ export class TravelCalculator {
 
   updateSettings(travelSettings: SettingsTravel) {
     this.travelSettings = travelSettings
-    this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallBackLumpSumCountry)
+    this.validator.updateSettings(travelSettings)
+    this.lumpSumCalculator.setFallBackLumpSumCountry(travelSettings.fallBackLumpSumCountry)
   }
 
   sort(travel: Travel) {
@@ -289,10 +291,27 @@ export class TravelCalculator {
 }
 
 type Invalid = { path: string; err: string | Error; val?: any }
-
+type Warning = { name: string; val?: any; limit?: any }
 export class TravelValidator {
+  travelSettings!: SettingsTravel
+
+  constructor(travelSettings: SettingsTravel) {
+    this.updateSettings(travelSettings)
+  }
+
+  updateSettings(travelSettings: SettingsTravel) {
+    this.travelSettings = travelSettings
+  }
+
   validate(travel: Travel): Invalid[] {
     return this.validateDates(travel).concat(this.validateCountries(travel))
+  }
+
+  /**
+   * checks a travel for warnings
+   */
+  check(travel: Travel): Warning[] {
+    return this.checkProfessionalShare(travel).concat(this.checkTravelLength(travel))
   }
 
   validateDates(travel: Travel): Invalid[] {
@@ -343,16 +362,42 @@ export class TravelValidator {
     }
     return conflicts
   }
+
+  checkTravelLength(travel: Travel): Warning[] {
+    const warnings: Warning[] = []
+    const cs = travel.stages.length
+    if (cs > 0) {
+      const travelLength = new Date(travel.stages[cs - 1].arrival).valueOf() - new Date(travel.stages[0].departure).valueOf()
+      const limit = this.travelSettings.minHoursOfTravel * 1000 * 60 * 60
+      if (travelLength < limit) {
+        warnings.push({ name: 'travelLengthToShort', val: travelLength, limit: limit })
+      }
+    }
+    return warnings
+  }
+
+  checkProfessionalShare(travel: Travel): Warning[] {
+    const warnings: Warning[] = []
+    if (travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare) {
+      warnings.push({ name: 'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare })
+    }
+    return warnings
+  }
 }
 
 export default class LumpSumCalculator {
-  fallBackLumpSumCountry: CountryCode
+  fallBackLumpSumCountry!: CountryCode
   getCountryById: (id: CountryCode) => Promise<Country>
 
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, fallBackLumpSumCountry: CountryCode) {
     this.getCountryById = getCountryById
+    this.setFallBackLumpSumCountry(fallBackLumpSumCountry)
+  }
+
+  setFallBackLumpSumCountry(fallBackLumpSumCountry: CountryCode) {
     this.fallBackLumpSumCountry = fallBackLumpSumCountry
   }
+
   async getLumpSum(country: Country, date: Date, special: string | undefined = undefined): Promise<LumpSum> {
     if (country.lumpSumsFrom) {
       const lumpSumFrom = await this.getCountryById(country.lumpSumsFrom)

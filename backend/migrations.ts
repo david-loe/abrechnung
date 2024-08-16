@@ -198,7 +198,7 @@ export async function checkForMigrations() {
             fallBackLumpSumCountry: oldSettings.fallBackLumpSumCountry,
             secoundNightOnAirplaneLumpSumCountry: oldSettings.secoundNightOnAirplaneLumpSumCountry,
             secoundNightOnShipOrFerryLumpSumCountry: oldSettings.secoundNightOnShipOrFerryLumpSumCountry
-          }
+          } as any
           await settings.save()
         } else {
           throw Error("Couldn't find settings")

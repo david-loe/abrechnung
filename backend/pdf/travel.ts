@@ -175,16 +175,20 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
         ': '
     })
   )
-
+  let text = ''
   // Dates + professionalShare + lastPlaceOfWork
-  var text =
-    i18n.t('labels.from', { lng: opts.language }) +
-    ': ' +
-    options.formatter.date(travel.startDate) +
-    '    ' +
-    i18n.t('labels.to', { lng: opts.language }) +
-    ': ' +
-    options.formatter.date(travel.endDate)
+  const sc = travel.stages.length
+  if (sc > 0) {
+    text =
+      i18n.t('labels.from', { lng: opts.language }) +
+      ': ' +
+      options.formatter.dateTime(travel.stages[0].departure) +
+      '    ' +
+      i18n.t('labels.to', { lng: opts.language }) +
+      ': ' +
+      options.formatter.dateTime(travel.stages[sc - 1].arrival)
+  }
+
   if (travel.professionalShare !== 1) {
     text =
       text + '    ' + i18n.t('labels.professionalShare', { lng: opts.language }) + ': ' + Math.round(travel.professionalShare! * 100) + '%'

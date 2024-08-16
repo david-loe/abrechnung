@@ -107,7 +107,9 @@ export const settingsSchema = new Schema<Settings>({
       factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
       fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
       secoundNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
-      secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true }
+      secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
+      minHoursOfTravel: { type: Number, min: 0, required: true },
+      minProfessionalShare: { type: Number, min: 0, max: 1, required: true }
     },
     required: true
   },

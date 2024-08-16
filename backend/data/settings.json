@@ -85,6 +85,8 @@
       "lunch": 0.4
     },
     "maxTravelDayCount": 92,
+    "minHoursOfTravel": 8,
+    "minProfessionalShare": 0.5,
     "secoundNightOnAirplaneLumpSumCountry": "AT",
     "secoundNightOnShipOrFerryLumpSumCountry": "LU",
     "toleranceStageDatesToApprovedTravelDates": 3,
