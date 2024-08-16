@@ -291,7 +291,7 @@ export class TravelCalculator {
 }
 
 type Invalid = { path: string; err: string | Error; val?: any }
-type Warning = {name: string, val?: any, limit?: any}
+type Warning = { name: string; val?: any; limit?: any }
 export class TravelValidator {
   travelSettings!: SettingsTravel
 
@@ -306,11 +306,11 @@ export class TravelValidator {
   validate(travel: Travel): Invalid[] {
     return this.validateDates(travel).concat(this.validateCountries(travel))
   }
-  
+
   /**
    * checks a travel for warnings
    */
-  check(travel: Travel): Warning[]{
+  check(travel: Travel): Warning[] {
     return this.checkProfessionalShare(travel).concat(this.checkTravelLength(travel))
   }
 
@@ -366,11 +366,11 @@ export class TravelValidator {
   checkTravelLength(travel: Travel): Warning[] {
     const warnings: Warning[] = []
     const cs = travel.stages.length
-    if(cs > 0){
-      const travelLength = (new Date(travel.stages[cs - 1].arrival)).valueOf() - (new Date(travel.stages[0].departure)).valueOf()
-      const limit = this.travelSettings.minHoursOfTravel * 1000 *60 *60
-      if(travelLength < limit){
-        warnings.push({name: 'travelLengthToShort', val: travelLength, limit: limit})
+    if (cs > 0) {
+      const travelLength = new Date(travel.stages[cs - 1].arrival).valueOf() - new Date(travel.stages[0].departure).valueOf()
+      const limit = this.travelSettings.minHoursOfTravel * 1000 * 60 * 60
+      if (travelLength < limit) {
+        warnings.push({ name: 'travelLengthToShort', val: travelLength, limit: limit })
       }
     }
     return warnings
@@ -378,8 +378,8 @@ export class TravelValidator {
 
   checkProfessionalShare(travel: Travel): Warning[] {
     const warnings: Warning[] = []
-    if(travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare){
-      warnings.push({name:'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare})
+    if (travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare) {
+      warnings.push({ name: 'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare })
     }
     return warnings
   }
@@ -394,7 +394,7 @@ export default class LumpSumCalculator {
     this.setFallBackLumpSumCountry(fallBackLumpSumCountry)
   }
 
-  setFallBackLumpSumCountry(fallBackLumpSumCountry: CountryCode){
+  setFallBackLumpSumCountry(fallBackLumpSumCountry: CountryCode) {
     this.fallBackLumpSumCountry = fallBackLumpSumCountry
   }
 
