@@ -11,6 +11,8 @@ import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
+import { mergeDeep } from '../common/scripts.js'
+import { getSettings } from './helper.js'
 
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
@@ -28,13 +30,13 @@ export function disconnectDB() {
 }
 
 export async function initDB() {
-  const DBsettings = (await mongoose.connection.collection('settings').findOne({})) as ISettings | null
+  const DBsettings = await getSettings()
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
       DBsettings.migrateFrom = DBsettings.version
     }
     DBsettings.version = settings.version
-    const mergedSettings = Object.assign({}, settings, DBsettings)
+    const mergedSettings = mergeDeep({}, settings, DBsettings)
     await mongoose.connection.collection('settings').findOneAndDelete({})
     await mongoose.connection.collection('settings').insertOne(mergedSettings)
     console.log(i18n.t('alerts.db.updatedSettings'))

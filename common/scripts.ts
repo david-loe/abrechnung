@@ -345,3 +345,31 @@ export class Base64 {
     return string
   }
 }
+
+/**
+ * Simple object check.
+ */
+export function isObject(item: any) {
+  return (item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date));
+}
+
+/**
+ * Deep merge two objects.
+ */
+export function mergeDeep(target: any, ... sources:any) {
+  if (!sources.length) return target;
+  const source = sources.shift();
+
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!isObject(target[key])) Object.assign(target, { [key]: {} });
+        mergeDeep(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+
+  return mergeDeep(target, ...sources);
+}

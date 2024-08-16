@@ -176,7 +176,7 @@
           <label class="form-check-label me-2" for="travelProfessionalShare">
             {{ $t('labels.professionalShare') + ':' }}
           </label>
-          <span id="travelProfessionalShare" :class="travel.professionalShare <= 0.5 ? 'text-danger' : ''">
+          <span id="travelProfessionalShare" :class="travel.professionalShare <= $root.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
           <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />

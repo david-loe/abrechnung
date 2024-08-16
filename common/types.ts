@@ -39,6 +39,8 @@ export interface SettingsTravel {
   fallBackLumpSumCountry: CountryCode
   secoundNightOnAirplaneLumpSumCountry: CountryCode
   secoundNightOnShipOrFerryLumpSumCountry: CountryCode
+  minHoursOfTravel: number
+  minProfessionalShare: number
 }
 
 /**
