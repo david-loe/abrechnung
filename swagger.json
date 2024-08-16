@@ -3870,6 +3870,14 @@
 					},
 					"secoundNightOnShipOrFerryLumpSumCountry": {
 						"$ref": "#/components/schemas/CountryCode"
+					},
+					"minHoursOfTravel": {
+						"type": "number",
+						"format": "double"
+					},
+					"minProfessionalShare": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
@@ -3886,7 +3894,9 @@
 					"factorOvernightLumpSumExceptions",
 					"fallBackLumpSumCountry",
 					"secoundNightOnAirplaneLumpSumCountry",
-					"secoundNightOnShipOrFerryLumpSumCountry"
+					"secoundNightOnShipOrFerryLumpSumCountry",
+					"minHoursOfTravel",
+					"minProfessionalShare"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4734,6 +4744,14 @@
 					},
 					"travelSettings": {
 						"properties": {
+							"minProfessionalShare": {
+								"type": "number",
+								"format": "double"
+							},
+							"minHoursOfTravel": {
+								"type": "number",
+								"format": "double"
+							},
 							"secoundNightOnShipOrFerryLumpSumCountry": {
 								"type": "string"
 							},
