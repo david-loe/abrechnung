@@ -81,6 +81,16 @@ export class UsersController extends Controller {
   }
 }
 
+function sendNewMagicloginMail(user: IUser) {
+  sendMail(
+    [user],
+    i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),
+    i18n.t('mail.newMagiclogin.paragraph', { lng: user.settings.language }),
+    { text: i18n.t('mail.newMagiclogin.buttonText', { lng: user.settings.language }), link: process.env.VITE_FRONTEND_URL },
+    i18n.t('mail.newMagiclogin.lastParagraph', { lng: user.settings.language })
+  )
+}
+
 interface SetterBodyUser extends SetterBody<IUser> {
   loseAccessAt: null | Date | undefined
 }
@@ -95,20 +105,28 @@ export class UserAdminController extends Controller {
 
   @Post()
   public async postUser(@Body() requestBody: SetterBodyUser) {
-    var cb: ((data: IUser) => any) | undefined = undefined
+    let cb: ((data: IUser) => any) | undefined = undefined
 
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
-      cb = (user: IUser) => {
-        sendMail(
-          [user],
-          i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),
-          i18n.t('mail.newMagiclogin.paragraph', { lng: user.settings.language }),
-          { text: i18n.t('mail.newMagiclogin.buttonText', { lng: user.settings.language }), link: process.env.VITE_FRONTEND_URL },
-          i18n.t('mail.newMagiclogin.lastParagraph', { lng: user.settings.language })
-        )
-      }
+      cb = sendNewMagicloginMail
     }
     return await this.setter(User, { requestBody: requestBody, allowNew: true, cb })
+  }
+
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBodyUser[]) {
+    const newMagicloginUsers: number[] = []
+    for (var i = 0; i < requestBody.length; i++) {
+      if (!requestBody[i]._id && requestBody[i].fk && requestBody[i].fk!.magiclogin) {
+        newMagicloginUsers.push(i)
+      }
+    }
+    const cb = (users: IUser[]) => {
+      for (const index of newMagicloginUsers) {
+        sendNewMagicloginMail(users[index])
+      }
+    }
+    return await this.insertMany(User, { requestBody, cb })
   }
 
   @Delete()
