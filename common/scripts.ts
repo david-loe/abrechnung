@@ -375,3 +375,47 @@ export function mergeDeep(target: any, ...sources: any) {
 
   return mergeDeep(target, ...sources)
 }
+
+export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', ') {
+  var lines = csv.split('\n')
+  var result = []
+  var headers = lines[0].split(separator)
+  for (var i = 1; i < lines.length; i++) {
+    var obj: any = {}
+    if (lines[i] === '') {
+      break
+    }
+    var currentline = lines[i].split(separator)
+    for (var j = 0; j < headers.length; j++) {
+      // search for [] to identify arrays
+      const match = currentline[j].match(/^\[(.*)\]$/)
+      if (match === null) {
+        obj[headers[j]] = currentline[j]
+      } else {
+        obj[headers[j]] = match[1].split(arraySeparator)
+      }
+    }
+    result.push(obj)
+  }
+  return result
+}
+
+export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', ') {
+  const array = [Object.keys(objects[0])].concat(objects)
+
+  return array
+    .map((it) => {
+      return Object.values(it)
+        .map((item) => {
+          if (Array.isArray(item)) {
+            return '[' + item.join(arraySeparator) + ']'
+          } else if (item === null) {
+            return 'null'
+          } else {
+            return item
+          }
+        })
+        .join(separator)
+    })
+    .join('\n')
+}
