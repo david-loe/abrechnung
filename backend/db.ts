@@ -1,5 +1,6 @@
 import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
+import { mergeDeep } from '../common/scripts.js'
 import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
 import countries from './data/countries.json' assert { type: 'json' }
 import currencies from './data/currencies.json' assert { type: 'json' }
@@ -11,8 +12,6 @@ import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
-import { mergeDeep } from '../common/scripts.js'
-import { getSettings } from './helper.js'
 
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
@@ -30,7 +29,7 @@ export function disconnectDB() {
 }
 
 export async function initDB() {
-  const DBsettings = await getSettings()
+  const DBsettings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (DBsettings) {
     if (DBsettings.version !== settings.version) {
       DBsettings.migrateFrom = DBsettings.version
