@@ -19,6 +19,7 @@
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'"></SettingsForm>
         <template v-else-if="entry === 'users'">
+          <CSVImport endpoint="admin/user/bulk"></CSVImport>
           <UserList class="mb-5"</UserList>
           <h2>{{ $t('labels.mergeUsers') }}</h2>
           <UserMerge></UserMerge>
@@ -37,6 +38,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import CountryList from './elements/CountryList.vue'
+import CSVImport from './elements/CSVImport.vue'
 import CurrencyList from './elements/CurrencyList.vue'
 import HealthInsuranceList from './elements/HealthInsuranceList.vue'
 import OrganisationList from './elements/OrganisationList.vue'
@@ -49,7 +51,7 @@ const entries = ['users', 'organisations', 'projects', 'countries', 'currencies'
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList, UserMerge },
+  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList, UserMerge, CSVImport },
   data() {
     return {
       entries,

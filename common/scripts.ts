@@ -349,7 +349,7 @@ export class Base64 {
 /**
  * Simple object check.
  */
-export function isObject(item: any) {
+function isObject(item: any) {
   return item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date)
 }
 
@@ -376,7 +376,7 @@ export function mergeDeep(target: any, ...sources: any) {
   return mergeDeep(target, ...sources)
 }
 
-export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', ') {
+export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', ', pathSeparator = '.') {
   var lines = csv.split('\n')
   var result = []
   var headers = lines[0].split(separator)
@@ -387,12 +387,21 @@ export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', 
     }
     var currentline = lines[i].split(separator)
     for (var j = 0; j < headers.length; j++) {
+      let object = obj
+      const pathParts = headers[j].split(pathSeparator)
+      for (var k = 0; k < pathParts.length - 1; k++) {
+        if (j == 0) {
+          object[pathParts[k]] = {}
+        }
+        object = object[pathParts[k]]
+      }
+      let key = pathParts[pathParts.length - 1]
       // search for [] to identify arrays
       const match = currentline[j].match(/^\[(.*)\]$/)
       if (match === null) {
-        obj[headers[j]] = currentline[j]
+        object[key] = currentline[j]
       } else {
-        obj[headers[j]] = match[1].split(arraySeparator)
+        object[key] = match[1].split(arraySeparator)
       }
     }
     result.push(obj)
