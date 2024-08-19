@@ -376,49 +376,73 @@ export function mergeDeep(target: any, ...sources: any) {
   return mergeDeep(target, ...sources)
 }
 
+function csvToArray(text: string, separator = ',', escape = '"') {
+  let p = '',
+    row = [''],
+    ret = [row],
+    i = 0,
+    r = 0,
+    s = !0,
+    l
+  for (l of text) {
+    if (escape === l) {
+      if (s && l === p) row[i] += l
+      s = !s
+    } else if (separator === l && s) l = row[++i] = ''
+    else if ('\n' === l && s) {
+      if ('\r' === p) row[i] = row[i].slice(0, -1)
+      row = ret[++r] = [(l = '')]
+      i = 0
+    } else row[i] += l
+    p = l
+  }
+  return ret
+}
+
 export function csvToObjects(
   csv: string,
   transformer: { [key: string]: (val: string) => any } = {},
-  separator = '\t',
+  separator = ',',
   arraySeparator = ',',
-  pathSeparator = '.'
+  pathSeparator = '.',
+  escape = '"'
 ) {
-  var lines = csv.replaceAll('\r\n', '\n').split('\n')
-  var result = []
-  var headers = lines[0].split(separator)
-  for (var i = 1; i < lines.length; i++) {
-    var obj: any = {}
-    if (lines[i] === '') {
-      break
-    }
-    var currentline = lines[i].split(separator)
-    for (var j = 0; j < headers.length; j++) {
-      let object = obj
-      const pathParts = headers[j].split(pathSeparator)
-      for (var k = 0; k < pathParts.length - 1; k++) {
-        if (!isObject(object[pathParts[k]])) {
-          object[pathParts[k]] = {}
+  const lines = csvToArray(csv, separator, escape)
+  console.log(lines)
+  let result = []
+  if (lines.length > 1) {
+    const headers = lines[0]
+    for (var i = 1; i < lines.length; i++) {
+      var obj: any = {}
+      var currentline = lines[i]
+      for (var j = 0; j < headers.length; j++) {
+        let object = obj
+        const pathParts = headers[j].split(pathSeparator)
+        for (var k = 0; k < pathParts.length - 1; k++) {
+          if (!isObject(object[pathParts[k]])) {
+            object[pathParts[k]] = {}
+          }
+          object = object[pathParts[k]]
         }
-        object = object[pathParts[k]]
+        let key = pathParts[pathParts.length - 1]
+        // search for [] to identify arrays
+        const match = currentline[j].match(/^\[(.*)\]$/)
+        let val: any = null
+        if (match === null) {
+          val = currentline[j]
+          if (transformer[headers[j]]) {
+            val = transformer[headers[j]](val)
+          }
+        } else {
+          val = match[1].split(arraySeparator)
+          if (transformer[headers[j]]) {
+            val = val.map(transformer[headers[j]])
+          }
+        }
+        object[key] = val
       }
-      let key = pathParts[pathParts.length - 1]
-      // search for [] to identify arrays
-      const match = currentline[j].match(/^\[(.*)\]$/)
-      let val: any = null
-      if (match === null) {
-        val = currentline[j]
-        if (transformer[headers[j]]) {
-          val = transformer[headers[j]](val)
-        }
-      } else {
-        val = match[1].split(arraySeparator)
-        if (transformer[headers[j]]) {
-          val = val.map(transformer[headers[j]])
-        }
-      }
-      object[key] = val
+      result.push(obj)
     }
-    result.push(obj)
   }
   return result
 }

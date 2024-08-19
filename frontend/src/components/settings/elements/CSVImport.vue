@@ -1,7 +1,7 @@
 <template>
   <h3>{{ $t('labels.csvImport') }}</h3>
+  <button class="btn btn-link" @click="downloadTemplate">{{ $t('labels.csvTemplate') }}</button>
   <input class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" required />
-  <button class="btn btn-light" @click="downloadTemplate">{{ $t('labels.csvTemplate') }}</button>
 </template>
 
 <script lang="ts">
@@ -31,7 +31,7 @@ export default defineComponent({
     convert(csv: string) {
       //remove first row if it starts with #
       if (csv.startsWith('#')) {
-        csv = csv.slice(csv.indexOf('\n'))
+        csv = csv.slice(csv.indexOf('\n') + 1)
       }
       return csvToObjects(csv, {
         'settings.projects': (val: string) => {
