@@ -21,7 +21,7 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 export class ExpenseReportController extends Controller {
   @Get()
   public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
-    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (a.createdAt as Date).valueOf() - (b.createdAt as Date).valueOf()
+    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.createdAt as Date).valueOf() - (a.createdAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
       filter: { owner: request.user!._id, historic: false },
@@ -169,7 +169,7 @@ export class ExpenseReportController extends Controller {
 export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>) {
-    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },

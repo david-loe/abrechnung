@@ -22,7 +22,7 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 export class TravelController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
-    const sortFn = (a: ITravel, b: ITravel) => (a.startDate as Date).valueOf() - (b.startDate as Date).valueOf()
+    const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter: { owner: request.user!._id, historic: false },
@@ -249,7 +249,7 @@ export class TravelController extends Controller {
 export class TravelApproveController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>) {
-    const sortFn = (a: ITravel, b: ITravel) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] },
@@ -265,15 +265,15 @@ export class TravelApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
     if (!extendedBody._id) {
-      ; (extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
+      ;(extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
       if (!(extendedBody as TravelApplication).name && (extendedBody as TravelApplication).startDate) {
         var date = new Date((extendedBody as TravelApplication).startDate!)
-          ; (extendedBody as TravelApplication).name =
-            (extendedBody as TravelApplication).destinationPlace?.place +
-            ' ' +
-            i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-            ' ' +
-            date.getUTCFullYear()
+        ;(extendedBody as TravelApplication).name =
+          (extendedBody as TravelApplication).destinationPlace?.place +
+          ' ' +
+          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
+          ' ' +
+          date.getUTCFullYear()
       }
     }
     const cb = async (travel: ITravel) => {
@@ -322,7 +322,7 @@ export class TravelApproveController extends Controller {
 export class TravelExamineController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>) {
-    const sortFn = (a: ITravel, b: ITravel) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },

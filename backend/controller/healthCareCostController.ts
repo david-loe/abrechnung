@@ -29,7 +29,7 @@ const fileHandler = multer({ limits: { fileSize: 16000000 } })
 export class HealthCareCostController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (a.createdAt as Date).valueOf() - (b.createdAt as Date).valueOf()
+    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.createdAt as Date).valueOf() - (a.createdAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter: { owner: request.user!._id, historic: false },
@@ -176,7 +176,7 @@ export class HealthCareCostController extends Controller {
 export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>) {
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }] },
@@ -327,7 +327,7 @@ export class HealthCareCostExamineController extends Controller {
 export class HealthCareCostConfirmController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>) {
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (a.updatedAt as Date).valueOf() - (b.updatedAt as Date).valueOf()
+    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter: { $and: [{ historic: false }, { $or: [{ state: 'underExaminationByInsurance' }, { state: 'refunded' }] }] },
