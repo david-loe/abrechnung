@@ -24,9 +24,8 @@
           <h2>{{ $t('labels.mergeUsers') }}</h2>
           <UserMerge></UserMerge>
         </template>
-        
-        <OrganisationList v-else-if="entry === 'organisations'"></OrganisationList>
         <ProjectList v-else-if="entry === 'projects'"></ProjectList>
+        <OrganisationList v-else-if="entry === 'organisations'"></OrganisationList>
         <CountryList v-else-if="entry === 'countries'"></CountryList>
         <CurrencyList v-else-if="entry === 'currencies'"></CurrencyList>
         <HealthInsuranceList v-else-if="entry === 'healthInsurances'"></HealthInsuranceList>
@@ -47,7 +46,7 @@ import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
 import UserMerge from './elements/UserMerge.vue'
 
-const entries = ['users', 'organisations', 'projects', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
+const entries = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
