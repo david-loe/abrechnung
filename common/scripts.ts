@@ -376,8 +376,14 @@ export function mergeDeep(target: any, ...sources: any) {
   return mergeDeep(target, ...sources)
 }
 
-export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', ', pathSeparator = '.') {
-  var lines = csv.split('\n')
+export function csvToObjects(
+  csv: string,
+  transformer: { [key: string]: (val: string) => any } = {},
+  separator = '\t',
+  arraySeparator = ',',
+  pathSeparator = '.'
+) {
+  var lines = csv.replaceAll('\r\n', '\n').split('\n')
   var result = []
   var headers = lines[0].split(separator)
   for (var i = 1; i < lines.length; i++) {
@@ -390,7 +396,7 @@ export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', 
       let object = obj
       const pathParts = headers[j].split(pathSeparator)
       for (var k = 0; k < pathParts.length - 1; k++) {
-        if (j == 0) {
+        if (!isObject(object[pathParts[k]])) {
           object[pathParts[k]] = {}
         }
         object = object[pathParts[k]]
@@ -398,11 +404,19 @@ export function csvToObjects(csv: string, separator = '\t', arraySeparator = ', 
       let key = pathParts[pathParts.length - 1]
       // search for [] to identify arrays
       const match = currentline[j].match(/^\[(.*)\]$/)
+      let val: any = null
       if (match === null) {
-        object[key] = currentline[j]
+        val = currentline[j]
+        if (transformer[headers[j]]) {
+          val = transformer[headers[j]](val)
+        }
       } else {
-        object[key] = match[1].split(arraySeparator)
+        val = match[1].split(arraySeparator)
+        if (transformer[headers[j]]) {
+          val = val.map(transformer[headers[j]])
+        }
       }
+      object[key] = val
     }
     result.push(obj)
   }
@@ -427,4 +441,17 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
         .join(separator)
     })
     .join('\n')
+}
+
+export function download(file: File) {
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(file)
+
+  link.href = url
+  link.download = file.name
+  document.body.appendChild(link)
+  link.click()
+
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(url)
 }
