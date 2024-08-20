@@ -24,3 +24,4 @@ vscode:
     - mhutchie.git-graph
     - esbenp.prettier-vscode
     - streetsidesoftware.code-spell-checker
+    - vue.volar
