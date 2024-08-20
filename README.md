@@ -6,9 +6,8 @@
 **abrechnung 🧾** ist eine Web App die:
 
 - Reisekosten- (inkl. automatischer Pauschalen Berechnung auch für internationale Reisen),
-- Auslagen-,
-- Krankenkosten- und
-- 🔜 Projekt-Abrechnungen
+- Auslagen- und
+- Krankenkosten-Abrechnungen
 
 digital und einfach möglich macht.
 
