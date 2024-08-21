@@ -17,18 +17,32 @@
       </div>
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
-        <SettingsForm v-if="entry === 'settings'"></SettingsForm>
+        <SettingsForm v-if="entry === 'settings'" />
         <template v-else-if="entry === 'users'">
-          <CSVImport endpoint="admin/user/bulk"></CSVImport>
-          <UserList class="mb-5"</UserList>
+          <CSVImport
+            endpoint="admin/user/bulk"
+            :transformers="[
+              { path: 'settings.projects', key: 'identifier', array: $root.projects },
+              { path: 'settings.organisation', key: 'name', array: $root.organisations }
+            ]"
+            :template-fields="[
+              'name.givenName',
+              'name.familyName',
+              'email',
+              'fk.magiclogin',
+              'loseAccessAt',
+              'settings.projects',
+              'settings.organisation'
+            ]" />
+          <UserList class="mb-5" />
           <h2>{{ $t('labels.mergeUsers') }}</h2>
-          <UserMerge></UserMerge>
+          <UserMerge />
         </template>
-        <ProjectList v-else-if="entry === 'projects'"></ProjectList>
-        <OrganisationList v-else-if="entry === 'organisations'"></OrganisationList>
-        <CountryList v-else-if="entry === 'countries'"></CountryList>
-        <CurrencyList v-else-if="entry === 'currencies'"></CurrencyList>
-        <HealthInsuranceList v-else-if="entry === 'healthInsurances'"></HealthInsuranceList>
+        <ProjectList v-else-if="entry === 'projects'" />
+        <OrganisationList v-else-if="entry === 'organisations'" />
+        <CountryList v-else-if="entry === 'countries'" />
+        <CurrencyList v-else-if="entry === 'currencies'" />
+        <HealthInsuranceList v-else-if="entry === 'healthInsurances'" />
       </div>
     </div>
   </div>
@@ -50,7 +64,17 @@ const entries = ['users', 'projects', 'organisations', 'countries', 'currencies'
 
 export default defineComponent({
   name: 'SettingsPage',
-  components: { UserList, SettingsForm, OrganisationList, ProjectList, CountryList, CurrencyList, HealthInsuranceList, UserMerge, CSVImport },
+  components: {
+    UserList,
+    SettingsForm,
+    OrganisationList,
+    ProjectList,
+    CountryList,
+    CurrencyList,
+    HealthInsuranceList,
+    UserMerge,
+    CSVImport
+  },
   data() {
     return {
       entries,

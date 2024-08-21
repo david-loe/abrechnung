@@ -5,18 +5,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { csvToObjects, download } from '../../../../../common/scripts'
 
 export default defineComponent({
   name: 'CSVImport',
   data() {
-    return {
-      templateFields: ['name.givenName', 'name.familyName']
-    }
+    return {}
   },
   components: {},
-  props: { endpoint: { type: String, required: true } },
+  props: {
+    endpoint: { type: String, required: true },
+    templateFields: { type: Array as PropType<Array<string>>, required: true },
+    transformers: {
+      type: Array as PropType<{ path: string; array: Array<{ _id: string; [key: string]: any }>; key: string }[]>,
+      default: () => [] as { path: string; array: Array<{ _id: string; [key: string]: any }>; key: string }[]
+    }
+  },
   methods: {
     readFile(event: Event) {
       if (event.target && (event.target as HTMLInputElement).files && (event.target as HTMLInputElement).files!.length > 0) {
@@ -30,27 +35,21 @@ export default defineComponent({
     },
     convert(csv: string) {
       //remove first row if it starts with #
-      if (csv.startsWith('#')) {
+      if (csv.startsWith('#') || csv.startsWith('"#')) {
         csv = csv.slice(csv.indexOf('\n') + 1)
       }
-      return csvToObjects(csv, {
-        'settings.projects': (val: string) => {
-          for (const project of this.$root.projects) {
-            if (project.identifier === val) {
-              return project._id
+      const transformer = {} as any
+      for (const entry of this.transformers) {
+        transformer[entry.path] = (val: string) => {
+          for (const item of entry.array) {
+            if (item[entry.key] === val) {
+              return item._id
             }
           }
-          throw Error(`No project found with identifier: '${val}''`)
-        },
-        'settings.organisation': (val: string) => {
-          for (const org of this.$root.organisations) {
-            if (org.name === val) {
-              return org._id
-            }
-          }
-          throw Error(`No organisation found with name: '${val}''`)
+          throw Error(`No item found with identifier: '${val}''`)
         }
-      })
+      }
+      return csvToObjects(csv, transformer, ';')
     },
     async submit(data: any[]) {
       const result = await this.$root.setter<any[]>(this.endpoint, data)
@@ -62,7 +61,7 @@ export default defineComponent({
       const file = new File([this.genTemplate()], 'template.csv', { type: 'text/csv' })
       download(file)
     },
-    genTemplate(seperator = ',', pathSeperator = '.') {
+    genTemplate(seperator = ';', pathSeperator = '.') {
       let csv =
         '#' +
         this.$t('labels.startInLine3') +

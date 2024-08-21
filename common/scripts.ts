@@ -221,7 +221,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
           return resolve(file)
         }
         // We resize the image with the canvas method drawImage();
-        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        ; (ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
       }
       // We put the Data URI in the image's src attribute
@@ -395,6 +395,12 @@ function csvToArray(text: string, separator = ',', escape = '"') {
       i = 0
     } else row[i] += l
     p = l
+  }
+  //remove empty rows
+  for (let i = ret.length - 1; i >= 0; i--) {
+    if (ret[i].length === 1 && ret[i][0] === '') {
+      ret.splice(i, 1)
+    }
   }
   return ret
 }
