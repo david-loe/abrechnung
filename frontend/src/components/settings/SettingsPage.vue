@@ -28,10 +28,12 @@
             :transformers="[
               { path: 'settings.projects', key: 'identifier', array: $root.projects },
               { path: 'settings.organisation', key: 'name', array: $root.organisations },
-              {path: 'loseAccessAt', fn: (val:string) => {
-                const match = val.match(/^(?<d>[0-3]?\d)\.(?<m>[0-1]?\d).(?<y>\d\d\d\d)$/)
-                if(match){
-                  return match.groups!.y + '-' + match.groups!.m.padStart(2, '0') + '-' + match.groups!.d.padStart(2, '0')
+              {path: 'loseAccessAt', fn: (val:string|undefined) => {
+                if(val){
+                  const match = val.match(/^(?<d>[0-3]?\d)\.(?<m>[0-1]?\d).(?<y>\d\d\d\d)$/)
+                  if(match){
+                    return match.groups!.y + '-' + match.groups!.m.padStart(2, '0') + '-' + match.groups!.d.padStart(2, '0')
+                  }
                 }
                 return val
               }}
@@ -55,7 +57,7 @@
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
-            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }, {path: 'budget.amount', fn: (val:string) => val ? val : undefined}]"
+            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }]"
             :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
             @imported=";($refs.projectList as any).getProjects()" />
         </template>

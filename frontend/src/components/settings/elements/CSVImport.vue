@@ -21,7 +21,10 @@ export default defineComponent({
     templateFields: { type: Array as PropType<Array<string>>, required: true },
     transformers: {
       type: Array as PropType<
-        ({ path: string; array: Array<{ _id: string; [key: string]: any }>; key: string } | { path: string; fn: (val: string) => any })[]
+        (
+          | { path: string; array: Array<{ _id: string; [key: string]: any }>; key: string }
+          | { path: string; fn: (val: string | undefined) => any }
+        )[]
       >,
       default: () => []
     }
@@ -47,7 +50,7 @@ export default defineComponent({
         if ('fn' in entry) {
           transformer[entry.path] = entry.fn
         } else {
-          transformer[entry.path] = (val: string) => {
+          transformer[entry.path] = (val: string | undefined) => {
             if (val) {
               for (const item of entry.array) {
                 if (item[entry.key] === val) {
@@ -56,7 +59,7 @@ export default defineComponent({
               }
               throw Error(`No item found with identifier: '${val}''`)
             } else {
-              return undefined
+              return val
             }
           }
         }

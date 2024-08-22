@@ -409,7 +409,7 @@ function csvToArray(text: string, separator = ',', escape = '"') {
 
 export function csvToObjects(
   csv: string,
-  transformer: { [key: string]: (val: string) => any } = {},
+  transformer: { [key: string]: (val: string | undefined) => any } = {},
   separator = ',',
   arraySeparator = ',',
   pathSeparator = '.',
@@ -424,6 +424,7 @@ export function csvToObjects(
       var currentline = lines[i]
       for (var j = 0; j < headers.length; j++) {
         let object = obj
+        let val: string | string[] | undefined = currentline[j] !== '' ? currentline[j] : undefined
         const pathParts = headers[j].split(pathSeparator)
         for (var k = 0; k < pathParts.length - 1; k++) {
           if (!isObject(object[pathParts[k]])) {
@@ -434,9 +435,7 @@ export function csvToObjects(
         let key = pathParts[pathParts.length - 1]
         // search for [] to identify arrays
         const match = currentline[j].match(/^\[(.*)\]$/)
-        let val: any = null
         if (match === null) {
-          val = currentline[j]
           if (transformer[headers[j]]) {
             val = transformer[headers[j]](val)
           }
