@@ -48,7 +48,7 @@ if (/windows/i.test(navigator.userAgent)) {
 // globally config axios
 axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
   interface ComponentCustomProperties {
     $formatter: Formatter
     $vueform: { i18n: { locale: Locale } }
