@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
     "qrcode": "^1.5.4",
     "qs": "^6.13.0",
     "vue": "^3.4.23",
-    "vue-i18n": "^9.13.1",
+    "vue-i18n": "^9.14.0",
     "vue-router": "^4.4.3",
     "vue-select": "^4.0.0-beta.6",
     "vue3-easy-data-table": "^1.5.47"
@@ -26,7 +26,7 @@
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^4.2.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.14.15",
+    "@types/node": "^20.16.1",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.9.15",
     "@types/vue-select": "^3.16.8",
@@ -34,7 +34,7 @@
     "eslint": "^9.9.0",
     "eslint-plugin-vue": "^9.27.0",
     "typescript": "^5.5.4",
-    "vite": "^5.4.1",
+    "vite": "^5.4.2",
     "vue-tsc": "^2.0.29"
   },
   "eslintConfig": {
