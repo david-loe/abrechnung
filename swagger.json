@@ -5346,6 +5346,32 @@
 			"SetterBody_IOrganisation_": {
 				"$ref": "#/components/schemas/SetterPartial_IOrganisation.NoPost_"
 			},
+			"SetterPartial_Omit_IOrganisation.logo_.NoPost_": {
+				"properties": {
+					"website": {
+						"type": "string"
+					},
+					"companyNumber": {
+						"type": "string"
+					},
+					"bankDetails": {
+						"type": "string"
+					},
+					"subfolderPath": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_Omit_IOrganisation.logo__": {
+				"$ref": "#/components/schemas/SetterPartial_Omit_IOrganisation.logo_.NoPost_"
+			},
 			"GETResponse_HealthInsurance-or-HealthInsurance-Array_": {
 				"properties": {
 					"data": {
@@ -7250,6 +7276,63 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/user/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/User"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBodyUser"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/admin/user/merge": {
@@ -9287,6 +9370,63 @@
 				]
 			}
 		},
+		"/admin/project/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Project"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_IProject_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/organisation": {
 			"get": {
 				"operationId": "GetOrganisation",
@@ -9545,6 +9685,63 @@
 				]
 			}
 		},
+		"/admin/organisation/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Organisation"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Organisation"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_Omit_IOrganisation.logo__"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/healthInsurance": {
 			"get": {
 				"operationId": "GetHealthInsurance",
@@ -9712,6 +9909,63 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/healthInsurance/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/HealthInsurance"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"HealthInsurance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_IHealthInsurance_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/healthCareCost": {
@@ -12028,6 +12282,63 @@
 				]
 			}
 		},
+		"/admin/currency/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Currency"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Currency"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_ICurrency_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/country": {
 			"get": {
 				"operationId": "GetCountry",
@@ -12242,6 +12553,63 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/country/bulk": {
+			"post": {
+				"operationId": "PostManyProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Country"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Country"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_ICountry_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/auth/ldapauth": {
