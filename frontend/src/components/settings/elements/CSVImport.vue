@@ -72,7 +72,8 @@ export default defineComponent({
       }
     },
     downloadTemplate() {
-      const file = new File([this.genTemplate()], 'template.csv', { type: 'text/csv' })
+      //Uint8Array for UTF-8 BOM
+      const file = new File([new Uint8Array([0xef, 0xbb, 0xbf]), this.genTemplate()], 'template.csv', { type: 'text/csv' })
       download(file)
     },
     genTemplate(seperator = ';', pathSeperator = '.') {

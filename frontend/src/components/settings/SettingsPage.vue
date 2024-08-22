@@ -55,7 +55,7 @@
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
-            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }]"
+            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }, {path: 'budget.amount', fn: (val:string) => val ? val : undefined}]"
             :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
             @imported=";($refs.projectList as any).getProjects()" />
         </template>
