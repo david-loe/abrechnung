@@ -389,9 +389,6 @@ export default defineComponent({
     const mails = await this.getExaminerMails()
     this.mailToLink = mailToLink(mails)
     this.msTeamsToLink = msTeamsToLink(mails)
-    console.log(this.expenseReport.editor._id !== this.$root.user._id)
-    console.log(this.$root.user._id)
-    console.log(this.expenseReport.editor._id)
     if (this.$refs.tooltip) {
       this.tooltip = new Tooltip(this.$refs.tooltip as Element)
     }

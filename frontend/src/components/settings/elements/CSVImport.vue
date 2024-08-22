@@ -65,15 +65,13 @@ export default defineComponent({
     },
     async submit(data: any[]) {
       const result = await this.$root.setter<any[]>(this.endpoint, data)
-      if (result.error) {
-        console.log(result.error)
-      } else {
+      if (result.ok) {
         this.$emit('imported')
       }
     },
     downloadTemplate() {
       //Uint8Array for UTF-8 BOM
-      const file = new File([new Uint8Array([0xef, 0xbb, 0xbf]), this.genTemplate()], 'template.csv', { type: 'text/csv' })
+      const file = new File([new Uint8Array([0xef, 0xbb, 0xbf]), this.genTemplate()], 'CSV Import.csv', { type: 'text/csv' })
       download(file)
     },
     genTemplate(seperator = ';', pathSeperator = '.') {

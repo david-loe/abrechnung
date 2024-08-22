@@ -416,7 +416,6 @@ export function csvToObjects(
   escape = '"'
 ) {
   const lines = csvToArray(csv, separator, escape)
-  console.log(lines)
   let result = []
   if (lines.length > 1) {
     const headers = lines[0]
