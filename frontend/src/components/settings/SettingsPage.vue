@@ -19,11 +19,22 @@
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'" />
         <template v-else-if="entry === 'users'">
+          <UserList class="mb-5" ref="userList" />
+
+          <h2>{{ $t('labels.csvImport') }}</h2>
           <CSVImport
+            class="mb-5"
             endpoint="admin/user/bulk"
             :transformers="[
               { path: 'settings.projects', key: 'identifier', array: $root.projects },
-              { path: 'settings.organisation', key: 'name', array: $root.organisations }
+              { path: 'settings.organisation', key: 'name', array: $root.organisations },
+              {path: 'loseAccessAt', fn: (val:string) => {
+                const match = val.match(/^(?<d>[1-3]?\d)\.(?<m>1?\d).(?<y>\d\d\d\d)$/)
+                if(match){
+                  return match.groups!.y + '-' + match.groups!.m.padStart(2, '0') + '-' + match.groups!.d.padStart(2, '0')
+                }
+                return val
+              }}
             ]"
             :template-fields="[
               'name.givenName',
@@ -33,12 +44,22 @@
               'loseAccessAt',
               'settings.projects',
               'settings.organisation'
-            ]" />
-          <UserList class="mb-5" />
+            ]"
+            @imported=";($refs.userList as any).getUsers()" />
           <h2>{{ $t('labels.mergeUsers') }}</h2>
           <UserMerge />
         </template>
-        <ProjectList v-else-if="entry === 'projects'" />
+        <template v-else-if="entry === 'projects'">
+          <ProjectList class="mb-5" ref="projectList" />
+          <h2>{{ $t('labels.csvImport') }}</h2>
+          <CSVImport
+            class="mb-5"
+            endpoint="admin/project/bulk"
+            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }]"
+            :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
+            @imported=";($refs.projectList as any).getProjects()" />
+        </template>
+
         <OrganisationList v-else-if="entry === 'organisations'" />
         <CountryList v-else-if="entry === 'countries'" />
         <CurrencyList v-else-if="entry === 'currencies'" />

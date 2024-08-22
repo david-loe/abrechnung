@@ -1,7 +1,8 @@
 <template>
-  <h3>{{ $t('labels.csvImport') }}</h3>
-  <button class="btn btn-link" @click="downloadTemplate">{{ $t('labels.csvTemplate') }}</button>
-  <input class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" required />
+  <div>
+    <button class="btn btn-link" @click="downloadTemplate">{{ $t('labels.csvTemplate') }}</button>
+    <input class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" required />
+  </div>
 </template>
 
 <script lang="ts">
@@ -10,6 +11,7 @@ import { csvToObjects, download } from '../../../../../common/scripts'
 
 export default defineComponent({
   name: 'CSVImport',
+  emits: ['imported'],
   data() {
     return {}
   },
@@ -18,8 +20,10 @@ export default defineComponent({
     endpoint: { type: String, required: true },
     templateFields: { type: Array as PropType<Array<string>>, required: true },
     transformers: {
-      type: Array as PropType<{ path: string; array: Array<{ _id: string; [key: string]: any }>; key: string }[]>,
-      default: () => [] as { path: string; array: Array<{ _id: string; [key: string]: any }>; key: string }[]
+      type: Array as PropType<
+        ({ path: string; array: Array<{ _id: string; [key: string]: any }>; key: string } | { path: string; fn: (val: string) => any })[]
+      >,
+      default: () => []
     }
   },
   methods: {
@@ -40,13 +44,21 @@ export default defineComponent({
       }
       const transformer = {} as any
       for (const entry of this.transformers) {
-        transformer[entry.path] = (val: string) => {
-          for (const item of entry.array) {
-            if (item[entry.key] === val) {
-              return item._id
+        if ('fn' in entry) {
+          transformer[entry.path] = entry.fn
+        } else {
+          transformer[entry.path] = (val: string) => {
+            if (val) {
+              for (const item of entry.array) {
+                if (item[entry.key] === val) {
+                  return item._id
+                }
+              }
+              throw Error(`No item found with identifier: '${val}''`)
+            } else {
+              return undefined
             }
           }
-          throw Error(`No item found with identifier: '${val}''`)
         }
       }
       return csvToObjects(csv, transformer, ';')
@@ -55,6 +67,8 @@ export default defineComponent({
       const result = await this.$root.setter<any[]>(this.endpoint, data)
       if (result.error) {
         console.log(result.error)
+      } else {
+        this.$emit('imported')
       }
     },
     downloadTemplate() {
