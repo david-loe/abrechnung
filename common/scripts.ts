@@ -221,7 +221,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
           return resolve(file)
         }
         // We resize the image with the canvas method drawImage();
-        ; (ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
       }
       // We put the Data URI in the image's src attribute
@@ -348,9 +348,11 @@ export class Base64 {
 
 /**
  * Simple object check.
+ *
+ * DOESN'T MAKE mongoose ObjectId AN OBJECT
  */
 function isObject(item: any) {
-  return item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date)
+  return item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date) && !('_bsontype' in item)
 }
 
 /**
