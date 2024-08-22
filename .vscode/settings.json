@@ -1,8 +1,18 @@
 {
   "typescript.tsdk": "backend/node_modules/typescript/lib",
-  "cSpell.words": ["tsoa"],
+  "cSpell.words": [
+    "Auslagenabrechnung",
+    "erstattungberechtigt",
+    "Faktorisierung",
+    "tsoa",
+    "Validierungsfehler",
+    "Verpflegungspauschale",
+    "Verpflegungspauschalen",
+    "Verpflegungspauschalenkürzung"
+  ],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
-  }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
