@@ -21,6 +21,10 @@ export class CurrencyAdminController extends Controller {
   public async postCurrency(@Body() requestBody: SetterBody<ICurrency>) {
     return await this.setter(Currency, { requestBody: requestBody, allowNew: true })
   }
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBody<ICurrency>[]) {
+    return await this.insertMany(Currency, { requestBody })
+  }
   @Delete()
   public async deleteCurrency(@Query() _id: _id) {
     return await this.deleter(Currency, { _id: _id })

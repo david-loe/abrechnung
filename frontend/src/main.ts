@@ -20,6 +20,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Vueform from '@vueform/vueform'
 import '@vueform/vueform/dist/vueform.css'
 import vueformConfig from './vueform.config.js'
+import './vueform.css'
 
 import Formatter from '../../common/formatter'
 import {

@@ -46,6 +46,10 @@ export class CountryAdminController extends Controller {
   public async postCountry(@Body() requestBody: SetterBody<ICountry>) {
     return await this.setter(Country, { requestBody: requestBody, allowNew: true })
   }
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBody<ICountry>[]) {
+    return await this.insertMany(Country, { requestBody })
+  }
   @Delete()
   public async deleteCountry(@Query() _id: _id) {
     return await this.deleter(Country, { _id: _id })

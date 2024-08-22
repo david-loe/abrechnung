@@ -35,6 +35,11 @@ export class OrganisationAdminController extends Controller {
     return await this.setter(Organisation, { requestBody: requestBody, allowNew: true })
   }
 
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBody<Omit<IOrganisation, 'logo'>>[]) {
+    return await this.insertMany(Organisation, { requestBody })
+  }
+
   @Delete()
   public async deleteOrganisation(@Query() _id: _id) {
     return await this.deleter(Organisation, { _id: _id })

@@ -21,6 +21,10 @@ export class HealthInsuranceAdminController extends Controller {
   public async postHealthInsurance(@Body() requestBody: SetterBody<IHealthInsurance>) {
     return await this.setter(HealthInsurance, { requestBody: requestBody, allowNew: true })
   }
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBody<IHealthInsurance>[]) {
+    return await this.insertMany(HealthInsurance, { requestBody })
+  }
   @Delete()
   public async deleteHealthInsurance(@Query() _id: _id) {
     return await this.deleter(HealthInsurance, { _id: _id })

@@ -39,6 +39,10 @@ export class ProjectAdminController extends Controller {
   public async postProject(@Body() requestBody: SetterBody<IProject>) {
     return await this.setter(Project, { requestBody: requestBody, allowNew: true })
   }
+  @Post('bulk')
+  public async postManyProjects(@Body() requestBody: SetterBody<IProject>[]) {
+    return await this.insertMany(Project, { requestBody })
+  }
   @Delete()
   public async deleteProject(@Query() _id: _id) {
     return await this.deleter(Project, { _id: _id })

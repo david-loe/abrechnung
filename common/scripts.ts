@@ -221,7 +221,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
           return resolve(file)
         }
         // We resize the image with the canvas method drawImage();
-        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
+        ; (ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
       }
       // We put the Data URI in the image's src attribute
@@ -349,7 +349,7 @@ export class Base64 {
 /**
  * Simple object check.
  */
-export function isObject(item: any) {
+function isObject(item: any) {
   return item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date)
 }
 
@@ -374,4 +374,114 @@ export function mergeDeep(target: any, ...sources: any) {
   }
 
   return mergeDeep(target, ...sources)
+}
+
+function csvToArray(text: string, separator = ',', escape = '"') {
+  let p = '',
+    row = [''],
+    ret = [row],
+    i = 0,
+    r = 0,
+    s = !0,
+    l
+  for (l of text) {
+    if (escape === l) {
+      if (s && l === p) row[i] += l
+      s = !s
+    } else if (separator === l && s) l = row[++i] = ''
+    else if ('\n' === l && s) {
+      if ('\r' === p) row[i] = row[i].slice(0, -1)
+      row = ret[++r] = [(l = '')]
+      i = 0
+    } else row[i] += l
+    p = l
+  }
+  //remove empty rows
+  for (let i = ret.length - 1; i >= 0; i--) {
+    if (ret[i].length === 1 && ret[i][0] === '') {
+      ret.splice(i, 1)
+    }
+  }
+  return ret
+}
+
+export function csvToObjects(
+  csv: string,
+  transformer: { [key: string]: (val: string) => any } = {},
+  separator = ',',
+  arraySeparator = ',',
+  pathSeparator = '.',
+  escape = '"'
+) {
+  const lines = csvToArray(csv, separator, escape)
+  console.log(lines)
+  let result = []
+  if (lines.length > 1) {
+    const headers = lines[0]
+    for (var i = 1; i < lines.length; i++) {
+      var obj: any = {}
+      var currentline = lines[i]
+      for (var j = 0; j < headers.length; j++) {
+        let object = obj
+        const pathParts = headers[j].split(pathSeparator)
+        for (var k = 0; k < pathParts.length - 1; k++) {
+          if (!isObject(object[pathParts[k]])) {
+            object[pathParts[k]] = {}
+          }
+          object = object[pathParts[k]]
+        }
+        let key = pathParts[pathParts.length - 1]
+        // search for [] to identify arrays
+        const match = currentline[j].match(/^\[(.*)\]$/)
+        let val: any = null
+        if (match === null) {
+          val = currentline[j]
+          if (transformer[headers[j]]) {
+            val = transformer[headers[j]](val)
+          }
+        } else {
+          val = match[1].split(arraySeparator)
+          if (transformer[headers[j]]) {
+            val = val.map(transformer[headers[j]])
+          }
+        }
+        object[key] = val
+      }
+      result.push(obj)
+    }
+  }
+  return result
+}
+
+export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', ') {
+  const array = [Object.keys(objects[0])].concat(objects)
+
+  return array
+    .map((it) => {
+      return Object.values(it)
+        .map((item) => {
+          if (Array.isArray(item)) {
+            return '[' + item.join(arraySeparator) + ']'
+          } else if (item === null) {
+            return 'null'
+          } else {
+            return item
+          }
+        })
+        .join(separator)
+    })
+    .join('\n')
+}
+
+export function download(file: File) {
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(file)
+
+  link.href = url
+  link.download = file.name
+  document.body.appendChild(link)
+  link.click()
+
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(url)
 }
