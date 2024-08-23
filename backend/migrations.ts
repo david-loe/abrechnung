@@ -197,7 +197,9 @@ export async function checkForMigrations() {
             factorOvernightLumpSumExceptions: oldSettings.factorOvernightLumpSumExceptions,
             fallBackLumpSumCountry: oldSettings.fallBackLumpSumCountry,
             secoundNightOnAirplaneLumpSumCountry: oldSettings.secoundNightOnAirplaneLumpSumCountry,
-            secoundNightOnShipOrFerryLumpSumCountry: oldSettings.secoundNightOnShipOrFerryLumpSumCountry
+            secoundNightOnShipOrFerryLumpSumCountry: oldSettings.secoundNightOnShipOrFerryLumpSumCountry,
+            minHoursOfTravel: 8, // fix migration failing
+            minProfessionalShare: 0.5 // fix migration failing
           } as any
           await settings.save()
         } else {
