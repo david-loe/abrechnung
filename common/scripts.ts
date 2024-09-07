@@ -485,3 +485,7 @@ export function download(file: File) {
   document.body.removeChild(link)
   window.URL.revokeObjectURL(url)
 }
+
+export function escapeRegExp(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}

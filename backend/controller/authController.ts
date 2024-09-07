@@ -1,7 +1,7 @@
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
-import { Base64 } from '../../common/scripts.js'
+import { Base64, escapeRegExp } from '../../common/scripts.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
@@ -29,7 +29,7 @@ const microsoftCallbackHandler = useMicrosoft ? passport.authenticate('microsoft
 
 const magicloginHandler = useMagicLogin
   ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-      var user = await User.findOne({ 'fk.magiclogin': req.body.destination })
+      var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
       if (user && (await user.isActive())) {
         magiclogin.send(req, res)
       } else {
