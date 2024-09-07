@@ -28,6 +28,6 @@ jobs:
           replace: 'NODE_ENV=production'
           include: '.env'
       - name: Start previous release
-        run: docker compose -f deploy-compose.yml run backend "npm run setup"
+        run: docker compose -f deploy-compose.yml run backend npm run setup
       - name: Run Migration
-        run: docker compose run backend "npm run setup"
+        run: docker compose run backend npm run setup
