@@ -26,4 +26,4 @@ jobs:
       - name: Build the stack
         run: docker compose up -d db ldap inbucket
       - name: Run Tests
-        run: docker compose run --service-ports --network abrechnung_compose_network backend "npm run test"
+        run: docker compose run --service-ports backend "npm run test"
