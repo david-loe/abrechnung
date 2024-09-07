@@ -9,7 +9,7 @@ jobs:
     uses: ./.github/workflows/build-and-test.yml
 
   publish-docs:
-    name: Pubilsh Docs to Github Pages
+    name: Publish Docs to Github Pages
     runs-on: ubuntu-latest
     permissions:
       contents: write
