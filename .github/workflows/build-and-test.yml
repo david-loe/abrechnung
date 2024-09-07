@@ -17,6 +17,12 @@ jobs:
         with:
           source: '.env.example'
           target: '.env'
+      - name: Set production mode in .env
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'NODE_ENV=development'
+          replace: 'NODE_ENV=production'
+          include: '.env'
       - name: Build the stack
         run: docker compose up -d db ldap inbucket
       - name: Run Tests
