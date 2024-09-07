@@ -20,4 +20,4 @@ jobs:
       - name: Build the stack
         run: docker compose up -d db ldap inbucket
       - name: Run Tests
-        run: docker compose exec backend npm test
+        run: docker compose run backend "npm run test"
