@@ -1,4 +1,5 @@
 import { default as MagicLoginStrategy } from 'passport-magic-login'
+import { escapeRegExp } from '../../common/scripts.js'
 import { NotAllowedError } from '../controller/error.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
@@ -8,7 +9,7 @@ const magicLogin = new MagicLoginStrategy.default({
   secret: process.env.MAGIC_LOGIN_SECRET,
   callbackUrl: process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback',
   sendMagicLink: async (destination, href) => {
-    var user = await User.findOne({ 'fk.magiclogin': destination }).lean()
+    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(destination) + '$', 'i') } }).lean()
     if (user) {
       sendMail(
         [user],
@@ -22,7 +23,7 @@ const magicLogin = new MagicLoginStrategy.default({
     }
   },
   verify: async function (payload, callback) {
-    var user = await User.findOne({ 'fk.magiclogin': payload.destination }).lean()
+    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(payload.destination) + '$', 'i') } }).lean()
     if (user) {
       callback(null, user, { redirect: payload.redirect })
     } else {
