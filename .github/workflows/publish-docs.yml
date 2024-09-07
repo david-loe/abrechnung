@@ -10,6 +10,7 @@ jobs:
 
   publish-docs:
     name: Publish Docs to Github Pages
+    needs: [build-and-test]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -18,6 +18,4 @@ COPY common /common
 
 RUN npm run build
 
-ENTRYPOINT [ "/bin/sh", "-c" ]
-
-CMD ["npm run start"]
+CMD ["npm", "run", "start"]
