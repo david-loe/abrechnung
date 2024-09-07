@@ -5,7 +5,12 @@ on:
     branches: ['main']
 
 jobs:
+  build-and-test:
+    uses: ./.github/workflows/build-and-test.yml
+
   publish-docs:
+    name: Publish Docs to Github Pages
+    needs: [build-and-test]
     runs-on: ubuntu-latest
     permissions:
       contents: write

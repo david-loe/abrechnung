@@ -1,0 +1,34 @@
+name: Build, Test & Migrate
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  workflow_call:
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/build-and-test.yml
+
+  migration-test:
+    name: Mirgation Test
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: copy .env file
+        uses: canastro/copy-file-action@master
+        with:
+          source: '.env.example'
+          target: '.env'
+      - name: Set production mode in .env
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'NODE_ENV=development'
+          replace: 'NODE_ENV=production'
+          include: '.env'
+      - name: Start previous release
+        run: docker compose -f deploy-compose.yml run backend npm run setup
+      - name: Run Migration
+        run: docker compose run backend npm run setup
