@@ -23,4 +23,4 @@ jobs:
       - name: Build Backend
         run: docker compose build
       - name: Build Frontend
-        run: docker run abrechnung-frontend "npm run build"
+        run: docker compose run frontend npm run build
