@@ -10,6 +10,9 @@ permissions:
   packages: write
 
 jobs:
+  build-test-migrate:
+    uses: ./.github/workflows/build-and-test.yml
+
   build_and_publish_platform_containers:
     name: Build and publish platform containers
     runs-on: ubuntu-latest

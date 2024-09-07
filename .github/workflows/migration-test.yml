@@ -1,12 +1,19 @@
-name: Production Build
+name: Build, Test & Migrate
 
 on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
   workflow_call:
 
 jobs:
-  production-build:
-    runs-on: ubuntu-latest
+  build-and-test:
+    uses: ./.github/workflows/build-and-test.yml
 
+  migration-test:
+    name: Mirgation Test
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: copy .env file
@@ -20,7 +27,7 @@ jobs:
           find: 'NODE_ENV=development'
           replace: 'NODE_ENV=production'
           include: '.env'
-      - name: Build Backend
-        run: docker compose build
-      - name: Build Frontend
-        run: docker run abrechnung-frontend "npm run build"
+      - name: Start previous release
+        run: docker compose -f deploy-compose.yml exec backend npm setup
+      - name: Run Migration
+        run: docker compose exec backend npm test

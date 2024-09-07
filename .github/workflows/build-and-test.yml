@@ -1,15 +1,15 @@
-name: Backend Test
+name: Build & Test
 
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+  workflow_call:
 
 jobs:
-  backend-test:
-    runs-on: ubuntu-latest
+  build:
+    uses: ./.github/workflows/production-build.yml
 
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: copy .env file
@@ -18,8 +18,6 @@ jobs:
           source: '.env.example'
           target: '.env'
       - name: Build the stack
-        run: docker compose up -d --build backend ldap inbucket
-      - name: Wait that backend initializes db
-        run: sleep 15s
+        run: docker compose up -d db ldap inbucket
       - name: Run Tests
         run: docker compose exec backend npm test
