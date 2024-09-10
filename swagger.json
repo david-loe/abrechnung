@@ -479,11 +479,6 @@
 			"NativeDate": {
 				"type": "string"
 			},
-			"Required___id-mongoose.Types.ObjectId__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
-			},
 			"IdDocument_string_": {
 				"anyOf": [
 					{
@@ -1645,6 +1640,11 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
 			},
 			"UserReplaceReferencesResult": {
 				"properties": {
@@ -6700,7 +6700,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.2.1",
+		"version": "1.2.2",
 		"contact": {}
 	},
 	"paths": {
@@ -6844,9 +6844,6 @@
 														"_id"
 													],
 													"type": "object"
-												},
-												{
-													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
 												}
 											]
 										},
