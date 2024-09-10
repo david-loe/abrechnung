@@ -19,11 +19,11 @@ import User from './models/user.js'
 async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState, startDate?: Date) {
   let res: Array<ITravel | IExpenseReport | IHealthCareCost>
   if (startDate) {
-    res = await model(schema)
+    res = await model<ITravel | IExpenseReport | IHealthCareCost>(schema)
       .find({ state: state, updatedAt: { $gte: startDate, $lt: date }, historic: false })
       .lean()
   } else {
-    res = await model(schema)
+    res = await model<ITravel | IExpenseReport | IHealthCareCost>(schema)
       .find({ state: state, updatedAt: { $lt: date }, historic: false })
       .lean()
   }
