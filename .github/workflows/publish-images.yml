@@ -11,11 +11,11 @@ permissions:
 
 jobs:
   build-test-migrate:
-    uses: ./.github/workflows/build-and-test.yml
+    uses: ./.github/workflows/migration-test.yml
 
   build_and_publish_platform_containers:
     name: Build and publish platform containers
-    # needs: [build-test-migrate]
+    needs: [build-test-migrate]
     runs-on: ubuntu-latest
 
     steps:
