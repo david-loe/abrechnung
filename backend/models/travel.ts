@@ -26,8 +26,6 @@ export const travelCalculator = new TravelCalculator(
   (await getSettings()).travelSettings
 )
 
-const settings = await getSettings()
-
 function place(required = false, withPlace = true) {
   const obj: any = {
     country: { type: String, ref: 'Country', required: required },
@@ -76,6 +74,8 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     advance: costObject(true, false, false, baseCurrency._id),
+    claimSpouseRefund: { type: Boolean },
+    fellowTravelersNames: { type: String },
     professionalShare: { type: Number, min: 0, max: 1 },
     claimOvernightLumpSum: { type: Boolean, default: true },
     lastPlaceOfWork: place(true, false),
@@ -129,10 +129,6 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
   },
   { timestamps: true }
 )
-
-if (settings.travelSettings.allowSpouseRefund) {
-  travelSchema.add({ claimSpouseRefund: { type: Boolean, default: false }, fellowTravelersNames: { type: String } })
-}
 
 function populate(doc: Document) {
   return Promise.allSettled([

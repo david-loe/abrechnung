@@ -10,6 +10,7 @@ const tokenSchema = new Schema(
   { timestamps: true }
 )
 
+// TODO: When changing settings.uploadTokenExpireAfterSeconds the index has to be recreated
 tokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: settings.uploadTokenExpireAfterSeconds })
 
 export default model('Token', tokenSchema)
