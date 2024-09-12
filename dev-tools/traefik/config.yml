@@ -1,0 +1,28 @@
+tls:
+  certificates:
+    - certFile: /certificates/abrechnung.crt
+      keyFile: /certificates/abrechnung.key
+
+http:
+  routers:
+    backend:
+      rule: 'Host(`{{ env "TLS_CERT_CN" }}`) && PathPrefix(`/backend`)'
+      service: backend-abrechnung@docker
+      entryPoints:
+        - https
+      tls: {}
+      middlewares:
+        - stripprefix-backend
+
+    frontend:
+      rule: 'Host(`{{ env "TLS_CERT_CN" }}`)'
+      service: frontend-abrechnung@docker
+      entryPoints:
+        - https
+      tls: {}
+
+  middlewares:
+    stripprefix-backend:
+      stripPrefix:
+        prefixes:
+          - '/backend'

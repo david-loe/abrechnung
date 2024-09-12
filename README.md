@@ -11,9 +11,7 @@
 
 digital und einfach möglich macht.
 
-
 https://github.com/david-loe/abrechnung/assets/56305409/8b31b6a1-e6c4-4bd9-bb76-3871e046a201
-
 
 ## Pauschalbeträge
 
@@ -53,6 +51,14 @@ Click below to launch a ready-to-use Gitpod workspace in your browser.
 4. Open `http://localhost:5000` and login with `professor:professor`
 
 > ℹ You can change ports and URLs in the `.env` file
+
+#### TLS in development
+
+To use TLS in development (self signed certificate)
+
+1. set the `TLS_CERT_CN` in `.env` to your host name.
+2. set `VITE_FRONTEND_URL` to `https://your-hostname`
+3. and `VITE_BACKEND_URL` to `https://your-hostname/backend`
 
 ## Schema
 
