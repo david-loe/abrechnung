@@ -73,5 +73,19 @@ services:
       - ME_CONFIG_BASICAUTH=false
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
 
+  traefik:
+    build:
+      context: ./dev-tools/traefik
+    labels:
+      - traefik.enable=true
+    ports:
+      - 443:443
+    volumes:
+      - ./dev-tools/traefik/config.yml:/etc/traefik/config.yml:ro
+      - ./dev-tools/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    env_file:
+      - .env
+
 volumes:
   db_data:
