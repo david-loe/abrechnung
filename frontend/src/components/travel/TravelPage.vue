@@ -118,9 +118,11 @@
                 </li>
                 <li>
                   <a
-                    :class="'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' ? ' disabled' : '')"
+                    :class="
+                      'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' && travel.state !== 'refunded' ? ' disabled' : '')
+                    "
                     href="#"
-                    @click="isReadOnly && endpointPrefix === 'examine/' ? null : deleteTravel()">
+                    @click="isReadOnly && endpointPrefix === 'examine/' && travel.state !== 'refunded' ? null : deleteTravel()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ $t('labels.delete') }}</span>
                   </a>

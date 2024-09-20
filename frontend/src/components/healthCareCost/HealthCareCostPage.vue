@@ -77,9 +77,24 @@
                 </template>
                 <li>
                   <a
-                    :class="'dropdown-item' + (isReadOnly && endpointPrefix !== '' ? ' disabled' : '')"
+                    :class="
+                      'dropdown-item' +
+                      (isReadOnly &&
+                      endpointPrefix !== '' &&
+                      healthCareCost.state !== 'refunded' &&
+                      healthCareCost.state !== 'underExaminationByInsurance'
+                        ? ' disabled'
+                        : '')
+                    "
                     href="#"
-                    @click="isReadOnly && endpointPrefix !== '' ? null : deleteHealthCareCost()">
+                    @click="
+                      isReadOnly &&
+                      endpointPrefix !== '' &&
+                      healthCareCost.state !== 'refunded' &&
+                      healthCareCost.state !== 'underExaminationByInsurance'
+                        ? null
+                        : deleteHealthCareCost()
+                    ">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ $t('labels.delete') }}</span>
                   </a>
