@@ -169,6 +169,10 @@ export default defineComponent({
       if (result) {
         this.users = result.data
       }
+      const rootUsers = (await this.$root.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)).ok?.data
+      if (rootUsers) {
+        this.$root.users = rootUsers
+      }
     },
     clickFilter(header: keyof Filter<string>) {
       if (this._filter[header]) {
