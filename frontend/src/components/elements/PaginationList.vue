@@ -15,7 +15,7 @@
                   <div class="row">
                     <div class="col-auto">
                       <div class="input-group mb-3">
-                        <input type="text" class="form-control" :placeholder="$t('labels.name')" v-model="searchFilter.name" />
+                        <input type="text" class="form-control" :placeholder="$t('labels.name')" v-model="searchFilter.name.$regex" />
                         <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
                       </div>
                     </div>
@@ -91,7 +91,7 @@ export default defineComponent({
   methods: {
     default() {
       return {
-        name: undefined as string | undefined,
+        name: { $regex: undefined as string | undefined, $options: 'i' },
         owner: undefined as string | undefined
       }
     },
@@ -106,12 +106,16 @@ export default defineComponent({
         page = this.meta.page
       }
       const queryParams: any = structuredClone(this.params)
-      for (const filterKey in this.searchFilter) {
-        if (this.searchFilter[filterKey] === null) {
-          this.searchFilter[filterKey] = undefined
+      Object.assign(queryParams.filter, this.searchFilter)
+      for (const filterKey in queryParams.filter) {
+        if (queryParams.filter[filterKey] === null) {
+          queryParams.filter[filterKey] = undefined
+        }
+        if (queryParams.filter[filterKey] && !queryParams.filter[filterKey].$regex && queryParams.filter[filterKey].$options) {
+          queryParams.filter[filterKey] = undefined
         }
       }
-      Object.assign(queryParams.filter, this.searchFilter)
+
       const filterJSON = Base64.encode(JSON.stringify(queryParams.filter))
       delete queryParams.filter
       queryParams.filterJSON = filterJSON !== 'e30=' ? filterJSON : undefined
