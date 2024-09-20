@@ -46,7 +46,9 @@
         <div v-if="!$root.settings.disableReportType.travel && $root.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.travel') }) }}</span>
+            <span class="ms-1">{{
+              $t($root.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
+            }}</span>
           </button>
         </div>
         <div v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport']" class="col-auto">
@@ -157,7 +159,9 @@ export default defineComponent({
       this.modalObject = undefined
     },
     async applyForTravel(travel: TravelSimple) {
-      const result = (await this.$root.setter<TravelSimple>('travel/appliedFor', travel)).ok
+      const result = (
+        await this.$root.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
+      ).ok
       if (result) {
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()

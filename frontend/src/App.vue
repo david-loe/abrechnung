@@ -384,7 +384,9 @@ export default defineComponent({
     },
     getFlagEmoji
   },
-  mounted() {}
+  created() {
+    document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
+  }
 })
 </script>
 

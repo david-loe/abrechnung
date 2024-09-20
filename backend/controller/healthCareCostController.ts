@@ -371,6 +371,10 @@ export class HealthCareCostConfirmController extends Controller {
       }
     })
   }
+  @Delete()
+  public async deleteHealthCareCost(@Query() _id: _id) {
+    return await this.deleter(HealthCareCost, { _id: _id })
+  }
 
   @Get('report')
   @Produces('application/pdf')
