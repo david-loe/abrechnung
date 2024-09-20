@@ -108,11 +108,10 @@ export default defineComponent({
       const queryParams: any = structuredClone(this.params)
       Object.assign(queryParams.filter, this.searchFilter)
       for (const filterKey in queryParams.filter) {
-        if (queryParams.filter[filterKey] === null) {
-          queryParams.filter[filterKey] = undefined
-        }
-        if (queryParams.filter[filterKey] && !queryParams.filter[filterKey].$regex && queryParams.filter[filterKey].$options) {
-          queryParams.filter[filterKey] = undefined
+        if (queryParams.filter[filterKey] === null || queryParams.filter[filterKey] === undefined) {
+          delete queryParams.filter[filterKey]
+        } else if (!queryParams.filter[filterKey].$regex && queryParams.filter[filterKey].$options) {
+          delete queryParams.filter[filterKey]
         }
       }
 
