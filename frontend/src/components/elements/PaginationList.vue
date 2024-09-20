@@ -99,13 +99,18 @@ export default defineComponent({
       if (page === 0 || page) {
         if (page < 1) {
           page = 1
-        } else if (this.hasMeta && page > this.meta.countPages) {
+        } else if (this.hasMeta && page > this.meta.countPages && this.meta.countPages > 0) {
           page = this.meta.countPages
         }
       } else if (this.hasMeta) {
         page = this.meta.page
       }
       const queryParams: any = structuredClone(this.params)
+      for (const filterKey in this.searchFilter) {
+        if (this.searchFilter[filterKey] === null) {
+          this.searchFilter[filterKey] = undefined
+        }
+      }
       Object.assign(queryParams.filter, this.searchFilter)
       const filterJSON = Base64.encode(JSON.stringify(queryParams.filter))
       delete queryParams.filter
