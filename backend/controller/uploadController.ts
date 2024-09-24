@@ -80,7 +80,7 @@ export class UploadController extends Controller {
     const token = await Token.findOne({ _id: tokenId })
     if (token) {
       if (true) {
-        await documentFileHandler(['files'], { owner: ownerId ? ownerId : userId })(req)
+        await documentFileHandler(['files'], { owner: ownerId || userId })(req)
         token.files = token.files.concat(requestBody.files as unknown as _id[])
         token.markModified('files')
         await token.save()

@@ -470,7 +470,7 @@ async function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage,
     width: 80,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.city', { lng: options.language }),
-    fn: (s?: string) => (s ? s : '')
+    fn: (s?: string) => s || ''
   })
   columns.push({
     key: 'purpose',
