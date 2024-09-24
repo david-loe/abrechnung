@@ -29,7 +29,8 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" required> </ProjectSelector>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="!askOwner" required>
+      </ProjectSelector>
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
