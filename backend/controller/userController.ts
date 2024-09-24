@@ -7,7 +7,10 @@ import { User as IUser, _id } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
+import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
 import Token from '../models/token.js'
+import Travel from '../models/travel.js'
 import User from '../models/user.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
@@ -131,7 +134,14 @@ export class UserAdminController extends Controller {
 
   @Delete()
   public async deleteUser(@Query() _id: _id) {
-    return await this.deleter(User, { _id })
+    return await this.deleter(User, {
+      _id,
+      referenceChecks: [
+        { model: Travel, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } },
+        { model: ExpenseReport, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } }
+      ]
+    })
   }
 
   @Post('merge')

@@ -22,6 +22,11 @@ export class NotFoundError extends ClientError {
   name = 'alerts.notFound'
 }
 
+export class ConflictError extends ClientError {
+  status = 409
+  name = 'alerts.conflict'
+}
+
 export class NotImplementedError extends ClientError {
   status = 501
   name = 'alerts.notImplemented'
