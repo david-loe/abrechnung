@@ -15,6 +15,7 @@
   "alerts": {
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
+    "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "db": {
       "createdSettings": "Einstellungen wurden vom Standard erstellt",

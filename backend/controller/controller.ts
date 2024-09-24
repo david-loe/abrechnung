@@ -3,7 +3,7 @@ import { FilterQuery, HydratedDocument, Model, ProjectionType, Types } from 'mon
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
 import { GETResponse, Meta, User, _id } from '../../common/types.js'
-import { NotAllowedError, NotFoundError } from './error.js'
+import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
 import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
@@ -144,6 +144,7 @@ export interface DeleterQuery {
 }
 
 export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQuery {
+  referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
   cb?: (data: DeleteResult) => any
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
@@ -298,6 +299,20 @@ export class Controller extends TsoaController {
     }
     if (options.checkOldObject && !(await options.checkOldObject(doc))) {
       throw new NotAllowedError(`Not allowed to delete this ${model.modelName}`)
+    }
+    if (options.referenceChecks) {
+      for (const referenceCheck of options.referenceChecks) {
+        const filter = { $or: [] as { [key: string]: any }[] }
+        for (const path of referenceCheck.paths) {
+          const conditions: { [key: string]: any } = structuredClone(referenceCheck.conditions) || {}
+          conditions[path] = options._id
+          filter.$or.push(conditions)
+        }
+        const count = await referenceCheck.model.countDocuments(filter)
+        if (count > 0) {
+          throw new ConflictError(`${count} ${referenceCheck.model.modelName}${count > 1 ? 's' : ''} linked.`)
+        }
+      }
     }
     const result = await doc.deleteOne()
     if (options.cb) {

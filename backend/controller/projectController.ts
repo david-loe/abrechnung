@@ -2,7 +2,10 @@ import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Project as IProject, ProjectSimple, _id } from '../../common/types.js'
 import { getSettings } from '../helper.js'
+import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
 import Project from '../models/project.js'
+import Travel from '../models/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
@@ -46,6 +49,13 @@ export class ProjectAdminController extends Controller {
   }
   @Delete()
   public async deleteProject(@Query() _id: _id) {
-    return await this.deleter(Project, { _id: _id })
+    return await this.deleter(Project, {
+      _id: _id,
+      referenceChecks: [
+        { model: ExpenseReport, paths: ['project'] },
+        { model: Travel, paths: ['project'] },
+        { model: HealthCareCost, paths: ['project'] }
+      ]
+    })
   }
 }

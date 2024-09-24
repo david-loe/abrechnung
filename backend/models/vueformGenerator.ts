@@ -137,7 +137,7 @@ function mapSchemaTypeToVueformElement(
     vueformElement['type'] = 'object'
     if (keys.length > 1 && isFlatObject(schemaType.type)) {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language, {
-        columns: { lg: { container: 12 / (keys.length == 2 ? 2 : 3) }, sm: { container: 6 } }
+        columns: { lg: { container: 12 / (keys.length === 2 ? 2 : 3) }, sm: { container: 6 } }
       })
     } else {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
