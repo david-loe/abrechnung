@@ -25,6 +25,13 @@
                         @update:model-value="getData(meta.page)"
                         :placeholder="$t('labels.owner')"></UserSelector>
                     </div>
+                    <div class="col-auto">
+                      <ProjectSelector
+                        v-model="searchFilter.project"
+                        @update:model-value="getData(meta.page)"
+                        :org-select-split="5"
+                        style="min-width: 184px"></ProjectSelector>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -63,11 +70,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { Base64 } from '../../../../common/scripts.js'
+import ProjectSelector from './ProjectSelector.vue'
 import UserSelector from './UserSelector.vue'
 
 export default defineComponent({
   name: 'PaginationList',
-  components: { UserSelector },
+  components: { UserSelector, ProjectSelector },
   data() {
     return {
       hasData: false,
@@ -92,7 +100,8 @@ export default defineComponent({
     default() {
       return {
         name: { $regex: undefined as string | undefined, $options: 'i' },
-        owner: undefined as string | undefined
+        owner: undefined as string | undefined,
+        project: undefined as string | undefined
       }
     },
     async getData(page?: number): Promise<void> {

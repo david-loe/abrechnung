@@ -84,7 +84,7 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" required> </ProjectSelector>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="!askOwner" required> </ProjectSelector>
     </div>
 
     <div class="mb-2">
@@ -94,8 +94,8 @@
           mode === 'add' && !askOwner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel && (travel.state === 'rejected' || travel.state === 'approved')
-              ? $t('labels.reapplyForX', { X: $t('labels.travel') })
-              : $t('labels.save')
+            ? $t('labels.reapplyForX', { X: $t('labels.travel') })
+            : $t('labels.save')
         }}
       </button>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">

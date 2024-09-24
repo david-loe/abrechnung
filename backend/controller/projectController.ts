@@ -14,16 +14,17 @@ export class ProjectController extends Controller {
   public async getProject(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
     const settings = await getSettings()
     if (
-      !settings.userCanSeeAllProjects &&
-      !request.user?.access['approve/travel'] &&
-      !request.user?.access['examine/travel'] &&
-      !request.user?.access['examine/expenseReport'] &&
-      !request.user?.access['examine/healthCareCost'] &&
-      !request.user?.access['confirm/healthCareCost']
+      settings.userCanSeeAllProjects ||
+      request.user?.access['approve/travel'] ||
+      request.user?.access['examine/travel'] ||
+      request.user?.access['examine/expenseReport'] ||
+      request.user?.access['examine/healthCareCost'] ||
+      request.user?.access['confirm/healthCareCost']
     ) {
+      return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
+    } else {
       throw new AuthorizationError()
     }
-    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
   }
 }
 
