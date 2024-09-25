@@ -1,6 +1,12 @@
 <template>
   <div>
-    <header class="mb-3 border-bottom">
+    <div
+      id="offline-banner"
+      v-if="online"
+      style="background-color: black; color: #fff; width: 100%; margin-bottom: 1%; display: flex; justify-content: center">
+      Du bist Offline
+    </div>
+    <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
           <div class="me-auto">
@@ -186,7 +192,8 @@ export default defineComponent({
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
-      accesses
+      accesses,
+      online: true
     }
   },
   components: {},
