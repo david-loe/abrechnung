@@ -44,7 +44,7 @@
           <h1>{{ $t('headlines.home') }}</h1>
         </div>
         <div v-if="!$root.settings.disableReportType.travel && $root.user.access['appliedFor:travel']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">
+          <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')" :disabled="!$root.online">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{
               $t($root.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
