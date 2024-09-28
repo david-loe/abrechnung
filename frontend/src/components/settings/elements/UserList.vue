@@ -140,7 +140,8 @@ export default defineComponent({
       if (formUser) {
         // reduce arrays of objects to arrays of _ids for vueform select elements
         const formUserSettings = Object.assign({}, formUser.settings)
-        formUser = Object.assign({}, formUser, { settings: formUserSettings })
+        const formUserProjects = Object.assign({}, formUser.projects)
+        formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
         formUser.settings.lastCurrencies = user!.settings.lastCurrencies.map((c) => c._id)
         formUser.settings.lastCountries = user!.settings.lastCountries.map((c) => c._id)
         formUser.projects.assigned = user!.projects.assigned.map((p) => p._id)
@@ -183,7 +184,7 @@ export default defineComponent({
       }
     }
   },
-  async created() {
+  async beforeMount() {
     await this.$root.load()
     this.getUsers()
   }
