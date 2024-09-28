@@ -65,7 +65,7 @@ export default defineComponent({
     },
     getProjects(orgaId?: string) {
       const projects: ProjectSimple[] = []
-      for (const project of this.$root.user.settings.projects) {
+      for (const project of this.$root.user.projects.assigned) {
         if (!orgaId || project.organisation === orgaId) {
           projects.push(project)
         }
@@ -73,7 +73,7 @@ export default defineComponent({
 
       for (const project of this.$root.projects) {
         let alreadyIn = false
-        for (const userProject of this.$root.user.settings.projects) {
+        for (const userProject of this.$root.user.projects.assigned) {
           if (project._id === userProject._id) {
             alreadyIn = true
             break

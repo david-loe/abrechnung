@@ -22,7 +22,8 @@ export class ProjectController extends Controller {
       request.user?.access['examine/travel'] ||
       request.user?.access['examine/expenseReport'] ||
       request.user?.access['examine/healthCareCost'] ||
-      request.user?.access['confirm/healthCareCost']
+      request.user?.access['confirm/healthCareCost'] ||
+      request.user?.access['admin']
     ) {
       return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
     } else {

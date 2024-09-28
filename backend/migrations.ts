@@ -55,6 +55,10 @@ export async function checkForMigrations() {
           throw Error("Couldn't find settings")
         }
       }
+      case '1.2.3': {
+        console.log('Apply migration from v1.2.3: Move projects from settings.projects to projects.assigned')
+        await mongoose.connection.collection('users').updateMany({}, { $rename: { 'settings.projects': 'projects.assigned' } })
+      }
       default:
         if (settings) {
           settings.migrateFrom = undefined

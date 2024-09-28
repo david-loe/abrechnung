@@ -100,6 +100,8 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "assignedProjects": "Zugewiesene Projekte",
+    "supervisedProjects": "Betreute Projekte",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",

@@ -53,13 +53,20 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     required: true
   },
   access: { type: accessObject, default: () => ({}) },
+  projects: {
+    type: {
+      assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
+      supervised: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.supervisedProjects' }
+    },
+    required: true
+  },
+
   loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
       language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
-      projects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
       organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
     },
@@ -76,7 +83,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'settings.projects' }),
+    doc.populate({ path: 'projects.assigned' }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
     doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })
   ])
@@ -161,12 +168,19 @@ userSchema.methods.merge = async function (this: UserDoc, userToOverwrite: Parti
   }
   delete userToOverwrite.access
 
-  Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
-  for (const p of userToOverwrite.settings!.projects) {
-    if (!this.settings.projects.some((tp) => tp._id.equals(p._id))) {
-      this.settings.projects.push(p)
+  for (const p of userToOverwrite.projects!.assigned) {
+    if (!this.projects.assigned.some((tp) => tp._id.equals(p._id))) {
+      this.projects.assigned.push(p)
     }
   }
+
+  for (const p of userToOverwrite.projects!.supervised) {
+    if (!this.projects.supervised.some((tp) => tp._id.equals(p._id))) {
+      this.projects.supervised.push(p)
+    }
+  }
+
+  Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
   delete userToOverwrite.settings
 
   Object.assign(this, userToOverwrite, this.toObject())

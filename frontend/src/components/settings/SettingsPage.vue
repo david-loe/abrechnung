@@ -26,7 +26,7 @@
             class="mb-5"
             endpoint="admin/user/bulk"
             :transformers="[
-              { path: 'settings.projects', key: 'identifier', array: $root.projects },
+              { path: 'projects.assigned', key: 'identifier', array: $root.projects },
               { path: 'settings.organisation', key: 'name', array: $root.organisations },
               {path: 'loseAccessAt', fn: (val:string|undefined) => {
                 if(val){
@@ -44,7 +44,7 @@
               'email',
               'fk.magiclogin',
               'loseAccessAt',
-              'settings.projects',
+              'projects.assigned',
               'settings.organisation'
             ]"
             @imported=";($refs.userList as any).getUsers()" />
