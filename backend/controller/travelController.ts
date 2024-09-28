@@ -1,4 +1,5 @@
 import { Request as ExRequest } from 'express'
+import { Condition } from 'mongoose'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
@@ -248,11 +249,15 @@ export class TravelController extends Controller {
 @Security('cookieAuth', ['approve/travel'])
 export class TravelApproveController extends Controller {
   @Get()
-  public async getTravel(@Queries() query: GetterQuery<ITravel>) {
+  public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+    const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
     const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
-      filter: { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] },
+      filter,
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
       sortFn
     })
@@ -321,11 +326,15 @@ export class TravelApproveController extends Controller {
 @Security('cookieAuth', ['examine/travel'])
 export class TravelExamineController extends Controller {
   @Get()
-  public async getTravel(@Queries() query: GetterQuery<ITravel>) {
+  public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+    const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
     const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
-      filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },
+      filter,
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sortFn

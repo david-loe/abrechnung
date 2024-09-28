@@ -1,4 +1,5 @@
 import { Request as ExRequest } from 'express'
+import { Condition } from 'mongoose'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
@@ -168,11 +169,17 @@ export class ExpenseReportController extends Controller {
 @Security('cookieAuth', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()
-  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>) {
+  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = {
+      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }]
+    }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
     const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
-      filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },
+      filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sortFn
