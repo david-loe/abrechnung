@@ -4,6 +4,7 @@ import {
   Token,
   User,
   UserReplaceReferencesResult,
+  _id,
   accesses,
   emailRegex,
   locales,
@@ -26,6 +27,7 @@ interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
   merge(userToOverwrite: Partial<User>, mergeFk: boolean): Promise<User>
+  addProjects(projects: { assigned?: _id[]; supervised?: _id[] }): Promise<void>
 }
 
 type UserModel = Model<User, {}, Methods>
@@ -56,7 +58,20 @@ export const userSchema = new Schema<User, UserModel, Methods>({
   projects: {
     type: {
       assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
-      supervised: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.supervisedProjects' }
+      supervised: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
+        required: true,
+        label: 'labels.supervisedProjects',
+        conditions: [
+          [
+            ['access.approve/travel', true],
+            ['access.examine/travel', true],
+            ['access.examine/expenseReport', true],
+            ['access.examine/healthCareCost', true],
+            ['access.confirm/healthCareCost', true]
+          ]
+        ]
+      }
     },
     required: true
   },
@@ -186,6 +201,29 @@ userSchema.methods.merge = async function (this: UserDoc, userToOverwrite: Parti
   Object.assign(this, userToOverwrite, this.toObject())
   await this.save()
   return this.toObject()
+}
+
+userSchema.methods.addProjects = async function addProjects(projects: { assigned?: _id[]; supervised?: _id[] }) {
+  let changed = false
+  if (projects.assigned) {
+    for (const newProjectId of projects.assigned) {
+      if (!this.projects.assigned.some((p) => p._id.equals(newProjectId))) {
+        changed = true
+        this.projects.assigned.push(newProjectId as any)
+      }
+    }
+  }
+  if (projects.supervised) {
+    for (const newProjectId of projects.supervised) {
+      if (!this.projects.supervised.some((p) => p._id.equals(newProjectId))) {
+        changed = true
+        this.projects.supervised.push(newProjectId)
+      }
+    }
+  }
+  if (changed) {
+    this.save()
+  }
 }
 
 export default model<User, UserModel>('User', userSchema)

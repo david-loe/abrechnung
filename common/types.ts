@@ -149,6 +149,13 @@ export interface Project extends ProjectSimple {
   budget?: BaseCurrencyMoney
 }
 
+export interface ProjectUsers {
+  assignees: _id[]
+  supervisors: _id[]
+}
+
+export interface ProjectWithUsers extends Project, ProjectUsers {}
+
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null

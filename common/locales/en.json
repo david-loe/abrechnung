@@ -100,6 +100,8 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "addAssignees": "Add Assignees",
+    "addSupervisors": "Add Supervisors",
     "assignedProjects": "Assigned Projects",
     "supervisedProjects": "Supervised Projects",
     "access": "Access",

@@ -1,6 +1,6 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { ExpenseReport, HealthCareCost, Project, Travel, _id } from '../../common/types.js'
+import { ExpenseReport, HealthCareCost, Project, ProjectUsers, Travel, _id } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {
@@ -53,3 +53,8 @@ export type IProject = ProjectSchema & { _id: _id }
 export default model<Project, ProjectModel>('Project', projectSchema)
 
 export interface ProjectDoc extends Methods, HydratedDocument<Project> {}
+
+export const projectUsersSchema = new Schema<ProjectUsers>({
+  assignees: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], required: true, label: 'labels.addAssignees' },
+  supervisors: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], required: true, label: 'labels.addSupervisors' }
+})
