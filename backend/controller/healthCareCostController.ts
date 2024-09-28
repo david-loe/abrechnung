@@ -10,7 +10,7 @@ import {
   Locale,
   _id
 } from '../../common/types.js'
-import { documentFileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
@@ -194,8 +194,13 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteHealthCareCost(@Query() _id: _id) {
-    return await this.deleter(HealthCareCost, { _id: _id })
+  public async deleteHealthCareCost(@Query() _id: _id, @Request() request: ExRequest) {
+    return await this.deleter(HealthCareCost, {
+      _id: _id,
+      async checkOldObject(oldObject: IHealthCareCost) {
+        return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+      }
+    })
   }
 
   @Post('expense')
@@ -207,7 +212,11 @@ export class HealthCareCostExamineController extends Controller {
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
@@ -219,13 +228,17 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id) {
+  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(HealthCareCost, {
       _id,
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           return true
         } else {
           return false
@@ -256,7 +269,7 @@ export class HealthCareCostExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -296,7 +309,7 @@ export class HealthCareCostExamineController extends Controller {
       cb: (e: IHealthCareCost) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -310,7 +323,11 @@ export class HealthCareCostExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
-    const healthCareCost = await HealthCareCost.findOne({ _id, historic: false, state: 'underExaminationByInsurance' }).lean()
+    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: 'underExaminationByInsurance' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
@@ -373,7 +390,7 @@ export class HealthCareCostConfirmController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExaminationByInsurance') {
+        if (oldObject.state === 'underExaminationByInsurance' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await documentFileHandler(['refundSum', 'receipts'], { owner: oldObject.owner._id })(request)
           await oldObject.saveToHistory()
           await oldObject.save()
@@ -385,16 +402,25 @@ export class HealthCareCostConfirmController extends Controller {
     })
   }
   @Delete()
-  public async deleteHealthCareCost(@Query() _id: _id) {
-    return await this.deleter(HealthCareCost, { _id: _id })
+  public async deleteHealthCareCost(@Query() _id: _id, @Request() request: ExRequest) {
+    return await this.deleter(HealthCareCost, {
+      _id: _id,
+      async checkOldObject(oldObject: IHealthCareCost) {
+        return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+      }
+    })
   }
 
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
-    const healthCareCost = await HealthCareCost.findOne({
+    const filter: Condition<IHealthCareCost> = {
       $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
-    }).lean()
+    }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
+    const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')

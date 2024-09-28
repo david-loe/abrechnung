@@ -3,7 +3,7 @@ import { Condition } from 'mongoose'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
-import { documentFileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import Travel, { TravelDoc } from '../models/travel.js'
@@ -297,7 +297,7 @@ export class TravelApproveController extends Controller {
       cb,
       allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === 'appliedFor') {
+        if (oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -316,7 +316,8 @@ export class TravelApproveController extends Controller {
       requestBody: extendedBody,
       cb: sendNotificationMail,
       allowNew: false,
-      checkOldObject: async (oldObject: TravelDoc) => oldObject.state === 'appliedFor'
+      checkOldObject: async (oldObject: TravelDoc) =>
+        oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
     })
   }
 }
@@ -348,13 +349,19 @@ export class TravelExamineController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
-      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state !== 'refunded'
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic && oldObject.state !== 'refunded' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
     })
   }
 
   @Delete()
-  public async deleteTravel(@Query() _id: _id) {
-    return await this.deleter(Travel, { _id: _id })
+  public async deleteTravel(@Query() _id: _id, @Request() request: ExRequest) {
+    return await this.deleter(Travel, {
+      _id: _id,
+      async checkOldObject(oldObject: TravelDoc) {
+        return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+      }
+    })
   }
 
   @Post('expense')
@@ -370,7 +377,11 @@ export class TravelExamineController extends Controller {
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
@@ -390,7 +401,11 @@ export class TravelExamineController extends Controller {
       arrayElementKey: 'stages',
       allowNew: true,
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
@@ -402,22 +417,34 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id) {
+  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state === 'underExamination'
+      async checkOldObject(oldObject: TravelDoc) {
+        return (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        )
+      }
     })
   }
 
   @Delete('stage')
-  public async deleteStage(@Query() _id: _id, @Query() parentId: _id) {
+  public async deleteStage(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
       arrayElementKey: 'stages',
-      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.state === 'underExamination'
+      async checkOldObject(oldObject: TravelDoc) {
+        return (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        )
+      }
     })
   }
 
@@ -437,7 +464,11 @@ export class TravelExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -457,7 +488,7 @@ export class TravelExamineController extends Controller {
       allowNew: false,
       cb: (e: ITravel) => sendNotificationMail(e, 'backToApproved'),
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -471,7 +502,11 @@ export class TravelExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
-    const travel = await Travel.findOne({ _id, historic: false, state: 'refunded' }).lean()
+    const filter: Condition<ITravel> = { _id, historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const travel = await Travel.findOne(filter).lean()
     if (travel) {
       const report = await generateTravelReport(travel, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
