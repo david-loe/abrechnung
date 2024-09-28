@@ -73,7 +73,8 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         ]
       }
     },
-    required: true
+    required: true,
+    default: () => ({})
   },
 
   loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
