@@ -4,6 +4,7 @@ import {
   Token,
   User,
   UserReplaceReferencesResult,
+  _id,
   accesses,
   emailRegex,
   locales,
@@ -26,6 +27,7 @@ interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
   merge(userToOverwrite: Partial<User>, mergeFk: boolean): Promise<User>
+  addProjects(projects: { assigned?: _id[]; supervised?: _id[] }): Promise<void>
 }
 
 type UserModel = Model<User, {}, Methods>
@@ -53,13 +55,34 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     required: true
   },
   access: { type: accessObject, default: () => ({}) },
+  projects: {
+    type: {
+      assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
+      supervised: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
+        required: true,
+        label: 'labels.supervisedProjects',
+        conditions: [
+          [
+            ['access.approve/travel', true],
+            ['access.examine/travel', true],
+            ['access.examine/expenseReport', true],
+            ['access.examine/healthCareCost', true],
+            ['access.confirm/healthCareCost', true]
+          ]
+        ]
+      }
+    },
+    required: true,
+    default: () => ({})
+  },
+
   loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
       language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
-      projects: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
       organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
     },
@@ -76,7 +99,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
     doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'settings.projects' }),
+    doc.populate({ path: 'projects.assigned' }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
     doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })
   ])
@@ -161,17 +184,47 @@ userSchema.methods.merge = async function (this: UserDoc, userToOverwrite: Parti
   }
   delete userToOverwrite.access
 
-  Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
-  for (const p of userToOverwrite.settings!.projects) {
-    if (!this.settings.projects.some((tp) => tp._id.equals(p._id))) {
-      this.settings.projects.push(p)
+  for (const p of userToOverwrite.projects!.assigned) {
+    if (!this.projects.assigned.some((tp) => tp._id.equals(p._id))) {
+      this.projects.assigned.push(p)
     }
   }
+
+  for (const p of userToOverwrite.projects!.supervised) {
+    if (!this.projects.supervised.some((tp) => tp._id.equals(p._id))) {
+      this.projects.supervised.push(p)
+    }
+  }
+
+  Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
   delete userToOverwrite.settings
 
   Object.assign(this, userToOverwrite, this.toObject())
   await this.save()
   return this.toObject()
+}
+
+userSchema.methods.addProjects = async function addProjects(projects: { assigned?: _id[]; supervised?: _id[] }) {
+  let changed = false
+  if (projects.assigned) {
+    for (const newProjectId of projects.assigned) {
+      if (!this.projects.assigned.some((p) => p._id.equals(newProjectId))) {
+        changed = true
+        this.projects.assigned.push(newProjectId as any)
+      }
+    }
+  }
+  if (projects.supervised) {
+    for (const newProjectId of projects.supervised) {
+      if (!this.projects.supervised.some((p) => p._id.equals(newProjectId))) {
+        changed = true
+        this.projects.supervised.push(newProjectId)
+      }
+    }
+  }
+  if (changed) {
+    this.save()
+  }
 }
 
 export default model<User, UserModel>('User', userSchema)

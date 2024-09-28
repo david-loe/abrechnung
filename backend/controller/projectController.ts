@@ -1,11 +1,12 @@
 import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Project as IProject, ProjectSimple, _id } from '../../common/types.js'
+import { Project as IProject, ProjectSimple, ProjectWithUsers, _id } from '../../common/types.js'
 import { getSettings } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import Project from '../models/project.js'
 import Travel from '../models/travel.js'
+import User from '../models/user.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
@@ -22,7 +23,8 @@ export class ProjectController extends Controller {
       request.user?.access['examine/travel'] ||
       request.user?.access['examine/expenseReport'] ||
       request.user?.access['examine/healthCareCost'] ||
-      request.user?.access['confirm/healthCareCost']
+      request.user?.access['confirm/healthCareCost'] ||
+      request.user?.access['admin']
     ) {
       return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
     } else {
@@ -40,8 +42,20 @@ export class ProjectAdminController extends Controller {
     return await this.getter(Project, { query })
   }
   @Post()
-  public async postProject(@Body() requestBody: SetterBody<IProject>) {
-    return await this.setter(Project, { requestBody: requestBody, allowNew: true })
+  public async postProject(@Body() requestBody: SetterBody<ProjectWithUsers>) {
+    async function cb(project: IProject) {
+      if (requestBody.assignees) {
+        for (const userId of requestBody.assignees) {
+          await (await User.findOne({ _id: userId }))?.addProjects({ assigned: [project._id] })
+        }
+      }
+      if (requestBody.supervisors) {
+        for (const userId of requestBody.supervisors) {
+          await (await User.findOne({ _id: userId }))?.addProjects({ supervised: [project._id] })
+        }
+      }
+    }
+    return await this.setter(Project, { requestBody: requestBody, allowNew: true, cb })
   }
   @Post('bulk')
   public async postManyProjects(@Body() requestBody: SetterBody<IProject>[]) {

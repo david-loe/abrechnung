@@ -1,8 +1,9 @@
 import { Request as ExRequest } from 'express'
+import { Condition } from 'mongoose'
 import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
-import { documentFileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
@@ -168,11 +169,17 @@ export class ExpenseReportController extends Controller {
 @Security('cookieAuth', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()
-  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>) {
+  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = {
+      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }]
+    }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
     const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
-      filter: { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] },
+      filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sortFn
@@ -180,8 +187,13 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteExpenseReport(@Query() _id: _id) {
-    return await this.deleter(ExpenseReport, { _id: _id })
+  public async deleteExpenseReport(@Query() _id: _id, @Request() request: ExRequest) {
+    return await this.deleter(ExpenseReport, {
+      _id: _id,
+      async checkOldObject(oldObject: IExpenseReport) {
+        return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+      }
+    })
   }
 
   @Post('expense')
@@ -192,8 +204,12 @@ export class ExpenseReportExamineController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+      async checkOldObject(oldObject: IExpenseReport) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
         } else {
@@ -205,13 +221,17 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id) {
+  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'underExamination') {
+        if (
+          !oldObject.historic &&
+          oldObject.state === 'underExamination' &&
+          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        ) {
           return true
         } else {
           return false
@@ -241,7 +261,7 @@ export class ExpenseReportExamineController extends Controller {
       cb: (e: IExpenseReport) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -271,7 +291,7 @@ export class ExpenseReportExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination') {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -285,7 +305,11 @@ export class ExpenseReportExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
-    const expenseReport = await ExpenseReport.findOne({ _id, historic: false, state: 'refunded' }).lean()
+    const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (expenseReport) {
       const report = await generateExpenseReportReport(expenseReport, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')

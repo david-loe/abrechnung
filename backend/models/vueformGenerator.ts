@@ -56,6 +56,10 @@ function mapSchemaTypeToVueformElement(
     vueformElement['description'] = translate(schemaType.description, language)
   }
 
+  if (schemaType.conditions) {
+    vueformElement['conditions'] = schemaType.conditions
+  }
+
   if (schemaType.label) {
     vueformElement['label'] = translate(schemaType.label, language)
   } else if (labelStr) {

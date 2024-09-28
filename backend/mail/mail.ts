@@ -84,12 +84,18 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
     text: '',
     link: ''
   }
+
+  const supervisedProjectsFilter = {
+    $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }]
+  }
   const userFilter: any = {}
   if (report.state === 'appliedFor') {
     userFilter[`access.approve/${reportType}`] = true
+    Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
   } else if (report.state === 'underExamination') {
     userFilter[`access.examine/${reportType}`] = true
+    Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
     // 'rejected', 'approved', 'refunded', 'underExaminationByInsurance'

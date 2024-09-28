@@ -149,6 +149,13 @@ export interface Project extends ProjectSimple {
   budget?: BaseCurrencyMoney
 }
 
+export interface ProjectUsers {
+  assignees: _id[]
+  supervisors: _id[]
+}
+
+export interface ProjectWithUsers extends Project, ProjectUsers {}
+
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   bankDetails?: string | null
@@ -166,12 +173,15 @@ export interface User extends UserSimple {
   access: {
     [key in Access]: boolean
   }
+  projects: {
+    assigned: Project[]
+    supervised: _id[]
+  }
   loseAccessAt?: null | Date | string
   settings: {
     language: Locale
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    projects: Project[]
     insurance?: HealthInsurance | null
     organisation?: OrganisationSimple | null
   }

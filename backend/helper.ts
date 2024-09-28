@@ -2,11 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
 import mongoose, { Model, Types } from 'mongoose'
 import {
+  _id,
   AnyState,
   DocumentFile as IDocumentFile,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
+  User as IUser,
   reportIsHealthCareCost,
   reportIsTravel,
   Settings
@@ -185,4 +187,11 @@ export async function getSettings(): Promise<Settings> {
   } else {
     throw Error('Settings not found')
   }
+}
+
+export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {
+  if (user.projects.supervised.length === 0) {
+    return true
+  }
+  return user.projects.supervised.some((p) => p._id.equals(projectId))
 }

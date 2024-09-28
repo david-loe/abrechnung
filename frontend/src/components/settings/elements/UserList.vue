@@ -22,7 +22,7 @@
       :headers="[
         { text: $t('labels.name'), value: 'name' },
         { text: 'E-Mail', value: 'email' },
-        { text: $t('labels.projects'), value: 'settings.projects', sortable: true },
+        { text: $t('labels.projects'), value: 'projects.assigned', sortable: true },
         { text: $t('labels.access'), value: 'access' },
         { value: 'buttons' }
       ]">
@@ -53,8 +53,8 @@
       <template #item-name="{ name }">
         {{ name.givenName + ' ' + name.familyName }}
       </template>
-      <template #item-settings.projects="{ settings }">
-        <span class="me-1" v-for="p in settings.projects">{{ p.identifier }}</span>
+      <template #item-projects.assigned="{ projects }">
+        <span class="me-1" v-for="p in projects.assigned">{{ p.identifier }}</span>
       </template>
       <template #item-access="user">
         <template v-for="access of accesses">
@@ -140,10 +140,11 @@ export default defineComponent({
       if (formUser) {
         // reduce arrays of objects to arrays of _ids for vueform select elements
         const formUserSettings = Object.assign({}, formUser.settings)
-        formUser = Object.assign({}, formUser, { settings: formUserSettings })
+        const formUserProjects = Object.assign({}, formUser.projects)
+        formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
         formUser.settings.lastCurrencies = user!.settings.lastCurrencies.map((c) => c._id)
         formUser.settings.lastCountries = user!.settings.lastCountries.map((c) => c._id)
-        formUser.settings.projects = user!.settings.projects.map((p) => p._id)
+        formUser.projects.assigned = user!.projects.assigned.map((p) => p._id)
         formUser.settings.organisation = user!.settings.organisation?._id
         formUser.settings.insurance = user!.settings.insurance?._id
       }
@@ -183,7 +184,7 @@ export default defineComponent({
       }
     }
   },
-  async created() {
+  async beforeMount() {
     await this.$root.load()
     this.getUsers()
   }
