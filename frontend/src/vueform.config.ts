@@ -43,5 +43,6 @@ export default defineConfig({
   endpoints: {},
   beforeSend(form$: any) {
     deepReplace(form$.data, null, undefined)
+    deepReplace(form$.data, '', undefined)
   }
 })
