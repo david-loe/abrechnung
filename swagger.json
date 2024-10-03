@@ -7,6 +7,57 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"BaseCurrencyMoney": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"mongoose.Types.ObjectId": {
+				"type": "string"
+			},
+			"_id": {
+				"$ref": "#/components/schemas/mongoose.Types.ObjectId",
+				"pattern": "^[0-9a-fA-F]{24}$"
+			},
+			"Project": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id",
+					"balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Locale": {
 				"type": "string",
 				"enum": [
@@ -118,57 +169,6 @@
 				"required": [
 					"name",
 					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"BaseCurrencyMoney": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					}
-				},
-				"required": [
-					"amount"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"mongoose.Types.ObjectId": {
-				"type": "string"
-			},
-			"_id": {
-				"$ref": "#/components/schemas/mongoose.Types.ObjectId",
-				"pattern": "^[0-9a-fA-F]{24}$"
-			},
-			"Project": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"name": {
-						"type": "string"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id",
-					"balance"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -389,6 +389,27 @@
 						],
 						"type": "object"
 					},
+					"projects": {
+						"properties": {
+							"supervised": {
+								"items": {
+									"$ref": "#/components/schemas/_id"
+								},
+								"type": "array"
+							},
+							"assigned": {
+								"items": {
+									"$ref": "#/components/schemas/Project"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"supervised",
+							"assigned"
+						],
+						"type": "object"
+					},
 					"loseAccessAt": {
 						"anyOf": [
 							{
@@ -419,12 +440,6 @@
 								],
 								"nullable": true
 							},
-							"projects": {
-								"items": {
-									"$ref": "#/components/schemas/Project"
-								},
-								"type": "array"
-							},
 							"lastCountries": {
 								"items": {
 									"$ref": "#/components/schemas/CountrySimple"
@@ -442,7 +457,6 @@
 							}
 						},
 						"required": [
-							"projects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -471,6 +485,7 @@
 					"_id",
 					"fk",
 					"access",
+					"projects",
 					"settings"
 				],
 				"type": "object",
@@ -534,54 +549,6 @@
 							},
 							{
 								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
-					},
-					"projects": {
-						"anyOf": [
-							{
-								"items": {
-									"properties": {
-										"identifier": {
-											"type": "string"
-										},
-										"budget": {
-											"properties": {
-												"amount": {
-													"type": "number",
-													"format": "double"
-												}
-											},
-											"type": "object"
-										},
-										"balance": {
-											"properties": {
-												"amount": {
-													"type": "number",
-													"format": "double"
-												}
-											},
-											"type": "object"
-										},
-										"organisation": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										},
-										"name": {
-											"type": "string"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-								},
-								"type": "array"
 							}
 						]
 					},
@@ -837,6 +804,27 @@
 						],
 						"type": "object"
 					},
+					"projects": {
+						"properties": {
+							"supervised": {
+								"items": {
+									"$ref": "#/components/schemas/_id"
+								},
+								"type": "array"
+							},
+							"assigned": {
+								"items": {
+									"$ref": "#/components/schemas/Project"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"supervised",
+							"assigned"
+						],
+						"type": "object"
+					},
 					"loseAccessAt": {
 						"anyOf": [
 							{
@@ -867,12 +855,6 @@
 								],
 								"nullable": true
 							},
-							"projects": {
-								"items": {
-									"$ref": "#/components/schemas/Project"
-								},
-								"type": "array"
-							},
 							"lastCountries": {
 								"items": {
 									"$ref": "#/components/schemas/CountrySimple"
@@ -890,7 +872,6 @@
 							}
 						},
 						"required": [
-							"projects",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -919,6 +900,7 @@
 					"_id",
 					"fk",
 					"access",
+					"projects",
 					"settings"
 				],
 				"type": "object",
@@ -1002,6 +984,7 @@
 								"_id",
 								"fk",
 								"access",
+								"projects",
 								"loseAccessAt",
 								"settings",
 								"vehicleRegistration",
@@ -1064,6 +1047,65 @@
 								"format": "date-time"
 							}
 						]
+					},
+					"projects": {
+						"properties": {
+							"supervised": {
+								"items": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								},
+								"type": "array"
+							},
+							"assigned": {
+								"anyOf": [
+									{
+										"items": {
+											"properties": {
+												"identifier": {
+													"type": "string"
+												},
+												"budget": {
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
+												},
+												"balance": {
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
+												},
+												"organisation": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											},
+											"type": "object"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									}
+								]
+							}
+						},
+						"type": "object"
 					},
 					"access": {
 						"properties": {
@@ -1139,54 +1181,6 @@
 									},
 									{
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									}
-								]
-							},
-							"projects": {
-								"anyOf": [
-									{
-										"items": {
-											"properties": {
-												"identifier": {
-													"type": "string"
-												},
-												"budget": {
-													"properties": {
-														"amount": {
-															"type": "number",
-															"format": "double"
-														}
-													},
-													"type": "object"
-												},
-												"balance": {
-													"properties": {
-														"amount": {
-															"type": "number",
-															"format": "double"
-														}
-													},
-													"type": "object"
-												},
-												"organisation": {
-													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-												},
-												"name": {
-													"type": "string"
-												},
-												"_id": {
-													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-												}
-											},
-											"type": "object"
-										},
-										"type": "array"
-									},
-									{
-										"items": {
-											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-										},
-										"type": "array"
 									}
 								]
 							},
@@ -1363,6 +1357,65 @@
 						"format": "date-time",
 						"nullable": true
 					},
+					"projects": {
+						"properties": {
+							"supervised": {
+								"items": {
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+								},
+								"type": "array"
+							},
+							"assigned": {
+								"anyOf": [
+									{
+										"items": {
+											"properties": {
+												"identifier": {
+													"type": "string"
+												},
+												"budget": {
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
+												},
+												"balance": {
+													"properties": {
+														"amount": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"type": "object"
+												},
+												"organisation": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											},
+											"type": "object"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									}
+								]
+							}
+						},
+						"type": "object"
+					},
 					"access": {
 						"properties": {
 							"admin": {
@@ -1437,54 +1490,6 @@
 									},
 									{
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									}
-								]
-							},
-							"projects": {
-								"anyOf": [
-									{
-										"items": {
-											"properties": {
-												"identifier": {
-													"type": "string"
-												},
-												"budget": {
-													"properties": {
-														"amount": {
-															"type": "number",
-															"format": "double"
-														}
-													},
-													"type": "object"
-												},
-												"balance": {
-													"properties": {
-														"amount": {
-															"type": "number",
-															"format": "double"
-														}
-													},
-													"type": "object"
-												},
-												"organisation": {
-													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-												},
-												"name": {
-													"type": "string"
-												},
-												"_id": {
-													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-												}
-											},
-											"type": "object"
-										},
-										"type": "array"
-									},
-									{
-										"items": {
-											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-										},
-										"type": "array"
 									}
 								]
 							},
@@ -5074,6 +5079,56 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"SetterPartial_ProjectWithUsers.NoPost_": {
+				"properties": {
+					"supervisors": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"assignees": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"identifier": {
+						"type": "string"
+					},
+					"budget": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"balance": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_ProjectWithUsers_": {
+				"$ref": "#/components/schemas/SetterPartial_ProjectWithUsers.NoPost_"
+			},
 			"SetterPartial_IProject.NoPost_": {
 				"properties": {
 					"identifier": {
@@ -6700,7 +6755,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.2.3",
+		"version": "1.2.4",
 		"contact": {}
 	},
 	"paths": {
@@ -7081,6 +7136,7 @@
 									"_id",
 									"fk",
 									"access",
+									"projects",
 									"loseAccessAt",
 									"settings",
 									"vehicleRegistration",
@@ -7170,6 +7226,7 @@
 									"_id",
 									"fk",
 									"access",
+									"projects",
 									"loseAccessAt",
 									"settings",
 									"vehicleRegistration",
@@ -9324,7 +9381,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IProject_"
+								"$ref": "#/components/schemas/SetterBody_ProjectWithUsers_"
 							}
 						}
 					}
