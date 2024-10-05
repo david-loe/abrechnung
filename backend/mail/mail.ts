@@ -10,25 +10,44 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
+import { genAuthenticatedLink } from '../authStrategies/magiclogin.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
 import mailClient from './client.js'
 
-export function sendMail(
+export async function sendMail(
   recipients: IUser[],
   subject: string,
-  paragaph: string,
+  paragraph: string,
   button: { text: string; link: string },
-  lastParagraph: string
+  lastParagraph: string,
+  authenticateLink = true
 ) {
-  if (mailClient == undefined || recipients.length === 0) {
-    return false
+  for (let i = 0; i < recipients.length; i++) {
+    const language = recipients[i].settings.language
+    const recipientButton = { ...button }
+    if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+      recipientButton.link = await genAuthenticatedLink({
+        destination: recipients[i].fk.magiclogin!,
+        redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
+      })
+    }
+    _sendMail(recipients[i], subject, paragraph, recipientButton, lastParagraph, language)
   }
-  const language = recipients[0].settings.language
-  var salutation = i18n.t('mail.hi', { lng: language })
-  if (recipients.length === 1) {
-    salutation = i18n.t('mail.hiX', { lng: language, X: recipients[0].name.givenName })
+}
+
+function _sendMail(
+  recipient: IUser,
+  subject: string,
+  paragraph: string,
+  button: { text: string; link: string },
+  lastParagraph: string,
+  language: Locale
+) {
+  if (mailClient == undefined) {
+    return
   }
+  const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
     name: i18n.t('headlines.title', { lng: language }) + ' ' + i18n.t('headlines.emoji', { lng: language }),
@@ -38,7 +57,7 @@ export function sendMail(
   const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
     salutation,
-    paragaph,
+    paragraph,
     button,
     lastParagraph,
     regards,
@@ -47,7 +66,7 @@ export function sendMail(
   const plainText =
     salutation +
     '\n\n' +
-    paragaph +
+    paragraph +
     '\n\n' +
     button.text +
     ': ' +
@@ -63,7 +82,7 @@ export function sendMail(
 
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
-    to: recipients.map((r) => r.email), // list of receivers
+    to: recipient.email, // list of receivers
     subject: subject, // Subject line
     text: plainText, // plain text body
     html: renderedHTML // html body

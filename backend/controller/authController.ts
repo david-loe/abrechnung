@@ -1,4 +1,5 @@
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { Base64, escapeRegExp } from '../../common/scripts.js'
@@ -38,7 +39,21 @@ const magicloginHandler = useMagicLogin
     }
   : NotImplementedMiddleware
 
-const magicloginCallbackHandler = useMagicLogin ? passport.authenticate('magiclogin') : NotImplementedMiddleware
+const magicloginCallbackHandler = useMagicLogin
+  ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
+      let redirect: any
+      if (req.query.token) {
+        const token = jwt.decode(req.query.token as string) as jwt.JwtPayload
+        const redirectPath = token.redirect
+        if (redirectPath && typeof redirectPath === 'string' && redirectPath.startsWith('/')) {
+          redirect = redirectPath
+        }
+      }
+      passport.authenticate('magiclogin', {
+        failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')
+      })(req, res, next)
+    }
+  : NotImplementedMiddleware
 
 @Tags('Authentication')
 @Route('auth')
