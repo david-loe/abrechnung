@@ -7484,6 +7484,41 @@
 				}
 			}
 		},
+		"/admin/user/form": {
+			"get": {
+				"operationId": "GetUserForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/upload/new": {
 			"get": {
 				"operationId": "UploadPage",
@@ -9171,6 +9206,41 @@
 				}
 			}
 		},
+		"/admin/settings/form": {
+			"get": {
+				"operationId": "GetSettingsForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/project": {
 			"get": {
 				"operationId": "GetProject",
@@ -9479,6 +9549,41 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/project/form": {
+			"get": {
+				"operationId": "GetProjectForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/organisation": {
@@ -9796,6 +9901,41 @@
 				}
 			}
 		},
+		"/admin/organisation/form": {
+			"get": {
+				"operationId": "GetOrganisationForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Organisation"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/healthInsurance": {
 			"get": {
 				"operationId": "GetHealthInsurance",
@@ -10020,6 +10160,41 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/healthInsurance/form": {
+			"get": {
+				"operationId": "GetHealthInsuranceForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"HealthInsurance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/healthCareCost": {
@@ -12429,6 +12604,41 @@
 				}
 			}
 		},
+		"/admin/currency/form": {
+			"get": {
+				"operationId": "GetCurrencyForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Currency"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/country": {
 			"get": {
 				"operationId": "GetCountry",
@@ -12700,6 +12910,41 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/country/form": {
+			"get": {
+				"operationId": "GetCountryForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Country"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/auth/ldapauth": {
