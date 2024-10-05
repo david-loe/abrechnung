@@ -3,7 +3,7 @@ import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import multer from 'multer'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { User as IUser, _id } from '../../common/types.js'
+import { User as IUser, _id, locales } from '../../common/types.js'
 import { documentFileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
@@ -11,7 +11,8 @@ import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import Token from '../models/token.js'
 import Travel from '../models/travel.js'
-import User from '../models/user.js'
+import User, { userSchema } from '../models/user.js'
+import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { File, IdDocument, idDocumentToId } from './types.js'
@@ -170,5 +171,9 @@ export class UserAdminController extends Controller {
     } else {
       throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
     }
+  }
+  @Get('form')
+  public async getUserForm() {
+    return { data: mongooseSchemaToVueformSchema(userSchema.obj, locales) }
   }
 }

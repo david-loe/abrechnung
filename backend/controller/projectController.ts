@@ -1,12 +1,13 @@
 import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Project as IProject, ProjectSimple, ProjectWithUsers, _id } from '../../common/types.js'
+import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
 import { getSettings } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
-import Project from '../models/project.js'
+import Project, { projectSchema } from '../models/project.js'
 import Travel from '../models/travel.js'
 import User from '../models/user.js'
+import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
@@ -71,5 +72,9 @@ export class ProjectAdminController extends Controller {
         { model: HealthCareCost, paths: ['project'] }
       ]
     })
+  }
+  @Get('form')
+  public async getProjectForm() {
+    return { data: mongooseSchemaToVueformSchema(projectSchema.obj, locales) }
   }
 }

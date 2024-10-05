@@ -1,26 +1,12 @@
 import { SchemaDefinition, SchemaTypeOptions } from 'mongoose'
 import { Locale, emailRegex } from '../../common/types.js'
-import { writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 
-export async function generateForms(
-  schemaMap: { [key: string]: SchemaDefinition<unknown> },
+export function mongooseSchemaToVueformSchema(
+  mongooseSchema: SchemaDefinition | any,
   language: Locale | readonly Locale[],
-  outputFolderPath: string
+  assignment = {}
 ) {
-  const start = new Date()
-  const prefix = outputFolderPath === '' ? '' : outputFolderPath + '/'
-  const promises: Promise<void>[] = []
-  for (const key in schemaMap) {
-    const path = prefix + key + '.json'
-    promises.push(writeToDisk(path, JSON.stringify(mongooseSchemaToVueformSchema(schemaMap[key], language))))
-  }
-  await Promise.all(promises)
-  const time = (new Date().valueOf() - start.valueOf()) / 1000
-  console.log(`Generated forms in ${time}s`)
-}
-
-function mongooseSchemaToVueformSchema(mongooseSchema: SchemaDefinition | any, language: Locale | readonly Locale[], assignment = {}) {
   const vueformSchema: any = {}
   for (const path in mongooseSchema) {
     const prop = mongooseSchema[path] as SchemaTypeOptions<any>

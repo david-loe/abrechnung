@@ -85,9 +85,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import projectFormSchema from '../../../../../common/forms/project.json'
 import { getById } from '../../../../../common/scripts.js'
-import { OrganisationSimple, Project, accesses } from '../../../../../common/types.js'
+import { Project, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
   name: T
@@ -111,16 +110,7 @@ export default defineComponent({
         identifier: false
       } as Filter<boolean>,
       accesses,
-      schema: Object.assign({}, projectFormSchema, {
-        buttons: {
-          type: 'group',
-          schema: {
-            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-          }
-        },
-        _id: { type: 'hidden', meta: true }
-      })
+      schema: {}
     }
   },
   methods: {
@@ -166,6 +156,16 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getProjects()
+    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/project/form')).ok?.data, {
+      buttons: {
+        type: 'group',
+        schema: {
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+        }
+      },
+      _id: { type: 'hidden', meta: true }
+    })
   }
 })
 </script>

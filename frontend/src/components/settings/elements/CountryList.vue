@@ -86,7 +86,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import countryFormSchema from '../../../../../common/forms/country.json'
 import { getById } from '../../../../../common/scripts.js'
 import { Country, Locale, accesses } from '../../../../../common/types.js'
 
@@ -112,15 +111,7 @@ export default defineComponent({
         _id: false
       } as Filter<boolean>,
       accesses,
-      schema: Object.assign({}, countryFormSchema, {
-        buttons: {
-          type: 'group',
-          schema: {
-            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-          }
-        }
-      })
+      schema: {}
     }
   },
   methods: {
@@ -166,6 +157,15 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getCountries()
+    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/country/form')).ok?.data, {
+      buttons: {
+        type: 'group',
+        schema: {
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+        }
+      }
+    })
   }
 })
 </script>

@@ -78,7 +78,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import healthInsuranceFormSchema from '../../../../../common/forms/healthInsurance.json'
 import { getById } from '../../../../../common/scripts.js'
 import { HealthInsurance, accesses } from '../../../../../common/types.js'
 
@@ -103,16 +102,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: Object.assign({}, healthInsuranceFormSchema, {
-        buttons: {
-          type: 'group',
-          schema: {
-            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-          }
-        },
-        _id: { type: 'hidden', meta: true }
-      })
+      schema: {}
     }
   },
   methods: {
@@ -153,6 +143,16 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
+    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/healthInsurance/form')).ok?.data, {
+      buttons: {
+        type: 'group',
+        schema: {
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+        }
+      },
+      _id: { type: 'hidden', meta: true }
+    })
   }
 })
 </script>

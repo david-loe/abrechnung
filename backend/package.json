@@ -46,7 +46,7 @@
     "typescript": "^5.6.2"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --ignore '../common/forms/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/build/server.js",
     "test": "npm run setup && npm run test:$NODE_ENV",
