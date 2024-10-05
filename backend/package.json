@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-backend",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -12,7 +12,7 @@
     "ejs": "^3.1.10",
     "express": "^5.0.0",
     "express-session": "^1.18.0",
-    "i18next": "^23.15.1",
+    "i18next": "^23.15.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
     "multer": "^1.4.5-lts.1",
