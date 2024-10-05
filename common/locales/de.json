@@ -87,7 +87,7 @@
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
     "lastPlaceOfWork": "Wähle hier deinen letzten Tätigkeitsort aus, dieser ist maßgebend für die Pauschalen deiner Abreise.",
-    "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu abrechnung🧾 haben soll.",
+    "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu @:{'headlines.title'}@:{'headlines.emoji'} haben soll.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
     "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
     "professionalShare": "Eine Dienstreise darf auch private Anteile haben, der berufliche Anteil muss aber über 50% liegen.",
@@ -422,14 +422,15 @@
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "magiclogin": {
-      "buttonText": "Weiter zu abrechnung🧾",
+      "subject": "Login bei @:{'headlines.title'}@:{'headlines.emoji'}",
+      "buttonText": "Weiter zu @:{'headlines.title'}@:{'headlines.emoji'}",
       "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen."
     },
     "newMagiclogin": {
-      "buttonText": "Zu abrechnung🧾",
+      "buttonText": "Zu @:{'headlines.title'}@:{'headlines.emoji'}",
       "lastParagraph": "Zum Anmelden benötigst du lediglich deine E-Mail Adresse.\nDrücke auf 'Mit E-Mail anmelden', gib deine E-Mail Adresse ein und dann bekommst du eine E-Mail mit einem Link der dich direkt einloggt.",
-      "paragraph": "Herzlich willkommen bei abrechnung🧾. Hier kannst du all deine Abrechnungen einreichen.",
-      "subject": "Willkommen bei abrechnung🧾"
+      "paragraph": "Herzlich willkommen bei @:{'headlines.title'}@:{'headlines.emoji'}. Hier kannst du all deine Abrechnungen einreichen.",
+      "subject": "Willkommen bei @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "regards": "Beste Grüße",
     "travel": {
@@ -468,7 +469,7 @@
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "{owner} hat die abrechnung fertiggestellt.",
+        "paragraph": "{owner} hat die Reiseabrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
     },

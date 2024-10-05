@@ -87,7 +87,7 @@
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)",
     "insurance": "Select your health insurance company, which will be asked to reimburse your health costs.",
     "lastPlaceOfWork": "Select your last place of work here, this is decisive for the lump sums of your departure.",
-    "loseAccessAt": "Set a date here from which the user should no longer have access to abrechnung🧾",
+    "loseAccessAt": "Set a date here from which the user should no longer have access to @:{'headlines.title'}@:{'headlines.emoji'}",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
     "patientName": "Enter the name of the person for whom the costs were incurred.",
     "professionalShare": "A business trip may also have private components, but these may not account for 50% or more.",
@@ -422,14 +422,15 @@
     "hi": "Hi there,",
     "hiX": "Hi {X},",
     "magiclogin": {
-      "buttonText": "Jump to abrechnung🧾",
+      "subject": "Login at @:{'headlines.title'}@:{'headlines.emoji'}",
+      "buttonText": "Jump to @:{'headlines.title'}@:{'headlines.emoji'}",
       "paragraph": "Click here to get access."
     },
     "newMagiclogin": {
-      "buttonText": "To abrechnung🧾",
+      "buttonText": "To @:{'headlines.title'}@:{'headlines.emoji'}",
       "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it.",
-      "paragraph": "Welcome to abrechnung🧾. Here you can submit all your expenses.",
-      "subject": "Welcome to abrechnung🧾"
+      "paragraph": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}. Here you can submit all your expenses.",
+      "subject": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "regards": "Best Regards",
     "travel": {
