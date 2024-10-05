@@ -95,7 +95,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import userFormSchema from '../../../../../common/forms/user.json'
 import { User, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
@@ -121,16 +120,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: Object.assign({}, userFormSchema, {
-        buttons: {
-          type: 'group',
-          schema: {
-            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-          }
-        },
-        _id: { type: 'hidden', meta: true }
-      })
+      schema: {}
     }
   },
   methods: {
@@ -187,6 +177,16 @@ export default defineComponent({
   async beforeMount() {
     await this.$root.load()
     this.getUsers()
+    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/user/form')).ok?.data, {
+      buttons: {
+        type: 'group',
+        schema: {
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+        }
+      },
+      _id: { type: 'hidden', meta: true }
+    })
   }
 })
 </script>

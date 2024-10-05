@@ -1,15 +1,8 @@
 import { CronJob } from 'cron'
-import { Locale, locales } from '../common/types.js'
+import { Locale } from '../common/types.js'
 import app from './app.js'
 import { fetchAndUpdateLumpSums } from './db.js'
-import { countrySchema } from './models/country.js'
-import { currencySchema } from './models/currency.js'
-import { healthInsuranceSchema } from './models/healthInsurance.js'
-import { organisationSchema } from './models/organisation.js'
-import { projectSchema, projectUsersSchema } from './models/project.js'
-import { settingsSchema } from './models/settings.js'
-import { UserDoc, userSchema } from './models/user.js'
-import { generateForms } from './models/vueformGenerator.js'
+import { UserDoc } from './models/user.js'
 import { retentionPolicy } from './retentionpolicy.js'
 const port = parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
@@ -60,22 +53,6 @@ declare global {
       readonly BACKEND_SAVE_REPORTS_ON_DISK: 'TRUE' | 'FALSE'
     }
   }
-}
-
-if (process.env.NODE_ENV === 'development') {
-  generateForms(
-    {
-      user: userSchema.obj,
-      country: countrySchema.obj,
-      currency: currencySchema.obj,
-      project: Object.assign(projectSchema.obj, projectUsersSchema.obj),
-      healthInsurance: healthInsuranceSchema.obj,
-      organisation: organisationSchema.obj,
-      settings: settingsSchema.obj
-    },
-    locales,
-    '../common/forms'
-  )
 }
 
 app.listen(port, () => {

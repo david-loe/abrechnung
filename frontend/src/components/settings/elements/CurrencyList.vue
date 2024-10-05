@@ -84,7 +84,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import currencyFormSchema from '../../../../../common/forms/currency.json'
 import { Currency, Locale, accesses } from '../../../../../common/types.js'
 
 interface Filter<T> {
@@ -108,15 +107,7 @@ export default defineComponent({
         _id: false
       } as Filter<boolean>,
       accesses,
-      schema: Object.assign({}, currencyFormSchema, {
-        buttons: {
-          type: 'group',
-          schema: {
-            submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-            reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-          }
-        }
-      })
+      schema: {}
     }
   },
   methods: {
@@ -156,6 +147,15 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
+    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/currency/form')).ok?.data, {
+      buttons: {
+        type: 'group',
+        schema: {
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
+          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
+        }
+      }
+    })
   }
 })
 </script>
