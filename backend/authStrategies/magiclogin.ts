@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { default as MagicLoginStrategy } from 'passport-magic-login'
+import MagicLoginStrategy from 'passport-magic-login'
 import { escapeRegExp } from '../../common/scripts.js'
 import { NotAllowedError } from '../controller/error.js'
 import i18n from '../i18n.js'
@@ -9,7 +9,7 @@ import User from '../models/user.js'
 const secret = process.env.MAGIC_LOGIN_SECRET
 const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
 const jwtOptions = {
-  expiresIn: 1000 * 60 * 120 // 120min
+  expiresIn: 60 * 120 // in seconds -> 120min
 }
 
 export default new MagicLoginStrategy.default({

@@ -44,7 +44,10 @@ const magicloginCallbackHandler = useMagicLogin
       let redirect: any
       if (req.query.token) {
         const token = jwt.decode(req.query.token as string) as jwt.JwtPayload
-        redirect = token.redirect
+        const redirectPath = token.redirect
+        if (redirectPath && typeof redirectPath === 'string' && redirectPath.startsWith('/')) {
+          redirect = redirectPath
+        }
       }
       passport.authenticate('magiclogin', {
         failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')

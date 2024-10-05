@@ -18,33 +18,34 @@ import mailClient from './client.js'
 export async function sendMail(
   recipients: IUser[],
   subject: string,
-  paragaph: string,
+  paragraph: string,
   button: { text: string; link: string },
   lastParagraph: string,
   authenticateLink = true
 ) {
   for (let i = 0; i < recipients.length; i++) {
     const language = recipients[i].settings.language
-    if (authenticateLink && recipients[i].fk.magiclogin && button.link.startsWith(process.env.VITE_FRONTEND_URL)) {
-      button.link = await genAuthenticatedLink({
+    const recipientButton = { ...button }
+    if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+      recipientButton.link = await genAuthenticatedLink({
         destination: recipients[i].fk.magiclogin!,
-        redirect: button.link.substring(process.env.VITE_FRONTEND_URL.length)
+        redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
       })
     }
-    _sendMail(recipients[i], subject, paragaph, button, lastParagraph, language)
+    _sendMail(recipients[i], subject, paragraph, recipientButton, lastParagraph, language)
   }
 }
 
 function _sendMail(
   recipient: IUser,
   subject: string,
-  paragaph: string,
+  paragraph: string,
   button: { text: string; link: string },
   lastParagraph: string,
   language: Locale
 ) {
   if (mailClient == undefined) {
-    return false
+    return
   }
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
@@ -56,7 +57,7 @@ function _sendMail(
   const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
     salutation,
-    paragaph,
+    paragraph,
     button,
     lastParagraph,
     regards,
@@ -65,7 +66,7 @@ function _sendMail(
   const plainText =
     salutation +
     '\n\n' +
-    paragaph +
+    paragraph +
     '\n\n' +
     button.text +
     ': ' +
