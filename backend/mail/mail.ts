@@ -10,25 +10,43 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
+import { genAuthenticatedLink } from '../authStrategies/magiclogin.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
 import mailClient from './client.js'
 
-export function sendMail(
+export async function sendMail(
   recipients: IUser[],
   subject: string,
   paragaph: string,
   button: { text: string; link: string },
-  lastParagraph: string
+  lastParagraph: string,
+  authenticateLink = true
 ) {
-  if (mailClient == undefined || recipients.length === 0) {
+  for (let i = 0; i < recipients.length; i++) {
+    const language = recipients[i].settings.language
+    if (authenticateLink && recipients[i].fk.magiclogin && button.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+      button.link = await genAuthenticatedLink({
+        destination: recipients[i].fk.magiclogin!,
+        redirect: button.link.substring(process.env.VITE_FRONTEND_URL.length)
+      })
+    }
+    _sendMail(recipients[i], subject, paragaph, button, lastParagraph, language)
+  }
+}
+
+function _sendMail(
+  recipient: IUser,
+  subject: string,
+  paragaph: string,
+  button: { text: string; link: string },
+  lastParagraph: string,
+  language: Locale
+) {
+  if (mailClient == undefined) {
     return false
   }
-  const language = recipients[0].settings.language
-  var salutation = i18n.t('mail.hi', { lng: language })
-  if (recipients.length === 1) {
-    salutation = i18n.t('mail.hiX', { lng: language, X: recipients[0].name.givenName })
-  }
+  const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
     name: i18n.t('headlines.title', { lng: language }) + ' ' + i18n.t('headlines.emoji', { lng: language }),
@@ -63,7 +81,7 @@ export function sendMail(
 
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
-    to: recipients.map((r) => r.email), // list of receivers
+    to: recipient.email, // list of receivers
     subject: subject, // Subject line
     text: plainText, // plain text body
     html: renderedHTML // html body
