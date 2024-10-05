@@ -103,8 +103,14 @@
             </div>
           </div>
         </div>
-        <div v-if="endpointPrefix !== ''" class="text-secondary">
-          {{ healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - ' + healthCareCost.project.identifier }}
+        <div class="text-secondary">
+          {{
+            (endpointPrefix === 'examine/'
+              ? healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - '
+              : '') +
+            healthCareCost.project.identifier +
+            (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '')
+          }}
         </div>
       </div>
 

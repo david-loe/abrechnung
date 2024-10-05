@@ -26,8 +26,8 @@
         </div>
       </div>
 
-      <span v-if="showOwner && request.owner" class="card-subtitle mb-1 fs-6 fw-medium text-muted">
-        {{ request.owner.name.givenName + ' ' + request.owner.name.familyName + ' - ' + request.project.identifier }}
+      <span class="card-subtitle mb-1 fs-6 fw-medium text-muted">
+        {{ (showOwner ? request.owner.name.givenName + ' ' + request.owner.name.familyName + ' - ' : '') + request.project.identifier }}
       </span>
       <div class="row mb-2">
         <slot name="details"></slot>
