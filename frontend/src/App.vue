@@ -2,7 +2,7 @@
   <div>
     <div
       id="offline-banner"
-      v-if="!online"
+      v-if="!onlineState"
       style="background-color: black; color: #fff; width: 100%; margin-bottom: 1%; display: flex; justify-content: center">
       Du bist Offline. Du kannst alle Daten sehen, aber nicht Bearbeiten.
     </div>
@@ -149,19 +149,19 @@ import { loadLocales } from '../../common/locales/load.js'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
+  accesses,
   CountrySimple,
   Currency,
   DisplaySettings,
   GETResponse,
   HealthInsurance,
   Locale,
+  locales,
   OrganisationSimple,
   ProjectSimple,
   SETResponse,
   Settings,
-  User,
-  accesses,
-  locales
+  User
 } from '../../common/types.js'
 import i18n from './i18n.js'
 
@@ -193,7 +193,8 @@ export default defineComponent({
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
       accesses,
-      online: true
+      onlineState: navigator.onLine
+      // true as true | false
     }
   },
   components: {},

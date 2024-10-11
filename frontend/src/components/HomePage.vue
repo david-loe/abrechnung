@@ -44,15 +44,17 @@
           <h1>{{ $t('headlines.home') }}</h1>
         </div>
         <div v-if="!$root.settings.disableReportType.travel && $root.user.access['appliedFor:travel']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')" :disabled="!$root.online">
+          <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{
               $t($root.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
             }}</span>
           </button>
         </div>
-        <div v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')">
+        <div
+          v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport'] && !$root.onlineState"
+          class="col-auto">
+          <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')" :disabled="!$root.onlineState">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
           </button>
