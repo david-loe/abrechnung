@@ -1,10 +1,9 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security } from 'tsoa'
 import { Country as ICountry, _id, locales } from '../../common/types.js'
 import Country, { countrySchema } from '../models/country.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
-@Tags('Country')
 @Route('')
 @Security('cookieAuth', ['user'])
 export class CountryController extends Controller {
@@ -39,7 +38,6 @@ export class CountryController extends Controller {
   }
 }
 
-@Tags('Admin', 'Country')
 @Route('admin/country')
 @Security('cookieAuth', ['admin'])
 export class CountryAdminController extends Controller {

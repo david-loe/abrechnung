@@ -1,6 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
 import {
   Expense,
   HealthCareCostState,
@@ -21,7 +21,6 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
 
-@Tags('HealthCareCost')
 @Route('healthCareCost')
 @Security('cookieAuth', ['user'])
 export class HealthCareCostController extends Controller {
@@ -168,7 +167,6 @@ export class HealthCareCostController extends Controller {
   }
 }
 
-@Tags('Examine', 'HealthCareCost')
 @Route('examine/healthCareCost')
 @Security('cookieAuth', ['examine/healthCareCost'])
 export class HealthCareCostExamineController extends Controller {
@@ -342,7 +340,6 @@ export class HealthCareCostExamineController extends Controller {
   }
 }
 
-@Tags('Confirm', 'HealthCareCost')
 @Route('confirm/healthCareCost')
 @Security('cookieAuth', ['confirm/healthCareCost'])
 export class HealthCareCostConfirmController extends Controller {

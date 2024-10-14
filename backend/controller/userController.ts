@@ -1,7 +1,7 @@
 import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
 import { User as IUser, _id, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -16,7 +16,6 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { File, IdDocument, idDocumentToId } from './types.js'
 
-@Tags('User')
 @Route('user')
 @Security('cookieAuth', ['user'])
 export class UserController extends Controller {
@@ -25,20 +24,17 @@ export class UserController extends Controller {
     return { data: request.user! as IUser }
   }
 
-  @Tags('Upload')
   @Get('token')
   public getToken(@Request() request: ExRequest) {
     return { data: request.user!.token }
   }
 
-  @Tags('Upload')
   @Delete('token')
   public async deleteToken(@Request() request: ExRequest) {
     request.user!.token = undefined
     await request.user!.save()
   }
 
-  @Tags('Upload')
   @Post('token')
   public async postToken(@Request() request: ExRequest) {
     const token = (await new Token().save()).toObject()
@@ -67,7 +63,6 @@ export class UserController extends Controller {
   }
 }
 
-@Tags('User')
 @Route('users')
 @Security('cookieAuth', ['user', 'approve/travel'])
 @Security('cookieAuth', ['user', 'examine/travel'])
@@ -95,7 +90,7 @@ function sendNewMagicloginMail(user: IUser) {
 interface SetterBodyUser extends SetterBody<IUser> {
   loseAccessAt: null | Date | undefined
 }
-@Tags('Admin', 'User')
+
 @Route('admin/user')
 @Security('cookieAuth', ['admin'])
 export class UserAdminController extends Controller {

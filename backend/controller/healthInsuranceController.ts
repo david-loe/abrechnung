@@ -1,10 +1,9 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security } from 'tsoa'
 import { HealthInsurance as IHealthInsurance, _id, locales } from '../../common/types.js'
 import HealthInsurance, { healthInsuranceSchema } from '../models/healthInsurance.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
-@Tags('HealthInsurance')
 @Route('healthInsurance')
 @Security('cookieAuth', ['user'])
 export class HealthInsuranceController extends Controller {
@@ -14,7 +13,6 @@ export class HealthInsuranceController extends Controller {
   }
 }
 
-@Tags('Admin', 'HealthInsurance')
 @Route('admin/healthInsurance')
 @Security('cookieAuth', ['admin'])
 export class HealthInsuranceAdminController extends Controller {

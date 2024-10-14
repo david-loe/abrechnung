@@ -1,12 +1,11 @@
 import { Request as ExRequest } from 'express'
 import { mongo } from 'mongoose'
-import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
+import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse } from 'tsoa'
 import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
 import { Controller } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 
-@Tags('DocumentFile')
 @Route('documentFile')
 @Security('cookieAuth', ['user'])
 export class DocumentFileController extends Controller {
@@ -32,7 +31,6 @@ export class DocumentFileController extends Controller {
   }
 }
 
-@Tags('Examine', 'DocumentFile')
 @Route('examine/documentFile')
 @Security('cookieAuth', ['user', 'examine/travel'])
 @Security('cookieAuth', ['user', 'examine/expenseReport'])

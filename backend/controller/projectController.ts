@@ -1,5 +1,5 @@
 import { Request as ExRequest } from 'express'
-import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
 import { getSettings } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -11,7 +11,6 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
-@Tags('Project')
 @Route('project')
 @Security('cookieAuth', ['user'])
 export class ProjectController extends Controller {
@@ -34,7 +33,6 @@ export class ProjectController extends Controller {
   }
 }
 
-@Tags('Admin', 'Project')
 @Route('admin/project')
 @Security('cookieAuth', ['admin'])
 export class ProjectAdminController extends Controller {
