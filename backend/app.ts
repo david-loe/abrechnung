@@ -1,11 +1,12 @@
 import MongoStore from 'connect-mongo'
 import cors from 'cors'
 import express, { Request as ExRequest, Response as ExResponse } from 'express'
+import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
-import { errorHandler } from './controller/error.js'
+import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
@@ -17,6 +18,17 @@ await checkForMigrations()
 
 const app = express()
 
+if (process.env.TRUST_PROXY) {
+  if (process.env.TRUST_PROXY.toLowerCase() === 'true') {
+    app.set('trust proxy', true)
+  } else if (process.env.TRUST_PROXY.match(/^\d+$/)) {
+    app.set('trust proxy', parseInt(process.env.TRUST_PROXY))
+  } else {
+    app.set('trust proxy', process.env.TRUST_PROXY)
+  }
+  app.get('/ip', (request, response) => response.send(request.ip))
+}
+
 app.use(express.json({ limit: '2mb' }))
 app.use(express.urlencoded({ limit: '2mb', extended: true }))
 app.use(
@@ -25,6 +37,19 @@ app.use(
     origin: [process.env.VITE_FRONTEND_URL, process.env.VITE_BACKEND_URL]
   })
 )
+
+if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
+  app.use(
+    rateLimit({
+      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS),
+      limit: parseInt(process.env.RATE_LIMIT),
+      standardHeaders: 'draft-7',
+      legacyHeaders: false,
+      skip: (req, res) => req.method !== 'POST',
+      handler: (req, res, next) => next(new RateLimitExceededError())
+    })
+  )
+}
 
 app.use(
   session({

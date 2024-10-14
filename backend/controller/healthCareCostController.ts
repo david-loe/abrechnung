@@ -1,6 +1,5 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import {
   Expense,
@@ -10,7 +9,7 @@ import {
   Locale,
   _id
 } from '../../common/types.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
@@ -21,8 +20,6 @@ import { writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
-
-const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('HealthCareCost')
 @Route('healthCareCost')

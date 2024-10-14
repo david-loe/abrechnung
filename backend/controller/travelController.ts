@@ -1,9 +1,8 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import multer from 'multer'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendNotificationMail } from '../mail/mail.js'
 import Travel, { TravelDoc } from '../models/travel.js'
@@ -14,8 +13,6 @@ import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, TravelApplication, TravelPost } from './types.js'
-
-const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('Travel')
 @Route('travel')

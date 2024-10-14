@@ -137,7 +137,7 @@ export default defineComponent({
       const files: Partial<DocumentFile>[] = []
       if (event.target && (event.target as HTMLInputElement).files) {
         for (const file of (event.target as HTMLInputElement).files!) {
-          if (file.size < 16000000) {
+          if (file.size < parseInt(import.meta.env.VITE_MAX_FILE_SIZE)) {
             if (file.type.indexOf('image') > -1) {
               const resizedImage = await resizeImage(file, 1400)
               files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
 import mongoose, { Model, Types } from 'mongoose'
+import multer from 'multer'
 import {
   _id,
   AnyState,
@@ -195,3 +196,5 @@ export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boo
   }
   return user.projects.supervised.some((p) => p._id.equals(projectId))
 }
+
+export const fileHandler = multer({ limits: { fileSize: parseInt(process.env.VITE_MAX_FILE_SIZE) } })
