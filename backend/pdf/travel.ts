@@ -19,7 +19,7 @@ import {
   TravelExpense,
   baseCurrency
 } from '../../common/types.js'
-import { getDateOfSubmission, getSettings } from '../helper.js'
+import { getSettings, getSubmissionReportFromHistory } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,
@@ -75,7 +75,7 @@ export async function generateTravelReport(travel: Travel, language: Locale) {
 
   let yDates = await drawDates(getLastPage(), newPage, travel, {
     font: font,
-    xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
+    xStart: getLastPage().getSize().width - edge - 175, // 175: width of dates table
     yStart: y - 16,
     fontSize: 9,
     language,
@@ -246,22 +246,28 @@ async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 80, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
-    key: 'date',
-    width: 55,
-    alignment: pdf_lib.TextAlignment.Right,
-    title: 'date',
-    fn: (d: Date) => options.formatter.date(d)
+    key: 'value',
+    width: 95,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: 'value',
+    fn: (d: Date | string) => (typeof d === 'string' ? d : options.formatter.date(d))
   })
 
   const summary = []
-  summary.push({ reference: i18n.t('labels.appliedForOn', { lng: options.language }), date: travel.createdAt })
+  summary.push({ reference: i18n.t('labels.appliedForOn', { lng: options.language }), value: travel.createdAt })
   summary.push({
     reference: i18n.t('labels.approvedOn', { lng: options.language }),
-    date: (await getDateOfSubmission(travel, 'appliedFor')) || travel.createdAt
+    value: (await getSubmissionReportFromHistory(travel, 'appliedFor'))?.updatedAt || travel.createdAt
   })
-  summary.push({ reference: i18n.t('labels.submittedOn', { lng: options.language }), date: await getDateOfSubmission(travel) })
-  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), date: travel.updatedAt })
-
+  summary.push({
+    reference: i18n.t('labels.submittedOn', { lng: options.language }),
+    value: (await getSubmissionReportFromHistory(travel))?.updatedAt
+  })
+  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), value: travel.updatedAt })
+  summary.push({
+    reference: i18n.t('labels.examinedBy', { lng: options.language }),
+    value: travel.editor.name.givenName + ' ' + travel.editor.name.familyName
+  })
   const tabelOptions: TabelOptions = options
   tabelOptions.firstRow = false
 
@@ -481,7 +487,7 @@ async function drawDays(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage,
   })
   columns.push({
     key: 'cateringNoRefund',
-    width: 80,
+    width: 120,
     alignment: pdf_lib.TextAlignment.Left,
     title: i18n.t('labels.cateringNoRefund', { lng: options.language }),
     fn: (c: TravelDay['cateringNoRefund']) =>

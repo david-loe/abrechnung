@@ -4,7 +4,7 @@ import pdf_lib from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { addUp } from '../../common/scripts.js'
 import { Cost, HealthCareCost, Locale, Money } from '../../common/types.js'
-import { getDateOfSubmission } from '../helper.js'
+import { getSubmissionReportFromHistory } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,
@@ -55,7 +55,7 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   const receiptMap = getReceiptMap(healthCareCost.expenses).map
   let yDates = await drawDates(getLastPage(), newPage, healthCareCost, {
     font: font,
-    xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
+    xStart: getLastPage().getSize().width - edge - 175, // 175: width of dates table
     yStart: y - 16,
     fontSize: 9,
     language,
@@ -197,16 +197,26 @@ async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 80, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
-    key: 'date',
-    width: 55,
-    alignment: pdf_lib.TextAlignment.Right,
-    title: 'date',
-    fn: (d: Date) => options.formatter.date(d)
+    key: 'value',
+    width: 95,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: 'value',
+    fn: (d: Date | string) => (typeof d === 'string' ? d : options.formatter.date(d))
   })
 
   const summary = []
-  summary.push({ reference: i18n.t('labels.submittedOn', { lng: options.language }), date: await getDateOfSubmission(healthCareCost) })
-  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), date: healthCareCost.updatedAt })
+  summary.push({
+    reference: i18n.t('labels.submittedOn', { lng: options.language }),
+    value: (await getSubmissionReportFromHistory(healthCareCost))?.updatedAt
+  })
+  summary.push({
+    reference: i18n.t('labels.examinedOn', { lng: options.language }),
+    value: healthCareCost.updatedAt
+  })
+  summary.push({
+    reference: i18n.t('labels.examinedBy', { lng: options.language }),
+    value: healthCareCost.editor.name.givenName + ' ' + healthCareCost.editor.name.familyName
+  })
 
   const tabelOptions: TabelOptions = options
   tabelOptions.firstRow = false

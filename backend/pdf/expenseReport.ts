@@ -4,7 +4,7 @@ import pdf_lib from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { addUp } from '../../common/scripts.js'
 import { Cost, ExpenseReport, Locale, Money } from '../../common/types.js'
-import { getDateOfSubmission } from '../helper.js'
+import { getSubmissionReportFromHistory } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,
@@ -56,7 +56,7 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   const receiptMap = getReceiptMap(expenseReport.expenses).map
   let yDates = await drawDates(getLastPage(), newPage, expenseReport, {
     font: font,
-    xStart: getLastPage().getSize().width - edge - 135, // 135: width of dates table
+    xStart: getLastPage().getSize().width - edge - 175, // 175: width of dates table
     yStart: y - 16,
     fontSize: 9,
     language,
@@ -197,17 +197,23 @@ async function drawDates(page: pdf_lib.PDFPage, newPageFn: () => pdf_lib.PDFPage
   const columns: Column[] = []
   columns.push({ key: 'reference', width: 80, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
   columns.push({
-    key: 'date',
-    width: 55,
-    alignment: pdf_lib.TextAlignment.Right,
-    title: 'date',
-    fn: (d: Date) => options.formatter.date(d)
+    key: 'value',
+    width: 95,
+    alignment: pdf_lib.TextAlignment.Left,
+    title: 'value',
+    fn: (d: Date | string) => (typeof d === 'string' ? d : options.formatter.date(d))
   })
 
   const summary = []
-  summary.push({ reference: i18n.t('labels.submittedOn', { lng: options.language }), date: await getDateOfSubmission(expenseReport) })
-  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), date: expenseReport.updatedAt })
-
+  summary.push({
+    reference: i18n.t('labels.submittedOn', { lng: options.language }),
+    value: (await getSubmissionReportFromHistory(expenseReport))?.updatedAt
+  })
+  summary.push({ reference: i18n.t('labels.examinedOn', { lng: options.language }), value: expenseReport.updatedAt })
+  summary.push({
+    reference: i18n.t('labels.examinedBy', { lng: options.language }),
+    value: expenseReport.editor.name.givenName + ' ' + expenseReport.editor.name.familyName
+  })
   const tabelOptions: TabelOptions = options
   tabelOptions.firstRow = false
 

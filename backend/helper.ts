@@ -155,11 +155,11 @@ export async function writeToDisk(
   }
 }
 
-export async function getDateOfSubmission(
+export async function getSubmissionReportFromHistory(
   report: ITravel | IExpenseReport | IHealthCareCost,
   overwriteQueryState?: AnyState
-): Promise<Date | null> {
-  let model: Model<{ updatedAt: Date; state: AnyState }> = ExpenseReport as any
+): Promise<ITravel | IExpenseReport | IHealthCareCost | null> {
+  let model: Model<ITravel | IExpenseReport | IHealthCareCost> = ExpenseReport as any
   let state: AnyState = 'inWork'
   if (reportIsTravel(report)) {
     model = Travel as any
@@ -173,7 +173,7 @@ export async function getDateOfSubmission(
   for (var i = 0; i < report.history.length; i++) {
     const historyReport = await model.findOne({ _id: report.history[i] }).lean()
     if (historyReport && historyReport.state === state) {
-      return historyReport.updatedAt as Date
+      return historyReport
     }
   }
   return null
