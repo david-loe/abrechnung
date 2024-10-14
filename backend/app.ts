@@ -26,7 +26,9 @@ if (process.env.TRUST_PROXY) {
   } else {
     app.set('trust proxy', process.env.TRUST_PROXY)
   }
-  app.get('/ip', (request, response) => response.send(request.ip))
+  app.get('/ip', (request, response) => {
+    response.send(request.ip)
+  })
 }
 
 app.use(express.json({ limit: '2mb' }))
@@ -70,7 +72,7 @@ app.use(auth)
 
 if (process.env.NODE_ENV === 'development') {
   app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-    return res.send(swaggerUi.generateHTML(swaggerDocument))
+    res.send(swaggerUi.generateHTML(swaggerDocument))
   })
 }
 
