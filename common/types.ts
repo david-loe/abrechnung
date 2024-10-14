@@ -113,7 +113,7 @@ export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
 
 export interface Token {
   _id: _id
-  createdAt: Date | string
+  expireAt: Date | string
   files: DocumentFile[]
 }
 

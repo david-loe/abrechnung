@@ -77,7 +77,7 @@ export default defineComponent({
     accept: { type: String, default: 'image/png, image/jpeg, .pdf' },
     endpointPrefix: { type: String, default: '' },
     multiple: { type: Boolean, default: true },
-    ownerId: {type: String}
+    ownerId: { type: String }
   },
   data() {
     return {
@@ -159,20 +159,18 @@ export default defineComponent({
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('userId', this.$root.user._id)
         url.searchParams.append('tokenId', this.token._id)
-        if(this.ownerId){
+        if (this.ownerId) {
           url.searchParams.append('ownerId', this.ownerId)
         }
         log(this.$t('labels.uploadLink') + ':')
         log(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
-        this.fetchTokenInterval = setInterval(this.getTokenFiles, 5000)
+        this.fetchTokenInterval = setInterval(this.getTokenFiles, 3000)
       }
     },
     async getTokenFiles() {
       if (this.token) {
-        this.secondsLeft = Math.round(
-          (new Date(this.token.createdAt).valueOf() + this.expireAfterSeconds * 1000 - new Date().valueOf()) / 1000
-        )
+        this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
       }
       const result = (await this.$root.getter<Token>('user/token')).ok
       if (result && result.data) {

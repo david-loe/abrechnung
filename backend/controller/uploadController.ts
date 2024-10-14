@@ -47,9 +47,7 @@ export class UploadController extends Controller {
         throw new NotFoundError(`No user found for ownerId: ${ownerId}`)
       }
     }
-    const secondsLeft = Math.round(
-      (new Date(user!.token!.createdAt).valueOf() + settings.uploadTokenExpireAfterSeconds * 1000 - new Date().valueOf()) / 1000
-    )
+    const secondsLeft = Math.round((new Date(user!.token!.expireAt).valueOf() - new Date().valueOf()) / 1000)
     const text = {
       tapToUpload: i18n.t('labels.tapToUpload', { lng: user?.settings.language }),
       uploading: i18n.t('labels.uploading', { lng: user?.settings.language }),

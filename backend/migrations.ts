@@ -61,7 +61,7 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('users').updateMany({}, { $rename: { 'settings.projects': 'projects.assigned' } })
     }
     if (semver.lte(migrateFrom, '1.2.6')) {
-      console.log('Apply migration from v1.2.6: Fix typo in settings')
+      console.log('Apply migration from v1.2.6: Fix Settings')
       await mongoose.connection.collection('settings').updateMany(
         {},
         {
@@ -71,6 +71,7 @@ export async function checkForMigrations() {
           }
         }
       )
+      await mongoose.connection.collection('tokens').dropIndex('createdAt_1')
     }
 
     if (settings) {

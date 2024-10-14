@@ -124,7 +124,7 @@ export const settingsSchema = new Schema<Settings>({
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
 export type ISettings = SettingsSchema & { _id: _id }
 
-settingsSchema.post('save', async function (this: HydratedDocument<Settings>) {
+settingsSchema.post('save', function (this: HydratedDocument<Settings>) {
   travelCalculator.updateSettings(this.travelSettings)
 })
 
