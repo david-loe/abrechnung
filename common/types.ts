@@ -37,8 +37,8 @@ export interface SettingsTravel {
   factorOvernightLumpSum: number
   factorOvernightLumpSumExceptions: CountryCode[]
   fallBackLumpSumCountry: CountryCode
-  secoundNightOnAirplaneLumpSumCountry: CountryCode
-  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
+  secondNightOnAirplaneLumpSumCountry: CountryCode
+  secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number
   minProfessionalShare: number
 }
@@ -113,7 +113,7 @@ export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
 
 export interface Token {
   _id: _id
-  createdAt: Date | string
+  expireAt: Date | string
   files: DocumentFile[]
 }
 

@@ -106,8 +106,8 @@ export const settingsSchema = new Schema<Settings>({
       factorOvernightLumpSum: { type: Number, min: 0, max: 1, required: true },
       factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
       fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
-      secoundNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
-      secoundNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
+      secondNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
+      secondNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
       minHoursOfTravel: { type: Number, min: 0, required: true },
       minProfessionalShare: { type: Number, min: 0, max: 1, required: true }
     },
@@ -124,7 +124,7 @@ export const settingsSchema = new Schema<Settings>({
 export type SettingsSchema = InferSchemaType<typeof settingsSchema>
 export type ISettings = SettingsSchema & { _id: _id }
 
-settingsSchema.post('save', async function (this: HydratedDocument<Settings>) {
+settingsSchema.post('save', function (this: HydratedDocument<Settings>) {
   travelCalculator.updateSettings(this.travelSettings)
 })
 

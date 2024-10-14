@@ -1,16 +1,19 @@
-import { Schema, model } from 'mongoose'
+import { HydratedDocument, Schema, model } from 'mongoose'
 import { getSettings } from '../helper.js'
-
-const settings = await getSettings()
 
 const tokenSchema = new Schema(
   {
-    files: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }] }
+    files: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }] },
+    expireAt: { type: Date, expires: 0 }
   },
   { timestamps: true }
 )
 
-// TODO: When changing settings.uploadTokenExpireAfterSeconds the index has to be recreated
-tokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: settings.uploadTokenExpireAfterSeconds })
+tokenSchema.pre('save', async function (this: HydratedDocument<any>) {
+  if (this.isNew) {
+    const settings = await getSettings()
+    this.expireAt = new Date(new Date().valueOf() + settings.uploadTokenExpireAfterSeconds * 1000)
+  }
+})
 
 export default model('Token', tokenSchema)
