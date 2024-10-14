@@ -77,7 +77,7 @@ export default defineComponent({
     accept: { type: String, default: 'image/png, image/jpeg, .pdf' },
     endpointPrefix: { type: String, default: '' },
     multiple: { type: Boolean, default: true },
-    ownerId: {type: String}
+    ownerId: { type: String }
   },
   data() {
     return {
@@ -137,7 +137,7 @@ export default defineComponent({
       const files: Partial<DocumentFile>[] = []
       if (event.target && (event.target as HTMLInputElement).files) {
         for (const file of (event.target as HTMLInputElement).files!) {
-          if (file.size < 16000000) {
+          if (file.size < parseInt(import.meta.env.VITE_MAX_FILE_SIZE)) {
             if (file.type.indexOf('image') > -1) {
               const resizedImage = await resizeImage(file, 1400)
               files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })
@@ -159,7 +159,7 @@ export default defineComponent({
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('userId', this.$root.user._id)
         url.searchParams.append('tokenId', this.token._id)
-        if(this.ownerId){
+        if (this.ownerId) {
           url.searchParams.append('ownerId', this.ownerId)
         }
         log(this.$t('labels.uploadLink') + ':')

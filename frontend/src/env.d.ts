@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
   readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
   readonly VITE_AUTH_USE_MAGIC_LOGIN: 'TRUE' | 'FALSE'
+  readonly VITE_MAX_FILE_SIZE: string
 }
 
 interface ImportMeta {

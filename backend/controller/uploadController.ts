@@ -1,10 +1,9 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import multer from 'multer'
 import fs from 'node:fs/promises'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
 import { _id } from '../../common/types.js'
-import { documentFileHandler, getSettings } from '../helper.js'
+import { documentFileHandler, fileHandler, getSettings } from '../helper.js'
 import i18n from '../i18n.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
@@ -18,7 +17,6 @@ async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction
   }
   next()
 }
-const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('Upload')
 @Route('upload')

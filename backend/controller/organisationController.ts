@@ -1,14 +1,11 @@
 import { Request as ExRequest } from 'express'
-import multer from 'multer'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Organisation as IOrganisation, _id, locales } from '../../common/types.js'
-import { documentFileHandler } from '../helper.js'
+import { documentFileHandler, fileHandler } from '../helper.js'
 import Organisation, { organisationSchema } from '../models/organisation.js'
 import Project from '../models/project.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-
-const fileHandler = multer({ limits: { fileSize: 16000000 } })
 
 @Tags('Organisation')
 @Route('organisation')

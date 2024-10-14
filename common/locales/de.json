@@ -46,6 +46,7 @@
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
     },
+    "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "notAllowed": "Nicht erlaubt!",
     "notFound": "Nichts gefunden!",
     "NotImplemented": "Nicht implementiert!",

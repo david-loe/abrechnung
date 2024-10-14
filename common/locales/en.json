@@ -46,6 +46,7 @@
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
     },
+    "rateLimitExceeded": "Rate Limit Exceeded!",
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
     "NotImplemented": "Not implemented!",

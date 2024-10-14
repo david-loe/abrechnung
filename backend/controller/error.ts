@@ -27,6 +27,11 @@ export class ConflictError extends ClientError {
   name = 'alerts.conflict'
 }
 
+export class RateLimitExceededError extends ClientError {
+  status = 429
+  name = 'alerts.rateLimitExceeded'
+}
+
 export class NotImplementedError extends ClientError {
   status = 501
   name = 'alerts.notImplemented'
