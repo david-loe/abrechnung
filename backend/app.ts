@@ -9,7 +9,7 @@ import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
-import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
+import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import i18n from './i18n.js'
 import { checkForMigrations } from './migrations.js'
 
