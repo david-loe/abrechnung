@@ -1,6 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -14,7 +14,6 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
-@Tags('Travel')
 @Route('travel')
 @Security('cookieAuth', ['user'])
 export class TravelController extends Controller {
@@ -241,7 +240,6 @@ export class TravelController extends Controller {
   }
 }
 
-@Tags('Approve', 'Travel')
 @Route('approve/travel')
 @Security('cookieAuth', ['approve/travel'])
 export class TravelApproveController extends Controller {
@@ -319,7 +317,6 @@ export class TravelApproveController extends Controller {
   }
 }
 
-@Tags('Examine', 'Travel')
 @Route('examine/travel')
 @Security('cookieAuth', ['examine/travel'])
 export class TravelExamineController extends Controller {

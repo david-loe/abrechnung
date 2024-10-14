@@ -19,7 +19,7 @@ const users = {
   }
 }
 
-async function createUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
+async function createUser(agent: request.Agent, userKey: keyof typeof users) {
   await loginUser(agent, userKey)
   await loginUser(agent, 'admin')
   const res = await agent
@@ -46,7 +46,7 @@ export default async function createAgent() {
   return agent
 }
 
-export async function loginUser(agent: request.SuperAgentTest, userKey: keyof typeof users) {
+export async function loginUser(agent: request.Agent, userKey: keyof typeof users) {
   await agent.post('/logout')
   await agent.post('/auth/ldapauth').send({ username: users[userKey].username, password: users[userKey].password })
 }

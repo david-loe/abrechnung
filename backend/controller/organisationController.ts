@@ -1,5 +1,5 @@
 import { Request as ExRequest } from 'express'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Organisation as IOrganisation, _id, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import Organisation, { organisationSchema } from '../models/organisation.js'
@@ -7,7 +7,6 @@ import Project from '../models/project.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
-@Tags('Organisation')
 @Route('organisation')
 @Security('cookieAuth', ['user'])
 export class OrganisationController extends Controller {
@@ -17,7 +16,6 @@ export class OrganisationController extends Controller {
   }
 }
 
-@Tags('Admin', 'Organisation')
 @Route('admin/organisation')
 @Security('cookieAuth', ['admin'])
 export class OrganisationAdminController extends Controller {

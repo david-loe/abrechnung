@@ -9,7 +9,7 @@ import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
-import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
+import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import i18n from './i18n.js'
 import { checkForMigrations } from './migrations.js'
 
@@ -26,7 +26,9 @@ if (process.env.TRUST_PROXY) {
   } else {
     app.set('trust proxy', process.env.TRUST_PROXY)
   }
-  app.get('/ip', (request, response) => response.send(request.ip))
+  app.get('/ip', (request, response) => {
+    response.send(request.ip)
+  })
 }
 
 app.use(express.json({ limit: '2mb' }))
@@ -70,7 +72,7 @@ app.use(auth)
 
 if (process.env.NODE_ENV === 'development') {
   app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-    return res.send(swaggerUi.generateHTML(swaggerDocument))
+    res.send(swaggerUi.generateHTML(swaggerDocument))
   })
 }
 

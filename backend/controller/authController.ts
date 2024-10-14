@@ -1,7 +1,7 @@
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
+import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse } from 'tsoa'
 import { Base64, escapeRegExp } from '../../common/scripts.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import User from '../models/user.js'
@@ -55,7 +55,6 @@ const magicloginCallbackHandler = useMagicLogin
     }
   : NotImplementedMiddleware
 
-@Tags('Authentication')
 @Route('auth')
 @Response(501, disabledMessage)
 export class AuthController extends Controller {
@@ -122,7 +121,6 @@ export class AuthController extends Controller {
   }
 }
 
-@Tags('Authentication')
 @Security('cookieAuth')
 @Route('auth')
 export class logoutController extends Controller {

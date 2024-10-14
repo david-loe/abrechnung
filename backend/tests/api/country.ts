@@ -1,5 +1,6 @@
 import test from 'ava'
 import { Country } from '../../../common/types.js'
+import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 
 const agent = await createAgent()
@@ -32,4 +33,8 @@ test('GET /specialLumpSums', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+test.serial.after.always('Drop DB Connection', async (t) => {
+  await disconnectDB()
 })

@@ -1,5 +1,6 @@
 import test from 'ava'
 import { Expense, ExpenseReport, ExpenseReportSimple } from '../../../common/types.js'
+import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
@@ -170,4 +171,8 @@ test.after.always('DELETE /expenseReport', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+test.serial.after.always('Drop DB Connection', async (t) => {
+  await disconnectDB()
 })

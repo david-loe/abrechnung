@@ -2,10 +2,10 @@ import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
 import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
-import countries from './data/countries.json' assert { type: 'json' }
-import currencies from './data/currencies.json' assert { type: 'json' }
-import healthInsurances from './data/healthInsurances.json' assert { type: 'json' }
-import settings from './data/settings.json' assert { type: 'json' }
+import countries from './data/countries.json' with { type: 'json' }
+import currencies from './data/currencies.json' with { type: 'json' }
+import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
+import settings from './data/settings.json' with { type: 'json' }
 import i18n from './i18n.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'

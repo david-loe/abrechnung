@@ -1,7 +1,7 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import fs from 'node:fs/promises'
-import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
+import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse } from 'tsoa'
 import { _id } from '../../common/types.js'
 import { documentFileHandler, fileHandler, getSettings } from '../helper.js'
 import i18n from '../i18n.js'
@@ -18,7 +18,6 @@ async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction
   next()
 }
 
-@Tags('Upload')
 @Route('upload')
 export class UploadController extends Controller {
   @Get('new')

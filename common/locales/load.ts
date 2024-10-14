@@ -1,6 +1,6 @@
 import { Locale } from '../types.js'
-import de from './de.json' assert { type: 'json' }
-import en from './en.json' assert { type: 'json' }
+import de from './de.json' with { type: 'json' }
+import en from './en.json' with { type: 'json' }
 
 export function loadLocales(overwriteJSONstring?: string) {
   const messages = { de, en }

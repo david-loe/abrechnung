@@ -1,10 +1,9 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security } from 'tsoa'
 import { Currency as ICurrency, _id, locales } from '../../common/types.js'
 import Currency, { currencySchema } from '../models/currency.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
-@Tags('Currency')
 @Route('currency')
 @Security('cookieAuth', ['user'])
 export class CurrencyController extends Controller {
@@ -14,7 +13,6 @@ export class CurrencyController extends Controller {
   }
 }
 
-@Tags('Admin', 'Currency')
 @Route('admin/currency')
 @Security('cookieAuth', ['admin'])
 export class CurrencyAdminController extends Controller {

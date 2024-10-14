@@ -1,10 +1,9 @@
-import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
+import { Body, Get, Post, Route, Security } from 'tsoa'
 import { Settings as ISettings, locales } from '../../common/types.js'
 import Settings, { settingsSchema } from '../models/settings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'
 
-@Tags('Settings')
 @Route('settings')
 @Security('cookieAuth', ['user'])
 export class SettingsController extends Controller {
@@ -14,7 +13,6 @@ export class SettingsController extends Controller {
   }
 }
 
-@Tags('Admin', 'Settings')
 @Route('admin/settings')
 @Security('cookieAuth', ['admin'])
 export class SettingsAdminController extends Controller {

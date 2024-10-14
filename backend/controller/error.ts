@@ -37,20 +37,21 @@ export class NotImplementedError extends ClientError {
   name = 'alerts.notImplemented'
 }
 
-export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): ExResponse | void {
+export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): void {
   if (!(err instanceof AuthorizationError)) {
     log(`Error on request of ${req.path}`, 'warn')
     log(err, 'warn')
   }
 
   if (err instanceof ValidateError) {
-    return res.status(422).json(err)
+    res.status(422).json(err)
   } else if (err instanceof MongooseErrors.ValidationError) {
-    return res.status(422).json(err)
+    res.status(422).json(err)
   } else if (err instanceof ClientError) {
-    return res.status(err.status).json(Object.assign({ message: err.message }, err))
+    res.status(err.status).json(Object.assign({ message: err.message }, err))
   } else if (err instanceof Error) {
-    return res.status(500).json(Object.assign({ message: err.message }, err))
+    res.status(500).json(Object.assign({ message: err.message }, err))
+  } else {
+    next(err)
   }
-  next(err)
 }
