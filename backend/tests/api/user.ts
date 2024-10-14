@@ -1,5 +1,6 @@
 import test from 'ava'
 import { User } from '../../../common/types.js'
+import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
 
@@ -90,4 +91,8 @@ test('POST /user/vehicleRegistration', async (t) => {
   }
   const res2 = await agent.get('/documentFile').query({ _id: (res.body.result as User).vehicleRegistration![0]._id })
   t.is(res2.status, 200, 'GET /documentFile')
+})
+
+test.serial.after.always('Drop DB Connection', async (t) => {
+  await disconnectDB()
 })

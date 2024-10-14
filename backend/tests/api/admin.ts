@@ -1,5 +1,6 @@
 import test from 'ava'
 import { User } from '../../../common/types.js'
+import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 
 const agent = await createAgent()
@@ -16,4 +17,8 @@ test('POST /admin/user', async (t) => {
   const res2 = await agent.post('/admin/user').send(user)
   t.is(res2.status, 200)
   t.like(res2.body.result, user)
+})
+
+test.serial.after.always('Drop DB Connection', async (t) => {
+  await disconnectDB()
 })
