@@ -272,7 +272,7 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"createdAt": {
+					"expireAt": {
 						"anyOf": [
 							{
 								"type": "string",
@@ -292,7 +292,7 @@
 				},
 				"required": [
 					"_id",
-					"createdAt",
+					"expireAt",
 					"files"
 				],
 				"type": "object",
@@ -3870,10 +3870,10 @@
 					"fallBackLumpSumCountry": {
 						"$ref": "#/components/schemas/CountryCode"
 					},
-					"secoundNightOnAirplaneLumpSumCountry": {
+					"secondNightOnAirplaneLumpSumCountry": {
 						"$ref": "#/components/schemas/CountryCode"
 					},
-					"secoundNightOnShipOrFerryLumpSumCountry": {
+					"secondNightOnShipOrFerryLumpSumCountry": {
 						"$ref": "#/components/schemas/CountryCode"
 					},
 					"minHoursOfTravel": {
@@ -3898,8 +3898,8 @@
 					"factorOvernightLumpSum",
 					"factorOvernightLumpSumExceptions",
 					"fallBackLumpSumCountry",
-					"secoundNightOnAirplaneLumpSumCountry",
-					"secoundNightOnShipOrFerryLumpSumCountry",
+					"secondNightOnAirplaneLumpSumCountry",
+					"secondNightOnShipOrFerryLumpSumCountry",
 					"minHoursOfTravel",
 					"minProfessionalShare"
 				],
@@ -4757,10 +4757,10 @@
 								"type": "number",
 								"format": "double"
 							},
-							"secoundNightOnShipOrFerryLumpSumCountry": {
+							"secondNightOnShipOrFerryLumpSumCountry": {
 								"type": "string"
 							},
-							"secoundNightOnAirplaneLumpSumCountry": {
+							"secondNightOnAirplaneLumpSumCountry": {
 								"type": "string"
 							},
 							"fallBackLumpSumCountry": {
@@ -6877,6 +6877,9 @@
 												},
 												{
 													"properties": {
+														"expireAt": {
+															"$ref": "#/components/schemas/NativeDate"
+														},
 														"files": {
 															"items": {
 																"$ref": "#/components/schemas/mongoose.Types.ObjectId"
