@@ -60,6 +60,18 @@ export async function checkForMigrations() {
       console.log('Apply migration from v1.2.3: Move projects from settings.projects to projects.assigned')
       await mongoose.connection.collection('users').updateMany({}, { $rename: { 'settings.projects': 'projects.assigned' } })
     }
+    if (semver.lte(migrateFrom, '1.2.6')) {
+      console.log('Apply migration from v1.2.6: Fix typo in settings')
+      await mongoose.connection.collection('settings').updateMany(
+        {},
+        {
+          $rename: {
+            'travelSettings.secoundNightOnAirplaneLumpSumCountry': 'travelSettings.secondNightOnAirplaneLumpSumCountry',
+            'travelSettings.secoundNightOnShipOrFerryLumpSumCountry': 'travelSettings.secondNightOnShipOrFerryLumpSumCountry'
+          }
+        }
+      )
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

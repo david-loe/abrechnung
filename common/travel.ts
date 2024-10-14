@@ -114,12 +114,12 @@ export class TravelCalculator {
             } else if (stage.transport.type === 'airplane') {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-                country: { _id: this.travelSettings.secoundNightOnAirplaneLumpSumCountry }
+                country: { _id: this.travelSettings.secondNightOnAirplaneLumpSumCountry }
               })
             } else if (stage.transport.type === 'shipOrFerry') {
               borderCrossings.push({
                 date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
-                country: { _id: this.travelSettings.secoundNightOnShipOrFerryLumpSumCountry }
+                country: { _id: this.travelSettings.secondNightOnShipOrFerryLumpSumCountry }
               })
             }
           }

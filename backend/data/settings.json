@@ -87,8 +87,8 @@
     "maxTravelDayCount": 92,
     "minHoursOfTravel": 8,
     "minProfessionalShare": 0.5,
-    "secoundNightOnAirplaneLumpSumCountry": "AT",
-    "secoundNightOnShipOrFerryLumpSumCountry": "LU",
+    "secondNightOnAirplaneLumpSumCountry": "AT",
+    "secondNightOnShipOrFerryLumpSumCountry": "LU",
     "toleranceStageDatesToApprovedTravelDates": 3,
     "vehicleRegistrationWhenUsingOwnCar": "optional"
   },

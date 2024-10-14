@@ -37,8 +37,8 @@ export interface SettingsTravel {
   factorOvernightLumpSum: number
   factorOvernightLumpSumExceptions: CountryCode[]
   fallBackLumpSumCountry: CountryCode
-  secoundNightOnAirplaneLumpSumCountry: CountryCode
-  secoundNightOnShipOrFerryLumpSumCountry: CountryCode
+  secondNightOnAirplaneLumpSumCountry: CountryCode
+  secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number
   minProfessionalShare: number
 }
