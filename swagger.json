@@ -6782,9 +6782,6 @@
 						}
 					}
 				},
-				"tags": [
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -6816,10 +6813,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Upload",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -6836,10 +6829,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Upload",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -6919,10 +6908,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Upload",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -6958,9 +6943,6 @@
 						}
 					}
 				},
-				"tags": [
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7006,9 +6988,6 @@
 						}
 					}
 				},
-				"tags": [
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7055,9 +7034,6 @@
 						}
 					}
 				},
-				"tags": [
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7175,10 +7151,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7275,10 +7247,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7312,10 +7280,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7365,10 +7329,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7442,10 +7402,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7508,10 +7464,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"User"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7530,9 +7482,6 @@
 						"description": ""
 					}
 				},
-				"tags": [
-					"Upload"
-				],
 				"security": [],
 				"parameters": [
 					{
@@ -7568,9 +7517,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Upload"
-				],
 				"security": [],
 				"parameters": [
 					{
@@ -7636,9 +7582,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7741,9 +7684,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7788,9 +7728,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7838,9 +7775,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7895,9 +7829,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -7952,9 +7883,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8009,9 +7937,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8076,9 +8001,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8126,9 +8048,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8186,9 +8105,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8228,9 +8144,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8265,9 +8178,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8293,10 +8203,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Approve",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8413,10 +8319,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Approve",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8507,10 +8409,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Approve",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8557,10 +8455,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8675,10 +8569,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8712,10 +8602,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8762,10 +8648,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8820,10 +8702,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8878,10 +8756,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8936,10 +8810,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -8994,10 +8864,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9056,10 +8922,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9099,10 +8961,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Examine",
-					"Travel"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9145,9 +9003,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Settings"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9185,10 +9040,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Settings"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9230,10 +9081,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Settings"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9259,9 +9106,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9341,10 +9185,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9437,10 +9277,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9474,10 +9310,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9527,10 +9359,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9575,10 +9403,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Project"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9604,9 +9428,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9690,10 +9511,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9787,10 +9604,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9824,10 +9637,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9877,10 +9686,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9925,10 +9730,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Organisation"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -9954,9 +9755,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthInsurance"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10048,10 +9846,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"HealthInsurance"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10085,10 +9879,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"HealthInsurance"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10138,10 +9928,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"HealthInsurance"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10186,10 +9972,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"HealthInsurance"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10215,9 +9997,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10309,9 +10088,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10358,9 +10134,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10415,9 +10188,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10472,9 +10242,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10549,9 +10316,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10591,9 +10355,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10628,9 +10389,6 @@
 						}
 					}
 				},
-				"tags": [
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10656,10 +10414,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10751,10 +10505,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10801,10 +10551,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10859,10 +10605,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10917,10 +10659,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -10979,10 +10717,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11034,10 +10768,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11072,10 +10802,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11159,10 +10885,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Confirm",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11254,10 +10976,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Confirm",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11304,10 +11022,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Confirm",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11351,10 +11065,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Confirm",
-					"HealthCareCost"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11389,9 +11099,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11481,9 +11188,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11530,9 +11234,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11587,9 +11288,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11644,9 +11342,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11718,9 +11413,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11760,9 +11452,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11797,9 +11486,6 @@
 						}
 					}
 				},
-				"tags": [
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11825,10 +11511,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11918,10 +11600,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -11968,10 +11646,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12026,10 +11700,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12084,10 +11754,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12155,10 +11821,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12198,10 +11860,6 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Examine",
-					"ExpenseReport"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12229,9 +11887,6 @@
 						"description": ""
 					}
 				},
-				"tags": [
-					"DocumentFile"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12264,9 +11919,6 @@
 						}
 					}
 				},
-				"tags": [
-					"DocumentFile"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12294,10 +11946,6 @@
 						"description": ""
 					}
 				},
-				"tags": [
-					"Examine",
-					"DocumentFile"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12343,10 +11991,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Examine",
-					"DocumentFile"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12394,9 +12038,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Currency"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12490,10 +12131,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Currency"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12527,10 +12164,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Currency"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12580,10 +12213,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Currency"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12628,10 +12257,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Currency"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12657,9 +12282,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12758,9 +12380,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12798,10 +12417,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12835,10 +12450,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12888,10 +12499,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12936,10 +12543,6 @@
 						}
 					}
 				},
-				"tags": [
-					"Admin",
-					"Country"
-				],
 				"security": [
 					{
 						"cookieAuth": [
@@ -12963,9 +12566,6 @@
 				},
 				"description": "Provides the authentication cookie.",
 				"summary": "Login using LDAP",
-				"tags": [
-					"Authentication"
-				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -13004,9 +12604,6 @@
 					}
 				},
 				"summary": "Redirecting to Microsoft login",
-				"tags": [
-					"Authentication"
-				],
 				"security": [],
 				"parameters": [
 					{
@@ -13033,9 +12630,6 @@
 				},
 				"description": "Provides the authentication cookie.",
 				"summary": "Microsoft login endpoint",
-				"tags": [
-					"Authentication"
-				],
 				"security": [],
 				"parameters": [
 					{
@@ -13062,9 +12656,6 @@
 				},
 				"description": "Send a magiclogin email to the destination email address.",
 				"summary": "Send login email",
-				"tags": [
-					"Authentication"
-				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -13103,9 +12694,6 @@
 				},
 				"description": "Provides the authentication cookie.",
 				"summary": "Email login endpoint",
-				"tags": [
-					"Authentication"
-				],
 				"security": [],
 				"parameters": [
 					{
@@ -13129,9 +12717,6 @@
 				},
 				"description": "Logout and delete session",
 				"summary": "Logout",
-				"tags": [
-					"Authentication"
-				],
 				"security": [
 					{
 						"cookieAuth": []
@@ -13150,9 +12735,6 @@
 				},
 				"description": "Empty method",
 				"summary": "Check if request is authenticated",
-				"tags": [
-					"Authentication"
-				],
 				"security": [
 					{
 						"cookieAuth": []
