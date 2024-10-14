@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="<%= language %>">
   <head>
     <meta charset="UTF-8" />
@@ -55,7 +55,7 @@
         const files = []
         if (event.target && event.target.files) {
           for (const file of event.target.files) {
-            if (file.size < 16000000) {
+            if (file.size < <%= maxFileSize %>) {
               if (file.type.indexOf('image') > -1) {
                 files.push({ data: await resizeImage(file, 1400), type: file.type, name: file.name })
               } else {

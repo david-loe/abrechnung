@@ -56,7 +56,8 @@ export class UploadController extends Controller {
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
       text,
-      language: user?.settings.language
+      language: user?.settings.language,
+      maxFileSize: parseInt(process.env.VITE_MAX_FILE_SIZE)
     })
     this.setHeader('Content-Type', 'text/html; charset=utf-8')
     req.res?.send(renderedHTML)
