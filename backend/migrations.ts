@@ -71,7 +71,9 @@ export async function checkForMigrations() {
           }
         }
       )
-      await mongoose.connection.collection('tokens').dropIndex('createdAt_1')
+      if ('tokens' in mongoose.connection.collections) {
+        await mongoose.connection.collection('tokens').dropIndex('createdAt_1')
+      }
     }
 
     if (settings) {
