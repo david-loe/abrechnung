@@ -64,7 +64,7 @@ app.use(
     },
     resave: true,
     saveUninitialized: false,
-    name: i18n.t('headlines.title')
+    name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
   })
 )
 
