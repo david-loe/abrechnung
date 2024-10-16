@@ -42,7 +42,7 @@ services:
   ldap:
     build:
       context: ./dev-tools/ldap
-      dockerfile: Dockerfile.${NODE_ENV}
+      dockerfile: Dockerfile.development
     environment:
       - DEBUG=false
 
