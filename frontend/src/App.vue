@@ -2,7 +2,7 @@
   <div>
     <div
       id="offline-banner"
-      v-if="!onlineState"
+      v-if="!isOffline"
       style="background-color: black; color: #fff; width: 100%; margin-bottom: 1%; display: flex; justify-content: center">
       Du bist Offline. Du kannst alle Daten sehen, aber nicht Bearbeiten.
     </div>
@@ -193,7 +193,7 @@ export default defineComponent({
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
       accesses,
-      onlineState: navigator.onLine
+      isOffline: false
       // true as true | false
     }
   },

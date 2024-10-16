@@ -52,9 +52,9 @@
           </button>
         </div>
         <div
-          v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport'] && !$root.onlineState"
+          v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport'] && !$root.isOffline"
           class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')" :disabled="!$root.onlineState">
+          <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')" :disabled="!$root.isOffline">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
           </button>
