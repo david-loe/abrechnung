@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
-import { NetworkFirst } from 'workbox-strategies'
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 
 declare var self: ServiceWorkerGlobalScope
 export default {}
@@ -19,9 +19,22 @@ self.addEventListener('install', (event) => {
     })()
   )
 })
-setDefaultHandler(new NetworkFirst())
+setDefaultHandler(new NetworkOnly())
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
+
+registerRoute(
+  ({ request }) => request.destination === 'font',
+  new CacheFirst({
+    cacheName: 'font-cache'
+  })
+)
+registerRoute(
+  ({ request }) => /\/backend\/.*/.test(request.url),
+  new NetworkFirst({
+    cacheName: 'backend-cache'
+  })
+)
 
 self.addEventListener('fetch', (event) => {
   console.log('sw weiterleitung genutzt')
