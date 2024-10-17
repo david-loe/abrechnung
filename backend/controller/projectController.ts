@@ -4,7 +4,7 @@ import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } fr
 import { getSettings } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
-import Project, { projectSchema } from '../models/project.js'
+import Project, { projectSchema, projectUsersSchema } from '../models/project.js'
 import Travel from '../models/travel.js'
 import User from '../models/user.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
@@ -73,6 +73,6 @@ export class ProjectAdminController extends Controller {
   }
   @Get('form')
   public async getProjectForm() {
-    return { data: mongooseSchemaToVueformSchema(projectSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(Object.assign(projectSchema.obj, projectUsersSchema.obj), locales) }
   }
 }
