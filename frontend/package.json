@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite & vue-tsc --noEmit --watch",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit && vite build && cp src/manifest.json dist/manifest.json && cp -R src/icons dist/icons",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore --fix src",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
