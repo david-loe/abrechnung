@@ -43,6 +43,38 @@ export interface SettingsTravel {
   minProfessionalShare: number
 }
 
+export interface SystemSettings {
+  auth: {
+    microsoft?: {
+      clientId: string
+      clientSecret: string
+      tenant: string
+    } | null
+    ldapauth?: {
+      url: string
+      bindDN: string
+      bindCredentials: string
+      searchBase: string
+      searchFilter: string
+      tlsRequestCert: boolean
+      tlsRejectUnauthorized: boolean
+      mailAttribute: string
+      uidAttribute: string
+      familyNameAttribute: string
+      givenNameAttribute: string
+    } | null
+  }
+  smtp: {
+    host: string
+    port: number
+    secure: boolean
+    user: string
+    password: string
+    senderAddress: string
+  }
+  _id: _id
+}
+
 /**
  * @pattern ^[A-Z]{2}$
  */
