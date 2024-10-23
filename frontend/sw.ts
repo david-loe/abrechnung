@@ -10,19 +10,21 @@ const urlsToFetch = ['/backend/healthCareCost?limit=12', '/backend/expenseReport
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
-      // const cache = await caches.open(cacheName).then((cache) => cache.addAll(['user', 'backend/user']))
-      // Setting {cache: 'reload'} in the new request will ensure that the response
-      // isn't fulfilled from the HTTP cache; i.e., it will be from the network.
-      // await cache.put(new Request('/backend/settings'), await fetch('/backend/settings'))
+      let urlsToCache = await fetchAndCacheUrls(urlsToFetch)
+      const cache = await caches.open(cacheName).then((cache) => {
+        cache.addAll(urlsToCache)
+        cache.addAll(urlsToFetch)
+      })
       console.log('installevent triggerd')
     })()
   )
+  self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
   console.log('activate event triggerd')
   for (const url of urlsToFetch) {
-    fetchAndStoreUrl(url)
+    // fetchAndStoreUrl(url)
   }
 })
 
@@ -39,9 +41,44 @@ registerRoute(
 registerRoute(
   ({ request }) => /\/backend\/.*/.test(request.url),
   new NetworkFirst({
-    cacheName: 'backend-cache'
+    cacheName: cacheName
   })
 )
+registerRoute(
+  ({ request }) => request.url.includes('/manifest.json'),
+  new NetworkFirst({
+    cacheName: 'manifest-cache'
+  })
+)
+
+self.addEventListener('fetch', (event) => {
+  // Hier prüfen wir, ob die Anfrage zu einer der gecachten Routen gehört
+  event.respondWith(
+    caches.open(cacheName).then((cache) => {
+      return cache.keys().then((keys) => {
+        // console.log('Cached keys:', keys)
+        return cache.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            console.log('Cache response')
+            // Wenn die Antwort im Cache ist, gib sie sofort zurück
+            return cachedResponse
+          }
+          console.log('Network Response')
+          console.log(event.request)
+          // Wenn die Antwort nicht im Cache ist, hole sie vom Netzwerk
+          return fetch(event.request)
+        })
+        // .then((networkResponse) => {
+        //   // Die neue Antwort kann ebenfalls im Cache gespeichert werden (optional)
+        //   // return caches.open(cacheName).then((cache) => {
+        //   //   cache.put(event.request, networkResponse.clone()) // Klonen, da der Response-Stream nur einmal gelesen werden kann
+        //   return networkResponse // Netzwerkantwort zurückgeben
+        // })
+      })
+    })
+    //   })
+  )
+})
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -102,7 +139,6 @@ async function fetchAndStoreUrl(url: string) {
     console.error(`Fehler beim Abrufen der URL ${url}:`, error)
   }
 }
-
 async function fetchDetail(reportType: 'travel' | 'expenseReport' | 'healthCareCost' | null, id: string) {
   if (reportType != null) {
     const db = await openDatabase()
@@ -134,6 +170,40 @@ async function fetchDetail(reportType: 'travel' | 'expenseReport' | 'healthCareC
       console.error(`Fehler beim Abrufen der URL ${url}:`, error)
     }
   }
+}
+async function fetchAndCacheUrls(urls: string[]) {
+  let detailUrls: string[] = []
+  for (let url of urls) {
+    try {
+      const response = await fetch(url) // Daten von der URL abrufen
+      if (response.ok) {
+        const res = await response.json() // Antwortdaten verarbeiten
+        const shortenedUrl = url.replace(/\?limit=\d+/, '').replace('/backend/', '')
+        let reportType: 'travel' | 'expenseReport' | 'healthCareCost' | null = null
+        if (shortenedUrl == 'travel') {
+          reportType = 'travel'
+        } else if (shortenedUrl == 'expenseReport') {
+          reportType = 'expenseReport'
+        } else if (shortenedUrl == 'healthCareCost') {
+          reportType = 'healthCareCost'
+        }
+        for (let i = 0; i < res.data.length; i++) {
+          detailUrls.push(
+            '/backend/' +
+              reportType +
+              '?_id=' +
+              res.data[i]._id +
+              (reportType == 'travel'
+                ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
+                : '&additionalFields=expenses')
+          )
+        }
+      }
+    } catch (error) {
+      console.error(`Fehler beim Abrufen der URL ${url}:`, error)
+    }
+  }
+  return detailUrls
 }
 
 // // Route für travel, um die IDs bei der ersten Anfrage zu cachen
