@@ -1,7 +1,22 @@
-import { model, Schema } from 'mongoose'
+import { HydratedDocument, model, Schema } from 'mongoose'
 import { emailRegex, SystemSettings } from '../../common/types.js'
+import ldapauth from '../authStrategies/ldapauth.js'
+import microsoft from '../authStrategies/microsoft.js'
+import mail from '../mail/client.js'
 
 export const systemSettingsSchema = new Schema<SystemSettings>({
+  smtp: {
+    type: {
+      host: { type: String, trim: true, required: true, label: 'Host' },
+      port: { type: Number, required: true, min: 1, max: 65535, label: 'Port' },
+      secure: { type: Boolean, required: true, default: true, label: 'Secure' },
+      user: { type: String, trim: true, required: true },
+      password: { type: String, trim: true, required: true },
+      senderAddress: { type: String, trim: true, required: true, validate: emailRegex, label: 'Sender Address' }
+    },
+    required: true,
+    label: 'SMTP'
+  },
   auth: {
     type: {
       microsoft: {
@@ -19,8 +34,12 @@ export const systemSettingsSchema = new Schema<SystemSettings>({
           bindCredentials: { type: String, trim: true, label: 'Bind Credentials' },
           searchBase: { type: String, trim: true, label: 'Search Base' },
           searchFilter: { type: String, trim: true, label: 'Search Filter' },
-          tlsRequestCert: { type: Boolean, default: true, label: 'TLS Request Cert' },
-          tlsRejectUnauthorized: { type: Boolean, default: false, label: 'TLS Reject Unauthorized' },
+          tlsOptions: {
+            type: {
+              rejectUnauthorized: { type: Boolean, default: true, label: 'Reject Unauthorized' }
+            },
+            label: 'TLS Options'
+          },
           mailAttribute: { type: String, trim: true, default: 'mail', label: 'Mail Attribute' },
           uidAttribute: { type: String, trim: true, default: 'uid', label: 'UID Attribute' },
           familyNameAttribute: { type: String, trim: true, default: 'sn', label: 'Family Name Attribute' },
@@ -30,19 +49,29 @@ export const systemSettingsSchema = new Schema<SystemSettings>({
       }
     },
     required: true
-  },
-  smtp: {
-    type: {
-      host: { type: String, trim: true, required: true, label: 'Host' },
-      port: { type: Number, required: true, min: 1, max: 65535, label: 'Port' },
-      secure: { type: Boolean, required: true, default: true, label: 'Secure' },
-      user: { type: String, trim: true, required: true },
-      password: { type: String, trim: true, required: true },
-      senderAddress: { type: String, trim: true, required: true, validate: emailRegex, label: 'Sender Address' }
-    },
-    required: true,
-    label: 'SMTP'
   }
 })
+
+systemSettingsSchema.pre('validate', async function (this: HydratedDocument<SystemSettings>, next) {
+  if (this.auth.ldapauth?.url) {
+    await ldapauth.verifyConfig(this.auth.ldapauth)
+  }
+  await mail.verifyConfig(this.smtp)
+  next()
+})
+
+systemSettingsSchema.post('save', function (this: HydratedDocument<SystemSettings>) {
+  applySystemSettings(this)
+})
+
+export function applySystemSettings(systemSettings: SystemSettings) {
+  mail.configureClient(systemSettings.smtp)
+  if (systemSettings.auth.ldapauth?.url) {
+    ldapauth.configureStrategy(systemSettings.auth.ldapauth)
+  }
+  if (systemSettings.auth.microsoft?.clientId) {
+    microsoft.configureStrategy(systemSettings.auth.microsoft)
+  }
+}
 
 export default model<SystemSettings>('SystemSettings', systemSettingsSchema)

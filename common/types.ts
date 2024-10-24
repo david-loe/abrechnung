@@ -43,35 +43,42 @@ export interface SettingsTravel {
   minProfessionalShare: number
 }
 
+export interface ldapauthSettings {
+  url: string
+  bindDN: string
+  bindCredentials: string
+  searchBase: string
+  searchFilter: string
+  tlsOptions: {
+    rejectUnauthorized: boolean
+  }
+  mailAttribute: string
+  uidAttribute: string
+  familyNameAttribute: string
+  givenNameAttribute: string
+}
+
+export interface smtpSettings {
+  host: string
+  port: number
+  secure: boolean
+  user: string
+  password: string
+  senderAddress: string
+}
+
+export interface microsoftSettings {
+  clientId: string
+  clientSecret: string
+  tenant: string
+}
+
 export interface SystemSettings {
   auth: {
-    microsoft?: {
-      clientId: string
-      clientSecret: string
-      tenant: string
-    } | null
-    ldapauth?: {
-      url: string
-      bindDN: string
-      bindCredentials: string
-      searchBase: string
-      searchFilter: string
-      tlsRequestCert: boolean
-      tlsRejectUnauthorized: boolean
-      mailAttribute: string
-      uidAttribute: string
-      familyNameAttribute: string
-      givenNameAttribute: string
-    } | null
+    microsoft?: microsoftSettings | null
+    ldapauth?: ldapauthSettings | null
   }
-  smtp: {
-    host: string
-    port: number
-    secure: boolean
-    user: string
-    password: string
-    senderAddress: string
-  }
+  smtp: smtpSettings
   _id: _id
 }
 

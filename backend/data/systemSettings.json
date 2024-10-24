@@ -6,8 +6,9 @@
             "bindCredentials": "GoodNewsEveryone",
             "searchBase": "ou=people,dc=planetexpress,dc=com",
             "searchFilter": "(uid={{username}})",
-            "tlsRequestCert": true,
-            "tlsRejectUnauthorized": false,
+            "tlsOptions": {
+                "rejectUnauthorized": false
+            },
             "mailAttribute": "mail",
             "uidAttribute": "uid",
             "familyNameAttribute": "sn",

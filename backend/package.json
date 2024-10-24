@@ -14,7 +14,6 @@
     "express-rate-limit": "^7.4.1",
     "express-session": "^1.18.1",
     "i18next": "^23.16.0",
-    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.15",
@@ -27,6 +26,10 @@
     "semver": "^7.6.3",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^6.5.0"
+  },
+  "peerDependencies": {
+    "ldapauth-fork": "^5.0.5",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

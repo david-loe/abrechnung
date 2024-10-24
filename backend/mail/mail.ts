@@ -13,7 +13,7 @@ import {
 import { genAuthenticatedLink } from '../authStrategies/magiclogin.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
-import mailClient from './client.js'
+import mail from './client.js'
 
 export async function sendMail(
   recipients: IUser[],
@@ -44,9 +44,7 @@ function _sendMail(
   lastParagraph: string,
   language: Locale
 ) {
-  if (mailClient == undefined) {
-    return
-  }
+  const mailClient = mail.getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
@@ -81,7 +79,7 @@ function _sendMail(
     app.url
 
   mailClient.sendMail({
-    from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
+    from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
     to: recipient.email, // list of receivers
     subject: subject, // Subject line
     text: plainText, // plain text body
