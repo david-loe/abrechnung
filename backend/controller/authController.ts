@@ -3,7 +3,9 @@ import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse } from 'tsoa'
 import { Base64, escapeRegExp } from '../../common/scripts.js'
+import ldapauth from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
+import microsoft from '../authStrategies/microsoft.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 
@@ -16,17 +18,22 @@ const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFun
   throw new NotImplementedError(disabledMessage)
 }
 
-const ldapauthHandler = useLDAPauth ? passport.authenticate('ldapauth', { session: true }) : NotImplementedMiddleware
+const ldapauthHandler = useLDAPauth
+  ? (req: ExRequest, res: ExResponse, next: NextFunction) =>
+      passport.authenticate(ldapauth.getStrategy(), { session: true })(req, res, next)
+  : NotImplementedMiddleware
 
 const microsoftHandler = useMicrosoft
   ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
       const redirect = req.query.redirect
       const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
-      passport.authenticate('microsoft', { state: state })(req, res, next)
+      passport.authenticate(microsoft.getStrategy(), { state: state })(req, res, next)
     }
   : NotImplementedMiddleware
 
-const microsoftCallbackHandler = useMicrosoft ? passport.authenticate('microsoft') : NotImplementedMiddleware
+const microsoftCallbackHandler = useMicrosoft
+  ? (req: ExRequest, res: ExResponse, next: NextFunction) => passport.authenticate(microsoft.getStrategy())(req, res, next)
+  : NotImplementedMiddleware
 
 const magicloginHandler = useMagicLogin
   ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
@@ -49,7 +56,7 @@ const magicloginCallbackHandler = useMagicLogin
           redirect = redirectPath
         }
       }
-      passport.authenticate('magiclogin', {
+      passport.authenticate(magiclogin, {
         failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')
       })(req, res, next)
     }

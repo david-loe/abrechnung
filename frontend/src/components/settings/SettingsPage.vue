@@ -18,6 +18,7 @@
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'" />
+        <SystemSettingsForm v-if="entry === 'systemSettings'" />
         <template v-else-if="entry === 'users'">
           <UserList class="mb-5" ref="userList" />
 
@@ -80,10 +81,11 @@ import HealthInsuranceList from './elements/HealthInsuranceList.vue'
 import OrganisationList from './elements/OrganisationList.vue'
 import ProjectList from './elements/ProjectList.vue'
 import SettingsForm from './elements/SettingsForm.vue'
+import SystemSettingsForm from './elements/SystemSettingsForm.vue'
 import UserList from './elements/UserList.vue'
 import UserMerge from './elements/UserMerge.vue'
 
-const entries = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
+const entries = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances', 'settings', 'systemSettings'] as const
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -96,7 +98,8 @@ export default defineComponent({
     CurrencyList,
     HealthInsuranceList,
     UserMerge,
-    CSVImport
+    CSVImport,
+    SystemSettingsForm
   },
   data() {
     return {

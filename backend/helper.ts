@@ -12,7 +12,8 @@ import {
   User as IUser,
   reportIsHealthCareCost,
   reportIsTravel,
-  Settings
+  Settings,
+  SystemSettings
 } from '../common/types.js'
 import { connectDB } from './db.js'
 import DocumentFile from './models/documentFile.js'
@@ -187,6 +188,16 @@ export async function getSettings(): Promise<Settings> {
     return settings
   } else {
     throw Error('Settings not found')
+  }
+}
+
+export async function getSystemSettings(): Promise<SystemSettings> {
+  await connectDB()
+  const systemSettings = (await mongoose.connection.collection('systemsettings').findOne()) as SystemSettings | null
+  if (systemSettings) {
+    return systemSettings
+  } else {
+    throw Error('System Settings not found')
   }
 }
 

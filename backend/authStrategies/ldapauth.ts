@@ -1,54 +1,84 @@
+import LdapAuth from 'ldapauth-fork'
 import LdapStrategy from 'passport-ldapauth'
+import { ldapauthSettings } from '../../common/types.js'
 import User from '../models/user.js'
-import { NewUser, addAdminIfNone } from './index.js'
+import { AuthenticationStrategy, NewUser, addAdminIfNone } from './index.js'
 
-const ldapauth = new LdapStrategy(
-  {
-    server: {
-      url: process.env.LDAP_URL,
-      bindDN: process.env.LDAP_BINDDN,
-      bindCredentials: process.env.LDAP_BINDCREDENTIALS,
-      searchBase: process.env.LDAP_SEARCHBASE,
-      searchFilter: process.env.LDAP_SEARCHFILTER,
+class Ldapauth extends AuthenticationStrategy<LdapStrategy, ldapauthSettings> {
+  #mapConfig(config: ldapauthSettings): LdapStrategy.Options['server'] {
+    return {
+      url: config.url,
+      bindDN: config.bindDN,
+      bindCredentials: config.bindCredentials,
+      searchBase: config.searchBase,
+      searchFilter: config.searchFilter,
       tlsOptions: {
-        requestCert: process.env.LDAP_TLS_REQUESTCERT.toLowerCase() === 'true',
-        rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true'
+        rejectUnauthorized: config.tlsOptions.rejectUnauthorized
       }
-    }
-  },
-  async function (ldapUser: any, cb: (error: any, user?: any) => void) {
-    let user = await User.findOne({ 'fk.ldapauth': ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
-    let email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
-    if (Array.isArray(email)) {
-      if (email.length > 0) {
-        email = email[0]
-      } else {
-        email = undefined
-      }
-    }
-    if (!user && email) {
-      user = await User.findOne({ email: email })
-    }
-    const newUser: NewUser = {
-      fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
-      email: email,
-      name: { familyName: ldapUser[process.env.LDAP_SURNAME_ATTRIBUTE], givenName: ldapUser[process.env.LDAP_GIVENNAME_ATTRIBUTE] }
-    }
-    if (!user) {
-      user = new User(newUser)
-    } else {
-      Object.assign(user.fk, newUser.fk)
-      delete newUser.fk
-      Object.assign(user, newUser)
-    }
-    try {
-      await user.save()
-      addAdminIfNone(user)
-      cb(null, user)
-    } catch (error) {
-      cb(error)
     }
   }
-)
+  configureStrategy(config: ldapauthSettings) {
+    this.strategy = new LdapStrategy(
+      {
+        server: this.#mapConfig(config)
+      },
+      async function (ldapUser: any, cb: (error: any, user?: any) => void) {
+        let user = await User.findOne({ 'fk.ldapauth': ldapUser[config.uidAttribute] })
+        let email = ldapUser[config.mailAttribute]
+        if (Array.isArray(email)) {
+          if (email.length > 0) {
+            email = email[0]
+          } else {
+            email = undefined
+          }
+        }
+        if (!user && email) {
+          user = await User.findOne({ email: email })
+        }
+        const newUser: NewUser = {
+          fk: { ldapauth: ldapUser[config.uidAttribute] },
+          email: email,
+          name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
+        }
+        if (!user) {
+          user = new User(newUser)
+        } else {
+          Object.assign(user.fk, newUser.fk)
+          delete newUser.fk
+          Object.assign(user, newUser)
+        }
+        try {
+          await user.save()
+          addAdminIfNone(user)
+          cb(null, user)
+        } catch (error) {
+          cb(error)
+        }
+      }
+    )
+  }
+  verifyConfig(config: ldapauthSettings) {
+    return new Promise((resolve, reject) => {
+      try {
+        const ldapAuthInstance = new LdapAuth(this.#mapConfig(config))
+        const adminClient = (ldapAuthInstance as any)._adminClient
+        const userClient = (ldapAuthInstance as any)._userClient
+        ldapAuthInstance.on('error', reject)
+        adminClient.on('error', reject)
+        adminClient.on('connectTimeout', reject)
+        adminClient.on('connectError', reject)
+        userClient.on('error', reject)
+        userClient.on('connectTimeout', reject)
+        userClient.on('connectError', reject)
 
-export default ldapauth
+        adminClient.once('connect', () => {
+          resolve(ldapAuthInstance)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+}
+
+export default new Ldapauth()
