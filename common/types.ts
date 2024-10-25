@@ -228,6 +228,15 @@ export interface User extends UserSimple {
   token?: Token | null
 }
 
+export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {
+  access: { user: User['access']['user']; admin: User['access']['admin'] }
+} = {
+  fk: { magiclogin: 'admin@to.ken' },
+  email: 'admin@to.ken',
+  name: { familyName: 'Token Access', givenName: 'Admin' },
+  access: { user: true, admin: true }
+}
+
 export interface BaseCurrencyMoney {
   amount: number | null
 }

@@ -8,7 +8,7 @@ import User from '../models/user.js'
 
 const secret = process.env.MAGIC_LOGIN_SECRET
 const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
-const jwtOptions = {
+const options = {
   expiresIn: 60 * 120 // in seconds -> 120min
 }
 
@@ -38,10 +38,10 @@ export default new MagicLoginStrategy.default({
       callback(new NotAllowedError('No magiclogin user found for e-mail: ' + payload.destination))
     }
   },
-  jwtOptions: jwtOptions
+  jwtOptions: options
 })
 
-export function genAuthenticatedLink(payload: { destination: string; redirect: string }) {
+export function genAuthenticatedLink(payload: { destination: string; redirect: string }, jwtOptions: jwt.SignOptions = options) {
   return new Promise<string>((resolve, reject) => {
     const code = Math.floor(Math.random() * 90000) + 10000 + ''
     jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {

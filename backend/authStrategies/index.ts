@@ -1,6 +1,6 @@
 import { HydratedDocument } from 'mongoose'
 import passport from 'passport'
-import { Contact, User as IUser } from '../../common/types.js'
+import { Contact, User as IUser, tokenAdminUser } from '../../common/types.js'
 import { getSettings } from '../helper.js'
 import User from '../models/user.js'
 
@@ -10,7 +10,7 @@ export interface NewUser extends Contact {
 }
 
 export function addAdminIfNone(user: HydratedDocument<IUser>) {
-  User.exists({ 'access.admin': true }).then((doc) => {
+  User.exists({ 'access.admin': true, 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }).then((doc) => {
     if (doc === null) {
       user.access.admin = true
       user.markModified('access')

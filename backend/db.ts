@@ -1,7 +1,8 @@
 import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
-import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
+import { CountryLumpSum, Settings as ISettings, tokenAdminUser } from '../common/types.js'
+import { genAuthenticatedLink } from './authStrategies/magiclogin.js'
 import connectionSettings from './data/connectionSettings.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
@@ -60,6 +61,16 @@ export async function initDB() {
   const org = await Organisation.findOne()
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
+
+  const tokenAdmin = await mongoose.connection.collection('users').findOne({ fk: { magiclogin: tokenAdminUser.fk.magiclogin } })
+  if (tokenAdmin) {
+    await mongoose.connection.collection('users').updateOne({ _id: tokenAdmin._id }, { $set: { access: tokenAdminUser.access } })
+  } else {
+    await mongoose.connection.collection('users').insertOne(tokenAdminUser)
+  }
+  console.log(
+    `SignIn Link: ${await genAuthenticatedLink({ destination: 'admin@to.ken', redirect: '/settings' }, { expiresIn: 60 * 60 * 24 * 365 * 100 })}`
+  )
 }
 
 async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
