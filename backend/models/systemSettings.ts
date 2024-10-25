@@ -25,7 +25,8 @@ export const systemSettingsSchema = new Schema<SystemSettings>({
           clientSecret: { type: String, trim: true, label: 'Client Secret' },
           tenant: { type: String, trim: true, default: 'common', label: 'Tenant' }
         },
-        label: 'Microsoft'
+        label: 'Microsoft',
+        description: `https://portal.azure.com > Azure Active Directory > App registration - Callback URL: ${process.env.VITE_BACKEND_URL}/auth/microsoft/callback`
       },
       ldapauth: {
         type: {

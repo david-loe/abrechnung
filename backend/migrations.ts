@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
 import Settings from './models/settings.js'
+import { applySystemSettings } from './models/systemSettings.js'
 
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
@@ -75,7 +76,42 @@ export async function checkForMigrations() {
         await mongoose.connection.collection('tokens').dropIndex('createdAt_1')
       }
     }
-
+    if (semver.lte(migrateFrom, '1.3.1')) {
+      console.log('Apply migration from v1.3.1: Move ENV to System Settings')
+      const settingsFromEnv: any = {
+        auth: {
+          microsoft: {
+            clientId: process.env.MS_AZURE_CLIENT_ID,
+            clientSecret: process.env.MS_AZURE_CLIENT_SECRET,
+            tenant: process.env.MS_AZURE_TENANT
+          },
+          ldapauth: {
+            url: process.env.LDAP_URL,
+            bindDN: process.env.LDAP_BINDDN,
+            bindCredentials: process.env.LDAP_BINDCREDENTIALS,
+            searchBase: process.env.LDAP_SEARCHBASE,
+            searchFilter: process.env.LDAP_SEARCHFILTER,
+            tlsOptions: {
+              rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true'
+            },
+            mailAttribute: process.env.LDAP_MAIL_ATTRIBUTE,
+            uidAttribute: process.env.LDAP_UID_ATTRIBUTE,
+            familyNameAttribute: process.env.LDAP_SURNAME_ATTRIBUTE,
+            givenNameAttribute: process.env.LDAP_GIVENNAME_ATTRIBUTE
+          }
+        },
+        smtp: {
+          host: process.env.SMTP_HOST,
+          port: parseInt(process.env.SMTP_PORT),
+          secure: process.env.SMTP_SECURE.toLowerCase() === 'true',
+          user: process.env.SMTP_USER,
+          password: process.env.SMTP_PASS,
+          senderAddress: process.env.MAIL_SENDER_ADDRESS
+        }
+      }
+      await mongoose.connection.collection('settings').updateOne({}, { $set: settingsFromEnv })
+      applySystemSettings(settingsFromEnv)
+    }
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()
