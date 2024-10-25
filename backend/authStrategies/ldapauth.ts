@@ -1,8 +1,7 @@
 import LdapAuth from 'ldapauth-fork'
 import LdapStrategy from 'passport-ldapauth'
 import { ldapauthSettings } from '../../common/types.js'
-import User from '../models/user.js'
-import { AuthenticationStrategy, NewUser, addAdminIfNone } from './index.js'
+import { AuthenticationStrategy, findOrCreateUser } from './index.js'
 
 class Ldapauth extends AuthenticationStrategy<LdapStrategy, ldapauthSettings> {
   #mapConfig(config: ldapauthSettings): LdapStrategy.Options['server'] {
@@ -23,37 +22,16 @@ class Ldapauth extends AuthenticationStrategy<LdapStrategy, ldapauthSettings> {
         server: this.#mapConfig(config)
       },
       async function (ldapUser: any, cb: (error: any, user?: any) => void) {
-        let user = await User.findOne({ 'fk.ldapauth': ldapUser[config.uidAttribute] })
-        let email = ldapUser[config.mailAttribute]
-        if (Array.isArray(email)) {
-          if (email.length > 0) {
-            email = email[0]
-          } else {
-            email = undefined
-          }
-        }
-        if (!user && email) {
-          user = await User.findOne({ email: email })
-        }
-        const newUser: NewUser = {
-          fk: { ldapauth: ldapUser[config.uidAttribute] },
-          email: email,
-          name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
-        }
-        if (!user) {
-          user = new User(newUser)
-        } else {
-          Object.assign(user.fk, newUser.fk)
-          delete newUser.fk
-          Object.assign(user, newUser)
-        }
-        try {
-          await user.save()
-          addAdminIfNone(user)
-          cb(null, user)
-        } catch (error) {
-          cb(error)
-        }
+        let email: string | string[] = ldapUser[config.mailAttribute]
+
+        findOrCreateUser(
+          { ldapauth: ldapUser[config.uidAttribute] },
+          {
+            email: Array.isArray(email) ? (email.length > 0 ? email[0] : '') : email,
+            name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
+          },
+          cb
+        )
       }
     )
   }

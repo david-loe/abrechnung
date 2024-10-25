@@ -1,7 +1,6 @@
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
 import { microsoftSettings } from '../../common/types.js'
-import User from '../models/user.js'
-import { AuthenticationStrategy, NewUser, addAdminIfNone } from './index.js'
+import { AuthenticationStrategy, findOrCreateUser } from './index.js'
 
 interface msProfile {
   provider: 'microsoft'
@@ -37,34 +36,18 @@ class Microsoft extends AuthenticationStrategy<MicrosoftStrategy, microsoftSetti
         scope: ['user.read']
       },
       async function (accessToken: string, refreshToken: string, profile: msProfile, verified: (error: any, user?: Express.User) => void) {
-        var user = await User.findOne({ 'fk.microsoft': profile._json.id })
-        var email = profile._json.mail
-        if (!user && email) {
-          user = await User.findOne({ email: email })
-        }
         let displayNameSplit = profile._json.displayName.split(' ')
-        const newUser: NewUser = {
-          fk: { microsoft: profile._json.id },
-          email: email,
-          name: {
-            familyName: profile._json.surname || (displayNameSplit.shift() as string), // first part of displayNameSplit
-            givenName: profile._json.givenName || (displayNameSplit.length > 1 ? displayNameSplit.join(' ') : ' ') // rest of displayNameSplit
-          }
-        }
-        if (!user) {
-          user = new User(newUser)
-        } else {
-          Object.assign(user.fk, newUser.fk)
-          delete newUser.fk
-          Object.assign(user, newUser)
-        }
-        try {
-          await user.save()
-          verified(null, user)
-          addAdminIfNone(user)
-        } catch (error) {
-          verified(error)
-        }
+        await findOrCreateUser(
+          { microsoft: profile._json.id },
+          {
+            email: profile._json.mail,
+            name: {
+              familyName: profile._json.surname || (displayNameSplit.shift() as string), // first part of displayNameSplit
+              givenName: profile._json.givenName || (displayNameSplit.length > 1 ? displayNameSplit.join(' ') : ' ') // rest of displayNameSplit
+            }
+          },
+          verified
+        )
       }
     )
   }
