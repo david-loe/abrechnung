@@ -23,9 +23,8 @@ export abstract class AuthenticationStrategy<Strategy extends passport.Strategy,
 
   getStrategy() {
     if (!this.strategy) {
-      throw new Error('ldapauth Strategy is not configured')
+      throw new Error(`${this.constructor.name} Strategy is not configured`)
     }
-    console.log('get ' + this.strategy.name)
     return this.strategy
   }
 
