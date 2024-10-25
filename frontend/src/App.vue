@@ -246,6 +246,7 @@ export default defineComponent({
               this.updateLocale(this.user.settings.language)
               this.auth = true
             }
+            this.isOffline = !navigator.onLine // braucht man irgendwie für Safari & Firefox?
             this.loadState = 'LOADED'
           })
         }
