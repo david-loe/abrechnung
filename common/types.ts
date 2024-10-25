@@ -73,7 +73,7 @@ export interface microsoftSettings {
   tenant: string
 }
 
-export interface SystemSettings {
+export interface ConnectionSettings {
   auth: {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null

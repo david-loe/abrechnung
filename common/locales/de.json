@@ -101,7 +101,7 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
-    "systemSettings": "Systemeinstellungen",
+    "connectionSettings": "Verbindungseinstellungen",
     "auth": "Authentifizierung",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",

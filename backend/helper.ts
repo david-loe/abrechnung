@@ -5,6 +5,7 @@ import multer from 'multer'
 import {
   _id,
   AnyState,
+  ConnectionSettings,
   DocumentFile as IDocumentFile,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
@@ -12,8 +13,7 @@ import {
   User as IUser,
   reportIsHealthCareCost,
   reportIsTravel,
-  Settings,
-  SystemSettings
+  Settings
 } from '../common/types.js'
 import { connectDB } from './db.js'
 import DocumentFile from './models/documentFile.js'
@@ -191,13 +191,13 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
-export async function getSystemSettings(): Promise<SystemSettings> {
+export async function getConnectionSettings(): Promise<ConnectionSettings> {
   await connectDB()
-  const systemSettings = (await mongoose.connection.collection('systemsettings').findOne()) as SystemSettings | null
-  if (systemSettings) {
-    return systemSettings
+  const connectionSettings = (await mongoose.connection.collection('connectionsettings').findOne()) as ConnectionSettings | null
+  if (connectionSettings) {
+    return connectionSettings
   } else {
-    throw Error('System Settings not found')
+    throw Error('Connection Settings not found')
   }
 }
 

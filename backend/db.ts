@@ -2,19 +2,19 @@ import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
 import { CountryLumpSum, Settings as ISettings } from '../common/types.js'
+import connectionSettings from './data/connectionSettings.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
-import systemSettings from './data/systemSettings.json' with { type: 'json' }
-import { getSystemSettings } from './helper.js'
+import { getConnectionSettings } from './helper.js'
 import i18n from './i18n.js'
+import ConnectionSettings, { applyConnectionSettings } from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
-import SystemSettings, { applySystemSettings } from './models/systemSettings.js'
 
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
@@ -51,9 +51,9 @@ export async function initDB() {
   await fetchAndUpdateLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
 
-  await initer(SystemSettings, 'systemSettings', [systemSettings])
-  const loadedSystemSettings = await getSystemSettings()
-  applySystemSettings(loadedSystemSettings)
+  await initer(ConnectionSettings, 'connectionSettings', [connectionSettings])
+  const loadedConnectionSettings = await getConnectionSettings()
+  applyConnectionSettings(loadedConnectionSettings)
 
   const organisations = [{ name: 'My Organisation' }]
   await initer(Organisation, 'organisation', organisations)

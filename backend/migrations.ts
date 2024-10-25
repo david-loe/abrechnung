@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
+import { applyConnectionSettings } from './models/connectionSettings.js'
 import Settings from './models/settings.js'
-import { applySystemSettings } from './models/systemSettings.js'
 
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
@@ -77,7 +77,7 @@ export async function checkForMigrations() {
       }
     }
     if (semver.lte(migrateFrom, '1.3.1')) {
-      console.log('Apply migration from v1.3.1: Move ENV to System Settings')
+      console.log('Apply migration from v1.3.1: Move ENV to Connection Settings')
       const settingsFromEnv: any = {
         auth: {
           microsoft: {
@@ -109,8 +109,8 @@ export async function checkForMigrations() {
           senderAddress: process.env.MAIL_SENDER_ADDRESS
         }
       }
-      await mongoose.connection.collection('settings').updateOne({}, { $set: settingsFromEnv })
-      applySystemSettings(settingsFromEnv)
+      await mongoose.connection.collection('connectionsettings').updateOne({}, { $set: settingsFromEnv })
+      applyConnectionSettings(settingsFromEnv)
     }
     if (settings) {
       settings.migrateFrom = undefined

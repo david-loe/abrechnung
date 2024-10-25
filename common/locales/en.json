@@ -101,7 +101,7 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
-    "systemSettings": "System Settings",
+    "connectionSettings": "Connection Settings",
     "auth": "Authentication",
     "access": "Access",
     "accessIcons": "Icons for access rights",

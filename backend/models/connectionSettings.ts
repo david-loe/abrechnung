@@ -1,10 +1,10 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
-import { emailRegex, SystemSettings } from '../../common/types.js'
+import { ConnectionSettings, emailRegex } from '../../common/types.js'
 import ldapauth from '../authStrategies/ldapauth.js'
 import microsoft from '../authStrategies/microsoft.js'
 import mail from '../mail/client.js'
 
-export const systemSettingsSchema = new Schema<SystemSettings>({
+export const connectionSettingsSchema = new Schema<ConnectionSettings>({
   smtp: {
     type: {
       host: { type: String, trim: true, required: true, label: 'Host' },
@@ -53,7 +53,7 @@ export const systemSettingsSchema = new Schema<SystemSettings>({
   }
 })
 
-systemSettingsSchema.pre('validate', async function (this: HydratedDocument<SystemSettings>, next) {
+connectionSettingsSchema.pre('validate', async function (this: HydratedDocument<ConnectionSettings>, next) {
   if (this.auth.ldapauth?.url) {
     await ldapauth.verifyConfig(this.auth.ldapauth)
   }
@@ -61,18 +61,18 @@ systemSettingsSchema.pre('validate', async function (this: HydratedDocument<Syst
   next()
 })
 
-systemSettingsSchema.post('save', function (this: HydratedDocument<SystemSettings>) {
-  applySystemSettings(this)
+connectionSettingsSchema.post('save', function (this: HydratedDocument<ConnectionSettings>) {
+  applyConnectionSettings(this)
 })
 
-export function applySystemSettings(systemSettings: SystemSettings) {
-  mail.configureClient(systemSettings.smtp)
-  if (systemSettings.auth.ldapauth?.url) {
-    ldapauth.configureStrategy(systemSettings.auth.ldapauth)
+export function applyConnectionSettings(connectionSettings: ConnectionSettings) {
+  mail.configureClient(connectionSettings.smtp)
+  if (connectionSettings.auth.ldapauth?.url) {
+    ldapauth.configureStrategy(connectionSettings.auth.ldapauth)
   }
-  if (systemSettings.auth.microsoft?.clientId) {
-    microsoft.configureStrategy(systemSettings.auth.microsoft)
+  if (connectionSettings.auth.microsoft?.clientId) {
+    microsoft.configureStrategy(connectionSettings.auth.microsoft)
   }
 }
 
-export default model<SystemSettings>('SystemSettings', systemSettingsSchema)
+export default model<ConnectionSettings>('ConnectionSettings', connectionSettingsSchema)
