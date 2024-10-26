@@ -1,4 +1,4 @@
-import { SchemaDefinition, SchemaTypeOptions } from 'mongoose'
+import { Schema, SchemaDefinition, SchemaTypeOptions } from 'mongoose'
 import { Locale, emailRegex } from '../../common/types.js'
 import i18n from '../i18n.js'
 
@@ -99,6 +99,8 @@ function mapSchemaTypeToVueformElement(
     vueformElement['type'] = 'checkbox'
     vueformElement['text'] = vueformElement['label']
     delete vueformElement['label']
+  } else if (schemaType.type === Schema.Types.Mixed) {
+    vueformElement['type'] = 'mixed'
   } else if (Array.isArray(schemaType.type)) {
     if (schemaType.type[0].ref) {
       vueformElement['type'] = schemaType.type[0].ref.toString().toLowerCase()

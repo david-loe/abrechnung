@@ -135,11 +135,13 @@
 <script lang="ts">
 import axios, { AxiosRequestConfig } from 'axios'
 import { defineComponent } from 'vue'
+import { loadLocales } from '../../common/locales/load.js'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
   CountrySimple,
   Currency,
+  DisplaySettings,
   GETResponse,
   HealthInsurance,
   Locale,
@@ -151,6 +153,7 @@ import {
   accesses,
   locales
 } from '../../common/types.js'
+import i18n from './i18n.js'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -169,6 +172,7 @@ export default defineComponent({
       currencies: [] as Currency[],
       countries: [] as CountrySimple[],
       settings: {} as Settings,
+      displaySettings: {} as DisplaySettings,
       healthInsurances: [] as HealthInsurance[],
       organisations: [] as OrganisationSimple[],
       projects: [] as ProjectSimple[],
@@ -183,41 +187,62 @@ export default defineComponent({
   },
   components: {},
   methods: {
-    async load() {
+    async load(withoutAuth = false) {
       if (this.loadState === 'UNLOADED') {
         this.loadState = 'LOADING'
-        this.loadingPromise = Promise.allSettled([
-          this.getter<User>('user'),
-          this.getter<Currency[]>('currency'),
-          this.getter<CountrySimple[]>('country'),
-          this.getter<Settings>('settings'),
-          this.getter<HealthInsurance[]>('healthInsurance'),
-          this.getter<OrganisationSimple[]>('organisation'),
-          this.getter<ProjectSimple[]>('project', {}, {}, false),
-          this.getter<{ [key: string]: string[] }>('specialLumpSums'),
-          this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
-        ]).then((result) => {
-          this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
-          this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
-          this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
-          this.settings =
-            result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
-          this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
-          this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
-          this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
-          this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
-          this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
-
-          log(this.$t('labels.user') + ':')
-          log(this.user)
-          if (this.user._id) {
-            this.$i18n.locale = this.user.settings.language
-            this.$vueform.i18n.locale = this.user.settings.language
-            this.$formatter.setLocale(this.user.settings.language)
-            this.auth = true
+        const displayPromise = Promise.allSettled([this.getter<DisplaySettings>('displaySettings')]).then((result) => {
+          this.displaySettings =
+            result[0].status === 'fulfilled'
+              ? result[0].value.ok
+                ? result[0].value.ok.data
+                : ({} as DisplaySettings)
+              : ({} as DisplaySettings)
+          const messages = loadLocales(this.displaySettings.locale.overwrite)
+          for (const locale in messages) {
+            i18n.global.setLocaleMessage(locale, messages[locale as Locale])
           }
-          this.loadState = 'LOADED'
+          this.updateLocale(this.displaySettings.locale.default)
+          this.$i18n.fallbackLocale = this.displaySettings.locale.fallback
+          document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
         })
+        if (withoutAuth) {
+          this.loadingPromise = new Promise(async (resolve) => {
+            await displayPromise
+            this.loadState = 'LOADED'
+          })
+        } else {
+          this.loadingPromise = Promise.allSettled([
+            this.getter<User>('user'),
+            this.getter<Currency[]>('currency'),
+            this.getter<CountrySimple[]>('country'),
+            this.getter<Settings>('settings'),
+            this.getter<HealthInsurance[]>('healthInsurance'),
+            this.getter<OrganisationSimple[]>('organisation'),
+            this.getter<ProjectSimple[]>('project', {}, {}, false),
+            this.getter<{ [key: string]: string[] }>('specialLumpSums'),
+            this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false),
+            displayPromise
+          ]).then((result) => {
+            this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
+            this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
+            this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
+            this.settings =
+              result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
+            this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
+            this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
+            this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
+            this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
+            this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
+
+            log(this.$t('labels.user') + ':')
+            log(this.user)
+            if (this.user._id) {
+              this.updateLocale(this.user.settings.language)
+              this.auth = true
+            }
+            this.loadState = 'LOADED'
+          })
+        }
         await this.loadingPromise
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
@@ -349,9 +374,8 @@ export default defineComponent({
       )
     },
     async pushUserSettings(settings: User['settings']) {
-      this.$formatter.setLocale(this.$i18n.locale as Locale)
+      this.updateLocale(this.$i18n.locale as Locale, false)
       settings.language = this.$i18n.locale as Locale
-      this.$vueform.i18n.locale = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true
@@ -363,6 +387,13 @@ export default defineComponent({
           console.log(error.response.data)
         }
       }
+    },
+    updateLocale(locale: Locale, updateI18n = true) {
+      if (updateI18n) {
+        this.$i18n.locale = locale
+      }
+      this.$vueform.i18n.locale = locale
+      this.$formatter.setLocale(locale)
     },
     setLastCurrency(currency: Currency) {
       this.setLast(currency, this.user.settings.lastCurrencies)
@@ -383,9 +414,6 @@ export default defineComponent({
       }
     },
     getFlagEmoji
-  },
-  created() {
-    document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
   }
 })
 </script>

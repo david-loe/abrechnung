@@ -1,13 +1,15 @@
 import { createI18n } from 'vue-i18n'
-import { loadLocales } from '../../common/locales/load.js'
-import { Locale } from '../../common/types.js'
+import { Locale, locales } from '../../common/types.js'
 
-const messages = loadLocales(import.meta.env.VITE_I18N_LOCALES_OVERWRITE)
+const emptyMessages = {} as { [key in Locale]: {} }
+for (const locale of locales) {
+  emptyMessages[locale] = {}
+}
 
-export default createI18n<typeof messages.de, Locale>({
+export default createI18n<any, Locale>({
   legacy: false,
-  locale: import.meta.env.VITE_I18N_LOCALE || 'de',
-  fallbackLocale: import.meta.env.VITE_I18N_FALLBACK_LOCALE || 'de',
-  messages: messages,
+  locale: 'de',
+  fallbackLocale: 'de',
+  messages: emptyMessages,
   globalInjection: true
 })

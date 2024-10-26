@@ -1,0 +1,15 @@
+{
+    "auth": {
+        "magiclogin": true,
+        "microsoft": true,
+        "ldapauth": true
+    },
+    "locale": {
+        "default": "de",
+        "fallback": "de",
+        "overwrite": {
+            "de": {},
+            "en": {}
+        }
+    }
+}

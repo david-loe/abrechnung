@@ -3,64 +3,79 @@ import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse } from 'tsoa'
 import { Base64, escapeRegExp } from '../../common/scripts.js'
+import { tokenAdminUser } from '../../common/types.js'
 import ldapauth from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import microsoft from '../authStrategies/microsoft.js'
+import { getDisplaySettings } from '../helper.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 
-const disabledMessage = 'This Authentication Method has been disabled by .env settings.'
-const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true'
-const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true'
+const disabledMessage = 'This Authentication Method has been disabled by display settings.'
 const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
 
 const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
   throw new NotImplementedError(disabledMessage)
 }
 
-const ldapauthHandler = useLDAPauth
-  ? (req: ExRequest, res: ExResponse, next: NextFunction) =>
-      passport.authenticate(ldapauth.getStrategy(), { session: true })(req, res, next)
-  : NotImplementedMiddleware
+const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.ldapauth) {
+    passport.authenticate(ldapauth.getStrategy(), { session: true })(req, res, next)
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
 
-const microsoftHandler = useMicrosoft
-  ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
-      const redirect = req.query.redirect
-      const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
-      passport.authenticate(microsoft.getStrategy(), { state: state })(req, res, next)
+const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.microsoft) {
+    const redirect = req.query.redirect
+    const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
+    passport.authenticate(microsoft.getStrategy(), { state: state })(req, res, next)
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
+
+const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.microsoft) {
+    passport.authenticate(microsoft.getStrategy())(req, res, next)
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
+
+const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.magiclogin) {
+    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
+    if (user && (await user.isActive())) {
+      magiclogin.send(req, res)
+    } else {
+      throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)
     }
-  : NotImplementedMiddleware
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
 
-const microsoftCallbackHandler = useMicrosoft
-  ? (req: ExRequest, res: ExResponse, next: NextFunction) => passport.authenticate(microsoft.getStrategy())(req, res, next)
-  : NotImplementedMiddleware
-
-const magicloginHandler = useMagicLogin
-  ? async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-      var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
-      if (user && (await user.isActive())) {
-        magiclogin.send(req, res)
-      } else {
-        throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)
-      }
+const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  let redirect: any
+  let tokenAdmin = false
+  if (req.query.token) {
+    const token = jwt.decode(req.query.token as string) as jwt.JwtPayload
+    const redirectPath = token.redirect
+    tokenAdmin = token.destination === tokenAdminUser.fk.magiclogin
+    if (redirectPath && typeof redirectPath === 'string' && redirectPath.startsWith('/')) {
+      redirect = redirectPath
     }
-  : NotImplementedMiddleware
-
-const magicloginCallbackHandler = useMagicLogin
-  ? (req: ExRequest, res: ExResponse, next: NextFunction) => {
-      let redirect: any
-      if (req.query.token) {
-        const token = jwt.decode(req.query.token as string) as jwt.JwtPayload
-        const redirectPath = token.redirect
-        if (redirectPath && typeof redirectPath === 'string' && redirectPath.startsWith('/')) {
-          redirect = redirectPath
-        }
-      }
-      passport.authenticate(magiclogin, {
-        failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')
-      })(req, res, next)
-    }
-  : NotImplementedMiddleware
+  }
+  if ((await getDisplaySettings()).auth.magiclogin || tokenAdmin) {
+    passport.authenticate(magiclogin, {
+      failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')
+    })(req, res, next)
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
 
 @Route('auth')
 @Response(501, disabledMessage)

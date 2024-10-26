@@ -1,11 +1,9 @@
-import jwt from 'jsonwebtoken'
 import MagicLoginStrategy from 'passport-magic-login'
 import { escapeRegExp } from '../../common/scripts.js'
 import { NotAllowedError } from '../controller/error.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
 import User from '../models/user.js'
-
 const secret = process.env.MAGIC_LOGIN_SECRET
 const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
 const options = {
@@ -40,16 +38,3 @@ export default new MagicLoginStrategy.default({
   },
   jwtOptions: options
 })
-
-export function genAuthenticatedLink(payload: { destination: string; redirect: string }, jwtOptions: jwt.SignOptions = options) {
-  return new Promise<string>((resolve, reject) => {
-    const code = Math.floor(Math.random() * 90000) + 10000 + ''
-    jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(`${callbackUrl}?token=${token}`)
-      }
-    })
-  })
-}

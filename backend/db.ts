@@ -1,18 +1,18 @@
 import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
-import { CountryLumpSum, Settings as ISettings, tokenAdminUser } from '../common/types.js'
-import { genAuthenticatedLink } from './authStrategies/magiclogin.js'
+import { CountryLumpSum, DisplaySettings as IDisplaySettings, Settings as ISettings, tokenAdminUser } from '../common/types.js'
 import connectionSettings from './data/connectionSettings.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
+import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
-import { getConnectionSettings } from './helper.js'
-import i18n from './i18n.js'
+import { genAuthenticatedLink, getConnectionSettings } from './helper.js'
 import ConnectionSettings, { applyConnectionSettings } from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
+import DisplaySettings from './models/displaySettings.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
@@ -21,7 +21,7 @@ export async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
     await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
-    console.log(i18n.t('alerts.db.success'))
+    console.log('Connected to Database')
     await initDB()
   } else {
     await mongoose.connection.asPromise()
@@ -42,19 +42,19 @@ export async function initDB() {
     const mergedSettings = mergeDeep({}, settings, DBsettings)
     await mongoose.connection.collection('settings').findOneAndDelete({})
     await mongoose.connection.collection('settings').insertOne(mergedSettings)
-    console.log(i18n.t('alerts.db.updatedSettings'))
+    console.log('Updated Settings')
   } else {
     await mongoose.connection.collection('settings').insertOne(settings)
-    console.log(i18n.t('alerts.db.createdSettings'))
+    console.log('Created Settings from Default')
   }
+  await initer(ConnectionSettings, 'connectionSettings', [connectionSettings])
+  const loadedConnectionSettings = await getConnectionSettings()
+  applyConnectionSettings(loadedConnectionSettings)
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
   await fetchAndUpdateLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
-
-  await initer(ConnectionSettings, 'connectionSettings', [connectionSettings])
-  const loadedConnectionSettings = await getConnectionSettings()
-  applyConnectionSettings(loadedConnectionSettings)
+  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
 
   const organisations = [{ name: 'My Organisation' }]
   await initer(Organisation, 'organisation', organisations)

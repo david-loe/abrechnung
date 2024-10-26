@@ -6,6 +6,7 @@ import {
   _id,
   AnyState,
   ConnectionSettings,
+  DisplaySettings,
   DocumentFile as IDocumentFile,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
@@ -201,6 +202,16 @@ export async function getConnectionSettings(): Promise<ConnectionSettings> {
   }
 }
 
+export async function getDisplaySettings(): Promise<DisplaySettings> {
+  await connectDB()
+  const displaySettings = (await mongoose.connection.collection('displaysettings').findOne()) as DisplaySettings | null
+  if (displaySettings) {
+    return displaySettings
+  } else {
+    throw Error('Display Settings not found')
+  }
+}
+
 export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {
   if (user.projects.supervised.length === 0) {
     return true
@@ -209,3 +220,22 @@ export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boo
 }
 
 export const fileHandler = multer({ limits: { fileSize: parseInt(process.env.VITE_MAX_FILE_SIZE) } })
+
+import jwt from 'jsonwebtoken'
+const options = {
+  expiresIn: 60 * 120 // in seconds -> 120min
+}
+export function genAuthenticatedLink(payload: { destination: string; redirect: string }, jwtOptions: jwt.SignOptions = options) {
+  const secret = process.env.MAGIC_LOGIN_SECRET
+  const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
+  return new Promise<string>((resolve, reject) => {
+    const code = Math.floor(Math.random() * 90000) + 10000 + ''
+    jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(`${callbackUrl}?token=${token}`)
+      }
+    })
+  })
+}

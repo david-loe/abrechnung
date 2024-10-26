@@ -2,17 +2,10 @@ import { Locale } from '../types.js'
 import de from './de.json' with { type: 'json' }
 import en from './en.json' with { type: 'json' }
 
-export function loadLocales(overwriteJSONstring?: string) {
+export function loadLocales(overwrite: { [key in Locale]?: { [key: string]: string } }) {
+  delete (overwrite as any)._id
   const messages = { de, en }
-  if (overwriteJSONstring) {
-    let overwrite: { [key in Locale]?: { [key: string]: string } } | null = null
-    try {
-      overwrite = JSON.parse(overwriteJSONstring)
-    } catch (error) {
-      console.error('LOCALES_OVERWRITE Error')
-      console.error(error)
-    }
-    if (overwrite) {
+
       for (const lang in overwrite) {
         for (const identifier in overwrite[lang as Locale]) {
           let pathExists = false
@@ -34,11 +27,9 @@ export function loadLocales(overwriteJSONstring?: string) {
             }
           }
           if (!pathExists) {
-            console.error(`ENV: VITE_I18N_LOCALES_OVERWRITE: No message found at '${identifier}' (${lang})`)
+            console.error(`Locale Overwrite: No message found at '${identifier}' (${lang})`)
           }
-        }
-      }
-    }
+                }
   }
   return messages
 }

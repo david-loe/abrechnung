@@ -26,6 +26,7 @@ import Formatter from '../../common/formatter'
 import {
   CountrySimple,
   Currency,
+  DisplaySettings,
   GETResponse,
   HealthInsurance,
   Locale,
@@ -60,13 +61,14 @@ declare module 'vue' {
       addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
-      load: () => Promise<void>
+      load: (withoutAuth?: boolean) => Promise<void>
       pushUserSettings: (settings: User['settings']) => Promise<void>
       loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
       currencies: Currency[]
       countries: CountrySimple[]
       user: User
       settings: Settings
+      displaySettings: DisplaySettings
       healthInsurances: HealthInsurance[]
       organisations: OrganisationSimple[]
       projects: ProjectSimple[]

@@ -10,7 +10,7 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
-import { genAuthenticatedLink } from '../authStrategies/magiclogin.js'
+import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
 import mail from './client.js'

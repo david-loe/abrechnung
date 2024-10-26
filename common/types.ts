@@ -82,6 +82,20 @@ export interface ConnectionSettings {
   _id: _id
 }
 
+export interface DisplaySettings {
+  auth: {
+    magiclogin: boolean
+    microsoft: boolean
+    ldapauth: boolean
+  }
+  locale: {
+    default: Locale
+    fallback: Locale
+    overwrite: { [key in Locale]: { [key: string]: string } }
+  }
+  _id: _id
+}
+
 /**
  * @pattern ^[A-Z]{2}$
  */

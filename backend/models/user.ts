@@ -10,9 +10,10 @@ import {
   locales,
   userReplaceCollections
 } from '../../common/types.js'
-import { getSettings } from '../helper.js'
+import { getDisplaySettings, getSettings } from '../helper.js'
 
 const settings = await getSettings()
+const displaySettings = await getDisplaySettings()
 
 const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
 for (const access of accesses) {
@@ -80,7 +81,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
   loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
-      language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },
+      language: { type: String, default: displaySettings.locale.default, enum: locales },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },

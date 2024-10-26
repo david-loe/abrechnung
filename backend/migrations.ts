@@ -77,8 +77,8 @@ export async function checkForMigrations() {
       }
     }
     if (semver.lte(migrateFrom, '1.3.1')) {
-      console.log('Apply migration from v1.3.1: Move ENV to Connection Settings')
-      const settingsFromEnv: any = {
+      console.log('Apply migration from v1.3.1: Move ENV to Connection and Display Settings')
+      const connectionSettingsFromEnv: any = {
         auth: {
           microsoft: {
             clientId: process.env.MS_AZURE_CLIENT_ID,
@@ -92,7 +92,7 @@ export async function checkForMigrations() {
             searchBase: process.env.LDAP_SEARCHBASE,
             searchFilter: process.env.LDAP_SEARCHFILTER,
             tlsOptions: {
-              rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true'
+              rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED?.toLowerCase() === 'true'
             },
             mailAttribute: process.env.LDAP_MAIL_ATTRIBUTE,
             uidAttribute: process.env.LDAP_UID_ATTRIBUTE,
@@ -102,15 +102,28 @@ export async function checkForMigrations() {
         },
         smtp: {
           host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT),
-          secure: process.env.SMTP_SECURE.toLowerCase() === 'true',
+          port: parseInt(process.env.SMTP_PORT as string),
+          secure: process.env.SMTP_SECURE?.toLowerCase() === 'true',
           user: process.env.SMTP_USER,
           password: process.env.SMTP_PASS,
           senderAddress: process.env.MAIL_SENDER_ADDRESS
         }
       }
-      await mongoose.connection.collection('connectionsettings').updateOne({}, { $set: settingsFromEnv })
-      applyConnectionSettings(settingsFromEnv)
+      await mongoose.connection.collection('connectionsettings').updateOne({}, { $set: connectionSettingsFromEnv })
+      applyConnectionSettings(connectionSettingsFromEnv)
+      const displaySettingsFromEnv: any = {
+        auth: {
+          microsoft: process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true',
+          ldapauth: process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true',
+          magiclogin: process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
+        },
+        locale: {
+          default: process.env.VITE_I18N_LOCALE,
+          fallback: process.env.VITE_I18N_FALLBACK_LOCALE,
+          overwrite: JSON.parse(process.env.VITE_I18N_LOCALES_OVERWRITE || '{"de":{},"en":{}}')
+        }
+      }
+      await mongoose.connection.collection('displaysettings').updateOne({}, { $set: displaySettingsFromEnv })
     }
     if (settings) {
       settings.migrateFrom = undefined

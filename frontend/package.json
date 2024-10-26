@@ -15,6 +15,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "json-editor-vue": "^0.17.2",
     "qrcode": "^1.5.4",
     "qs": "^6.13.0",
     "vue": "^3.5.12",

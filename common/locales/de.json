@@ -17,11 +17,6 @@
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
-    "db": {
-      "createdSettings": "Einstellungen wurden vom Standard erstellt",
-      "success": "Erfolgreich mit der Datenbank verbunden.",
-      "updatedSettings": "Einstellungen wurden aktualisiert"
-    },
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
@@ -46,10 +41,10 @@
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
       "travel": "Du hast noch keine Reisen beantragt. Beantrage deine erste Reise!"
     },
-    "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "notAllowed": "Nicht erlaubt!",
     "notFound": "Nichts gefunden!",
     "NotImplemented": "Nicht implementiert!",
+    "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "reloadRequired": "Neuladen erforderlich",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "successDeleting": "Gelöscht",
@@ -63,7 +58,8 @@
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
     "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
     "deleteRefundedAfterXDays": "Um keine automatische  Löschung durchzuführen 0 eingeben",
-    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben"
+    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben",
+    "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}"
   },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
@@ -101,8 +97,6 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
-    "connectionSettings": "Verbindungseinstellungen",
-    "auth": "Authentifizierung",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
@@ -124,6 +118,7 @@
     "approvedTravels": "Genehmigte Reisen",
     "arrival": "Ankunft",
     "assignedProjects": "Zugewiesene Projekte",
+    "auth": "Authentifizierung",
     "backToApplicant": "Zurück zum Antragsteller",
     "balance": "Saldo",
     "bankDetails": "Bankverbindung",
@@ -143,6 +138,7 @@
     "companyNumber": "Betriebsnummer",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
     "confirm": "Bestätigen",
+    "connectionSettings": "Verbindungseinstellungen",
     "cost": "Kosten",
     "countries": "Länder",
     "country": "Land",
@@ -156,6 +152,7 @@
     "day": "Tag",
     "days": "Tage",
     "de": "Deutsch 🇩🇪",
+    "default": "Standard",
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
     "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
@@ -168,6 +165,7 @@
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
     "disableReportType": "Antragsarten deaktivieren",
+    "displaySettings": "Anzeigeeinstellungen",
     "distance": "Entfernung [km]",
     "distanceRefunds": "Entfernungspauschalen",
     "distanceRefundType": "Entfernungspauschale",
@@ -195,6 +193,7 @@
     "factorCateringLumpSumExceptions": "Ausnahmen der Faktorisierung für die Verpflegungspauschalen",
     "factorOvernightLumpSum": "Faktor für die Übernachtungspauschalen",
     "factorOvernightLumpSumExceptions": "Ausnahmen der Faktorisierung für die Übernachtungspauschalen",
+    "fallback": "Ersatz",
     "fallBackLumpSumCountry": "Ausweichland für die Pauschalen",
     "familyName": "Nachname",
     "fellowTravelersNames": "Namen aller Mitreisenden",
@@ -247,6 +246,7 @@
     "organisation": "Organisation",
     "organisations": "Organisationen",
     "otherTransport": "Anderes Verkehrsmittel 🚆🚖",
+    "overwrite": "Überschreiben",
     "ownCar": "Eigenes Auto 🚘",
     "owner": "Besitzer",
     "password": "Passwort",
@@ -427,9 +427,9 @@
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "magiclogin": {
-      "subject": "Login bei @:{'headlines.title'}@:{'headlines.emoji'}",
       "buttonText": "Weiter zu @:{'headlines.title'}@:{'headlines.emoji'}",
-      "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen."
+      "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen.",
+      "subject": "Login bei @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "newMagiclogin": {
       "buttonText": "Zu @:{'headlines.title'}@:{'headlines.emoji'}",
