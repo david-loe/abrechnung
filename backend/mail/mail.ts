@@ -10,6 +10,7 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
+import { sendPushNotification } from '../app.js'
 import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n, { formatter } from '../i18n.js'
@@ -161,6 +162,6 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
   const paragraph = i18n.t(`mail.${reportType}.${textState || report.state}.paragraph`, interpolation)
   const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${textState || report.state}.lastParagraph`, interpolation) : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
-
+  sendPushNotification()
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

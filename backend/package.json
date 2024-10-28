@@ -25,7 +25,8 @@
     "pdf-lib": "^1.17.1",
     "semver": "^7.6.3",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.5.1"
+    "tsoa": "^6.4.0",
+    "web-push": "^3.6.7"
   },
   "peerDependencies": {
     "jsonwebtoken": "^9.0.2",
@@ -45,6 +46,7 @@
     "@types/semver": "^7.5.8",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.7",
+    "@types/web-push": "^3.6.4",
     "ava": "^6.2.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.1",

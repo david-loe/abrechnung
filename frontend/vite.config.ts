@@ -11,6 +11,7 @@ export default {
       strategies: 'injectManifest',
       srcDir: '',
       filename: 'sw.ts',
+      injectRegister: false,
       workbox: {
         clientsClaim: true,
         skipWaiting: true

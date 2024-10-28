@@ -50,7 +50,7 @@ services:
   inbucket:
     build:
       context: ./dev-tools/inbucket
-      dockerfile: Dockerfile.${NODE_ENV}
+      dockerfile: Dockerfile.development
     ports:
       - ${INBUCKET_UI_PORT}:9000
     environment:
