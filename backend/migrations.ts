@@ -11,7 +11,7 @@ export async function checkForMigrations() {
       async function rewriteSubmissionDate(collection: string, state: string) {
         const allReports = mongoose.connection.collection(collection).find({ historic: false })
         for await (const report of allReports) {
-          for (var i = 0; i < report.history.length; i++) {
+          for (let i = 0; i < report.history.length; i++) {
             const history = await mongoose.connection.collection(collection).findOne({ _id: report.history[i] })
             if (history && history.state === state) {
               let submissionDate = report.updatedAt

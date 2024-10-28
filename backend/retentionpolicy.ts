@@ -105,7 +105,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
     if (owner) {
       let recipients = [owner]
 
-      var reportType: ReportType
+      let reportType: ReportType
       if (reportIsTravel(report)) {
         reportType = 'travel'
       } else if (reportIsHealthCareCost(report)) {

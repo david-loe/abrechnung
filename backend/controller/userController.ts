@@ -120,7 +120,7 @@ export class UserAdminController extends Controller {
   @Post('bulk')
   public async postManyProjects(@Body() requestBody: SetterBodyUser[]) {
     const newMagicloginUsers: number[] = []
-    for (var i = 0; i < requestBody.length; i++) {
+    for (let i = 0; i < requestBody.length; i++) {
       if (!requestBody[i]._id && requestBody[i].fk && requestBody[i].fk!.magiclogin) {
         newMagicloginUsers.push(i)
       }

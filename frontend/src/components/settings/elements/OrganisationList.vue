@@ -95,7 +95,7 @@ export default defineComponent({
       this._showForm = true
     },
     async postOrganisation(organisation: Organisation) {
-      var headers = {}
+      let headers = {}
       if (organisation.logo && organisation.logo.data) {
         headers = {
           'Content-Type': 'multipart/form-data'

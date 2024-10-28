@@ -100,7 +100,7 @@ healthCareCostSchema.methods.saveToHistory = async function (this: HealthCareCos
 }
 
 async function exchange(costObject: Money, date: string | number | Date) {
-  var exchangeRate = null
+  let exchangeRate = null
 
   if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
     exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
@@ -116,7 +116,7 @@ healthCareCostSchema.methods.calculateExchangeRates = async function (this: Heal
     promiseList.push(exchange(expense.cost, expense.cost.date))
   }
   const results = await Promise.allSettled(promiseList)
-  var i = 0
+  let i = 0
   for (const expense of this.expenses) {
     if (results[i].status === 'fulfilled') {
       Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)

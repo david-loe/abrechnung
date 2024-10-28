@@ -126,7 +126,7 @@ export class TravelController extends Controller {
       if (!request.user!.access['appliedFor:travel']) {
         throw new AuthorizationError()
       } else if (!extendedBody.name && extendedBody.startDate) {
-        var date = new Date(extendedBody.startDate)
+        let date = new Date(extendedBody.startDate)
         extendedBody.name =
           extendedBody.destinationPlace?.place +
           ' ' +
@@ -149,12 +149,12 @@ export class TravelController extends Controller {
 
   @Post('approved')
   public async postApproved(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
-    var extendedBody: SetterBody<ITravel> = requestBody
+    let extendedBody: SetterBody<ITravel> = requestBody
     if (!extendedBody._id) {
       if (!request.user!.access['approved:travel']) {
         throw new AuthorizationError()
       } else if (!extendedBody.name && extendedBody.startDate) {
-        var date = new Date(extendedBody.startDate)
+        let date = new Date(extendedBody.startDate)
         extendedBody.name =
           extendedBody.destinationPlace?.place +
           ' ' +
@@ -267,7 +267,7 @@ export class TravelApproveController extends Controller {
     if (!extendedBody._id) {
       ;(extendedBody as any).lastPlaceOfWork = { country: (extendedBody as TravelApplication).destinationPlace?.country, place: '' }
       if (!(extendedBody as TravelApplication).name && (extendedBody as TravelApplication).startDate) {
-        var date = new Date((extendedBody as TravelApplication).startDate!)
+        let date = new Date((extendedBody as TravelApplication).startDate!)
         ;(extendedBody as TravelApplication).name =
           (extendedBody as TravelApplication).destinationPlace?.place +
           ' ' +

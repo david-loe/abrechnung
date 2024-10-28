@@ -14,7 +14,7 @@ export default new MagicLoginStrategy.default({
   secret: secret,
   callbackUrl: callbackUrl,
   sendMagicLink: async (destination, href) => {
-    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(destination) + '$', 'i') } }).lean()
+    let user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(destination) + '$', 'i') } }).lean()
     if (user) {
       sendMail(
         [user],
@@ -29,7 +29,7 @@ export default new MagicLoginStrategy.default({
     }
   },
   verify: async function (payload, callback) {
-    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(payload.destination) + '$', 'i') } })
+    let user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(payload.destination) + '$', 'i') } })
     if (user && (await user.isActive())) {
       callback(null, user, { redirect: payload.redirect })
     } else {

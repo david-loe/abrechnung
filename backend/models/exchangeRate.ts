@@ -31,13 +31,13 @@ export async function convertCurrency(
   if (from === to) {
     return null
   }
-  var convertionDate = new Date(date)
-  if (convertionDate.valueOf() - new Date().valueOf() > 0) {
-    convertionDate = new Date()
+  let conversionDate = new Date(date)
+  if (conversionDate.valueOf() - new Date().valueOf() > 0) {
+    conversionDate = new Date()
   }
-  const month = convertionDate.getUTCMonth() + 1
-  const year = convertionDate.getUTCFullYear()
-  var data: IExchangeRate | null | undefined = await ExchangeRate.findOne({ currency: from.toUpperCase(), month: month, year: year }).lean()
+  const month = conversionDate.getUTCMonth() + 1
+  const year = conversionDate.getUTCFullYear()
+  let data: IExchangeRate | null | undefined = await ExchangeRate.findOne({ currency: from.toUpperCase(), month: month, year: year }).lean()
   if (!data && !(await ExchangeRate.findOne({ month: month, year: year }).lean())) {
     const url = `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`
     const res = await axios.get(url)
@@ -54,5 +54,5 @@ export async function convertCurrency(
   }
   const rate = data.value
   amount = Math.round((amount / rate) * 100) / 100
-  return { date: convertionDate, rate, amount }
+  return { date: conversionDate, rate, amount }
 }

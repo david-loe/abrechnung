@@ -339,7 +339,7 @@ export default defineComponent({
       return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'expenseReport/report?_id=' + this.expenseReport._id
     },
     async postExpense(expense: Expense) {
-      var headers = {}
+      let headers = {}
       if (expense.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'

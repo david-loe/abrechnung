@@ -58,8 +58,8 @@ export class TravelCalculator {
 
   calculateProgress(travel: Travel) {
     if (travel.stages.length > 0) {
-      var approvedLength = getDiffInDays(travel.startDate, travel.endDate) + 1
-      var stageLength = getDiffInDays(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival) + 1
+      let approvedLength = getDiffInDays(travel.startDate, travel.endDate) + 1
+      let stageLength = getDiffInDays(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival) + 1
       if (stageLength >= approvedLength) {
         travel.progress = 100
       } else {
@@ -99,7 +99,7 @@ export class TravelCalculator {
       const startCountry = travel.stages[0].startLocation.country
       borderCrossings.push({ date: new Date(travel.stages[0].departure), country: startCountry })
 
-      for (var i = 0; i < travel.stages.length; i++) {
+      for (let i = 0; i < travel.stages.length; i++) {
         const stage = travel.stages[i]
         // Country Change (or special change)
         if (
@@ -131,11 +131,11 @@ export class TravelCalculator {
   }
 
   getDateOfLastPlaceOfWork(travel: Travel) {
-    var date: Date | null = null
+    let date: Date | null = null
     function sameCountryAndSpecial(placeA: Place, placeB: Place): boolean {
       return placeA.country._id === placeB.country._id && placeA.special === placeB.special
     }
-    for (var i = travel.stages.length - 1; i >= 0; i--) {
+    for (let i = travel.stages.length - 1; i >= 0; i--) {
       if (sameCountryAndSpecial(travel.stages[i].endLocation, travel.lastPlaceOfWork)) {
         date = datetimeToDate(travel.stages[i].arrival)
         break
@@ -154,7 +154,7 @@ export class TravelCalculator {
       borderCrossings.push({ date: borderX.date, country: await this.getCountryById(borderX.country._id), special: borderX.special })
     }
     const days = this.getDays(travel)
-    var bXIndex = 0
+    let bXIndex = 0
     for (const day of days) {
       while (
         bXIndex < borderCrossings.length - 1 &&
@@ -182,15 +182,15 @@ export class TravelCalculator {
   }
 
   async addCateringRefunds(travel: Travel) {
-    for (var i = 0; i < travel.days.length; i++) {
+    for (let i = 0; i < travel.days.length; i++) {
       const day = travel.days[i] as TravelDayFullCountry
       if (day.purpose == 'professional') {
         const result: Partial<Refund> = { type: 'catering24' }
         if (i == 0 || i == travel.days.length - 1) {
           result.type = 'catering8'
         }
-        var amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type!]
-        var leftover = 1
+        let amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type!]
+        let leftover = 1
         if (day.cateringNoRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
         if (day.cateringNoRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
         if (day.cateringNoRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
@@ -216,14 +216,14 @@ export class TravelCalculator {
 
   async addOvernightRefunds(travel: Travel) {
     if (travel.claimOvernightLumpSum) {
-      var stageIndex = 0
-      for (var i = 0; i < travel.days.length; i++) {
+      let stageIndex = 0
+      for (let i = 0; i < travel.days.length; i++) {
         const day = travel.days[i] as TravelDayFullCountry
         if (day.purpose == 'professional') {
           if (i == travel.days.length - 1) {
             break
           }
-          var midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
+          let midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
           while (stageIndex < travel.stages.length - 1 && midnight - new Date(travel.stages[stageIndex].arrival).valueOf() > 0) {
             stageIndex++
           }
@@ -234,7 +234,7 @@ export class TravelCalculator {
             continue
           }
           const result: Partial<Refund> = { type: 'overnight' }
-          var amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type!]
+          let amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type!]
           result.refund = {
             amount:
               Math.round(
@@ -256,8 +256,8 @@ export class TravelCalculator {
 
   calculateProfessionalShare(travel: Travel) {
     if (travel.days.length > 0) {
-      var professionalDays = 0
-      var calc = false
+      let professionalDays = 0
+      let calc = false
       for (const day of travel.days) {
         if (day.purpose === 'professional') {
           professionalDays += 1
@@ -316,8 +316,8 @@ export class TravelValidator {
 
   validateDates(travel: Travel): Invalid[] {
     const conflicts = new Set<Invalid>()
-    for (var i = 0; i < travel.stages.length; i++) {
-      for (var j = 0; j < travel.stages.length; j++) {
+    for (let i = 0; i < travel.stages.length; i++) {
+      for (let j = 0; j < travel.stages.length; j++) {
         if (i !== j) {
           if (travel.stages[i].departure.valueOf() < travel.stages[j].departure.valueOf()) {
             if (travel.stages[i].arrival.valueOf() <= travel.stages[j].departure.valueOf()) {
@@ -354,7 +354,7 @@ export class TravelValidator {
 
   validateCountries(travel: Travel): Invalid[] {
     const conflicts: Invalid[] = []
-    for (var i = 1; i < travel.stages.length; i++) {
+    for (let i = 1; i < travel.stages.length; i++) {
       if (travel.stages[i - 1].endLocation.country._id !== travel.stages[i].startLocation.country._id) {
         conflicts.push({ path: 'stages.' + (i - 1) + '.endLocation.country', err: 'countryChangeBetweenStages' })
         conflicts.push({ path: 'stages.' + i + '.startLocation.country', err: 'countryChangeBetweenStages' })
@@ -406,9 +406,9 @@ export default class LumpSumCalculator {
       const fallBackLumpSumCountry = await this.getCountryById(this.fallBackLumpSumCountry)
       return this.getLumpSum(fallBackLumpSumCountry, date)
     } else {
-      var nearest = 0
-      for (var i = 0; i < country.lumpSums.length; i++) {
-        var diff = date.valueOf() - (country.lumpSums[i].validFrom as Date).valueOf()
+      let nearest = 0
+      for (let i = 0; i < country.lumpSums.length; i++) {
+        let diff = date.valueOf() - (country.lumpSums[i].validFrom as Date).valueOf()
         if (diff >= 0 && diff < date.valueOf() - (country.lumpSums[nearest].validFrom as Date).valueOf()) {
           nearest = i
         }

@@ -45,7 +45,7 @@ const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: N
 
 const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.magiclogin) {
-    var user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
+    let user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
     if (user && (await user.isActive())) {
       magiclogin.send(req, res)
     } else {
@@ -103,7 +103,7 @@ export class AuthController extends Controller {
   @Middlewares(microsoftCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
   public microsoftCallback(@Query() state?: string) {
-    var redirect: string | undefined
+    let redirect: string | undefined
     if (state) {
       try {
         redirect = JSON.parse(Base64.decode(state)).redirect
@@ -133,7 +133,7 @@ export class AuthController extends Controller {
   }
 
   private redirectToFrontend(path?: string) {
-    var redirect = ''
+    let redirect = ''
     if (path && path.startsWith('/')) {
       redirect = path
     }

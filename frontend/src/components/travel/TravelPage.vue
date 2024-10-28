@@ -658,7 +658,7 @@ export default defineComponent({
       return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'travel/report?_id=' + this.travel._id
     },
     async postStage(stage: Stage) {
-      var headers = {}
+      let headers = {}
       if (stage.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
@@ -692,7 +692,7 @@ export default defineComponent({
       }
     },
     async postExpense(expense: TravelExpense) {
-      var headers = {}
+      let headers = {}
       if (expense.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
@@ -731,7 +731,7 @@ export default defineComponent({
       }
     },
     getStageIcon(stage: Stage) {
-      var icon = null
+      let icon = null
       if (stage.transport.type == 'ownCar') {
         icon = 'bi bi-car-front'
       } else if (stage.transport.type == 'airplane') {
@@ -745,14 +745,14 @@ export default defineComponent({
     },
     renderTable() {
       this.table = []
-      var stageIndex = 0
+      let stageIndex = 0
       for (const expense of this.travel.expenses) {
         if (this.travel.days.length === 0 || expense.cost.date < this.travel.days[0].date) {
           this.table.push({ type: 'expense', data: expense })
         }
       }
-      for (var i = 0; i < this.travel.days.length; i++) {
-        var stagesStart = stageIndex
+      for (let i = 0; i < this.travel.days.length; i++) {
+        let stagesStart = stageIndex
         while (
           stageIndex < this.travel.stages.length &&
           i < this.travel.days.length - 1 &&
@@ -760,7 +760,7 @@ export default defineComponent({
         ) {
           stageIndex++
         }
-        var stagesEnd = stageIndex
+        let stagesEnd = stageIndex
         if (i == this.travel.days.length - 1) {
           stagesEnd = this.travel.stages.length
         }
@@ -826,7 +826,7 @@ export default defineComponent({
     getLastPaceOfWorkList(travel: Travel) {
       const list: Omit<Place, 'place'>[] = []
       function add(place: Place, list: Omit<Place, 'place'>[]) {
-        var found = false
+        let found = false
         for (const entry of list) {
           if (entry.country._id === place.country._id && entry.special === place.special) {
             found = true

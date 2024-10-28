@@ -105,11 +105,11 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
   lumpSumsJSON.sort((a, b) => new Date(a.validFrom).valueOf() - new Date(b.validFrom).valueOf())
   for (const lumpSums of lumpSumsJSON) {
     const validFrom = new Date(lumpSums.validFrom).valueOf()
-    var count = 0
+    let count = 0
     for (const lumpSum of lumpSums.data) {
       const country = await Country.findOne({ _id: lumpSum.countryCode })
       if (country) {
-        var newData = true
+        let newData = true
         for (const countrylumpSums of country.lumpSums) {
           if ((countrylumpSums.validFrom as Date).valueOf() >= validFrom) {
             newData = false

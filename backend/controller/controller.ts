@@ -56,14 +56,14 @@ type SetterPartial<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial2<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : _SetterPartial2<T[P], U> | undefined
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial2<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : _SetterPartial2<T[P], U> | undefined
     }
   : T
 
@@ -84,14 +84,14 @@ type _SetterPartial2<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial2<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : _SetterPartial1<T[P], U> | undefined
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial2<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : _SetterPartial1<T[P], U> | undefined
     }
   : T
 
@@ -112,14 +112,14 @@ type _SetterPartial1<T, U extends string> = T extends object
         | Types.ObjectId[]
         ? T[P] | undefined | null
         : T[P] extends Types.Buffer | null | undefined
-        ? Data | Types.Buffer | undefined
-        : T[P] extends (infer ElementType)[] | null | undefined
-        ? ElementType extends { _id: infer idType extends _id | string }
-          ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-          : _SetterPartial2<ElementType, U>[] | null | undefined
-        : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-        ? T[P] | IdDocument<idType> | null | undefined
-        : T[P]
+          ? Data | Types.Buffer | undefined
+          : T[P] extends (infer ElementType)[] | null | undefined
+            ? ElementType extends { _id: infer idType extends _id | string }
+              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+              : _SetterPartial2<ElementType, U>[] | null | undefined
+            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+              ? T[P] | IdDocument<idType> | null | undefined
+              : T[P]
     }
   : T
 
@@ -189,7 +189,7 @@ export class Controller extends TsoaController {
       }
     }
     if (options.query._id) {
-      var conditions: any = Object.assign({ _id: options.query._id }, options.filter)
+      let conditions: any = Object.assign({ _id: options.query._id }, options.filter)
       const result = (await model.findOne(conditions, options.projection).lean()) as ModelType
       if (result !== null) {
         if (options.cb) {
@@ -200,7 +200,7 @@ export class Controller extends TsoaController {
         throw new NotFoundError(`No ${model.modelName} for _id: '${options.query._id}' found.`)
       }
     } else {
-      var conditions: any = {}
+      let conditions: any = {}
       if (options.query.filterJSON) {
         conditions = JSON.parse(Base64.decode(options.query.filterJSON))
       }
@@ -215,7 +215,7 @@ export class Controller extends TsoaController {
       if (options.sortFn) {
         result.sort(options.sortFn)
       }
-      var data: ModelType[]
+      let data: ModelType[]
       if (meta.limit > 0) {
         meta.countPages = Math.ceil(meta.count / meta.limit)
         data = result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page)
@@ -231,9 +231,9 @@ export class Controller extends TsoaController {
   }
 
   async setter<ModelType extends { _id?: Types.ObjectId | string }>(model: Model<ModelType>, options: SetterOptions<ModelType>) {
-    var result: ModelType
+    let result: ModelType
     if (options.requestBody._id) {
-      var oldObject = await model.findOne({ _id: options.requestBody._id })
+      let oldObject = await model.findOne({ _id: options.requestBody._id })
       if (!oldObject) {
         throw new NotFoundError(`No ${model.modelName} for _id: '${options.requestBody._id}' found.`)
       }
@@ -265,7 +265,7 @@ export class Controller extends TsoaController {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if (options.requestBody._id && options.requestBody._id !== '') {
-      var found = false
+      let found = false
       for (const arrayElement of parentObject[options.arrayElementKey] as Array<ArrayElementType>) {
         if ((arrayElement._id! as Types.ObjectId).equals(options.requestBody._id as string)) {
           found = true
@@ -329,8 +329,8 @@ export class Controller extends TsoaController {
     if (options.checkOldObject && !(await options.checkOldObject(parentObject))) {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
-    var found = false
-    for (var i = 0; i < (parentObject[options.arrayElementKey] as Array<{ _id: _id }>).length; i++) {
+    let found = false
+    for (let i = 0; i < (parentObject[options.arrayElementKey] as Array<{ _id: _id }>).length; i++) {
       if ((parentObject[options.arrayElementKey] as Array<{ _id: _id }>)[i]._id.equals(options._id)) {
         found = true
         if (options.beforeDelete) {

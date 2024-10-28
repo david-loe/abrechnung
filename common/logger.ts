@@ -1,4 +1,4 @@
-var development = false
+let development = false
 if ((import.meta as unknown as any).env) {
   development = (import.meta as unknown as any).env.MODE === 'development'
 } else {

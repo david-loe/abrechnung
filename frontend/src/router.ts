@@ -139,7 +139,7 @@ const router = createRouter({
 })
 
 async function auth() {
-  var auth = false
+  let auth = false
   try {
     const res = await axios.get(import.meta.env.VITE_BACKEND_URL + '/auth/authenticated', {
       withCredentials: true

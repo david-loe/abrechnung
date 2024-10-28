@@ -8,7 +8,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-ignore
-var healthCareCost: HealthCareCostSimple = {
+let healthCareCost: HealthCareCostSimple = {
   name: 'Broken leg',
   patientName: 'Ben Logas'
 }
@@ -89,7 +89,7 @@ const expenses: Expense[] = [
 test.serial('POST /healthCareCost/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/healthCareCost/expense').query({ parentId: healthCareCost._id.toString() })
+    let req = agent.post('/healthCareCost/expense').query({ parentId: healthCareCost._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)

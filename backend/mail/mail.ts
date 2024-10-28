@@ -95,8 +95,8 @@ async function _sendMail(
 }
 
 export async function sendNotificationMail(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
-  var recipients = []
-  var reportType: ReportType
+  let recipients = []
+  let reportType: ReportType
   if (reportIsTravel(report)) {
     reportType = 'travel'
   } else if (reportIsHealthCareCost(report)) {

@@ -1,5 +1,5 @@
-import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js';
-import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js';
+import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
+import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
@@ -14,7 +14,7 @@ class Formatter {
   #simpleDateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric' }
   #dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
     timeZone: 'UTC',
-     year: 'numeric',
+    year: 'numeric',
     month: 'numeric',
     day: 'numeric',
     hour: 'numeric',
@@ -113,9 +113,9 @@ class Formatter {
   money(baseMoney: BaseCurrencyMoney | Money, options?: MoneyStringOptions): string {
     const opts = Object.assign({ useExchangeRate: true, warning: false, func: (x: number) => x }, options)
     this.setLocale(opts.locale)
-    var amount = 0
+    let amount = 0
     const money = baseCurrencyMoneyToMoney(baseMoney)
-    var currency = typeof money.currency === 'string' ? money.currency : money.currency._id
+    let currency = typeof money.currency === 'string' ? money.currency : money.currency._id
     if (opts.useExchangeRate && money.exchangeRate) {
       amount = money.exchangeRate.amount
       currency = baseCurrency._id
@@ -135,7 +135,7 @@ class Formatter {
     if (!money || (money && (typeof money.amount !== 'number' || (!money.amount && !printZero)))) {
       return ''
     }
-    var str = this.currency(money.amount!, money.currency._id)
+    let str = this.currency(money.amount!, money.currency._id)
     if (money.exchangeRate && money.exchangeRate.rate) {
       str = str + ' / ' + this.float(money.exchangeRate.rate) + ' = ' + this.baseCurrency(money.exchangeRate.amount)
     }
