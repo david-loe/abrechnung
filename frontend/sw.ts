@@ -35,7 +35,7 @@ registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
 
 registerRoute(
   ({ request }) => request.destination === 'font',
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: 'font-cache'
   })
 )
