@@ -189,7 +189,8 @@ export default defineComponent({
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
       accesses,
-      isOffline: false as boolean
+      isOffline: false as boolean,
+      showInstallationBanner: false as boolean
     }
   },
   components: { OfflineBanner },

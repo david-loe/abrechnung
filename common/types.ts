@@ -248,7 +248,7 @@ export interface User extends UserSimple {
   push: {
     subscriptions: Subscription[]
   }
-  subscriptions: Subscription[]
+
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
 }
