@@ -465,3 +465,12 @@ export const baseCurrency: Currency = {
   subunit: 'Cent',
   symbol: '€'
 }
+
+export type Subscription = {
+  endpoint: string
+  expirationTime: null
+  keys: {
+    p256dh: string
+    auth: string
+  }
+}
