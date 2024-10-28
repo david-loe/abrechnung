@@ -81,11 +81,13 @@ export const userSchema = new Schema<User, UserModel, Methods>({
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
-      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
+      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
+      showInstallBanner: { type: Boolean, ref: 'InstallBanner', required: true, default: true }
     },
     required: true,
     default: () => ({})
   },
+
   vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }], hide: true },
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
 })

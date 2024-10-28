@@ -85,6 +85,7 @@ declare module 'vue' {
       specialLumpSums: { [key: string]: string[] }
       users: { name: User['name']; _id: string }[]
       isOffline: boolean
+      showInstallationBanner: boolean
     }
   }
 }

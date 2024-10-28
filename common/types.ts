@@ -243,7 +243,9 @@ export interface User extends UserSimple {
     lastCountries: CountrySimple[]
     insurance?: HealthInsurance | null
     organisation?: OrganisationSimple | null
+    showInstallBanner: boolean
   }
+
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
 }

@@ -189,7 +189,8 @@ export default defineComponent({
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
       accesses,
-      isOffline: false as boolean
+      isOffline: false as boolean,
+      showInstallationBanner: false as boolean
     }
   },
   components: { OfflineBanner },
@@ -245,6 +246,7 @@ export default defineComponent({
             if (this.user._id) {
               this.updateLocale(this.user.settings.language)
               this.auth = true
+              this.$root.showInstallationBanner = this.$root.user.settings.showInstallBanner
             }
             this.isOffline = !navigator.onLine // braucht man irgendwie für Safari & Firefox?
             this.loadState = 'LOADED'
