@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose'
 import { DisplaySettings, Locale, locales } from '../../common/types.js'
 
-const overwrites = {} as { [key in Locale]: { type: typeof Schema.Types.Mixed; required: true; default: Function } }
+const overwrites = {} as { [key in Locale]: { type: typeof Schema.Types.Mixed; required: true; default: () => object } }
 for (const locale of locales) {
   overwrites[locale] = { type: Schema.Types.Mixed, required: true, default: () => ({}) }
 }

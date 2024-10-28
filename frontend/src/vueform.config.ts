@@ -19,7 +19,7 @@ function deepReplace(obj: any, search: any, replacement: any) {
   for (const key in obj) {
     if (obj[key] === search) {
       obj[key] = replacement
-    } else if (typeof obj[key] === 'object') {
+    } else if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
       deepReplace(obj[key], search, replacement)
     }
   }

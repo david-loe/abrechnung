@@ -206,8 +206,7 @@ export default defineComponent({
           document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
         })
         if (withoutAuth) {
-          this.loadingPromise = new Promise(async (resolve) => {
-            await displayPromise
+          this.loadingPromise = displayPromise.then(() => {
             this.loadState = 'LOADED'
           })
         } else {

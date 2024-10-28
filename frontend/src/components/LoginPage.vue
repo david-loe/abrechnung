@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center" id="loginPage">
+  <div v-if="$root.displaySettings.auth" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
     <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
     <div v-if="strategy === 'ldapauth'">
