@@ -4,15 +4,14 @@ import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse } from 'tsoa'
 import { Base64, escapeRegExp } from '../../common/scripts.js'
 import { tokenAdminUser } from '../../common/types.js'
-import ldapauth from '../authStrategies/ldapauth.js'
+import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
-import microsoft from '../authStrategies/microsoft.js'
-import { getDisplaySettings } from '../helper.js'
+import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
+import { getDisplaySettings } from '../db.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by display settings.'
-const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
 
 const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
   throw new NotImplementedError(disabledMessage)
@@ -20,7 +19,7 @@ const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFun
 
 const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.ldapauth) {
-    passport.authenticate(ldapauth.getStrategy(), { session: true })(req, res, next)
+    passport.authenticate(await getLdapauthStrategy(), { session: true })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -30,7 +29,7 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
   if ((await getDisplaySettings()).auth.microsoft) {
     const redirect = req.query.redirect
     const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
-    passport.authenticate(microsoft.getStrategy(), { state: state })(req, res, next)
+    passport.authenticate(await getMicrosoftStrategy(), { state: state })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -38,7 +37,7 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
 
 const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    passport.authenticate(microsoft.getStrategy())(req, res, next)
+    passport.authenticate(await getMicrosoftStrategy())(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }

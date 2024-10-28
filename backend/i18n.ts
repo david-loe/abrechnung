@@ -1,7 +1,7 @@
 import i18next, { Resource } from 'i18next'
 import { loadLocales } from '../common/locales/load.js'
 import { Locale } from '../common/types.js'
-import { getDisplaySettings } from './helper.js'
+import { getDisplaySettings } from './db.js'
 
 const displaySettings = await getDisplaySettings()
 function loadLocaleMessages() {

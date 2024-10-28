@@ -1,5 +1,6 @@
 import ejs from 'ejs'
 import fs from 'fs'
+import nodemailer from 'nodemailer'
 import {
   ExpenseReportSimple,
   HealthCareCostSimple,
@@ -10,10 +11,16 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
+import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
-import mail from './client.js'
+import { mapSmtpConfig } from '../settingsValidator.js'
+
+async function getClient() {
+  const connectionSettings = await getConnectionSettings()
+  return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
+}
 
 export async function sendMail(
   recipients: IUser[],
@@ -36,7 +43,7 @@ export async function sendMail(
   }
 }
 
-function _sendMail(
+async function _sendMail(
   recipient: IUser,
   subject: string,
   paragraph: string,
@@ -44,7 +51,7 @@ function _sendMail(
   lastParagraph: string,
   language: Locale
 ) {
-  const mailClient = mail.getClient()
+  const mailClient = await getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {

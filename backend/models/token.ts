@@ -1,5 +1,5 @@
 import { HydratedDocument, Schema, model } from 'mongoose'
-import { getSettings } from '../helper.js'
+import { getSettings } from '../db.js'
 
 const tokenSchema = new Schema(
   {

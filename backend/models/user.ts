@@ -10,7 +10,7 @@ import {
   locales,
   userReplaceCollections
 } from '../../common/types.js'
-import { getDisplaySettings, getSettings } from '../helper.js'
+import { getDisplaySettings, getSettings } from '../db.js'
 
 const settings = await getSettings()
 const displaySettings = await getDisplaySettings()

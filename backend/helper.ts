@@ -1,22 +1,19 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
-import mongoose, { Model, Types } from 'mongoose'
+import jwt from 'jsonwebtoken'
+import { Model, Types } from 'mongoose'
 import multer from 'multer'
 import {
   _id,
   AnyState,
-  ConnectionSettings,
-  DisplaySettings,
   DocumentFile as IDocumentFile,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
   User as IUser,
   reportIsHealthCareCost,
-  reportIsTravel,
-  Settings
+  reportIsTravel
 } from '../common/types.js'
-import { connectDB } from './db.js'
 import DocumentFile from './models/documentFile.js'
 import ExpenseReport from './models/expenseReport.js'
 import HealthCareCost from './models/healthCareCost.js'
@@ -182,36 +179,6 @@ export async function getSubmissionReportFromHistory(
   return null
 }
 
-export async function getSettings(): Promise<Settings> {
-  await connectDB()
-  const settings = (await mongoose.connection.collection('settings').findOne()) as Settings | null
-  if (settings) {
-    return settings
-  } else {
-    throw Error('Settings not found')
-  }
-}
-
-export async function getConnectionSettings(): Promise<ConnectionSettings> {
-  await connectDB()
-  const connectionSettings = (await mongoose.connection.collection('connectionsettings').findOne()) as ConnectionSettings | null
-  if (connectionSettings) {
-    return connectionSettings
-  } else {
-    throw Error('Connection Settings not found')
-  }
-}
-
-export async function getDisplaySettings(): Promise<DisplaySettings> {
-  await connectDB()
-  const displaySettings = (await mongoose.connection.collection('displaysettings').findOne()) as DisplaySettings | null
-  if (displaySettings) {
-    return displaySettings
-  } else {
-    throw Error('Display Settings not found')
-  }
-}
-
 export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {
   if (user.projects.supervised.length === 0) {
     return true
@@ -221,11 +188,10 @@ export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boo
 
 export const fileHandler = multer({ limits: { fileSize: parseInt(process.env.VITE_MAX_FILE_SIZE) } })
 
-import jwt from 'jsonwebtoken'
-const options = {
-  expiresIn: 60 * 120 // in seconds -> 120min
-}
-export function genAuthenticatedLink(payload: { destination: string; redirect: string }, jwtOptions: jwt.SignOptions = options) {
+export function genAuthenticatedLink(
+  payload: { destination: string; redirect: string },
+  jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }
+) {
   const secret = process.env.MAGIC_LOGIN_SECRET
   const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
   return new Promise<string>((resolve, reject) => {

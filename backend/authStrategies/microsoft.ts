@@ -1,6 +1,7 @@
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
 import { microsoftSettings } from '../../common/types.js'
-import { AuthenticationStrategy, findOrCreateUser } from './index.js'
+import { getConnectionSettings } from '../db.js'
+import { findOrCreateUser } from './index.js'
 
 interface msProfile {
   provider: 'microsoft'
@@ -25,9 +26,11 @@ interface msProfile {
   }
 }
 
-class Microsoft extends AuthenticationStrategy<MicrosoftStrategy, microsoftSettings> {
-  configureStrategy(config: microsoftSettings) {
-    this.strategy = new MicrosoftStrategy(
+export async function getMicrosoftStrategy() {
+  const connectionSettings = await getConnectionSettings()
+  if (connectionSettings.auth.microsoft) {
+    const config: microsoftSettings = connectionSettings.auth.microsoft
+    return new MicrosoftStrategy(
       {
         clientID: config.clientId,
         clientSecret: config.clientSecret,
@@ -50,7 +53,7 @@ class Microsoft extends AuthenticationStrategy<MicrosoftStrategy, microsoftSetti
         )
       }
     )
+  } else {
+    throw new Error('Microsoft not configured in Connection Settings')
   }
 }
-
-export default new Microsoft()

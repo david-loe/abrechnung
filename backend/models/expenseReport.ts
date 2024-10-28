@@ -1,6 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
-import { convertCurrency, costObject } from './helper.js'
+import { convertCurrency } from './exchangeRate.js'
+import { costObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {

@@ -1,15 +1,21 @@
 import axios from 'axios'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
-import { CountryLumpSum, DisplaySettings as IDisplaySettings, Settings as ISettings, tokenAdminUser } from '../common/types.js'
+import {
+  CountryLumpSum,
+  ConnectionSettings as IConnectionSettings,
+  DisplaySettings as IDisplaySettings,
+  Settings as ISettings,
+  tokenAdminUser
+} from '../common/types.js'
 import connectionSettings from './data/connectionSettings.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
 import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
-import { genAuthenticatedLink, getConnectionSettings } from './helper.js'
-import ConnectionSettings, { applyConnectionSettings } from './models/connectionSettings.js'
+import { genAuthenticatedLink } from './helper.js'
+import ConnectionSettings from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
 import DisplaySettings from './models/displaySettings.js'
@@ -48,13 +54,12 @@ export async function initDB() {
     console.log('Created Settings from Default')
   }
   await initer(ConnectionSettings, 'connectionSettings', [connectionSettings])
-  const loadedConnectionSettings = await getConnectionSettings()
-  applyConnectionSettings(loadedConnectionSettings)
+  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
+
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
   await fetchAndUpdateLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
-  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
 
   const organisations = [{ name: 'My Organisation' }]
   await initer(Organisation, 'organisation', organisations)
@@ -125,5 +130,35 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
     if (count > 0) {
       console.log('Added ' + count + ' lump sums for ' + new Date(lumpSums.validFrom))
     }
+  }
+}
+
+export async function getSettings(): Promise<ISettings> {
+  await connectDB()
+  const settings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
+  if (settings) {
+    return settings
+  } else {
+    throw Error('Settings not found')
+  }
+}
+
+export async function getConnectionSettings(): Promise<IConnectionSettings> {
+  await connectDB()
+  const connectionSettings = (await mongoose.connection.collection('connectionsettings').findOne()) as IConnectionSettings | null
+  if (connectionSettings) {
+    return connectionSettings
+  } else {
+    throw Error('Connection Settings not found')
+  }
+}
+
+export async function getDisplaySettings(): Promise<IDisplaySettings> {
+  await connectDB()
+  const displaySettings = (await mongoose.connection.collection('displaysettings').findOne()) as IDisplaySettings | null
+  if (displaySettings) {
+    return displaySettings
+  } else {
+    throw Error('Display Settings not found')
   }
 }

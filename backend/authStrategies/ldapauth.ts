@@ -1,25 +1,16 @@
-import LdapAuth from 'ldapauth-fork'
 import LdapStrategy from 'passport-ldapauth'
 import { ldapauthSettings } from '../../common/types.js'
-import { AuthenticationStrategy, findOrCreateUser } from './index.js'
+import { getConnectionSettings } from '../db.js'
+import { mapLdapauthConfig } from '../settingsValidator.js'
+import { findOrCreateUser } from './index.js'
 
-class Ldapauth extends AuthenticationStrategy<LdapStrategy, ldapauthSettings> {
-  #mapConfig(config: ldapauthSettings): LdapStrategy.Options['server'] {
-    return {
-      url: config.url,
-      bindDN: config.bindDN,
-      bindCredentials: config.bindCredentials,
-      searchBase: config.searchBase,
-      searchFilter: config.searchFilter,
-      tlsOptions: {
-        rejectUnauthorized: config.tlsOptions.rejectUnauthorized
-      }
-    }
-  }
-  configureStrategy(config: ldapauthSettings) {
-    this.strategy = new LdapStrategy(
+export async function getLdapauthStrategy() {
+  const connectionSettings = await getConnectionSettings()
+  if (connectionSettings.auth.ldapauth) {
+    const config: ldapauthSettings = connectionSettings.auth.ldapauth
+    return new LdapStrategy(
       {
-        server: this.#mapConfig(config)
+        server: mapLdapauthConfig(config)
       },
       async function (ldapUser: any, cb: (error: any, user?: any) => void) {
         let email: string | string[] = ldapUser[config.mailAttribute]
@@ -34,29 +25,7 @@ class Ldapauth extends AuthenticationStrategy<LdapStrategy, ldapauthSettings> {
         )
       }
     )
-  }
-  verifyConfig(config: ldapauthSettings) {
-    return new Promise((resolve, reject) => {
-      try {
-        const ldapAuthInstance = new LdapAuth(this.#mapConfig(config))
-        const adminClient = (ldapAuthInstance as any)._adminClient
-        const userClient = (ldapAuthInstance as any)._userClient
-        ldapAuthInstance.on('error', reject)
-        adminClient.on('error', reject)
-        adminClient.on('connectTimeout', reject)
-        adminClient.on('connectError', reject)
-        userClient.on('error', reject)
-        userClient.on('connectTimeout', reject)
-        userClient.on('connectError', reject)
-
-        adminClient.once('connect', () => {
-          resolve(ldapAuthInstance)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    })
+  } else {
+    throw new Error('LDAP not configured in Connection Settings')
   }
 }
-
-export default new Ldapauth()

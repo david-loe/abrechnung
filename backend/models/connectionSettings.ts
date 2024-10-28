@@ -1,8 +1,6 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
 import { ConnectionSettings, emailRegex } from '../../common/types.js'
-import ldapauth from '../authStrategies/ldapauth.js'
-import microsoft from '../authStrategies/microsoft.js'
-import mail from '../mail/client.js'
+import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
 export const connectionSettingsSchema = new Schema<ConnectionSettings>({
   smtp: {
@@ -55,24 +53,10 @@ export const connectionSettingsSchema = new Schema<ConnectionSettings>({
 
 connectionSettingsSchema.pre('validate', async function (this: HydratedDocument<ConnectionSettings>, next) {
   if (this.auth.ldapauth?.url) {
-    await ldapauth.verifyConfig(this.auth.ldapauth)
+    await verifyLdapauthConfig(this.auth.ldapauth)
   }
-  await mail.verifyConfig(this.smtp)
+  await verifySmtpConfig(this.smtp)
   next()
 })
-
-connectionSettingsSchema.post('save', function (this: HydratedDocument<ConnectionSettings>) {
-  applyConnectionSettings(this)
-})
-
-export function applyConnectionSettings(connectionSettings: ConnectionSettings) {
-  mail.configureClient(connectionSettings.smtp)
-  if (connectionSettings.auth.ldapauth?.url) {
-    ldapauth.configureStrategy(connectionSettings.auth.ldapauth)
-  }
-  if (connectionSettings.auth.microsoft?.clientId) {
-    microsoft.configureStrategy(connectionSettings.auth.microsoft)
-  }
-}
 
 export default model<ConnectionSettings>('ConnectionSettings', connectionSettingsSchema)

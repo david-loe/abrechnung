@@ -19,7 +19,8 @@ import {
   TravelExpense,
   baseCurrency
 } from '../../common/types.js'
-import { getSettings, getSubmissionReportFromHistory } from '../helper.js'
+import { getSettings } from '../db.js'
+import { getSubmissionReportFromHistory } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,

@@ -14,10 +14,11 @@ import {
   transportTypes,
   travelStates
 } from '../../common/types.js'
-import { getSettings } from '../helper.js'
+import { getSettings } from '../db.js'
 import Country from './country.js'
 import DocumentFile from './documentFile.js'
-import { convertCurrency, costObject } from './helper.js'
+import { convertCurrency } from './exchangeRate.js'
+import { costObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 

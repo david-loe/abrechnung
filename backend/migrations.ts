@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
-import { applyConnectionSettings } from './models/connectionSettings.js'
 import Settings from './models/settings.js'
 
 export async function checkForMigrations() {
@@ -110,7 +109,7 @@ export async function checkForMigrations() {
         }
       }
       await mongoose.connection.collection('connectionsettings').updateOne({}, { $set: connectionSettingsFromEnv })
-      applyConnectionSettings(connectionSettingsFromEnv)
+
       const displaySettingsFromEnv: any = {
         auth: {
           microsoft: process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true',

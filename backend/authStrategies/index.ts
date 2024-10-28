@@ -1,8 +1,8 @@
-import { HydratedDocument } from 'mongoose'
+import mongoose, { HydratedDocument } from 'mongoose'
 import passport from 'passport'
 import { Contact, User as IUser, tokenAdminUser } from '../../common/types.js'
-import { getSettings } from '../helper.js'
-import User from '../models/user.js'
+import { getSettings } from '../db.js'
+import { UserDoc } from '../models/user.js'
 
 export interface NewUser extends Contact {
   fk?: IUser['fk']
@@ -10,7 +10,8 @@ export interface NewUser extends Contact {
 }
 
 export function addAdminIfNone(user: HydratedDocument<IUser>) {
-  User.exists({ 'access.admin': true, 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }).then((doc) => {
+  const UserModel = mongoose.model<UserDoc>('User')
+  UserModel.exists({ 'access.admin': true, 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }).then((doc) => {
     if (doc === null) {
       user.access.admin = true
       user.markModified('access')
@@ -20,10 +21,11 @@ export function addAdminIfNone(user: HydratedDocument<IUser>) {
 }
 
 export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUser, 'fk'>, cb: (error: any, user?: Express.User) => void) {
-  let user = await User.findOne({ fk: filter })
+  const UserModel = mongoose.model<UserDoc>('User')
+  let user = await UserModel.findOne({ fk: filter })
   let email = userData.email
   if (!user && email) {
-    user = await User.findOne({ email: email })
+    user = await UserModel.findOne({ email: email })
   }
   const newUser: NewUser = {
     fk: filter,
@@ -32,7 +34,7 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
     access: (await getSettings()).defaultAccess
   }
   if (!user) {
-    user = new User(newUser)
+    user = new UserModel(newUser)
   } else {
     delete newUser.access
     Object.assign(user.fk, newUser.fk)
