@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Backend",
+      "address": "localhost",
+      "port": 9229,
+      "restart": true,
+      "protocol": "inspector",
+      "localRoot": "${workspaceFolder}/backend",
+      "remoteRoot": "/app",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "timeout": 100000
+    }
+  ]
+}
