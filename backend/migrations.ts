@@ -112,9 +112,9 @@ export async function checkForMigrations() {
 
       const displaySettingsFromEnv: any = {
         auth: {
-          microsoft: process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true',
-          ldapauth: process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true',
-          magiclogin: process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
+          microsoft: process.env.VITE_AUTH_USE_MS_AZURE?.toLowerCase() === 'true',
+          ldapauth: process.env.VITE_AUTH_USE_LDAP?.toLowerCase() === 'true',
+          magiclogin: process.env.VITE_AUTH_USE_MAGIC_LOGIN?.toLowerCase() === 'true'
         },
         locale: {
           default: process.env.VITE_I18N_LOCALE,

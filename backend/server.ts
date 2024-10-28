@@ -20,9 +20,6 @@ declare global {
       readonly VITE_FRONTEND_URL: string
       readonly VITE_BACKEND_URL: string
       readonly COOKIE_SECRET: string
-      readonly VITE_AUTH_USE_MS_AZURE: 'TRUE' | 'FALSE'
-      readonly VITE_AUTH_USE_LDAP: 'TRUE' | 'FALSE'
-      readonly VITE_AUTH_USE_MAGIC_LOGIN: 'TRUE' | 'FALSE'
       readonly MAGIC_LOGIN_SECRET: string
 
       readonly BACKEND_PORT: string

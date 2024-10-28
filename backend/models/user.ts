@@ -20,10 +20,6 @@ for (const access of accesses) {
   accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
 }
 
-const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true'
-const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true'
-const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
-
 interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
@@ -36,8 +32,8 @@ type UserModel = Model<User, {}, Methods>
 export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
     type: {
-      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !useMicrosoft },
-      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !useLDAPauth },
+      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
+      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
       magiclogin: {
         type: String,
         index: true,
@@ -45,7 +41,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         sparse: true,
         validate: emailRegex,
         label: 'Magic Login Email',
-        hide: !useMagicLogin
+        hide: !displaySettings.auth.magiclogin
       }
     },
     required: true
