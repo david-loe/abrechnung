@@ -96,6 +96,10 @@
     "travelInsideOfEU": "Ist deine Reise eine länderübergreifende Reise innerhalb der EU?",
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
+  "installation": {
+    "iosSafari": "Um die App zu installieren, gehe uf das Teilen Menü etc.",
+    "iosChrome": "Um die App zu installieren, gehe uf das Teilen Menü etc."
+  },
   "labels": {
     "locale": "Sprache",
     "reportEmail": "Email Adresse für Berichte",

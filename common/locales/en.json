@@ -96,6 +96,10 @@
     "travelInsideOfEU": "Is your trip a cross-country trip within the EU?",
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
+  "installation": {
+    "iosSafari": "Um die App zu installieren, gehe uf das Teilen Menü etc.",
+    "iosChrome": "Um die App zu installieren, gehe uf das Teilen Menü etc."
+  },
   "labels": {
     "locale": "Language",
     "reportEmail": "Email Address for Reports",
