@@ -3,4 +3,7 @@ declare module 'mongoose' {
     type ObjectId = string
     type Buffer = Blob
   }
+  namespace mongo {
+    type Binary = Blob
+  }
 }

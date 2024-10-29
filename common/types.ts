@@ -1,4 +1,4 @@
-import { Types } from 'mongoose'
+import { mongo, Types } from 'mongoose'
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$
@@ -157,7 +157,7 @@ export interface Place {
 }
 
 export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
-  data: Types.Buffer
+  data: mongo.Binary
   owner: _id
   type: T
   name: string
