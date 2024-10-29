@@ -92,7 +92,7 @@
           @clicked="(e) => $router.push('/healthCareCost/' + e._id)"></HealthCareCostCardList>
       </template>
     </div>
-    <Installation>this is the body</Installation>
+    <Installation v-if="$root.loadState === 'LOADED'"></Installation>
   </div>
 </template>
 

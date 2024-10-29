@@ -1,7 +1,7 @@
 <template>
   <div
     id="installBanner"
-    v-if="$root.showInstallationBanner && !alreadyInstalled && mobile"
+    v-if="showInstallationBanner && mobile"
     style="
       width: 100%;
       position: fixed;
@@ -16,17 +16,23 @@
     <div class="container-lg p-3">
       <div style="display: flex; justify-content: space-between">
         <h5 class="">Installationshinweis</h5>
-        <button type="button" class="btn-close" @click="hideModal()"></button>
+        <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
-
       <div>
-        <div class="mb-2">
+        <div>
           {{ $t('installation.iosSafari') }}
+        </div>
+        <div class="mb-2">
           <button v-if="operationSystem == 'Android'" type="button" class="btn btn-primary m-1" @click="install()">Installieren</button>
           <button type="button" class="btn btn-danger m-1" @click="dontShowAgain()">Nicht erneut anzeigen</button>
         </div>
       </div>
     </div>
+  </div>
+  <div
+    v-else-if="mobile && !alreadyInstalled"
+    style="position: fixed; left: auto; right: 0px; bottom: 0px; z-index: 4000; display: block; justify-content: center">
+    <button type="button" class="btn btn-light m-2" @click="showBanner()">InstallationsInfos</button>
   </div>
 </template>
 <script lang="ts">
@@ -40,32 +46,40 @@ export default defineComponent({
   name: 'Installation',
   data() {
     return {
-      showInstallationBanner: true as Boolean, //hier einfach auf einen Wert aus den Setting setzen
+      showInstallationBanner: false as Boolean,
       alreadyInstalled: false,
-
       operationSystem: 'Unknown' as OperationSystems,
       browser: 'Unknown' as BrowserTypes,
-      mobile: false as boolean | undefined
+      mobile: false as boolean | undefined,
+      show: false as boolean
     }
   },
   props: {},
   methods: {
-    hideModal() {
-      // this.showInstallationBanner = false
-      this.$root.showInstallationBanner = false
+    hideBanner() {
+      this.showInstallationBanner = false
+    },
+    showBanner() {
+      this.showInstallationBanner = true
     },
     async dontShowAgain() {
       let settings = this.$root.user.settings
       settings.showInstallBanner = false
+      await this.postSettings(settings)
+      this.hideBanner()
+    },
+    install() {
+      let settings = this.$root.user.settings
+      settings.showInstallBanner = true
+      // hier braucht es noch was zur Erkennung ob die App installiert wurde.
       this.postSettings(settings)
-      this.$root.showInstallationBanner = false
+      this.hideBanner()
     },
     async postSettings(settings: {}) {
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
           withCredentials: true
         })
-        console.log('pushing worked')
       } catch (error: any) {
         if (error.response.status === 401) {
           this.$router.push('login')
@@ -73,12 +87,6 @@ export default defineComponent({
           console.log(error.response.data)
         }
       }
-    },
-    install() {
-      let settings = this.$root.user.settings
-      settings.showInstallBanner = true
-      this.postSettings(settings)
-      this.alreadyInstalled = true
     },
     detectBrowser() {
       const userAgent = navigator.userAgent
@@ -113,6 +121,10 @@ export default defineComponent({
     this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
+    //checking if User alredy uses a installed PWA
+    this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
+    // only setting this true, if alreadyInstalled not true AND user setting is true
+    this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.alreadyInstalled
   }
 })
 </script>
