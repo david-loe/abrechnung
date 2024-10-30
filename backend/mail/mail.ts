@@ -18,7 +18,7 @@ import mailClient from './client.js'
 export function sendMail(
   recipients: IUser[],
   subject: string,
-  paragaph: string,
+  paragaph: string, // ist bestimmt ein Tippfehler?!
   button: { text: string; link: string },
   lastParagraph: string
 ) {
@@ -61,6 +61,12 @@ export function sendMail(
     app.name +
     ': ' +
     app.url
+  recipients.map((s) => {
+    let subscriptions = s.push.subscriptions
+    if (subscriptions) {
+      sendPushNotification(subject, paragaph, subscriptions)
+    }
+  })
 
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
@@ -125,6 +131,6 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
     ? i18n.t(`mail.${reportType}.${textState ? textState : report.state}.lastParagraph`, interpolation)
     : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
-  sendPushNotification()
+
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }
