@@ -1,4 +1,4 @@
-import LdapAuth from 'ldapauth-fork'
+import ldap from 'ldapjs'
 import nodemailer from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
 import LdapStrategy from 'passport-ldapauth'
@@ -6,35 +6,22 @@ import { ldapauthSettings, smtpSettings } from '../common/types.js'
 
 export function verifyLdapauthConfig(config: ldapauthSettings) {
   return new Promise<true>((resolve, reject) => {
-    try {
-      const ldapAuthInstance = new LdapAuth(mapLdapauthConfig(config))
-      const adminClient = (ldapAuthInstance as any)._adminClient
-      const userClient = (ldapAuthInstance as any)._userClient
-      const errorHandler = (err: Error) => {
-        cleanup()
-        reject(err)
-      }
-      ldapAuthInstance.on('error', errorHandler)
-      adminClient.on('error', errorHandler)
-      adminClient.on('connectTimeout', errorHandler)
-      adminClient.on('connectError', errorHandler)
-      userClient.on('error', errorHandler)
-      userClient.on('connectTimeout', errorHandler)
-      userClient.on('connectError', errorHandler)
-      function cleanup() {
-        ldapAuthInstance.removeListener('error', errorHandler)
-        adminClient.removeAllListeners()
-        userClient.removeAllListeners()
-        ldapAuthInstance.close()
-      }
+    const client = ldap.createClient(mapLdapauthConfig(config))
 
-      adminClient.once('connect', () => {
-        cleanup()
-        resolve(true)
-      })
-    } catch (err) {
+    client.on('error', (err) => {
+      client.destroy()
       reject(err)
-    }
+    })
+
+    client.bind(config.bindDN, config.bindCredentials, (err) => {
+      if (err) {
+        client.unbind()
+        reject(err)
+      } else {
+        client.unbind()
+        resolve(true)
+      }
+    })
   })
 }
 
