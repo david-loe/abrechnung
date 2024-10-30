@@ -60,7 +60,7 @@ services:
   mongo-express:
     build:
       context: ./dev-tools/mongo-express
-      dockerfile: Dockerfile.${NODE_ENV}
+      dockerfile: Dockerfile.development
     depends_on:
       - db
     ports:
