@@ -8,7 +8,7 @@ import {
   Settings as ISettings,
   tokenAdminUser
 } from '../common/types.js'
-import connectionSettings from './data/connectionSettings.json' with { type: 'json' }
+import connectionSettingsDevelopment from './data/connectionSettings.development.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
 import displaySettings from './data/displaySettings.json' with { type: 'json' }
@@ -54,7 +54,16 @@ export async function initDB() {
     await mongoose.connection.collection('settings').insertOne(settings)
     console.log('Created Settings from Default')
   }
-  await initer(ConnectionSettings, 'connectionSettings', [connectionSettings])
+
+  if (process.env.NODE_ENV === 'development') {
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDevelopment], true)
+  } else {
+    const emtpyConnectionSettings: Partial<IConnectionSettings> = {
+      auth: {}
+    }
+    await initer(ConnectionSettings, 'connectionSettings', [emtpyConnectionSettings])
+  }
+
   await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
 
   await initer(Currency, 'currencies', currencies)
@@ -79,10 +88,10 @@ export async function initDB() {
   )
 }
 
-async function initer<T>(model: Model<T>, name: string, data: Partial<T>[]) {
+async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean = false) {
   const doc = await model.exists({})
   if (doc === null) {
-    const newDocs = await model.insertMany(data)
+    const newDocs = await model.insertMany(data, { lean })
     console.log('Added ' + newDocs.length + ' ' + name)
   }
 }

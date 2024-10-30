@@ -78,7 +78,7 @@ export interface ConnectionSettings {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null
   }
-  smtp: smtpSettings
+  smtp?: smtpSettings | null
   _id: _id
 }
 

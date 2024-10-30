@@ -25,11 +25,20 @@ function mapSchemaTypeToVueformElement(
   if (schemaType.hide) {
     return
   }
-  const vueformElement = Object.assign({ rules: ['nullable'] }, assignment) as any
+  const rules: any[] = ['nullable']
+  if (schemaType.rules && Array.isArray(schemaType.rules)) {
+    rules.push(...schemaType.rules)
+  }
+  const vueformElement = Object.assign({ rules }, assignment) as any
 
   if (schemaType.required && schemaType.type !== Boolean) {
-    vueformElement['rules'].splice(vueformElement['rules'].indexOf('nullable'), 1)
-    vueformElement['rules'].push('required')
+    let index = vueformElement['rules'].indexOf('nullable')
+    if (index !== -1) {
+      vueformElement['rules'].splice(index, 1)
+    }
+    if (!vueformElement['rules'].some((v: any) => Boolean(v.required))) {
+      vueformElement['rules'].push('required')
+    }
   }
   if (schemaType.min !== undefined) {
     vueformElement['rules'].push('min:' + schemaType.min)

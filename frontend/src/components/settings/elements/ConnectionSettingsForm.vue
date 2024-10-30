@@ -16,6 +16,15 @@ export default defineComponent({
   },
   methods: {
     async postConnectionSettings(connectionSettings: ConnectionSettings) {
+      if (!connectionSettings.smtp?.host) {
+        connectionSettings.smtp = undefined
+      }
+      if (!connectionSettings.auth.ldapauth?.url) {
+        connectionSettings.auth.ldapauth = undefined
+      }
+      if (!connectionSettings.auth.microsoft?.clientId) {
+        connectionSettings.auth.microsoft = undefined
+      }
       const result = await this.$root.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
       if (result.ok) {
         this.connectionSettings = result.ok

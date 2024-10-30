@@ -19,7 +19,11 @@ import { mapSmtpConfig } from '../settingsValidator.js'
 
 async function getClient() {
   const connectionSettings = await getConnectionSettings()
-  return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
+  if (connectionSettings.smtp?.host) {
+    return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
+  } else {
+    throw new Error('SMTP not configured in Connection Settings')
+  }
 }
 
 export async function sendMail(
