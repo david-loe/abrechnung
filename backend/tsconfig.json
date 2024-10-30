@@ -1,7 +1,7 @@
 {
   "include": ["**/*", "../common/**/*"],
   "compilerOptions": {
-    "sourceMap": true,
+    // "sourceMap": true,
     "outDir": "dist",
     "strict": true,
     "module": "NodeNext",
