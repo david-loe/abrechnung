@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { NetworkFirst } from 'workbox-strategies'
 declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
@@ -59,7 +59,7 @@ registerRoute(
 )
 registerRoute(
   ({ request }) => request.url.includes('/manifest.json'),
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
 )
