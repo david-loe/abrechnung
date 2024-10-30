@@ -19,7 +19,6 @@ import {
   retention,
   travelStates
 } from '../../common/types.js'
-import '../db.js'
 import { travelCalculator } from './travel.js'
 
 const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }

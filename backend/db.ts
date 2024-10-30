@@ -26,16 +26,17 @@ import Project from './models/project.js'
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
+    mongoose.connection.on('connected', () => console.log('Connected to Database'))
+    mongoose.connection.on('disconnected', () => console.log('Disconnected from Database'))
     await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
-    console.log('Connected to Database')
     await initDB()
   } else {
     await mongoose.connection.asPromise()
   }
 }
 
-export function disconnectDB() {
-  return mongoose.disconnect()
+export async function disconnectDB() {
+  await mongoose.disconnect()
 }
 
 export async function initDB() {

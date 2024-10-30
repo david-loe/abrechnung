@@ -5,21 +5,32 @@ import LdapStrategy from 'passport-ldapauth'
 import { ldapauthSettings, smtpSettings } from '../common/types.js'
 
 export function verifyLdapauthConfig(config: ldapauthSettings) {
-  return new Promise((resolve, reject) => {
+  return new Promise<true>((resolve, reject) => {
     try {
       const ldapAuthInstance = new LdapAuth(mapLdapauthConfig(config))
       const adminClient = (ldapAuthInstance as any)._adminClient
       const userClient = (ldapAuthInstance as any)._userClient
-      ldapAuthInstance.on('error', reject)
-      adminClient.on('error', reject)
-      adminClient.on('connectTimeout', reject)
-      adminClient.on('connectError', reject)
-      userClient.on('error', reject)
-      userClient.on('connectTimeout', reject)
-      userClient.on('connectError', reject)
+      const errorHandler = (err: Error) => {
+        cleanup()
+        reject(err)
+      }
+      ldapAuthInstance.on('error', errorHandler)
+      adminClient.on('error', errorHandler)
+      adminClient.on('connectTimeout', errorHandler)
+      adminClient.on('connectError', errorHandler)
+      userClient.on('error', errorHandler)
+      userClient.on('connectTimeout', errorHandler)
+      userClient.on('connectError', errorHandler)
+      function cleanup() {
+        ldapAuthInstance.removeListener('error', errorHandler)
+        adminClient.removeAllListeners()
+        userClient.removeAllListeners()
+        ldapAuthInstance.close()
+      }
 
       adminClient.once('connect', () => {
-        resolve(ldapAuthInstance)
+        cleanup()
+        resolve(true)
       })
     } catch (err) {
       reject(err)
