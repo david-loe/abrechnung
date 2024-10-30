@@ -67,29 +67,34 @@ app.use(
     name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
   })
 )
-let subscription: Subscription
 
+// würde Sinn ergeben das alles noch auszulagern in die zugehörige Datei
 app.post('/subscribe', (req, res) => {
-  subscription = req.body
-  // Überprüfen, ob die Subscription gültig ist
+  let subscription: Subscription = req.body
   if (subscription) {
     console.log('subscribed:', subscription)
   }
+  res.status(201).json({ subscription: subscription }) // damit im frontend die subscription mit dem Nutzer verknüpft werden kann
 })
+
 const privateKey = '0atvpnBQ73eO_-oXS5u4E7J58WT4H9D9TPbFP6UzBWY'
 const publicKey = 'BKErXryGQvwdIA46Htyy8NXKiF9RiDNkTthBZwGukC7-4rJHAH9n0ZH5D14F1A8vwB-Ou7JiToZOL0jQgT60zMc'
 webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, publicKey, privateKey)
 
-export function sendPushNotification() {
+// getting the subscriptions of one user to send notifcation to all devices of the user
+export function sendPushNotification(title: String, body: String, subscriptions: Subscription[]) {
   let payload = {
-    title: 'Neue Nachricht',
-    body: 'Dies ist der Inhalt der Nachricht!'
+    title: title,
+    body: body
   }
-  webpush
-    .sendNotification(subscription, JSON.stringify(payload))
-    .then((response) => console.log('Benachrichtigung gesendet:', response))
-    .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+  for (let i = 0; i < subscriptions.length; i++) {
+    webpush
+      .sendNotification(subscriptions[i], JSON.stringify(payload))
+      .then((response) => console.log('Benachrichtigung gesendet:', response))
+      .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+  }
 }
+
 app.use(auth)
 
 if (process.env.NODE_ENV === 'development') {
