@@ -1,21 +1,23 @@
 /// <reference lib="webworker" />
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
-import { NetworkFirst, NetworkOnly } from 'workbox-strategies'
+import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
-let cacheName = 'abrechnung'
+let cacheName = 'abrechnung' // hier könnte man eine versionierung ergänzen - eventuell nach app version?
+// dann müsste man alle alten Caches aber auch aktiv löschen
 const reportTypeToFetch = ['healthCareCost', 'expenseReport', 'travel']
 
 self.addEventListener('install', (event) => {
   console.log('installevent triggerd')
-  self.skipWaiting()
+  self.skipWaiting() // direkt activate triggern
 })
 
 self.addEventListener('activate', (event) => {
-  console.log('activate event triggerd')
   event.waitUntil(
+    // ausführen dieser Funktion ist quatschig, wenn der Service Worker nicht aktiviert wird, wenn der Nutzer schon eingeloggt ist
+    // wird installiert, wenn die Seite geladen wird - da ist der Nutzer selten schon eingeloggt.
     (async () => {
       let urlsToCache = await fetchAndCacheUrls(reportTypeToFetch)
       const cache = await caches.open(cacheName).then((cache) => {
@@ -47,11 +49,51 @@ registerRoute(
 )
 registerRoute(
   ({ request }) => request.url.includes('/manifest.json'),
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
 )
 
+self.addEventListener('push', (event) => {
+  console.log(event.data?.json(), Notification.permission)
+  let notification = event.data?.json()
+  event.waitUntil(
+    self.registration.showNotification(notification.title, {
+      body: notification.body
+    })
+  )
+})
+
+async function fetchAndCacheUrls(reportTypes: string[]) {
+  let detailUrls: string[] = []
+  for (let reportType of reportTypes) {
+    let url = '/backend/' + reportType + '?limit=12'
+    detailUrls.push(url)
+    detailUrls.push('/backend/' + reportType + '/examiner')
+    try {
+      const response = await fetch(url) // Daten von der URL abrufen
+      if (response.ok) {
+        const res = await response.json() // Antwortdaten verarbeiten
+        for (let i = 0; i < res.data.length; i++) {
+          detailUrls.push(
+            '/backend/' +
+              reportType +
+              '?_id=' +
+              res.data[i]._id +
+              (reportType == 'travel'
+                ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
+                : '&additionalFields=expenses')
+          )
+        }
+      }
+    } catch (error) {
+      console.error(`Fehler beim Abrufen der URL ${url}:`, error)
+    }
+  }
+  return detailUrls
+}
+
+// ab hier aktuell irrelevant ------------------------------------------------------------------------------------------------------------------------
 // self.addEventListener('fetch', (event) => {
 //   event.respondWith(
 //     //das soll network first sein.
@@ -104,35 +146,6 @@ registerRoute(
 //   //   //   })
 //   // )
 // })
-
-async function fetchAndCacheUrls(reportTypes: string[]) {
-  let detailUrls: string[] = []
-  for (let reportType of reportTypes) {
-    let url = '/backend/' + reportType + '?limit=12'
-    detailUrls.push(url)
-    detailUrls.push('/backend/' + reportType + '/examiner')
-    try {
-      const response = await fetch(url) // Daten von der URL abrufen
-      if (response.ok) {
-        const res = await response.json() // Antwortdaten verarbeiten
-        for (let i = 0; i < res.data.length; i++) {
-          detailUrls.push(
-            '/backend/' +
-              reportType +
-              '?_id=' +
-              res.data[i]._id +
-              (reportType == 'travel'
-                ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
-                : '&additionalFields=expenses')
-          )
-        }
-      }
-    } catch (error) {
-      console.error(`Fehler beim Abrufen der URL ${url}:`, error)
-    }
-  }
-  return detailUrls
-}
 
 // // Route für travel, um die IDs bei der ersten Anfrage zu cachen
 // registerRoute(
