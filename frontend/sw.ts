@@ -59,7 +59,7 @@ registerRoute(
 )
 registerRoute(
   ({ request }) => request.url.includes('/manifest.json'),
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
 )
