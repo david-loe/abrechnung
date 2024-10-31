@@ -59,7 +59,7 @@ registerRoute(
   })
 )
 registerRoute(
-  ({ request }) => request.url.includes('/manifest.json'),
+  ({ request }) => request.url.includes('/icons/'),
   new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
