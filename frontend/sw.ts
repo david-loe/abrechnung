@@ -33,7 +33,9 @@ self.addEventListener('activate', (event) => {
   console.log('activated')
 })
 
+//brauch ich für verwendung vom Cache
 // setDefaultHandler(new NetworkOnly())
+
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
 
