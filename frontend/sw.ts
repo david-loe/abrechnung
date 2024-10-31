@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
-import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
-import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
 declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
@@ -20,18 +20,20 @@ self.addEventListener('activate', (event) => {
     // wird installiert, wenn die Seite geladen wird - da ist der Nutzer selten schon eingeloggt.
     (async () => {
       let urlsToCache = await fetchAndCacheUrls(reportTypeToFetch)
-      const cache = await caches.open(cacheName).then((cache) => {
-        cache.addAll(urlsToCache)
-      })
-      new NetworkFirst({
-        cacheName: cacheName
-      })
+      // const cache = await caches.open(cacheName).then((cache) => {
+      //   cache.addAll(urlsToCache)
+      // })
+      // new NetworkFirst({
+      //   cacheName: cacheName
+      // })
+      let urlsToStore = addBackendRoutes(urlsToCache)
+      await fetchAndStoreUrls(urlsToStore)
     })()
   )
   console.log('activated')
 })
 
-setDefaultHandler(new NetworkOnly())
+// setDefaultHandler(new NetworkOnly())
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
 
@@ -41,14 +43,20 @@ registerRoute(
     cacheName: 'font-cache'
   })
 )
+// registerRoute(
+//   ({ request }) => /\/backend\/.*/.test(request.url),
+//   new NetworkFirst({
+//     cacheName: cacheName
+//   })
+// )
 registerRoute(
-  ({ request }) => /\/backend\/.*/.test(request.url),
-  new NetworkFirst({
-    cacheName: cacheName
+  ({ request }) => /\/icons\/.*/.test(request.url),
+  new StaleWhileRevalidate({
+    cacheName: 'manifest-cache'
   })
 )
 registerRoute(
-  ({ request }) => request.url.includes('/manifest.json'),
+  ({ request }) => request.url.includes('/icons/'),
   new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
@@ -94,120 +102,6 @@ async function fetchAndCacheUrls(reportTypes: string[]) {
 }
 
 // ab hier aktuell irrelevant ------------------------------------------------------------------------------------------------------------------------
-// self.addEventListener('fetch', (event) => {
-//   event.respondWith(
-//     //das soll network first sein.
-//     fetch(event.request)
-//       .then((networkResponse) => {
-//         // Wenn die Netzwerkanfrage erfolgreich ist, wird die Antwort im Cache gespeichert
-//         return caches.open(cacheName).then((cache) => {
-//           // Speichere die Antwort im Cache für zukünftige Anfragen
-//           cache.put(event.request, networkResponse.clone())
-//           return networkResponse // Gib die Netzwerkantwort zurück
-//         })
-//       })
-//       .catch(() => {
-//         // Falls die Netzwerkanfrage fehlschlägt, versuche die Antwort aus dem Cache zu holen
-//         return caches.match(event.request).then((cachedResponse) => {
-//           if (cachedResponse) {
-//             console.log('cached response')
-//             return cachedResponse // Gib die gecachte Antwort zurück
-//           }
-//           // Optional: Fallback falls keine gecachte Antwort vorhanden ist
-//           return new Response('Offline und keine Daten im Cache verfügbar.', { status: 504 })
-//         })
-//       })
-//   )
-
-//   // Hier prüfen wir, ob die Anfrage zu einer der gecachten Routen gehört
-//   // event.respondWith(
-//   //   caches.open(cacheName).then((cache) => {
-//   //     return cache.keys().then((keys) => {
-//   //       // console.log('Cached keys:', keys)
-//   //       return cache.match(event.request).then((cachedResponse) => {
-//   //         if (cachedResponse) {
-//   //           console.log('Cache response')
-//   //           // Wenn die Antwort im Cache ist, gib sie sofort zurück
-//   //           return cachedResponse
-//   //         }
-//   //         console.log('Network Response')
-//   //         console.log(event.request)
-//   //         // Wenn die Antwort nicht im Cache ist, hole sie vom Netzwerk
-//   //         return fetch(event.request)
-//   //       })
-//   //       // .then((networkResponse) => {
-//   //       //   // Die neue Antwort kann ebenfalls im Cache gespeichert werden (optional)
-//   //       //   // return caches.open(cacheName).then((cache) => {
-//   //       //   //   cache.put(event.request, networkResponse.clone()) // Klonen, da der Response-Stream nur einmal gelesen werden kann
-//   //       //   return networkResponse // Netzwerkantwort zurückgeben
-//   //       // })
-//   //     })
-//   //   })
-//   //   //   })
-//   // )
-// })
-
-// // Route für travel, um die IDs bei der ersten Anfrage zu cachen
-// registerRoute(
-//   ({ request }) => /\/backend\/travel\?limit=/.test(request.url),
-//   async (params) => {
-//     const response = await fetch(params.request) // Initiale Travel-Anfrage
-//     const data = await response.json() // Antwort parsen
-
-//     // Sofortige Rückgabe der initialen Antwort
-//     const clonedResponse = response.clone()
-
-//     // IDs extrahieren und für jede ID eine Anfrage absetzen
-//     const travelRequests = data.travels.map(async (travel: { id: any }) => {
-//       try {
-//         const travelResponse = await fetch(`/backend/travel?id=${travel.id}&additionalFields=expenses&additionalFields=days`)
-
-//         if (!travelResponse.ok) {
-//           throw new Error(`Error fetching travel details for ID ${travel.id}: ${travelResponse.status}`)
-//         }
-
-//         // Klone den Response, da wir ihn nicht direkt cachen können
-//         const travelResponseClone = travelResponse.clone()
-
-//         // Jedes travelDetail im Cache speichern
-//         const travelCache = await caches.open('backend-cache')
-//         await travelCache.put(travelResponseClone.url, travelResponseClone)
-//       } catch (error) {
-//         console.error(error)
-//       }
-//     })
-
-//     // Warte auf alle zusätzlichen Anfragen
-//     await Promise.all(travelRequests)
-
-//     return clonedResponse // Die Hauptantwort zurückgeben
-//   }
-// )
-
-// self.addEventListener('fetch', (event) => {
-//   // Prüfen, ob die angeforderte URL die von dir gewünschte API ist
-//   if (event.request.url.includes('/backend/travel')) {
-//     console.log('travel getter abgefangen')
-//     event.respondWith(fetch(event.request))
-//   }
-// })
-
-// self.addEventListener('fetch', (event) => {
-//   console.log('sw weiterleitung genutzt')
-//   event.respondWith(fetch(event.request))
-// })
-// self.addEventListener('message', (event) => {
-//   if (event.data && event.data.type === 'cacheTravelDetails') {
-//     const travelId = event.data.travelId
-//     const response = event.data.response
-
-//     // Öffne den Cache und speichere die Antwort für die Travel-Details
-//     caches.open('travel-details-cache').then((cache) => {
-//       cache.put(`/backend/travel?_id=${travelId}&additionalFields=stages&additionalFields=expenses&additionalFields=days`, response)
-//       console.log(`Cached travel details for travel ID: ${travelId}`)
-//     })
-//   }
-// })
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -229,64 +123,17 @@ function openDatabase(): Promise<IDBDatabase> {
 }
 
 // aktuell geht die Funktion davon aus, dass die URL auf jeden fall limit enthält und reportTypes abfragt, zu denen mehr gesucht werden
-async function fetchAndStoreUrl(url: string) {
+async function fetchAndStoreUrls(urls: string[]) {
   const db = await openDatabase()
-  try {
-    const response = await fetch(url) // Daten von der URL abrufen
-    if (response.ok) {
-      const res = await response.json() // Antwortdaten verarbeiten
-      const transaction = db.transaction('urls', 'readwrite')
-      const store = transaction.objectStore('urls')
-      store.put({ id: url, res })
-      const shortenedUrl = url.replace(/\?limit=\d+/, '').replace('/backend/', '')
-      let reportType: 'travel' | 'expenseReport' | 'healthCareCost' | null = null
-      if (shortenedUrl == 'travel') {
-        reportType = 'travel'
-      } else if (shortenedUrl == 'expenseReport') {
-        reportType = 'expenseReport'
-      } else if (shortenedUrl == 'healthCareCost') {
-        reportType = 'healthCareCost'
-      }
-      console.log(res.data)
-      for (let i = 0; i < res.data.length; i++) {
-        console.log(res.data[i]._id + ' ' + reportType)
-        await fetchDetail(reportType, res.data[i]._id)
-      }
-      // Speichern in der IndexedDB
-      // Füge das Objekt in die IndexedDB ein
-
-      return new Promise<void>((resolve, reject) => {
-        transaction.oncomplete = () => {
-          resolve()
-        }
-        transaction.onerror = (event) => {
-          reject((event.target as IDBTransaction).error)
-        }
-      })
-    }
-  } catch (error) {
-    console.error(`Fehler beim Abrufen der URL ${url}:`, error)
-  }
-}
-async function fetchDetail(reportType: 'travel' | 'expenseReport' | 'healthCareCost' | null, id: string) {
-  if (reportType != null) {
-    const db = await openDatabase()
-    let url =
-      '/backend/' +
-      reportType +
-      '?id=' +
-      id +
-      (reportType == 'travel' ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days' : '&additionalFields=expenses')
-    console.log(url)
+  for (let i = 0; i < urls.length; i++) {
     try {
-      const response = await fetch(url) // Daten von der URL abrufen
+      const response = await fetch(urls[i]) // Daten von der URL abrufen
       if (response.ok) {
         const res = await response.json() // Antwortdaten verarbeiten
         const transaction = db.transaction('urls', 'readwrite')
         const store = transaction.objectStore('urls')
-        store.put({ id: url, res })
-
-        return new Promise<void>((resolve, reject) => {
+        store.put({ id: urls[i], res })
+        await new Promise<void>((resolve, reject) => {
           transaction.oncomplete = () => {
             resolve()
           }
@@ -296,7 +143,71 @@ async function fetchDetail(reportType: 'travel' | 'expenseReport' | 'healthCareC
         })
       }
     } catch (error) {
-      console.error(`Fehler beim Abrufen der URL ${url}:`, error)
+      console.error(`Fehler beim Abrufen der URL ${urls[i]}:`, error)
     }
   }
+}
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    (async () => {
+      console.log('fetch event used for: ' + event.request.url)
+      const cachedResponse = await caches.match(event.request)
+
+      if (cachedResponse) {
+        // Falls eine gecachte Antwort gefunden wird, gebe sie zurück
+        console.log('Serving from cache:', event.request.url)
+        return cachedResponse
+      }
+      try {
+        const networkResponse = await fetch(event.request)
+        return networkResponse // hier fehlt noch - dass es dann gespeichert wird.
+      } catch (error) {
+        console.log(`Netzwerk fehlgeschlagen, verwende Fallback: ${event.request.url}`)
+        let url = event.request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
+        console.log(url)
+        // Netzwerk fehlgeschlagen: Hole Daten aus IndexedDB
+        const db = await openDatabase()
+        const transaction = db.transaction('urls', 'readonly')
+        const store = transaction.objectStore('urls')
+        const getRequest = store.get(url)
+        return new Promise<Response>((resolve, reject) => {
+          getRequest.onsuccess = () => {
+            console.log(getRequest)
+            const cachedData = getRequest.result
+            if (cachedData) {
+              // console.log(cachedData.json())
+              // Gecachte Antwort aus IndexedDB erstellen
+              const cachedResponse = new Response(JSON.stringify(cachedData.res), {
+                headers: { 'Content-Type': 'application/json' }
+              })
+              resolve(cachedResponse)
+            } else {
+              reject(new Error(`Keine gecachten Daten in IndexedDB verfügbar ${url}`))
+            }
+          }
+
+          getRequest.onerror = () => reject(getRequest.error)
+        })
+      }
+    })()
+  )
+})
+function addBackendRoutes(urlsToCache: string[]) {
+  let urls = urlsToCache
+  let urlsAdd = [
+    '/backend/user',
+    '/backend/currency',
+    '/backend/country',
+    '/backend/settings',
+    '/backend/healthInsurance',
+    '/backend/organisation',
+    '/backend/project',
+    '/backend/specialLumpSums',
+    '/backend/users'
+  ]
+  for (let i = 0; i < urlsAdd.length; i++) {
+    urls.push(urlsAdd[i])
+  }
+  return urls
 }
