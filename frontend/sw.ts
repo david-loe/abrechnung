@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
-import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
+import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
@@ -20,21 +20,21 @@ self.addEventListener('activate', (event) => {
     // wird installiert, wenn die Seite geladen wird - da ist der Nutzer selten schon eingeloggt.
     (async () => {
       let urlsToCache = await fetchAndCacheUrls(reportTypeToFetch)
-      // const cache = await caches.open(cacheName).then((cache) => {
-      //   cache.addAll(urlsToCache)
-      // })
-      // new NetworkFirst({
-      //   cacheName: cacheName
-      // })
-      let urlsToStore = addBackendRoutes(urlsToCache)
-      await fetchAndStoreUrls(urlsToStore)
+      const cache = await caches.open(cacheName).then((cache) => {
+        cache.addAll(urlsToCache)
+      })
+      new NetworkFirst({
+        cacheName: cacheName
+      })
+      // let urlsToStore = addBackendRoutes(urlsToCache)
+      // await fetchAndStoreUrls(urlsToStore)
     })()
   )
   console.log('activated')
 })
 
 //brauch ich für verwendung vom Cache
-// setDefaultHandler(new NetworkOnly())
+setDefaultHandler(new NetworkOnly())
 
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
@@ -45,12 +45,12 @@ registerRoute(
     cacheName: 'font-cache'
   })
 )
-// registerRoute(
-//   ({ request }) => /\/backend\/.*/.test(request.url),
-//   new NetworkFirst({
-//     cacheName: cacheName
-//   })
-// )
+registerRoute(
+  ({ request }) => /\/backend\/.*/.test(request.url),
+  new NetworkFirst({
+    cacheName: cacheName
+  })
+)
 registerRoute(
   ({ request }) => /\/icons\/.*/.test(request.url),
   new StaleWhileRevalidate({
@@ -58,7 +58,7 @@ registerRoute(
   })
 )
 registerRoute(
-  ({ request }) => request.url.includes('/icons/'),
+  ({ request }) => request.url.includes('/manifest'),
   new StaleWhileRevalidate({
     cacheName: 'manifest-cache'
   })
@@ -150,51 +150,51 @@ async function fetchAndStoreUrls(urls: string[]) {
   }
 }
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    (async () => {
-      console.log('fetch event used for: ' + event.request.url)
-      const cachedResponse = await caches.match(event.request)
+// self.addEventListener('fetch', (event) => {
+//   event.respondWith(
+//     (async () => {
+//       console.log('fetch event used for: ' + event.request.url)
+//       const cachedResponse = await caches.match(event.request)
 
-      if (cachedResponse) {
-        // Falls eine gecachte Antwort gefunden wird, gebe sie zurück
-        console.log('Serving from cache:', event.request.url)
-        return cachedResponse
-      }
-      try {
-        const networkResponse = await fetch(event.request)
-        return networkResponse // hier fehlt noch - dass es dann gespeichert wird.
-      } catch (error) {
-        console.log(`Netzwerk fehlgeschlagen, verwende Fallback: ${event.request.url}`)
-        let url = event.request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
-        console.log(url)
-        // Netzwerk fehlgeschlagen: Hole Daten aus IndexedDB
-        const db = await openDatabase()
-        const transaction = db.transaction('urls', 'readonly')
-        const store = transaction.objectStore('urls')
-        const getRequest = store.get(url)
-        return new Promise<Response>((resolve, reject) => {
-          getRequest.onsuccess = () => {
-            console.log(getRequest)
-            const cachedData = getRequest.result
-            if (cachedData) {
-              // console.log(cachedData.json())
-              // Gecachte Antwort aus IndexedDB erstellen
-              const cachedResponse = new Response(JSON.stringify(cachedData.res), {
-                headers: { 'Content-Type': 'application/json' }
-              })
-              resolve(cachedResponse)
-            } else {
-              reject(new Error(`Keine gecachten Daten in IndexedDB verfügbar ${url}`))
-            }
-          }
+//       if (cachedResponse) {
+//         // Falls eine gecachte Antwort gefunden wird, gebe sie zurück
+//         console.log('Serving from cache:', event.request.url)
+//         return cachedResponse
+//       }
+//       try {
+//         const networkResponse = await fetch(event.request)
+//         return networkResponse // hier fehlt noch - dass es dann gespeichert wird.
+//       } catch (error) {
+//         console.log(`Netzwerk fehlgeschlagen, verwende Fallback: ${event.request.url}`)
+//         let url = event.request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
+//         console.log(url)
+//         // Netzwerk fehlgeschlagen: Hole Daten aus IndexedDB
+//         const db = await openDatabase()
+//         const transaction = db.transaction('urls', 'readonly')
+//         const store = transaction.objectStore('urls')
+//         const getRequest = store.get(url)
+//         return new Promise<Response>((resolve, reject) => {
+//           getRequest.onsuccess = () => {
+//             console.log(getRequest)
+//             const cachedData = getRequest.result
+//             if (cachedData) {
+//               // console.log(cachedData.json())
+//               // Gecachte Antwort aus IndexedDB erstellen
+//               const cachedResponse = new Response(JSON.stringify(cachedData.res), {
+//                 headers: { 'Content-Type': 'application/json' }
+//               })
+//               resolve(cachedResponse)
+//             } else {
+//               reject(new Error(`Keine gecachten Daten in IndexedDB verfügbar ${url}`))
+//             }
+//           }
 
-          getRequest.onerror = () => reject(getRequest.error)
-        })
-      }
-    })()
-  )
-})
+//           getRequest.onerror = () => reject(getRequest.error)
+//         })
+//       }
+//     })()
+//   )
+// })
 function addBackendRoutes(urlsToCache: string[]) {
   let urls = urlsToCache
   let urlsAdd = [
