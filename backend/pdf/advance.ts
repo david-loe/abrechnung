@@ -23,7 +23,7 @@ export async function generateAdvanceReport(travel: TravelSimple, language: Loca
   }
   newPage()
 
-  var y = getLastPage().getSize().height
+  let y = getLastPage().getSize().height
   await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), travel.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
@@ -58,7 +58,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   )
 
   // Title
-  var y = opts.yStart - opts.fontSize * 1.5
+  let y = opts.yStart - opts.fontSize * 1.5
   page.drawText(travel.name, {
     x: opts.xStart,
     y: y,
@@ -68,7 +68,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   })
 
   // Traveler
-  var y = y - opts.fontSize * 1.5 * 1.5
+  y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.traveler', { lng: opts.language }) +
       ': ' +
@@ -86,7 +86,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   )
 
   // Reason + Place
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   drawPlace(
     page,
     travel.destinationPlace,
@@ -103,7 +103,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
   )
 
   // Dates
-  var text =
+  let text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
     options.formatter.date(travel.startDate) +
@@ -111,7 +111,7 @@ function drawGeneralAdvanceInformation(page: pdf_lib.PDFPage, travel: TravelSimp
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
     options.formatter.date(travel.endDate)
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
     y: y,

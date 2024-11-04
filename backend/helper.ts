@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
-import mongoose, { Model, Types } from 'mongoose'
+import jwt from 'jsonwebtoken'
+import { Model, Types } from 'mongoose'
 import multer from 'multer'
 import {
   _id,
@@ -11,24 +12,22 @@ import {
   Travel as ITravel,
   User as IUser,
   reportIsHealthCareCost,
-  reportIsTravel,
-  Settings
+  reportIsTravel
 } from '../common/types.js'
-import { connectDB } from './db.js'
 import DocumentFile from './models/documentFile.js'
 import ExpenseReport from './models/expenseReport.js'
 import HealthCareCost from './models/healthCareCost.js'
 import Travel from './models/travel.js'
 
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
-  var keys: string[] = []
+  let keys: string[] = []
   for (const obj of objects) {
     const oKeys = Object.keys(obj)
     if (keys.length < oKeys.length) {
       keys = oKeys
     }
   }
-  var str = keys.join(separator) + '\n'
+  let str = keys.join(separator) + '\n'
   for (const obj of objects) {
     const col: string[] = []
     for (const key of keys) {
@@ -55,8 +54,8 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
     if (!fileOwner) {
       throw new Error('No owner for uploaded files')
     }
-    var pathExists = true
-    var tmpCheckObj = req.body
+    let pathExists = true
+    let tmpCheckObj = req.body
     for (const prop of pathToFiles) {
       if (tmpCheckObj[prop]) {
         tmpCheckObj = tmpCheckObj[prop]
@@ -68,19 +67,19 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
     if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
       let reqDocuments = tmpCheckObj
       function multerFileName(i: number) {
-        var str = pathToFiles.length > 0 ? pathToFiles[0] : ''
-        for (var j = 1; j < pathToFiles.length; j++) {
+        let str = pathToFiles.length > 0 ? pathToFiles[0] : ''
+        for (let j = 1; j < pathToFiles.length; j++) {
           str += '[' + pathToFiles[j] + ']'
         }
         str += '[' + i + '][data]'
         return str
       }
-      async function handleFile(reqDoc: any) {
+      async function handleFile(reqDoc: any, i: number) {
         if (!reqDoc._id) {
-          var buffer = null
+          let buffer = null
           if (opts.multiple) {
             for (const file of req.files as Express.Multer.File[]) {
-              if (file.fieldname == multerFileName(i + iR)) {
+              if (file.fieldname == multerFileName(i)) {
                 buffer = file.buffer
                 break
               }
@@ -107,9 +106,9 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
         return reqDoc._id
       }
       if (opts.multiple) {
-        var iR = 0 // index reduction
-        for (var i = 0; i < reqDocuments.length; i++) {
-          const resultId = await handleFile(reqDocuments[i])
+        let iR = 0 // index reduction
+        for (let i = 0; i < reqDocuments.length; i++) {
+          const resultId = await handleFile(reqDocuments[i], i + iR)
           if (resultId) {
             reqDocuments[i] = resultId
           } else {
@@ -119,7 +118,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           }
         }
       } else {
-        await handleFile(reqDocuments)
+        await handleFile(reqDocuments, 0)
       }
     }
     if (next) {
@@ -133,14 +132,14 @@ export async function writeToDisk(
   data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
 ) {
   // create folders
-  var root = ''
-  var folderPath = filePath
+  let root = ''
+  let folderPath = filePath
   if (folderPath[0] === '/') {
     root = '/'
     folderPath = folderPath.slice(1)
   }
   const folders = folderPath.split('/').slice(0, -1) // remove last item (file)
-  var cfolderPath = root
+  let cfolderPath = root
   for (const folder of folders) {
     cfolderPath = cfolderPath + folder + '/'
     try {
@@ -171,23 +170,13 @@ export async function getSubmissionReportFromHistory(
   if (overwriteQueryState) {
     state = overwriteQueryState
   }
-  for (var i = 0; i < report.history.length; i++) {
+  for (let i = 0; i < report.history.length; i++) {
     const historyReport = await model.findOne({ _id: report.history[i] }).lean()
     if (historyReport && historyReport.state === state) {
       return historyReport
     }
   }
   return null
-}
-
-export async function getSettings(): Promise<Settings> {
-  await connectDB()
-  const settings = (await mongoose.connection.collection('settings').findOne()) as Settings | null
-  if (settings) {
-    return settings
-  } else {
-    throw Error('Settings not found')
-  }
 }
 
 export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {
@@ -198,3 +187,21 @@ export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boo
 }
 
 export const fileHandler = multer({ limits: { fileSize: parseInt(process.env.VITE_MAX_FILE_SIZE) } })
+
+export function genAuthenticatedLink(
+  payload: { destination: string; redirect: string },
+  jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }
+) {
+  const secret = process.env.MAGIC_LOGIN_SECRET
+  const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
+  return new Promise<string>((resolve, reject) => {
+    const code = Math.floor(Math.random() * 90000) + 10000 + ''
+    jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(`${callbackUrl}?token=${token}`)
+      }
+    })
+  })
+}

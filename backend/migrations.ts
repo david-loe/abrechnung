@@ -11,7 +11,7 @@ export async function checkForMigrations() {
       async function rewriteSubmissionDate(collection: string, state: string) {
         const allReports = mongoose.connection.collection(collection).find({ historic: false })
         for await (const report of allReports) {
-          for (var i = 0; i < report.history.length; i++) {
+          for (let i = 0; i < report.history.length; i++) {
             const history = await mongoose.connection.collection(collection).findOne({ _id: report.history[i] })
             if (history && history.state === state) {
               let submissionDate = report.updatedAt
@@ -75,7 +75,55 @@ export async function checkForMigrations() {
         await mongoose.connection.collection('tokens').dropIndex('createdAt_1')
       }
     }
+    if (semver.lte(migrateFrom, '1.3.1')) {
+      console.log('Apply migration from v1.3.1: Move ENV to Connection and Display Settings')
+      const connectionSettingsFromEnv: any = {
+        auth: {
+          microsoft: {
+            clientId: process.env.MS_AZURE_CLIENT_ID,
+            clientSecret: process.env.MS_AZURE_CLIENT_SECRET,
+            tenant: process.env.MS_AZURE_TENANT
+          },
+          ldapauth: {
+            url: process.env.LDAP_URL,
+            bindDN: process.env.LDAP_BINDDN,
+            bindCredentials: process.env.LDAP_BINDCREDENTIALS,
+            searchBase: process.env.LDAP_SEARCHBASE,
+            searchFilter: process.env.LDAP_SEARCHFILTER,
+            tlsOptions: {
+              rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED?.toLowerCase() === 'true'
+            },
+            mailAttribute: process.env.LDAP_MAIL_ATTRIBUTE,
+            uidAttribute: process.env.LDAP_UID_ATTRIBUTE,
+            familyNameAttribute: process.env.LDAP_SURNAME_ATTRIBUTE,
+            givenNameAttribute: process.env.LDAP_GIVENNAME_ATTRIBUTE
+          }
+        },
+        smtp: {
+          host: process.env.SMTP_HOST,
+          port: parseInt(process.env.SMTP_PORT as string),
+          secure: process.env.SMTP_SECURE?.toLowerCase() === 'true',
+          user: process.env.SMTP_USER,
+          password: process.env.SMTP_PASS,
+          senderAddress: process.env.MAIL_SENDER_ADDRESS
+        }
+      }
+      await mongoose.connection.collection('connectionsettings').updateOne({}, { $set: connectionSettingsFromEnv })
 
+      const displaySettingsFromEnv: any = {
+        auth: {
+          microsoft: process.env.VITE_AUTH_USE_MS_AZURE?.toLowerCase() === 'true',
+          ldapauth: process.env.VITE_AUTH_USE_LDAP?.toLowerCase() === 'true',
+          magiclogin: process.env.VITE_AUTH_USE_MAGIC_LOGIN?.toLowerCase() === 'true'
+        },
+        locale: {
+          default: process.env.VITE_I18N_LOCALE,
+          fallback: process.env.VITE_I18N_FALLBACK_LOCALE,
+          overwrite: JSON.parse(process.env.VITE_I18N_LOCALES_OVERWRITE || '{"de":{},"en":{}}')
+        }
+      }
+      await mongoose.connection.collection('displaysettings').updateOne({}, { $set: displaySettingsFromEnv })
+    }
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()

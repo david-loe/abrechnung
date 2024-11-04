@@ -11,7 +11,7 @@ import {
   reportIsTravel,
   schemaNames
 } from '../common/types.js'
-import { getSettings } from './helper.js'
+import { getSettings } from './db.js'
 import i18n from './i18n.js'
 import { sendMail } from './mail/mail.js'
 import User from './models/user.js'
@@ -105,7 +105,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
     if (owner) {
       let recipients = [owner]
 
-      var reportType: ReportType
+      let reportType: ReportType
       if (reportIsTravel(report)) {
         reportType = 'travel'
       } else if (reportIsHealthCareCost(report)) {

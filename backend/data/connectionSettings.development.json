@@ -1,0 +1,26 @@
+{
+    "auth": {
+        "ldapauth": {
+            "url": "ldaps://ldap:636",
+            "bindDN": "cn=admin,dc=planetexpress,dc=com",
+            "bindCredentials": "GoodNewsEveryone",
+            "searchBase": "ou=people,dc=planetexpress,dc=com",
+            "searchFilter": "(uid={{username}})",
+            "tlsOptions": {
+                "rejectUnauthorized": false
+            },
+            "mailAttribute": "mail",
+            "uidAttribute": "uid",
+            "familyNameAttribute": "sn",
+            "givenNameAttribute": "givenName"
+        }
+    },
+    "smtp": {
+        "host": "inbucket",
+        "port": 2500,
+        "secure": false,
+        "user": "username",
+        "password": "password",
+        "senderAddress": "info@abrechnung.com"
+    }
+}

@@ -1,9 +1,9 @@
 <template>
-  <div class="text-center" id="loginPage">
+  <div v-if="$root.displaySettings.auth" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
     <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
     <div v-if="strategy === 'ldapauth'">
-      <form v-if="useLDAP" class="form-signin" @submit.prevent="login()">
+      <form v-if="$root.displaySettings.auth.ldapauth" class="form-signin" @submit.prevent="login()">
         <div class="form-floating">
           <input
             type="text"
@@ -35,7 +35,7 @@
       </form>
     </div>
     <div v-else-if="strategy === 'magiclogin'">
-      <form v-if="useMagicLogin" class="form-signin" @submit.prevent="requestMagicLogin()">
+      <form v-if="$root.displaySettings.auth.magiclogin" class="form-signin" @submit.prevent="requestMagicLogin()">
         <div class="form-floating">
           <input
             type="email"
@@ -55,21 +55,21 @@
       </form>
     </div>
 
-    <div v-if="useLDAP" class="mt-4">
+    <div v-if="$root.displaySettings.auth.ldapauth" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
         <i class="bi bi-people-fill me-1"></i>
         {{ $t('labels.signInX', { X: 'LDAP' }) }}
       </button>
     </div>
 
-    <div v-if="useMicrosoft" class="mt-4">
+    <div v-if="$root.displaySettings.auth.microsoft" class="mt-4">
       <a class="btn btn-lg btn-primary" :href="microsoftLink()">
         <i class="bi bi-microsoft me-1"></i>
         {{ $t('labels.signInX', { X: 'Microsoft' }) }}
       </a>
     </div>
 
-    <div v-if="useMagicLogin" class="mt-4">
+    <div v-if="$root.displaySettings.auth.magiclogin" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
         {{ $t('labels.signInX', { X: 'E-Mail' }) }}
@@ -91,11 +91,8 @@ export default defineComponent({
       strategy: '' as Strategy,
       passwordLDAP: '',
       usernameLDAP: '',
-      useLDAP: import.meta.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true',
-      useMicrosoft: import.meta.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true',
       magicLoginMail: '',
-      magicLoginSend: false,
-      useMagicLogin: import.meta.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
+      magicLoginSend: false
     }
   },
   methods: {
@@ -141,8 +138,8 @@ export default defineComponent({
       )
     }
   },
-  created() {
-    this.$root.loadState = 'LOADED'
+  async created() {
+    await this.$root.load(true)
   }
 })
 </script>

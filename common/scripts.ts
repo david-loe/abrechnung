@@ -10,7 +10,7 @@ export function getById<T extends { _id: string }>(id: string, array: T[]): T | 
 }
 
 export function mailToLink(recipients: string[], subject?: string, body?: string, cc?: string[], bcc?: string[]): string {
-  var paramString = ''
+  let paramString = ''
   function addParam(param: string, value: string) {
     if (value.length > 0) {
       if (paramString.length > 0) {
@@ -28,7 +28,7 @@ export function mailToLink(recipients: string[], subject?: string, body?: string
 }
 
 export function msTeamsToLink(recipients: string[], message?: string, topicName?: string): string {
-  var paramString = ''
+  let paramString = ''
   function addParam(param: string, value: string) {
     if (value.length > 0) {
       if (paramString.length > 0) {
@@ -108,7 +108,7 @@ export function getDiffInDays(startDate: Date | string | number, endDate: Date |
 
 export function getDayList(startDate: Date | string | number, endDate: Date | string | number): Date[] {
   const days: Date[] = []
-  for (var i = 0; i < getDiffInDays(startDate, endDate) + 1; i++) {
+  for (let i = 0; i < getDiffInDays(startDate, endDate) + 1; i++) {
     days.push(new Date(datetimeToDate(startDate).valueOf() + i * 1000 * 60 * 60 * 24))
   }
   return days
@@ -119,7 +119,7 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
 }
 
 function getLumpSumsSum(travel: Travel) {
-  var sum = 0
+  let sum = 0
   for (const day of travel.days) {
     for (const refund of day.refunds) {
       if (refund.refund.amount != null) {
@@ -131,9 +131,9 @@ function getLumpSumsSum(travel: Travel) {
 }
 
 function getBaseCurrencyAmount(a: Money): number {
-  var amount = 0
+  let amount = 0
   if (a.amount !== null) {
-    var currency = typeof a.currency === 'string' ? a.currency : a.currency._id
+    let currency = typeof a.currency === 'string' ? a.currency : a.currency._id
     if (currency === baseCurrency._id) {
       amount = a.amount
     } else if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
@@ -144,10 +144,10 @@ function getBaseCurrencyAmount(a: Money): number {
 }
 
 function getTravelExpensesSum(travel: Travel) {
-  var sum = 0
+  let sum = 0
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount !== null) {
-      var add = getBaseCurrencyAmount(stage.cost)
+      let add = getBaseCurrencyAmount(stage.cost)
       if (stage.purpose === 'mixed') {
         add = add * travel.professionalShare!
       }
@@ -156,7 +156,7 @@ function getTravelExpensesSum(travel: Travel) {
   }
   for (const expense of travel.expenses) {
     if (expense.cost && expense.cost.amount !== null) {
-      var add = getBaseCurrencyAmount(expense.cost)
+      let add = getBaseCurrencyAmount(expense.cost)
       if (expense.purpose === 'mixed') {
         add = add * travel.professionalShare!
       }
@@ -205,15 +205,15 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
     reader.readAsDataURL(file)
     reader.onload = function (this: FileReader) {
       // We create an image to receive the Data URI
-      var img = document.createElement('img')
+      let img = document.createElement('img')
       // When the img "onload" is triggered we can resize the image.
       img.onload = function (this: GlobalEventHandlers) {
         // We create a canvas and get its context.
-        var canvas = document.createElement('canvas')
-        var ctx = canvas.getContext('2d')
+        let canvas = document.createElement('canvas')
+        let ctx = canvas.getContext('2d')
         // We set the dimensions to the wanted size.
-        var max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
-        var min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
+        let max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
+        let min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
         if (img[max] > longestSide) {
           canvas[max] = longestSide
           canvas[min] = img[min] * (longestSide / img[max])
@@ -234,9 +234,9 @@ export class Base64 {
   static #keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 
   static encode(input: string): string {
-    var output = ''
-    var chr1, chr2, chr3, enc1, enc2, enc3, enc4
-    var i = 0
+    let output = ''
+    let chr1, chr2, chr3, enc1, enc2, enc3, enc4
+    let i = 0
 
     input = this.#utf8_encode(input)
 
@@ -263,10 +263,10 @@ export class Base64 {
   }
 
   static decode(input: string): string {
-    var output = ''
-    var chr1, chr2, chr3
-    var enc1, enc2, enc3, enc4
-    var i = 0
+    let output = ''
+    let chr1, chr2, chr3
+    let enc1, enc2, enc3, enc4
+    let i = 0
 
     input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '')
 
@@ -297,10 +297,10 @@ export class Base64 {
 
   static #utf8_encode(string: string): string {
     string = string.replace(/\r\n/g, '\n')
-    var utftext = ''
+    let utftext = ''
 
-    for (var n = 0; n < string.length; n++) {
-      var c = string.charCodeAt(n)
+    for (let n = 0; n < string.length; n++) {
+      let c = string.charCodeAt(n)
 
       if (c < 128) {
         utftext += String.fromCharCode(c)
@@ -318,9 +318,9 @@ export class Base64 {
   }
 
   static #utf8_decode(utftext: string): string {
-    var string = ''
-    var i = 0
-    var c,
+    let string = ''
+    let i = 0
+    let c,
       c2,
       c3 = 0
 
@@ -419,14 +419,14 @@ export function csvToObjects(
   let result = []
   if (lines.length > 1) {
     const headers = lines[0]
-    for (var i = 1; i < lines.length; i++) {
-      var obj: any = {}
-      var currentline = lines[i]
-      for (var j = 0; j < headers.length; j++) {
+    for (let i = 1; i < lines.length; i++) {
+      let obj: any = {}
+      let currentline = lines[i]
+      for (let j = 0; j < headers.length; j++) {
         let object = obj
         let val: string | string[] | undefined = currentline[j] !== '' ? currentline[j] : undefined
         const pathParts = headers[j].split(pathSeparator)
-        for (var k = 0; k < pathParts.length - 1; k++) {
+        for (let k = 0; k < pathParts.length - 1; k++) {
           if (!isObject(object[pathParts[k]])) {
             object[pathParts[k]] = {}
           }

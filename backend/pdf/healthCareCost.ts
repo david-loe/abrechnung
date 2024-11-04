@@ -35,7 +35,7 @@ export async function generateHealthCareCostReport(healthCareCost: HealthCareCos
   }
   newPage()
 
-  var y = getLastPage().getSize().height
+  let y = getLastPage().getSize().height
   await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), healthCareCost.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
@@ -108,7 +108,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
   )
 
   // Title
-  var y = opts.yStart - opts.fontSize * 1.5
+  let y = opts.yStart - opts.fontSize * 1.5
   page.drawText(healthCareCost.name, {
     x: opts.xStart,
     y: y,
@@ -118,7 +118,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
   })
 
   //Project identifier and name
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   page.drawText(
     i18n.t('labels.project', { lng: opts.language }) +
       ': ' +
@@ -133,7 +133,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, healthCareCost: HealthCar
     }
   )
   // Isurance + patientName
-  var y = y - opts.fontSize * 1.5 * 1.5
+  y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.insurance', { lng: opts.language }) +
       ': ' +

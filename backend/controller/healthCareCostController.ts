@@ -91,7 +91,7 @@ export class HealthCareCostController extends Controller {
       if (!request.user!.access['inWork:healthCareCost']) {
         throw new AuthorizationError()
       } else if (!extendedBody.name) {
-        var date = new Date()
+        let date = new Date()
         extendedBody.name =
           requestBody.patientName +
           ' ' +
@@ -291,7 +291,7 @@ export class HealthCareCostExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user?._id })
     if (!extendedBody._id && !extendedBody.name) {
-      var date = new Date()
+      let date = new Date()
       extendedBody.name =
         requestBody.patientName +
         ' ' +

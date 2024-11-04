@@ -19,7 +19,7 @@ import DocumentFile from '../models/documentFile.js'
 import Organisation from '../models/organisation.js'
 
 export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost): Promise<string> {
-  var path = '/reports/'
+  let path = '/reports/'
   if (reportIsTravel(report)) {
     if (report.state === 'approved') {
       path += 'advance/'
@@ -146,20 +146,21 @@ export async function attachReceipts(pdfDoc: pdf_lib.PDFDocument, receiptMap: Re
         drawNumber(page, receipt)
       }
     } else {
+      let image: pdf_lib.PDFImage
       if (receipt.type === 'image/jpeg') {
         const zeroOffsetData = new Uint8Array(data, 0)
-        var image = await pdfDoc.embedJpg(zeroOffsetData)
+        image = await pdfDoc.embedJpg(zeroOffsetData)
       } else {
         // receipt.type === 'image/png'
-        var image = await pdfDoc.embedPng(data)
+        image = await pdfDoc.embedPng(data)
       }
-      var page = null
+      let page = null
       if (image.width > image.height) {
         page = pdfDoc.addPage([pdf_lib.PageSizes.A4[1], pdf_lib.PageSizes.A4[0]]) // landscape page
       } else {
         page = pdfDoc.addPage(pdf_lib.PageSizes.A4)
       }
-      var size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
+      let size = image.scaleToFit(page.getSize().width - opts.edge * 2, page.getSize().height - opts.edge * 2)
       if (size.width > image.width) {
         size = image.size()
       }
@@ -183,7 +184,7 @@ export async function drawPlace(page: pdf_lib.PDFPage, place: { country: Country
     options
   )
 
-  var text = opts.prefix
+  let text = opts.prefix
   if (place.place) {
     text += place.place + ', '
   }
@@ -205,7 +206,7 @@ export async function drawPlace(page: pdf_lib.PDFPage, place: { country: Country
 export async function drawFlag(page: pdf_lib.PDFPage, countryCode: string, options: Options) {
   const opts = options
 
-  var filename = countryCode
+  let filename = countryCode
   if (opts.fontSize > 42 * 0.75) {
     // 0.75 px <=> 1 pt
     filename = filename + '@3x'
@@ -238,7 +239,7 @@ export async function drawLogo(page: pdf_lib.PDFPage, options: Options) {
     color: opts.textColor
   })
 
-  var filename = 'receipt'
+  let filename = 'receipt'
   if (opts.fontSize > 24) {
     filename = filename + '36'
   } else if (opts.fontSize > 12) {
@@ -272,15 +273,16 @@ export async function drawOrganisationLogo(
     return
   }
   const data = (doc.data as any as mongo.Binary).buffer
+  let image: pdf_lib.PDFImage
   if (doc.type === 'image/jpeg') {
     const zeroOffsetData = new Uint8Array(data, 0)
-    var image = await page.doc.embedJpg(zeroOffsetData)
+    image = await page.doc.embedJpg(zeroOffsetData)
   } else {
     // receipt.type === 'image/png'
-    var image = await page.doc.embedPng(data)
+    image = await page.doc.embedPng(data)
   }
 
-  var size = image.scaleToFit(options.maxWidth, options.maxHeight)
+  let size = image.scaleToFit(options.maxWidth, options.maxHeight)
   if (size.width > image.width) {
     size = image.size()
   }
@@ -359,11 +361,11 @@ export async function drawTable(
   opts.yStart = opts.yStart - opts.cellHeight
   opts.newPageYStart = opts.newPageYStart - opts.cellHeight
 
-  var x = opts.xStart
-  var y = opts.yStart
-  for (var i = 0; i < data.length; i++) {
+  let x = opts.xStart
+  let y = opts.yStart
+  for (let i = 0; i < data.length; i++) {
     x = opts.xStart
-    var yMin = y
+    let yMin = y
     const columnBorders: pdf_lib.PDFPageDrawLineOptions[] = []
     const cellTexts: {
       text: string
@@ -381,7 +383,7 @@ export async function drawTable(
     }[] = []
     for (const column of columns) {
       const datum = data[i][column.key]
-      var cell = datum
+      let cell = datum
       if (column.fn) {
         cell = column.fn(cell)
       }
@@ -456,7 +458,7 @@ export async function drawTable(
         thickness: opts.borderThickness,
         color: opts.borderColor
       })
-      var page = newPageFn()
+      page = newPageFn()
       x = opts.newPageXStart
       y = opts.newPageYStart
       opts.xStart = opts.newPageXStart

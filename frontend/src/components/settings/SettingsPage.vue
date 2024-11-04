@@ -18,6 +18,8 @@
       <div class="col">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'" />
+        <ConnectionSettingsForm v-if="entry === 'connectionSettings'" />
+        <DisplaySettingsForm v-if="entry === 'displaySettings'" />
         <template v-else-if="entry === 'users'">
           <UserList class="mb-5" ref="userList" />
 
@@ -73,9 +75,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import ConnectionSettingsForm from './elements/ConnectionSettingsForm.vue'
 import CountryList from './elements/CountryList.vue'
 import CSVImport from './elements/CSVImport.vue'
 import CurrencyList from './elements/CurrencyList.vue'
+import DisplaySettingsForm from './elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from './elements/HealthInsuranceList.vue'
 import OrganisationList from './elements/OrganisationList.vue'
 import ProjectList from './elements/ProjectList.vue'
@@ -83,7 +87,17 @@ import SettingsForm from './elements/SettingsForm.vue'
 import UserList from './elements/UserList.vue'
 import UserMerge from './elements/UserMerge.vue'
 
-const entries = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances', 'settings'] as const
+const entries = [
+  'users',
+  'projects',
+  'organisations',
+  'countries',
+  'currencies',
+  'healthInsurances',
+  'settings',
+  'connectionSettings',
+  'displaySettings'
+] as const
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -96,7 +110,9 @@ export default defineComponent({
     CurrencyList,
     HealthInsuranceList,
     UserMerge,
-    CSVImport
+    CSVImport,
+    ConnectionSettingsForm,
+    DisplaySettingsForm
   },
   data() {
     return {

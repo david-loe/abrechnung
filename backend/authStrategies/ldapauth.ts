@@ -1,54 +1,31 @@
 import LdapStrategy from 'passport-ldapauth'
-import User from '../models/user.js'
-import { NewUser, addAdminIfNone } from './index.js'
+import { ldapauthSettings } from '../../common/types.js'
+import { getConnectionSettings } from '../db.js'
+import { mapLdapauthConfig } from '../settingsValidator.js'
+import { findOrCreateUser } from './index.js'
 
-const ldapauth = new LdapStrategy(
-  {
-    server: {
-      url: process.env.LDAP_URL,
-      bindDN: process.env.LDAP_BINDDN,
-      bindCredentials: process.env.LDAP_BINDCREDENTIALS,
-      searchBase: process.env.LDAP_SEARCHBASE,
-      searchFilter: process.env.LDAP_SEARCHFILTER,
-      tlsOptions: {
-        requestCert: process.env.LDAP_TLS_REQUESTCERT.toLowerCase() === 'true',
-        rejectUnauthorized: process.env.LDAP_TLS_REJECTUNAUTHORIZED.toLowerCase() === 'true'
+export async function getLdapauthStrategy() {
+  const connectionSettings = await getConnectionSettings()
+  if (connectionSettings.auth.ldapauth) {
+    const config: ldapauthSettings = connectionSettings.auth.ldapauth
+    return new LdapStrategy(
+      {
+        server: mapLdapauthConfig(config)
+      },
+      async function (ldapUser: any, cb: (error: any, user?: any) => void) {
+        let email: string | string[] = ldapUser[config.mailAttribute]
+
+        findOrCreateUser(
+          { ldapauth: ldapUser[config.uidAttribute] },
+          {
+            email: Array.isArray(email) ? (email.length > 0 ? email[0] : '') : email,
+            name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
+          },
+          cb
+        )
       }
-    }
-  },
-  async function (ldapUser: any, cb: (error: any, user?: any) => void) {
-    let user = await User.findOne({ 'fk.ldapauth': ldapUser[process.env.LDAP_UID_ATTRIBUTE] })
-    let email = ldapUser[process.env.LDAP_MAIL_ATTRIBUTE]
-    if (Array.isArray(email)) {
-      if (email.length > 0) {
-        email = email[0]
-      } else {
-        email = undefined
-      }
-    }
-    if (!user && email) {
-      user = await User.findOne({ email: email })
-    }
-    const newUser: NewUser = {
-      fk: { ldapauth: ldapUser[process.env.LDAP_UID_ATTRIBUTE] },
-      email: email,
-      name: { familyName: ldapUser[process.env.LDAP_SURNAME_ATTRIBUTE], givenName: ldapUser[process.env.LDAP_GIVENNAME_ATTRIBUTE] }
-    }
-    if (!user) {
-      user = new User(newUser)
-    } else {
-      Object.assign(user.fk, newUser.fk)
-      delete newUser.fk
-      Object.assign(user, newUser)
-    }
-    try {
-      await user.save()
-      addAdminIfNone(user)
-      cb(null, user)
-    } catch (error) {
-      cb(error)
-    }
+    )
+  } else {
+    throw new Error('LDAP not configured in Connection Settings')
   }
-)
-
-export default ldapauth
+}

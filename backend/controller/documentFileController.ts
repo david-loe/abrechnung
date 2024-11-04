@@ -1,5 +1,4 @@
 import { Request as ExRequest } from 'express'
-import { mongo } from 'mongoose'
 import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse } from 'tsoa'
 import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
@@ -18,8 +17,8 @@ export class DocumentFileController extends Controller {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file && request.user!._id.equals(file.owner._id)) {
       request.res?.setHeader('Content-Type', file.type)
-      request.res?.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
-      request.res?.send((file.data as any as mongo.Binary).buffer)
+      request.res?.setHeader('Content-Length', file.data.length().toString())
+      request.res?.send(file.data.buffer)
     } else {
       throw new NotAllowedError()
     }
@@ -45,8 +44,8 @@ export class DocumentFileAdminController extends Controller {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file) {
       request.res?.setHeader('Content-Type', file.type)
-      request.res?.setHeader('Content-Length', (file.data as any as mongo.Binary).length().toString())
-      request.res?.send((file.data as any as mongo.Binary).buffer)
+      request.res?.setHeader('Content-Length', file.data.length().toString())
+      request.res?.send(file.data.buffer)
     } else {
       throw new NotFoundError('No file found')
     }

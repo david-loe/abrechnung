@@ -2,15 +2,8 @@ import express from 'express'
 import { Types } from 'mongoose'
 import passport from 'passport'
 import { User as IUser } from '../common/types.js'
-import ldapauth from './authStrategies/ldapauth.js'
-import magicLogin from './authStrategies/magiclogin.js'
-import microsoft from './authStrategies/microsoft.js'
 import User from './models/user.js'
 const router = express.Router()
-
-passport.use(ldapauth)
-passport.use(microsoft)
-passport.use(magicLogin)
 
 passport.serializeUser(async (user: IUser, cb) => {
   cb(null, { _id: user._id })

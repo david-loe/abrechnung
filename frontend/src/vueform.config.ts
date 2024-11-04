@@ -7,6 +7,7 @@ import CountryElement from './components/elements/vueform/CountryElement.vue'
 import CurrencyElement from './components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from './components/elements/vueform/DocumentfileElement.vue'
 import HealthinsuranceElement from './components/elements/vueform/HealthinsuranceElement.vue'
+import MixedElement from './components/elements/vueform/MixedElement.vue'
 import OrganisationElement from './components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from './components/elements/vueform/ProjectElement.vue'
 import UserElement from './components/elements/vueform/UserElement.vue'
@@ -18,7 +19,7 @@ function deepReplace(obj: any, search: any, replacement: any) {
   for (const key in obj) {
     if (obj[key] === search) {
       obj[key] = replacement
-    } else if (typeof obj[key] === 'object') {
+    } else if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
       deepReplace(obj[key], search, replacement)
     }
   }
@@ -33,7 +34,8 @@ export default defineConfig({
     CurrencyElement,
     ProjectElement,
     HealthinsuranceElement,
-    UserElement
+    UserElement,
+    MixedElement
   ],
   locales: { de, en },
   locale: 'de',

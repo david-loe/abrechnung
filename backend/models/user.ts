@@ -10,18 +10,15 @@ import {
   locales,
   userReplaceCollections
 } from '../../common/types.js'
-import { getSettings } from '../helper.js'
+import { getDisplaySettings, getSettings } from '../db.js'
 
 const settings = await getSettings()
+const displaySettings = await getDisplaySettings()
 
 const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
 for (const access of accesses) {
   accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
 }
-
-const useLDAPauth = process.env.VITE_AUTH_USE_LDAP.toLowerCase() === 'true'
-const useMicrosoft = process.env.VITE_AUTH_USE_MS_AZURE.toLowerCase() === 'true'
-const useMagicLogin = process.env.VITE_AUTH_USE_MAGIC_LOGIN.toLowerCase() === 'true'
 
 interface Methods {
   isActive(): Promise<boolean>
@@ -35,8 +32,8 @@ type UserModel = Model<User, {}, Methods>
 export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
     type: {
-      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !useMicrosoft },
-      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !useLDAPauth },
+      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
+      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
       magiclogin: {
         type: String,
         index: true,
@@ -44,7 +41,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         sparse: true,
         validate: emailRegex,
         label: 'Magic Login Email',
-        hide: !useMagicLogin
+        hide: !displaySettings.auth.magiclogin
       }
     },
     required: true
@@ -80,7 +77,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
   loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
-      language: { type: String, default: process.env.VITE_I18N_LOCALE, enum: locales },
+      language: { type: String, default: displaySettings.locale.default, enum: locales },
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },

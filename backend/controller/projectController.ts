@@ -1,7 +1,7 @@
 import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
-import { getSettings } from '../helper.js'
+import { getSettings } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import Project, { projectSchema, projectUsersSchema } from '../models/project.js'

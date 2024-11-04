@@ -78,15 +78,15 @@
           reader.readAsDataURL(file)
           reader.onload = function () {
             // We create an image to receive the Data URI
-            var img = document.createElement('img')
+            let img = document.createElement('img')
             // When the img "onload" is triggered we can resize the image.
             img.onload = function () {
               // We create a canvas and get its context.
-              var canvas = document.createElement('canvas')
-              var ctx = canvas.getContext('2d')
+              let canvas = document.createElement('canvas')
+              let ctx = canvas.getContext('2d')
               // We set the dimensions to the wanted size.
-              var max = img.height < img.width ? 'width' : 'height'
-              var min = max == 'width' ? 'height' : 'width'
+              let max = img.height < img.width ? 'width' : 'height'
+              let min = max == 'width' ? 'height' : 'width'
               if (img[max] > longestSide) {
                 canvas[max] = longestSide
                 canvas[min] = img[min] * (longestSide / img[max])
@@ -102,7 +102,7 @@
           }
         })
       }
-      var fileInput = document.getElementById('upload')
+      let fileInput = document.getElementById('upload')
 
       fileInput.addEventListener('change', async function (event) {
         const files = await fileEventToDocumentFiles(event)
@@ -111,7 +111,7 @@
           document.getElementById('button').remove()
           document.getElementById('text').innerHTML = '<%= text.uploading %>'
           const FD = new FormData()
-          for (var i = 0; i < files.length; i++) {
+          for (let i = 0; i < files.length; i++) {
             for (const [name, value] of Object.entries(files[i])) FD.append('files[' + i + '][' + name + ']', value)
           }
           const response = await fetch('<%- url %>', {

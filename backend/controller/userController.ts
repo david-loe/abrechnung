@@ -2,7 +2,7 @@ import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
-import { User as IUser, _id, locales } from '../../common/types.js'
+import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { sendMail } from '../mail/mail.js'
@@ -73,7 +73,11 @@ export class UserController extends Controller {
 export class UsersController extends Controller {
   @Get()
   public async getUsers(@Queries() query: GetterQuery<IUser>) {
-    return await this.getter(User, { query, projection: { name: 1 } })
+    return await this.getter(User, {
+      query,
+      projection: { name: 1 },
+      filter: { 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }
+    })
   }
 }
 
@@ -96,7 +100,11 @@ interface SetterBodyUser extends SetterBody<IUser> {
 export class UserAdminController extends Controller {
   @Get()
   public async getUser(@Queries() query: GetterQuery<IUser>) {
-    return await this.getter(User, { query, projection: { vehicleRegistration: 0 } })
+    return await this.getter(User, {
+      query,
+      projection: { vehicleRegistration: 0 },
+      filter: { 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }
+    })
   }
 
   @Post()
@@ -112,7 +120,7 @@ export class UserAdminController extends Controller {
   @Post('bulk')
   public async postManyProjects(@Body() requestBody: SetterBodyUser[]) {
     const newMagicloginUsers: number[] = []
-    for (var i = 0; i < requestBody.length; i++) {
+    for (let i = 0; i < requestBody.length; i++) {
       if (!requestBody[i]._id && requestBody[i].fk && requestBody[i].fk!.magiclogin) {
         newMagicloginUsers.push(i)
       }

@@ -5,11 +5,11 @@ interface FormField {
 
 export function objectToFormFields(object: any, fieldPrefix: string = '', formFields: FormField[] = []): FormField[] {
   for (const key in object) {
-    var field = fieldPrefix ? fieldPrefix + '[' + key + ']' : key
+    let field = fieldPrefix ? fieldPrefix + '[' + key + ']' : key
     if (object[key] === null || object[key] === undefined) {
       continue
     } else if (Array.isArray(object[key])) {
-      for (var i = 0; i < object[key].length; i++) {
+      for (let i = 0; i < object[key].length; i++) {
         objectToFormFields(object[key][i], field + '[' + i + ']', formFields)
       }
     } else if (object[key] instanceof Date) {

@@ -35,7 +35,7 @@ export async function generateExpenseReportReport(expenseReport: ExpenseReport, 
   }
   newPage()
 
-  var y = getLastPage().getSize().height
+  let y = getLastPage().getSize().height
   await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), expenseReport.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
@@ -97,7 +97,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
   )
 
   // Title
-  var y = opts.yStart - opts.fontSize * 1.5
+  let y = opts.yStart - opts.fontSize * 1.5
   page.drawText(expenseReport.name, {
     x: opts.xStart,
     y: y,
@@ -106,7 +106,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     color: opts.textColor
   })
   //Project identifier and name
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   page.drawText(
     i18n.t('labels.project', { lng: opts.language }) +
       ': ' +
@@ -121,7 +121,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     }
   )
   // Traveler
-  var y = y - opts.fontSize * 1.5 * 1.5
+  y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.expensePayer', { lng: opts.language }) +
       ': ' +
@@ -138,7 +138,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
   )
 
   // Dates + professionalShare
-  var text =
+  let text =
     i18n.t('labels.from', { lng: opts.language }) +
     ': ' +
     options.formatter.date(expenseReport.expenses[0].cost.date) +
@@ -146,7 +146,7 @@ function drawGeneralInformation(page: pdf_lib.PDFPage, expenseReport: ExpenseRep
     i18n.t('labels.to', { lng: opts.language }) +
     ': ' +
     options.formatter.date(expenseReport.expenses[expenseReport.expenses.length - 1].cost.date)
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   page.drawText(text, {
     x: opts.xStart,
     y: y,

@@ -17,11 +17,6 @@
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
-    "db": {
-      "createdSettings": "Created Settings from Default",
-      "success": "Successfully connected to the Database.",
-      "updatedSettings": "Updated Settings"
-    },
     "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
@@ -46,10 +41,10 @@
       "stage": "There are no stages jet. Add one!",
       "travel": "There are no travels. Add one!"
     },
-    "rateLimitExceeded": "Rate Limit Exceeded!",
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
     "NotImplemented": "Not implemented!",
+    "rateLimitExceeded": "Rate Limit Exceeded!",
     "reloadRequired": "Reload required",
     "stagesOverlapping": "Stages are overlapping",
     "successDeleting": "Deleted successfully",
@@ -63,7 +58,8 @@
     "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "deleteInWorkReportsAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "deleteRefundedAfterXDays": "Enter 0 to prevent automatic deletion",
-    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email"
+    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email",
+    "keyFullIdentifier": "The key is the complete identifier, e.g: {\"labels.new\": \"NEW\"}"
   },
   "distanceRefundTypes": {
     "car": "Car 🚗",
@@ -122,6 +118,7 @@
     "approvedTravels": "approved travels",
     "arrival": "Arrival",
     "assignedProjects": "Assigned Projects",
+    "auth": "Authentication",
     "backToApplicant": "Back to applicant",
     "balance": "Balance",
     "bankDetails": "Bank details",
@@ -141,6 +138,7 @@
     "companyNumber": "Company number",
     "configCateringRefund": "Config catering refund",
     "confirm": "Confirm",
+    "connectionSettings": "Connection Settings",
     "cost": "Cost",
     "countries": "Countries",
     "country": "Country",
@@ -154,6 +152,7 @@
     "day": "Day",
     "days": "Days",
     "de": "German 🇩🇪",
+    "default": "Default",
     "defaultAccess": "Default access rights",
     "delete": "Delete",
     "deleteApprovedTravelAfterXDaysUnused": "Delete approved, unused trips - in days",
@@ -166,6 +165,7 @@
     "destinationPlace": "Destination place",
     "dinner": "Dinner",
     "disableReportType": "Deactivate application types",
+    "displaySettings": "Display Settings",
     "distance": "Distance [km]",
     "distanceRefunds": "Distance refunds",
     "distanceRefundType": "Distance Refund Type",
@@ -193,6 +193,7 @@
     "factorCateringLumpSumExceptions": "Exceptions to the factorization of the catering lump sums",
     "factorOvernightLumpSum": "Factor for the overnight lump sums",
     "factorOvernightLumpSumExceptions": "Exceptions to the factorization of the overnight lump sums",
+    "fallback": "Fallback",
     "fallBackLumpSumCountry": "Fall back country for lump sums",
     "familyName": "Family name",
     "fellowTravelersNames": "Name of all fellow travelers",
@@ -245,6 +246,7 @@
     "organisation": "Organisation",
     "organisations": "Organisations",
     "otherTransport": "Other transport 🚆🚖",
+    "overwrite": "Overwrite",
     "ownCar": "Own car 🚘",
     "owner": "Owner",
     "password": "Password",
@@ -425,9 +427,9 @@
     "hi": "Hi there,",
     "hiX": "Hi {X},",
     "magiclogin": {
-      "subject": "Login at @:{'headlines.title'}@:{'headlines.emoji'}",
       "buttonText": "Jump to @:{'headlines.title'}@:{'headlines.emoji'}",
-      "paragraph": "Click here to get access."
+      "paragraph": "Click here to get access.",
+      "subject": "Login at @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "newMagiclogin": {
       "buttonText": "To @:{'headlines.title'}@:{'headlines.emoji'}",

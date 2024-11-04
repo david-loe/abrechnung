@@ -1,4 +1,4 @@
-import { Types } from 'mongoose'
+import { mongo, Types } from 'mongoose'
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$
@@ -41,6 +41,59 @@ export interface SettingsTravel {
   secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number
   minProfessionalShare: number
+}
+
+export interface ldapauthSettings {
+  url: string
+  bindDN: string
+  bindCredentials: string
+  searchBase: string
+  searchFilter: string
+  tlsOptions: {
+    rejectUnauthorized: boolean
+  }
+  mailAttribute: string
+  uidAttribute: string
+  familyNameAttribute: string
+  givenNameAttribute: string
+}
+
+export interface smtpSettings {
+  host: string
+  port: number
+  secure: boolean
+  user: string
+  password: string
+  senderAddress: string
+}
+
+export interface microsoftSettings {
+  clientId: string
+  clientSecret: string
+  tenant: string
+}
+
+export interface ConnectionSettings {
+  auth: {
+    microsoft?: microsoftSettings | null
+    ldapauth?: ldapauthSettings | null
+  }
+  smtp?: smtpSettings | null
+  _id: _id
+}
+
+export interface DisplaySettings {
+  auth: {
+    magiclogin: boolean
+    microsoft: boolean
+    ldapauth: boolean
+  }
+  locale: {
+    default: Locale
+    fallback: Locale
+    overwrite: { [key in Locale]: { [key: string]: string } }
+  }
+  _id: _id
 }
 
 /**
@@ -104,7 +157,7 @@ export interface Place {
 }
 
 export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
-  data: Types.Buffer
+  data: mongo.Binary
   owner: _id
   type: T
   name: string
@@ -187,6 +240,15 @@ export interface User extends UserSimple {
   }
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
+}
+
+export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {
+  access: { user: User['access']['user']; admin: User['access']['admin'] }
+} = {
+  fk: { magiclogin: 'admin@to.ken' },
+  email: 'admin@to.ken',
+  name: { familyName: 'Token Access', givenName: 'Admin' },
+  access: { user: true, admin: true }
 }
 
 export interface BaseCurrencyMoney {

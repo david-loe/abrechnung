@@ -7,7 +7,7 @@ import { objectToFormFields } from './_helper.js'
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-var travel: TravelSimple = {
+let travel: TravelSimple = {
   name: 'Ankara Aug 2023',
   reason: 'Fortbildung',
   destinationPlace: {
@@ -168,7 +168,7 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
-    var req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
+    let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
     for (const entry of objectToFormFields(stage)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)
@@ -202,7 +202,7 @@ const expenses: TravelExpense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
+    let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)

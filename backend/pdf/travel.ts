@@ -19,7 +19,8 @@ import {
   TravelExpense,
   baseCurrency
 } from '../../common/types.js'
-import { getSettings, getSubmissionReportFromHistory } from '../helper.js'
+import { getSettings } from '../db.js'
+import { getSubmissionReportFromHistory } from '../helper.js'
 import i18n from '../i18n.js'
 import {
   Column,
@@ -52,7 +53,7 @@ export async function generateTravelReport(travel: Travel, language: Locale) {
   }
   newPage()
 
-  var y = getLastPage().getSize().height
+  let y = getLastPage().getSize().height
   await drawLogo(getLastPage(), { font: font, fontSize: 16, xStart: 16, yStart: y - 32, language, formatter })
   await drawOrganisationLogo(getLastPage(), travel.project.organisation, {
     xStart: getLastPage().getSize().width - 166,
@@ -118,7 +119,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   )
 
   // Title
-  var y = opts.yStart - opts.fontSize * 1.5
+  let y = opts.yStart - opts.fontSize * 1.5
   page.drawText(travel.name, {
     x: opts.xStart,
     y: y,
@@ -127,7 +128,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
     color: opts.textColor
   })
   //Project identifier and name
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   page.drawText(
     i18n.t('labels.project', { lng: opts.language }) +
       ': ' +
@@ -142,7 +143,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
     }
   )
   // Traveler
-  var y = y - opts.fontSize * 1.5 * 1.5
+  y = y - opts.fontSize * 1.5 * 1.5
   page.drawText(
     i18n.t('labels.traveler', { lng: opts.language }) +
       ': ' +
@@ -160,7 +161,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
   )
 
   // Reason + Place
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   drawPlace(
     page,
     travel.destinationPlace,
@@ -194,7 +195,7 @@ function drawGeneralTravelInformation(page: pdf_lib.PDFPage, travel: Travel, opt
       text + '    ' + i18n.t('labels.professionalShare', { lng: opts.language }) + ': ' + Math.round(travel.professionalShare! * 100) + '%'
   }
   const lastPlace = { country: travel.lastPlaceOfWork.country, place: travel.lastPlaceOfWork.special }
-  var y = y - opts.fontSize * 1.5
+  y = y - opts.fontSize * 1.5
   drawPlace(
     page,
     lastPlace,

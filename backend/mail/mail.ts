@@ -1,5 +1,6 @@
 import ejs from 'ejs'
 import fs from 'fs'
+import nodemailer from 'nodemailer'
 import {
   ExpenseReportSimple,
   HealthCareCostSimple,
@@ -10,10 +11,20 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
-import { genAuthenticatedLink } from '../authStrategies/magiclogin.js'
+import { getConnectionSettings } from '../db.js'
+import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
-import mailClient from './client.js'
+import { mapSmtpConfig } from '../settingsValidator.js'
+
+async function getClient() {
+  const connectionSettings = await getConnectionSettings()
+  if (connectionSettings.smtp?.host) {
+    return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
+  } else {
+    throw new Error('SMTP not configured in Connection Settings')
+  }
+}
 
 export async function sendMail(
   recipients: IUser[],
@@ -36,7 +47,7 @@ export async function sendMail(
   }
 }
 
-function _sendMail(
+async function _sendMail(
   recipient: IUser,
   subject: string,
   paragraph: string,
@@ -44,9 +55,7 @@ function _sendMail(
   lastParagraph: string,
   language: Locale
 ) {
-  if (mailClient == undefined) {
-    return
-  }
+  const mailClient = await getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
@@ -81,7 +90,7 @@ function _sendMail(
     app.url
 
   mailClient.sendMail({
-    from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
+    from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
     to: recipient.email, // list of receivers
     subject: subject, // Subject line
     text: plainText, // plain text body
@@ -90,8 +99,8 @@ function _sendMail(
 }
 
 export async function sendNotificationMail(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
-  var recipients = []
-  var reportType: ReportType
+  let recipients = []
+  let reportType: ReportType
   if (reportIsTravel(report)) {
     reportType = 'travel'
   } else if (reportIsHealthCareCost(report)) {

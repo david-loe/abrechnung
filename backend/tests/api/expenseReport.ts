@@ -8,7 +8,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-ignore
-var expenseReport: ExpenseReportSimple = {
+let expenseReport: ExpenseReportSimple = {
   name: 'Expenses from last Month'
 }
 
@@ -78,7 +78,7 @@ const expenses: Expense[] = [
 test.serial('POST /expenseReport/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
-    var req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
+    let req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
     for (const entry of objectToFormFields(expense)) {
       if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
         req = req.attach(entry.field, entry.val)

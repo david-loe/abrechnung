@@ -15,6 +15,7 @@ services:
       # - ./reports/healthCareCost:/reports/healthCareCost #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
+      - ${BACKEND_DEBUG_PORT}:${BACKEND_DEBUG_PORT}
     env_file:
       - .env
 

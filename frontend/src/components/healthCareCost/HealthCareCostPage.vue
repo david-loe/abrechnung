@@ -380,7 +380,7 @@ export default defineComponent({
       )
     },
     async refund() {
-      var headers = {}
+      let headers = {}
       if (this.healthCareCost.refundSum.receipts && this.healthCareCost.refundSum.receipts.length > 0) {
         headers = {
           'Content-Type': 'multipart/form-data'
@@ -403,7 +403,7 @@ export default defineComponent({
       return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
     },
     async postExpense(expense: Expense) {
-      var headers = {}
+      let headers = {}
       if (expense.cost.receipts) {
         headers = {
           'Content-Type': 'multipart/form-data'
