@@ -209,28 +209,9 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"mongoose.Types.Buffer": {
-				"properties": {
-					"data": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
-					},
-					"type": {
-						"type": "string",
-						"enum": [
-							"Buffer"
-						],
-						"nullable": false
-					}
-				},
-				"required": [
-					"data",
-					"type"
-				],
-				"type": "object"
+			"Binary": {
+				"type": "string",
+				"description": "A class representation of the BSON Binary type."
 			},
 			"DocumentFileType": {
 				"type": "string",
@@ -243,7 +224,7 @@
 			"DocumentFile": {
 				"properties": {
 					"data": {
-						"$ref": "#/components/schemas/mongoose.Types.Buffer"
+						"$ref": "#/components/schemas/Binary"
 					},
 					"owner": {
 						"$ref": "#/components/schemas/_id"
@@ -1013,8 +994,7 @@
 											"type": "string"
 										},
 										{
-											"type": "string",
-											"format": "byte"
+											"$ref": "#/components/schemas/Binary"
 										}
 									]
 								},
@@ -1328,8 +1308,7 @@
 											"type": "string"
 										},
 										{
-											"type": "string",
-											"format": "byte"
+											"$ref": "#/components/schemas/Binary"
 										}
 									]
 								},
@@ -2845,8 +2824,7 @@
 													"type": "string"
 												},
 												{
-													"type": "string",
-													"format": "byte"
+													"$ref": "#/components/schemas/Binary"
 												}
 											]
 										},
@@ -2928,8 +2906,7 @@
 													"type": "string"
 												},
 												{
-													"type": "string",
-													"format": "byte"
+													"$ref": "#/components/schemas/Binary"
 												}
 											]
 										},
@@ -5177,7 +5154,7 @@
 			"DocumentFile_ImageType_": {
 				"properties": {
 					"data": {
-						"$ref": "#/components/schemas/mongoose.Types.Buffer"
+						"$ref": "#/components/schemas/Binary"
 					},
 					"owner": {
 						"$ref": "#/components/schemas/_id"
@@ -5359,8 +5336,7 @@
 										"type": "string"
 									},
 									{
-										"type": "string",
-										"format": "byte"
+										"$ref": "#/components/schemas/Binary"
 									}
 								]
 							},
@@ -5834,8 +5810,7 @@
 													"type": "string"
 												},
 												{
-													"type": "string",
-													"format": "byte"
+													"$ref": "#/components/schemas/Binary"
 												}
 											]
 										},
@@ -6213,6 +6188,213 @@
 				},
 				"type": "object",
 				"additionalProperties": false
+			},
+			"IDisplaySettings": {
+				"properties": {
+					"auth": {
+						"properties": {
+							"ldapauth": {
+								"type": "boolean"
+							},
+							"microsoft": {
+								"type": "boolean"
+							},
+							"magiclogin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"ldapauth",
+							"microsoft",
+							"magiclogin"
+						],
+						"type": "object"
+					},
+					"locale": {
+						"properties": {
+							"overwrite": {
+								"properties": {
+									"de": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"en": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									}
+								},
+								"required": [
+									"de",
+									"en"
+								],
+								"type": "object"
+							},
+							"fallback": {
+								"$ref": "#/components/schemas/Locale"
+							},
+							"default": {
+								"$ref": "#/components/schemas/Locale"
+							}
+						},
+						"required": [
+							"overwrite",
+							"fallback",
+							"default"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"auth",
+					"locale",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DisplaySettings": {
+				"properties": {
+					"auth": {
+						"properties": {
+							"ldapauth": {
+								"type": "boolean"
+							},
+							"microsoft": {
+								"type": "boolean"
+							},
+							"magiclogin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"ldapauth",
+							"microsoft",
+							"magiclogin"
+						],
+						"type": "object"
+					},
+					"locale": {
+						"properties": {
+							"overwrite": {
+								"properties": {
+									"de": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"en": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									}
+								},
+								"required": [
+									"de",
+									"en"
+								],
+								"type": "object"
+							},
+							"fallback": {
+								"$ref": "#/components/schemas/Locale"
+							},
+							"default": {
+								"$ref": "#/components/schemas/Locale"
+							}
+						},
+						"required": [
+							"overwrite",
+							"fallback",
+							"default"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"auth",
+					"locale",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_IDisplaySettings.NoPost_": {
+				"properties": {
+					"locale": {
+						"properties": {
+							"fallback": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							},
+							"default": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							},
+							"overwrite": {
+								"properties": {
+									"en": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"de": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"auth": {
+						"properties": {
+							"magiclogin": {
+								"type": "boolean"
+							},
+							"ldapauth": {
+								"type": "boolean"
+							},
+							"microsoft": {
+								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_IDisplaySettings_": {
+				"$ref": "#/components/schemas/SetterPartial_IDisplaySettings.NoPost_"
 			},
 			"GETResponse_Currency-or-Currency-Array_": {
 				"properties": {
@@ -6734,6 +6916,296 @@
 			},
 			"SetterBody_ICountry_": {
 				"$ref": "#/components/schemas/SetterPartial_ICountry.NoPost_"
+			},
+			"microsoftSettings": {
+				"properties": {
+					"clientId": {
+						"type": "string"
+					},
+					"clientSecret": {
+						"type": "string"
+					},
+					"tenant": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"clientId",
+					"clientSecret",
+					"tenant"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ldapauthSettings": {
+				"properties": {
+					"url": {
+						"type": "string"
+					},
+					"bindDN": {
+						"type": "string"
+					},
+					"bindCredentials": {
+						"type": "string"
+					},
+					"searchBase": {
+						"type": "string"
+					},
+					"searchFilter": {
+						"type": "string"
+					},
+					"tlsOptions": {
+						"properties": {
+							"rejectUnauthorized": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"rejectUnauthorized"
+						],
+						"type": "object"
+					},
+					"mailAttribute": {
+						"type": "string"
+					},
+					"uidAttribute": {
+						"type": "string"
+					},
+					"familyNameAttribute": {
+						"type": "string"
+					},
+					"givenNameAttribute": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"url",
+					"bindDN",
+					"bindCredentials",
+					"searchBase",
+					"searchFilter",
+					"tlsOptions",
+					"mailAttribute",
+					"uidAttribute",
+					"familyNameAttribute",
+					"givenNameAttribute"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"smtpSettings": {
+				"properties": {
+					"host": {
+						"type": "string"
+					},
+					"port": {
+						"type": "number",
+						"format": "double"
+					},
+					"secure": {
+						"type": "boolean"
+					},
+					"user": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"senderAddress": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"host",
+					"port",
+					"secure",
+					"user",
+					"password",
+					"senderAddress"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IConnectionSettings": {
+				"properties": {
+					"auth": {
+						"properties": {
+							"ldapauth": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ldapauthSettings"
+									}
+								],
+								"nullable": true
+							},
+							"microsoft": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/microsoftSettings"
+									}
+								],
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"smtp": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/smtpSettings"
+							}
+						],
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"auth",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ConnectionSettings": {
+				"properties": {
+					"auth": {
+						"properties": {
+							"ldapauth": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ldapauthSettings"
+									}
+								],
+								"nullable": true
+							},
+							"microsoft": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/microsoftSettings"
+									}
+								],
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"smtp": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/smtpSettings"
+							}
+						],
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"auth",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_IConnectionSettings.NoPost_": {
+				"properties": {
+					"smtp": {
+						"properties": {
+							"senderAddress": {
+								"type": "string"
+							},
+							"password": {
+								"type": "string"
+							},
+							"secure": {
+								"type": "boolean"
+							},
+							"port": {
+								"type": "number",
+								"format": "double"
+							},
+							"host": {
+								"type": "string"
+							},
+							"user": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"auth": {
+						"properties": {
+							"ldapauth": {
+								"properties": {
+									"givenNameAttribute": {
+										"type": "string"
+									},
+									"familyNameAttribute": {
+										"type": "string"
+									},
+									"uidAttribute": {
+										"type": "string"
+									},
+									"mailAttribute": {
+										"type": "string"
+									},
+									"tlsOptions": {
+										"properties": {
+											"rejectUnauthorized": {
+												"type": "boolean"
+											}
+										},
+										"required": [
+											"rejectUnauthorized"
+										],
+										"type": "object"
+									},
+									"searchFilter": {
+										"type": "string"
+									},
+									"searchBase": {
+										"type": "string"
+									},
+									"bindCredentials": {
+										"type": "string"
+									},
+									"bindDN": {
+										"type": "string"
+									},
+									"url": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"microsoft": {
+								"properties": {
+									"tenant": {
+										"type": "string"
+									},
+									"clientSecret": {
+										"type": "string"
+									},
+									"clientId": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_IConnectionSettings_": {
+				"$ref": "#/components/schemas/SetterPartial_IConnectionSettings.NoPost_"
 			}
 		},
 		"securitySchemes": {
@@ -12023,6 +12495,111 @@
 				]
 			}
 		},
+		"/displaySettings": {
+			"get": {
+				"operationId": "GetDisplaySettings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/IDisplaySettings"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/admin/displaySettings": {
+			"post": {
+				"operationId": "PostDisplaySettings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/DisplaySettings"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IDisplaySettings_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/displaySettings/form": {
+			"get": {
+				"operationId": "GetDisplaySettingsForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/currency": {
 			"get": {
 				"operationId": "GetCurrency",
@@ -12553,6 +13130,115 @@
 				"parameters": []
 			}
 		},
+		"/admin/connectionSettings": {
+			"get": {
+				"operationId": "GetConnectionSettings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/IConnectionSettings"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "PostConnectionSettings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ConnectionSettings"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IConnectionSettings_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/connectionSettings/form": {
+			"get": {
+				"operationId": "GetConnectionSettingsForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/auth/ldapauth": {
 			"post": {
 				"operationId": "Ldapauth",
@@ -12561,7 +13247,7 @@
 						"description": "No content"
 					},
 					"501": {
-						"description": "This Authentication Method has been disabled by .env settings."
+						"description": "This Authentication Method has been disabled by display settings."
 					}
 				},
 				"description": "Provides the authentication cookie.",
@@ -12600,7 +13286,7 @@
 						"description": "Redirecting to Microsoft"
 					},
 					"501": {
-						"description": "This Authentication Method has been disabled by .env settings."
+						"description": "This Authentication Method has been disabled by display settings."
 					}
 				},
 				"summary": "Redirecting to Microsoft login",
@@ -12625,7 +13311,7 @@
 						"description": "Redirecting to Frontend"
 					},
 					"501": {
-						"description": "This Authentication Method has been disabled by .env settings."
+						"description": "This Authentication Method has been disabled by display settings."
 					}
 				},
 				"description": "Provides the authentication cookie.",
@@ -12651,7 +13337,7 @@
 						"description": ""
 					},
 					"501": {
-						"description": "This Authentication Method has been disabled by .env settings."
+						"description": "This Authentication Method has been disabled by display settings."
 					}
 				},
 				"description": "Send a magiclogin email to the destination email address.",
@@ -12689,7 +13375,7 @@
 						"description": "Redirecting to Frontend"
 					},
 					"501": {
-						"description": "This Authentication Method has been disabled by .env settings."
+						"description": "This Authentication Method has been disabled by display settings."
 					}
 				},
 				"description": "Provides the authentication cookie.",
