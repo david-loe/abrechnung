@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite & vue-tsc --noEmit --watch",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv,vue --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --ignore '../common/forms/*' --exec 'npm run build'",
     "build": "vue-tsc --noEmit && vite build && cp src/manifest.json dist/manifest.json && cp -R src/icons dist/icons",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore --fix src",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
@@ -16,6 +16,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "json-editor-vue": "^0.17.3",
+    "nodemon": "^3.1.7",
     "qrcode": "^1.5.4",
     "qs": "^6.13.1",
     "vue": "^3.5.12",
