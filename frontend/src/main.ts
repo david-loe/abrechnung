@@ -104,18 +104,7 @@ let options = { userVisibleOnly: true, applicationServerKey: publicKey }
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((registration) => {
-      if ('PushManager' in window && publicKey) {
-        console.log('Push avaiable')
-        registration.pushManager.subscribe(options).then((subscription) => {
-          fetch('/backend/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(subscription) as BodyInit
-          })
-        })
-      }
-    })
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(() => {})
   })
 }
 
