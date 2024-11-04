@@ -7,7 +7,7 @@ declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
 let cacheName = 'abrechnung' // hier könnte man eine versionierung ergänzen - eventuell nach app version?
-// dann müsste man alle alten Caches aber auch aktiv löschen
+// dann müsste man alle alten Caches aber auch aktiv löschen - würde aber sinn machen maybe
 const reportTypeToFetch = ['healthCareCost', 'expenseReport', 'travel']
 
 self.addEventListener('install', (event) => {
@@ -104,8 +104,6 @@ async function fetchAndCacheUrls(reportTypes: string[]) {
   return detailUrls
 }
 
-// ab hier aktuell irrelevant ------------------------------------------------------------------------------------------------------------------------
-
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('myDatabase', 1)
@@ -125,7 +123,6 @@ function openDatabase(): Promise<IDBDatabase> {
   })
 }
 
-// aktuell geht die Funktion davon aus, dass die URL auf jeden fall limit enthält und reportTypes abfragt, zu denen mehr gesucht werden
 async function fetchAndStoreUrls(urls: string[]) {
   const db = await openDatabase()
   for (let i = 0; i < urls.length; i++) {
