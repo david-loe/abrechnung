@@ -247,35 +247,6 @@ export default defineComponent({
             if (this.user._id) {
               this.updateLocale(this.user.settings.language)
               this.auth = true
-              //das funktioniert zumindest in Chrome am Mac schonmal
-              if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
-                let options = { userVisibleOnly: true, applicationServerKey: import.meta.env.VITE_PUBLIC_VAPID_KEY }
-                window.navigator.serviceWorker.getRegistration().then(async (registration) => {
-                  if (registration) {
-                    registration.pushManager.subscribe(options).then(async (subscription) => {
-                      let existingPushsubscription = this.user.push.subscriptions.find((sub) => sub.endpoint === subscription.endpoint)
-                      if (!existingPushsubscription) {
-                        console.log('true')
-                        let result = await fetch('/backend/subscribe', {
-                          // aus komischen gründen wird die route nicht im chache gespeichert - ist praktisch, dürfte aber nicht so sein
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(subscription)
-                        })
-                        let data = await result.json()
-                        this.user.push.subscriptions.push(data.subscription)
-                        fetch('/backend/user/subscriptions', {
-                          // gleiches hier mit dem Cache
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(this.user.push)
-                        })
-                        console.log('subscription added')
-                      }
-                    })
-                  }
-                })
-              }
             }
             console.log(this.user)
             this.isOffline = !navigator.onLine // braucht man irgendwie für Safari & Firefox?
@@ -469,36 +440,15 @@ export default defineComponent({
               userVisibleOnly: true,
               applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
             }
-            console.log(options)
             window.navigator.serviceWorker.getRegistration().then(async (registration) => {
               if (registration) {
                 await registration.pushManager.subscribe(options).then(async (subscription) => {
-                  console.log(subscription)
-                  let existingPushsubscription = this.user.push.subscriptions.find((sub) => sub.endpoint === subscription.endpoint)
-                  console.log('already exits: ' + existingPushsubscription)
-                  if (existingPushsubscription) {
-                    console.log('true')
-                    let result = await fetch('/backend/subscribe', {
-                      // aus komischen gründen wird die route nicht im chache gespeichert - ist praktisch, dürfte aber nicht so sein
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(subscription)
-                    })
-                    let data = await result.json()
-                    console.log(data)
-                    this.user.push.subscriptions.push(data.subscription)
-                    // try {
-                    //   await fetch('/backend/user/subscriptions', {
-                    //     // gleiches hier mit dem Cache
-                    //     method: 'POST',
-                    //     headers: { 'Content-Type': 'application/json' },
-                    //     body: JSON.stringify(this.user.push)
-                    //   })
-                    //   console.log('subscription added')
-                    // } catch (err) {
-                    //   console.log(err)
-                    // }
-                  }
+                  console.log('true')
+                  await fetch('/backend/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(subscription)
+                  })
                 })
               }
             })

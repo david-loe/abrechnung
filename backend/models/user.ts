@@ -87,27 +87,6 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     required: true,
     default: () => ({})
   },
-  push: {
-    type: {
-      subscriptions: {
-        type: [
-          {
-            endpoint: { type: String, required: true },
-            keys: {
-              p256dh: { type: String, required: true },
-              auth: { type: String, required: true }
-            }
-          }
-        ],
-        required: true,
-        default: []
-      }
-    },
-    hide: true,
-    required: true,
-    ref: 'push',
-    default: () => ({ subscriptions: [] })
-  },
   vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }], hide: true },
   token: { type: Schema.Types.ObjectId, ref: 'Token' }
 })

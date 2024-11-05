@@ -86,16 +86,17 @@ app.use(
 app.post('/subscribe', (req, res) => {
   let subscription: Subscription = req.body
   if (subscription) {
-    console.log('subscribed:', subscription)
+    if (!req.session.subscriptions) {
+      req.session.subscriptions = []
+    }
+    if (!req.session.subscriptions.some((sub) => sub.endpoint === subscription.endpoint)) {
+      req.session.subscriptions.push(subscription)
+    }
+    console.log(req.session)
+    res.status(201)
+  } else {
+    // res.status(400)
   }
-  if (!req.session.subscriptions) {
-    req.session.subscriptions = []
-  }
-  if (!req.session.subscriptions.some((sub) => sub.endpoint === subscription.endpoint)) {
-    req.session.subscriptions.push(subscription)
-  }
-  console.log(req.session)
-  res.status(201).json({ subscription: subscription }) // damit im frontend die subscription mit dem Nutzer verknüpft werden kann
 })
 
 async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
@@ -139,14 +140,15 @@ export async function sendPushNotification(title: String, body: String, users: U
   }
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
-    console.log(sessions)
     if (sessions) {
       for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].subscriptions)
+        if (sessions[i].subscriptions) {
+          console.log(sessions[i])
           webpush
             .sendNotification(sessions[i].subscriptions[0], JSON.stringify(payload))
             .then((response) => console.log('Benachrichtigung gesendet:', response))
             .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+        }
       }
     }
   }

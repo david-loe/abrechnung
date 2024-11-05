@@ -51,14 +51,6 @@ export class UserController extends Controller {
     return { message: 'alerts.successSaving', result: result.settings }
   }
 
-  @Post('subscriptions')
-  public async postSubscriptions(@Body() requestBody: SetterBody<IUser['push']>, @Request() request: ExRequest) {
-    Object.assign(request.user!.push, requestBody)
-    request.user!.markModified('push')
-    const result = (await request.user!.save()).toObject()
-    return { message: 'alerts.successSaving', result: result.push }
-  }
-
   @Post('vehicleRegistration')
   @Middlewares(fileHandler.any())
   @Consumes('multipart/form-data')
