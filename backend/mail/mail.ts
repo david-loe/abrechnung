@@ -91,12 +91,8 @@ async function _sendMail(
     app.name +
     ': ' +
     app.url
-  recipients.map((s) => {
-    let subscriptions = s.push.subscriptions
-    if (subscriptions) {
-      sendPushNotification(subject, paragaph, subscriptions)
-    }
-  })
+
+  sendPushNotification(subject, paragaph, recipients)
 
   return await mailClient.sendMail({
     from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address

@@ -2,11 +2,11 @@ import MongoStore from 'connect-mongo'
 import cors from 'cors'
 import express, { Request as ExRequest, Response as ExResponse } from 'express'
 import { rateLimit } from 'express-rate-limit'
-import session from 'express-session'
+import session, { SessionData } from 'express-session'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import webpush from 'web-push'
-import { Subscription } from '../common/types.js'
+import { Subscription, User } from '../common/types.js'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
@@ -53,9 +53,23 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
   )
 }
 
+if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
+  app.use(
+    rateLimit({
+      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS),
+      limit: parseInt(process.env.RATE_LIMIT),
+      standardHeaders: 'draft-7',
+      legacyHeaders: false,
+      skip: (req, res) => req.method !== 'POST',
+      handler: (req, res, next) => next(new RateLimitExceededError())
+    })
+  )
+}
+
+const sessionStore = MongoStore.create({ client: mongoose.connection.getClient() })
 app.use(
   session({
-    store: MongoStore.create({ client: mongoose.connection.getClient() }),
+    store: sessionStore,
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
@@ -74,24 +88,67 @@ app.post('/subscribe', (req, res) => {
   if (subscription) {
     console.log('subscribed:', subscription)
   }
+  if (!req.session.subscriptions) {
+    req.session.subscriptions = []
+  }
+  if (!req.session.subscriptions.some((sub) => sub.endpoint === subscription.endpoint)) {
+    req.session.subscriptions.push(subscription)
+  }
+  console.log(req.session)
   res.status(201).json({ subscription: subscription }) // damit im frontend die subscription mit dem Nutzer verknüpft werden kann
 })
+
+async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
+  try {
+    const sessions: SessionData[] = await new Promise<SessionData[]>((resolve, reject) => {
+      sessionStore.all((err, sessions) => {
+        if (err) {
+          return reject(err) // Fehlerbehandlung
+        }
+        if (Array.isArray(sessions)) {
+          resolve(sessions) // Wenn es ein Array ist, direkt zurückgeben
+        } else {
+          // Wenn es ein Objekt ist, in ein Array umwandeln
+          //keine ahnung was das hier soll..
+        }
+      })
+    })
+    // Filtere die Sessions nach der Benutzer-ID
+    const userSessions = sessions.filter((session) => {
+      return (
+        session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()
+      )
+    })
+
+    return userSessions
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Sessions:', error)
+    return []
+  }
+}
 
 const privateKey = '0atvpnBQ73eO_-oXS5u4E7J58WT4H9D9TPbFP6UzBWY'
 const publicKey = 'BKErXryGQvwdIA46Htyy8NXKiF9RiDNkTthBZwGukC7-4rJHAH9n0ZH5D14F1A8vwB-Ou7JiToZOL0jQgT60zMc'
 webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, publicKey, privateKey)
 
 // getting the subscriptions of one user to send notifcation to all devices of the user
-export function sendPushNotification(title: String, body: String, subscriptions: Subscription[]) {
+export async function sendPushNotification(title: String, body: String, users: User[]) {
   let payload = {
     title: title,
     body: body
   }
-  for (let i = 0; i < subscriptions.length; i++) {
-    webpush
-      .sendNotification(subscriptions[i], JSON.stringify(payload))
-      .then((response) => console.log('Benachrichtigung gesendet:', response))
-      .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+  for (let i = 0; i < users.length; i++) {
+    let sessions = await findSessionsByUserId(users[i]._id)
+    console.log(sessions)
+    if (sessions) {
+      for (let i = 0; i < sessions.length; i++) {
+        if (sessions[i].subscriptions)
+          webpush
+            .sendNotification(sessions[i].subscriptions[0], JSON.stringify(payload))
+            .then((response) => console.log('Benachrichtigung gesendet:', response))
+            .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+      }
+    }
   }
 }
 
