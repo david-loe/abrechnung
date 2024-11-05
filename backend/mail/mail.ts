@@ -61,12 +61,8 @@ export function sendMail(
     app.name +
     ': ' +
     app.url
-  recipients.map((s) => {
-    let subscriptions = s.push.subscriptions
-    if (subscriptions) {
-      sendPushNotification(subject, paragaph, subscriptions)
-    }
-  })
+
+  sendPushNotification(subject, paragaph, recipients)
 
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
