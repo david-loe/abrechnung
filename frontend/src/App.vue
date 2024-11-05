@@ -132,6 +132,7 @@
             >
           </span>
         </div>
+        <button @click="subscribeToPush">PushBenachrichtigung</button>
       </div>
     </footer>
   </div>
@@ -227,7 +228,8 @@ export default defineComponent({
             this.getter<ProjectSimple[]>('project', {}, {}, false),
             this.getter<{ [key: string]: string[] }>('specialLumpSums'),
             this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false),
-            displayPromise
+            displayPromise,
+            this.loadAndStoreData()
           ]).then((result) => {
             this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
             this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
@@ -292,6 +294,7 @@ export default defineComponent({
         })
         if (res.status === 204) {
           this.auth = false
+          this.clearingDB()
           this.$router.push({ path: '/login' })
         }
       } catch (error: any) {
@@ -453,7 +456,145 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
-    getFlagEmoji
+    async subscribeToPush() {
+      if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
+        console.log('push avaiable in navigator')
+        try {
+          // Frage die Berechtigung an
+          const permission = await Notification.requestPermission()
+
+          if (permission === 'granted') {
+            console.log('Berechtigung erteilt')
+            let options = {
+              userVisibleOnly: true,
+              applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
+            }
+            console.log(options)
+            window.navigator.serviceWorker.getRegistration().then(async (registration) => {
+              if (registration) {
+                await registration.pushManager.subscribe(options).then(async (subscription) => {
+                  console.log(subscription)
+                  let existingPushsubscription = this.user.push.subscriptions.find((sub) => sub.endpoint === subscription.endpoint)
+                  console.log('already exits: ' + existingPushsubscription)
+                  if (existingPushsubscription) {
+                    console.log('true')
+                    let result = await fetch('/backend/subscribe', {
+                      // aus komischen gründen wird die route nicht im chache gespeichert - ist praktisch, dürfte aber nicht so sein
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(subscription)
+                    })
+                    let data = await result.json()
+                    console.log(data)
+                    this.user.push.subscriptions.push(data.subscription)
+                    // try {
+                    //   await fetch('/backend/user/subscriptions', {
+                    //     // gleiches hier mit dem Cache
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' },
+                    //     body: JSON.stringify(this.user.push)
+                    //   })
+                    //   console.log('subscription added')
+                    // } catch (err) {
+                    //   console.log(err)
+                    // }
+                  }
+                })
+              }
+            })
+          }
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    urlBase64ToUint8Array(base64String: string) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+      const rawData = window.atob(base64)
+      const outputArray = new Uint8Array(rawData.length)
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i)
+      }
+      return outputArray
+    },
+    getFlagEmoji,
+    async loadAndStoreData() {
+      const reportTypesToFetch = ['healthCareCost', 'expenseReport', 'travel']
+      let urlsToStore = await this.getRoutesForStore(reportTypesToFetch)
+      await this.fetchAndStoreUrls(urlsToStore)
+      return Promise.resolve('Data loaded and stored successfully')
+    },
+    async getRoutesForStore(reportTypes: string[]) {
+      // hier könnte man auch einfach gleich den fetch drin machen
+      let urls: string[] = []
+      for (let reportType of reportTypes) {
+        let url = '/backend/' + reportType + '?limit=12'
+        urls.push(url)
+        urls.push('/backend/' + reportType + '/examiner')
+        try {
+          const response = await fetch(url) // Daten von der URL abrufen
+          if (response.ok) {
+            const res = await response.json() // Antwortdaten verarbeiten
+            for (let i = 0; i < res.data.length; i++) {
+              urls.push(
+                '/backend/' +
+                  reportType +
+                  '?_id=' +
+                  res.data[i]._id +
+                  (reportType == 'travel'
+                    ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
+                    : '&additionalFields=expenses')
+              )
+            }
+          }
+        } catch (error) {
+          console.error(`Fehler beim Abrufen der URL ${url}:`, error)
+        }
+      }
+      return urls
+    },
+    async fetchAndStoreUrls(urls: string[]) {
+      for (let i = 0; i < urls.length; i++) {
+        try {
+          await fetch(urls[i]) // Daten von der URL abrufen
+        } catch (error) {
+          console.error(`Fehler beim Abrufen der URL ${urls[i]}:`, error)
+        }
+      }
+    },
+    async clearingDB() {
+      const db = await this.openDatabase()
+
+      // Starte eine Transaktion für den Object Store, den du leeren willst
+      const transaction = db.transaction(['urls'], 'readwrite')
+      const store = transaction.objectStore('urls')
+
+      // Leere den Object Store
+      const clearRequest = store.clear()
+
+      clearRequest.onsuccess = () => {
+        console.log('Object Store wurde erfolgreich geleert.')
+      }
+    },
+    openDatabase(): Promise<IDBDatabase> {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('myDatabase', 1)
+
+        request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result
+          db.createObjectStore('urls', { keyPath: 'id' })
+        }
+
+        request.onsuccess = (event) => {
+          resolve((event.target as IDBOpenDBRequest).result)
+        }
+
+        request.onerror = (event) => {
+          reject((event.target as IDBOpenDBRequest).error)
+        }
+      })
+    }
   },
   mounted() {
     window.addEventListener('online', this.updateConnectionStatus)
