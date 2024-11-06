@@ -86,13 +86,9 @@ app.use(
 app.post('/subscribe', (req, res) => {
   let subscription: Subscription = req.body
   if (subscription) {
-    if (!req.session.subscriptions) {
-      req.session.subscriptions = []
-    }
-    if (!req.session.subscriptions.some((sub) => sub.endpoint === subscription.endpoint)) {
-      req.session.subscriptions.push(subscription)
-    }
+    req.session.subscription = subscription
     console.log(req.session)
+    console.log(req.session.subscription)
     res.status(201)
   } else {
     // res.status(400)
@@ -141,12 +137,13 @@ export async function sendPushNotification(title: String, body: String, users: U
   console.log('trying to push')
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
+    console.log(sessions)
     if (sessions) {
       for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].subscriptions) {
-          console.log(sessions[i])
+        if (sessions[i].subscription) {
+          console.log(sessions[i].subscription)
           webpush
-            .sendNotification(sessions[i].subscriptions[0], JSON.stringify(payload))
+            .sendNotification(sessions[i].subscription, JSON.stringify(payload))
             .then((response) => console.log('Benachrichtigung gesendet:', response))
             .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
         }

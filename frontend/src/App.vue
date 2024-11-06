@@ -281,15 +281,15 @@ export default defineComponent({
             this.loadState = 'LOADED'
           })
         }
+        await this.loadingPromise
+        await this.subscribeToPush()
         if ((this.mobile && this.alreadyInstalled) || !this.mobile) {
           console.log(navigator.userAgent)
           this.$root.askForPermission =
             /safari/i.test(navigator.userAgent) &&
             !/chrome|crios|chromium/i.test(navigator.userAgent) &&
             Notification.permission === 'default'
-          await this.subscribeToPush()
         }
-        await this.loadingPromise
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
       }
@@ -470,6 +470,7 @@ export default defineComponent({
     async subscribeToPush() {
       if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
         console.log('push avaiable in navigator')
+        console.log(this.user)
         try {
           console.log(Notification.permission)
           const permission = await Notification.requestPermission()
@@ -485,6 +486,7 @@ export default defineComponent({
             window.navigator.serviceWorker.getRegistration().then(async (registration) => {
               if (registration) {
                 await registration.pushManager.subscribe(options).then(async (subscription) => {
+                  console.log(subscription)
                   await fetch('/backend/subscribe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

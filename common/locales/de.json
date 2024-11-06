@@ -69,8 +69,10 @@
   "headlines": {
     "emoji": "🧾",
     "home": "Home",
+    "installbanner": "App installieren",
     "login": "Login",
     "logout": "Logout",
+    "pushBenachrichtigung": "Benachrichtigungen an",
     "settings": "Einstellungen",
     "title": "abrechnung"
   },
