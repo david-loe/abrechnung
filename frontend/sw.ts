@@ -9,12 +9,12 @@ export default {}
 precacheAndRoute(self.__WB_MANIFEST)
 const reportTypeToFetch = ['healthCareCost', 'expenseReport', 'travel']
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   console.log('installevent triggerd')
   self.skipWaiting() // direkt 'activate' triggern
 })
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', () => {
   console.log('activated')
 })
 
