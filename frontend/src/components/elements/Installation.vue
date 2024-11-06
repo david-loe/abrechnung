@@ -105,6 +105,7 @@ export default defineComponent({
     }
   },
   mounted() {
+    // darum noch kümmern :)
     if (false) {
       window.addEventListener('beforeInstallPrompt', (event) => {})
     }
