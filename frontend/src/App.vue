@@ -51,7 +51,27 @@
                     </router-link>
                   </li>
                 </template>
-
+                <template v-if="mobile && !alreadyInstalled">
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
+                      <i class="fs-4 bi bi-box-arrow-down"></i>
+                      <span class="ms-1">{{ $t('headlines.installbanner') }}</span>
+                    </button>
+                  </li>
+                </template>
+                <template v-if="true">
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button @click="subscribeToPush" class="d-flex align-items-center dropdown-item">
+                      <i class="fs-4 bi bi-app-indicator"></i> <span class="ms-1">{{ $t('headlines.pushBenachrichtigung') }}</span>
+                    </button>
+                  </li>
+                </template>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -132,10 +152,10 @@
             >
           </span>
         </div>
-        <button @click="subscribeToPush">PushBenachrichtigung</button>
       </div>
     </footer>
   </div>
+  <Installation ref="InstallBanner" v-if="$root.loadState === 'LOADED' && auth"></Installation>
 </template>
 
 <script lang="ts">
@@ -160,6 +180,7 @@ import {
   User
 } from '../../common/types.js'
 import i18n from './i18n.js'
+import Installation from './components/elements/Installation.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
 
 export interface Alert {
@@ -190,10 +211,12 @@ export default defineComponent({
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
       accesses,
-      isOffline: false as boolean
+      isOffline: false as boolean,
+      alreadyInstalled: false as boolean,
+      mobile: false as boolean
     }
   },
-  components: { OfflineBanner },
+  components: { OfflineBanner, Installation },
   methods: {
     async load(withoutAuth = false) {
       if (this.loadState === 'UNLOADED') {
@@ -250,6 +273,8 @@ export default defineComponent({
             }
             console.log(this.user)
             this.isOffline = !navigator.onLine // braucht man irgendwie für Safari & Firefox?
+            this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+            this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
             this.loadState = 'LOADED'
           })
         }
@@ -303,6 +328,11 @@ export default defineComponent({
           }
         }
         return { error: error.response.data }
+      }
+    },
+    showInstallBanner() {
+      if (this.$refs.InstallBanner as typeof Installation) {
+        ;(this.$refs.InstallBanner as typeof Installation).showBanner()
       }
     },
     async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {

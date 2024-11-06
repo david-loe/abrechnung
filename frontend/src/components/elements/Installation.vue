@@ -1,7 +1,7 @@
 <template>
   <div
     id="installBanner"
-    v-if="showInstallationBanner && mobile"
+    v-if="showInstallationBanner && $root.mobile"
     style="
       width: 100%;
       position: fixed;
@@ -29,11 +29,6 @@
       </div>
     </div>
   </div>
-  <div
-    v-else-if="mobile && !alreadyInstalled"
-    style="position: fixed; left: auto; right: 0px; bottom: 0px; z-index: 4000; display: block; justify-content: center">
-    <button type="button" class="btn btn-light m-2" @click="showBanner()">InstallationsInfos</button>
-  </div>
 </template>
 <script lang="ts">
 import axios from 'axios'
@@ -47,11 +42,8 @@ export default defineComponent({
   data() {
     return {
       showInstallationBanner: false as Boolean,
-      alreadyInstalled: false,
       operationSystem: 'Unknown' as OperationSystems,
-      browser: 'Unknown' as BrowserTypes,
-      mobile: false as boolean | undefined,
-      show: false as boolean
+      browser: 'Unknown' as BrowserTypes
     }
   },
   props: {},
@@ -71,7 +63,7 @@ export default defineComponent({
     install() {
       let settings = this.$root.user.settings
       settings.showInstallBanner = true
-      // hier braucht es noch was zur Erkennung ob die App installiert wurde.
+      // hier braucht es noch was zur Erkennung ob die App installiert wurde. bzw etwas da getriggert wird
       this.postSettings(settings)
       this.hideBanner()
     },
@@ -82,7 +74,7 @@ export default defineComponent({
         })
       } catch (error: any) {
         if (error.response.status === 401) {
-          this.$router.push('login')
+          this.$router.push('login') // macht das hier sinn?
         } else {
           console.log(error.response.data)
         }
@@ -106,7 +98,7 @@ export default defineComponent({
 
       if (/win/i.test(userAgent)) return 'Windows'
       if (/android/i.test(userAgent)) return 'Android'
-      if (/mac/i.test(userAgent)) return this.mobile ? 'iOS' : 'macOS'
+      if (/mac/i.test(userAgent)) return this.$root.mobile ? 'iOS' : 'macOS'
       if (/linux/i.test(userAgent)) return 'Linux'
       if (/iphone|ipad|ipod/i.test(userAgent)) return 'iOS'
       return 'Unknown'
@@ -118,13 +110,10 @@ export default defineComponent({
     }
   },
   beforeMount() {
-    this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
-    //checking if User alredy uses a installed PWA
-    this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
     // only setting this true, if alreadyInstalled not true AND user setting is true
-    this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.alreadyInstalled
+    this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
   }
 })
 </script>
