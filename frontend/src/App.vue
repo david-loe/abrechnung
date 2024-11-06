@@ -1,6 +1,7 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
+    <PushBanner v-if="$root.askForPermission" @subscribe="subscribeToPush" @closePush="closePush"> </PushBanner>
     <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -62,7 +63,7 @@
                     </button>
                   </li>
                 </template>
-                <template v-if="true">
+                <!-- <template v-if="(mobile && alreadyInstalled) || !mobile">
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
@@ -71,7 +72,7 @@
                       <i class="fs-4 bi bi-app-indicator"></i> <span class="ms-1">{{ $t('headlines.pushBenachrichtigung') }}</span>
                     </button>
                   </li>
-                </template>
+                </template> -->
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -182,6 +183,7 @@ import {
 import i18n from './i18n.js'
 import Installation from './components/elements/Installation.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
+import PushBanner from './components/elements/PushBanner.vue'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -213,10 +215,11 @@ export default defineComponent({
       accesses,
       isOffline: false as boolean,
       alreadyInstalled: false as boolean,
-      mobile: false as boolean
+      mobile: false as boolean,
+      askForPermission: false as boolean
     }
   },
-  components: { OfflineBanner, Installation },
+  components: { OfflineBanner, Installation, PushBanner },
   methods: {
     async load(withoutAuth = false) {
       if (this.loadState === 'UNLOADED') {
@@ -278,6 +281,14 @@ export default defineComponent({
             this.loadState = 'LOADED'
           })
         }
+        if ((this.mobile && this.alreadyInstalled) || !this.mobile) {
+          console.log(navigator.userAgent)
+          this.$root.askForPermission =
+            /safari/i.test(navigator.userAgent) &&
+            !/chrome|crios|chromium/i.test(navigator.userAgent) &&
+            Notification.permission === 'default'
+          await this.subscribeToPush()
+        }
         await this.loadingPromise
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
@@ -330,11 +341,7 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-    showInstallBanner() {
-      if (this.$refs.InstallBanner as typeof Installation) {
-        ;(this.$refs.InstallBanner as typeof Installation).showBanner()
-      }
-    },
+
     async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
@@ -457,15 +464,20 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
+    closePush() {
+      this.$root.askForPermission = false
+    },
     async subscribeToPush() {
       if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
         console.log('push avaiable in navigator')
         try {
-          // Frage die Berechtigung an
+          console.log(Notification.permission)
           const permission = await Notification.requestPermission()
-
+          console.log(permission)
+          this.closePush
           if (permission === 'granted') {
             console.log('Berechtigung erteilt')
+            this.$root.askForPermission = false
             let options = {
               userVisibleOnly: true,
               applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
@@ -473,7 +485,6 @@ export default defineComponent({
             window.navigator.serviceWorker.getRegistration().then(async (registration) => {
               if (registration) {
                 await registration.pushManager.subscribe(options).then(async (subscription) => {
-                  console.log('true')
                   await fetch('/backend/subscribe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -486,6 +497,11 @@ export default defineComponent({
         } catch (err) {
           console.log(err)
         }
+      }
+    },
+    showInstallBanner() {
+      if (this.$refs.InstallBanner as typeof Installation) {
+        ;(this.$refs.InstallBanner as typeof Installation).showBanner()
       }
     },
     urlBase64ToUint8Array(base64String: string) {

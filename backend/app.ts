@@ -138,6 +138,7 @@ export async function sendPushNotification(title: String, body: String, users: U
     title: title,
     body: body
   }
+  console.log('trying to push')
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
     if (sessions) {
