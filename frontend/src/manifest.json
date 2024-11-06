@@ -2,7 +2,7 @@
   "short_name": "Abrechnung",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ff0000",
+  "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
     {
