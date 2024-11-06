@@ -9,13 +9,22 @@ export default {}
 precacheAndRoute(self.__WB_MANIFEST)
 const reportTypeToFetch = ['healthCareCost', 'expenseReport', 'travel']
 
-self.addEventListener('install', () => {
-  console.log('installevent triggerd')
-  self.skipWaiting() // direkt 'activate' triggern
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    (async () => {
+      console.log('installevent triggerd')
+      self.skipWaiting() // triggert direkt 'activate'
+    })()
+  )
 })
 
-self.addEventListener('activate', () => {
-  console.log('activated')
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      console.log('activated')
+      self.clients.claim() // weiß nicht was genau das für einen unterschied macht
+    })()
+  )
 })
 
 setDefaultHandler(new NetworkOnly())
