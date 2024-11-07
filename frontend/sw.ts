@@ -7,7 +7,6 @@ import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strateg
 declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
-const reportTypeToFetch = ['healthCareCost', 'expenseReport', 'travel']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -65,7 +64,25 @@ self.addEventListener('push', (event) => {
   let notification = event.data?.json()
   event.waitUntil(
     self.registration.showNotification(notification.title, {
-      body: notification.body
+      body: notification.body,
+      data: { url: notification.url }
+    })
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const urlToOpen = event.notification.data.url
+  console.log('open ' + event.notification.data.url)
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const client = clientList.find((c) => c.url === urlToOpen && 'focus' in c)
+      if (client) {
+        return client.focus()
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen)
+      }
     })
   )
 })

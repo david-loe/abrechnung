@@ -87,7 +87,6 @@ declare module 'vue' {
       isOffline: boolean
       alreadyInstalled: boolean
       mobile: boolean
-      askForPermission: boolean
     }
   }
 }
