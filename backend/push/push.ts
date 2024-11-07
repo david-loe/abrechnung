@@ -1,2 +1,55 @@
-const private_vapid_key = '0atvpnBQ73eO_-oXS5u4E7J58WT4H9D9TPbFP6UzBWY'
-const publicVapidKey = 'BKErXryGQvwdIA46Htyy8NXKiF9RiDNkTthBZwGukC7-4rJHAH9n0ZH5D14F1A8vwB-Ou7JiToZOL0jQgT60zMc'
+import { SessionData } from 'express-session'
+import mongoose from 'mongoose'
+import webpush from 'web-push'
+import { User } from '../../common/types.js'
+import { sessionStore } from '../app.js'
+
+webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
+
+export async function sendPushNotification(title: String, body: String, users: User[]) {
+  let payload = {
+    title: title,
+    body: body
+  }
+  for (let i = 0; i < users.length; i++) {
+    let sessions = await findSessionsByUserId(users[i]._id)
+    console.log(sessions)
+    if (sessions) {
+      for (let i = 0; i < sessions.length; i++) {
+        if (sessions[i].subscription) {
+          console.log(sessions[i].subscription)
+          webpush
+            .sendNotification(sessions[i].subscription, JSON.stringify(payload))
+            .then((response) => console.log('Benachrichtigung gesendet:', response))
+            .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+        }
+      }
+    }
+  }
+}
+
+async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
+  try {
+    const sessions: SessionData[] = await new Promise<SessionData[]>((resolve, reject) => {
+      sessionStore.all((err, sessions) => {
+        if (err) {
+          return reject(err)
+        }
+        if (Array.isArray(sessions)) {
+          resolve(sessions)
+        }
+      })
+    })
+    // Filtere die Sessions nach der Benutzer-ID
+    const userSessions = sessions.filter((session) => {
+      return (
+        session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()
+      )
+    })
+
+    return userSessions
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Sessions:', error)
+    return []
+  }
+}

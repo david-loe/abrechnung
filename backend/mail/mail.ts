@@ -10,9 +10,9 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
-import { sendPushNotification } from '../app.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
+import { sendPushNotification } from '../push/push.js'
 import mailClient from './client.js'
 
 export function sendMail(
