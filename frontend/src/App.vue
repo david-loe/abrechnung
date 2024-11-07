@@ -213,8 +213,7 @@ export default defineComponent({
           this.getter<OrganisationSimple[]>('organisation'),
           this.getter<ProjectSimple[]>('project', {}, {}, false),
           this.getter<{ [key: string]: string[] }>('specialLumpSums'),
-          this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false),
-          this.loadAndStoreData()
+          this.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)
         ]).then((result) => {
           this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
           this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
@@ -240,8 +239,10 @@ export default defineComponent({
           this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
 
           this.loadState = 'LOADED'
+          console.log(this.loadState)
         })
         await this.loadingPromise
+        this.loadAndStoreData()
         await this.subscribeToPush()
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
@@ -416,7 +417,7 @@ export default defineComponent({
         console.log('push avaiable in navigator')
         try {
           if (Notification.permission === 'default') {
-          const permission = await Notification.requestPermission()
+            const permission = await Notification.requestPermission()
           }
           if (Notification.permission === 'granted') {
             console.log('Berechtigung erteilt')
@@ -536,6 +537,7 @@ export default defineComponent({
     }
   },
   mounted() {
+    console.log('mounted')
     window.addEventListener('online', this.updateConnectionStatus)
     window.addEventListener('offline', this.updateConnectionStatus)
   }
