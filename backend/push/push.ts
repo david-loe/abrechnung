@@ -6,10 +6,11 @@ import { sessionStore } from '../app.js'
 
 webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
 
-export async function sendPushNotification(title: String, body: String, users: User[]) {
+export async function sendPushNotification(title: String, body: String, users: User[], url: string) {
   let payload = {
     title: title,
-    body: body
+    body: body,
+    url: url
   }
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)

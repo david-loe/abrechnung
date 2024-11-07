@@ -62,7 +62,7 @@ export function sendMail(
     ': ' +
     app.url
 
-  sendPushNotification(subject, paragaph, recipients)
+  sendPushNotification(subject, paragaph, recipients, button.link)
 
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
@@ -90,17 +90,17 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
   const userFilter: any = {}
   if (report.state === 'appliedFor') {
     userFilter[`access.approve/${reportType}`] = true
-    button.link = `${process.env.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
+    button.link = `${process.env.VITE_FRONTEND_URL}approve/${reportType}/${report._id}`
   } else if (report.state === 'underExamination') {
     userFilter[`access.examine/${reportType}`] = true
-    button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
+    button.link = `${process.env.VITE_FRONTEND_URL}examine/${reportType}/${report._id}`
   } else {
     // 'rejected', 'approved', 'refunded', 'underExaminationByInsurance'
     userFilter['_id'] = report.owner._id
     button.link =
       report.state === 'rejected'
-        ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
-        : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
+        ? `${process.env.VITE_FRONTEND_URL}${reportType}`
+        : `${process.env.VITE_FRONTEND_URL}${reportType}/${report._id}`
   }
   recipients = await User.find(userFilter).lean()
   if (recipients.length === 0) {
