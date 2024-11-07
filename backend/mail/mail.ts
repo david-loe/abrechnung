@@ -10,11 +10,11 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
-import { sendPushNotification } from '../app.js'
 import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n, { formatter } from '../i18n.js'
 import User from '../models/user.js'
+import { sendPushNotification } from '../push/push.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
 import { getMailTemplate } from '../templates/cache.js'
 
