@@ -476,7 +476,7 @@ export default defineComponent({
           const permission = await Notification.requestPermission()
           console.log(permission)
           this.closePush
-          if (permission === 'granted') {
+          if (Notification.permission === 'granted') {
             console.log('Berechtigung erteilt')
             this.$root.askForPermission = false
             let options = {

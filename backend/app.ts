@@ -85,11 +85,11 @@ app.use(
 // würde Sinn ergeben das alles noch auszulagern in die zugehörige Datei
 app.post('/subscribe', (req, res) => {
   let subscription: Subscription = req.body
-  if (subscription) {
+  if (subscription && subscription.endpoint) {
     req.session.subscription = subscription
     console.log(req.session)
     console.log(req.session.subscription)
-    res.status(201)
+    res.status(201).json({ subscription: subscription })
   } else {
     // res.status(400)
   }
@@ -124,6 +124,7 @@ async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
   }
 }
 
+//aus env übernehmen
 const privateKey = '0atvpnBQ73eO_-oXS5u4E7J58WT4H9D9TPbFP6UzBWY'
 const publicKey = 'BKErXryGQvwdIA46Htyy8NXKiF9RiDNkTthBZwGukC7-4rJHAH9n0ZH5D14F1A8vwB-Ou7JiToZOL0jQgT60zMc'
 webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, publicKey, privateKey)
