@@ -1,7 +1,6 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <PushBanner v-if="$root.askForPermission" @subscribe="subscribeToPush" @closePush="closePush"> </PushBanner>
     <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -63,16 +62,6 @@
                     </button>
                   </li>
                 </template>
-                <!-- <template v-if="(mobile && alreadyInstalled) || !mobile">
-                  <li>
-                    <hr class="dropdown-divider" />
-                  </li>
-                  <li>
-                    <button @click="subscribeToPush" class="d-flex align-items-center dropdown-item">
-                      <i class="fs-4 bi bi-app-indicator"></i> <span class="ms-1">{{ $t('headlines.pushBenachrichtigung') }}</span>
-                    </button>
-                  </li>
-                </template> -->
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -215,8 +204,7 @@ export default defineComponent({
       accesses,
       isOffline: false as boolean,
       alreadyInstalled: false as boolean,
-      mobile: false as boolean,
-      askForPermission: false as boolean
+      mobile: false as boolean
     }
   },
   components: { OfflineBanner, Installation, PushBanner },
@@ -283,13 +271,6 @@ export default defineComponent({
         }
         await this.loadingPromise
         await this.subscribeToPush()
-        if ((this.mobile && this.alreadyInstalled) || !this.mobile) {
-          console.log(navigator.userAgent)
-          this.$root.askForPermission =
-            /safari/i.test(navigator.userAgent) &&
-            !/chrome|crios|chromium/i.test(navigator.userAgent) &&
-            Notification.permission === 'default'
-        }
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
       }
@@ -464,21 +445,15 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
-    closePush() {
-      this.$root.askForPermission = false
-    },
     async subscribeToPush() {
       if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
         console.log('push avaiable in navigator')
-        console.log(this.user)
         try {
-          console.log(Notification.permission)
+          if (Notification.permission === 'default') {
           const permission = await Notification.requestPermission()
-          console.log(permission)
-          this.closePush
+          }
           if (Notification.permission === 'granted') {
             console.log('Berechtigung erteilt')
-            this.$root.askForPermission = false
             let options = {
               userVisibleOnly: true,
               applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
