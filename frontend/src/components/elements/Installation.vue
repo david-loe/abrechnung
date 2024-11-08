@@ -5,7 +5,6 @@
     style="
       width: 100%;
       position: fixed;
-      height: 33vh;
       left: 0px;
       bottom: 0px;
       z-index: 4000;
@@ -14,18 +13,69 @@
       justify-content: center;
     ">
     <div class="container-lg p-3">
-      <div style="display: flex; justify-content: space-between">
-        <h5 class="">Installationshinweis</h5>
+      <div id="installationHeader" style="display: flex; justify-content: space-between">
+        <h5 class="">{{ $t('installation.header') }}</h5>
         <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
       <div>
-        <div>
-          {{ $t('installation.iosSafari') }}
+        <div v-if="!promptInstallEvent" id="installationBody" class="my-1">
+          <div v-if="operationSystem === 'iOS'">
+            <div v-if="browser === 'Safari'">
+              <div>
+                {{ $t('installation.iosSafari.steps.one.one') }} <i class="bi bi-box-arrow-up"></i
+                >{{ $t('installation.iosSafari.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.iosSafari.steps.two') }} <i class="bi bi-plus-square"></i></div>
+              <div>{{ $t('installation.iosSafari.steps.three') }}</div>
+            </div>
+            <div v-else-if="browser === 'Chrome'">
+              <div>
+                {{ $t('installation.iosChrome.steps.one.one') }} <i class="bi bi-box-arrow-up"></i
+                >{{ $t('installation.iosChrome.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.iosChrome.steps.two') }} <i class="bi bi-plus-square"></i></div>
+              <div>{{ $t('installation.iosChrome.steps.three') }}</div>
+            </div>
+            <div v-else-if="browser === 'Firefox'">
+              <div>
+                {{ $t('installation.iosFirefox.steps.one.one') }} <i class="bi bi-list"></i
+                >{{ $t('installation.iosFirefox.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.iosFirefox.steps.two') }} <i class="bi bi-box-arrow-up"></i></div>
+              <div>{{ $t('installation.iosFirefox.steps.three') }} <i class="bi bi-plus-square"></i></div>
+              <div>{{ $t('installation.iosFirefox.steps.four') }}</div>
+            </div>
+          </div>
+          <div v-else-if="operationSystem === 'Android'">
+            <div v-if="browser === 'SamsungInternet'">
+              <div>
+                {{ $t('installation.AndroidSamsung.steps.one.one') }} <i class="bi bi-arrow-down-square"></i
+                >{{ $t('installation.AndroidSamsung.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.AndroidSamsung.steps.two') }}</div>
+            </div>
+            <div v-else-if="browser === 'Chrome'">
+              <div>
+                {{ $t('installation.AndroidChrome.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i
+                >{{ $t('installation.AndroidChrome.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.AndroidChrome.steps.two') }}</div>
+              <div>{{ $t('installation.AndroidChrome.steps.three') }}</div>
+            </div>
+            <div v-else-if="browser === 'Firefox'">
+              <div>
+                {{ $t('installation.AndroidFirefox.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i
+                >{{ $t('installation.AndroidFirefox.steps.one.two') }}
+              </div>
+              <div>{{ $t('installation.AndroidFirefox.steps.two') }}</div>
+              <div>{{ $t('installation.AndroidFirefox.steps.three') }}</div>
+            </div>
+          </div>
         </div>
-        <div class="mb-2">
-          <button v-if="operationSystem == 'Android'" type="button" class="btn btn-primary m-1" @click="install()">Installieren</button>
-          <button type="button" class="btn btn-danger m-1" @click="dontShowAgain()">Nicht erneut anzeigen</button>
-        </div>
+      </div>
+      <div id="installationFooter" class="mt-auto" style="bottom: 0px">
+        <button v-if="promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">Installieren</button>
+        <button type="button" class="btn btn-danger" @click="dontShowAgain()">Nicht erneut anzeigen</button>
       </div>
     </div>
   </div>
@@ -35,7 +85,13 @@ import axios from 'axios'
 import { defineComponent } from 'vue'
 
 type OperationSystems = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
-type BrowserTypes = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge'
+type BrowserTypes = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge' | 'SamsungInternet'
+
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
 
 export default defineComponent({
   name: 'Installation',
@@ -43,7 +99,8 @@ export default defineComponent({
     return {
       showInstallationBanner: false as Boolean,
       operationSystem: 'Unknown' as OperationSystems,
-      browser: 'Unknown' as BrowserTypes
+      browser: 'Unknown' as BrowserTypes,
+      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
     }
   },
   props: {},
@@ -60,11 +117,11 @@ export default defineComponent({
       await this.postSettings(settings)
       this.hideBanner()
     },
-    install() {
-      let settings = this.$root.user.settings
-      settings.showInstallBanner = true
-      // hier braucht es noch was zur Erkennung ob die App installiert wurde. bzw etwas da getriggert wird
-      this.postSettings(settings)
+    async install() {
+      if (this.promptInstallEvent) {
+        await this.promptInstallEvent.prompt()
+      }
+      this.promptInstallEvent = undefined
       this.hideBanner()
     },
     async postSettings(settings: {}) {
@@ -82,7 +139,9 @@ export default defineComponent({
     },
     detectBrowser() {
       const userAgent = navigator.userAgent
-      if (/chrome|chromium|crios/i.test(userAgent) && !/edg/i.test(userAgent)) {
+      if (/SamsungBrowser/i.test(userAgent)) {
+        return 'SamsungInternet'
+      } else if (/chrome|chromium|crios/i.test(userAgent) && !/edg/i.test(userAgent)) {
         return 'Chrome'
       } else if (/firefox|fxios/i.test(userAgent)) {
         return 'Firefox'
@@ -106,15 +165,18 @@ export default defineComponent({
   },
   mounted() {
     // darum noch kümmern :)
-    if (false) {
-      window.addEventListener('beforeInstallPrompt', (event) => {})
-    }
   },
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
+    window.addEventListener('beforeinstallprompt', (event) => {
+      console.log('event catched')
+      event.preventDefault()
+      this.promptInstallEvent = event as BeforeInstallPromptEvent
+    })
     // only setting this true, if alreadyInstalled not true AND user setting is true
     this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
+    console.log(this.showInstallationBanner)
   }
 })
 </script>
