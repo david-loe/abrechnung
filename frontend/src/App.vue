@@ -54,7 +54,7 @@
                   <li>
                     <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
                       <i class="fs-4 bi bi-box-arrow-down"></i>
-                      <span class="ms-1">{{ $t('headlines.installbanner') }}</span>
+                      <span class="ms-1">{{ $t('headlines.installApp') }}</span>
                     </button>
                   </li>
                 </template>
@@ -165,7 +165,6 @@ import {
 } from '../../common/types.js'
 import Installation from './components/elements/Installation.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
-import PushBanner from './components/elements/PushBanner.vue'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -199,7 +198,7 @@ export default defineComponent({
       mobile: false as boolean
     }
   },
-  components: { OfflineBanner, Installation, PushBanner },
+  components: { OfflineBanner, Installation },
   methods: {
     async load() {
       if (this.loadState === 'UNLOADED') {
