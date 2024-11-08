@@ -26,6 +26,13 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+// Ein benutzerdefiniertes Event für die Client-Seiten senden, wenn ein Update verfügbar ist
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
 setDefaultHandler(new NetworkOnly())
 
 // to allow work offline

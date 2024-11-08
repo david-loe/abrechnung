@@ -1,6 +1,10 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
+<div id="update-banner" class="update-banner position-absolute fixed-top w-100 bg-light text-center p-1" hidden>
+    {{ $t('reload.info') }}</br>
+    <button class="btn btn-success my-1" id="reload-button" @click="reload()">{{ $t('reload.button') }}</button>
+  </div>
     <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -137,8 +141,8 @@
                 class="text-decoration-none link-body-emphasis"
                 target="_blank"
                 :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + settings.version"
-                >v{{ settings.version }}</a
-              ></small
+                >v{{ settings.version }}
+              </a></small
             >
           </span>
         </div>
@@ -566,6 +570,9 @@ export default defineComponent({
           reject((event.target as IDBOpenDBRequest).error)
         }
       })
+    },
+    reload(){
+      window.location.reload()
     }
   },
   mounted() {

@@ -91,14 +91,6 @@ declare module 'vue' {
   }
 }
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(() => {
-      console.log('SW registered')
-    })
-  })
-}
-
 const app = createApp(App)
 app.component('vSelect', vSelect)
 app.component('EasyDataTable', Vue3EasyDataTable)
