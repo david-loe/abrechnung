@@ -12,10 +12,6 @@ export default {
       srcDir: '',
       filename: 'sw.ts',
       injectRegister: false,
-      workbox: {
-        clientsClaim: true,
-        skipWaiting: true
-      },
       manifest: false
     })
   ],
