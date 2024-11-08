@@ -13,7 +13,7 @@ import {
 } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
-import i18n from '../i18n.js'
+import i18n, { formatter } from '../i18n.js'
 import User from '../models/user.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
 
@@ -139,9 +139,12 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
   }
   const language = recipients[0].settings.language
 
-  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string } = {
+  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string; refundSum?: string } = {
     owner: report.owner.name.givenName,
-    lng: language
+    lng: language,
+    refundSum: (report as HealthCareCostSimple).refundSum
+      ? formatter.money((report as HealthCareCostSimple).refundSum, { locale: language })
+      : undefined
   }
 
   if (report.comments.length > 0) {

@@ -1,4 +1,5 @@
 import i18next, { Resource } from 'i18next'
+import Formatter from '../common/formatter.js'
 import { loadLocales } from '../common/locales/load.js'
 import { Locale } from '../common/types.js'
 import { getDisplaySettings } from './db.js'
@@ -29,3 +30,5 @@ const i18n = i18next.createInstance({
 await i18n.init()
 
 export default i18n
+
+export const formatter = new Formatter(displaySettings.locale.default)

@@ -1,7 +1,6 @@
 import fs from 'fs'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib from 'pdf-lib'
-import Formatter from '../../common/formatter.js'
 import { addUp } from '../../common/scripts.js'
 import {
   Cost,
@@ -21,7 +20,7 @@ import {
 } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import { getSubmissionReportFromHistory } from '../helper.js'
-import i18n from '../i18n.js'
+import i18n, { formatter } from '../i18n.js'
 import {
   Column,
   Options,
@@ -37,7 +36,7 @@ import {
 } from './helper.js'
 
 export async function generateTravelReport(travel: Travel, language: Locale) {
-  const formatter = new Formatter(language)
+  formatter.setLocale(language)
   const pdfDoc = await pdf_lib.PDFDocument.create()
   pdfDoc.registerFontkit(pdf_fontkit)
   const fontBytes = fs.readFileSync('../common/fonts/NotoSans-Regular.ttf')

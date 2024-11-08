@@ -14,7 +14,7 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
-import i18n from '../i18n.js'
+import i18n, { formatter } from '../i18n.js'
 import DocumentFile from '../models/documentFile.js'
 import Organisation from '../models/organisation.js'
 
@@ -35,7 +35,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   } else {
     path += 'expenseReport/'
   }
-  const formatter = new Formatter(i18n.language as Locale)
+  formatter.setLocale(i18n.language as Locale)
   const totalSum = formatter.money(addUp(report).total)
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
