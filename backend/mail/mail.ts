@@ -135,8 +135,8 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
     userFilter['_id'] = report.owner._id
     button.link =
       report.state === 'rejected'
-        ? `${process.env.VITE_FRONTEND_URL}${reportType}`
-        : `${process.env.VITE_FRONTEND_URL}${reportType}/${report._id}`
+        ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
+        : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
   }
   recipients = await User.find(userFilter).lean()
   if (recipients.length === 0) {
