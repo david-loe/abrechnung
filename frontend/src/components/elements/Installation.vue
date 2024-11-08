@@ -74,8 +74,8 @@
         </div>
       </div>
       <div id="installationFooter" class="mt-auto" style="bottom: 0px">
-        <button v-if="promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">Installieren</button>
-        <button type="button" class="btn btn-danger" @click="dontShowAgain()">Nicht erneut anzeigen</button>
+        <button v-if="promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">{{ $t('labels.install') }}</button>
+        <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontshowagain') }}</button>
       </div>
     </div>
   </div>
