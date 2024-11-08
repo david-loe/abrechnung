@@ -120,6 +120,7 @@ async function storeResponse(url: string, response: Response) {
   store.put({ id: url, res })
   await new Promise<void>((resolve, reject) => {
     transaction.oncomplete = () => {
+      console.log('data saved for' + url)
       resolve()
     }
     transaction.onerror = () => {
@@ -132,7 +133,7 @@ async function getDataFromStore(request: Request) {
   let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
   try {
     const networkResponse = await fetch(request)
-    await storeResponse(url, networkResponse.clone())
+    storeResponse(url, networkResponse.clone())
     return networkResponse
   } catch (error) {
     const db = await openDatabase()
