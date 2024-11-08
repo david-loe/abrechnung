@@ -20,7 +20,12 @@ export function addAdminIfNone(user: HydratedDocument<IUser>) {
 }
 
 export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUser, 'fk'>, cb: (error: any, user?: Express.User) => void) {
-  let user = await User.findOne({ fk: filter })
+  const searchFilter = {} as any
+  // find User with fk, regardless of other fks
+  for (const key in filter) {
+    searchFilter['fk.' + key] = filter[key as keyof IUser['fk']]
+  }
+  let user = await User.findOne(searchFilter)
   let email = userData.email
   if (!user && email) {
     user = await User.findOne({ email: email })
