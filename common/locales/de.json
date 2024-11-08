@@ -552,6 +552,10 @@
     "10": "Nov",
     "11": "Dez"
   },
+  "reload": {
+    "info": "Eine neue Version der App ist verfügbar. Bitte lade die Seite neu:",
+    "button": "Seite neu laden"
+  },
   "report": {
     "advance": {
       "approvedXY": "Am {X} durch {Y} genehmigt."

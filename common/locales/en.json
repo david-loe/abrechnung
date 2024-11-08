@@ -491,6 +491,10 @@
       "paragraph": "Welcome to abrechnung🧾. Here you can submit all your expenses.",
       "subject": "Welcome to abrechnung🧾"
     },
+    "reload": {
+      "info": "A new version of this app is avaiable. Please reload the page:",
+      "button": "Reload"
+    },
     "regards": "Best Regards",
     "travel": {
       "appliedFor": {
