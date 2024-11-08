@@ -103,31 +103,31 @@
       "steps": {
         "one": {
           "one": "1. Gehe auf das Teilen ",
-          "two": " Menü (unten mittig am Bildschirm)"
+          "two": " Menü (unten mittig am Bildschirm)."
         },
-        "two": "2. Klicke auf Zum Home-Bildschirm ",
-        "three": "3. Klicke Hinzufügen"
+        "two": "2. Klicke auf 'Zum Home-Bildschirm' ",
+        "three": "3. Klicke 'Hinzufügen'."
       }
     },
     "iosChrome": {
       "steps": {
         "one": {
           "one": "1. Gehe auf das Teilen ",
-          "two": " Menü (rechts oben neben der Adressleiste)"
+          "two": " Menü (rechts oben neben der Adressleiste)."
         },
-        "two": "2. Klicke auf Zum Home-Bildschirm  ",
-        "three": "3. Klicke Hinzufügen"
+        "two": "2. Klicke auf 'Zum Home-Bildschirm'  ",
+        "three": "3. Klicke 'Hinzufügen'."
       }
     },
     "iosFirefox": {
       "steps": {
         "one": {
           "one": "1. Gehe auf das Menü ",
-          "two": " (unten rechts)"
+          "two": " (unten rechts)."
         },
         "two": "2. Gehe auf Teilen ",
-        "three": "3. Klicke auf Zum Home-Bildschirm  ",
-        "four": "4. Klicke Hinzufügen"
+        "three": "3. Klicke auf 'Zum Home-Bildschirm'  ",
+        "four": "4. Klicke 'Hinzufügen'."
       }
     },
     "AndroidSamsung": {
@@ -136,27 +136,27 @@
           "one": "1. Klicke auf das ",
           "two": " Symbol (oben neben der Adressleiste)"
         },
-        "two": "2. Klicke auf Installieren"
+        "two": "2. Klicke auf 'Installieren'."
       }
     },
     "AndroidChrome": {
       "steps": {
         "one": {
           "one": "1. Klicke auf das Menü ",
-          "two": " (oben rechts)"
+          "two": " (oben rechts)."
         },
-        "two": "2. Klicke auf Zum Startbildschirm hinzufügen",
-        "three": "3. Klicke auf Installieren"
+        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'.",
+        "three": "3. Klicke auf 'Installieren'"
       }
     },
     "AndroidFirefox": {
       "steps": {
         "one": {
           "one": "1. Klicke auf das Menü ",
-          "two": " (oben rechts)"
+          "two": " (oben rechts)."
         },
-        "two": "2. Klicke auf Zum Startbildschirm hinzufügen",
-        "three": "3. Klicke auf Hinzufügen"
+        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'.",
+        "three": "3. Klicke auf 'Hinzufügen'."
       }
     }
   },
@@ -237,6 +237,7 @@
     "distanceRefunds": "Entfernungspauschalen",
     "distanceRefundType": "Entfernungspauschale",
     "done": "Erledigt",
+    "dontshowagain": "Nicht erneut anzeigen",
     "downloadX": "{X} herunterladen",
     "edit": "Bearbeiten",
     "editAgain": "Nochmal bearbeiten",
@@ -279,6 +280,7 @@
     "image": "Bild",
     "import": "Importieren",
     "includingSpouseRefund": "inkl. Ehepartner Pauschalen",
+    "install": "Installieren",
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "language": "Sprache",
