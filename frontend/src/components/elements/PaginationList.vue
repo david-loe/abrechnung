@@ -135,6 +135,25 @@ export default defineComponent({
         this.meta = result.meta
         this.hasMeta = true
       }
+      if (navigator.onLine) {
+        this.getRoutesForStore()
+      }
+    },
+    getRoutesForStore() {
+      fetch('/backend/' + this.endpoint + '/examiner')
+      if (this.hasData) {
+        for (let i = 0; i < this.data.length; i++) {
+          fetch(
+            '/backend/' +
+              this.endpoint +
+              '?_id=' +
+              this.data[i]._id +
+              (this.endpoint == 'travel'
+                ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
+                : '&additionalFields=expenses')
+          )
+        }
+      }
     },
     clearSearch() {
       this.searchFilter = this.default()

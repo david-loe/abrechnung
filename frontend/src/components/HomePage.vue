@@ -98,7 +98,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
-import Installation from './elements/Installation.vue'
 import ModalComponent from './elements/ModalComponent.vue'
 import ExpenseReportCardList from './expenseReport/elements/ExpenseReportCardList.vue'
 import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
@@ -122,8 +121,7 @@ export default defineComponent({
     ExpenseReportForm,
     HealthCareCostCardList,
     HealthCareCostForm,
-    ModalComponent,
-    Installation
+    ModalComponent
   },
   props: [],
   data() {

@@ -11,7 +11,6 @@ precacheAndRoute(self.__WB_MANIFEST)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
-      console.log('installevent triggerd')
       self.skipWaiting() // triggert direkt 'activate'
     })()
   )
@@ -20,7 +19,6 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      console.log('activated')
       self.clients.claim() // weiß nicht was genau das für einen unterschied macht
     })()
   )
@@ -47,7 +45,6 @@ registerRoute(
 
 //Callback Handler selbst geschrieben:
 const DataToStore: RouteHandler = async ({ request }) => {
-  console.log('RouteHandler triggered for:', request.url)
   let response = getDataFromStore(request)
   return response
 }
@@ -80,7 +77,6 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   const urlToOpen = event.notification.data.url
-  console.log('open ' + event.notification.data.url)
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       const client = clientList.find((c) => c.url === urlToOpen && 'focus' in c)
@@ -96,7 +92,7 @@ self.addEventListener('notificationclick', (event) => {
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('myDatabase', 1)
+    const request = indexedDB.open('myDatabase', 1) // umbennenen und zentral speichern?
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
@@ -114,13 +110,12 @@ function openDatabase(): Promise<IDBDatabase> {
 }
 async function storeResponse(url: string, response: Response) {
   const db = await openDatabase()
-  const res = await response.json() // Antwortdaten verarbeiten
+  const res = await response.json()
   const transaction = db.transaction('urls', 'readwrite')
   const store = transaction.objectStore('urls')
   store.put({ id: url, res })
   await new Promise<void>((resolve, reject) => {
     transaction.oncomplete = () => {
-      console.log('data saved for' + url)
       resolve()
     }
     transaction.onerror = () => {

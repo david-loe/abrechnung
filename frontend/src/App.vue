@@ -1,10 +1,10 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-<div id="update-banner" class="update-banner position-absolute fixed-top w-100 bg-light text-center p-1" hidden>
-    {{ $t('reload.info') }}</br>
-    <button class="btn btn-success my-1" id="reload-button" @click="reload()">{{ $t('reload.button') }}</button>
-  </div>
+    <div id="update-banner" class="update-banner position-absolute fixed-top w-100 bg-light text-center p-1" hidden>
+      {{ $t('reload.info') }}
+      <button class="btn btn-success my-1" id="reload-button" @click="reload()">{{ $t('reload.button') }}</button>
+    </div>
     <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -141,8 +141,8 @@
                 class="text-decoration-none link-body-emphasis"
                 target="_blank"
                 :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + settings.version"
-                >v{{ settings.version }}
-              </a></small
+                >v{{ settings.version }}</a
+              ></small
             >
           </span>
         </div>
@@ -272,8 +272,10 @@ export default defineComponent({
           })
         }
         await this.loadingPromise
-        this.loadAndStoreData()
-        await this.subscribeToPush()
+        console.log(this.loadState)
+        if (!this.isOffline) {
+          await this.subscribeToPush()
+        }
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
       }
@@ -325,7 +327,6 @@ export default defineComponent({
         return { error: error.response.data }
       }
     },
-
     async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
       try {
         const res = await axios.post(
@@ -445,18 +446,17 @@ export default defineComponent({
         list.pop()
       }
     },
+    getFlagEmoji,
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
     async subscribeToPush() {
       if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
-        console.log('push avaiable in navigator')
         try {
           if (Notification.permission === 'default') {
             const permission = await Notification.requestPermission()
           }
           if (Notification.permission === 'granted') {
-            console.log('Berechtigung erteilt')
             let options = {
               userVisibleOnly: true,
               applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
@@ -464,7 +464,6 @@ export default defineComponent({
             window.navigator.serviceWorker.getRegistration().then(async (registration) => {
               if (registration) {
                 await registration.pushManager.subscribe(options).then(async (subscription) => {
-                  console.log(subscription)
                   await fetch('/backend/subscribe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -494,89 +493,37 @@ export default defineComponent({
       }
       return outputArray
     },
-    getFlagEmoji,
-    async loadAndStoreData() {
-      const reportTypesToFetch = ['healthCareCost', 'expenseReport', 'travel']
-      let urlsToStore = await this.getRoutesForStore(reportTypesToFetch)
-      await this.fetchAndStoreUrls(urlsToStore)
-      return Promise.resolve('Data loaded and stored successfully')
-    },
-    async getRoutesForStore(reportTypes: string[]) {
-      // hier könnte man auch einfach gleich den fetch drin machen
-      let urls: string[] = []
-      for (let reportType of reportTypes) {
-        let url = '/backend/' + reportType + '?limit=12'
-        urls.push(url)
-        urls.push('/backend/' + reportType + '/examiner')
-        try {
-          const response = await fetch(url) // Daten von der URL abrufen
-          if (response.ok) {
-            const res = await response.json() // Antwortdaten verarbeiten
-            for (let i = 0; i < res.data.length; i++) {
-              urls.push(
-                '/backend/' +
-                  reportType +
-                  '?_id=' +
-                  res.data[i]._id +
-                  (reportType == 'travel'
-                    ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
-                    : '&additionalFields=expenses')
-              )
-            }
-          }
-        } catch (error) {
-          console.error(`Fehler beim Abrufen der URL ${url}:`, error)
-        }
-      }
-      return urls
-    },
-    async fetchAndStoreUrls(urls: string[]) {
-      for (let i = 0; i < urls.length; i++) {
-        try {
-          await fetch(urls[i]) // Daten von der URL abrufen
-        } catch (error) {
-          console.error(`Fehler beim Abrufen der URL ${urls[i]}:`, error)
-        }
-      }
-    },
-    async clearingDB() {
-      const db = await this.openDatabase()
-
-      // Starte eine Transaktion für den Object Store, den du leeren willst
-      const transaction = db.transaction(['urls'], 'readwrite')
-      const store = transaction.objectStore('urls')
-
-      // Leere den Object Store
-      const clearRequest = store.clear()
-
-      clearRequest.onsuccess = () => {
-        console.log('Object Store wurde erfolgreich geleert.')
-      }
-    },
     openDatabase(): Promise<IDBDatabase> {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open('myDatabase', 1)
-
         request.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result
           db.createObjectStore('urls', { keyPath: 'id' })
         }
-
         request.onsuccess = (event) => {
           resolve((event.target as IDBOpenDBRequest).result)
         }
-
         request.onerror = (event) => {
           reject((event.target as IDBOpenDBRequest).error)
         }
       })
     },
-    reload(){
+    async clearingDB() {
+      const db = await this.openDatabase()
+      // Starte eine Transaktion für den Object Store, den du leeren willst
+      const transaction = db.transaction(['urls'], 'readwrite')
+      const store = transaction.objectStore('urls')
+      // Leere den Object Store
+      const clearRequest = store.clear()
+      clearRequest.onsuccess = () => {
+        console.log('Object Store wurde erfolgreich geleert.')
+      }
+    },
+    reload() {
       window.location.reload()
     }
   },
   mounted() {
-    console.log('mounted')
     window.addEventListener('online', this.updateConnectionStatus)
     window.addEventListener('offline', this.updateConnectionStatus)
   }

@@ -89,7 +89,7 @@ app.post('/subscribe', (req, res) => {
     console.log(req.session.subscription)
     res.status(201).json({ subscription: subscription })
   } else {
-    res.status(400).json({ info: 'Subscription was not accepted' })
+    res.status(200).json({ subscription: {} })
   }
 })
 

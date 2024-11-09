@@ -131,7 +131,7 @@ export default defineComponent({
         })
       } catch (error: any) {
         if (error.response.status === 401) {
-          this.$router.push('login') // macht das hier sinn?
+          this.$router.push('login') // macht das hier sinn - wahrscheinlich schon
         } else {
           console.log(error.response.data)
         }
@@ -154,7 +154,6 @@ export default defineComponent({
     },
     detectOS() {
       const userAgent = navigator.userAgent
-
       if (/win/i.test(userAgent)) return 'Windows'
       if (/android/i.test(userAgent)) return 'Android'
       if (/mac/i.test(userAgent)) return this.$root.mobile ? 'iOS' : 'macOS'
@@ -164,19 +163,16 @@ export default defineComponent({
     }
   },
   mounted() {
-    // darum noch kümmern :)
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      this.promptInstallEvent = event as BeforeInstallPromptEvent
+    })
   },
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
-    window.addEventListener('beforeinstallprompt', (event) => {
-      console.log('event catched')
-      event.preventDefault()
-      this.promptInstallEvent = event as BeforeInstallPromptEvent
-    })
     // only setting this true, if alreadyInstalled not true AND user setting is true
     this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
-    console.log(this.showInstallationBanner)
   }
 })
 </script>
