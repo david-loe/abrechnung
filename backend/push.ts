@@ -14,11 +14,9 @@ export async function sendPushNotification(title: String, body: String, users: U
   }
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
-    console.log(sessions)
     if (sessions) {
       for (let i = 0; i < sessions.length; i++) {
         if (sessions[i].subscription) {
-          console.log(sessions[i].subscription)
           webpush
             .sendNotification(sessions[i].subscription, JSON.stringify(payload))
             .then((response) => console.log('Benachrichtigung gesendet:', response))
@@ -47,7 +45,6 @@ async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
         session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()
       )
     })
-
     return userSessions
   } catch (error) {
     console.error('Fehler beim Abrufen der Sessions:', error)

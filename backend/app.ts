@@ -85,8 +85,6 @@ app.post('/subscribe', (req, res) => {
   let subscription: Subscription = req.body
   if (subscription && subscription.endpoint) {
     req.session.subscription = subscription
-    console.log(req.session)
-    console.log(req.session.subscription)
     res.status(201).json({ subscription: subscription })
   } else {
     res.status(200).json({ subscription: {} })
