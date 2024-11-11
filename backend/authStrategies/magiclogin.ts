@@ -21,7 +21,7 @@ export default new MagicLoginStrategy.default({
         i18n.t('mail.magiclogin.subject', { lng: user.settings.language }),
         i18n.t('mail.magiclogin.paragraph', { lng: user.settings.language }),
         { text: i18n.t('mail.magiclogin.buttonText', { lng: user.settings.language }), link: href },
-        '',
+        undefined,
         false
       )
     } else {

@@ -30,20 +30,23 @@ export async function sendMail(
   recipients: IUser[],
   subject: string,
   paragraph: string,
-  button: { text: string; link: string },
-  lastParagraph: string,
+  button?: { text: string; link: string },
+  lastParagraph?: string,
   authenticateLink = true
 ) {
   for (let i = 0; i < recipients.length; i++) {
     const language = recipients[i].settings.language
-    const recipientButton = { ...button }
-    if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
-      recipientButton.link = await genAuthenticatedLink({
-        destination: recipients[i].fk.magiclogin!,
-        redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
-      })
+    let recipientButton: { text: string; link: string } | undefined = undefined
+    if (button) {
+      recipientButton = { ...button }
+      if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+        recipientButton.link = await genAuthenticatedLink({
+          destination: recipients[i].fk.magiclogin!,
+          redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
+        })
+      }
     }
-    _sendMail(recipients[i], subject, paragraph, recipientButton, lastParagraph, language)
+    _sendMail(recipients[i], subject, paragraph, language, recipientButton, lastParagraph)
   }
 }
 
@@ -51,9 +54,9 @@ async function _sendMail(
   recipient: IUser,
   subject: string,
   paragraph: string,
-  button: { text: string; link: string },
-  lastParagraph: string,
-  language: Locale
+  language: Locale,
+  button?: { text: string; link: string },
+  lastParagraph?: string
 ) {
   const mailClient = await getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
@@ -77,10 +80,7 @@ async function _sendMail(
     '\n\n' +
     paragraph +
     '\n\n' +
-    button.text +
-    ': ' +
-    button.link +
-    '\n\n' +
+    (button ? button.text + ': ' + button.link + '\n\n' : '') +
     lastParagraph +
     '\n\n' +
     regards +
