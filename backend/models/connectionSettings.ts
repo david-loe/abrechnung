@@ -7,6 +7,7 @@ function requiredIf(ifPath: string) {
 }
 
 export const connectionSettingsSchema = new Schema<ConnectionSettings>({
+  sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
   smtp: {
     type: {
       host: { type: String, trim: true, required: true, label: 'Host', rules: requiredIf('smtp.user') },

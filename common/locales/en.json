@@ -97,6 +97,8 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "labels": {
+    "reportEmail": "Email Address for Reports",
+    "sendPDFReportsToOrganisationEmail": "Send PDF reports to organisation email",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",

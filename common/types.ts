@@ -74,11 +74,13 @@ export interface microsoftSettings {
 }
 
 export interface ConnectionSettings {
+  sendPDFReportsToOrganisationEmail: boolean
   auth: {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null
   }
   smtp?: smtpSettings | null
+
   _id: _id
 }
 
@@ -211,6 +213,7 @@ export interface ProjectWithUsers extends Project, ProjectUsers {}
 
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
+  reportEmail?: string | null
   bankDetails?: string | null
   companyNumber?: string | null
   logo?: DocumentFile<ImageType> | null
