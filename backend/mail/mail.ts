@@ -1,5 +1,5 @@
 import ejs from 'ejs'
-import fs from 'fs'
+import fs from 'fs/promises'
 import nodemailer from 'nodemailer'
 import {
   ExpenseReportSimple,
@@ -66,7 +66,7 @@ async function _sendMail(
     url: process.env.VITE_FRONTEND_URL
   }
 
-  const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
+  const template = await fs.readFile('./templates/mail.ejs', { encoding: 'utf-8' })
   const renderedHTML = ejs.render(template, {
     salutation,
     paragraph,

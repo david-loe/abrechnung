@@ -1,6 +1,6 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import fs from 'node:fs/promises'
+import fs from 'fs/promises'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse } from 'tsoa'
 import { _id } from '../../common/types.js'
 import { getSettings } from '../db.js'
