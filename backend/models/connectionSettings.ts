@@ -1,13 +1,20 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
-import { ConnectionSettings, emailRegex } from '../../common/types.js'
+import { ConnectionSettings, emailRegex, locales } from '../../common/types.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
 function requiredIf(ifPath: string) {
-  return [{ required: [ifPath, 'not_in', [null, '']] }, { nullable: [ifPath, 'in', [null, '']] }]
+  return [{ required: [ifPath, 'not_in', [null, '', false]] }, { nullable: [ifPath, 'in', [null, '', false]] }]
 }
 
 export const connectionSettingsSchema = new Schema<ConnectionSettings>({
-  sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
+  PDFReportsViaEmail: {
+    type: {
+      sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
+      locale: { type: String, enum: locales, required: true }
+    },
+    required: true,
+    label: 'PDF via Email'
+  },
   smtp: {
     type: {
       host: { type: String, trim: true, required: true, label: 'Host', rules: requiredIf('smtp.user') },

@@ -17,7 +17,7 @@ import i18n, { formatter } from '../i18n.js'
 import User from '../models/user.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
 
-async function getClient() {
+export async function getClient() {
   const connectionSettings = await getConnectionSettings()
   if (connectionSettings.smtp?.host) {
     return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))

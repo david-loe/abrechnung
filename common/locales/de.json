@@ -97,6 +97,7 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "labels": {
+    "locale": "Sprache",
     "reportEmail": "Email Adresse für Berichte",
     "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-Email senden",
     "access": "Zugriffsrechte",

@@ -30,8 +30,7 @@ export const displaySettingsSchema = new Schema<DisplaySettings>(
         fallback: { type: String, enum: locales, required: true },
         overwrite: { type: overwrites, required: true, description: 'description.keyFullIdentifier' }
       },
-      required: true,
-      label: 'Sprache'
+      required: true
     }
   },
   { minimize: false, toObject: { minimize: false }, toJSON: { minimize: false } }

@@ -16,7 +16,7 @@ import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
-import { writeToDiskFilePath } from '../pdf/helper.js'
+import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
@@ -251,6 +251,7 @@ export class HealthCareCostExamineController extends Controller {
 
     const cb = async (healthCareCost: IHealthCareCost) => {
       sendNotificationMail(healthCareCost)
+      sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
           await writeToDiskFilePath(healthCareCost),
@@ -371,6 +372,7 @@ export class HealthCareCostConfirmController extends Controller {
 
     const cb = async (healthCareCost: IHealthCareCost) => {
       sendNotificationMail(healthCareCost)
+      sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
           await writeToDiskFilePath(healthCareCost),

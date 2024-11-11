@@ -74,7 +74,10 @@ export interface microsoftSettings {
 }
 
 export interface ConnectionSettings {
-  sendPDFReportsToOrganisationEmail: boolean
+  PDFReportsViaEmail: {
+    sendPDFReportsToOrganisationEmail: boolean
+    locale: Locale
+  }
   auth: {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null
