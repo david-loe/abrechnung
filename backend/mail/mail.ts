@@ -34,6 +34,7 @@ export async function sendMail(
   lastParagraph?: string,
   authenticateLink = true
 ) {
+  const mailPromises = []
   for (let i = 0; i < recipients.length; i++) {
     const language = recipients[i].settings.language
     let recipientButton: { text: string; link: string } | undefined = undefined
@@ -46,8 +47,9 @@ export async function sendMail(
         })
       }
     }
-    _sendMail(recipients[i], subject, paragraph, language, recipientButton, lastParagraph)
+    mailPromises.push(_sendMail(recipients[i], subject, paragraph, language, recipientButton, lastParagraph))
   }
+  return await Promise.allSettled(mailPromises)
 }
 
 async function _sendMail(
@@ -89,7 +91,7 @@ async function _sendMail(
     ': ' +
     app.url
 
-  mailClient.sendMail({
+  return await mailClient.sendMail({
     from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
     to: recipient.email, // list of receivers
     subject: subject, // Subject line
