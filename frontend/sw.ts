@@ -2,7 +2,7 @@
 import { RouteHandler } from 'workbox-core'
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
-import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
 declare var self: ServiceWorkerGlobalScope
 export default {}
@@ -24,32 +24,16 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// Ein benutzerdefiniertes Event für die Client-Seiten senden, wenn ein Update verfügbar ist
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting()
-  }
-})
-
 setDefaultHandler(new NetworkOnly())
-
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
 
 registerRoute(
   ({ request }) => request.destination === 'font',
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'font-cache'
   })
 )
-
-//Callback Handler selbst geschrieben:
-const DataToStore: RouteHandler = async ({ request }) => {
-  let response = getDataFromStore(request)
-  return response
-}
-registerRoute(({ request }) => /\/backend\/(?!auth\b).*/.test(request.url), DataToStore)
-
 registerRoute(
   ({ request }) => /\/icons\/.*/.test(request.url),
   new StaleWhileRevalidate({
@@ -63,68 +47,14 @@ registerRoute(
   })
 )
 
-self.addEventListener('push', (event) => {
-  console.log(event.data?.json(), Notification.permission)
-  let notification = event.data?.json()
-  event.waitUntil(
-    self.registration.showNotification(notification.title, {
-      body: notification.body,
-      data: { url: notification.url }
-    })
-  )
-})
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  const urlToOpen = event.notification.data.url
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      const client = clientList.find((c) => c.url === urlToOpen && 'focus' in c)
-      if (client) {
-        return client.focus()
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(urlToOpen)
-      }
-    })
-  )
-})
-
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('myDatabase', 1) // umbennenen und zentral speichern?
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      db.createObjectStore('urls', { keyPath: 'id' })
-    }
-
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBOpenDBRequest).result)
-    }
-
-    request.onerror = (event) => {
-      reject((event.target as IDBOpenDBRequest).error)
-    }
-  })
+//Callback Handler selbst geschrieben:
+const NetworkFirstToDB: RouteHandler = async ({ request }) => {
+  let response = handleRequestWithNetworkFirst(request)
+  return response
 }
-async function storeResponse(url: string, response: Response) {
-  const db = await openDatabase()
-  const res = await response.json()
-  const transaction = db.transaction('urls', 'readwrite')
-  const store = transaction.objectStore('urls')
-  store.put({ id: url, res })
-  await new Promise<void>((resolve, reject) => {
-    transaction.oncomplete = () => {
-      resolve()
-    }
-    transaction.onerror = () => {
-      reject('Problem')
-    }
-  })
-}
+registerRoute(({ request }) => /\/backend\/(?!auth\b).*/.test(request.url), NetworkFirstToDB)
 
-async function getDataFromStore(request: Request) {
+async function handleRequestWithNetworkFirst(request: Request) {
   let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
   try {
     const networkResponse = await fetch(request)
@@ -152,3 +82,63 @@ async function getDataFromStore(request: Request) {
     })
   }
 }
+async function storeResponse(url: string, response: Response) {
+  const db = await openDatabase()
+  const res = await response.json()
+  const transaction = db.transaction('urls', 'readwrite')
+  const store = transaction.objectStore('urls')
+  store.put({ id: url, res })
+  await new Promise<void>((resolve, reject) => {
+    transaction.oncomplete = () => {
+      resolve()
+    }
+    transaction.onerror = () => {
+      reject('Problem')
+    }
+  })
+}
+function openDatabase(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('myDatabase', 1) // umbennenen und zentral speichern?
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result
+      db.createObjectStore('urls', { keyPath: 'id' })
+    }
+
+    request.onsuccess = (event) => {
+      resolve((event.target as IDBOpenDBRequest).result)
+    }
+
+    request.onerror = (event) => {
+      reject((event.target as IDBOpenDBRequest).error)
+    }
+  })
+}
+
+self.addEventListener('push', (event) => {
+  console.log(event.data?.json(), Notification.permission)
+  let notification = event.data?.json()
+  event.waitUntil(
+    self.registration.showNotification(notification.title, {
+      body: notification.body,
+      data: { url: notification.url }
+    })
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const urlToOpen = event.notification.data.url
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const client = clientList.find((c) => c.url === urlToOpen && 'focus' in c)
+      if (client) {
+        return client.focus()
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen)
+      }
+    })
+  )
+})
