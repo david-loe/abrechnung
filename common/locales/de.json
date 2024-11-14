@@ -58,8 +58,8 @@
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
     "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
     "deleteRefundedAfterXDays": "Um keine automatische  Löschung durchzuführen 0 eingeben",
-    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben",
-    "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}"
+    "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}",
+    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben"
   },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
@@ -242,6 +242,7 @@
     "none": "gar nicht",
     "note": "Bemerkung",
     "object": "Objekt",
+    "on": "am",
     "optional": "optional",
     "organisation": "Organisation",
     "organisations": "Organisationen",
