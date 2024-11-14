@@ -265,7 +265,7 @@ export default defineComponent({
               this.auth = true
             }
             console.log(this.user)
-            this.isOffline = !navigator.onLine // braucht man irgendwie für Safari & Firefox?
+            this.isOffline = !navigator.onLine
             this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
             this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
             this.loadState = 'LOADED'
@@ -470,6 +470,8 @@ export default defineComponent({
                     body: JSON.stringify(subscription)
                   })
                 })
+              } else {
+                return
               }
             })
           }
