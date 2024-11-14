@@ -58,8 +58,8 @@
     "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "deleteInWorkReportsAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "deleteRefundedAfterXDays": "Enter 0 to prevent automatic deletion",
-    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email",
-    "keyFullIdentifier": "The key is the complete identifier, e.g: {\"labels.new\": \"NEW\"}"
+    "keyFullIdentifier": "The key is the complete identifier, e.g: {\"labels.new\": \"NEW\"}",
+    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email"
   },
   "distanceRefundTypes": {
     "car": "Car 🚗",
@@ -242,6 +242,7 @@
     "none": "not at all",
     "note": "Note",
     "object": "Object",
+    "on": "on",
     "optional": "optional",
     "organisation": "Organisation",
     "organisations": "Organisations",

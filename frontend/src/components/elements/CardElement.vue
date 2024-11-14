@@ -38,7 +38,7 @@
         <div v-if="showEditor" class="col-auto">
           <small class="ms-1">
             <i class="bi bi-pencil-square"></i>
-            {{ request.editor.name.givenName }}
+            {{ request.editor.name.givenName }} {{ $t('labels.on') }} {{ $formatter.simpleDate(request.updatedAt) }}
           </small>
         </div>
       </div>
