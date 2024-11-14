@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      self.clients.claim() // weiß nicht was genau das für einen unterschied macht
+      self.clients.claim()
     })()
   )
 })
@@ -144,7 +144,7 @@ async function getDataFromStore(request: Request) {
           })
           resolve(cachedResponse)
         } else {
-          reject(new Error(`Keine gecachten Daten in IndexedDB verfügbar ${url}`))
+          reject(error)
         }
       }
 
