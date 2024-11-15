@@ -140,8 +140,8 @@ export default defineComponent({
       }
     },
     getRoutesForStore() {
-      fetch('/backend/' + this.endpoint + '/examiner')
       if (this.hasData) {
+        fetch('/backend/' + this.endpoint + '/examiner')
         for (let i = 0; i < this.data.length; i++) {
           fetch(
             '/backend/' +
