@@ -184,7 +184,11 @@ export interface Alert {
   id?: number
   ttl?: number
 }
-
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
 export default defineComponent({
   data() {
     return {
@@ -207,7 +211,8 @@ export default defineComponent({
       accesses,
       isOffline: false as boolean,
       alreadyInstalled: false as boolean,
-      mobile: false as boolean
+      mobile: false as boolean,
+      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
     }
   },
   components: { OfflineBanner, Installation },
@@ -528,6 +533,13 @@ export default defineComponent({
   mounted() {
     window.addEventListener('online', this.updateConnectionStatus)
     window.addEventListener('offline', this.updateConnectionStatus)
+  },
+  created() {
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      console.log('event catched')
+      this.promptInstallEvent = event as BeforeInstallPromptEvent
+    })
   }
 })
 </script>

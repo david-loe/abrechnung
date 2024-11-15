@@ -56,6 +56,11 @@ function updateBootstrapTheme() {
 updateBootstrapTheme()
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateBootstrapTheme)
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
 // globally config axios
 axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 
@@ -87,6 +92,7 @@ declare module 'vue' {
       isOffline: boolean
       alreadyInstalled: boolean
       mobile: boolean
+      promptInstallEvent: BeforeInstallPromptEvent | undefined
     }
   }
 }

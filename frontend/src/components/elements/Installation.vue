@@ -18,7 +18,7 @@
         <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
       <div>
-        <div v-if="!promptInstallEvent" id="installationBody" class="my-1">
+        <div v-if="!$root.promptInstallEvent" id="installationBody" class="my-1">
           <div v-if="operationSystem === 'iOS'">
             <div v-if="browser === 'Safari'">
               <div>
@@ -74,7 +74,9 @@
         </div>
       </div>
       <div id="installationFooter" class="mt-auto" style="bottom: 0px">
-        <button v-if="promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">{{ $t('labels.install') }}</button>
+        <button v-if="$root.promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">
+          {{ $t('labels.install') }}
+        </button>
         <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontshowagain') }}</button>
       </div>
     </div>
@@ -99,8 +101,7 @@ export default defineComponent({
     return {
       showInstallationBanner: false as Boolean,
       operationSystem: 'Unknown' as OperationSystems,
-      browser: 'Unknown' as BrowserTypes,
-      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
+      browser: 'Unknown' as BrowserTypes
     }
   },
   props: {},
@@ -118,10 +119,10 @@ export default defineComponent({
       this.hideBanner()
     },
     async install() {
-      if (this.promptInstallEvent) {
-        await this.promptInstallEvent.prompt()
+      if (this.$root.promptInstallEvent) {
+        await this.$root.promptInstallEvent.prompt()
       }
-      this.promptInstallEvent = undefined
+      this.$root.promptInstallEvent = undefined
       this.hideBanner()
     },
     async postSettings(settings: {}) {
@@ -162,12 +163,7 @@ export default defineComponent({
       return 'Unknown'
     }
   },
-  mounted() {
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault()
-      this.promptInstallEvent = event as BeforeInstallPromptEvent
-    })
-  },
+  mounted() {},
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
