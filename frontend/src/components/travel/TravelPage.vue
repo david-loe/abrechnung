@@ -471,7 +471,11 @@
                   </button>
                 </template>
                 <template v-else>
-                  <a class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
+                  <a
+                    class="btn btn-primary"
+                    :href="reportLink()"
+                    :download="travel.name + '.pdf'"
+                    :style="$root.isOffline ? 'display: none' : ''">
                     <i class="bi bi-download"></i>
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
