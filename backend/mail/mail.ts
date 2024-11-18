@@ -62,8 +62,6 @@ export function sendMail(
     ': ' +
     app.url
 
-  sendPushNotification(subject, paragaph, recipients, button.link)
-
   mailClient.sendMail({
     from: '"' + app.name + '" <' + process.env.MAIL_SENDER_ADDRESS + '>', // sender address
     to: recipients.map((r) => r.email), // list of receivers
@@ -127,5 +125,6 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
     ? i18n.t(`mail.${reportType}.${textState ? textState : report.state}.lastParagraph`, interpolation)
     : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
+  sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

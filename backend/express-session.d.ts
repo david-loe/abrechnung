@@ -1,13 +1,13 @@
-// src/express-session.d.ts
-
 import 'express-session'
+import type { Types } from 'mongoose'
+import { PushSubscription } from 'web-push'
 
 declare module 'express-session' {
   interface SessionData {
-    subscription?: Subscription
+    subscription: PushSubscription
     passport?: {
       user?: {
-        _id?: mongoose.Types.ObjectId // oder mongoose.Types.ObjectId, je nachdem, wie du die ID speicherst
+        _id?: Types.ObjectId
       }
     }
   }
