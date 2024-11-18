@@ -7,7 +7,6 @@ export default {
   plugins: [
     vue(),
     VitePWA({
-      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       srcDir: '',
       filename: 'sw.ts',
