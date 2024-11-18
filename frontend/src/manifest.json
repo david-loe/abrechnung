@@ -1,10 +1,15 @@
 {
-  "short_name": "Abrechnung",
+  "short_name": "abrechnung",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
+    {
+      "src": "/icons/receipt152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
     {
       "src": "/icons/receipt192.png",
       "sizes": "192x192",
