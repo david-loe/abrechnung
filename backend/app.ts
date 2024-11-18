@@ -5,7 +5,7 @@ import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
-import { Subscription } from '../common/types.js'
+import { PushSubscription } from 'web-push'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
@@ -80,9 +80,8 @@ app.use(
     name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
   })
 )
-
 app.post('/subscribe', (req, res) => {
-  let subscription: Subscription = req.body
+  let subscription: PushSubscription = req.body
   if (subscription && subscription.endpoint) {
     req.session.subscription = subscription
     res.status(201).json({ subscription: subscription })

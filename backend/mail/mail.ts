@@ -164,5 +164,6 @@ export async function sendNotificationMail(report: TravelSimple | ExpenseReportS
   const paragraph = i18n.t(`mail.${reportType}.${textState || report.state}.paragraph`, interpolation)
   const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${textState || report.state}.lastParagraph`, interpolation) : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
+  sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)
 }

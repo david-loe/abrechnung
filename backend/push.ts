@@ -16,7 +16,7 @@ export async function sendPushNotification(title: String, body: String, users: U
     let sessions = await findSessionsByUserId(users[i]._id)
     if (sessions) {
       for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].subscription) {
+        if (sessions[i].subscription != undefined) {
           webpush
             .sendNotification(sessions[i].subscription, JSON.stringify(payload))
             .then((response) => console.log('Benachrichtigung gesendet:', response))
@@ -39,7 +39,6 @@ async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
         }
       })
     })
-    // Filtere die Sessions nach der Benutzer-ID
     const userSessions = sessions.filter((session) => {
       return (
         session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()
