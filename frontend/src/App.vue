@@ -241,14 +241,12 @@ export default defineComponent({
             this.$formatter.setLocale(this.user.settings.language)
             this.auth = true
           }
-          console.log(this.user)
           this.isOffline = !navigator.onLine
           this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
           this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
           this.loadState = 'LOADED'
         })
         await this.loadingPromise
-        console.log(this.loadState)
         if (!this.isOffline) {
           await this.subscribeToPush()
         }
@@ -488,7 +486,7 @@ export default defineComponent({
       // Leere den Object Store
       const clearRequest = store.clear()
       clearRequest.onsuccess = () => {
-        console.log('Object Store wurde erfolgreich geleert.')
+        return
       }
     },
     reload() {
@@ -502,7 +500,6 @@ export default defineComponent({
   created() {
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault()
-      console.log('event catched')
       this.promptInstallEvent = event as BeforeInstallPromptEvent
     })
   }

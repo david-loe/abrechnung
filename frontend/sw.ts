@@ -11,11 +11,10 @@ precacheAndRoute(self.__WB_MANIFEST)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
-      self.skipWaiting() // triggert direkt 'activate'
+      self.skipWaiting()
     })()
   )
 })
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
@@ -23,7 +22,6 @@ self.addEventListener('activate', (event) => {
     })()
   )
 })
-
 setDefaultHandler(new NetworkOnly())
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))

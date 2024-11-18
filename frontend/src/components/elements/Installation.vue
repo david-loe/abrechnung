@@ -22,24 +22,24 @@
           <div v-if="operationSystem === 'iOS'">
             <div v-if="browser === 'Safari'">
               <div>
-                {{ $t('installation.iosSafari.steps.one.one') }} <i class="bi bi-box-arrow-up"></i
-                >{{ $t('installation.iosSafari.steps.one.two') }}
+                {{ $t('installation.iosSafari.steps.one.one') }} <i class="bi bi-box-arrow-up"></i>
+                {{ $t('installation.iosSafari.steps.one.two') }}
               </div>
               <div>{{ $t('installation.iosSafari.steps.two') }} <i class="bi bi-plus-square"></i></div>
               <div>{{ $t('installation.iosSafari.steps.three') }}</div>
             </div>
             <div v-else-if="browser === 'Chrome'">
               <div>
-                {{ $t('installation.iosChrome.steps.one.one') }} <i class="bi bi-box-arrow-up"></i
-                >{{ $t('installation.iosChrome.steps.one.two') }}
+                {{ $t('installation.iosChrome.steps.one.one') }} <i class="bi bi-box-arrow-up"></i>
+                {{ $t('installation.iosChrome.steps.one.two') }}
               </div>
               <div>{{ $t('installation.iosChrome.steps.two') }} <i class="bi bi-plus-square"></i></div>
               <div>{{ $t('installation.iosChrome.steps.three') }}</div>
             </div>
             <div v-else-if="browser === 'Firefox'">
               <div>
-                {{ $t('installation.iosFirefox.steps.one.one') }} <i class="bi bi-list"></i
-                >{{ $t('installation.iosFirefox.steps.one.two') }}
+                {{ $t('installation.iosFirefox.steps.one.one') }} <i class="bi bi-list"></i>
+                {{ $t('installation.iosFirefox.steps.one.two') }}
               </div>
               <div>{{ $t('installation.iosFirefox.steps.two') }} <i class="bi bi-box-arrow-up"></i></div>
               <div>{{ $t('installation.iosFirefox.steps.three') }} <i class="bi bi-plus-square"></i></div>
@@ -49,23 +49,23 @@
           <div v-else-if="operationSystem === 'Android'">
             <div v-if="browser === 'SamsungInternet'">
               <div>
-                {{ $t('installation.AndroidSamsung.steps.one.one') }} <i class="bi bi-arrow-down-square"></i
-                >{{ $t('installation.AndroidSamsung.steps.one.two') }}
+                {{ $t('installation.AndroidSamsung.steps.one.one') }} <i class="bi bi-arrow-down-square"></i>
+                {{ $t('installation.AndroidSamsung.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidSamsung.steps.two') }}</div>
             </div>
             <div v-else-if="browser === 'Chrome'">
               <div>
-                {{ $t('installation.AndroidChrome.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i
-                >{{ $t('installation.AndroidChrome.steps.one.two') }}
+                {{ $t('installation.AndroidChrome.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i>
+                {{ $t('installation.AndroidChrome.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidChrome.steps.two') }}</div>
               <div>{{ $t('installation.AndroidChrome.steps.three') }}</div>
             </div>
             <div v-else-if="browser === 'Firefox'">
               <div>
-                {{ $t('installation.AndroidFirefox.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i
-                >{{ $t('installation.AndroidFirefox.steps.one.two') }}
+                {{ $t('installation.AndroidFirefox.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i>
+                {{ $t('installation.AndroidFirefox.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidFirefox.steps.two') }}</div>
               <div>{{ $t('installation.AndroidFirefox.steps.three') }}</div>
@@ -99,7 +99,7 @@ export default defineComponent({
   name: 'Installation',
   data() {
     return {
-      showInstallationBanner: false as Boolean,
+      showInstallationBanner: false as boolean,
       operationSystem: 'Unknown' as OperationSystems,
       browser: 'Unknown' as BrowserTypes
     }
@@ -155,15 +155,14 @@ export default defineComponent({
     },
     detectOS() {
       const userAgent = navigator.userAgent
+      if (/iphone|ipad|ipod/i.test(userAgent)) return 'iOS'
       if (/win/i.test(userAgent)) return 'Windows'
       if (/android/i.test(userAgent)) return 'Android'
-      if (/mac/i.test(userAgent)) return this.$root.mobile ? 'iOS' : 'macOS'
+      if (/mac/i.test(userAgent)) return 'macOS'
       if (/linux/i.test(userAgent)) return 'Linux'
-      if (/iphone|ipad|ipod/i.test(userAgent)) return 'iOS'
       return 'Unknown'
     }
   },
-  mounted() {},
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
