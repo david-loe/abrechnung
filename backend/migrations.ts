@@ -124,6 +124,16 @@ export async function checkForMigrations() {
       }
       await mongoose.connection.collection('displaysettings').updateOne({}, { $set: displaySettingsFromEnv })
     }
+    if (semver.lte(migrateFrom, '1.4.1')) {
+      console.log('Apply migration from v1.4.1: Add PDFReportsViaEmail Settings')
+      const displaySettings = await mongoose.connection.collection('displaysettings').findOne({})
+      await mongoose.connection
+        .collection('connectionsettings')
+        .updateOne(
+          {},
+          { $set: { PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: displaySettings?.locale?.default || 'de' } } }
+        )
+    }
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()
