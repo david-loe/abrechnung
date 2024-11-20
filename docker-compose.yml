@@ -9,10 +9,6 @@ services:
     volumes:
       - ./backend:/app
       - ./common:/common
-      # - ./reports/travel:/reports/travel #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/expenseReport:/reports/expenseReport #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/advance:/reports/advance #BACKEND_SAVE_REPORTS_ON_DISK
-      # - ./reports/healthCareCost:/reports/healthCareCost #BACKEND_SAVE_REPORTS_ON_DISK
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
       - ${BACKEND_DEBUG_PORT}:${BACKEND_DEBUG_PORT}
