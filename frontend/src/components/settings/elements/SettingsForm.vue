@@ -20,9 +20,21 @@ export default defineComponent({
         this.$root.settings = result.ok
         ;(this.$refs.form$ as any).load(this.$root.settings)
       }
+    },
+    ctrlS(event: KeyboardEvent) {
+      if (event.ctrlKey && event.key === 's') {
+        event.preventDefault()
+        if (!event.repeat && this.$refs.form$) {
+          this.postSettings((this.$refs.form$ as any).data)
+        }
+      }
     }
   },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.ctrlS)
+  },
   async mounted() {
+    document.addEventListener('keydown', this.ctrlS)
     await this.$root.load()
     this.schema = Object.assign({}, (await this.$root.getter<any>('admin/settings/form')).ok?.data, {
       buttons: {
