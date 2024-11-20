@@ -15,7 +15,7 @@
       ]"
       :headers="[
         { text: $t('labels.name'), value: 'name' },
-        { text: $t('labels.subfolderPath'), value: 'subfolderPath' },
+        { text: $t('labels.reportEmail'), value: 'reportEmail' },
         { text: $t('labels.website'), value: 'website' },
         { value: 'buttons' }
       ]">
