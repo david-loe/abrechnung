@@ -541,3 +541,4 @@ export const baseCurrency: Currency = {
   subunit: 'Cent',
   symbol: '€'
 }
+export const defaultLocale: Locale = 'de'

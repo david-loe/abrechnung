@@ -3,6 +3,7 @@ import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
 
+import { defaultLocale } from '../../common/types'
 import CountryElement from './components/elements/vueform/CountryElement.vue'
 import CurrencyElement from './components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from './components/elements/vueform/DocumentfileElement.vue'
@@ -38,7 +39,7 @@ export default defineConfig({
     MixedElement
   ],
   locales: { de, en },
-  locale: 'de',
+  locale: defaultLocale,
   env: import.meta.env.MODE,
   displayErrors: false,
   displayMessages: false,

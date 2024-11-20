@@ -1,15 +1,17 @@
 import { createI18n } from 'vue-i18n'
-import { Locale, locales } from '../../common/types.js'
+import de from '../../common/locales/de.json' with { type: 'json' }
+import en from '../../common/locales/en.json' with { type: 'json' }
+import { defaultLocale, Locale } from '../../common/types.js'
 
-const emptyMessages = {} as { [key in Locale]: {} }
-for (const locale of locales) {
-  emptyMessages[locale] = {}
+const defaultMessages = {
+  de,
+  en
 }
 
 export default createI18n<any, Locale>({
   legacy: false,
-  locale: 'de',
-  fallbackLocale: 'de',
-  messages: emptyMessages,
+  locale: defaultLocale,
+  fallbackLocale: defaultLocale,
+  messages: defaultMessages,
   globalInjection: true
 })

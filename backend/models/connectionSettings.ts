@@ -1,5 +1,5 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
-import { ConnectionSettings, emailRegex, locales } from '../../common/types.js'
+import { ConnectionSettings, defaultLocale, emailRegex, locales } from '../../common/types.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
 function requiredIf(ifPath: string) {
@@ -10,9 +10,10 @@ export const connectionSettingsSchema = new Schema<ConnectionSettings>({
   PDFReportsViaEmail: {
     type: {
       sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
-      locale: { type: String, enum: locales, required: true }
+      locale: { type: String, enum: locales, required: true, default: defaultLocale }
     },
     required: true,
+    default: () => ({}),
     label: 'PDF via Email'
   },
   smtp: {
@@ -101,7 +102,8 @@ export const connectionSettingsSchema = new Schema<ConnectionSettings>({
         label: 'LDAP'
       }
     },
-    required: true
+    required: true,
+    default: () => ({})
   }
 })
 
