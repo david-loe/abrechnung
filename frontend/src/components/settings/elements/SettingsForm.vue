@@ -1,5 +1,10 @@
 <template>
-  <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postSettings(form$.data)"></Vueform>
+  <Vueform
+    :schema="schema"
+    ref="form$"
+    :endpoint="false"
+    @submit="(form$: any) => postSettings(form$.data)"
+    @keydown.ctrl.s.prevent="() => postSettings(($refs.form$ as any).data)"></Vueform>
 </template>
 
 <script lang="ts">
@@ -20,21 +25,9 @@ export default defineComponent({
         this.$root.settings = result.ok
         ;(this.$refs.form$ as any).load(this.$root.settings)
       }
-    },
-    ctrlS(event: KeyboardEvent) {
-      if (event.ctrlKey && event.key === 's') {
-        event.preventDefault()
-        if (!event.repeat && this.$refs.form$) {
-          this.postSettings((this.$refs.form$ as any).data)
-        }
-      }
     }
   },
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.ctrlS)
-  },
   async mounted() {
-    document.addEventListener('keydown', this.ctrlS)
     await this.$root.load()
     this.schema = Object.assign({}, (await this.$root.getter<any>('admin/settings/form')).ok?.data, {
       buttons: {

@@ -1,5 +1,10 @@
 <template>
-  <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postDisplaySettings(form$.data)"></Vueform>
+  <Vueform
+    :schema="schema"
+    ref="form$"
+    :endpoint="false"
+    @submit="(form$: any) => postDisplaySettings(form$.data)"
+    @keydown.ctrl.s.prevent="() => postDisplaySettings(($refs.form$ as any).data)"></Vueform>
 </template>
 
 <script lang="ts">
@@ -21,21 +26,9 @@ export default defineComponent({
         this.displaySettings = result.ok
         ;(this.$refs.form$ as any).load(this.displaySettings)
       }
-    },
-    ctrlS(event: KeyboardEvent) {
-      if (event.ctrlKey && event.key === 's') {
-        event.preventDefault()
-        if (!event.repeat && this.$refs.form$) {
-          this.postDisplaySettings((this.$refs.form$ as any).data)
-        }
-      }
     }
   },
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.ctrlS)
-  },
   async mounted() {
-    document.addEventListener('keydown', this.ctrlS)
     await this.$root.load()
     this.schema = Object.assign({}, (await this.$root.getter<any>('admin/displaySettings/form')).ok?.data, {
       buttons: {
