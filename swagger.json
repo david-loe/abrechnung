@@ -5189,6 +5189,10 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"reportEmail": {
+						"type": "string",
+						"nullable": true
+					},
 					"bankDetails": {
 						"type": "string",
 						"nullable": true
@@ -5255,6 +5259,10 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"reportEmail": {
+						"type": "string",
+						"nullable": true
+					},
 					"bankDetails": {
 						"type": "string",
 						"nullable": true
@@ -5306,6 +5314,7 @@
 								"name",
 								"_id",
 								"subfolderPath",
+								"reportEmail",
 								"bankDetails",
 								"companyNumber",
 								"logo",
@@ -5362,6 +5371,9 @@
 					"bankDetails": {
 						"type": "string"
 					},
+					"reportEmail": {
+						"type": "string"
+					},
 					"subfolderPath": {
 						"type": "string"
 					},
@@ -5386,6 +5398,9 @@
 						"type": "string"
 					},
 					"bankDetails": {
+						"type": "string"
+					},
+					"reportEmail": {
 						"type": "string"
 					},
 					"subfolderPath": {
@@ -7028,6 +7043,21 @@
 			},
 			"IConnectionSettings": {
 				"properties": {
+					"PDFReportsViaEmail": {
+						"properties": {
+							"locale": {
+								"$ref": "#/components/schemas/Locale"
+							},
+							"sendPDFReportsToOrganisationEmail": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"locale",
+							"sendPDFReportsToOrganisationEmail"
+						],
+						"type": "object"
+					},
 					"auth": {
 						"properties": {
 							"ldapauth": {
@@ -7062,6 +7092,7 @@
 					}
 				},
 				"required": [
+					"PDFReportsViaEmail",
 					"auth",
 					"_id"
 				],
@@ -7070,6 +7101,21 @@
 			},
 			"ConnectionSettings": {
 				"properties": {
+					"PDFReportsViaEmail": {
+						"properties": {
+							"locale": {
+								"$ref": "#/components/schemas/Locale"
+							},
+							"sendPDFReportsToOrganisationEmail": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"locale",
+							"sendPDFReportsToOrganisationEmail"
+						],
+						"type": "object"
+					},
 					"auth": {
 						"properties": {
 							"ldapauth": {
@@ -7104,6 +7150,7 @@
 					}
 				},
 				"required": [
+					"PDFReportsViaEmail",
 					"auth",
 					"_id"
 				],
@@ -7132,6 +7179,21 @@
 							},
 							"user": {
 								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"PDFReportsViaEmail": {
+						"properties": {
+							"sendPDFReportsToOrganisationEmail": {
+								"type": "boolean"
+							},
+							"locale": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
 							}
 						},
 						"type": "object"
@@ -9948,6 +10010,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"reportEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
@@ -10031,6 +10094,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"reportEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
@@ -11322,6 +11386,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"reportEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
