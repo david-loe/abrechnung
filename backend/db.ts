@@ -56,12 +56,9 @@ export async function initDB() {
   }
 
   if (process.env.NODE_ENV === 'development') {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDevelopment], true)
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDevelopment as Partial<IConnectionSettings>], true)
   } else {
-    const emtpyConnectionSettings: Partial<IConnectionSettings> = {
-      auth: {}
-    }
-    await initer(ConnectionSettings, 'connectionSettings', [emtpyConnectionSettings])
+    await initer(ConnectionSettings, 'connectionSettings', [{} as Partial<IConnectionSettings>])
   }
 
   await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])

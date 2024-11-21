@@ -22,5 +22,9 @@
         "user": "username",
         "password": "password",
         "senderAddress": "info@abrechnung.com"
+    },
+    "PDFReportsViaEmail": {
+        "sendPDFReportsToOrganisationEmail": false,
+        "locale": "de"
     }
 }

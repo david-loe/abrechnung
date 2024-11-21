@@ -74,11 +74,16 @@ export interface microsoftSettings {
 }
 
 export interface ConnectionSettings {
+  PDFReportsViaEmail: {
+    sendPDFReportsToOrganisationEmail: boolean
+    locale: Locale
+  }
   auth: {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null
   }
   smtp?: smtpSettings | null
+
   _id: _id
 }
 
@@ -211,6 +216,7 @@ export interface ProjectWithUsers extends Project, ProjectUsers {}
 
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
+  reportEmail?: string | null
   bankDetails?: string | null
   companyNumber?: string | null
   logo?: DocumentFile<ImageType> | null
@@ -535,3 +541,4 @@ export const baseCurrency: Currency = {
   subunit: 'Cent',
   symbol: '€'
 }
+export const defaultLocale: Locale = 'de'

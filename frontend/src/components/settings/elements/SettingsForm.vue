@@ -1,5 +1,10 @@
 <template>
-  <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postSettings(form$.data)"></Vueform>
+  <Vueform
+    :schema="schema"
+    ref="form$"
+    :endpoint="false"
+    @submit="(form$: any) => postSettings(form$.data)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postSettings(($refs.form$ as any).data)}"></Vueform>
 </template>
 
 <script lang="ts">

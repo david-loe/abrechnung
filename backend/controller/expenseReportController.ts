@@ -8,7 +8,7 @@ import { sendNotificationMail } from '../mail/mail.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
-import { writeToDiskFilePath } from '../pdf/helper.js'
+import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { IdDocument, MoneyPost } from './types.js'
@@ -273,6 +273,7 @@ export class ExpenseReportExamineController extends Controller {
 
     const cb = async (expenseReport: IExpenseReport) => {
       sendNotificationMail(expenseReport)
+      sendViaMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
           await writeToDiskFilePath(expenseReport),

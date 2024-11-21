@@ -134,7 +134,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 
       const subject = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.subject`, interpolation)
       const paragraph = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.paragraph`, interpolation)
-      await sendMail(recipients, subject, paragraph, button, '')
+      await sendMail(recipients, subject, paragraph, button)
     }
   }
 }

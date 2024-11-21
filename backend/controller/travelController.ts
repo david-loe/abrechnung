@@ -8,7 +8,7 @@ import { sendNotificationMail } from '../mail/mail.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { generateAdvanceReport } from '../pdf/advance.js'
-import { writeToDiskFilePath } from '../pdf/helper.js'
+import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
@@ -278,12 +278,11 @@ export class TravelApproveController extends Controller {
     }
     const cb = async (travel: ITravel) => {
       sendNotificationMail(travel)
-      if (
-        travel.advance.amount !== null &&
-        travel.advance.amount > 0 &&
-        process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true'
-      ) {
-        await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel, i18n.language as Locale))
+      if (travel.advance.amount !== null && travel.advance.amount > 0) {
+        sendViaMail(travel)
+        if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+          await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel, i18n.language as Locale))
+        }
       }
     }
 
@@ -448,6 +447,7 @@ export class TravelExamineController extends Controller {
 
     const cb = async (travel: ITravel) => {
       sendNotificationMail(travel)
+      sendViaMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel, i18n.language as Locale))
       }

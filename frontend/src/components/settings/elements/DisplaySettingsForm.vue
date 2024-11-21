@@ -1,5 +1,10 @@
 <template>
-  <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postDisplaySettings(form$.data)"></Vueform>
+  <Vueform
+    :schema="schema"
+    ref="form$"
+    :endpoint="false"
+    @submit="(form$: any) => postDisplaySettings(form$.data)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postDisplaySettings(($refs.form$ as any).data)}"></Vueform>
 </template>
 
 <script lang="ts">
@@ -29,7 +34,14 @@ export default defineComponent({
       buttons: {
         type: 'group',
         schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } }
+          submit: {
+            type: 'button',
+            submits: true,
+            buttonLabel: this.$t('labels.save'),
+            full: true,
+            columns: { container: 6 },
+            id: 'submit-button'
+          }
         }
       },
       _id: { type: 'hidden', meta: true }

@@ -1,5 +1,4 @@
 import ejs from 'ejs'
-import fs from 'fs'
 import nodemailer from 'nodemailer'
 import {
   ExpenseReportSimple,
@@ -16,8 +15,9 @@ import { genAuthenticatedLink } from '../helper.js'
 import i18n, { formatter } from '../i18n.js'
 import User from '../models/user.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
+import { getMailTemplate } from '../templates/cache.js'
 
-async function getClient() {
+export async function getClient() {
   const connectionSettings = await getConnectionSettings()
   if (connectionSettings.smtp?.host) {
     return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
@@ -30,30 +30,35 @@ export async function sendMail(
   recipients: IUser[],
   subject: string,
   paragraph: string,
-  button: { text: string; link: string },
-  lastParagraph: string,
+  button?: { text: string; link: string },
+  lastParagraph?: string,
   authenticateLink = true
 ) {
+  const mailPromises = []
   for (let i = 0; i < recipients.length; i++) {
     const language = recipients[i].settings.language
-    const recipientButton = { ...button }
-    if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
-      recipientButton.link = await genAuthenticatedLink({
-        destination: recipients[i].fk.magiclogin!,
-        redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
-      })
+    let recipientButton: { text: string; link: string } | undefined = undefined
+    if (button) {
+      recipientButton = { ...button }
+      if (authenticateLink && recipients[i].fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+        recipientButton.link = await genAuthenticatedLink({
+          destination: recipients[i].fk.magiclogin!,
+          redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
+        })
+      }
     }
-    _sendMail(recipients[i], subject, paragraph, recipientButton, lastParagraph, language)
+    mailPromises.push(_sendMail(recipients[i], subject, paragraph, language, recipientButton, lastParagraph))
   }
+  return await Promise.allSettled(mailPromises)
 }
 
 async function _sendMail(
   recipient: IUser,
   subject: string,
   paragraph: string,
-  button: { text: string; link: string },
-  lastParagraph: string,
-  language: Locale
+  language: Locale,
+  button?: { text: string; link: string },
+  lastParagraph?: string
 ) {
   const mailClient = await getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
@@ -63,7 +68,7 @@ async function _sendMail(
     url: process.env.VITE_FRONTEND_URL
   }
 
-  const template = fs.readFileSync('./templates/mail.ejs', { encoding: 'utf-8' })
+  const template = await getMailTemplate()
   const renderedHTML = ejs.render(template, {
     salutation,
     paragraph,
@@ -77,10 +82,7 @@ async function _sendMail(
     '\n\n' +
     paragraph +
     '\n\n' +
-    button.text +
-    ': ' +
-    button.link +
-    '\n\n' +
+    (button ? button.text + ': ' + button.link + '\n\n' : '') +
     lastParagraph +
     '\n\n' +
     regards +
@@ -89,7 +91,7 @@ async function _sendMail(
     ': ' +
     app.url
 
-  mailClient.sendMail({
+  return await mailClient.sendMail({
     from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
     to: recipient.email, // list of receivers
     subject: subject, // Subject line

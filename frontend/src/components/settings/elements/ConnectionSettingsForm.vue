@@ -1,5 +1,10 @@
 <template>
-  <Vueform :schema="schema" ref="form$" :endpoint="false" @submit="(form$: any) => postConnectionSettings(form$.data)"></Vueform>
+  <Vueform
+    :schema="schema"
+    ref="form$"
+    :endpoint="false"
+    @submit="(form$: any) => postConnectionSettings(form$.data)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postConnectionSettings(($refs.form$ as any).data)}"></Vueform>
 </template>
 
 <script lang="ts">
@@ -32,6 +37,7 @@ export default defineComponent({
       }
     }
   },
+
   async mounted() {
     await this.$root.load()
     this.schema = Object.assign({}, (await this.$root.getter<any>('admin/connectionSettings/form')).ok?.data, {
