@@ -74,7 +74,7 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
         pdf = await generateExpenseReportReport(report, lng)
       }
       const appName = i18n.t('headlines.title', { lng }) + ' ' + i18n.t('headlines.emoji', { lng })
-      formatter.setLocale(i18n.language as Locale)
+      formatter.setLocale(lng)
       const totalSum = formatter.money(addUp(report).total)
 
       const text =
