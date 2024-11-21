@@ -1,5 +1,4 @@
 import ejs from 'ejs'
-import fs from 'fs/promises'
 import nodemailer from 'nodemailer'
 import {
   ExpenseReportSimple,
@@ -16,6 +15,7 @@ import { genAuthenticatedLink } from '../helper.js'
 import i18n, { formatter } from '../i18n.js'
 import User from '../models/user.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
+import { getMailTemplate } from '../templates/cache.js'
 
 export async function getClient() {
   const connectionSettings = await getConnectionSettings()
@@ -68,7 +68,7 @@ async function _sendMail(
     url: process.env.VITE_FRONTEND_URL
   }
 
-  const template = await fs.readFile('./templates/mail.ejs', { encoding: 'utf-8' })
+  const template = await getMailTemplate()
   const renderedHTML = ejs.render(template, {
     salutation,
     paragraph,

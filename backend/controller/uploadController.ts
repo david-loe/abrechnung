@@ -1,6 +1,5 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import fs from 'fs/promises'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse } from 'tsoa'
 import { _id } from '../../common/types.js'
 import { getSettings } from '../db.js'
@@ -8,6 +7,7 @@ import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
+import { getUploadTemplate } from '../templates/cache.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { File } from './types.js'
 
@@ -33,7 +33,7 @@ export class UploadController extends Controller {
   ): Promise<void> {
     const settings = await getSettings()
     const user = await User.findOne({ _id: userId }).lean()
-    const template = await fs.readFile('./templates/upload.ejs', { encoding: 'utf-8' })
+    const template = await getUploadTemplate()
     const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')
     url.searchParams.append('userId', userId)
     url.searchParams.append('tokenId', tokenId)
