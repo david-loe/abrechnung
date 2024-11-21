@@ -4,7 +4,7 @@
     ref="form$"
     :endpoint="false"
     @submit="(form$: any) => postSettings(form$.data)"
-    @keydown.ctrl.s.prevent="() => postSettings(($refs.form$ as any).data)"></Vueform>
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postSettings(($refs.form$ as any).data)}"></Vueform>
 </template>
 
 <script lang="ts">
