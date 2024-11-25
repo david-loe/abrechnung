@@ -1,6 +1,6 @@
 import { SessionData } from 'express-session'
 import mongoose from 'mongoose'
-import webpush from 'web-push'
+import webpush, { PushSubscription } from 'web-push'
 import { User } from './../common/types.js'
 import { sessionStore } from './app.js'
 
@@ -16,9 +16,9 @@ export async function sendPushNotification(title: String, body: String, users: U
     let sessions = await findSessionsByUserId(users[i]._id)
     if (sessions) {
       for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].subscription != undefined) {
+        if (sessions[i].subscription) {
           webpush
-            .sendNotification(sessions[i].subscription, JSON.stringify(payload))
+            .sendNotification(sessions[i].subscription as PushSubscription, JSON.stringify(payload))
             .then((response) => console.log('Benachrichtigung gesendet:', response))
             .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
         }

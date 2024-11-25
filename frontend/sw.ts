@@ -45,15 +45,8 @@ registerRoute(
   })
 )
 
-//Callback Handler selbst geschrieben:
 const NetworkFirstToDB: RouteHandler = async ({ request }) => {
-  let response = handleRequestWithNetworkFirst(request)
-  return response
-}
-registerRoute(({ request }) => /\/backend\/(?!auth\b).*/.test(request.url), NetworkFirstToDB)
-
-async function handleRequestWithNetworkFirst(request: Request) {
-  let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '/backend')
+  let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
   try {
     const networkResponse = await fetch(request)
     storeResponse(url, networkResponse.clone())
@@ -80,6 +73,12 @@ async function handleRequestWithNetworkFirst(request: Request) {
     })
   }
 }
+registerRoute(({ request }) => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const regex = new RegExp(`${backendUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?!auth\\b).*`)
+  return regex.test(request.url)
+}, NetworkFirstToDB)
+
 async function storeResponse(url: string, response: Response) {
   const db = await openDatabase()
   const res = await response.json()
