@@ -176,6 +176,7 @@ import {
 import i18n from './i18n.js'
 import Installation from './components/elements/Installation.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
+import { clearingDB, subscribeToPush } from './helper.js'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -276,8 +277,10 @@ export default defineComponent({
           })
         }
         await this.loadingPromise
+        console.log(this.loadState)
+        console.log()
         if (!this.isOffline) {
-          await this.subscribeToPush()
+          await subscribeToPush()
         }
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
@@ -290,7 +293,7 @@ export default defineComponent({
         })
         if (res.status === 204) {
           this.auth = false
-          this.clearingDB()
+          clearingDB()
           this.$router.push({ path: '/login' })
         }
       } catch (error: any) {
@@ -453,75 +456,38 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
-    async subscribeToPush() {
-      if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
-        try {
-          if (Notification.permission === 'default') {
-            const permission = await Notification.requestPermission()
-          }
-          if (Notification.permission === 'granted') {
-            let options = {
-              userVisibleOnly: true,
-              applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
-            }
-            window.navigator.serviceWorker.getRegistration().then(async (registration) => {
-              if (registration) {
-                await registration.pushManager.subscribe(options).then(async (subscription) => {
-                  await fetch('/backend/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(subscription)
-                  })
-                })
-              } else {
-                return
-              }
-            })
-          }
-        } catch (err) {
-          console.log(err)
-        }
-      }
-    },
+    //   if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
+    //     try {
+    //       if (Notification.permission === 'default') {
+    //         const permission = await Notification.requestPermission()
+    //       }
+    //       if (Notification.permission === 'granted') {
+    //         let options = {
+    //           userVisibleOnly: true,
+    //           applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
+    //         }
+    //         window.navigator.serviceWorker.getRegistration().then(async (registration) => {
+    //           if (registration) {
+    //             await registration.pushManager.subscribe(options).then(async (subscription) => {
+    //               await fetch('/backend/subscribe', {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify(subscription)
+    //               })
+    //             })
+    //           } else {
+    //             return
+    //           }
+    //         })
+    //       }
+    //     } catch (err) {
+    //       console.log(err)
+    //     }
+    //   }
+    // },
     showInstallBanner() {
       if (this.$refs.InstallBanner as typeof Installation) {
         ;(this.$refs.InstallBanner as typeof Installation).showBanner()
-      }
-    },
-    urlBase64ToUint8Array(base64String: string) {
-      const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
-      const rawData = window.atob(base64)
-      const outputArray = new Uint8Array(rawData.length)
-      for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i)
-      }
-      return outputArray
-    },
-    openDatabase(): Promise<IDBDatabase> {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open('myDatabase', 1)
-        request.onupgradeneeded = (event) => {
-          const db = (event.target as IDBOpenDBRequest).result
-          db.createObjectStore('urls', { keyPath: 'id' })
-        }
-        request.onsuccess = (event) => {
-          resolve((event.target as IDBOpenDBRequest).result)
-        }
-        request.onerror = (event) => {
-          reject((event.target as IDBOpenDBRequest).error)
-        }
-      })
-    },
-    async clearingDB() {
-      const db = await this.openDatabase()
-      // Starte eine Transaktion für den Object Store, den du leeren willst
-      const transaction = db.transaction(['urls'], 'readwrite')
-      const store = transaction.objectStore('urls')
-      // Leere den Object Store
-      const clearRequest = store.clear()
-      clearRequest.onsuccess = () => {
-        return
       }
     },
     reload() {
