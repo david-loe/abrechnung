@@ -456,35 +456,7 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
-    //   if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
-    //     try {
-    //       if (Notification.permission === 'default') {
-    //         const permission = await Notification.requestPermission()
-    //       }
-    //       if (Notification.permission === 'granted') {
-    //         let options = {
-    //           userVisibleOnly: true,
-    //           applicationServerKey: this.urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
-    //         }
-    //         window.navigator.serviceWorker.getRegistration().then(async (registration) => {
-    //           if (registration) {
-    //             await registration.pushManager.subscribe(options).then(async (subscription) => {
-    //               await fetch('/backend/subscribe', {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify(subscription)
-    //               })
-    //             })
-    //           } else {
-    //             return
-    //           }
-    //         })
-    //       }
-    //     } catch (err) {
-    //       console.log(err)
-    //     }
-    //   }
-    // },
+
     showInstallBanner() {
       if (this.$refs.InstallBanner as typeof Installation) {
         ;(this.$refs.InstallBanner as typeof Installation).showBanner()
