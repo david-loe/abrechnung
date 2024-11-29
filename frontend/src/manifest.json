@@ -6,17 +6,17 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "/icons/receipt152.png",
+      "src": "/appicons/receipt152.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "/icons/receipt192.png",
+      "src": "/appicons/receipt192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/receipt512.png",
+      "src": "/appicons/receipt512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

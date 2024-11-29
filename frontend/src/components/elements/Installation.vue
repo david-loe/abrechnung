@@ -71,6 +71,12 @@
               <div>{{ $t('installation.AndroidFirefox.steps.three') }}</div>
             </div>
           </div>
+          <div v-else>
+            <div>
+              {{ $t('installation.default.steps.one') }}
+            </div>
+            <div>{{ $t('installation.default.steps.two') }}</div>
+          </div>
         </div>
       </div>
       <div id="installationFooter" class="mt-auto" style="bottom: 0px">
