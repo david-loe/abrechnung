@@ -32,18 +32,6 @@ registerRoute(
     cacheName: 'font-cache'
   })
 )
-registerRoute(
-  ({ request }) => /\/icons\/.*/.test(request.url),
-  new StaleWhileRevalidate({
-    cacheName: 'manifest-cache'
-  })
-)
-registerRoute(
-  ({ request }) => request.url.includes('/manifest'),
-  new StaleWhileRevalidate({
-    cacheName: 'manifest-cache'
-  })
-)
 
 const NetworkFirstToDB: RouteHandler = async ({ request }) => {
   let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')

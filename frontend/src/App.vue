@@ -1,10 +1,6 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <div id="update-banner" class="update-banner position-absolute fixed-top w-100 bg-light text-center p-1" hidden>
-      {{ $t('reload.info') }}
-      <button class="btn btn-success my-1" id="reload-button" @click="reload()">{{ $t('reload.button') }}</button>
-    </div>
     <header class="mb-3 border-bottom bg-white bg-opacity-25">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -55,7 +51,7 @@
                     </router-link>
                   </li>
                 </template>
-                <template v-if="mobile && !alreadyInstalled">
+                <template v-if="mobile && !alreadyInstalled && !isOffline">
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
@@ -149,7 +145,7 @@
       </div>
     </footer>
   </div>
-  <Installation ref="InstallBanner" v-if="$root.loadState === 'LOADED' && auth"></Installation>
+  <Installation ref="InstallBanner" v-if="$root.loadState === 'LOADED' && auth && !isOffline"></Installation>
 </template>
 
 <script lang="ts">
@@ -277,8 +273,6 @@ export default defineComponent({
           })
         }
         await this.loadingPromise
-        console.log(this.loadState)
-        console.log()
         if (!this.isOffline) {
           await subscribeToPush()
         }
@@ -456,14 +450,10 @@ export default defineComponent({
     updateConnectionStatus() {
       this.isOffline = !window.navigator.onLine
     },
-
     showInstallBanner() {
       if (this.$refs.InstallBanner as typeof Installation) {
         ;(this.$refs.InstallBanner as typeof Installation).showBanner()
       }
-    },
-    reload() {
-      window.location.reload()
     }
   },
   mounted() {
