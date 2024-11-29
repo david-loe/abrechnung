@@ -6,8 +6,6 @@ if ('serviceWorker' in navigator) {
         newWorker.onstatechange = () => {
           if (newWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // const updateBanner = document.getElementById('update-banner')
-              // updateBanner?.removeAttribute('hidden')
               newWorker.onstatechange = () => {
                 if (newWorker.state === 'activated') {
                   window.location.reload()
