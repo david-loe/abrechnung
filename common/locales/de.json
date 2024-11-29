@@ -99,6 +99,12 @@
   },
   "installation": {
     "header": "abrechnung installieren - so geht's:",
+    "default": {
+      "steps": {
+        "one": "1. Über das Browser- oder das Teilen Menü kannst du mit 'Zum Startbildschirm hinzufügen' oder 'Installieren' die Installation starten.",
+        "two": "2. Folge dem Installationsprozess"
+      }
+    },
     "iosSafari": {
       "steps": {
         "one": {

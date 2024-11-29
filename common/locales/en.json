@@ -98,6 +98,12 @@
   },
   "installation": {
     "header": "Install the App with these steps:",
+    "default": {
+      "steps": {
+        "one": "1. By using the menu or the share menu and clicking on 'Add to Homescreen' or 'Install' the installation can be started.",
+        "two": "2. Follow the instructions."
+      }
+    },
     "iosSafari": {
       "steps": {
         "one": {
