@@ -198,6 +198,17 @@ export function addUp(report: Travel | ExpenseReport | HealthCareCost): {
   }
 }
 
+export function sanitizeFilename(filename: string) {
+  // Liste der unsicheren Zeichen, die in Dateinamen nicht erlaubt sind
+  const unsafeChars = /[<>:"/\\|?*\0]/g
+  const sanitized = filename.replace(unsafeChars, '_')
+  // Entfernen von führenden oder abschließenden Leerzeichen
+  const trimmed = sanitized.trim()
+  // Windows-Dateinamen dürfen nicht mit einem Punkt oder einer Leerstelle enden
+  const finalName = trimmed.replace(/[.\s]+$/g, '')
+  return finalName
+}
+
 // From https://stackoverflow.com/a/52983833/13582326
 export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
   return new Promise((resolve) => {
@@ -416,7 +427,7 @@ export function csvToObjects(
   escape = '"'
 ) {
   const lines = csvToArray(csv, separator, escape)
-  let result = []
+  let result: any[] = []
   if (lines.length > 1) {
     const headers = lines[0]
     for (let i = 1; i < lines.length; i++) {
