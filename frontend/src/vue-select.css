@@ -1,14 +1,23 @@
 :root {
   --vs-dropdown-option-padding: 0rem 0.75rem;
   --vs-actions-padding: 0rem 0.75rem 0rem 0rem;
-  --vs-colors--lightest: var(--bs-gray-400);
-  --vs-colors--dark: var(--bs-dark);
+  --vs-colors--lightest: var(--bs-border-color);
+  --vs-colors--light: var(--bs-body-bg);
+  --vs-colors--dark: var(--bs-body-color);
+  --vs-colors--darkest: var(--bs-secondary-color);
+
   --vs-border-radius: 0.375rem;
-  --vs-controls-color: var(--bs-gray-800);
-  --vs-dropdown-option--active-bg: #1e90ff;
+
+  --vs-controls-color: var(--bs-secondary-color);
+  --vs-controls--deselect-text-shadow: 0 1px 0 var(--vs-colors--lightest);
+
+  --vs-dropdown-bg: var(--vs-colors--light);
+  --vs-dropdown-option--active-bg: var(--bs-primary);
   --vs-dropdown-min-width: 60px;
   --vs-dropdown-max-height: 250px;
-  --vs-selected-bg: #f0f0f0;
+  --vs-dropdown-box-shadow: var(--bs-box-shadow);
+
+  --vs-selected-bg: var(--vs-colors--lightest);
   --vs-selected-color: var(--vs-colors--dark);
   --vs-selected-border-color: var(--vs-border-color);
   --vs-selected-border-style: var(--vs-border-style);

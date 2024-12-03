@@ -1,10 +1,10 @@
 <template>
   <div>
-    <header class="mb-3 border-bottom bg-white bg-opacity-25">
+    <header class="mb-3 border-bottom">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
           <div class="me-auto">
-            <a href="/" class="nav-link link-dark d-flex align-items-center">
+            <a href="/" class="nav-link link-body-emphasis d-flex align-items-center">
               <i class="fs-1 bi bi-receipt"></i>
               <span class="fs-4 ms-2 d-none d-md-block">{{ $t('headlines.title') }}</span>
             </a>
@@ -12,14 +12,18 @@
           <template v-if="auth">
             <div v-for="access of accesses" :key="access">
               <template v-if="access !== 'admin' && access.indexOf(':') === -1 && user.access[access]">
-                <router-link :to="'/' + access" class="nav-link link-dark d-flex align-items-center">
+                <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
                   <i v-for="icon of $root.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
                   <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
                 </router-link>
               </template>
             </div>
             <div class="dropdown">
-              <a class="nav-link link-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
+              <a
+                class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle"
+                data-bs-toggle="dropdown"
+                href="#"
+                role="button">
                 <i class="fs-4 bi bi-person-circle"></i>
                 <span class="ms-1 d-none d-md-block">{{ user.name.givenName }}</span>
               </a>
@@ -60,7 +64,7 @@
             </div>
           </template>
           <div v-else>
-            <router-link to="/login" class="nav-link link-dark d-flex align-items-center">
+            <router-link to="/login" class="nav-link link-body-emphasis d-flex align-items-center">
               <i class="fs-4 bi bi-box-arrow-in-right"></i>
               <span class="ms-1 d-none d-md-block">{{ $t('headlines.login') }}</span>
             </router-link>
@@ -119,7 +123,7 @@
             © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
             <small v-if="settings.version"
               ><a
-                class="text-decoration-none link-dark"
+                class="text-decoration-none link-body-emphasis"
                 target="_blank"
                 :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + settings.version"
                 >v{{ settings.version }}</a

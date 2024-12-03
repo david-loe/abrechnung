@@ -3,12 +3,20 @@
   --easy-table-row-border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
 
   --easy-table-body-row-font-color: var(--bs-body-color);
+  --easy-table-body-row-background-color: var(--bs-body-bg);
   --easy-table-body-row-font-size: var(--bs-body-font-size);
   --easy-table-body-row-height: var(--bs-body-line-height);
   --easy-table-body-item-padding: 0.25rem 0.25rem;
 
+  --easy-table-body-row-hover-font-color: var(--bs-secondary-color);
+  --easy-table-body-row-hover-background-color: var(--bs-secondary-bg);
+
   --easy-table-header-font-color: var(--bs-body-color);
+  --easy-table-header-background-color: var(--bs-body-bg);
   --easy-table-header-font-size: var(--bs-body-font-size);
   --easy-table-header-height: var(--bs-body-line-height);
   --easy-table-header-item-padding: 0.5rem 0.25rem;
+
+  --easy-table-footer-font-color: var(--bs-body-color);
+  --easy-table-footer-background-color: var(--bs-body-bg);
 }
