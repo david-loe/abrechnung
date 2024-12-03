@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import { Types, mongo } from 'mongoose'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
-import { addUp } from '../../common/scripts.js'
+import { addUp, sanitizeFilename } from '../../common/scripts.js'
 import {
   Cost,
   CountrySimple,
@@ -45,7 +45,10 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   const totalSum = formatter.money(addUp(report).total)
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
-  path += subfolder + report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
+  const filename = sanitizeFilename(
+    report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
+  )
+  path += subfolder + filename
   return path
 }
 
