@@ -46,6 +46,16 @@ if (/windows/i.test(navigator.userAgent)) {
   }
 }
 
+// Light/Dark Mode switch
+function updateBootstrapTheme() {
+  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  document.documentElement.setAttribute('data-bs-theme', isDarkMode ? 'dark' : 'light')
+  // vueform looks for .dark class (https://vueform.com/docs/styles-and-layout#dark-mode)
+  document.documentElement.setAttribute('class', isDarkMode ? 'dark' : '')
+}
+updateBootstrapTheme()
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateBootstrapTheme)
+
 // globally config axios
 axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 

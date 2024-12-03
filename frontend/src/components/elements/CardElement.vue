@@ -10,7 +10,7 @@
         </div>
         <div v-if="showDropdown" class="col-auto">
           <div class="dropdown" @click="(e) => e.stopPropagation()">
-            <a class="nav-link link-dark" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+            <a class="nav-link link-body-emphasis" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
               <i class="bi bi-three-dots-vertical"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
