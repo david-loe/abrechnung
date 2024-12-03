@@ -95,12 +95,6 @@ import { defineComponent } from 'vue'
 type OperationSystems = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
 type BrowserTypes = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge' | 'SamsungInternet'
 
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[]
-  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
-  prompt(): Promise<void>
-}
-
 export default defineComponent({
   name: 'Installation',
   data() {

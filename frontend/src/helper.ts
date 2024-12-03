@@ -12,7 +12,7 @@ export async function subscribeToPush() {
         window.navigator.serviceWorker.getRegistration().then(async (registration) => {
           if (registration) {
             await registration.pushManager.subscribe(options).then(async (subscription) => {
-              await fetch('/backend/subscribe', {
+              await fetch(import.meta.env.VITE_BACKEND_URL + '/subscribe', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(subscription)
