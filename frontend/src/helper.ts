@@ -1,33 +1,40 @@
+/**
+ * register user for push notifivation if Push Manager and VAPID key avaiable
+ * checking permission and asking for it if needed
+ */
+
 export async function subscribeToPush() {
-  if ('PushManager' in window && import.meta.env.VITE_PUBLIC_VAPID_KEY) {
-    try {
-      if (Notification.permission === 'default') {
-        const permission = await Notification.requestPermission()
-      }
-      if (Notification.permission === 'granted') {
-        let options = {
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
-        }
-        window.navigator.serviceWorker.getRegistration().then(async (registration) => {
-          if (registration) {
-            await registration.pushManager.subscribe(options).then(async (subscription) => {
-              await fetch(import.meta.env.VITE_BACKEND_URL + '/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(subscription)
-              })
-            })
-          } else {
-            return
-          }
-        })
-      }
-    } catch (err) {
-      console.log(err)
-    }
+  if (!('PushManager' in window) || !import.meta.env.VITE_PUBLIC_VAPID_KEY) {
+    return
   }
+  if (Notification.permission === 'default') {
+    const permission = await Notification.requestPermission()
+  }
+  if (!(Notification.permission === 'granted')) {
+    return
+  }
+  let options = {
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
+  }
+  const registration = await window.navigator.serviceWorker.getRegistration()
+  if (!registration) {
+    return
+  }
+  const subscription = await registration.pushManager.subscribe(options)
+  if (!subscription) {
+    return
+  }
+  await fetch(import.meta.env.VITE_BACKEND_URL + '/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(subscription)
+  })
 }
+/**
+ * Converts a base64 string into a Uint8Array for cryptographic or encoding purposes.
+ * @param base64String -a string in base64 encoding.
+ */
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
@@ -38,6 +45,10 @@ function urlBase64ToUint8Array(base64String: string) {
   }
   return outputArray
 }
+
+/**
+ * Opens a connection to an IndexedDB database named 'myDatabase' and sets up an object store called 'urls' with an id key if the database is newly created or upgraded.
+ */
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('myDatabase', 1)
@@ -53,12 +64,15 @@ function openDatabase(): Promise<IDBDatabase> {
     }
   })
 }
+/**
+ * Clears all entries in the 'urls' object store in the IndexedDB database.
+ */
 export async function clearingDB() {
   const db = await openDatabase()
-  // Starte eine Transaktion für den Object Store, den du leeren willst
+
   const transaction = db.transaction(['urls'], 'readwrite')
   const store = transaction.objectStore('urls')
-  // Leere den Object Store
+
   const clearRequest = store.clear()
   clearRequest.onsuccess = () => {
     return

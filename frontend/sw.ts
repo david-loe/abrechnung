@@ -8,6 +8,7 @@ declare var self: ServiceWorkerGlobalScope
 export default {}
 precacheAndRoute(self.__WB_MANIFEST)
 
+//reacting to install event and trigger activate event immediatly
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
@@ -15,6 +16,7 @@ self.addEventListener('install', (event) => {
     })()
   )
 })
+//reacting to activate event and getting control over clients immediatly
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
@@ -22,10 +24,13 @@ self.addEventListener('activate', (event) => {
     })()
   )
 })
+
+//default caching strategy - no caching only using network
 setDefaultHandler(new NetworkOnly())
-// to allow work offline
+// to allow work offline - setting default entry point for app
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
 
+//caching all fonts with StaleWhileRevalidat strategy
 registerRoute(
   ({ request }) => request.destination === 'font',
   new StaleWhileRevalidate({
@@ -33,6 +38,7 @@ registerRoute(
   })
 )
 
+//defining a Route Handler for NetworkForst strategy but saving the data in IndexedDB
 const NetworkFirstToDB: RouteHandler = async ({ request }) => {
   let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
   try {
@@ -47,26 +53,26 @@ const NetworkFirstToDB: RouteHandler = async ({ request }) => {
     return new Promise<Response>((resolve, reject) => {
       getRequest.onsuccess = () => {
         const cachedData = getRequest.result
-        if (cachedData) {
-          const cachedResponse = new Response(JSON.stringify(cachedData.res), {
-            headers: { 'Content-Type': 'application/json' }
-          })
-          resolve(cachedResponse)
-        } else {
+        if (!cachedData) {
           reject(error)
         }
+        const cachedResponse = new Response(JSON.stringify(cachedData.res), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+        resolve(cachedResponse)
       }
-
       getRequest.onerror = () => reject(getRequest.error)
     })
   }
 }
+//register all Routes using the backend url for NetWorkFirstToDB RouteHandler
 registerRoute(({ request }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL
   const regex = new RegExp(`${backendUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?!auth\\b).*`)
   return regex.test(request.url)
 }, NetworkFirstToDB)
 
+//saving data in indexedDB
 async function storeResponse(url: string, response: Response) {
   const db = await openDatabase()
   const res = await response.json()
@@ -101,6 +107,7 @@ function openDatabase(): Promise<IDBDatabase> {
   })
 }
 
+//reacting to push event and trigger display of notification
 self.addEventListener('push', (event) => {
   console.log(event.data?.json(), Notification.permission)
   let notification = event.data?.json()
@@ -112,6 +119,7 @@ self.addEventListener('push', (event) => {
   )
 })
 
+//reacting to notificationclick event and open the notification url
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   const urlToOpen = event.notification.data.url

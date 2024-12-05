@@ -12,8 +12,10 @@ import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' assert { type: 'json' }
 import i18n from './i18n.js'
 import { checkForMigrations } from './migrations.js'
+
 await connectDB()
 await checkForMigrations()
+
 const app = express()
 
 app.use(express.json({ limit: '2mb' }))
@@ -25,6 +27,7 @@ app.use(
   })
 )
 
+//makes sessionStore avaiable in other files aswell
 export const sessionStore = MongoStore.create({ client: mongoose.connection.getClient() })
 app.use(
   session({
@@ -40,6 +43,8 @@ app.use(
     name: i18n.t('headlines.title')
   })
 )
+
+//Route for saving the Push Subscription in the session
 app.post('/subscribe', (req, res) => {
   let subscription: PushSubscription = req.body
   if (subscription && subscription.endpoint) {

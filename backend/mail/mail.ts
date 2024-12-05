@@ -18,7 +18,7 @@ import mailClient from './client.js'
 export function sendMail(
   recipients: IUser[],
   subject: string,
-  paragaph: string, // ist bestimmt ein Tippfehler?!
+  paragaph: string,
   button: { text: string; link: string },
   lastParagraph: string
 ) {
@@ -71,6 +71,8 @@ export function sendMail(
   })
 }
 
+//Function that is called if report state is changed
+//calls the sendNotification funtion of push Service to send Push Notification additionally
 export async function sendNotificationMail(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
   var recipients = []
   var reportType: ReportType
