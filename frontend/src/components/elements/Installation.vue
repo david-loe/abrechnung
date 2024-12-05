@@ -140,17 +140,11 @@ export default defineComponent({
     },
     detectBrowser() {
       const userAgent = navigator.userAgent
-      if (/SamsungBrowser/i.test(userAgent)) {
-        return 'SamsungInternet'
-      } else if (/chrome|chromium|crios/i.test(userAgent) && !/edg/i.test(userAgent)) {
-        return 'Chrome'
-      } else if (/firefox|fxios/i.test(userAgent)) {
-        return 'Firefox'
-      } else if (/safari/i.test(userAgent) && !/chrome|crios|chromium/i.test(userAgent)) {
-        return 'Safari'
-      } else if (/edg/i.test(userAgent)) {
-        return 'Edge'
-      }
+      if (/SamsungBrowser/i.test(userAgent)) return 'SamsungInternet'
+      if (/chrome|chromium|crios/i.test(userAgent) && !/edg/i.test(userAgent)) return 'Chrome'
+      if (/firefox|fxios/i.test(userAgent)) return 'Firefox'
+      if (/safari/i.test(userAgent) && !/chrome|crios|chromium/i.test(userAgent)) return 'Safari'
+      if (/edg/i.test(userAgent)) return 'Edge'
       return 'Unknown'
     },
     detectOS() {
@@ -166,7 +160,7 @@ export default defineComponent({
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
-    // only setting this true, if alreadyInstalled not true AND user setting is true
+    // only setting this true, if alreadyInstalled is not true AND user setting is true
     this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
   }
 })

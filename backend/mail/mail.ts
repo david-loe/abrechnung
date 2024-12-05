@@ -103,6 +103,8 @@ async function _sendMail(
   })
 }
 
+//Function that is called if report state is changed
+//calls the sendNotification funtion of push Service to send Push Notification additionally
 export async function sendNotificationMail(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
   let recipients = []
   let reportType: ReportType

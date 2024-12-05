@@ -544,12 +544,3 @@ export const baseCurrency: Currency = {
   symbol: '€'
 }
 export const defaultLocale: Locale = 'de'
-
-export type Subscription = {
-  endpoint: string
-  expirationTime: null
-  keys: {
-    p256dh: string
-    auth: string
-  }
-}

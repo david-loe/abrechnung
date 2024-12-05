@@ -140,6 +140,7 @@ export default defineComponent({
       }
     },
     getRoutesForStore() {
+      //calling th detail routes of reports to trigger saving the data in the IndexedDB for offline usage
       if (this.hasData) {
         fetch('/backend/' + this.endpoint + '/examiner')
         for (let i = 0; i < this.data.length; i++) {

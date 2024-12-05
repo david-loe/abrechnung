@@ -13,8 +13,10 @@ import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import i18n from './i18n.js'
 import { checkForMigrations } from './migrations.js'
+
 await connectDB()
 await checkForMigrations()
+
 const app = express()
 
 if (process.env.TRUST_PROXY) {
@@ -65,6 +67,7 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
   )
 }
 
+//makes sessionStore avaiable in other files aswell
 export const sessionStore = MongoStore.create({ client: mongoose.connection.getClient() })
 app.use(
   session({
@@ -80,6 +83,8 @@ app.use(
     name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
   })
 )
+
+//Route for saving the Push Subscription in the session
 app.post('/subscribe', (req, res) => {
   let subscription: PushSubscription = req.body
   if (subscription && subscription.endpoint) {

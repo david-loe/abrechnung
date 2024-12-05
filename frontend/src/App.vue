@@ -273,6 +273,7 @@ export default defineComponent({
           })
         }
         await this.loadingPromise
+        //subscribing to push notifications if network connection avaiable
         if (!this.isOffline) {
           await subscribeToPush()
         }
