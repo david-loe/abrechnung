@@ -160,7 +160,7 @@ export default defineComponent({
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
-    // only setting this true, if alreadyInstalled is not true AND user setting is true
+    // showing Installbanner if alreadyInstalled is not true AND user setting is true
     this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
   }
 })

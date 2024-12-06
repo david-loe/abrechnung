@@ -8,7 +8,7 @@ webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_V
 
 /**
  * Sends push notifications to a list of users.
- +
+ *
  * @param {string} title - notification title
  * @param {string} body - notification content
  * @param {User[]} users - a list of users to get the notification
