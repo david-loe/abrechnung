@@ -107,7 +107,7 @@
     "iosSafari": {
       "steps": {
         "one": {
-          "one": "1. Got to the Share ",
+          "one": "1. Go to the Share ",
           "two": " Menu (in the middle of the bottom)."
         },
         "two": "2. Click on 'Add to Home Screen'  ",
@@ -117,7 +117,7 @@
     "iosChrome": {
       "steps": {
         "one": {
-          "one": "1. Got to the Share ",
+          "one": "1. Go to the Share ",
           "two": " Menu (on the top, next to adress bar)."
         },
         "two": "2. Click on 'Add to Home Screen'  ",
@@ -242,7 +242,7 @@
     "distanceRefunds": "Distance refunds",
     "distanceRefundType": "Distance Refund Type",
     "done": "Done",
-    "dontshowagain": "Don't show again.",
+    "dontShowAgain": "Don't show again.",
     "downloadX": "Download {X}",
     "edit": "Edit",
     "editAgain": "Edit again",
@@ -511,10 +511,6 @@
       "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it.",
       "paragraph": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}. Here you can submit all your expenses.",
       "subject": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}"
-    },
-    "reload": {
-      "info": "A new version of this app is avaiable. Please reload the page:",
-      "button": "Reload"
     },
     "regards": "Best Regards",
     "travel": {

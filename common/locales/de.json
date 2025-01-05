@@ -243,7 +243,7 @@
     "distanceRefunds": "Entfernungspauschalen",
     "distanceRefundType": "Entfernungspauschale",
     "done": "Erledigt",
-    "dontshowagain": "Nicht erneut anzeigen",
+    "dontShowAgain": "Nicht erneut anzeigen",
     "downloadX": "{X} herunterladen",
     "edit": "Bearbeiten",
     "editAgain": "Nochmal bearbeiten",
@@ -572,10 +572,6 @@
     "9": "Okt",
     "10": "Nov",
     "11": "Dez"
-  },
-  "reload": {
-    "info": "Eine neue Version der App ist verfügbar. Bitte lade die Seite neu:",
-    "button": "Seite neu laden"
   },
   "report": {
     "advance": {

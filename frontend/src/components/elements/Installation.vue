@@ -83,7 +83,7 @@
         <button v-if="$root.promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">
           {{ $t('labels.install') }}
         </button>
-        <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontshowagain') }}</button>
+        <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontShowAgain') }}</button>
       </div>
     </div>
   </div>
