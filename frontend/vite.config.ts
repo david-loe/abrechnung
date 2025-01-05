@@ -11,7 +11,10 @@ export default {
       srcDir: '',
       filename: 'sw.ts',
       injectRegister: false,
-      manifest: false
+      manifest: false,
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 4000000
+      }
     })
   ],
   server: { port: 80, strictPort: true, host: '0.0.0.0' },
