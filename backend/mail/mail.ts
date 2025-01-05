@@ -92,8 +92,6 @@ async function _sendMail(
     ': ' +
     app.url
 
-  sendPushNotification(subject, paragaph, recipients, button.link)
-
   return await mailClient.sendMail({
     from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
     to: recipient.email, // list of receivers
