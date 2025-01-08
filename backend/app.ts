@@ -87,8 +87,12 @@ app.use(
 //Route for saving the Push Subscription in the session
 app.post('/subscribe', (req, res) => {
   let subscription: PushSubscription = req.body
+  console.log(req.user)
+  console.log(req.session) // irgendwie hier problem, dass die Session nicht richtig mit dem Nutzer verknüpft wird.
+  console.log(subscription)
   if (subscription && subscription.endpoint) {
     req.session.subscription = subscription
+    console.log(req.session)
     res.status(201).json({ subscription: subscription })
   } else {
     res.status(200).json({ subscription: {} })

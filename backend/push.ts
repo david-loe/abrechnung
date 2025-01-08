@@ -4,7 +4,11 @@ import webpush, { PushSubscription } from 'web-push'
 import { User } from './../common/types.js'
 import { sessionStore } from './app.js'
 
-webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
+if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
+  console.log('Vapid is not https')
+} else {
+  webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
+}
 
 /**
  * Sends push notifications to a list of users.
@@ -20,16 +24,26 @@ export async function sendPushNotification(title: String, body: String, users: U
     body: body,
     url: url
   }
+
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
-    if (sessions) {
-      for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].subscription) {
-          webpush
-            .sendNotification(sessions[i].subscription as PushSubscription, JSON.stringify(payload))
-            .then((response) => console.log('Benachrichtigung gesendet:', response))
-            .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
+    if (!sessions) {
+      return
+    }
+    console.log('hallo')
+    for (let i = 0; i < sessions.length; i++) {
+      // console.log(sessions[i])
+      if (sessions[i].subscription) {
+        let subscription: PushSubscription | undefined = sessions[i].subscription
+        // console.log(subscription)
+        if (subscription) {
+          let webpushdetails = webpush.generateRequestDetails(subscription)
+          console.log('trying to send a push')
         }
+        webpush
+          .sendNotification(sessions[i].subscription as PushSubscription, JSON.stringify(payload))
+          .then((response) => console.log('Benachrichtigung gesendet:', response))
+          .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
       }
     }
   }
@@ -53,6 +67,7 @@ async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
         }
       })
     })
+    console.log(sessions)
     const userSessions = sessions.filter((session) => {
       return (
         session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()
