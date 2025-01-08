@@ -5,7 +5,7 @@ import { User } from './../common/types.js'
 import { sessionStore } from './app.js'
 
 if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
-  console.log('Vapid is not https')
+  console.log('Host is not https - Push Notification can not be used')
 } else {
   webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
 }
