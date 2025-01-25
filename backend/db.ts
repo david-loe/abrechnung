@@ -8,7 +8,8 @@ import {
   Settings as ISettings,
   tokenAdminUser
 } from '../common/types.js'
-import connectionSettingsDevelopment from './data/connectionSettings.development.json' with { type: 'json' }
+import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
+import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
 import displaySettings from './data/displaySettings.json' with { type: 'json' }
@@ -55,10 +56,10 @@ export async function initDB() {
     console.log('Created Settings from Default')
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDevelopment as Partial<IConnectionSettings>], true)
+  if (process.env.NODE_ENV === 'production') {
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd as Partial<IConnectionSettings>])
   } else {
-    await initer(ConnectionSettings, 'connectionSettings', [{} as Partial<IConnectionSettings>])
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDev as Partial<IConnectionSettings>], true)
   }
 
   await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
