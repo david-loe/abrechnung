@@ -1,29 +1,15 @@
 /// <reference lib="webworker" />
-import { RouteHandler } from 'workbox-core'
+import { clientsClaim, RouteHandler } from 'workbox-core'
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
 declare var self: ServiceWorkerGlobalScope
-export default {}
+
 precacheAndRoute(self.__WB_MANIFEST)
 
-//reacting to install event and trigger activate event immediatly
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      self.skipWaiting()
-    })()
-  )
-})
-//reacting to activate event and getting control over clients immediatly
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      self.clients.claim()
-    })()
-  )
-})
+self.skipWaiting()
+clientsClaim()
 
 //default caching strategy - no caching only using network
 setDefaultHandler(new NetworkOnly())

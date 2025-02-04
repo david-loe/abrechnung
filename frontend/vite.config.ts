@@ -7,11 +7,17 @@ export default {
   plugins: [
     vue(),
     VitePWA({
+      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       srcDir: '',
       filename: 'sw.ts',
       injectRegister: false,
       manifest: false,
+      devOptions: {
+        enabled: true,
+        navigateFallback: 'index.html',
+        type: 'module'
+      },
       injectManifest: {
         maximumFileSizeToCacheInBytes: 4000000
       }

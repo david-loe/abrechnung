@@ -1,6 +1,7 @@
 {
   "short_name": "abrechnung",
-  "start_url": "/",
+  "start_url": "/user",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
