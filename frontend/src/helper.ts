@@ -25,10 +25,11 @@ export async function subscribeToPush() {
   if (!subscription) {
     return
   }
-  await fetch(import.meta.env.VITE_BACKEND_URL + '/subscribe', {
+  await fetch(import.meta.env.VITE_BACKEND_URL + '/user/subscription', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(subscription)
+    body: JSON.stringify(subscription),
+    credentials: 'include'
   })
 }
 /**

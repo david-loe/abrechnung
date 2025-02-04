@@ -1,24 +1,10 @@
 import { SessionData } from 'express-session'
 import mongoose from 'mongoose'
-import webpush, { PushSubscription } from 'web-push'
+import webpush from 'web-push'
 import { User } from './../common/types.js'
 import { sessionStore } from './app.js'
 
-if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
-  console.log('Host is not https - Push Notification can not be used')
-} else {
-  webpush.setVapidDetails(process.env.VITE_FRONTEND_URL, process.env.VITE_PUBLIC_VAPID_KEY, process.env.VITE_PRIVATE_VAPID_KEY)
-}
-
-/**
- * Sends push notifications to a list of users.
- *
- * @param {string} title - notification title
- * @param {string} body - notification content
- * @param {User[]} users - a list of users to get the notification
- * @param {string} url - url to be opend when clicking on the notification
- */
-export async function sendPushNotification(title: String, body: String, users: User[], url: string) {
+export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
   let payload = {
     title: title,
     body: body,
@@ -27,21 +13,16 @@ export async function sendPushNotification(title: String, body: String, users: U
 
   for (let i = 0; i < users.length; i++) {
     let sessions = await findSessionsByUserId(users[i]._id)
-    if (!sessions) {
-      return
-    }
-    console.log('hallo')
-    for (let i = 0; i < sessions.length; i++) {
-      // console.log(sessions[i])
-      if (sessions[i].subscription) {
-        let subscription: PushSubscription | undefined = sessions[i].subscription
-        // console.log(subscription)
-        if (subscription) {
-          let webpushdetails = webpush.generateRequestDetails(subscription)
-          console.log('trying to send a push')
-        }
+    for (const session of sessions) {
+      if (session.subscription) {
         webpush
-          .sendNotification(sessions[i].subscription as PushSubscription, JSON.stringify(payload))
+          .sendNotification(session.subscription, JSON.stringify(payload), {
+            vapidDetails: {
+              subject: process.env.VITE_FRONTEND_URL,
+              publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
+              privateKey: process.env.VITE_PRIVATE_VAPID_KEY
+            }
+          })
           .then((response) => console.log('Benachrichtigung gesendet:', response))
           .catch((error) => console.error('Fehler beim Senden der Benachrichtigung:', error))
       }
@@ -49,12 +30,6 @@ export async function sendPushNotification(title: String, body: String, users: U
   }
 }
 
-/**
- * gets all session of the user identified by userId.
- *
- * @param {mongoose.Types.ObjectId} userId - User Identifier
- * @returns {Promise<SessionData[]>} - array including all the sessions of one user
- */
 async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
   try {
     const sessions: SessionData[] = await new Promise<SessionData[]>((resolve, reject) => {
@@ -67,7 +42,6 @@ async function findSessionsByUserId(userId: mongoose.Types.ObjectId) {
         }
       })
     })
-    console.log(sessions)
     const userSessions = sessions.filter((session) => {
       return (
         session.passport && session.passport.user && session.passport.user._id && session.passport.user._id.toString() === userId.toString()

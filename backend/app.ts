@@ -5,7 +5,6 @@ import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
-import { PushSubscription } from 'web-push'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB } from './db.js'
@@ -54,19 +53,6 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
   )
 }
 
-if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
-  app.use(
-    rateLimit({
-      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS),
-      limit: parseInt(process.env.RATE_LIMIT),
-      standardHeaders: 'draft-7',
-      legacyHeaders: false,
-      skip: (req, res) => req.method !== 'POST',
-      handler: (req, res, next) => next(new RateLimitExceededError())
-    })
-  )
-}
-
 //makes sessionStore avaiable in other files aswell
 export const sessionStore = MongoStore.create({ client: mongoose.connection.getClient() })
 app.use(
@@ -83,21 +69,6 @@ app.use(
     name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
   })
 )
-
-//Route for saving the Push Subscription in the session
-app.post('/subscribe', (req, res) => {
-  let subscription: PushSubscription = req.body
-  console.log(req.user)
-  console.log(req.session) // irgendwie hier problem, dass die Session nicht richtig mit dem Nutzer verknüpft wird.
-  console.log(subscription)
-  if (subscription && subscription.endpoint) {
-    req.session.subscription = subscription
-    console.log(req.session)
-    res.status(201).json({ subscription: subscription })
-  } else {
-    res.status(200).json({ subscription: {} })
-  }
-})
 
 app.use(auth)
 

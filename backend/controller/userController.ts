@@ -2,6 +2,7 @@ import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
+import { PushSubscription } from 'web-push'
 import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -60,6 +61,12 @@ export class UserController extends Controller {
     request.user!.markModified('vehicleRegistration')
     const result = await request.user!.save()
     return { message: 'alerts.successSaving', result: result }
+  }
+
+  @Post('subscription')
+  public async subscribe(@Body() requestBody: PushSubscription, @Request() request: ExRequest) {
+    request.session.subscription = requestBody
+    return { message: 'alerts.successSaving', result: requestBody }
   }
 }
 
