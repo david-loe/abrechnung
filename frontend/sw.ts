@@ -53,9 +53,15 @@ const NetworkFirstToDB: RouteHandler = async ({ request }) => {
 }
 //register all Routes using the backend url for NetWorkFirstToDB RouteHandler
 registerRoute(({ request }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
-  const regex = new RegExp(`${backendUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?!auth\\b).*`)
-  return regex.test(request.url)
+  try {
+    const requestUrl = new URL(request.url)
+    const backendUrl = new URL(import.meta.env.VITE_BACKEND_URL)
+    // Vergleiche den Origin (Protokoll + Host) und schließe z. B. Pfade mit "/auth" aus
+    return requestUrl.origin === backendUrl.origin && !requestUrl.pathname.startsWith('/auth')
+  } catch (error) {
+    console.error('Fehler beim Parsen der URL:', error)
+    return false
+  }
 }, NetworkFirstToDB)
 
 //saving data in indexedDB
@@ -95,12 +101,23 @@ function openDatabase(): Promise<IDBDatabase> {
 
 //reacting to push event and trigger display of notification
 self.addEventListener('push', (event) => {
-  console.log(event.data?.json(), Notification.permission)
-  let notification = event.data?.json()
+  let data
+  try {
+    data = event.data?.json()
+  } catch (e) {
+    console.error('Push-Daten konnten nicht geparst werden:', e)
+    return
+  }
+  // Überprüfe, ob alle nötigen Felder vorhanden sind
+  if (!data || !data.title || !data.url) {
+    console.error('Push-Daten unvollständig:', data)
+    return
+  }
   event.waitUntil(
-    self.registration.showNotification(notification.title, {
-      body: notification.body,
-      data: { url: notification.url }
+    self.registration.showNotification(data.title, {
+      body: data.body || '',
+      data: { url: data.url }
+      // Hier können weitere Optionen wie Icons oder Aktionen ergänzt werden
     })
   )
 })
