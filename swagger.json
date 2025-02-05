@@ -279,7 +279,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IUser": {
+			"User": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -405,6 +405,9 @@
 					},
 					"settings": {
 						"properties": {
+							"showInstallBanner": {
+								"type": "boolean"
+							},
 							"organisation": {
 								"allOf": [
 									{
@@ -438,6 +441,7 @@
 							}
 						},
 						"required": [
+							"showInstallBanner",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -513,6 +517,9 @@
 			},
 			"SetterPartial_IUser-at-settings.NoPost_": {
 				"properties": {
+					"showInstallBanner": {
+						"type": "boolean"
+					},
 					"organisation": {
 						"anyOf": [
 							{
@@ -694,7 +701,95 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"User": {
+			"PushSubscription": {
+				"description": "Configuration for a Push Subscription. This can be obtained on the frontend by calling\nserviceWorkerRegistration.pushManager.subscribe().\nThe expected format is the same output as JSON.stringify'ing a PushSubscription in the browser.",
+				"properties": {
+					"endpoint": {
+						"type": "string"
+					},
+					"expirationTime": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"keys": {
+						"properties": {
+							"auth": {
+								"type": "string"
+							},
+							"p256dh": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"auth",
+							"p256dh"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"endpoint",
+					"keys"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Meta": {
+				"properties": {
+					"count": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"countPages": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"count",
+					"page",
+					"limit",
+					"countPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_User-or-User-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/User"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/User"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IUser": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -820,6 +915,9 @@
 					},
 					"settings": {
 						"properties": {
+							"showInstallBanner": {
+								"type": "boolean"
+							},
 							"organisation": {
 								"allOf": [
 									{
@@ -853,6 +951,7 @@
 							}
 						},
 						"required": [
+							"showInstallBanner",
 							"lastCountries",
 							"lastCurrencies",
 							"language"
@@ -883,60 +982,6 @@
 					"access",
 					"projects",
 					"settings"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Meta": {
-				"properties": {
-					"count": {
-						"type": "number",
-						"format": "double"
-					},
-					"page": {
-						"type": "number",
-						"format": "double"
-					},
-					"limit": {
-						"type": "number",
-						"format": "double"
-					},
-					"countPages": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"count",
-					"page",
-					"limit",
-					"countPages"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_User-or-User-Array_": {
-				"properties": {
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/User"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/User"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"meta": {
-						"$ref": "#/components/schemas/Meta"
-					}
-				},
-				"required": [
-					"data",
-					"meta"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1144,6 +1189,9 @@
 					},
 					"settings": {
 						"properties": {
+							"showInstallBanner": {
+								"type": "boolean"
+							},
 							"organisation": {
 								"anyOf": [
 									{
@@ -1452,6 +1500,9 @@
 					},
 					"settings": {
 						"properties": {
+							"showInstallBanner": {
+								"type": "boolean"
+							},
 							"organisation": {
 								"anyOf": [
 									{
@@ -3883,344 +3934,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ISettings": {
-				"properties": {
-					"userCanSeeAllProjects": {
-						"type": "boolean"
-					},
-					"defaultAccess": {
-						"properties": {
-							"user": {
-								"type": "boolean"
-							},
-							"inWork:expenseReport": {
-								"type": "boolean"
-							},
-							"inWork:healthCareCost": {
-								"type": "boolean"
-							},
-							"appliedFor:travel": {
-								"type": "boolean"
-							},
-							"approved:travel": {
-								"type": "boolean"
-							},
-							"approve/travel": {
-								"type": "boolean"
-							},
-							"examine/travel": {
-								"type": "boolean"
-							},
-							"examine/expenseReport": {
-								"type": "boolean"
-							},
-							"examine/healthCareCost": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
-							"admin": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"confirm/healthCareCost",
-							"admin"
-						],
-						"type": "object"
-					},
-					"disableReportType": {
-						"properties": {
-							"travel": {
-								"type": "boolean"
-							},
-							"expenseReport": {
-								"type": "boolean"
-							},
-							"healthCareCost": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"travel",
-							"expenseReport",
-							"healthCareCost"
-						],
-						"type": "object"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteRefundedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteRefundedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
-					},
-					"travelSettings": {
-						"$ref": "#/components/schemas/SettingsTravel"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"stateColors": {
-						"properties": {
-							"rejected": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"appliedFor": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"approved": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"underExamination": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"refunded": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"inWork": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"underExaminationByInsurance": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							}
-						},
-						"required": [
-							"rejected",
-							"appliedFor",
-							"approved",
-							"underExamination",
-							"refunded",
-							"inWork",
-							"underExaminationByInsurance"
-						],
-						"type": "object"
-					},
-					"accessIcons": {
-						"properties": {
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"confirm/healthCareCost",
-							"admin"
-						],
-						"type": "object"
-					},
-					"version": {
-						"type": "string"
-					},
-					"migrateFrom": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"userCanSeeAllProjects",
-					"defaultAccess",
-					"disableReportType",
-					"retentionPolicy",
-					"travelSettings",
-					"uploadTokenExpireAfterSeconds",
-					"stateColors",
-					"accessIcons",
-					"version",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Settings": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -4564,9 +4277,6 @@
 					"migrateFrom": {
 						"type": "string"
 					},
-					"version": {
-						"type": "string"
-					},
 					"accessIcons": {
 						"properties": {
 							"admin": {
@@ -4897,6 +4607,9 @@
 					},
 					"userCanSeeAllProjects": {
 						"type": "boolean"
+					},
+					"version": {
+						"type": "string"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -6204,78 +5917,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IDisplaySettings": {
-				"properties": {
-					"auth": {
-						"properties": {
-							"ldapauth": {
-								"type": "boolean"
-							},
-							"microsoft": {
-								"type": "boolean"
-							},
-							"magiclogin": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"ldapauth",
-							"microsoft",
-							"magiclogin"
-						],
-						"type": "object"
-					},
-					"locale": {
-						"properties": {
-							"overwrite": {
-								"properties": {
-									"de": {
-										"properties": {},
-										"additionalProperties": {
-											"type": "string"
-										},
-										"type": "object"
-									},
-									"en": {
-										"properties": {},
-										"additionalProperties": {
-											"type": "string"
-										},
-										"type": "object"
-									}
-								},
-								"required": [
-									"de",
-									"en"
-								],
-								"type": "object"
-							},
-							"fallback": {
-								"$ref": "#/components/schemas/Locale"
-							},
-							"default": {
-								"$ref": "#/components/schemas/Locale"
-							}
-						},
-						"required": [
-							"overwrite",
-							"fallback",
-							"default"
-						],
-						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"auth",
-					"locale",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"DisplaySettings": {
 				"properties": {
 					"auth": {
@@ -7041,64 +6682,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IConnectionSettings": {
-				"properties": {
-					"PDFReportsViaEmail": {
-						"properties": {
-							"locale": {
-								"$ref": "#/components/schemas/Locale"
-							},
-							"sendPDFReportsToOrganisationEmail": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"locale",
-							"sendPDFReportsToOrganisationEmail"
-						],
-						"type": "object"
-					},
-					"auth": {
-						"properties": {
-							"ldapauth": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/ldapauthSettings"
-									}
-								],
-								"nullable": true
-							},
-							"microsoft": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/microsoftSettings"
-									}
-								],
-								"nullable": true
-							}
-						},
-						"type": "object"
-					},
-					"smtp": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/smtpSettings"
-							}
-						],
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"PDFReportsViaEmail",
-					"auth",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"ConnectionSettings": {
 				"properties": {
 					"PDFReportsViaEmail": {
@@ -7304,7 +6887,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/IUser"
+											"$ref": "#/components/schemas/User"
 										}
 									},
 									"required": [
@@ -7547,6 +7130,53 @@
 									"vehicleRegistration"
 								],
 								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/subscription": {
+			"post": {
+				"operationId": "Subscribe",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/PushSubscription"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PushSubscription"
 							}
 						}
 					}
@@ -9525,7 +9155,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/ISettings"
+											"$ref": "#/components/schemas/Settings"
 										}
 									},
 									"required": [
@@ -12571,7 +12201,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/IDisplaySettings"
+											"$ref": "#/components/schemas/DisplaySettings"
 										}
 									},
 									"required": [
@@ -13206,7 +12836,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/IConnectionSettings"
+											"$ref": "#/components/schemas/ConnectionSettings"
 										}
 									},
 									"required": [
