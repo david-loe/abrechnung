@@ -1,4 +1,5 @@
 import axios from 'axios'
+import MongoStore from 'connect-mongo'
 import mongoose, { Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
 import {
@@ -35,6 +36,8 @@ export async function connectDB() {
     await mongoose.connection.asPromise()
   }
 }
+
+export const sessionStore = MongoStore.create({ client: mongoose.connection.getClient() })
 
 export async function disconnectDB() {
   await mongoose.disconnect()

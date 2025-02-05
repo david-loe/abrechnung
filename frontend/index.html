@@ -4,8 +4,11 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" type="image/svg" href="https://icons.getbootstrap.com/assets/icons/receipt.svg" />
     <title>abrechnung 🧾</title>
+    <meta name="description" content="My Awesome App description" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg" href="https://icons.getbootstrap.com/assets/icons/receipt.svg" />
   </head>
 
   <body>
@@ -13,6 +16,7 @@
       <strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
+    <script type="module" src="/src/registerSW.ts"></script>
     <script type="module" src="/src/main.ts"></script>
 
     <!-- built files will be auto injected -->

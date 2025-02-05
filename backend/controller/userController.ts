@@ -2,16 +2,17 @@ import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
+import { PushSubscription } from 'web-push'
 import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendMail } from '../mail/mail.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import Token from '../models/token.js'
 import Travel from '../models/travel.js'
 import User, { userSchema } from '../models/user.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
+import { sendMail } from '../notifications/mail.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { File, IdDocument, idDocumentToId } from './types.js'
@@ -60,6 +61,12 @@ export class UserController extends Controller {
     request.user!.markModified('vehicleRegistration')
     const result = await request.user!.save()
     return { message: 'alerts.successSaving', result: result }
+  }
+
+  @Post('subscription')
+  public async subscribe(@Body() requestBody: PushSubscription, @Request() request: ExRequest) {
+    request.session.subscription = requestBody
+    return { message: 'alerts.successSaving', result: requestBody }
   }
 }
 

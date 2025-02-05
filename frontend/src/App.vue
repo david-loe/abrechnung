@@ -1,5 +1,6 @@
 <template>
   <div>
+    <OfflineBanner v-if="isOffline"></OfflineBanner>
     <header class="mb-3 border-bottom">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -50,7 +51,17 @@
                     </router-link>
                   </li>
                 </template>
-
+                <template v-if="mobile && !alreadyInstalled && !isOffline">
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
+                      <i class="fs-4 bi bi-box-arrow-down"></i>
+                      <span class="ms-1">{{ $t('headlines.installApp') }}</span>
+                    </button>
+                  </li>
+                </template>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -134,6 +145,7 @@
       </div>
     </footer>
   </div>
+  <Installation ref="InstallBanner" v-if="$root.loadState === 'LOADED' && auth && !isOffline"></Installation>
 </template>
 
 <script lang="ts">
@@ -143,21 +155,24 @@ import { loadLocales } from '../../common/locales/load.js'
 import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
+  accesses,
   CountrySimple,
   Currency,
   DisplaySettings,
   GETResponse,
   HealthInsurance,
   Locale,
+  locales,
   OrganisationSimple,
   ProjectSimple,
   SETResponse,
   Settings,
-  User,
-  accesses,
-  locales
+  User
 } from '../../common/types.js'
 import i18n from './i18n.js'
+import Installation from './components/elements/Installation.vue'
+import OfflineBanner from './components/elements/OfflineBanner.vue'
+import { clearingDB, subscribeToPush } from './helper.js'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -166,7 +181,11 @@ export interface Alert {
   id?: number
   ttl?: number
 }
-
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
 export default defineComponent({
   data() {
     return {
@@ -186,10 +205,14 @@ export default defineComponent({
       loadingPromise: null as Promise<void> | null,
       bp: { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
       locales,
-      accesses
+      accesses,
+      isOffline: false as boolean,
+      alreadyInstalled: false as boolean,
+      mobile: false as boolean,
+      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
     }
   },
-  components: {},
+  components: { OfflineBanner, Installation },
   methods: {
     async load(withoutAuth = false) {
       if (this.loadState === 'UNLOADED') {
@@ -243,10 +266,17 @@ export default defineComponent({
               this.updateLocale(this.user.settings.language)
               this.auth = true
             }
+            this.isOffline = !navigator.onLine
+            this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+            this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
             this.loadState = 'LOADED'
           })
         }
         await this.loadingPromise
+        //subscribing to push notifications if network connection avaiable
+        if (!this.isOffline) {
+          await subscribeToPush()
+        }
       } else if (this.loadState === 'LOADING') {
         await this.loadingPromise
       }
@@ -258,6 +288,7 @@ export default defineComponent({
         })
         if (res.status === 204) {
           this.auth = false
+          clearingDB()
           this.$router.push({ path: '/login' })
         }
       } catch (error: any) {
@@ -416,7 +447,25 @@ export default defineComponent({
         list.pop()
       }
     },
-    getFlagEmoji
+    getFlagEmoji,
+    updateConnectionStatus() {
+      this.isOffline = !window.navigator.onLine
+    },
+    showInstallBanner() {
+      if (this.$refs.InstallBanner as typeof Installation) {
+        ;(this.$refs.InstallBanner as typeof Installation).showBanner()
+      }
+    }
+  },
+  mounted() {
+    window.addEventListener('online', this.updateConnectionStatus)
+    window.addEventListener('offline', this.updateConnectionStatus)
+  },
+  created() {
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      this.promptInstallEvent = event as BeforeInstallPromptEvent
+    })
   }
 })
 </script>

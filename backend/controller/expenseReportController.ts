@@ -4,9 +4,9 @@ import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendNotificationMail } from '../mail/mail.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
+import { sendNotification } from '../notifications/notification.js'
 import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
@@ -116,7 +116,7 @@ export class ExpenseReportController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: sendNotificationMail,
+      cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') {
@@ -253,7 +253,7 @@ export class ExpenseReportExamineController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: (e: IExpenseReport) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
+      cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
@@ -272,7 +272,7 @@ export class ExpenseReportExamineController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user?._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
-      sendNotificationMail(expenseReport)
+      sendNotification(expenseReport)
       sendViaMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(

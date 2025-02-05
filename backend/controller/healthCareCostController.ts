@@ -11,10 +11,10 @@ import {
 } from '../../common/types.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendNotificationMail } from '../mail/mail.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
+import { sendNotification } from '../notifications/notification.js'
 import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
@@ -126,7 +126,7 @@ export class HealthCareCostController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: sendNotificationMail,
+      cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') {
@@ -250,7 +250,7 @@ export class HealthCareCostExamineController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      sendNotificationMail(healthCareCost)
+      sendNotification(healthCareCost)
       sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(
@@ -302,7 +302,7 @@ export class HealthCareCostExamineController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: (e: IHealthCareCost) => sendNotificationMail(e, extendedBody._id ? 'backToInWork' : undefined),
+      cb: (e: IHealthCareCost) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
@@ -371,7 +371,7 @@ export class HealthCareCostConfirmController extends Controller {
     })
 
     const cb = async (healthCareCost: IHealthCareCost) => {
-      sendNotificationMail(healthCareCost)
+      sendNotification(healthCareCost)
       sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(

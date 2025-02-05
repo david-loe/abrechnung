@@ -1,13 +1,11 @@
-import MongoStore from 'connect-mongo'
 import cors from 'cors'
 import express, { Request as ExRequest, Response as ExResponse } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
-import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
-import { connectDB } from './db.js'
+import { connectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import i18n from './i18n.js'
@@ -55,7 +53,7 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
 
 app.use(
   session({
-    store: MongoStore.create({ client: mongoose.connection.getClient() }),
+    store: sessionStore,
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,

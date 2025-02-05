@@ -135,6 +135,26 @@ export default defineComponent({
         this.meta = result.meta
         this.hasMeta = true
       }
+      if (navigator.onLine) {
+        this.getRoutesForStore()
+      }
+    },
+    getRoutesForStore() {
+      //calling th detail routes of reports to trigger saving the data in the IndexedDB for offline usage
+      if (this.hasData) {
+        fetch('/backend/' + this.endpoint + '/examiner')
+        for (let i = 0; i < this.data.length; i++) {
+          fetch(
+            '/backend/' +
+              this.endpoint +
+              '?_id=' +
+              this.data[i]._id +
+              (this.endpoint == 'travel'
+                ? '&additionalFields=stages&additionalFields=expenses&additionalFields=days'
+                : '&additionalFields=expenses')
+          )
+        }
+      }
     },
     clearSearch() {
       this.searchFilter = this.default()

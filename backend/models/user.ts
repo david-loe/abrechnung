@@ -81,7 +81,8 @@ export const userSchema = new Schema<User, UserModel, Methods>({
       lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
       lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
-      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' }
+      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
+      showInstallBanner: { type: Boolean, required: true, default: true }
     },
     required: true,
     default: () => ({})

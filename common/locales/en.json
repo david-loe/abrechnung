@@ -96,6 +96,75 @@
     "travelInsideOfEU": "Is your trip a cross-country trip within the EU?",
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
+  "installation": {
+    "header": "Install the App with these steps:",
+    "default": {
+      "steps": {
+        "one": "1. By using the menu or the share menu and clicking on 'Add to Homescreen' or 'Install' the installation can be started.",
+        "two": "2. Follow the instructions."
+      }
+    },
+    "iosSafari": {
+      "steps": {
+        "one": {
+          "one": "1. Go to the Share ",
+          "two": " Menu (in the middle of the bottom)."
+        },
+        "two": "2. Click on 'Add to Home Screen'  ",
+        "three": "3. Click on 'Add'."
+      }
+    },
+    "iosChrome": {
+      "steps": {
+        "one": {
+          "one": "1. Go to the Share ",
+          "two": " Menu (on the top, next to adress bar)."
+        },
+        "two": "2. Click on 'Add to Home Screen'  ",
+        "three": "3. Click on 'Add'."
+      }
+    },
+    "iosFirefox": {
+      "steps": {
+        "one": {
+          "one": "1. Go to the menu ",
+          "two": " (bottom right corner)."
+        },
+        "two": "2. Click on 'Share' ",
+        "three": "3. Click on 'Add to Home Screen'  ",
+        "four": "4. Click on 'Add'."
+      }
+    },
+    "AndroidSamsung": {
+      "steps": {
+        "one": {
+          "one": "1. Click on the ",
+          "two": " symbol (on the top, next to adress bar)."
+        },
+        "two": "2. Click on 'Install'."
+      }
+    },
+    "AndroidChrome": {
+      "steps": {
+        "one": {
+          "one": "1. Click on the menu ",
+          "two": " (top right corner)."
+        },
+        "two": "2. Click on 'Add to Home Screen'.",
+        "three": "3. Click on 'Install'."
+      }
+    },
+    "AndroidFirefox": {
+      "steps": {
+        "one": {
+          "one": "1. Click on the menu ",
+          "two": " (top right corner)."
+        },
+        "two": "2. Click on 'Add to Home Screen'.",
+        "three": "3. Click on 'Add'."
+      }
+    }
+  },
   "labels": {
     "locale": "Language",
     "reportEmail": "Email Address for Reports",
@@ -173,6 +242,7 @@
     "distanceRefunds": "Distance refunds",
     "distanceRefundType": "Distance Refund Type",
     "done": "Done",
+    "dontShowAgain": "Don't show again.",
     "downloadX": "Download {X}",
     "edit": "Edit",
     "editAgain": "Edit again",
@@ -215,6 +285,7 @@
     "image": "Image",
     "import": "Import",
     "includingSpouseRefund": "incl. spouse refunds",
+    "install": "Install",
     "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
     "language": "Language",
