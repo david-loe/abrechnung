@@ -1,15 +1,5 @@
 <template>
-  <div
-    id="offline-banner"
-    style="
-      background-color: #434343;
-      color: #fff;
-      width: 100%;
-      margin-bottom: 1%;
-      display: flex;
-      justify-content: center;
-      text-align: center;
-    ">
+  <div id="offline-banner" class="bg-danger-subtle" style="width: 100%; display: flex; justify-content: center">
     Du bist Offline. Die Daten befinden sich unter Umständen nicht auf dem neusten Stand.
   </div>
 </template>
