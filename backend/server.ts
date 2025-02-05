@@ -26,7 +26,7 @@ declare global {
       readonly MONGO_URL: string
       readonly BACKEND_SAVE_REPORTS_ON_DISK: 'TRUE' | 'FALSE'
       readonly VITE_PUBLIC_VAPID_KEY: string
-      readonly VITE_PRIVATE_VAPID_KEY: string
+      readonly PRIVATE_VAPID_KEY: string
       readonly VITE_MAX_FILE_SIZE: string
       readonly RATE_LIMIT_WINDOW_MS: string
       readonly RATE_LIMIT: string

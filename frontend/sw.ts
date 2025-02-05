@@ -55,9 +55,8 @@ const NetworkFirstToDB: RouteHandler = async ({ request }) => {
 registerRoute(({ request }) => {
   try {
     const requestUrl = new URL(request.url)
-    const backendUrl = new URL(import.meta.env.VITE_BACKEND_URL)
     // Vergleiche den Origin (Protokoll + Host) und schließe z. B. Pfade mit "/auth" aus
-    return requestUrl.origin === backendUrl.origin && !requestUrl.pathname.startsWith('/auth')
+    return request.url.startsWith(import.meta.env.VITE_BACKEND_URL) && !request.url.startsWith(import.meta.env.VITE_BACKEND_URL + '/auth')
   } catch (error) {
     console.error('Fehler beim Parsen der URL:', error)
     return false
@@ -66,19 +65,22 @@ registerRoute(({ request }) => {
 
 //saving data in indexedDB
 async function storeResponse(url: string, response: Response) {
-  const db = await openDatabase()
-  const res = await response.json()
-  const transaction = db.transaction('urls', 'readwrite')
-  const store = transaction.objectStore('urls')
-  store.put({ id: url, res })
-  await new Promise<void>((resolve, reject) => {
-    transaction.oncomplete = () => {
-      resolve()
-    }
-    transaction.onerror = () => {
-      reject('Problem')
-    }
-  })
+  const contentType = response.headers.get('content-type')
+  if (contentType !== null && contentType.includes('application/json')) {
+    const db = await openDatabase()
+    const res = await response.json()
+    const transaction = db.transaction('urls', 'readwrite')
+    const store = transaction.objectStore('urls')
+    store.put({ id: url, res })
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => {
+        resolve()
+      }
+      transaction.onerror = () => {
+        reject('Problem')
+      }
+    })
+  }
 }
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

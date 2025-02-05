@@ -4,9 +4,9 @@ import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
-import { sendNotificationMail } from '../mail/mail.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
+import { sendNotification } from '../notifications/notification.js'
 import { generateAdvanceReport } from '../pdf/advance.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { generateTravelReport } from '../pdf/travel.js'
@@ -137,7 +137,7 @@ export class TravelController extends Controller {
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotificationMail,
+      cb: sendNotification,
       checkOldObject: async (oldObject: TravelDoc) =>
         !oldObject.historic &&
         (oldObject.state === 'appliedFor' || oldObject.state === 'rejected' || oldObject.state === 'approved') &&
@@ -196,7 +196,7 @@ export class TravelController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotificationMail,
+      cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'approved') {
@@ -277,7 +277,7 @@ export class TravelApproveController extends Controller {
       }
     }
     const cb = async (travel: ITravel) => {
-      sendNotificationMail(travel)
+      sendNotification(travel)
       if (travel.advance.amount !== null && travel.advance.amount > 0) {
         sendViaMail(travel)
         if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
@@ -308,7 +308,7 @@ export class TravelApproveController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotificationMail,
+      cb: sendNotification,
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) =>
         oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
@@ -446,7 +446,7 @@ export class TravelExamineController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user?._id })
 
     const cb = async (travel: ITravel) => {
-      sendNotificationMail(travel)
+      sendNotification(travel)
       sendViaMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
         await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel, i18n.language as Locale))
@@ -480,7 +480,7 @@ export class TravelExamineController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
-      cb: (e: ITravel) => sendNotificationMail(e, 'backToApproved'),
+      cb: (e: ITravel) => sendNotification(e, 'backToApproved'),
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()

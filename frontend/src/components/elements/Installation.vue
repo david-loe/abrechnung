@@ -2,16 +2,8 @@
   <div
     id="installBanner"
     v-if="showInstallationBanner && $root.mobile"
-    style="
-      width: 100%;
-      position: fixed;
-      left: 0px;
-      bottom: 0px;
-      z-index: 4000;
-      display: block;
-      background-color: rgb(240, 240, 240, 1);
-      justify-content: center;
-    ">
+    class="bg-body-secondary"
+    style="width: 100%; position: fixed; left: 0px; bottom: 0px; z-index: 9999; display: block">
     <div class="container-lg p-3">
       <div id="installationHeader" style="display: flex; justify-content: space-between">
         <h5 class="">{{ $t('installation.header') }}</h5>

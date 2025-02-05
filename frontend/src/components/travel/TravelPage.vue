@@ -17,7 +17,7 @@
           :stage="modalObject as Partial<Stage> | Gap | undefined"
           :travelStartDate="travel.startDate"
           :travelEndDate="travel.endDate"
-          :disabled="isReadOnly || $root.isOffline"
+          :disabled="isReadOnly"
           :showVehicleRegistration="travel.state === 'approved'"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
@@ -31,7 +31,7 @@
           v-else-if="modalObjectType === 'expense'"
           ref="expenseForm"
           :expense="modalObject as Partial<TravelExpense> | undefined"
-          :disabled="isReadOnly || $root.isOffline"
+          :disabled="isReadOnly"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
@@ -63,7 +63,7 @@
         </div>
         <div class="col-auto">
           <div class="dropdown">
-            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false" :disabled="$root.isOffline">
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
               {{ $t('labels.help') }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -90,13 +90,7 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a
-                class="nav-link link-body-emphasis"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="outside"
-                href="#"
-                role="button"
-                :style="$root.isOffline ? 'display: none' : ''">
+              <a class="nav-link link-body-emphasis" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -104,7 +98,7 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly" disabled />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnly" />
                         <label class="form-check-label text-nowrap" for="editTravel">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ $t('labels.readOnly') }}</span>
@@ -158,7 +152,7 @@
               id="travelClaimOvernightLumpSum"
               v-model="travel.claimOvernightLumpSum"
               @change="postTravelSettings"
-              :disabled="isReadOnly || $root.isOffline" />
+              :disabled="isReadOnly" />
             <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum') }}</label>
             <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
           </div>
@@ -173,7 +167,7 @@
                 class="form-select form-select-sm"
                 @change="postTravelSettings"
                 v-model="travel.lastPlaceOfWork"
-                :disabled="isReadOnly || $root.isOffline">
+                :disabled="isReadOnly">
                 <option v-for="place of getLastPaceOfWorkList(travel)" :value="place" :key="place.country._id + place.special">
                   <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
                 </option>
@@ -201,20 +195,14 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-2">
             <div class="col-auto">
-              <button
-                class="btn btn-secondary"
-                @click="isReadOnly ? null : showModal('add', undefined, 'stage')"
-                :disabled="isReadOnly || $root.isOffline">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
                 <span class="ms-1 d-md-none">{{ $t('labels.stage') }}</span>
               </button>
             </div>
             <div class="col-auto">
-              <button
-                class="btn btn-secondary"
-                @click="isReadOnly ? null : showModal('add', undefined, 'expense')"
-                :disabled="isReadOnly || $root.isOffline">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ $t('labels.expense') }}</span>
@@ -226,7 +214,7 @@
               <button
                 class="btn btn-link btn-sm"
                 @click="travel.days.map((d) => ((d as Day).showSettings = true))"
-                :disabled="travel.stages.length == 0 || $root.isOffline">
+                :disabled="travel.stages.length == 0">
                 {{ $t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
               </button>
@@ -235,7 +223,7 @@
               <button
                 class="btn btn-link btn-sm"
                 @click="travel.days.map((d) => ((d as Day).showSettings = false))"
-                :disabled="travel.stages.length == 0 || $root.isOffline">
+                :disabled="travel.stages.length == 0">
                 {{ $t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
               </button>
@@ -308,7 +296,7 @@
                         :id="'configCateringRefund' + key + (row.data as Day).date"
                         v-model="((row.data as Day).cateringNoRefund as any)[key]"
                         @change="isReadOnly ? null : postTravelSettings()"
-                        :disabled="isReadOnly || $root.isOffline" />
+                        :disabled="isReadOnly" />
                       <label class="form-check-label" :for="'configCateringRefund' + key + (row.data as Day).date">
                         {{ $t('labels.' + key) }}
                       </label>
@@ -323,7 +311,7 @@
                             class="form-select form-select-sm"
                             v-model="(row.data as Day).purpose"
                             @change="isReadOnly ? null : postTravelSettings()"
-                            :disabled="isReadOnly || $root.isOffline"
+                            :disabled="isReadOnly"
                             required>
                             <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
                               {{ $t('labels.' + purpose) }}
@@ -387,11 +375,7 @@
             <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button
-                  class="btn btn-sm btn-light"
-                  @click="showModal('add', row.data as Gap, 'stage')"
-                  style="border-radius: 50%"
-                  :disabled="$root.isOffline">
+                <button class="btn btn-sm btn-light" @click="showModal('add', row.data as Gap, 'stage')" style="border-radius: 50%">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -471,11 +455,7 @@
                   </button>
                 </template>
                 <template v-else>
-                  <a
-                    class="btn btn-primary"
-                    :href="reportLink()"
-                    :download="travel.name + '.pdf'"
-                    :style="$root.isOffline ? 'display: none' : ''">
+                  <a class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
                     <i class="bi bi-download"></i>
                     <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
                   </a>
@@ -492,7 +472,7 @@
                   <button
                     @click="isReadOnly ? null : toExamination()"
                     class="btn btn-primary"
-                    :disabled="travel.stages.length < 1 || isReadOnly || $root.isOffline"
+                    :disabled="travel.stages.length < 1 || isReadOnly"
                     style="min-width: max-content">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ $t('labels.toExamination') }}</span>

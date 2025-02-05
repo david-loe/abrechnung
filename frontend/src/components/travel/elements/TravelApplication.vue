@@ -31,10 +31,10 @@
     </table>
 
     <div v-if="showButtons" class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')" :disabled="$root.isOffline">
+      <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')">
         {{ $t('labels.edit') }}
       </button>
-      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted', travel._id)" :disabled="$root.isOffline">
+      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted', travel._id)">
         {{ $t('labels.delete') }}
       </button>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">

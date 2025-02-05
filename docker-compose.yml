@@ -42,7 +42,7 @@ services:
   ldap:
     build:
       context: ./dev-tools/ldap
-      dockerfile: Dockerfile.development
+      dockerfile: Dockerfile.${NODE_ENV}
     environment:
       - DEBUG=false
 
@@ -50,7 +50,7 @@ services:
   inbucket:
     build:
       context: ./dev-tools/inbucket
-      dockerfile: Dockerfile.development
+      dockerfile: Dockerfile.${NODE_ENV}
     ports:
       - ${INBUCKET_UI_PORT}:9000
     environment:
@@ -60,7 +60,7 @@ services:
   mongo-express:
     build:
       context: ./dev-tools/mongo-express
-      dockerfile: Dockerfile.development
+      dockerfile: Dockerfile.${NODE_ENV}
     depends_on:
       - db
     ports:

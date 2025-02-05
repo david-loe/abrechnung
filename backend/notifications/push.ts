@@ -1,7 +1,7 @@
 import { SessionData } from 'express-session'
 import webpush from 'web-push'
-import { User } from './../common/types.js'
-import { sessionStore } from './app.js'
+import { sessionStore } from '../db.js'
+import { User } from './../../common/types.js'
 
 export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
   const payload = {
@@ -12,18 +12,21 @@ export async function sendPushNotification(title: string, body: string, users: U
   const allSessions = await getAllSessions()
   for (const user of users) {
     const userSessions = allSessions.filter((session) => session.subscription && user._id.equals(session.passport.user._id))
-    const latestSession = userSessions.reduce(
-      (max, session) => (new Date(session.cookie.expires!).valueOf() > new Date(max.cookie.expires!).valueOf() ? session : max),
-      userSessions[0]
-    )
-
-    webpush.sendNotification(latestSession.subscription!, JSON.stringify(payload), {
-      vapidDetails: {
-        subject: process.env.VITE_FRONTEND_URL,
-        publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
-        privateKey: process.env.VITE_PRIVATE_VAPID_KEY
+    if (userSessions.length > 0) {
+      const latestSession = userSessions.reduce(
+        (max, session) => (new Date(session.cookie.expires!).valueOf() > new Date(max.cookie.expires!).valueOf() ? session : max),
+        userSessions[0]
+      )
+      if (latestSession) {
+        webpush.sendNotification(latestSession.subscription!, JSON.stringify(payload), {
+          vapidDetails: {
+            subject: process.env.VITE_FRONTEND_URL,
+            publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
+            privateKey: process.env.PRIVATE_VAPID_KEY
+          }
+        })
       }
-    })
+    }
   }
 }
 

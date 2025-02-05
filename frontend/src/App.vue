@@ -1,7 +1,7 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <header class="mb-3 border-bottom bg-white bg-opacity-25">
+    <header class="mb-3 border-bottom">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
           <div class="me-auto">

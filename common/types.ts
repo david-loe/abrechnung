@@ -245,7 +245,6 @@ export interface User extends UserSimple {
     organisation?: OrganisationSimple | null
     showInstallBanner: boolean
   }
-
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
 }

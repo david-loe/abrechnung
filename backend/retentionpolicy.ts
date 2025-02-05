@@ -13,8 +13,8 @@ import {
 } from '../common/types.js'
 import { getSettings } from './db.js'
 import i18n from './i18n.js'
-import { sendMail } from './mail/mail.js'
 import User from './models/user.js'
+import { sendMail } from './notifications/mail.js'
 
 async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState, startDate?: Date) {
   let res: Array<ITravel | IExpenseReport | IHealthCareCost>
