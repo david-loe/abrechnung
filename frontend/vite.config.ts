@@ -23,7 +23,7 @@ export default {
       }
     })
   ],
-  server: { port: 80, strictPort: true, host: '0.0.0.0' },
+  server: { port: 80, strictPort: true, host: '0.0.0.0', allowedHosts: [process.env.VITE_FRONTEND_URL!.replace(/^https?:\/\//, '')] },
   preview: { port: 80, host: '0.0.0.0' },
   resolve: {
     alias: {
