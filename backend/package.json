@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-backend",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -14,7 +14,7 @@
     "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
     "i18next": "^23.16.8",
-    "mongoose": "^8.9.7",
+    "mongoose": "^8.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
     "passport": "^0.7.0",
