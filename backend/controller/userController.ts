@@ -167,14 +167,15 @@ export class UserAdminController extends Controller {
         deleteResult = await User.deleteOne({ _id: userIdToOverwrite })
       }
 
-      let mergedUser = user.toObject()
+      const unmergedUser = user.toObject()
+      let mergedUser: IUser | undefined = undefined
       if (userToOverwrite) {
         mergedUser = await user.merge(userToOverwrite, Boolean(delOverwritten))
       }
 
       const replacedReferences = await user.replaceReferences(userIdToOverwrite)
 
-      return { result: { mergedUser, replacedReferences, deleteResult }, message: 'alerts.successSaving' }
+      return { result: { mergedUser: mergedUser || unmergedUser, replacedReferences, deleteResult }, message: 'alerts.successSaving' }
     } else {
       throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
     }
