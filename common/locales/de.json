@@ -98,42 +98,24 @@
     "vehicleRegistration": "Lade hier den Fahrzeugschein deines Autos hoch."
   },
   "installation": {
-    "header": "abrechnung installieren - so geht's:",
-    "default": {
-      "steps": {
-        "one": "1. Über das Browser- oder das Teilen Menü kannst du mit 'Zum Startbildschirm hinzufügen' oder 'Installieren' die Installation starten.",
-        "two": "2. Folge dem Installationsprozess"
-      }
-    },
-    "iosSafari": {
+    "AndroidChrome": {
       "steps": {
         "one": {
-          "one": "1. Gehe auf das Teilen ",
-          "two": " Menü (unten mittig am Bildschirm)."
+          "one": "1. Klicke auf das Menü ",
+          "two": " (oben rechts)."
         },
-        "two": "2. Klicke auf 'Zum Home-Bildschirm' ",
-        "three": "3. Klicke 'Hinzufügen'."
+        "three": "3. Klicke auf 'Installieren'",
+        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'."
       }
     },
-    "iosChrome": {
+    "AndroidFirefox": {
       "steps": {
         "one": {
-          "one": "1. Gehe auf das Teilen ",
-          "two": " Menü (rechts oben neben der Adressleiste)."
+          "one": "1. Klicke auf das Menü ",
+          "two": " (oben rechts)."
         },
-        "two": "2. Klicke auf 'Zum Home-Bildschirm'  ",
-        "three": "3. Klicke 'Hinzufügen'."
-      }
-    },
-    "iosFirefox": {
-      "steps": {
-        "one": {
-          "one": "1. Gehe auf das Menü ",
-          "two": " (unten rechts)."
-        },
-        "two": "2. Gehe auf Teilen ",
-        "three": "3. Klicke auf 'Zum Home-Bildschirm'  ",
-        "four": "4. Klicke 'Hinzufügen'."
+        "three": "3. Klicke auf 'Hinzufügen'.",
+        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'."
       }
     },
     "AndroidSamsung": {
@@ -145,31 +127,46 @@
         "two": "2. Klicke auf 'Installieren'."
       }
     },
-    "AndroidChrome": {
+    "default": {
       "steps": {
-        "one": {
-          "one": "1. Klicke auf das Menü ",
-          "two": " (oben rechts)."
-        },
-        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'.",
-        "three": "3. Klicke auf 'Installieren'"
+        "one": "1. Über das Browser- oder das Teilen Menü kannst du mit 'Zum Startbildschirm hinzufügen' oder 'Installieren' die Installation starten.",
+        "two": "2. Folge dem Installationsprozess"
       }
     },
-    "AndroidFirefox": {
+    "header": "abrechnung installieren - so geht's:",
+    "iosChrome": {
       "steps": {
         "one": {
-          "one": "1. Klicke auf das Menü ",
-          "two": " (oben rechts)."
+          "one": "1. Gehe auf das Teilen ",
+          "two": " Menü (rechts oben neben der Adressleiste)."
         },
-        "two": "2. Klicke auf 'Zum Startbildschirm hinzufügen'.",
-        "three": "3. Klicke auf 'Hinzufügen'."
+        "three": "3. Klicke 'Hinzufügen'.",
+        "two": "2. Klicke auf 'Zum Home-Bildschirm'  "
+      }
+    },
+    "iosFirefox": {
+      "steps": {
+        "four": "4. Klicke 'Hinzufügen'.",
+        "one": {
+          "one": "1. Gehe auf das Menü ",
+          "two": " (unten rechts)."
+        },
+        "three": "3. Klicke auf 'Zum Home-Bildschirm'  ",
+        "two": "2. Gehe auf Teilen "
+      }
+    },
+    "iosSafari": {
+      "steps": {
+        "one": {
+          "one": "1. Gehe auf das Teilen ",
+          "two": " Menü (unten mittig am Bildschirm)."
+        },
+        "three": "3. Klicke 'Hinzufügen'.",
+        "two": "2. Klicke auf 'Zum Home-Bildschirm' "
       }
     }
   },
   "labels": {
-    "locale": "Sprache",
-    "reportEmail": "Email Adresse für Berichte",
-    "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-Email senden",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
@@ -293,6 +290,7 @@
     "lastCountries": "Letzte Länder",
     "lastCurrencies": "Letzte Währungen",
     "lastPlaceOfWork": "Letzter Tätigkeitsort",
+    "locale": "Sprache",
     "location": "Ort",
     "logo": "Logo",
     "loseAccessAt": "Ablaufdatum",
@@ -349,6 +347,7 @@
     "refundSum": "Durch Versicherung erstatteter Betrag",
     "reject": "Ablehnen",
     "report": "Bericht",
+    "reportEmail": "Email Adresse für Berichte",
     "required": "erforderlich",
     "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
@@ -358,8 +357,10 @@
     "secondNightOnAirplaneLumpSumCountry": "Land für die Verpflegungspauschalen ab 2. Nacht im Flugzeug",
     "secondNightOnShipOrFerryLumpSumCountry": "Land für die Verpflegungspauschalen ab 2. Nacht auf dem Schiff",
     "sendMail": "E-Mail senden",
+    "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-Email senden",
     "settings": "Einstellungen",
     "shipOrFerry": "Schiff oder Fähre 🚢",
+    "showInstallBanner": "Installationshinweis anzeigen",
     "showX": "{X} anzeigen",
     "signIn": "Anmelden",
     "signInX": "Mit {X} anmelden",

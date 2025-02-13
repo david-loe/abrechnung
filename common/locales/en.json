@@ -97,42 +97,24 @@
     "vehicleRegistration": "Upload the vehicle registration of your car here."
   },
   "installation": {
-    "header": "Install the App with these steps:",
-    "default": {
-      "steps": {
-        "one": "1. By using the menu or the share menu and clicking on 'Add to Homescreen' or 'Install' the installation can be started.",
-        "two": "2. Follow the instructions."
-      }
-    },
-    "iosSafari": {
+    "AndroidChrome": {
       "steps": {
         "one": {
-          "one": "1. Go to the Share ",
-          "two": " Menu (in the middle of the bottom)."
+          "one": "1. Click on the menu ",
+          "two": " (top right corner)."
         },
-        "two": "2. Click on 'Add to Home Screen'  ",
-        "three": "3. Click on 'Add'."
+        "three": "3. Click on 'Install'.",
+        "two": "2. Click on 'Add to Home Screen'."
       }
     },
-    "iosChrome": {
+    "AndroidFirefox": {
       "steps": {
         "one": {
-          "one": "1. Go to the Share ",
-          "two": " Menu (on the top, next to adress bar)."
+          "one": "1. Click on the menu ",
+          "two": " (top right corner)."
         },
-        "two": "2. Click on 'Add to Home Screen'  ",
-        "three": "3. Click on 'Add'."
-      }
-    },
-    "iosFirefox": {
-      "steps": {
-        "one": {
-          "one": "1. Go to the menu ",
-          "two": " (bottom right corner)."
-        },
-        "two": "2. Click on 'Share' ",
-        "three": "3. Click on 'Add to Home Screen'  ",
-        "four": "4. Click on 'Add'."
+        "three": "3. Click on 'Add'.",
+        "two": "2. Click on 'Add to Home Screen'."
       }
     },
     "AndroidSamsung": {
@@ -144,31 +126,46 @@
         "two": "2. Click on 'Install'."
       }
     },
-    "AndroidChrome": {
+    "default": {
       "steps": {
-        "one": {
-          "one": "1. Click on the menu ",
-          "two": " (top right corner)."
-        },
-        "two": "2. Click on 'Add to Home Screen'.",
-        "three": "3. Click on 'Install'."
+        "one": "1. By using the menu or the share menu and clicking on 'Add to Homescreen' or 'Install' the installation can be started.",
+        "two": "2. Follow the instructions."
       }
     },
-    "AndroidFirefox": {
+    "header": "Install the App with these steps:",
+    "iosChrome": {
       "steps": {
         "one": {
-          "one": "1. Click on the menu ",
-          "two": " (top right corner)."
+          "one": "1. Go to the Share ",
+          "two": " Menu (on the top, next to adress bar)."
         },
-        "two": "2. Click on 'Add to Home Screen'.",
-        "three": "3. Click on 'Add'."
+        "three": "3. Click on 'Add'.",
+        "two": "2. Click on 'Add to Home Screen'  "
+      }
+    },
+    "iosFirefox": {
+      "steps": {
+        "four": "4. Click on 'Add'.",
+        "one": {
+          "one": "1. Go to the menu ",
+          "two": " (bottom right corner)."
+        },
+        "three": "3. Click on 'Add to Home Screen'  ",
+        "two": "2. Click on 'Share' "
+      }
+    },
+    "iosSafari": {
+      "steps": {
+        "one": {
+          "one": "1. Go to the Share ",
+          "two": " Menu (in the middle of the bottom)."
+        },
+        "three": "3. Click on 'Add'.",
+        "two": "2. Click on 'Add to Home Screen'  "
       }
     }
   },
   "labels": {
-    "locale": "Language",
-    "reportEmail": "Email Address for Reports",
-    "sendPDFReportsToOrganisationEmail": "Send PDF reports to organisation email",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",
@@ -292,6 +289,7 @@
     "lastCountries": "Last countries",
     "lastCurrencies": "Last currencies",
     "lastPlaceOfWork": "Last place of work",
+    "locale": "Language",
     "location": "Location",
     "logo": "Logo",
     "loseAccessAt": "Expiration date",
@@ -348,6 +346,7 @@
     "refundSum": "Amount refunded by insurance",
     "reject": "Reject",
     "report": "Report",
+    "reportEmail": "Email Address for Reports",
     "required": "required",
     "retentionPolicy": "Retention policy",
     "route": "Route",
@@ -357,8 +356,10 @@
     "secondNightOnAirplaneLumpSumCountry": "Country for the catering lump sums from the 2nd night in an aircraft",
     "secondNightOnShipOrFerryLumpSumCountry": "Country for the catering lump sums from the 2nd night on a ship",
     "sendMail": "Send E-Mail",
+    "sendPDFReportsToOrganisationEmail": "Send PDF reports to organisation email",
     "settings": "Settings",
     "shipOrFerry": "Ship or ferry 🚢",
+    "showInstallBanner": "Show install banner",
     "showX": "Show {X}",
     "signIn": "Sign in",
     "signInX": "Sign in with {X}",
