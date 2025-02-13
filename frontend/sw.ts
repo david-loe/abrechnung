@@ -14,7 +14,7 @@ clientsClaim()
 //default caching strategy - no caching only using network
 setDefaultHandler(new NetworkOnly())
 // to allow work offline - setting default entry point for app
-registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist: [/^\/backend\/auth/] }))
+registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist: [/^\/backend\/auth/, /\/report(?:\?|$)/] }))
 
 //caching all fonts with StaleWhileRevalidat strategy
 registerRoute(
