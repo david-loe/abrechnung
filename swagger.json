@@ -1676,11 +1676,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Required___id-mongoose.Types.ObjectId__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
-			},
 			"UserReplaceReferencesResult": {
 				"properties": {
 					"travels": {
@@ -6872,7 +6867,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.5.0",
+		"version": "1.5.2",
 		"contact": {}
 	},
 	"paths": {
@@ -7006,6 +7001,18 @@
 													},
 													"required": [
 														"_id"
+													],
+													"type": "object"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
 													],
 													"type": "object"
 												}
@@ -7538,14 +7545,7 @@
 													"$ref": "#/components/schemas/UserReplaceReferencesResult"
 												},
 												"mergedUser": {
-													"allOf": [
-														{
-															"$ref": "#/components/schemas/User"
-														},
-														{
-															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
-														}
-													]
+													"$ref": "#/components/schemas/User"
 												}
 											},
 											"required": [
