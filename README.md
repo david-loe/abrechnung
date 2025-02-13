@@ -37,7 +37,7 @@ Dieser statische Währungsrechner zeigt den offiziellen monatlichen Buchungskurs
 
 Using prebuilt docker images:
 
-https://github.com/david-loe/abrechnung/blob/822f3e5402e978e7a4364e64897ac386868d0273/deploy-compose.yml#L1-L34
+https://github.com/david-loe/abrechnung/blob/1cb710b1225c65035950a5464e05fc34ff3dd199/deploy-compose.yml#L1-L34
 
 ℹ Don't forget to specify [environment variables](.env.example) in a `.env` file or directly in the compose.yml.
 
