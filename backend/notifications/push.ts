@@ -4,6 +4,9 @@ import { sessionStore } from '../db.js'
 import { User } from './../../common/types.js'
 
 export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
+  if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
+    return
+  }
   const payload = {
     title: title,
     body: body,
