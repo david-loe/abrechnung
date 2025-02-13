@@ -21,13 +21,17 @@ export async function sendPushNotification(title: string, body: string, users: U
         userSessions[0]
       )
       if (latestSession) {
-        webpush.sendNotification(latestSession.subscription!, JSON.stringify(payload), {
-          vapidDetails: {
-            subject: process.env.VITE_FRONTEND_URL,
-            publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
-            privateKey: process.env.PRIVATE_VAPID_KEY
-          }
-        })
+        try {
+          webpush.sendNotification(latestSession.subscription!, JSON.stringify(payload), {
+            vapidDetails: {
+              subject: process.env.VITE_FRONTEND_URL,
+              publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
+              privateKey: process.env.PRIVATE_VAPID_KEY
+            }
+          })
+        } catch (error) {
+          console.error(error)
+        }
       }
     }
   }
