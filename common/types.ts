@@ -328,6 +328,7 @@ export interface HealthCareCostComment extends Comment {
 
 export interface TravelSimple extends RequestSimple {
   state: TravelState
+  log: Log<TravelState>
   comments: TravelComment[]
   comment?: string | null
   reason: string
@@ -371,10 +372,18 @@ export interface TravelDay {
   _id: _id
 }
 
+export type Log<StateType extends AnyState> = {
+  [key in StateType]?: {
+    date: Date | string
+    editor: UserSimple
+  }
+}
+
 export interface RequestSimple {
   name: string
   owner: UserSimple
   state: AnyState
+  log: Log<AnyState>
   project: Project
   editor: UserSimple
   createdAt: Date | string
@@ -395,6 +404,7 @@ export interface Travel extends TravelSimple {
 
 export interface ExpenseReportSimple extends RequestSimple {
   state: ExpenseReportState
+  log: Log<ExpenseReportState>
   advance: Money
   comments: ExpenseReportComment[]
   comment?: string | null
@@ -411,6 +421,7 @@ export interface HealthCareCostSimple extends RequestSimple {
   insurance: HealthInsurance
   refundSum: MoneyPlus
   state: HealthCareCostState
+  log: Log<HealthCareCostState>
   comments: HealthCareCostComment[]
   comment?: string | null
 }
@@ -478,6 +489,11 @@ export type Access = (typeof accesses)[number]
 
 export const meals = ['breakfast', 'lunch', 'dinner'] as const
 export type Meal = (typeof meals)[number]
+
+export const fontNames = ['NotoSans'] as const
+export type FontName = (typeof fontNames)[number]
+
+export type PageOrientation = 'portrait' | 'landscape'
 
 export const lumpsumTypes = ['overnight', 'catering8', 'catering24'] as const
 export type LumpsumType = (typeof lumpsumTypes)[number]

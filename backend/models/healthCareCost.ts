@@ -8,7 +8,7 @@ import {
   healthCareCostStates
 } from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject } from './helper.js'
+import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -32,6 +32,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
       enum: healthCareCostStates,
       default: 'inWork'
     },
+    log: logObject(healthCareCostStates),
     refundSum: costObject(true, true, false, baseCurrency._id),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
@@ -68,6 +69,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'log.$*.editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
@@ -97,6 +99,7 @@ healthCareCostSchema.methods.saveToHistory = async function (this: HealthCareCos
   const old = await model('HealthCareCost').create([doc], { timestamps: false })
   this.history.push(old[0]._id)
   this.markModified('history')
+  this.log[this.state] = { date: new Date(), editor: this.editor }
 }
 
 async function exchange(costObject: Money, date: string | number | Date) {

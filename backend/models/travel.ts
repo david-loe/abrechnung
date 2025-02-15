@@ -18,7 +18,7 @@ import { getSettings } from '../db.js'
 import Country from './country.js'
 import DocumentFile from './documentFile.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject } from './helper.js'
+import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -57,6 +57,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
       enum: travelStates,
       default: 'appliedFor'
     },
+    log: logObject(travelStates),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
       {
@@ -147,6 +148,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'log.$*.editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
@@ -180,6 +182,8 @@ travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
   const old = await model('Travel').create([doc], { timestamps: false })
   this.history.push(old[0]._id)
   this.markModified('history')
+  this.log[this.state] = { date: new Date(), editor: this.editor }
+
   switch (this.state) {
     case 'approved':
       {

@@ -1,7 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject } from './helper.js'
+import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -23,6 +23,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
       enum: expenseReportStates,
       default: 'inWork'
     },
+    log: logObject(expenseReportStates),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
       {
@@ -57,6 +58,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
+    doc.populate({ path: 'log.$*.editor', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
@@ -86,6 +88,7 @@ expenseReportSchema.methods.saveToHistory = async function (this: ExpenseReportD
   const old = await model('ExpenseReport').create([doc], { timestamps: false })
   this.history.push(old[0]._id)
   this.markModified('history')
+  this.log[this.state] = { date: new Date(), editor: this.editor }
 }
 
 async function exchange(costObject: Money, date: string | number | Date) {

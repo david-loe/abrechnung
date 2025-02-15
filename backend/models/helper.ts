@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+import { AnyState } from '../../common/types.js'
 
 export function costObject(
   exchangeRate = true,
@@ -30,4 +31,13 @@ export function costObject(
     }
   }
   return { type, required, default: () => ({}) }
+}
+
+export function logObject<T extends AnyState>(states: readonly T[]) {
+  const logEntry = { type: { date: { type: Date, required: true }, editor: { type: Schema.Types.ObjectId, ref: 'User', required: true } } }
+  const log: { type: { [key in T]?: typeof logEntry }; required: true } = { type: {}, required: true }
+  for (const state of states) {
+    log.type[state] = logEntry
+  }
+  return log
 }

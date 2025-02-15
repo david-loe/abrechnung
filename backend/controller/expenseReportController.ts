@@ -2,12 +2,12 @@ import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
+import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
-import { generateExpenseReportReport } from '../pdf/expenseReport.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
@@ -140,7 +140,7 @@ export class ExpenseReportController extends Controller {
       state: 'refunded'
     }).lean()
     if (expenseReport) {
-      const report = await generateExpenseReportReport(expenseReport, request.user!.settings.language)
+      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -275,10 +275,7 @@ export class ExpenseReportExamineController extends Controller {
       sendNotification(expenseReport)
       sendViaMail(expenseReport)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          await writeToDiskFilePath(expenseReport),
-          await generateExpenseReportReport(expenseReport, i18n.language as Locale)
-        )
+        await writeToDisk(await writeToDiskFilePath(expenseReport), await reportPrinter.print(expenseReport, i18n.language as Locale))
       }
     }
 
@@ -307,7 +304,7 @@ export class ExpenseReportExamineController extends Controller {
     }
     const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (expenseReport) {
-      const report = await generateExpenseReportReport(expenseReport, request.user!.settings.language)
+      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

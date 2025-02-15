@@ -134,6 +134,25 @@ export async function checkForMigrations() {
           { $set: { PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: displaySettings?.locale?.default || 'de' } } }
         )
     }
+    if (semver.lte(migrateFrom, '1.5.2')) {
+      console.log('Apply migration from v1.5.2: Add log to reports')
+      async function writeLogFromHistory(collection: string) {
+        const allReports = mongoose.connection.collection(collection).find({ historic: false })
+        for await (const report of allReports) {
+          for (let i = 0; i < report.history.length; i++) {
+            const history = await mongoose.connection.collection(collection).findOne({ _id: report.history[i] })
+            if (history) {
+              const set = { $set: {} as any }
+              set.$set[`log.${history.state}`] = { date: history.updatedAt, editor: history.editor }
+              mongoose.connection.collection(collection).updateOne({ _id: report._id }, set)
+            }
+          }
+        }
+      }
+      await writeLogFromHistory('travels')
+      await writeLogFromHistory('expensereports')
+      await writeLogFromHistory('healthcarecosts')
+    }
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()
