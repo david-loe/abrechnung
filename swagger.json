@@ -2176,6 +2176,126 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Log_TravelState_": {
+				"properties": {
+					"rejected": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"appliedFor": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"approved": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"underExamination": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"refunded": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"TravelComment": {
 				"properties": {
 					"text": {
@@ -2278,6 +2398,172 @@
 					}
 				]
 			},
+			"Log_AnyState_": {
+				"properties": {
+					"rejected": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"appliedFor": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"approved": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"underExamination": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"refunded": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"inWork": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"underExaminationByInsurance": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"Travel": {
 				"properties": {
 					"name": {
@@ -2288,6 +2574,9 @@
 					},
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_TravelState_"
 					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
@@ -2419,6 +2708,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -2481,6 +2771,9 @@
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_TravelState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -2611,6 +2904,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -2658,12 +2952,14 @@
 								"name",
 								"owner",
 								"state",
+								"log",
 								"project",
 								"editor",
 								"createdAt",
 								"updatedAt",
 								"_id",
 								"state",
+								"log",
 								"comments",
 								"comment",
 								"reason",
@@ -3157,6 +3453,9 @@
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_TravelState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -3249,6 +3548,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -3265,6 +3565,80 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"Log_ExpenseReportState_": {
+				"properties": {
+					"underExamination": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"refunded": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"inWork": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object"
 			},
 			"ExpenseReportComment": {
 				"properties": {
@@ -3300,6 +3674,9 @@
 					},
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_ExpenseReportState_"
 					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
@@ -3350,6 +3727,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -3428,6 +3806,103 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Log_HealthCareCostState_": {
+				"properties": {
+					"underExamination": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"refunded": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"inWork": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					},
+					"underExaminationByInsurance": {
+						"properties": {
+							"editor": {
+								"$ref": "#/components/schemas/UserSimple"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "string",
+										"format": "date-time"
+									}
+								]
+							}
+						},
+						"required": [
+							"editor",
+							"date"
+						],
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"HealthCareCostComment": {
 				"properties": {
 					"text": {
@@ -3462,6 +3937,9 @@
 					},
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_HealthCareCostState_"
 					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
@@ -3518,6 +3996,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -3646,7 +4125,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance_.NoPost_": {
+			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance-or-log_.NoPost_": {
 				"properties": {
 					"project": {
 						"anyOf": [
@@ -5259,6 +5738,9 @@
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_HealthCareCostState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -5329,6 +5811,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -5382,6 +5865,9 @@
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_HealthCareCostState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -5452,6 +5938,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -5490,6 +5977,7 @@
 								"name",
 								"owner",
 								"state",
+								"log",
 								"project",
 								"editor",
 								"createdAt",
@@ -5499,6 +5987,7 @@
 								"insurance",
 								"refundSum",
 								"state",
+								"log",
 								"comments",
 								"comment",
 								"history",
@@ -5672,6 +6161,9 @@
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_ExpenseReportState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -5736,6 +6228,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -5787,6 +6280,9 @@
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
+					"log": {
+						"$ref": "#/components/schemas/Log_ExpenseReportState_"
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project"
 					},
@@ -5851,6 +6347,7 @@
 					"name",
 					"owner",
 					"state",
+					"log",
 					"project",
 					"editor",
 					"createdAt",
@@ -5887,12 +6384,14 @@
 								"name",
 								"owner",
 								"state",
+								"log",
 								"project",
 								"editor",
 								"createdAt",
 								"updatedAt",
 								"_id",
 								"state",
+								"log",
 								"advance",
 								"comments",
 								"comment",
@@ -7794,12 +8293,14 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"reason",
@@ -8415,12 +8916,14 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"reason",
@@ -8667,12 +9170,14 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"reason",
@@ -10211,6 +10716,7 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
@@ -10220,6 +10726,7 @@
 									"insurance",
 									"refundSum",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"history",
@@ -10628,6 +11135,7 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
@@ -10637,6 +11145,7 @@
 									"insurance",
 									"refundSum",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"history",
@@ -11100,6 +11609,7 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
@@ -11109,6 +11619,7 @@
 									"insurance",
 									"refundSum",
 									"state",
+									"log",
 									"comments",
 									"comment",
 									"history",
@@ -11314,12 +11825,14 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"state",
+									"log",
 									"advance",
 									"comments",
 									"comment",
@@ -11726,12 +12239,14 @@
 									"name",
 									"owner",
 									"state",
+									"log",
 									"project",
 									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"state",
+									"log",
 									"advance",
 									"comments",
 									"comment",
