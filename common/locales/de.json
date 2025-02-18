@@ -84,7 +84,7 @@
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
-    "lastPlaceOfWork": "Wähle hier deinen letzten Tätigkeitsort aus, dieser ist maßgebend für die Pauschalen deiner Abreise.",
+    "lastPlaceOfWork": "Wähle hier deinen letzten Tätigkeitsort aus, dieser ist maßgebend für die Pauschalen deiner Rückreise.",
     "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu @:{'headlines.title'}@:{'headlines.emoji'} haben soll.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
     "patientName": "Gib hier den Namen der Person an, für die die Kosten angefallen sind.",
@@ -174,6 +174,7 @@
     "addSupervisors": "Betreuenden hinzufügen",
     "addX": "{X} hinzufügen",
     "advance": "Vorschuss",
+    "advanceFromEmployer": "Vorschuss vom Arbeitgeber",
     "airplane": "Flugzeug ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Abrechnung für Ehepartner bei Reisen erlauben",
@@ -576,7 +577,7 @@
   },
   "report": {
     "advance": {
-      "approvedXY": "Am {X} durch {Y} genehmigt."
+      "approvedXonYbyZ": "Vorschuss in Höhe von {X} am {Y} durch {Z} genehmigt."
     }
   },
   "settings": {},

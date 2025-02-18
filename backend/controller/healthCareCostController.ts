@@ -9,13 +9,13 @@ import {
   Locale,
   _id
 } from '../../common/types.js'
+import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
-import { generateHealthCareCostReport } from '../pdf/healthCareCost.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
@@ -147,7 +147,7 @@ export class HealthCareCostController extends Controller {
       $and: [{ _id, owner: request.user!._id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
     }).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
+      const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -253,10 +253,7 @@ export class HealthCareCostExamineController extends Controller {
       sendNotification(healthCareCost)
       sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          await writeToDiskFilePath(healthCareCost),
-          await generateHealthCareCostReport(healthCareCost, i18n.language as Locale)
-        )
+        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
       }
     }
 
@@ -325,7 +322,7 @@ export class HealthCareCostExamineController extends Controller {
     }
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
+      const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -374,10 +371,7 @@ export class HealthCareCostConfirmController extends Controller {
       sendNotification(healthCareCost)
       sendViaMail(healthCareCost)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(
-          await writeToDiskFilePath(healthCareCost),
-          await generateHealthCareCostReport(healthCareCost, i18n.language as Locale)
-        )
+        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
       }
     }
 
@@ -418,7 +412,7 @@ export class HealthCareCostConfirmController extends Controller {
     }
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
-      const report = await generateHealthCareCostReport(healthCareCost, request.user!.settings.language)
+      const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

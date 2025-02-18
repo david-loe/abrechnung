@@ -2,14 +2,13 @@ import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
+import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
-import { generateAdvanceReport } from '../pdf/advance.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { generateTravelReport } from '../pdf/travel.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, TravelApplication, TravelPost } from './types.js'
@@ -220,7 +219,7 @@ export class TravelController extends Controller {
       state: 'refunded'
     }).lean()
     if (travel) {
-      const report = await generateTravelReport(travel, request.user!.settings.language)
+      const report = await reportPrinter.print(travel, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)
@@ -281,7 +280,7 @@ export class TravelApproveController extends Controller {
       if (travel.advance.amount !== null && travel.advance.amount > 0) {
         sendViaMail(travel)
         if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-          await writeToDisk(await writeToDiskFilePath(travel), await generateAdvanceReport(travel, i18n.language as Locale))
+          await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
         }
       }
     }
@@ -449,7 +448,7 @@ export class TravelExamineController extends Controller {
       sendNotification(travel)
       sendViaMail(travel)
       if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(travel), await generateTravelReport(travel, i18n.language as Locale))
+        await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
       }
     }
 
@@ -502,7 +501,7 @@ export class TravelExamineController extends Controller {
     }
     const travel = await Travel.findOne(filter).lean()
     if (travel) {
-      const report = await generateTravelReport(travel, request.user!.settings.language)
+      const report = await reportPrinter.print(travel, request.user!.settings.language)
       request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
       request.res?.setHeader('Content-Type', 'application/pdf')
       request.res?.setHeader('Content-Length', report.length)

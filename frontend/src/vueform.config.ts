@@ -16,9 +16,11 @@ import UserElement from './components/elements/vueform/UserElement.vue'
 en.vueform.elements.list.add = '+ Add'
 de.vueform.elements.list.add = '+ Hinzufügen'
 
-function deepReplace(obj: any, search: any, replacement: any) {
+const keysToExclude = new Set(['loseAccessAt'])
+
+function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set<string> = new Set()) {
   for (const key in obj) {
-    if (obj[key] === search) {
+    if (!keysToExclude.has(key) && obj[key] === search) {
       obj[key] = replacement
     } else if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
       deepReplace(obj[key], search, replacement)
@@ -45,7 +47,7 @@ export default defineConfig({
   displayMessages: false,
   endpoints: {},
   beforeSend(form$: any) {
-    deepReplace(form$.data, null, undefined)
-    deepReplace(form$.data, '', undefined)
+    deepReplace(form$.data, null, undefined, keysToExclude)
+    deepReplace(form$.data, '', undefined, keysToExclude)
   }
 })

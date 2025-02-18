@@ -173,6 +173,7 @@
     "addSupervisors": "Add Supervisors",
     "addX": "Add {X}",
     "advance": "Advance",
+    "advanceFromEmployer": "Advance From Employer",
     "airplane": "Airplane ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Allow accounting for spouses when traveling",
@@ -575,7 +576,7 @@
   },
   "report": {
     "advance": {
-      "approvedXY": "Approved on {X} by {Y}."
+      "approvedXonYbyZ": "Advance in the amount of {X} approved by {Z} on {Y}."
     }
   },
   "settings": {},

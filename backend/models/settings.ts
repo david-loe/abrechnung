@@ -19,6 +19,7 @@ import {
   retention,
   travelStates
 } from '../../common/types.js'
+import { reportPrinter } from '../factory.js'
 import { travelCalculator } from './travel.js'
 
 const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }
@@ -125,6 +126,7 @@ export type ISettings = SettingsSchema & { _id: _id }
 
 settingsSchema.post('save', function (this: HydratedDocument<Settings>) {
   travelCalculator.updateSettings(this.travelSettings)
+  reportPrinter.setDistanceRefunds(this.travelSettings.distanceRefunds)
 })
 
 export default model('Settings', settingsSchema)

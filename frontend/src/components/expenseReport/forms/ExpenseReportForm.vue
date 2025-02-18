@@ -13,7 +13,7 @@
     </div>
     <div class="mb-3">
       <label for="expenseReportFormAdvance" class="form-label me-2">
-        {{ $t('labels.advance') }}
+        {{ $t('labels.advanceFromEmployer') }}
       </label>
       <div class="input-group" id="expenseReportFormAdvance">
         <input
