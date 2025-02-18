@@ -191,7 +191,7 @@ travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
       if (stage.transport.type == 'ownCar') {
         if (receipts.length == 0) {
           const owner = await User.findOne({ _id: this.owner._id }).lean()
-          if (owner && owner.vehicleRegistration) {
+          if (owner?.vehicleRegistration) {
             for (const vr of owner.vehicleRegistration) {
               const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
               delete (doc as unknown as any)._id

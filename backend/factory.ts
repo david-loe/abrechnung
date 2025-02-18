@@ -28,7 +28,7 @@ export const reportPrinter = new ReportPrinter(
   },
   async (id: _id) => {
     const orga = await Organisation.findOne({ _id: id }).lean()
-    if (orga && orga.logo && orga.logo._id) {
+    if (orga?.logo?._id) {
       return { logoId: orga.logo._id, website: orga.website }
     }
     return null
