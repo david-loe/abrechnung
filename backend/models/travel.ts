@@ -148,7 +148,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'log.$*.editor', select: { name: 1, email: 1 } }),
+    ...travelStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
@@ -184,29 +184,24 @@ travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
 
-  switch (this.state) {
-    case 'approved':
-      {
-        // move vehicle registration of owner as receipt to 'ownCar' stages
-        const receipts = []
-        for (const stage of this.stages) {
-          if (stage.transport.type == 'ownCar') {
-            if (receipts.length == 0) {
-              const owner = await User.findOne({ _id: this.owner._id }).lean()
-              if (owner && owner.vehicleRegistration) {
-                for (const vr of owner.vehicleRegistration) {
-                  const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
-                  delete (doc as unknown as any)._id
-                  receipts.push(await DocumentFile.create(doc))
-                }
-              }
+  if (this.state === 'approved') {
+    // move vehicle registration of owner as receipt to 'ownCar' stages
+    const receipts = []
+    for (const stage of this.stages) {
+      if (stage.transport.type == 'ownCar') {
+        if (receipts.length == 0) {
+          const owner = await User.findOne({ _id: this.owner._id }).lean()
+          if (owner && owner.vehicleRegistration) {
+            for (const vr of owner.vehicleRegistration) {
+              const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
+              delete (doc as unknown as any)._id
+              receipts.push(await DocumentFile.create(doc))
             }
-            stage.cost.receipts = receipts
           }
         }
+        stage.cost.receipts = receipts
       }
-
-      break
+    }
   }
 }
 

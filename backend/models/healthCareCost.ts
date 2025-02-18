@@ -69,7 +69,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'log.$*.editor', select: { name: 1, email: 1 } }),
+    ...healthCareCostStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
     doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
   ])
 }
