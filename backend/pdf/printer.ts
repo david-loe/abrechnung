@@ -164,8 +164,8 @@ class ReportPrint {
     let y = this.drawer.currentPage.getSize().height
     await this.drawer.drawLogo({
       fontSize: this.drawer.settings.fontSizes.L,
-      xStart: 16,
-      yStart: y - (16 + this.drawer.settings.fontSizes.L)
+      xStart: this.drawer.settings.pagePadding / 3,
+      yStart: y - this.drawer.settings.pagePadding / 3
     })
     await this.drawer.drawOrganisationLogo(this.report.project.organisation, {
       xStart: this.drawer.currentPage.getSize().width - 166,
@@ -175,12 +175,13 @@ class ReportPrint {
     })
     y = y - this.drawer.settings.pagePadding
 
-    y = this.drawNameAndProject({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.M
-    })
-    y = this.drawTravelInformation({
+    y =
+      this.drawNameAndProject({
+        xStart: this.drawer.settings.pagePadding,
+        yStart: y - 24,
+        fontSize: this.drawer.settings.fontSizes.M
+      }) - 10
+    y = await this.drawTravelInformation({
       xStart: this.drawer.settings.pagePadding,
       yStart: y,
       fontSize: this.drawer.settings.fontSizes.M
@@ -209,7 +210,7 @@ class ReportPrint {
       getReceiptMap(this.report.expenses, optionalMapTravel.number).map
     )
 
-    y = y - 16
+    // y = y - 16
 
     if (reportIsTravel(this.report) && this.report.state === 'approved') {
       //Advance
@@ -252,11 +253,9 @@ class ReportPrint {
   }
 
   drawNameAndProject(options: Options) {
-    let y = options.yStart - options.fontSize * 1.5
-    this.drawer.drawText(this.report.name, { xStart: options.xStart, yStart: y, fontSize: options.fontSize * 1.5 })
-
-    y = y - options.fontSize * 1.5
-    this.drawer.drawText(
+    let y = options.yStart
+    y = this.drawer.drawMultilineText(this.report.name, { xStart: options.xStart, yStart: y, fontSize: options.fontSize * 1.5 })
+    y = this.drawer.drawMultilineText(
       this.t('labels.project') + ': ' + this.report.project.identifier + (this.report.project.name ? ' - ' + this.report.project.name : ''),
       {
         xStart: options.xStart,
@@ -267,12 +266,11 @@ class ReportPrint {
     return y
   }
 
-  drawTravelInformation(options: Options) {
+  async drawTravelInformation(options: Options) {
     let y = options.yStart
     if (reportIsTravel(this.report)) {
       // Traveler
-      y = y - options.fontSize * 1.5 * 1.5
-      this.drawer.drawText(
+      y = this.drawer.drawMultilineText(
         this.t('labels.traveler') +
           ': ' +
           this.report.owner.name.givenName +
@@ -287,13 +285,15 @@ class ReportPrint {
       )
 
       // Reason + Place
-      y = y - options.fontSize * 1.5
-      this.drawer.drawPlace(this.report.destinationPlace, {
-        xStart: options.xStart,
-        yStart: y,
-        fontSize: options.fontSize,
-        prefix: this.t('labels.reason') + ': ' + this.report.reason + '    ' + this.t('labels.destinationPlace') + ': '
-      })
+      y = await this.drawer.drawMultilineTextWithPlace(
+        this.t('labels.reason') + ': ' + this.report.reason + '    ' + this.t('labels.destinationPlace') + ': ',
+        this.report.destinationPlace,
+        {
+          xStart: options.xStart,
+          yStart: y,
+          fontSize: options.fontSize
+        }
+      )
       let text = ''
       // Dates + professionalShare + lastPlaceOfWork
       const sc = this.report.stages.length
@@ -309,17 +309,15 @@ class ReportPrint {
       if (this.report.professionalShare !== null && this.report.professionalShare !== 1) {
         text = text + '    ' + this.t('labels.professionalShare') + ': ' + Math.round(this.report.professionalShare * 100) + '%'
       }
-      y = y - options.fontSize * 1.5
       if (this.report.lastPlaceOfWork) {
         const lastPlace = { country: this.report.lastPlaceOfWork.country, place: this.report.lastPlaceOfWork.special }
-        this.drawer.drawPlace(lastPlace, {
+        y = await this.drawer.drawMultilineTextWithPlace(text + '    ' + this.t('labels.lastPlaceOfWork') + ': ', lastPlace, {
           xStart: options.xStart,
           yStart: y,
-          fontSize: options.fontSize,
-          prefix: text + '    ' + this.t('labels.lastPlaceOfWork') + ': '
+          fontSize: options.fontSize
         })
       } else {
-        this.drawer.drawText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
+        y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
       }
     }
     return y
@@ -328,8 +326,7 @@ class ReportPrint {
   drawExpenseInformation(options: Options) {
     let y = options.yStart
     if (reportIsExpenseReport(this.report)) {
-      y = y - options.fontSize * 1.5 * 1.5
-      this.drawer.drawText(
+      y = this.drawer.drawMultilineText(
         this.t('labels.expensePayer') + ': ' + this.report.owner.name.givenName + ' ' + this.report.owner.name.familyName,
         {
           xStart: options.xStart,
@@ -346,8 +343,7 @@ class ReportPrint {
         this.t('labels.to') +
         ': ' +
         this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)
-      y = y - options.fontSize * 1.5
-      this.drawer.drawText(text, {
+      y = this.drawer.drawMultilineText(text, {
         xStart: options.xStart,
         yStart: y,
         fontSize: options.fontSize
@@ -360,8 +356,7 @@ class ReportPrint {
     let y = options.yStart
     if (reportIsHealthCareCost(this.report)) {
       // Isurance + patientName
-      y = y - options.fontSize * 1.5 * 1.5
-      this.drawer.drawText(
+      y = this.drawer.drawMultilineText(
         this.t('labels.insurance') +
           ': ' +
           this.report.insurance.name +
@@ -388,8 +383,7 @@ class ReportPrint {
   drawAdvanceApprovedText(options: Options) {
     let y = options.yStart
     if (reportIsTravel(this.report)) {
-      y = y - options.fontSize * 1.5 * 1.5
-      this.drawer.drawText(
+      y = this.drawer.drawMultilineText(
         this.t('report.advance.approvedXonYbyZ', {
           X: this.drawer.formatter.detailedMoney(this.report.advance, true),
           Y: this.drawer.formatter.date(this.report.updatedAt),
@@ -418,13 +412,15 @@ class ReportPrint {
 
     const addedUp = addUp(this.report)
     const summary = []
+    const hasAdvance = addedUp.advance.amount !== null && addedUp.advance.amount > 0
     if (reportIsTravel(this.report)) {
       summary.push({ reference: this.t('labels.lumpSums'), sum: addedUp.lumpSums })
     }
-
-    summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
-    if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
-      addedUp.advance.amount = -1 * addedUp.advance.amount
+    if (reportIsTravel(this.report) || hasAdvance) {
+      summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
+    }
+    if (hasAdvance) {
+      addedUp.advance.amount = -1 * addedUp.advance.amount!
       summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
     }
     summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
@@ -722,6 +718,104 @@ class ReportPrint {
   }
 }
 
+// From https://github.com/Hopding/pdf-lib
+const lineSplit = (text: string) => text.split(/[\n\f\r\u000B]/)
+const cleanText = (text: string) => text.replace(/\t|\u0085|\u2028|\u2029/g, '    ').replace(/[\b\v]/g, '')
+const lastIndexOfWhitespace = (line: string) => {
+  for (let idx = line.length; idx > 0; idx--) {
+    if (/\s/.test(line[idx])) return idx
+  }
+  return undefined
+}
+const splitOutLines = (input: string, maxWidth: number, font: pdf_lib.PDFFont, fontSize: number) => {
+  let lastWhitespaceIdx = input.length
+  while (lastWhitespaceIdx > 0) {
+    const line = input.substring(0, lastWhitespaceIdx)
+    const encoded = font.encodeText(line)
+    const width = font.widthOfTextAtSize(line, fontSize)
+    if (width < maxWidth) {
+      const remainder = input.substring(lastWhitespaceIdx) || undefined
+      return { line, encoded, width, remainder }
+    }
+    lastWhitespaceIdx = lastIndexOfWhitespace(line) ?? 0
+  }
+
+  // We were unable to split the input enough to get a chunk that would fit
+  // within the specified `maxWidth` so we'll just return everything
+  return {
+    line: input,
+    encoded: font.encodeText(input),
+    width: font.widthOfTextAtSize(input, fontSize),
+    remainder: undefined
+  }
+}
+
+const layoutMultilineText = (
+  text: string,
+  { alignment, fontSize, font, bounds, lineHeightFactor }: pdf_lib.LayoutTextOptions & { lineHeightFactor?: number }
+): pdf_lib.MultilineTextLayout => {
+  const lines = lineSplit(cleanText(text))
+
+  if (fontSize === undefined || fontSize === 0) {
+    fontSize = 12
+  }
+  if (lineHeightFactor === undefined) {
+    lineHeightFactor = 0.2
+  }
+  const height = font.heightAtSize(fontSize)
+  const lineHeight = height + height * lineHeightFactor
+
+  const textLines: pdf_lib.TextPosition[] = []
+
+  let minX = bounds.x
+  let minY = bounds.y
+  let maxX = bounds.x + bounds.width
+  let maxY = bounds.y + bounds.height
+
+  let y = bounds.y + bounds.height
+  for (let idx = 0, len = lines.length; idx < len; idx++) {
+    let prevRemainder: string | undefined = lines[idx]
+    while (prevRemainder !== undefined) {
+      const { line, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize)
+
+      // prettier-ignore
+      const x = (
+          alignment === pdf_lib.TextAlignment.Left   ? bounds.x
+        : alignment === pdf_lib.TextAlignment.Center ? bounds.x + (bounds.width / 2) - (width / 2)
+        : alignment === pdf_lib.TextAlignment.Right  ? bounds.x + bounds.width - width
+        : bounds.x
+      );
+
+      y -= lineHeight
+
+      if (x < minX) minX = x
+      if (y < minY) minY = y
+      if (x + width > maxX) maxX = x + width
+      if (y + height > maxY) maxY = y + height
+
+      textLines.push({ text: line, encoded, width, height, x, y })
+
+      // Only trim lines that we had to split ourselves. So we won't trim lines
+      // that the user provided themselves with whitespace.
+      prevRemainder = remainder?.trim()
+    }
+  }
+
+  return {
+    fontSize,
+    lineHeight,
+    lines: textLines,
+    bounds: {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY
+    }
+  }
+}
+
+const flagPseudoSuffix = 'mim'
+
 class PDFDrawer {
   font: pdf_lib.PDFFont
   doc: pdf_lib.PDFDocument
@@ -773,6 +867,68 @@ class PDFDrawer {
     const isPortrait = orientation === 'portrait'
     const size = [this.settings.pageSize[isPortrait ? 0 : 1], this.settings.pageSize[isPortrait ? 1 : 0]] as [number, number]
     this.currentPage = this.doc.addPage(size)
+  }
+
+  /**
+   * returns bottom y end
+   */
+  drawMultilineText(text: string, options: Options & { alignment?: pdf_lib.TextAlignment; width?: number }) {
+    const opts = Object.assign(options, {
+      alignment: pdf_lib.TextAlignment.Left,
+      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
+    })
+    const multiLineText = layoutMultilineText(text, {
+      alignment: opts.alignment,
+      font: this.font,
+      fontSize: opts.fontSize,
+      bounds: { width: opts.width, height: opts.fontSize, x: opts.xStart, y: opts.yStart },
+      lineHeightFactor: 0
+    })
+    for (const line of multiLineText.lines) {
+      this.drawText(line.text, { xStart: line.x, yStart: line.y, fontSize: opts.fontSize })
+    }
+    return opts.yStart - multiLineText.bounds.height
+  }
+
+  async drawMultilineTextWithPlace(
+    text: string,
+    place: { country: CountrySimple; place?: string },
+    options: Options & { alignment?: pdf_lib.TextAlignment; width?: number }
+  ) {
+    const opts = Object.assign(options, {
+      alignment: pdf_lib.TextAlignment.Left,
+      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
+    })
+    const flagPseudoSuffixWidth =
+      this.font.widthOfTextAtSize(flagPseudoSuffix, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
+    if (place.place) {
+      text += place.place + ', '
+    }
+    text += place.country.name[this.settings.language]
+    text += flagPseudoSuffix
+
+    const multiLineText = layoutMultilineText(text, {
+      alignment: opts.alignment,
+      font: this.font,
+      fontSize: opts.fontSize,
+      bounds: { width: opts.width, height: opts.fontSize, x: opts.xStart, y: opts.yStart },
+      lineHeightFactor: 0
+    })
+    const len = multiLineText.lines.length
+    if (len > 0) {
+      const lastLine = multiLineText.lines[len - 1]
+      lastLine.text = lastLine.text.slice(0, lastLine.text.length - flagPseudoSuffix.length)
+
+      for (const line of multiLineText.lines) {
+        this.drawText(line.text, { xStart: line.x, yStart: line.y, fontSize: opts.fontSize })
+      }
+      await this.drawFlag(place.country._id, {
+        xStart: lastLine.x + lastLine.width - flagPseudoSuffixWidth,
+        yStart: lastLine.y,
+        fontSize: opts.fontSize
+      })
+    }
+    return opts.yStart - multiLineText.bounds.height
   }
 
   drawText(text: string, options: Options) {
@@ -853,27 +1009,6 @@ class PDFDrawer {
     }
   }
 
-  async drawPlace(place: { country: CountrySimple; place?: string }, options: Options & { prefix?: string }) {
-    const opts = Object.assign(
-      {
-        prefix: ''
-      },
-      options
-    )
-
-    let text = opts.prefix
-    if (place.place) {
-      text += place.place + ', '
-    }
-    text += place.country.name[this.settings.language]
-    const flagX = opts.xStart + this.font.widthOfTextAtSize(text, opts.fontSize) + opts.fontSize / 4
-
-    this.drawText(text, opts)
-
-    opts.xStart = flagX
-    await this.drawFlag(place.country._id, opts)
-  }
-
   async drawFlag(countryCode: CountryCode, options: Options) {
     const opts = options
 
@@ -896,12 +1031,10 @@ class PDFDrawer {
     })
   }
 
+  /**
+   * Oben links (xStart, yStart)
+   */
   async drawLogo(options: Options) {
-    const text = i18n.t('headlines.title', { lng: this.settings.language })
-    const flagX = options.xStart + this.font.widthOfTextAtSize(text, options.fontSize) + options.fontSize / 4
-
-    this.drawText(text, options)
-
     let filename = 'receipt'
     if (options.fontSize > 24) {
       filename = filename + '36'
@@ -912,12 +1045,20 @@ class PDFDrawer {
     }
     const logoBytes = await fs.readFile('./pdf/receipt/' + filename + '.png')
     const logo = await this.doc.embedPng(logoBytes)
+    const logoSize = this.font.heightAtSize(options.fontSize)
+    const y = options.yStart - logoSize * 0.8
 
     this.currentPage.drawImage(logo, {
-      x: flagX,
-      y: options.yStart - options.fontSize / 9,
-      height: options.fontSize,
-      width: options.fontSize
+      x: options.xStart,
+      y: y - logoSize / 5,
+      height: logoSize,
+      width: logoSize
+    })
+
+    this.drawText(i18n.t('headlines.title', { lng: this.settings.language }), {
+      xStart: options.xStart + logoSize + options.fontSize / 4,
+      yStart: y,
+      fontSize: options.fontSize
     })
   }
 
@@ -981,7 +1122,6 @@ class PDFDrawer {
     if (data.length == 0) {
       return options.yStart
     }
-    const flagPseudoSuffix = 'mim'
     const flagPseudoSuffixWidth =
       this.font.widthOfTextAtSize(flagPseudoSuffix, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
     const opts = Object.assign(
@@ -1036,20 +1176,18 @@ class PDFDrawer {
           cell = '---'
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
-        const multiText = pdf_lib.layoutMultilineText(
-          cell.toString() + (column.countryCodeForFlag && !opts.firstRow ? flagPseudoSuffix : ''),
-          {
-            alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
-            font: this.font,
-            fontSize: fontSize,
-            bounds: {
-              width: column.width - this.settings.cellPadding.x * 3,
-              height: fontSize,
-              x: x,
-              y: y
-            }
-          }
-        )
+        const multiText = layoutMultilineText(cell.toString() + (column.countryCodeForFlag && !opts.firstRow ? flagPseudoSuffix : ''), {
+          alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
+          font: this.font,
+          fontSize: fontSize,
+          bounds: {
+            width: column.width - this.settings.cellPadding.x * 3,
+            height: fontSize,
+            x: x,
+            y: y
+          },
+          lineHeightFactor: 0
+        })
         for (const line of multiText.lines) {
           cellTexts.push({
             text: line.text,
