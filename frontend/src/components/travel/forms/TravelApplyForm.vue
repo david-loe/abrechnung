@@ -72,7 +72,7 @@
     </template>
     <div class="mb-2">
       <label for="travelFormAdvance" class="form-label me-2">
-        {{ $t('labels.advance') }}
+        {{ $t('labels.advanceFromEmployer') }}
       </label>
       <InfoPoint :text="$t('info.advance')" />
       <div class="input-group" id="travelFormAdvance">
