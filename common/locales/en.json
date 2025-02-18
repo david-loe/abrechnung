@@ -576,7 +576,7 @@
   },
   "report": {
     "advance": {
-      "approvedXY": "Approved on {X} by {Y}."
+      "approvedXonYbyZ": "Advance in the amount of {X} approved by {Z} on {Y}."
     }
   },
   "settings": {},

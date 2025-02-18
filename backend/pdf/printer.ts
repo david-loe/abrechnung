@@ -205,25 +205,27 @@ class ReportPrint {
     }
     const receiptMap = Object.assign(optionalMap1.map, optionalMap2, getReceiptMap(this.report.expenses, optionalMap1.number).map)
 
-    y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.M })
+    y = y - 16
 
-    let yDates: number
     if (reportIsTravel(this.report) && this.report.state === 'approved') {
       //Advance
-      yDates = this.drawAdvanceApprovedText({
+      y = this.drawAdvanceApprovedText({
         xStart: this.drawer.settings.pagePadding,
         yStart: y,
         fontSize: this.drawer.settings.fontSizes.M
       })
     } else {
+      let yDates = y
+      y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
+
       yDates = await this.drawDates({
         xStart: this.drawer.currentPage.getSize().width - this.drawer.settings.pagePadding - 175, // 175: width of dates table
-        yStart: y - 16,
+        yStart: yDates,
         fontSize: this.drawer.settings.fontSizes.S
       })
+      y = y < yDates ? y : yDates
     }
 
-    y = y < yDates ? y : yDates
     y = await this.drawStages(receiptMap, {
       xStart: this.drawer.settings.pagePadding,
       yStart: y - 16,
@@ -381,18 +383,21 @@ class ReportPrint {
 
   drawAdvanceApprovedText(options: Options) {
     let y = options.yStart
-    y = y - options.fontSize * 1.5 * 1.5
-    this.drawer.drawText(
-      this.t('report.advance.approvedXY', {
-        X: this.drawer.formatter.date(this.report.updatedAt),
-        Y: this.report.editor.name.givenName + ' ' + this.report.editor.name.familyName
-      }),
-      {
-        xStart: options.xStart,
-        yStart: y,
-        fontSize: options.fontSize
-      }
-    )
+    if (reportIsTravel(this.report)) {
+      y = y - options.fontSize * 1.5 * 1.5
+      this.drawer.drawText(
+        this.t('report.advance.approvedXonYbyZ', {
+          X: this.drawer.formatter.detailedMoney(this.report.advance, true),
+          Y: this.drawer.formatter.date(this.report.updatedAt),
+          Z: this.report.editor.name.givenName + ' ' + this.report.editor.name.familyName
+        }),
+        {
+          xStart: options.xStart,
+          yStart: y,
+          fontSize: options.fontSize
+        }
+      )
+    }
     return y
   }
 
@@ -401,7 +406,7 @@ class ReportPrint {
     columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
     columns.push({
       key: 'sum',
-      width: 65,
+      width: 85,
       alignment: pdf_lib.TextAlignment.Right,
       title: 'sum',
       fn: (m: Money) => this.drawer.formatter.detailedMoney(m, true)
@@ -786,8 +791,8 @@ class PDFDrawer {
       x: 2,
       y: this.currentPage.getSize().height - (this.settings.fontSizes.L + 2),
       width: width,
-      height: this.settings.fontSizes.L + 2,
-      color: pdf_lib.rgb(0, 0, 0),
+      height: this.settings.fontSizes.L + 4,
+      color: pdf_lib.rgb(1, 1, 1), //white
       opacity: 0.5
     })
     this.drawText(text, {
