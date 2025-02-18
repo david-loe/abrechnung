@@ -196,14 +196,18 @@ class ReportPrint {
       fontSize: this.drawer.settings.fontSizes.M
     })
 
-    const optionalMap1 = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 0 }
-    const optionalMap2: ReceiptMap = {}
+    const optionalMapTravel = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 1 }
+    const optionalMapHealth: ReceiptMap = {}
     if (reportIsHealthCareCost(this.report) && this.report.refundSum.receipts && this.report.refundSum.receipts.length > 0) {
       for (const receipt of this.report.refundSum.receipts) {
-        optionalMap2[receipt._id!.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
+        optionalMapHealth[receipt._id!.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
       }
     }
-    const receiptMap = Object.assign(optionalMap1.map, optionalMap2, getReceiptMap(this.report.expenses, optionalMap1.number).map)
+    const receiptMap = Object.assign(
+      optionalMapTravel.map,
+      optionalMapHealth,
+      getReceiptMap(this.report.expenses, optionalMapTravel.number).map
+    )
 
     y = y - 16
 
@@ -785,7 +789,7 @@ class PDFDrawer {
     if (receipt.noNumberPrint) {
       return
     }
-    const text = '#' + receipt.number + ' - ' + this.formatter.date(receipt.date)
+    const text = '#' + receipt.number + (receipt.date ? ' - ' + this.formatter.date(receipt.date) : '')
     const width = this.font.widthOfTextAtSize(text, this.settings.fontSizes.L)
     this.currentPage.drawRectangle({
       x: 2,
