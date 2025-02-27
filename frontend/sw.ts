@@ -14,7 +14,12 @@ clientsClaim()
 //default caching strategy - no caching only using network
 setDefaultHandler(new NetworkOnly())
 // to allow work offline - setting default entry point for app
-registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist: [/^\/backend\/auth/, /\/report(?:\?|$)/] }))
+const denylist = [/\/report(?:\?|$)/]
+if (import.meta.env.VITE_BACKEND_URL.startsWith(import.meta.env.VITE_FRONTEND_URL)) {
+  const backendPath = import.meta.env.VITE_BACKEND_URL.replace(import.meta.env.VITE_FRONTEND_URL, '')
+  denylist.push(new RegExp(`^${backendPath}/auth`))
+}
+registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
 
 //caching all fonts with StaleWhileRevalidat strategy
 registerRoute(
@@ -53,12 +58,9 @@ const NetworkFirstToDB: RouteHandler = async ({ request }) => {
 }
 //register all Routes using the backend url for NetWorkFirstToDB RouteHandler
 registerRoute(({ request }) => {
-  const res =
+  const isBackendURLbutNotAuth =
     request.url.startsWith(import.meta.env.VITE_BACKEND_URL) && !request.url.startsWith(import.meta.env.VITE_BACKEND_URL + '/auth')
-  if (!res) {
-    console.log(request.url)
-  }
-  return res
+  return isBackendURLbutNotAuth
 }, NetworkFirstToDB)
 
 //saving data in indexedDB
