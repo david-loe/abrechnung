@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@vueform/vueform": "^1.12.3",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "json-editor-vue": "^0.17.3",
@@ -27,17 +27,17 @@
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^4.2.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.13.4",
+    "@types/node": "^22.13.5",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.9.18",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^5.2.1",
-    "eslint": "^9.20.1",
+    "eslint": "^9.21.0",
     "eslint-plugin-vue": "^9.32.0",
     "typescript": "^5.7.3",
     "vite": "^5.4.14",
     "vite-plugin-pwa": "^0.21.1",
-    "vue-tsc": "^2.2.2"
+    "vue-tsc": "^2.2.4"
   },
   "eslintConfig": {
     "root": true,
