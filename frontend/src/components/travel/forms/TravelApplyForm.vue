@@ -30,12 +30,7 @@
     <template
       v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate">
       <div class="form-check mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          v-model="formTravel.isCrossBorder"
-          id="travelFormIsCrossBorder"
-          @change="prepA1()" />
+        <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
         <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
         <InfoPoint :text="$t('info.isCrossBorder')" />
       </div>
@@ -182,7 +177,10 @@ export default defineComponent({
         endDate: '',
         destinationPlace: undefined,
         claimSpouseRefund: false,
-        a1Certificate: undefined,
+        a1Certificate: {
+          exactAddress: '',
+          destinationName: ''
+        },
         isCrossBorder: undefined,
         advance: {
           amount: null,
@@ -201,6 +199,9 @@ export default defineComponent({
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
       }
+      if (!this.formTravel.isCrossBorder) {
+        this.formTravel.a1Certificate = undefined
+      }
       return this.formTravel
     },
     input() {
@@ -213,13 +214,6 @@ export default defineComponent({
         return datetimeToDateString(date.valueOf() + this.$root.settings.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       } else {
         return ''
-      }
-    },
-    prepA1() {
-      if (this.formTravel.isCrossBorder) {
-        this.formTravel.a1Certificate = {}
-      } else {
-        this.formTravel.a1Certificate = undefined
       }
     }
   },
