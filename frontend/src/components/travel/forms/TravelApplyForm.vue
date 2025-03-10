@@ -21,16 +21,18 @@
       <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
 
-    <div v-if="formTravel.destinationPlace.country.needsA1Certificate" class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
-      <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
-      <InfoPoint :text="$t('info.isCrossBorder')" />
-    </div>
-
-    <div class="mb-2">
+    <div class="mb-3">
       <label for="travelFormReason" class="form-label me-2"> {{ $t('labels.reason') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.reason')" />
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
+    </div>
+
+    <div
+      v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate"
+      class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
+      <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
+      <InfoPoint :text="$t('info.isCrossBorder')" />
     </div>
 
     <div class="row mb-3">
@@ -187,6 +189,7 @@ export default defineComponent({
   },
   created() {
     this.formTravel = this.input()
+    console.log(this.formTravel)
   },
   watch: {
     travel: function () {
