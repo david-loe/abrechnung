@@ -334,11 +334,15 @@ export interface TravelSimple extends RequestSimple {
   comment?: string | null
   reason: string
   destinationPlace: Place
-  travelInsideOfEU: boolean
   startDate: Date | string
   endDate: Date | string
   advance: Money
   progress: number
+  isCrossBorder?: boolean | null
+  a1Certificate?: {
+    exactAddress: string
+    destinationName: string
+  } | null
   claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
   fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
@@ -528,8 +532,8 @@ export type UserReplaceReferencesResult = {
 
 export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel
 export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is TravelSimple
-export function reportIsTravel(report: any): report is { travelInsideOfEU: boolean } {
-  return typeof report.travelInsideOfEU === 'boolean'
+export function reportIsTravel(report: any): report is { reason: string } {
+  return typeof report.reason === 'string'
 }
 
 export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost

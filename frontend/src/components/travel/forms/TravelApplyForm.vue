@@ -21,10 +21,10 @@
       <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
 
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" v-model="formTravel.travelInsideOfEU" id="travelFormTravelInsideOfEU" />
-      <label class="form-check-label me-2" for="travelFormTravelInsideOfEU"> {{ $t('labels.travelInsideOfEU') }} </label>
-      <InfoPoint :text="$t('info.travelInsideOfEU')" />
+    <div v-if="formTravel.destinationPlace.country.needsA1Certificate" class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
+      <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
+      <InfoPoint :text="$t('info.isCrossBorder')" />
     </div>
 
     <div class="mb-2">
@@ -152,7 +152,6 @@ export default defineComponent({
         startDate: '',
         endDate: '',
         destinationPlace: undefined,
-        travelInsideOfEU: false,
         claimSpouseRefund: false,
         advance: {
           amount: null,

@@ -51,17 +51,7 @@ import { TravelSimple, travelStates } from '../../../../../common/types.js'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import StatePipeline from '../../elements/StatePipeline.vue'
 
-const keys = [
-  'owner',
-  'reason',
-  'startDate',
-  'endDate',
-  'travelInsideOfEU',
-  'editor',
-  'comments',
-  'claimSpouseRefund',
-  'fellowTravelersNames'
-]
+const keys = ['owner', 'reason', 'startDate', 'endDate', 'isCrossBorder', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames']
 export default defineComponent({
   name: 'TravelApply',
   data() {
