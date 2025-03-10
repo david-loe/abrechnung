@@ -21,17 +21,41 @@
       <PlaceInput id="travelFormDestinationPlace" v-model="formTravel.destinationPlace" :required="true"></PlaceInput>
     </div>
 
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" v-model="formTravel.travelInsideOfEU" id="travelFormTravelInsideOfEU" />
-      <label class="form-check-label me-2" for="travelFormTravelInsideOfEU"> {{ $t('labels.travelInsideOfEU') }} </label>
-      <InfoPoint :text="$t('info.travelInsideOfEU')" />
-    </div>
-
-    <div class="mb-2">
+    <div class="mb-3">
       <label for="travelFormReason" class="form-label me-2"> {{ $t('labels.reason') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.reason')" />
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
     </div>
+
+    <template
+      v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate">
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
+        <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
+        <InfoPoint :text="$t('info.isCrossBorder')" />
+      </div>
+      <template v-if="formTravel.isCrossBorder">
+        <div class="mb-3">
+          <label for="travelFormExactAddress" class="form-label me-2">
+            {{ $t('labels.exactAddress') }}<span class="text-danger">*</span>
+          </label>
+          <InfoPoint :text="$t('info.exactAddress')" />
+          <input type="text" class="form-control" id="travelFormExactAddress" v-model="formTravel.a1Certificate.exactAddress" required />
+        </div>
+        <div class="mb-3">
+          <label for="travelFormDestinationName" class="form-label me-2">
+            {{ $t('labels.destinationName') }}<span class="text-danger">*</span>
+          </label>
+          <InfoPoint :text="$t('info.destinationName')" />
+          <input
+            type="text"
+            class="form-control"
+            id="travelFormDestinationName"
+            v-model="formTravel.a1Certificate.destinationName"
+            required />
+        </div>
+      </template>
+    </template>
 
     <div class="row mb-3">
       <div class="col-auto">
@@ -152,8 +176,12 @@ export default defineComponent({
         startDate: '',
         endDate: '',
         destinationPlace: undefined,
-        travelInsideOfEU: false,
         claimSpouseRefund: false,
+        a1Certificate: {
+          exactAddress: '',
+          destinationName: ''
+        },
+        isCrossBorder: undefined,
         advance: {
           amount: null,
           currency: baseCurrency
@@ -170,6 +198,9 @@ export default defineComponent({
       this.loading = true
       if (this.settingsChanged) {
         this.$root.pushUserSettings(this.$root.user.settings)
+      }
+      if (!this.formTravel.isCrossBorder) {
+        this.formTravel.a1Certificate = undefined
       }
       return this.formTravel
     },

@@ -81,9 +81,12 @@
     "claimOvernightLumpSum": "Du kannst entweder Übernachtungspauschalen beanspruchen oder die tatsächlichen Kosten für Übernachtungen abrechnen.",
     "claimSpouseRefund": "Wenn du gemeinsam mit deinem Ehepartner verreist und er auch erstattungberechtigt ist, kannst du ihn mitabrechnen.",
     "cost": "Trage hier die Kosten ein.",
+    "destinationName": "Name von der Unterkunft oder Firma",
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
+    "exactAddress": "Gib hier die genaue Adresse deines Reiseziels an.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
+    "isCrossBorder": "Gib an ob es sich bei der Reise um eine grenzüberschreitende Reise handelt.",
     "lastPlaceOfWork": "Wähle hier deinen letzten Tätigkeitsort aus, dieser ist maßgebend für die Pauschalen deiner Rückreise.",
     "loseAccessAt": "Stelle hier ein Datum ein, ab dem der Nutzer keinen Zugriff mehr zu @:{'headlines.title'}@:{'headlines.emoji'} haben soll.",
     "midnightCountries": "Gib an in welchen Land du dich um Mitternacht befandest, die Verpflegungspauschale hängt davon ab.",
@@ -167,6 +170,7 @@
     }
   },
   "labels": {
+    "a1Certificate": "A1 Bescheinigung",
     "access": "Zugriffsrechte",
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
@@ -233,6 +237,7 @@
     "delOverwritten": "Soll der zu überschreibende Benutzer gelöscht werden?",
     "departure": "Abfahrt /-flug",
     "description": "Beschreibung",
+    "destinationName": "Name des Reiseziels",
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
     "disableReportType": "Antragsarten deaktivieren",
@@ -252,6 +257,7 @@
     "endDate": "Enddatum",
     "endLocation": "Nach",
     "error": "Fehler ❌",
+    "exactAddress": "Genaue Adresse",
     "examine": "Prüfen",
     "examinedBy": "Geprüft von",
     "examinedOn": "Geprüft am",
@@ -287,6 +293,7 @@
     "install": "Installieren",
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
+    "isCrossBorder": "Ist eine Grenzüberschreitende Reise",
     "language": "Sprache",
     "lastCountries": "Letzte Länder",
     "lastCurrencies": "Letzte Währungen",
@@ -311,6 +318,7 @@
     "model": "Modell",
     "models": "Modelle",
     "name": "Name",
+    "needsA1Certificate": "Benötigt A1 Bescheinigung",
     "new": "Neu",
     "newX": "{X} - Neu",
     "none": "gar nicht",
@@ -517,6 +525,10 @@
     },
     "regards": "Beste Grüße",
     "travel": {
+      "a1": {
+        "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",
+        "subject": "🗂️ A1 Bescheinigung nötig"
+      },
       "appliedFor": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Reiseantrag von {owner} kam grade rein.",

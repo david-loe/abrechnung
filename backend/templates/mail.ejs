@@ -368,7 +368,15 @@
                         </table>
                         <% } %>
                         <% if (lastParagraph) { %>
-                        <p><%= lastParagraph %></p>
+                        <p>
+                        <% if (Array.isArray(lastParagraph)) { %>
+                          <% for (const par of lastParagraph) { %>
+                            <%= par %><br>
+                          <% } %>
+                        <% }else{ %>
+                          <%= lastParagraph %>
+                        <% } %>
+                        </p>
                         <% } %>
                         <p><%= regards %></p>
                       </td>

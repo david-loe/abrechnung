@@ -80,9 +80,12 @@
     "claimOvernightLumpSum": "You can either claim overnight lump sums or account for the actual cost of overnight accommodations.",
     "claimSpouseRefund": "If you are traveling with your spouse and he is also eligible for reimbursement, you can bill him as well.",
     "cost": "Enter the cost here.",
+    "destinationName": "Name of the accommodation or company",
     "destinationPlace": "Specify here the place that is the destination of your trip.",
+    "exactAddress": "Enter the exact address of your destination here.",
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)",
     "insurance": "Select your health insurance company, which will be asked to reimburse your health costs.",
+    "isCrossBorder": "Specify whether the trip is a cross-border trip.",
     "lastPlaceOfWork": "Select your last place of work here, this is decisive for the lump sums of your departure.",
     "loseAccessAt": "Set a date here from which the user should no longer have access to @:{'headlines.title'}@:{'headlines.emoji'}",
     "midnightCountries": "Specify which country you were in at midnight, the food allowance depends on it.",
@@ -166,6 +169,7 @@
     }
   },
   "labels": {
+    "a1Certificate": "A1 Certificate",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",
@@ -232,6 +236,7 @@
     "delOverwritten": "Should the overwritten user be deleted?",
     "departure": "Departure",
     "description": "Description",
+    "destinationName": "Destination name",
     "destinationPlace": "Destination place",
     "dinner": "Dinner",
     "disableReportType": "Deactivate application types",
@@ -251,6 +256,7 @@
     "endDate": "End date",
     "endLocation": "End",
     "error": "Error ❌",
+    "exactAddress": "Exact address",
     "examine": "Examine",
     "examinedBy": "Examined by",
     "examinedOn": "Examined on",
@@ -286,6 +292,7 @@
     "install": "Install",
     "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
+    "isCrossBorder": "Is a cross-border trip",
     "language": "Language",
     "lastCountries": "Last countries",
     "lastCurrencies": "Last currencies",
@@ -310,6 +317,7 @@
     "model": "Model",
     "models": "Models",
     "name": "Name",
+    "needsA1Certificate": "Needs A1 certificate",
     "new": "New",
     "newX": "New {X}",
     "none": "not at all",
@@ -516,6 +524,10 @@
     },
     "regards": "Best Regards",
     "travel": {
+      "a1": {
+        "paragraph": "A new business trip requires an A1 certificate:",
+        "subject": "🗂️ A1 certificate required"
+      },
       "appliedFor": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new travel application from {owner} just came in.",

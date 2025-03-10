@@ -15,7 +15,6 @@ let travel: TravelSimple = {
     country: { _id: 'TR' },
     place: 'Ankara'
   },
-  travelInsideOfEU: false,
   startDate: new Date('2023-08-24T00:00:00.000Z'),
   endDate: new Date('2023-09-02T00:00:00.000Z'),
   advance: {

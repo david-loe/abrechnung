@@ -1,6 +1,6 @@
 import ejs from 'ejs'
 import nodemailer from 'nodemailer'
-import { User as IUser, Locale } from '../../common/types.js'
+import { Contact, User as IUser, Locale } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
@@ -17,11 +17,11 @@ export async function getClient() {
 }
 
 export async function sendMail(
-  recipients: IUser[],
+  recipients: Array<Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }>,
   subject: string,
   paragraph: string,
   button?: { text: string; link: string },
-  lastParagraph?: string,
+  lastParagraph?: string | string[],
   authenticateLink = true
 ) {
   const mailPromises = []
@@ -43,12 +43,12 @@ export async function sendMail(
 }
 
 async function _sendMail(
-  recipient: IUser,
+  recipient: Contact,
   subject: string,
   paragraph: string,
   language: Locale,
   button?: { text: string; link: string },
-  lastParagraph?: string
+  lastParagraph?: string | string[]
 ) {
   const mailClient = await getClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
@@ -73,8 +73,7 @@ async function _sendMail(
     paragraph +
     '\n\n' +
     (button ? button.text + ': ' + button.link + '\n\n' : '') +
-    lastParagraph +
-    '\n\n' +
+    (lastParagraph ? (Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph) + '\n\n' : '') +
     regards +
     '\n\n' +
     app.name +

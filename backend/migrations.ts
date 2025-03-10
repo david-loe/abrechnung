@@ -124,6 +124,7 @@ export async function checkForMigrations() {
       }
       await mongoose.connection.collection('displaysettings').updateOne({}, { $set: displaySettingsFromEnv })
     }
+
     if (semver.lte(migrateFrom, '1.4.1')) {
       console.log('Apply migration from v1.4.1: Add PDFReportsViaEmail Settings')
       const displaySettings = await mongoose.connection.collection('displaysettings').findOne({})
@@ -134,6 +135,7 @@ export async function checkForMigrations() {
           { $set: { PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: displaySettings?.locale?.default || 'de' } } }
         )
     }
+
     if (semver.lte(migrateFrom, '1.5.2')) {
       console.log('Apply migration from v1.5.2: Add log to reports')
       async function writeLogFromHistory(collection: string) {
@@ -153,6 +155,39 @@ export async function checkForMigrations() {
       await writeLogFromHistory('expensereports')
       await writeLogFromHistory('healthcarecosts')
     }
+
+    if (semver.lte(migrateFrom, '1.5.4')) {
+      console.log('Apply migration from v1.5.4: Add needsA1Certificate to countries')
+      // prettier-ignore
+      const a1countries = [
+        // andere Mitgliedstaaten der Europäischen Union (EU)
+        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
+        "PL", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
+        "PT", "RO", "SK", "SI", "ES", "SE", // "DE" not
+        // Weitere europäische Länder
+        "IS", "LI", "NO", "CH", "GB"
+      ] as const
+      await mongoose.connection
+        .collection<{ _id: string }>('countries')
+        .updateMany({ _id: { $in: a1countries } }, { $set: { needsA1Certificate: true } })
+    }
+
+    if (semver.lte(migrateFrom, '1.5.4')) {
+      console.log('Apply migration from v1.5.4: migrate travelInsideOfEU to isCrossBorder and a1Certificate')
+
+      await mongoose.connection.collection<{ _id: string }>('travels').updateMany({ travelInsideOfEU: true }, [
+        {
+          $set: {
+            isCrossBorder: true,
+            a1Certificate: {
+              exactAddress: '$destinationPlace.place',
+              destinationName: '$destinationPlace.place'
+            }
+          }
+        }
+      ])
+    }
+
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()

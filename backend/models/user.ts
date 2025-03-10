@@ -96,7 +96,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'settings.insurance' }),
     doc.populate({ path: 'settings.organisation', select: { name: 1 } }),
     doc.populate({ path: 'settings.lastCurrencies' }),
-    doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1 } }),
+    doc.populate({ path: 'settings.lastCountries', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }),
     doc.populate({ path: 'projects.assigned' }),
     doc.populate({ path: 'vehicleRegistration', select: { name: 1, type: 1 } }),
     doc.populate<{ token: Token }>({ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } })

@@ -1,13 +1,16 @@
+import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
 import {
   ExpenseReportSimple,
   HealthCareCostSimple,
   Locale,
-  ReportType,
-  TravelSimple,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  ReportType,
+  TravelSimple
 } from '../../common/types.js'
+import { getDisplaySettings } from '../db.js'
 import i18n, { formatter } from '../i18n.js'
+import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendMail } from './mail.js'
 import { sendPushNotification } from './push.js'
@@ -75,4 +78,36 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)
+}
+
+export async function sendA1Notification(report: TravelSimple) {
+  const org = await Organisation.findOne({ _id: report.project.organisation })
+  if (org?.a1CertificateEmail) {
+    const language = (await getDisplaySettings()).locale.default
+    const dif = getDiffInDays(report.startDate, report.endDate) + 1
+    const t = (key: string) => i18n.t(key, { lng: language })
+    const subject = t('mail.travel.a1.subject')
+    const paragraph = t('mail.travel.a1.paragraph')
+    const lastParagraph = [
+      `${t('labels.traveler')}: ${report.owner.name.givenName} ${report.owner.name.familyName}`,
+      `${t('labels.reason')}: ${report.reason}`,
+      `${t('labels.startDate')}: ${formatter.date(report.startDate, language)}`,
+      `${t('labels.endDate')}: ${formatter.date(report.endDate)} (${dif} ${t('labels.' + (dif == 1 ? 'day' : 'days'))})`,
+      `${t('labels.destinationPlace')}: ${PlaceToString(report.destinationPlace, language)}`,
+      `${t('labels.approvedBy')}: ${report.editor.name.givenName} ${report.editor.name.familyName}`,
+      `${t('labels.destinationName')}: ${report.a1Certificate?.destinationName}`,
+      `${t('labels.exactAddress')}: ${report.a1Certificate?.exactAddress}`
+    ]
+    if (report.fellowTravelersNames) {
+      lastParagraph.splice(1, 0, `\n${t('labels.fellowTravelersNames')}: ${report.fellowTravelersNames}`)
+    }
+    sendMail(
+      [{ email: org.a1CertificateEmail, fk: {}, settings: { language }, name: { givenName: org.name, familyName: '' } }],
+      subject,
+      paragraph,
+      undefined,
+      lastParagraph,
+      false
+    )
+  }
 }
