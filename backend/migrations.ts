@@ -160,10 +160,10 @@ export async function checkForMigrations() {
       console.log('Apply migration from v1.5.4: Add needsA1Certificate to countries')
       // prettier-ignore
       const a1countries = [
-        // Mitgliedstaaten der Europäischen Union (EU)
+        // andere Mitgliedstaaten der Europäischen Union (EU)
         "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
-        "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
-        "PL", "PT", "RO", "SK", "SI", "ES", "SE",
+        "PL", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
+        "PT", "RO", "SK", "SI", "ES", "SE", // "DE" not
         // Weitere europäische Länder
         "IS", "LI", "NO", "CH", "GB"
       ] as const
