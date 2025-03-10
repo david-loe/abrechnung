@@ -219,7 +219,6 @@ export default defineComponent({
   },
   created() {
     this.formTravel = this.input()
-    console.log(this.formTravel)
   },
   watch: {
     travel: function () {

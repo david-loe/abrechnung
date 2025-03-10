@@ -68,11 +68,17 @@ async function _sendMail(
     app
   })
   const plainText =
-    salutation + '\n\n' + paragraph + '\n\n' + (button ? button.text + ': ' + button.link + '\n\n' : '') + lastParagraph
-      ? Array.isArray(lastParagraph)
-        ? lastParagraph.join('\n')
-        : lastParagraph
-      : '' + '\n\n' + regards + '\n\n' + app.name + ': ' + app.url
+    salutation +
+    '\n\n' +
+    paragraph +
+    '\n\n' +
+    (button ? button.text + ': ' + button.link + '\n\n' : '') +
+    (lastParagraph ? (Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph) + '\n\n' : '') +
+    regards +
+    '\n\n' +
+    app.name +
+    ': ' +
+    app.url
 
   return await mailClient.sendMail({
     from: '"' + app.name + '" <' + mailClient.options.from + '>', // sender address
