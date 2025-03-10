@@ -11,6 +11,7 @@ export const countrySchema = new Schema<Country>({
     },
     required: true
   },
+  needsA1Certificate: { type: Boolean },
   alias: {
     type: {
       de: { type: [{ type: String, trim: true }] },

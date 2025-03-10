@@ -153,6 +153,21 @@ export async function checkForMigrations() {
       await writeLogFromHistory('expensereports')
       await writeLogFromHistory('healthcarecosts')
     }
+    if (semver.lte(migrateFrom, '1.5.4')) {
+      console.log('Apply migration from v1.5.4: Add needsA1Certificate to countries')
+      // prettier-ignore
+      const a1countries = [
+        // Mitgliedstaaten der Europäischen Union (EU)
+        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
+        "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
+        "PL", "PT", "RO", "SK", "SI", "ES", "SE",
+        // Weitere europäische Länder
+        "IS", "LI", "NO", "CH", "GB"
+      ] as const
+      await mongoose.connection
+        .collection<{ _id: string }>('countries')
+        .updateMany({ _id: { $in: a1countries } }, { $set: { needsA1Certificate: true } })
+    }
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()

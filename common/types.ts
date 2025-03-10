@@ -107,15 +107,16 @@ export interface DisplaySettings {
 export type CountryCode = string
 
 export interface CountrySimple {
+  _id: CountryCode
   name: {
     de: string
     en: string
   }
+  needsA1Certificate?: boolean | null
   alias?: {
     de: string[]
     en?: string[]
   }
-  _id: CountryCode
   flag?: string | null
   currency?: CurrencyCode | null
 }
