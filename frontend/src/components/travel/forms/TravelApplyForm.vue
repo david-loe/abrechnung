@@ -27,13 +27,40 @@
       <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required />
     </div>
 
-    <div
-      v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate"
-      class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" />
-      <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
-      <InfoPoint :text="$t('info.isCrossBorder')" />
-    </div>
+    <template
+      v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate">
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          v-model="formTravel.isCrossBorder"
+          id="travelFormIsCrossBorder"
+          @change="prepA1()" />
+        <label class="form-check-label me-2" for="travelFormIsCrossBorder"> {{ $t('labels.isCrossBorder') }} </label>
+        <InfoPoint :text="$t('info.isCrossBorder')" />
+      </div>
+      <template v-if="formTravel.isCrossBorder">
+        <div class="mb-3">
+          <label for="travelFormExactAddress" class="form-label me-2">
+            {{ $t('labels.exactAddress') }}<span class="text-danger">*</span>
+          </label>
+          <InfoPoint :text="$t('info.exactAddress')" />
+          <input type="text" class="form-control" id="travelFormExactAddress" v-model="formTravel.a1Certificate.exactAddress" required />
+        </div>
+        <div class="mb-3">
+          <label for="travelFormDestinationName" class="form-label me-2">
+            {{ $t('labels.destinationName') }}<span class="text-danger">*</span>
+          </label>
+          <InfoPoint :text="$t('info.destinationName')" />
+          <input
+            type="text"
+            class="form-control"
+            id="travelFormDestinationName"
+            v-model="formTravel.a1Certificate.destinationName"
+            required />
+        </div>
+      </template>
+    </template>
 
     <div class="row mb-3">
       <div class="col-auto">
@@ -155,6 +182,8 @@ export default defineComponent({
         endDate: '',
         destinationPlace: undefined,
         claimSpouseRefund: false,
+        a1Certificate: undefined,
+        isCrossBorder: undefined,
         advance: {
           amount: null,
           currency: baseCurrency
@@ -184,6 +213,13 @@ export default defineComponent({
         return datetimeToDateString(date.valueOf() + this.$root.settings.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       } else {
         return ''
+      }
+    },
+    prepA1() {
+      if (this.formTravel.isCrossBorder) {
+        this.formTravel.a1Certificate = {}
+      } else {
+        this.formTravel.a1Certificate = undefined
       }
     }
   },
