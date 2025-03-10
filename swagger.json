@@ -115,6 +115,9 @@
 			},
 			"CountrySimple": {
 				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
 					"name": {
 						"properties": {
 							"en": {
@@ -129,6 +132,10 @@
 							"de"
 						],
 						"type": "object"
+					},
+					"needsA1Certificate": {
+						"type": "boolean",
+						"nullable": true
 					},
 					"alias": {
 						"properties": {
@@ -150,9 +157,6 @@
 						],
 						"type": "object"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
 					"flag": {
 						"type": "string",
 						"nullable": true
@@ -167,8 +171,8 @@
 					}
 				},
 				"required": [
-					"name",
-					"_id"
+					"_id",
+					"name"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -553,6 +557,9 @@
 									"properties": {
 										"currency": {
 											"type": "string"
+										},
+										"needsA1Certificate": {
+											"type": "boolean"
 										},
 										"flag": {
 											"type": "string"
@@ -1226,6 +1233,9 @@
 												"currency": {
 													"type": "string"
 												},
+												"needsA1Certificate": {
+													"type": "boolean"
+												},
 												"flag": {
 													"type": "string"
 												},
@@ -1536,6 +1546,9 @@
 											"properties": {
 												"currency": {
 													"type": "string"
+												},
+												"needsA1Certificate": {
+													"type": "boolean"
 												},
 												"flag": {
 													"type": "string"
@@ -2625,9 +2638,6 @@
 					"destinationPlace": {
 						"$ref": "#/components/schemas/Place"
 					},
-					"travelInsideOfEU": {
-						"type": "boolean"
-					},
 					"startDate": {
 						"anyOf": [
 							{
@@ -2656,6 +2666,26 @@
 					"progress": {
 						"type": "number",
 						"format": "double"
+					},
+					"isCrossBorder": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"destinationName",
+							"exactAddress"
+						],
+						"type": "object",
+						"nullable": true
 					},
 					"claimSpouseRefund": {
 						"type": "boolean",
@@ -2717,7 +2747,6 @@
 					"comments",
 					"reason",
 					"destinationPlace",
-					"travelInsideOfEU",
 					"startDate",
 					"endDate",
 					"advance",
@@ -2821,9 +2850,6 @@
 					"destinationPlace": {
 						"$ref": "#/components/schemas/Place"
 					},
-					"travelInsideOfEU": {
-						"type": "boolean"
-					},
 					"startDate": {
 						"anyOf": [
 							{
@@ -2852,6 +2878,26 @@
 					"progress": {
 						"type": "number",
 						"format": "double"
+					},
+					"isCrossBorder": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"destinationName",
+							"exactAddress"
+						],
+						"type": "object",
+						"nullable": true
 					},
 					"claimSpouseRefund": {
 						"type": "boolean",
@@ -2913,7 +2959,6 @@
 					"comments",
 					"reason",
 					"destinationPlace",
-					"travelInsideOfEU",
 					"startDate",
 					"endDate",
 					"advance",
@@ -2964,11 +3009,12 @@
 								"comment",
 								"reason",
 								"destinationPlace",
-								"travelInsideOfEU",
 								"startDate",
 								"endDate",
 								"advance",
 								"progress",
+								"isCrossBorder",
+								"a1Certificate",
 								"claimSpouseRefund",
 								"fellowTravelersNames",
 								"claimOvernightLumpSum",
@@ -3008,6 +3054,20 @@
 						"type": "string"
 					},
 					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"isCrossBorder": {
 						"type": "boolean"
 					},
 					"advance": {
@@ -3050,9 +3110,6 @@
 								"format": "date-time"
 							}
 						]
-					},
-					"travelInsideOfEU": {
-						"type": "boolean"
 					},
 					"destinationPlace": {
 						"properties": {
@@ -3503,9 +3560,6 @@
 					"destinationPlace": {
 						"$ref": "#/components/schemas/Place"
 					},
-					"travelInsideOfEU": {
-						"type": "boolean"
-					},
 					"startDate": {
 						"anyOf": [
 							{
@@ -3535,6 +3589,26 @@
 						"type": "number",
 						"format": "double"
 					},
+					"isCrossBorder": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"destinationName",
+							"exactAddress"
+						],
+						"type": "object",
+						"nullable": true
+					},
 					"claimSpouseRefund": {
 						"type": "boolean",
 						"nullable": true
@@ -3557,7 +3631,6 @@
 					"comments",
 					"reason",
 					"destinationPlace",
-					"travelInsideOfEU",
 					"startDate",
 					"endDate",
 					"advance",
@@ -4143,6 +4216,20 @@
 					"claimSpouseRefund": {
 						"type": "boolean"
 					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"isCrossBorder": {
+						"type": "boolean"
+					},
 					"endDate": {
 						"anyOf": [
 							{
@@ -4164,9 +4251,6 @@
 								"format": "date-time"
 							}
 						]
-					},
-					"travelInsideOfEU": {
-						"type": "boolean"
 					},
 					"destinationPlace": {
 						"properties": {
@@ -4219,6 +4303,20 @@
 					"claimSpouseRefund": {
 						"type": "boolean"
 					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"isCrossBorder": {
+						"type": "boolean"
+					},
 					"endDate": {
 						"anyOf": [
 							{
@@ -4240,9 +4338,6 @@
 								"format": "date-time"
 							}
 						]
-					},
-					"travelInsideOfEU": {
-						"type": "boolean"
 					},
 					"destinationPlace": {
 						"properties": {
@@ -5380,6 +5475,10 @@
 						"type": "string",
 						"nullable": true
 					},
+					"a1CertificateEmail": {
+						"type": "string",
+						"nullable": true
+					},
 					"bankDetails": {
 						"type": "string",
 						"nullable": true
@@ -5450,6 +5549,10 @@
 						"type": "string",
 						"nullable": true
 					},
+					"a1CertificateEmail": {
+						"type": "string",
+						"nullable": true
+					},
 					"bankDetails": {
 						"type": "string",
 						"nullable": true
@@ -5502,6 +5605,7 @@
 								"_id",
 								"subfolderPath",
 								"reportEmail",
+								"a1CertificateEmail",
 								"bankDetails",
 								"companyNumber",
 								"logo",
@@ -5558,6 +5662,9 @@
 					"bankDetails": {
 						"type": "string"
 					},
+					"a1CertificateEmail": {
+						"type": "string"
+					},
 					"reportEmail": {
 						"type": "string"
 					},
@@ -5585,6 +5692,9 @@
 						"type": "string"
 					},
 					"bankDetails": {
+						"type": "string"
+					},
+					"a1CertificateEmail": {
 						"type": "string"
 					},
 					"reportEmail": {
@@ -6760,6 +6870,9 @@
 			},
 			"Country": {
 				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
 					"name": {
 						"properties": {
 							"en": {
@@ -6774,6 +6887,10 @@
 							"de"
 						],
 						"type": "object"
+					},
+					"needsA1Certificate": {
+						"type": "boolean",
+						"nullable": true
 					},
 					"alias": {
 						"properties": {
@@ -6794,9 +6911,6 @@
 							"de"
 						],
 						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/CountryCode"
 					},
 					"flag": {
 						"type": "string",
@@ -6822,8 +6936,8 @@
 					}
 				},
 				"required": [
-					"name",
 					"_id",
+					"name",
 					"lumpSums"
 				],
 				"type": "object",
@@ -6857,6 +6971,9 @@
 			},
 			"ICountry": {
 				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
 					"name": {
 						"properties": {
 							"en": {
@@ -6871,6 +6988,10 @@
 							"de"
 						],
 						"type": "object"
+					},
+					"needsA1Certificate": {
+						"type": "boolean",
+						"nullable": true
 					},
 					"alias": {
 						"properties": {
@@ -6891,9 +7012,6 @@
 							"de"
 						],
 						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/CountryCode"
 					},
 					"flag": {
 						"type": "string",
@@ -6919,8 +7037,8 @@
 					}
 				},
 				"required": [
-					"name",
 					"_id",
+					"name",
 					"lumpSums"
 				],
 				"type": "object",
@@ -6945,9 +7063,10 @@
 						"items": {
 							"type": "string",
 							"enum": [
-								"name",
-								"alias",
 								"_id",
+								"name",
+								"needsA1Certificate",
+								"alias",
 								"flag",
 								"currency",
 								"lumpSums",
@@ -7026,6 +7145,9 @@
 					},
 					"currency": {
 						"type": "string"
+					},
+					"needsA1Certificate": {
+						"type": "boolean"
 					},
 					"flag": {
 						"type": "string"
@@ -8305,11 +8427,12 @@
 									"comment",
 									"reason",
 									"destinationPlace",
-									"travelInsideOfEU",
 									"startDate",
 									"endDate",
 									"advance",
 									"progress",
+									"isCrossBorder",
+									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
 									"claimOvernightLumpSum",
@@ -8928,11 +9051,12 @@
 									"comment",
 									"reason",
 									"destinationPlace",
-									"travelInsideOfEU",
 									"startDate",
 									"endDate",
 									"advance",
 									"progress",
+									"isCrossBorder",
+									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
 									"claimOvernightLumpSum",
@@ -9182,11 +9306,12 @@
 									"comment",
 									"reason",
 									"destinationPlace",
-									"travelInsideOfEU",
 									"startDate",
 									"endDate",
 									"advance",
 									"progress",
+									"isCrossBorder",
+									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
 									"claimOvernightLumpSum",
@@ -10146,6 +10271,7 @@
 									"_id",
 									"subfolderPath",
 									"reportEmail",
+									"a1CertificateEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
@@ -10230,6 +10356,7 @@
 									"_id",
 									"subfolderPath",
 									"reportEmail",
+									"a1CertificateEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
@@ -11526,6 +11653,7 @@
 									"_id",
 									"subfolderPath",
 									"reportEmail",
+									"a1CertificateEmail",
 									"bankDetails",
 									"companyNumber",
 									"logo",
@@ -13114,9 +13242,10 @@
 							"items": {
 								"type": "string",
 								"enum": [
-									"name",
-									"alias",
 									"_id",
+									"name",
+									"needsA1Certificate",
+									"alias",
 									"flag",
 									"currency",
 									"lumpSums",
