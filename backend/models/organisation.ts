@@ -4,6 +4,7 @@ import { emailRegex, Organisation } from '../../common/types.js'
 export const organisationSchema = new Schema<Organisation>({
   name: { type: String, trim: true, required: true },
   reportEmail: { type: String, validate: emailRegex },
+  a1CertificateEmail: { type: String, validate: emailRegex },
   website: { type: String },
   bankDetails: { type: String },
   companyNumber: { type: String, trim: true },

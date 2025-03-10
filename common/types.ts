@@ -218,6 +218,7 @@ export interface ProjectWithUsers extends Project, ProjectUsers {}
 export interface Organisation extends OrganisationSimple {
   subfolderPath: string
   reportEmail?: string | null
+  a1CertificateEmail?: string | null
   bankDetails?: string | null
   companyNumber?: string | null
   logo?: DocumentFile<ImageType> | null

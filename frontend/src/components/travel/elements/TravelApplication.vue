@@ -51,7 +51,7 @@ import { TravelSimple, travelStates } from '../../../../../common/types.js'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import StatePipeline from '../../elements/StatePipeline.vue'
 
-const keys = ['owner', 'reason', 'startDate', 'endDate', 'isCrossBorder', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames']
+const keys = ['owner', 'reason', 'startDate', 'endDate', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames', 'a1Certificate']
 export default defineComponent({
   name: 'TravelApply',
   data() {
@@ -87,6 +87,12 @@ export default defineComponent({
           if (this.travel.comments.length > 0) {
             const c = this.travel.comments[this.travel.comments.length - 1]
             return c.author.name.givenName + ': "' + c.text + '"'
+          } else {
+            return ''
+          }
+        case 'a1Certificate':
+          if (this.travel.a1Certificate) {
+            return this.travel.a1Certificate.destinationName + ' - ' + this.travel.a1Certificate.exactAddress
           } else {
             return ''
           }

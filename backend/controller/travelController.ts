@@ -7,7 +7,7 @@ import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, write
 import i18n from '../i18n.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
-import { sendNotification } from '../notifications/notification.js'
+import { sendA1Notification, sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
@@ -149,6 +149,7 @@ export class TravelController extends Controller {
   @Post('approved')
   public async postApproved(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
     let extendedBody: SetterBody<ITravel> = requestBody
+    let cb = (travel: ITravel) => {}
     if (!extendedBody._id) {
       if (!request.user!.access['approved:travel']) {
         throw new AuthorizationError()
@@ -160,6 +161,11 @@ export class TravelController extends Controller {
           i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
           ' ' +
           date.getUTCFullYear()
+      }
+      cb = (travel: ITravel) => {
+        if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
+          sendA1Notification(travel)
+        }
       }
       Object.assign(extendedBody, {
         state: 'approved' as TravelState,
@@ -173,6 +179,7 @@ export class TravelController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: true,
+      cb,
       async checkOldObject(oldObject: TravelDoc) {
         if (
           oldObject.owner._id.equals(request.user!._id) &&
@@ -277,6 +284,9 @@ export class TravelApproveController extends Controller {
     }
     const cb = async (travel: ITravel) => {
       sendNotification(travel)
+      if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
+        sendA1Notification(travel)
+      }
       if (travel.advance.amount !== null && travel.advance.amount > 0) {
         sendViaMail(travel)
         if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {

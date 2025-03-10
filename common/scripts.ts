@@ -1,4 +1,10 @@
-import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Money, Travel, baseCurrency, reportIsTravel } from './types.js'
+import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency, reportIsTravel } from './types.js'
+
+export function PlaceToString(place: Place, language?: Locale) {
+  return `${place.place}, ${language ? place.country.name[language] : place.country._id}` + place.country.flag
+    ? ' ' + place.country.flag
+    : ''
+}
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
   for (const item of array) {

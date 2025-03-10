@@ -554,6 +554,10 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat die Reiseabrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
+      },
+      "a1": {
+        "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",
+        "subject": "🗂️ A1 Bescheinigung nötig"
       }
     },
     "underExaminationByInsurance": {

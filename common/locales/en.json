@@ -553,6 +553,10 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has finished his travel expenses.",
         "subject": "🛂 Travel to examine"
+      },
+      "a1": {
+        "paragraph": "A new business trip requires an A1 certificate:",
+        "subject": "🗂️ A1 certificate required"
       }
     },
     "underExaminationByInsurance": {
