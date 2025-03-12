@@ -17,6 +17,7 @@
     "mongoose": "^8.12.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
+    "openid-client": "^6.3.4",
     "passport": "^0.7.0",
     "passport-ldapauth": "^3.0.1",
     "passport-magic-login": "^1.2.2",

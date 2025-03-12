@@ -73,6 +73,12 @@ export interface microsoftSettings {
   tenant: string
 }
 
+export interface oidcSettings {
+  server: string // Authorization server's Issuer Identifier URL
+  clientId: string // Client identifier at the Authorization Server
+  clientSecret: string // Client Secret
+}
+
 export interface ConnectionSettings {
   PDFReportsViaEmail: {
     sendPDFReportsToOrganisationEmail: boolean
@@ -81,6 +87,7 @@ export interface ConnectionSettings {
   auth: {
     microsoft?: microsoftSettings | null
     ldapauth?: ldapauthSettings | null
+    oidc?: oidcSettings | null
   }
   smtp?: smtpSettings | null
 
@@ -92,6 +99,7 @@ export interface DisplaySettings {
     magiclogin: boolean
     microsoft: boolean
     ldapauth: boolean
+    oidc: boolean
   }
   locale: {
     default: Locale
@@ -230,6 +238,7 @@ export interface User extends UserSimple {
     microsoft?: string | null
     ldapauth?: string | null
     magiclogin?: string | null
+    oidc?: string | null
   }
   access: {
     [key in Access]: boolean

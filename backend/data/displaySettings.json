@@ -2,7 +2,8 @@
     "auth": {
         "magiclogin": true,
         "microsoft": true,
-        "ldapauth": true
+        "ldapauth": true,
+        "oidc": true
     },
     "locale": {
         "default": "de",

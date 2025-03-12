@@ -7,6 +7,7 @@ import { tokenAdminUser } from '../../common/types.js'
 import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
+import { getOidcStrategy } from '../authStrategies/oidc.js'
 import { getDisplaySettings } from '../db.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
@@ -53,6 +54,24 @@ const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunc
     }
   } else {
     NotImplementedMiddleware(req, res, next)
+  }
+}
+
+const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.oidc) {
+    const redirect = req.query.redirect
+    const state = redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
+    passport.authenticate(await getOidcStrategy(), { state: state })(req, res, next)
+  } else {
+    next(new NotImplementedError(disabledMessage))
+  }
+}
+
+const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.oidc) {
+    passport.authenticate(await getOidcStrategy())(req, res, next)
+  } else {
+    next(new NotImplementedError(disabledMessage))
   }
 }
 
@@ -130,6 +149,30 @@ export class AuthController extends Controller {
   @SuccessResponse(302, 'Redirecting to Frontend')
   public magicloginCallback(@Query() token: string, @Request() req: ExRequest) {
     this.redirectToFrontend(req.authInfo?.redirect)
+  }
+
+  /**
+   * @summary Redirecting to OIDC login
+   */
+  @Get('oidc')
+  @Middlewares(oidcHandler)
+  @SuccessResponse(302, 'Redirecting to OIDC Provider')
+  public oidc(@Query() redirect?: string) {}
+
+  /**
+   * @summary OIDC login callback endpoint
+   */
+  @Get('oidc/callback')
+  @Middlewares(oidcCallbackHandler)
+  @SuccessResponse(302, 'Redirecting to Frontend')
+  public oidcCallback(@Query() state?: string) {
+    let redirect: string | undefined
+    if (state) {
+      try {
+        redirect = JSON.parse(Base64.decode(state)).redirect
+      } catch {}
+    }
+    this.redirectToFrontend(redirect)
   }
 
   private redirectToFrontend(path?: string) {

@@ -69,6 +69,13 @@
       </a>
     </div>
 
+    <div v-if="$root.displaySettings.auth.oidc" class="mt-4">
+      <a class="btn btn-lg btn-primary" :href="oidcLink()">
+        <i class="bi bi-key me-1"></i>
+        {{ $t('labels.signInX', { X: 'OIDC' }) }}
+      </a>
+    </div>
+
     <div v-if="$root.displaySettings.auth.magiclogin" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
@@ -134,6 +141,13 @@ export default defineComponent({
       return (
         import.meta.env.VITE_BACKEND_URL +
         '/auth/microsoft' +
+        (this.$route.query.redirect ? '?redirect=' + (this.$route.query.redirect as string) : '')
+      )
+    },
+    oidcLink() {
+      return (
+        import.meta.env.VITE_BACKEND_URL +
+        '/auth/oidc' +
         (this.$route.query.redirect ? '?redirect=' + (this.$route.query.redirect as string) : '')
       )
     }
