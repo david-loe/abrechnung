@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,15 +11,15 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "@vueform/vueform": "^1.12.3",
-    "axios": "^1.8.1",
+    "@vueform/vueform": "^1.12.4",
+    "axios": "^1.8.3",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "json-editor-vue": "^0.17.3",
     "qrcode": "^1.5.4",
     "qs": "^6.14.0",
     "vue": "^3.5.12",
-    "vue-i18n": "^9.14.2",
+    "vue-i18n": "^9.14.3",
     "vue-router": "^4.5.0",
     "vue-select": "^4.0.0-beta.6",
     "vue3-easy-data-table": "^1.5.47"
@@ -27,17 +27,17 @@
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^4.2.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.13.5",
+    "@types/node": "^22.13.10",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.9.18",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^5.2.1",
-    "eslint": "^9.21.0",
-    "eslint-plugin-vue": "^9.32.0",
-    "typescript": "^5.7.3",
+    "eslint": "^9.22.0",
+    "eslint-plugin-vue": "^9.33.0",
+    "typescript": "^5.8.2",
     "vite": "^5.4.14",
     "vite-plugin-pwa": "^0.21.1",
-    "vue-tsc": "^2.2.4"
+    "vue-tsc": "^2.2.8"
   },
   "eslintConfig": {
     "root": true,
