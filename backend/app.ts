@@ -57,8 +57,8 @@ app.use(
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: 'strict'
+      secure: process.env.VITE_BACKEND_URL.startsWith('https'),
+      sameSite: process.env.VITE_BACKEND_URL.startsWith('https') ? 'none' : 'lax'
     },
     resave: true,
     saveUninitialized: false,
