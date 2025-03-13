@@ -65,3 +65,15 @@ export abstract class AuthenticationStrategy<Strategy extends passport.Strategy,
 
   abstract configureStrategy(config: Options): void
 }
+
+export function displayNameSplit(displayName: string) {
+  const isComma = displayName.indexOf(', ') !== -1
+  let splitStr = isComma ? ', ' : ' '
+  const split = displayName.split(splitStr)
+  const one = split.shift() as string
+  const two = split.join(' ') || ' '
+  return {
+    givenName: isComma ? two : one,
+    familyName: isComma ? one : two
+  }
+}
