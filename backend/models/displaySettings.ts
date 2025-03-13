@@ -25,6 +25,15 @@ export const displaySettingsSchema = new Schema<DisplaySettings>(
       },
       required: true
     },
+    oidc: {
+      type: {
+        label: { type: String, required: true, default: 'OIDC' },
+        icon: { type: String, required: true, default: 'key', label: 'Icon', description: 'https://icons.getbootstrap.com/' }
+      },
+      label: 'OIDC',
+      required: true,
+      conditions: [['auth.oidc', true]]
+    },
     locale: {
       type: {
         default: { type: String, enum: locales, required: true, default: defaultLocale },

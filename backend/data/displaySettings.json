@@ -5,6 +5,10 @@
         "ldapauth": true,
         "oidc": true
     },
+    "oidc": {
+        "label": "OIDC",
+        "icon": "key"
+    },
     "locale": {
         "default": "de",
         "fallback": "de",

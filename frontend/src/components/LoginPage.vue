@@ -71,8 +71,8 @@
 
     <div v-if="$root.displaySettings.auth.oidc" class="mt-4">
       <a class="btn btn-lg btn-primary" :href="oidcLink()">
-        <i class="bi bi-key me-1"></i>
-        {{ $t('labels.signInX', { X: 'OIDC' }) }}
+        <i :class="`bi bi-${$root.displaySettings.oidc.icon} me-1`"></i>
+        {{ $t('labels.signInX', { X: $root.displaySettings.oidc.label }) }}
       </a>
     </div>
 

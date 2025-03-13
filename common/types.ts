@@ -101,6 +101,10 @@ export interface DisplaySettings {
     ldapauth: boolean
     oidc: boolean
   }
+  oidc: {
+    label: string
+    icon: string
+  }
   locale: {
     default: Locale
     fallback: Locale

@@ -33,6 +33,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
   fk: {
     type: {
       microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
+      oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !displaySettings.auth.oidc },
       ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
       magiclogin: {
         type: String,
