@@ -7,6 +7,7 @@ import { tokenAdminUser } from '../../common/types.js'
 import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
+import { getOidcStrategy } from '../authStrategies/oidc.js'
 import { getDisplaySettings } from '../db.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
@@ -27,9 +28,8 @@ const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFuncti
 
 const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    const redirect = req.query.redirect
-    const state = req.query.redirect ? Base64.encode(JSON.stringify({ redirect })) : undefined
-    passport.authenticate(await getMicrosoftStrategy(), { state: state })(req, res, next)
+    req.session.redirect = String(req.query.redirect)
+    passport.authenticate(await getMicrosoftStrategy())(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -37,7 +37,8 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
 
 const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    passport.authenticate(await getMicrosoftStrategy())(req, res, next)
+    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
+    passport.authenticate(await getMicrosoftStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -51,6 +52,24 @@ const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunc
     } else {
       throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)
     }
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
+
+const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.oidc) {
+    req.session.redirect = String(req.query.redirect)
+    passport.authenticate(await getOidcStrategy())(req, res, next)
+  } else {
+    NotImplementedMiddleware(req, res, next)
+  }
+}
+
+const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
+  if ((await getDisplaySettings()).auth.oidc) {
+    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
+    passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -102,15 +121,7 @@ export class AuthController extends Controller {
   @Get('microsoft/callback')
   @Middlewares(microsoftCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
-  public microsoftCallback(@Query() state?: string) {
-    let redirect: string | undefined
-    if (state) {
-      try {
-        redirect = JSON.parse(Base64.decode(state)).redirect
-      } catch {}
-    }
-    this.redirectToFrontend(redirect)
-  }
+  public microsoftCallback() {}
 
   /**
    * Send a magiclogin email to the destination email address.
@@ -131,6 +142,22 @@ export class AuthController extends Controller {
   public magicloginCallback(@Query() token: string, @Request() req: ExRequest) {
     this.redirectToFrontend(req.authInfo?.redirect)
   }
+
+  /**
+   * @summary Redirecting to OIDC login
+   */
+  @Get('oidc')
+  @Middlewares(oidcHandler)
+  @SuccessResponse(302, 'Redirecting to OIDC Provider')
+  public oidc(@Query() redirect?: string) {}
+
+  /**
+   * @summary OIDC login callback endpoint
+   */
+  @Get('oidc/callback')
+  @Middlewares(oidcCallbackHandler)
+  @SuccessResponse(302, 'Redirecting to Frontend')
+  public oidcCallback() {}
 
   private redirectToFrontend(path?: string) {
     let redirect = ''

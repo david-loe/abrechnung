@@ -20,9 +20,19 @@ export const displaySettingsSchema = new Schema<DisplaySettings>(
       type: {
         magiclogin: { type: Boolean, required: true, label: 'Magiclogin' },
         microsoft: { type: Boolean, required: true, label: 'Microsoft' },
-        ldapauth: { type: Boolean, required: true, label: 'LDAP' }
+        ldapauth: { type: Boolean, required: true, label: 'LDAP' },
+        oidc: { type: Boolean, required: true, label: 'OIDC' }
       },
       required: true
+    },
+    oidc: {
+      type: {
+        label: { type: String, required: true, default: 'OIDC' },
+        icon: { type: String, required: true, default: 'key', label: 'Icon', description: "https://icons.getbootstrap.com/ (e.g. 'key')" }
+      },
+      label: 'OIDC',
+      required: true,
+      conditions: [['auth.oidc', true]]
     },
     locale: {
       type: {

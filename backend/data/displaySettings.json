@@ -2,7 +2,12 @@
     "auth": {
         "magiclogin": true,
         "microsoft": true,
-        "ldapauth": true
+        "ldapauth": true,
+        "oidc": true
+    },
+    "oidc": {
+        "label": "OIDC",
+        "icon": "key"
     },
     "locale": {
         "default": "de",

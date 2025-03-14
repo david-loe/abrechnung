@@ -100,8 +100,24 @@ export const connectionSettingsSchema = new Schema<ConnectionSettings>({
           }
         },
         label: 'LDAP'
+      },
+      oidc: {
+        type: {
+          server: {
+            type: String,
+            trim: true,
+            required: true,
+            label: 'Server',
+            rules: requiredIf('auth.oidc.clientId')
+          },
+          clientId: { type: String, trim: true, required: true, label: 'Client ID', rules: requiredIf('auth.oidc.server') },
+          clientSecret: { type: String, trim: true, required: true, label: 'Client Secret', rules: requiredIf('auth.oidc.server') }
+        },
+        label: 'OIDC',
+        description: `scope: 'openid email profile' - Callback URL: ${process.env.VITE_BACKEND_URL}/auth/oidc/callback`
       }
     },
+
     required: true,
     default: () => ({})
   }

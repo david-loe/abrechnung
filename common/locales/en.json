@@ -169,6 +169,7 @@
     }
   },
   "labels": {
+    "label": "Label",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "E-mail address for A1 certificate notifications",
     "access": "Access",

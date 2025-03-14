@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Request as ExRequest, Response as ExResponse } from 'express'
+import express, { Request as ExRequest, Response as ExResponse, NextFunction as ExNextFunction } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import swaggerUi from 'swagger-ui-express'
@@ -51,14 +51,17 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
   )
 }
 
+// only use secure cookie with https and trust proxy setup
+const useSecureCookie = process.env.VITE_BACKEND_URL.startsWith('https') && Boolean(process.env.TRUST_PROXY)
+
 app.use(
   session({
     store: sessionStore,
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: 'strict'
+      secure: useSecureCookie,
+      sameSite: useSecureCookie ? 'none' : 'lax'
     },
     resave: true,
     saveUninitialized: false,
@@ -69,9 +72,18 @@ app.use(
 app.use(auth)
 
 if (process.env.NODE_ENV === 'development') {
-  app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-    res.send(swaggerUi.generateHTML(swaggerDocument))
-  })
+  app.use(
+    '/docs',
+    // fix path when behind proxy https://github.com/scottie1984/swagger-ui-express/issues/183
+    (req: ExRequest, res: ExResponse, next: ExNextFunction) => {
+      if (req.originalUrl == '/docs') return res.redirect('docs/')
+      next()
+    },
+    swaggerUi.serve,
+    async (_req: ExRequest, res: ExResponse) => {
+      res.send(swaggerUi.generateHTML(swaggerDocument))
+    }
+  )
 }
 
 RegisterRoutes(app)
