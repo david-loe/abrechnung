@@ -62,7 +62,7 @@ const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) 
     req.session.redirect = String(req.query.redirect)
     passport.authenticate(await getOidcStrategy())(req, res, next)
   } else {
-    next(new NotImplementedError(disabledMessage))
+    NotImplementedMiddleware(req, res, next)
   }
 }
 
@@ -71,7 +71,7 @@ const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFu
     const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
     passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
-    next(new NotImplementedError(disabledMessage))
+    NotImplementedMiddleware(req, res, next)
   }
 }
 

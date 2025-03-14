@@ -67,6 +67,6 @@ export async function getOidcStrategy() {
       }
     )
   } else {
-    throw new Error('OIDC nicht in den Connection Settings konfiguriert.')
+    throw new Error('OIDC not configured in Connection Settings')
   }
 }
