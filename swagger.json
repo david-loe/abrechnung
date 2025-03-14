@@ -308,6 +308,10 @@
 					},
 					"fk": {
 						"properties": {
+							"oidc": {
+								"type": "string",
+								"nullable": true
+							},
 							"magiclogin": {
 								"type": "string",
 								"nullable": true
@@ -821,6 +825,10 @@
 					},
 					"fk": {
 						"properties": {
+							"oidc": {
+								"type": "string",
+								"nullable": true
+							},
 							"magiclogin": {
 								"type": "string",
 								"nullable": true
@@ -1179,6 +1187,9 @@
 					},
 					"fk": {
 						"properties": {
+							"oidc": {
+								"type": "string"
+							},
 							"magiclogin": {
 								"type": "string"
 							},
@@ -1493,6 +1504,9 @@
 					},
 					"fk": {
 						"properties": {
+							"oidc": {
+								"type": "string"
+							},
 							"magiclogin": {
 								"type": "string"
 							},
@@ -6525,6 +6539,9 @@
 				"properties": {
 					"auth": {
 						"properties": {
+							"oidc": {
+								"type": "boolean"
+							},
 							"ldapauth": {
 								"type": "boolean"
 							},
@@ -6536,9 +6553,25 @@
 							}
 						},
 						"required": [
+							"oidc",
 							"ldapauth",
 							"microsoft",
 							"magiclogin"
+						],
+						"type": "object"
+					},
+					"oidc": {
+						"properties": {
+							"icon": {
+								"type": "string"
+							},
+							"label": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"icon",
+							"label"
 						],
 						"type": "object"
 					},
@@ -6587,6 +6620,7 @@
 				},
 				"required": [
 					"auth",
+					"oidc",
 					"locale",
 					"_id"
 				],
@@ -6635,6 +6669,9 @@
 					},
 					"auth": {
 						"properties": {
+							"oidc": {
+								"type": "boolean"
+							},
 							"magiclogin": {
 								"type": "boolean"
 							},
@@ -6643,6 +6680,17 @@
 							},
 							"microsoft": {
 								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
+					"oidc": {
+						"properties": {
+							"icon": {
+								"type": "string"
+							},
+							"label": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -7265,6 +7313,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"oidcSettings": {
+				"properties": {
+					"server": {
+						"type": "string"
+					},
+					"clientId": {
+						"type": "string"
+					},
+					"clientSecret": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"server",
+					"clientId",
+					"clientSecret"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"smtpSettings": {
 				"properties": {
 					"host": {
@@ -7317,6 +7385,14 @@
 					},
 					"auth": {
 						"properties": {
+							"oidc": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/oidcSettings"
+									}
+								],
+								"nullable": true
+							},
 							"ldapauth": {
 								"allOf": [
 									{
@@ -7399,6 +7475,20 @@
 					},
 					"auth": {
 						"properties": {
+							"oidc": {
+								"properties": {
+									"server": {
+										"type": "string"
+									},
+									"clientSecret": {
+										"type": "string"
+									},
+									"clientId": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
 							"ldapauth": {
 								"properties": {
 									"givenNameAttribute": {
@@ -13656,16 +13746,7 @@
 				"description": "Provides the authentication cookie.",
 				"summary": "Microsoft login endpoint",
 				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "state",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
+				"parameters": []
 			}
 		},
 		"/auth/magiclogin": {
@@ -13730,6 +13811,47 @@
 						}
 					}
 				]
+			}
+		},
+		"/auth/oidc": {
+			"get": {
+				"operationId": "Oidc",
+				"responses": {
+					"302": {
+						"description": "Redirecting to OIDC Provider"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by display settings."
+					}
+				},
+				"summary": "Redirecting to OIDC login",
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "redirect",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/oidc/callback": {
+			"get": {
+				"operationId": "OidcCallback",
+				"responses": {
+					"302": {
+						"description": "Redirecting to Frontend"
+					},
+					"501": {
+						"description": "This Authentication Method has been disabled by display settings."
+					}
+				},
+				"summary": "OIDC login callback endpoint",
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/auth/logout": {
