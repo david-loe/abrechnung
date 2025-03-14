@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ConnectionSettings } from '../../../../../common/types.js'
 
@@ -30,7 +31,7 @@ export default defineComponent({
       if (!connectionSettings.auth.microsoft?.clientId) {
         connectionSettings.auth.microsoft = undefined
       }
-      const result = await this.$root.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
+      const result = await API.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
       if (result.ok) {
         this.connectionSettings = result.ok
         ;(this.$refs.form$ as any).load(this.connectionSettings)
@@ -40,7 +41,7 @@ export default defineComponent({
 
   async mounted() {
     await this.$root.load()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/connectionSettings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/connectionSettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {
@@ -49,7 +50,7 @@ export default defineComponent({
       },
       _id: { type: 'hidden', meta: true }
     })
-    this.connectionSettings = (await this.$root.getter<ConnectionSettings>('admin/connectionSettings')).ok?.data
+    this.connectionSettings = (await API.getter<ConnectionSettings>('admin/connectionSettings')).ok?.data
     queueMicrotask(() => (this.$refs.form$ as any).load(this.connectionSettings))
   }
 })

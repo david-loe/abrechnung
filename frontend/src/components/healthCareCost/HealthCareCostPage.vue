@@ -264,6 +264,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
 import { addUp, getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
@@ -328,13 +329,13 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteHealthCareCost() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost', { _id: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'healthCareCost', { _id: this._id })
       if (result) {
         this.$router.push({ path: this.parentPages[0].link })
       }
     },
     async toExamination() {
-      const result = await this.$root.setter<HealthCareCost>('healthCareCost/underExamination', {
+      const result = await API.setter<HealthCareCost>('healthCareCost/underExamination', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
@@ -343,7 +344,7 @@ export default defineComponent({
       }
     },
     async backToInWork() {
-      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/inWork', {
+      const result = await API.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/inWork', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
@@ -357,7 +358,7 @@ export default defineComponent({
       }
     },
     async toExaminationByInsurance() {
-      const result = await this.$root.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
+      const result = await API.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
         _id: this.healthCareCost._id,
         comment: this.healthCareCost.comment
       })
@@ -386,7 +387,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<HealthCareCost>(
+      const result = await API.setter<HealthCareCost>(
         'confirm/healthCareCost/refunded',
         {
           _id: this.healthCareCost._id,
@@ -409,7 +410,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, {
+      const result = await API.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, {
         headers,
         params: { parentId: this.healthCareCost._id }
       })
@@ -421,7 +422,7 @@ export default defineComponent({
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
       if (result) {
         this.setHealthCareCost(result)
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
@@ -432,7 +433,7 @@ export default defineComponent({
         _id: this._id,
         additionalFields: ['expenses']
       }
-      const result = (await this.$root.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
+      const result = (await API.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
       if (result) {
         this.setHealthCareCost(result.data)
       }
@@ -444,7 +445,7 @@ export default defineComponent({
       log(this.healthCareCost)
     },
     async getExaminerMails() {
-      const result = (await this.$root.getter<UserSimple[]>('healthCareCost/examiner')).ok
+      const result = (await API.getter<UserSimple[]>('healthCareCost/examiner')).ok
       if (result) {
         return result.data.map((x) => x.email)
       }
@@ -454,7 +455,7 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     if (this.endpointPrefix === 'examine/') {
-      const result = (await this.$root.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
+      const result = (await API.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
       if (result) {
         this.organisations = result.data
       }

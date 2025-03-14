@@ -59,6 +59,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -100,7 +101,7 @@ export default defineComponent({
       this.modalExpenseReport = undefined
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
+      const result = await API.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
       if (result.ok) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {

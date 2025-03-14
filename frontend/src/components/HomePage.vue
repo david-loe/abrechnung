@@ -96,6 +96,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
@@ -160,7 +161,7 @@ export default defineComponent({
     },
     async applyForTravel(travel: TravelSimple) {
       const result = (
-        await this.$root.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
+        await API.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
       ).ok
       if (result) {
         if (this.$refs.travelList) {
@@ -170,7 +171,7 @@ export default defineComponent({
       }
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = (await this.$root.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
+      const result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
       if (result) {
         if (this.$refs.expenseReportList) {
           ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
@@ -180,7 +181,7 @@ export default defineComponent({
       }
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      const result = (await this.$root.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
+      const result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
       if (result) {
         if (this.$refs.healthCareCostList) {
           ;(this.$refs.healthCareCostList as typeof HealthCareCostCardList).getData()
@@ -190,7 +191,7 @@ export default defineComponent({
       }
     },
     async deleteTravel(_id: string) {
-      const result = await this.$root.deleter('travel', { _id })
+      const result = await API.deleter('travel', { _id })
       if (result) {
         if (this.$refs.travelList) {
           ;(this.$refs.travelList as typeof TravelCardList).getData()

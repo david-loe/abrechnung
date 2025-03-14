@@ -84,6 +84,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { Project, accesses } from '../../../../../common/types.js'
@@ -120,7 +121,7 @@ export default defineComponent({
       this._showForm = true
     },
     async postProject(project: Project) {
-      const result = await this.$root.setter<Project>('admin/project', project)
+      const result = await API.setter<Project>('admin/project', project)
       if (result.ok) {
         this.getProjects()
         this._showForm = false
@@ -128,17 +129,17 @@ export default defineComponent({
       this.projectToEdit = undefined
     },
     async deleteProject(project: Project) {
-      const result = await this.$root.deleter('admin/project', { _id: project._id })
+      const result = await API.deleter('admin/project', { _id: project._id })
       if (result) {
         this.getProjects()
       }
     },
     async getProjects() {
-      const result = (await this.$root.getter<Project[]>('admin/project')).ok
+      const result = (await API.getter<Project[]>('admin/project')).ok
       if (result) {
         this.projects = result.data
       }
-      const rootProjects = (await this.$root.getter<Project[]>('project', {}, {}, false)).ok?.data
+      const rootProjects = (await API.getter<Project[]>('project', {}, {}, false)).ok?.data
       if (rootProjects) {
         this.$root.projects = rootProjects
       }
@@ -156,7 +157,7 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getProjects()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/project/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/project/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

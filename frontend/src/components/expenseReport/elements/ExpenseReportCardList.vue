@@ -12,6 +12,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import PaginationList from '../../elements/PaginationList.vue'
 import ExpenseReportCard from './ExpenseReportCard.vue'
@@ -29,7 +30,7 @@ export default defineComponent({
   },
   methods: {
     async deleteExpenseReport(_id: string): Promise<void> {
-      const result = await this.$root.deleter('expenseReport', { _id })
+      const result = await API.deleter('expenseReport', { _id })
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }

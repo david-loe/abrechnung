@@ -68,6 +68,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { Base64 } from '../../../../common/scripts.js'
 import ProjectSelector from './ProjectSelector.vue'
@@ -128,7 +129,7 @@ export default defineComponent({
       delete queryParams.filter
       queryParams.filterJSON = filterJSON !== 'e30=' ? filterJSON : undefined
 
-      let result = (await this.$root.getter<any[]>(this.endpoint, Object.assign({}, queryParams, { page, limit: this.meta.limit }))).ok
+      let result = (await API.getter<any[]>(this.endpoint, Object.assign({}, queryParams, { page, limit: this.meta.limit }))).ok
       if (result) {
         this.data = result.data
         this.hasData = true

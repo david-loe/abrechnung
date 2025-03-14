@@ -6,6 +6,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent, PropType } from 'vue'
 import { csvToObjects, download } from '../../../../../common/scripts'
 
@@ -67,7 +68,7 @@ export default defineComponent({
       return csvToObjects(csv, transformer, ';')
     },
     async submit(data: any[]) {
-      const result = await this.$root.setter<any[]>(this.endpoint, data)
+      const result = await API.setter<any[]>(this.endpoint, data)
       if (result.ok) {
         this.$emit('imported')
       }

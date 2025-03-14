@@ -58,6 +58,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { HealthCareCostSimple, HealthCareCostState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -102,7 +103,7 @@ export default defineComponent({
       this.modalHealthCareCost = undefined
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      const result = await this.$root.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
+      const result = await API.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
       if (result.ok) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {

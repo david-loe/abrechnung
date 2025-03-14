@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { Modal } from 'bootstrap'
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -110,7 +110,7 @@ export default defineComponent({
     async approveTravel(travel: TravelSimple, decision: 'approved' | 'rejected', comment?: string) {
       if (travel) {
         travel.comment = comment
-        const result = await this.$root.setter<TravelSimple>('approve/travel/' + decision, travel)
+        const result = await API.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
           ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
           ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
@@ -125,7 +125,7 @@ export default defineComponent({
   },
   async mounted() {
     if (this._id) {
-      const result = await this.$root.getter<TravelSimple>('approve/travel', { _id: this._id })
+      const result = await API.getter<TravelSimple>('approve/travel', { _id: this._id })
       if (result.ok) {
         this.showModal(result.ok.data)
       }

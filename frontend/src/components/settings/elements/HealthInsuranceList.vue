@@ -77,6 +77,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { HealthInsurance, accesses } from '../../../../../common/types.js'
@@ -112,7 +113,7 @@ export default defineComponent({
       this._showForm = true
     },
     async postHealthInsurance(healthInsurance: HealthInsurance) {
-      const result = await this.$root.setter<HealthInsurance>('admin/healthInsurance', healthInsurance)
+      const result = await API.setter<HealthInsurance>('admin/healthInsurance', healthInsurance)
       if (result.ok) {
         await this.updateRoot()
         this._showForm = false
@@ -120,13 +121,13 @@ export default defineComponent({
       this.healthInsuranceToEdit = undefined
     },
     async deleteHealthInsurance(healthInsurance: HealthInsurance) {
-      const result = await this.$root.deleter('admin/healthInsurance', { _id: healthInsurance._id })
+      const result = await API.deleter('admin/healthInsurance', { _id: healthInsurance._id })
       if (result) {
         await this.updateRoot()
       }
     },
     async updateRoot() {
-      const rootHealthInsurances = (await this.$root.getter<HealthInsurance[]>('healthInsurance')).ok?.data
+      const rootHealthInsurances = (await API.getter<HealthInsurance[]>('healthInsurance')).ok?.data
       if (rootHealthInsurances) {
         this.$root.healthInsurances = rootHealthInsurances
       }
@@ -143,7 +144,7 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/healthInsurance/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/healthInsurance/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

@@ -496,6 +496,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
@@ -604,7 +605,7 @@ export default defineComponent({
         lastPlaceOfWork: this.travel.lastPlaceOfWork,
         days: this.travel.days
       }
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel', travel)
+      const result = await API.setter<Travel>(this.endpointPrefix + 'travel', travel)
       if (result.ok) {
         this.setTravel(result.ok)
       } else {
@@ -613,7 +614,7 @@ export default defineComponent({
     },
     async applyForTravel(travel: Travel) {
       if (confirm(this.$t('alerts.warningReapply'))) {
-        const result = await this.$root.setter<Travel>('travel/appliedFor', travel)
+        const result = await API.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
           ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
           this.$router.push({ path: '/' })
@@ -623,19 +624,19 @@ export default defineComponent({
       }
     },
     async deleteTravel() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel', { _id: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'travel', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
     },
     async toExamination() {
-      const result = await this.$root.setter<Travel>('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
+      const result = await API.setter<Travel>('travel/underExamination', { _id: this.travel._id, comment: this.travel.comment })
       if (result.ok) {
         this.$router.push({ path: '/' })
       }
     },
     async backToApproved() {
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/approved', {
+      const result = await API.setter<Travel>(this.endpointPrefix + 'travel/approved', {
         _id: this.travel._id,
         comment: this.travel.comment
       })
@@ -649,7 +650,7 @@ export default defineComponent({
       }
     },
     async refund() {
-      const result = await this.$root.setter<Travel>('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
+      const result = await API.setter<Travel>('examine/travel/refunded', { _id: this.travel._id, comment: this.travel.comment })
       if (result.ok) {
         this.$router.push({ path: '/examine/travel' })
       }
@@ -668,7 +669,7 @@ export default defineComponent({
       if ((stage.cost.amount as unknown) === '') {
         stage.cost.amount = 0
       }
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
+      const result = await API.setter<Travel>(this.endpointPrefix + 'travel/stage', stage, {
         headers,
         params: { parentId: this.travel._id }
       })
@@ -685,7 +686,7 @@ export default defineComponent({
       }
     },
     async deleteStage(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
@@ -698,7 +699,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, {
+      const result = await API.setter<Travel>(this.endpointPrefix + 'travel/expense', expense, {
         headers,
         params: { parentId: this.travel._id }
       })
@@ -710,14 +711,14 @@ export default defineComponent({
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
-      const result = await this.$root.setter<User>(
+      const result = await API.setter<User>(
         this.endpointPrefix + 'user/vehicleRegistration',
         { vehicleRegistration },
         {
@@ -792,7 +793,7 @@ export default defineComponent({
         _id: this._id,
         additionalFields: ['stages', 'expenses', 'days']
       }
-      const res = (await this.$root.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
+      const res = (await API.getter<Travel>(this.endpointPrefix + 'travel', params)).ok
       if (res) {
         this.setTravel(res.data)
       }
@@ -817,7 +818,7 @@ export default defineComponent({
       this.renderTable()
     },
     async getExaminerMails() {
-      const result = (await this.$root.getter<UserSimple[]>('travel/examiner')).ok
+      const result = (await API.getter<UserSimple[]>('travel/examiner')).ok
       if (result) {
         return result.data.map((x) => x.email)
       }

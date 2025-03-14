@@ -13,6 +13,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import PaginationList from '../../elements/PaginationList.vue'
 import TravelCard from './TravelCard.vue'
@@ -29,7 +30,7 @@ export default defineComponent({
   },
   methods: {
     async deleteTravel(_id: string): Promise<void> {
-      const result = await this.$root.deleter('travel', { _id })
+      const result = await API.deleter('travel', { _id })
       if (result) {
         ;(this.$refs.list as typeof PaginationList).getData()
       }

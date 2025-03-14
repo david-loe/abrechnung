@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { DisplaySettings } from '../../../../../common/types.js'
 
@@ -21,7 +22,7 @@ export default defineComponent({
   },
   methods: {
     async postDisplaySettings(displaySettings: DisplaySettings) {
-      const result = await this.$root.setter<DisplaySettings>('admin/displaySettings', displaySettings)
+      const result = await API.setter<DisplaySettings>('admin/displaySettings', displaySettings)
       if (result.ok) {
         this.displaySettings = result.ok
         ;(this.$refs.form$ as any).load(this.displaySettings)
@@ -30,7 +31,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.$root.load()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/displaySettings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/displaySettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {
@@ -46,7 +47,7 @@ export default defineComponent({
       },
       _id: { type: 'hidden', meta: true }
     })
-    this.displaySettings = (await this.$root.getter<DisplaySettings>('displaySettings')).ok?.data
+    this.displaySettings = (await API.getter<DisplaySettings>('displaySettings')).ok?.data
     queueMicrotask(() => (this.$refs.form$ as any).load(this.displaySettings))
   }
 })

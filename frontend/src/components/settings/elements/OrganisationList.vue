@@ -62,6 +62,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { Organisation, accesses } from '../../../../../common/types.js'
 
@@ -101,7 +102,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<Organisation>('admin/organisation', organisation, { headers })
+      const result = await API.setter<Organisation>('admin/organisation', organisation, { headers })
       if (result.ok) {
         this.getOrganisations()
         this._showForm = false
@@ -109,17 +110,17 @@ export default defineComponent({
       this.organisationToEdit = undefined
     },
     async deleteOrganisation(organisation: Organisation) {
-      const result = await this.$root.deleter('admin/organisation', { _id: organisation._id })
+      const result = await API.deleter('admin/organisation', { _id: organisation._id })
       if (result) {
         this.getOrganisations()
       }
     },
     async getOrganisations() {
-      const result = (await this.$root.getter<Organisation[]>('admin/organisation')).ok
+      const result = (await API.getter<Organisation[]>('admin/organisation')).ok
       if (result) {
         this.organisations = result.data
       }
-      const rootOrganisations = (await this.$root.getter<Organisation[]>('organisation')).ok?.data
+      const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
       if (rootOrganisations) {
         this.$root.organisations = rootOrganisations
       }
@@ -136,7 +137,7 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getOrganisations()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/organisation/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/organisation/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {
