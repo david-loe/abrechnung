@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Request as ExRequest, Response as ExResponse } from 'express'
+import express, { Request as ExRequest, Response as ExResponse, NextFunction as ExNextFunction } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import swaggerUi from 'swagger-ui-express'
@@ -72,9 +72,18 @@ app.use(
 app.use(auth)
 
 if (process.env.NODE_ENV === 'development') {
-  app.use('/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-    res.send(swaggerUi.generateHTML(swaggerDocument))
-  })
+  app.use(
+    '/docs',
+    // fix path when behind proxy https://github.com/scottie1984/swagger-ui-express/issues/183
+    (req: ExRequest, res: ExResponse, next: ExNextFunction) => {
+      if (req.originalUrl == '/docs') return res.redirect('docs/')
+      next()
+    },
+    swaggerUi.serve,
+    async (_req: ExRequest, res: ExResponse) => {
+      res.send(swaggerUi.generateHTML(swaggerDocument))
+    }
+  )
 }
 
 RegisterRoutes(app)
