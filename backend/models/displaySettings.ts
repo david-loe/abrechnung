@@ -28,7 +28,7 @@ export const displaySettingsSchema = new Schema<DisplaySettings>(
     oidc: {
       type: {
         label: { type: String, required: true, default: 'OIDC' },
-        icon: { type: String, required: true, default: 'key', label: 'Icon', description: 'https://icons.getbootstrap.com/' }
+        icon: { type: String, required: true, default: 'key', label: 'Icon', description: "https://icons.getbootstrap.com/ (e.g. 'key')" }
       },
       label: 'OIDC',
       required: true,
