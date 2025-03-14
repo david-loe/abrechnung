@@ -10,5 +10,6 @@ declare module 'express-session' {
         _id: Types.ObjectId
       }
     }
+    redirect?: string
   }
 }
