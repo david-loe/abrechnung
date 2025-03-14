@@ -51,14 +51,17 @@ if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
   )
 }
 
+// only use secure cookie with https and trust proxy setup
+const useSecureCookie = process.env.VITE_BACKEND_URL.startsWith('https') && Boolean(process.env.TRUST_PROXY)
+
 app.use(
   session({
     store: sessionStore,
     secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
-      secure: process.env.VITE_BACKEND_URL.startsWith('https'),
-      sameSite: process.env.VITE_BACKEND_URL.startsWith('https') ? 'none' : 'lax'
+      secure: useSecureCookie,
+      sameSite: useSecureCookie ? 'none' : 'lax'
     },
     resave: true,
     saveUninitialized: false,

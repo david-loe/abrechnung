@@ -17,7 +17,7 @@ setDefaultHandler(new NetworkOnly())
 const denylist = [/\/report(?:\?|$)/]
 if (import.meta.env.VITE_BACKEND_URL.startsWith(import.meta.env.VITE_FRONTEND_URL)) {
   const backendPath = import.meta.env.VITE_BACKEND_URL.replace(import.meta.env.VITE_FRONTEND_URL, '')
-  denylist.push(new RegExp(`^${backendPath}/auth`))
+  denylist.push(new RegExp(`^${backendPath}/auth`), new RegExp(`^${backendPath}/ip`))
 }
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
 
