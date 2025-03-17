@@ -18,13 +18,12 @@ import { IdDocument, MoneyPost } from './types.js'
 export class ExpenseReportController extends Controller {
   @Get()
   public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
-    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.createdAt as Date).valueOf() - (a.createdAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
       filter: { owner: request.user!._id, historic: false },
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sortFn
+      sort: { createdAt: -1 }
     })
   }
   @Delete()
@@ -171,13 +170,12 @@ export class ExpenseReportExamineController extends Controller {
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
-    const sortFn = (a: IExpenseReport, b: IExpenseReport) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(ExpenseReport, {
       query,
       filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sortFn
+      sort: { updatedAt: -1 }
     })
   }
 
