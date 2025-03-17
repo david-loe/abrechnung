@@ -1,10 +1,10 @@
 // authStrategies/oidc.ts
+import { Request } from 'express'
 import * as openidClient from 'openid-client'
 import { Strategy as OidcStrategy } from 'openid-client/passport'
+import passport from 'passport'
 import { getConnectionSettings } from '../db.js'
 import { displayNameSplit, findOrCreateUser } from './index.js'
-import { Request } from 'express'
-import passport from 'passport'
 
 const scope = 'openid email profile'
 
@@ -18,12 +18,16 @@ export class CustomStrategy extends OidcStrategy {
   ): void {
     //check for callback url rather than param count
     if ((req.originalUrl ?? req.url).startsWith(callbackPath)) {
-      ;(OidcStrategy as any).prototype.authorizationCodeGrant.call(
-        this,
-        req,
-        new URL(`${process.env.VITE_BACKEND_URL}${req.originalUrl ?? req.url}`), // rewrite URL so when behind proxy no error is thrown
-        options
-      )
+      // rewrite URL so when behind proxy no error is thrown
+      const url = new URL(`${process.env.VITE_BACKEND_URL}${req.originalUrl ?? req.url}`)
+      // fix error from empty state search param david-loe/abrechnung#140
+      const params = new URLSearchParams(url.search)
+      if (params.has('state') && !params.get('state')) {
+        params.delete('state')
+        url.search = params.toString()
+      }
+
+      ;(OidcStrategy as any).prototype.authorizationCodeGrant.call(this, req, url, options)
     } else {
       ;(OidcStrategy as any).prototype.authorizationRequest.call(this, req, options)
     }

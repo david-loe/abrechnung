@@ -68,10 +68,6 @@ const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) 
 
 const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.oidc) {
-    // fix error from empty state search param david-loe/abrechnung#140
-    if (req.query.state === '') {
-      delete req.query.state
-    }
     const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
     passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
