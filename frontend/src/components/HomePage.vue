@@ -105,7 +105,7 @@ import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostCardList from './healthCareCost/elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './healthCareCost/forms/HealthCareCostForm.vue'
 import TravelApplication from './travel/elements/TravelApplication.vue'
-import TravelCardList from './travel/elements/TravelCardList.vue'
+import TravelCardList from './travel/elements/TravelList.vue'
 import TravelApplyForm from './travel/forms/TravelApplyForm.vue'
 
 type ModalMode = 'view' | 'add' | 'edit'

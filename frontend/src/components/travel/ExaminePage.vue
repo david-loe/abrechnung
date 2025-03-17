@@ -5,7 +5,7 @@
       class="mb-5"
       ref="travelCardListRef"
       endpoint="examine/travel"
-      :params="params('underExamination')"
+      stateFilter="underExamination"
       :showOwner="true"
       :showSearch="true"
       @clicked="(t) => $router.push('/examine/travel/' + t._id)">
@@ -20,7 +20,7 @@
       <hr class="hr" />
       <TravelCardList
         endpoint="examine/travel"
-        :params="params('refunded')"
+        stateFilter="refunded"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/examine/travel/' + t._id)">
@@ -32,7 +32,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { TravelState } from '../../../../common/types.js'
-import TravelCardList from './elements/TravelCardList.vue'
+import TravelCardList from './elements/TravelList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

@@ -40,7 +40,7 @@
         class="mb-5"
         ref="travelCardListRef"
         endpoint="approve/travel"
-        :params="params('appliedFor')"
+        stateFilter="appliedFor"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => showModal(t)"></TravelCardList>
@@ -54,7 +54,7 @@
         <hr class="hr" />
         <TravelCardList
           endpoint="approve/travel"
-          :params="params('approved')"
+          stateFilter="approved"
           :showOwner="true"
           :showSearch="true"
           @clicked="(t) => showModal(t)">
@@ -70,7 +70,7 @@ import { defineComponent } from 'vue'
 import { TravelSimple, TravelState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
-import TravelCardList from './elements/TravelCardList.vue'
+import TravelCardList from './elements/TravelList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 import TravelApproveForm from './forms/TravelApproveForm.vue'
 
