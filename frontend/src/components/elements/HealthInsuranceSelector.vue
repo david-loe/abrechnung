@@ -4,7 +4,7 @@
     :options="$root.healthInsurances"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(h: HealthInsurance) => $emit('update:modelValue', h)"
+    @update:modelValue="updateInsurance"
     :filter="filter"
     :disabled="disabled"
     style="min-width: 160px">
@@ -26,10 +26,6 @@ import { HealthInsurance } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',
-  data() {
-    return {}
-  },
-  components: {},
   props: {
     modelValue: { type: Object as PropType<HealthInsurance> },
     required: { type: Boolean, default: false },

@@ -59,7 +59,6 @@ const loadFromServer = async () => {
   if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
     const sortObj = {} as any
     sortObj[serverOptions.value.sortBy] = serverOptions.value.sortType
-    console.log(sortObj)
     params.sortJSON = Base64.encode(JSON.stringify(sortObj))
   }
   const filter = prepareFilter(props.filter)
