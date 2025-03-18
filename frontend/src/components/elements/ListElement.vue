@@ -51,7 +51,7 @@ const serverOptions = ref<ServerOptions>({
 })
 
 let oldFilterValue = ''
-const loadFromServer = async (filter?: Filter) => {
+const loadFromServer = async () => {
   loading.value = true
 
   const params = { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage } as any
@@ -62,7 +62,7 @@ const loadFromServer = async (filter?: Filter) => {
     console.log(sortObj)
     params.sortJSON = Base64.encode(JSON.stringify(sortObj))
   }
-
+  const filter = prepareFilter(props.filter)
   if (filter && Object.keys(filter).length > 0) {
     params.filterJSON = Base64.encode(JSON.stringify(filter))
   }
@@ -106,7 +106,7 @@ watch(
     const filterJSON = JSON.stringify(preparedFilter)
     if (oldFilterValue !== filterJSON) {
       oldFilterValue = filterJSON
-      loadFromServer(preparedFilter)
+      loadFromServer()
     }
   },
   { deep: true }

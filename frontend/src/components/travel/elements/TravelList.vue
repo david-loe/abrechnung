@@ -64,7 +64,7 @@
       </div>
     </template>
     <template #item-name="travel: TravelSimple">
-      <template v-if="travel.state === 'rejected' || travel.state === 'appliedFor'">
+      <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
         <a
           class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
           style="cursor: pointer"
@@ -152,6 +152,10 @@ const getEmptyFilter = () =>
 
 const filter = ref(getEmptyFilter())
 
+if (props.stateFilter) {
+  filter.value.state = props.stateFilter
+}
+
 const showFilter = ref({
   name: false,
   owner: false,
@@ -170,7 +174,12 @@ function clickFilter(header: keyof typeof showFilter.value) {
 }
 
 const list = useTemplateRef('list')
-defineExpose({ loadFromServer: list.value?.loadFromServer })
+function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+  }
+}
+defineExpose({ loadFromServer })
 </script>
 
 <style></style>
