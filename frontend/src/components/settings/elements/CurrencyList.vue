@@ -74,7 +74,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCurrency(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @close="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.currency') }) }}

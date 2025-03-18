@@ -9,7 +9,8 @@
     :items="items"
     sort-by="name"
     :headers="headers"
-    alternating>
+    alternating
+    :preventContextMenuRow="false">
     <template #header-name="header">
       <div class="filter-column">
         {{ header.text }}
@@ -61,18 +62,50 @@
         </div>
       </div>
     </template>
-    <template #item-name="{ name, _id }">
-      <router-link
-        :to="'/' + endpoint + '/' + _id"
-        class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
-        {{ name }}
-      </router-link>
+    <template #header-owner="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('owner')">
+          <i v-if="showFilter.owner" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.owner">
+          <UserSelector v-model="filter.owner as any"></UserSelector>
+        </div>
+      </div>
+    </template>
+    <template #item-name="travel: TravelSimple">
+      <template v-if="travel.state === 'rejected' || travel.state === 'appliedFor'">
+        <a
+          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
+          style="cursor: pointer"
+          @click="emits('clickedApplied', travel)">
+          {{ travel.name }}
+        </a>
+      </template>
+      <template v-else>
+        <router-link
+          :to="'/' + endpoint + '/' + travel._id"
+          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+          {{ travel.name }}
+        </router-link>
+      </template>
     </template>
     <template #item-startDate="{ startDate }">
       {{ $formatter.simpleDate(startDate) }}
     </template>
     <template #item-destinationPlace="{ destinationPlace }">
       <PlaceElement :place="destinationPlace"></PlaceElement>
+    </template>
+    <template #item-editor="{ editor }">
+      <span :title="editor.name.givenName + ' ' + editor.name.familyName">
+        {{ editor.name.givenName + ' ' + editor.name.familyName.substring(0, 1) + '.' }}
+      </span>
+    </template>
+    <template #item-owner="{ owner }">
+      <span :title="owner.name.givenName + ' ' + owner.name.familyName">
+        {{ owner.name.givenName + ' ' + owner.name.familyName.substring(0, 1) + '.' }}
+      </span>
     </template>
     <template #item-state="{ progress, state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
@@ -85,21 +118,24 @@
 import API from '@/api.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import i18n from '@/i18n.js'
 import { ref, toRaw, watch } from 'vue'
 import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
 import { Base64 } from '../../../../../common/scripts'
-import { TravelState, travelStates } from '../../../../../common/types'
+import { TravelSimple, TravelState, travelStates } from '../../../../../common/types'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import ProgressCircle from '../../elements/ProgressCircle.vue'
 import StateBadge from '../../elements/StateBadge.vue'
 
-interface Props {
+const props = defineProps<{
   endpoint: string
   stateFilter?: TravelState
-}
-const props = defineProps<Props>()
+  columnsToHide?: string[]
+}>()
+
+const emits = defineEmits<{ clickedApplied: [travel: TravelSimple] }>()
 
 const headers: Header[] = [
   //@ts-ignore
@@ -107,13 +143,26 @@ const headers: Header[] = [
   { text: i18n.global.t('labels.state'), value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
-  //@ts-ignore
   headers.push(
+    //@ts-ignore
     { text: i18n.global.t('labels.destinationPlace'), value: 'destinationPlace' },
     { text: i18n.global.t('labels.startDate'), value: 'startDate', sortable: true },
-    { text: i18n.global.t('labels.project'), value: 'project.identifier' }
+    { text: i18n.global.t('labels.project'), value: 'project.identifier' },
+    { text: i18n.global.t('labels.owner'), value: 'owner' },
+    { text: i18n.global.t('labels.editor'), value: 'editor' }
   )
 }
+if (props.columnsToHide) {
+  for (const columnToHide of props.columnsToHide) {
+    for (let i = 0; i <= headers.length; i++) {
+      if (headers[i].value === columnToHide) {
+        headers.splice(i, 1)
+        break
+      }
+    }
+  }
+}
+
 const items = ref<Item[]>([])
 const loading = ref(false)
 const serverItemsLength = ref(0)
@@ -214,6 +263,7 @@ watch(
   },
   { deep: true }
 )
+defineExpose({ loadFromServer })
 </script>
 
 <style></style>

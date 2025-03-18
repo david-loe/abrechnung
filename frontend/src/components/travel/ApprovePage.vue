@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalTravel && modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @reset="resetForms()">
+      @close="resetForms()">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
@@ -36,14 +36,12 @@
           </button>
         </div>
       </div>
-      <TravelCardList
+      <TravelList
         class="mb-5"
-        ref="travelCardListRef"
+        ref="travelListRef"
         endpoint="approve/travel"
         stateFilter="appliedFor"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => showModal(t)"></TravelCardList>
+        :columns-to-hide="['state', 'editor']"></TravelList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -52,13 +50,7 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelCardList
-          endpoint="approve/travel"
-          stateFilter="approved"
-          :showOwner="true"
-          :showSearch="true"
-          @clicked="(t) => showModal(t)">
-        </TravelCardList>
+        <TravelList endpoint="approve/travel" stateFilter="approved" :columns-to-hide="['state']"> </TravelList>
       </template>
     </div>
   </div>
@@ -67,16 +59,16 @@
 <script lang="ts">
 import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { TravelSimple, TravelState } from '../../../../common/types.js'
+import { TravelSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
-import TravelCardList from './elements/TravelList.vue'
+import TravelList from './elements/TravelList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 import TravelApproveForm from './forms/TravelApproveForm.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelCardList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
+  components: { TravelList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
   props: { _id: { type: String } },
   data() {
     return {
@@ -94,11 +86,11 @@ export default defineComponent({
       }
     },
     hideModal() {
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      }
+      ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+      this.$router.push('/approve/travel')
     },
     resetForms() {
+      this.hideModal()
       if (this.$refs.travelApproveForm) {
         ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
       }
@@ -112,27 +104,32 @@ export default defineComponent({
         travel.comment = comment
         const result = await API.setter<TravelSimple>('approve/travel/' + decision, travel)
         if (result.ok) {
-          ;(this.$refs.travelCardListRef as typeof TravelCardList).getData()
-          ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+          ;(this.$refs.travelListRef as typeof TravelList).loadFromServer()
+          this.hideModal()
         } else {
           ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
         }
       }
     },
-    params(state: TravelState) {
-      return { filter: { $and: [{ state }] } }
-    }
-  },
-  async mounted() {
-    if (this._id) {
-      const result = await API.getter<TravelSimple>('approve/travel', { _id: this._id })
+    async showTravel(_id: string) {
+      const result = await API.getter<TravelSimple>('approve/travel', { _id })
       if (result.ok) {
         this.showModal(result.ok.data)
       }
     }
   },
+  async mounted() {
+    if (this._id) {
+      this.showTravel(this._id)
+    }
+  },
   async created() {
     await this.$root.load()
+  },
+  watch: {
+    _id: function (value) {
+      this.showTravel(value)
+    }
   }
 })
 </script>

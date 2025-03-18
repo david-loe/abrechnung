@@ -3,7 +3,7 @@
     <ModalComponent
       ref="modalComp"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
-      @reset="resetForms()">
+      @close="resetForms()">
       <div v-if="modalObject">
         <template v-if="modalObjectType === 'travel'">
           <TravelApplication
@@ -66,13 +66,12 @@
       </div>
       <template v-if="!$root.settings.disableReportType.travel">
         <h3>{{ $t('labels.travel') }}</h3>
-        <TravelCardList
+        <TravelList
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :showDropdown="true"
-          @clicked="(t) => clickTravelCard(t)"
-          @edit="(t) => showModal('edit', t, 'travel')"></TravelCardList>
+          :columns-to-hide="['owner']"
+          @clicked-applied="(t) => showModal('view', t, 'travel')"></TravelList>
       </template>
       <template v-if="!$root.settings.disableReportType.expenseReport">
         <h3>{{ $t('labels.expenses') }}</h3>
@@ -105,7 +104,7 @@ import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostCardList from './healthCareCost/elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './healthCareCost/forms/HealthCareCostForm.vue'
 import TravelApplication from './travel/elements/TravelApplication.vue'
-import TravelCardList from './travel/elements/TravelList.vue'
+import TravelList from './travel/elements/TravelList.vue'
 import TravelApplyForm from './travel/forms/TravelApplyForm.vue'
 
 type ModalMode = 'view' | 'add' | 'edit'
@@ -115,7 +114,7 @@ type ModalObject = Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partia
 export default defineComponent({
   name: 'HomePage',
   components: {
-    TravelCardList,
+    TravelList,
     TravelApplyForm,
     TravelApplication,
     ExpenseReportCardList,
@@ -133,13 +132,6 @@ export default defineComponent({
     }
   },
   methods: {
-    clickTravelCard(travel: TravelSimple) {
-      if (['appliedFor', 'rejected'].indexOf(travel.state) > -1) {
-        this.showModal('view', travel, 'travel')
-      } else {
-        this.$router.push(`/travel/${travel._id}`)
-      }
-    },
     showModal(mode: ModalMode, object: ModalObject, type: ModalObjectType) {
       this.modalObjectType = type
       this.modalObject = object
@@ -165,7 +157,7 @@ export default defineComponent({
       ).ok
       if (result) {
         if (this.$refs.travelList) {
-          ;(this.$refs.travelList as typeof TravelCardList).getData()
+          ;(this.$refs.travelList as typeof TravelList).loadFromServer()
         }
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
@@ -194,7 +186,7 @@ export default defineComponent({
       const result = await API.deleter('travel', { _id })
       if (result) {
         if (this.$refs.travelList) {
-          ;(this.$refs.travelList as typeof TravelCardList).getData()
+          ;(this.$refs.travelList as typeof TravelList).loadFromServer()
         }
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }

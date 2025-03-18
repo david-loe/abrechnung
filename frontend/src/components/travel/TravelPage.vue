@@ -2,7 +2,7 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @reset="resetForms()"
+      @close="resetForms()"
       :header="
         modalMode === 'add'
           ? $t('labels.newX', { X: $t('labels.' + modalObjectType) })
@@ -584,9 +584,7 @@ export default defineComponent({
       }
     },
     hideModal() {
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      }
+      ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
     },
     resetForms() {
       if (this.$refs.stageForm) {
@@ -616,7 +614,7 @@ export default defineComponent({
       if (confirm(this.$t('alerts.warningReapply'))) {
         const result = await API.setter<Travel>('travel/appliedFor', travel)
         if (result.ok) {
-          ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+          this.hideModal()
           this.$router.push({ path: '/' })
         } else {
           await this.getTravel()
@@ -675,7 +673,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+        this.hideModal()
       } else if (result.error) {
         this.error = result.error
         ;(this.$refs.stageForm as typeof StageForm).loading = false
@@ -689,7 +687,7 @@ export default defineComponent({
       const result = await API.deleter(this.endpointPrefix + 'travel/stage', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+        this.hideModal()
       }
     },
     async postExpense(expense: TravelExpense) {
@@ -705,7 +703,7 @@ export default defineComponent({
       })
       if (result.ok) {
         this.setTravel(result.ok)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+        this.hideModal()
       } else {
         ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
       }
@@ -714,7 +712,7 @@ export default defineComponent({
       const result = await API.deleter(this.endpointPrefix + 'travel/expense', { _id, parentId: this._id })
       if (result) {
         this.setTravel(result)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
+        this.hideModal()
       }
     },
     async postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
