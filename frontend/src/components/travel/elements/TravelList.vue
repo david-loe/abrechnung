@@ -1,16 +1,5 @@
 <template>
-  <EasyDataTable
-    class="mb-3"
-    :rows-items="[5, 15, 25]"
-    :rows-per-page="5"
-    v-model:server-options="serverOptions"
-    :server-items-length="serverItemsLength"
-    :loading="loading"
-    :items="items"
-    sort-by="name"
-    :headers="headers"
-    alternating
-    :preventContextMenuRow="false">
+  <ListElement class="mb-3" ref="list" :endpoint="endpoint" :filter="filter" :headers="headers" :columns-to-hide="props.columnsToHide">
     <template #header-name="header">
       <div class="filter-column">
         {{ header.text }}
@@ -111,19 +100,18 @@
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
-  </EasyDataTable>
+  </ListElement>
 </template>
 
 <script lang="ts" setup>
-import API from '@/api.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
+import ListElement from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import i18n from '@/i18n.js'
-import { ref, toRaw, watch } from 'vue'
-import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
-import { Base64 } from '../../../../../common/scripts'
+import { ref, useTemplateRef } from 'vue'
+import type { Header } from 'vue3-easy-data-table'
 import { TravelSimple, TravelState, travelStates } from '../../../../../common/types'
 import PlaceElement from '../../elements/PlaceElement.vue'
 import ProgressCircle from '../../elements/ProgressCircle.vue'
@@ -152,24 +140,6 @@ if (window.innerWidth > bp.md) {
     { text: i18n.global.t('labels.editor'), value: 'editor' }
   )
 }
-if (props.columnsToHide) {
-  for (const columnToHide of props.columnsToHide) {
-    for (let i = 0; i <= headers.length; i++) {
-      if (headers[i].value === columnToHide) {
-        headers.splice(i, 1)
-        break
-      }
-    }
-  }
-}
-
-const items = ref<Item[]>([])
-const loading = ref(false)
-const serverItemsLength = ref(0)
-const serverOptions = ref<ServerOptions>({
-  page: 1,
-  rowsPerPage: 5
-})
 
 const getEmptyFilter = () =>
   ({
@@ -198,72 +168,9 @@ function clickFilter(header: keyof typeof showFilter.value) {
     showFilter.value[header] = true
   }
 }
-let oldFilterValue = ''
-const loadFromServer = async (additionalFilter?: any) => {
-  loading.value = true
 
-  const params = { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage } as any
-
-  if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
-    const sortObj = {} as any
-    sortObj[serverOptions.value.sortBy] = serverOptions.value.sortType
-    console.log(sortObj)
-    params.sortJSON = Base64.encode(JSON.stringify(sortObj))
-  }
-
-  let filter = additionalFilter || {}
-  if (props.stateFilter) {
-    Object.assign(filter, { state: props.stateFilter })
-  }
-  if (Object.keys(filter).length > 0) {
-    params.filterJSON = Base64.encode(JSON.stringify(filter))
-  }
-
-  let result = (await API.getter<any[]>(props.endpoint, params)).ok
-  if (result) {
-    items.value = result.data
-    serverItemsLength.value = result.meta.count
-  } else {
-    items.value = []
-    serverItemsLength.value = 0
-  }
-  loading.value = false
-}
-const prepareFilter = (filter: any) => {
-  const filterCopy = structuredClone(toRaw(filter))
-  for (const filterKey in filterCopy) {
-    if (filterCopy[filterKey] === null || filterCopy[filterKey] === undefined) {
-      delete filterCopy[filterKey]
-    } else if (typeof filterCopy[filterKey] === 'object' && !filterCopy[filterKey].$regex && filterCopy[filterKey].$options) {
-      delete filterCopy[filterKey]
-    }
-  }
-  return filterCopy
-}
-
-// initial load
-loadFromServer()
-
-watch(
-  serverOptions,
-  (value) => {
-    loadFromServer()
-  },
-  { deep: true }
-)
-watch(
-  filter,
-  (value) => {
-    const preparedFilter = prepareFilter(filter.value)
-    const filterJSON = JSON.stringify(preparedFilter)
-    if (oldFilterValue !== filterJSON) {
-      oldFilterValue = filterJSON
-      loadFromServer(preparedFilter)
-    }
-  },
-  { deep: true }
-)
-defineExpose({ loadFromServer })
+const list = useTemplateRef('list')
+defineExpose({ loadFromServer: list.value?.loadFromServer })
 </script>
 
 <style></style>
