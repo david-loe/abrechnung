@@ -32,7 +32,7 @@
       <HealthCareCostCardList
         class="mb-5"
         endpoint="examine/healthCareCost"
-        :params="params('underExamination')"
+        stateFilter="underExamination"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
@@ -47,7 +47,7 @@
         <hr class="hr" />
         <HealthCareCostCardList
           endpoint="examine/healthCareCost"
-          :params="params('underExaminationByInsurance')"
+          stateFilter="underExaminationByInsurance"
           :showOwner="true"
           :showSearch="true"
           @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">

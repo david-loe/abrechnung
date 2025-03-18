@@ -30,14 +30,13 @@
           </button>
         </div>
       </div>
-      <ExpenseReportCardList
+      <ExpenseReportList
+        key="underExamination"
         class="mb-5"
         endpoint="examine/expenseReport"
-        :params="params('underExamination')"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
-      </ExpenseReportCardList>
+        stateFilter="underExamination"
+        :columns-to-hide="['state', 'editor']">
+      </ExpenseReportList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -46,13 +45,8 @@
           {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <ExpenseReportCardList
-          endpoint="examine/expenseReport"
-          :params="params('refunded')"
-          :showOwner="true"
-          :showSearch="true"
-          @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
-        </ExpenseReportCardList>
+        <ExpenseReportList key="refunded" endpoint="examine/expenseReport" stateFilter="refunded" :columns-to-hide="['state']">
+        </ExpenseReportList>
       </template>
     </div>
   </div>
@@ -63,13 +57,13 @@ import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
-import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
+import ExpenseReportList from './elements/ExpenseReportList.vue'
 import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
 type ModalMode = 'add' | 'edit'
 export default defineComponent({
   name: 'ExaminePage',
-  components: { ExpenseReportCardList, ExpenseReportForm, ModalComponent },
+  components: { ExpenseReportList, ExpenseReportForm, ModalComponent },
   props: [],
   data() {
     return {

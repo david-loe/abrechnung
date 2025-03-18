@@ -4,7 +4,7 @@
     <HealthCareCostCardList
       class="mb-5"
       endpoint="confirm/healthCareCost"
-      :params="params('underExaminationByInsurance')"
+      stateFilter="underExaminationByInsurance"
       :showOwner="true"
       :showSearch="true"
       @clicked="(t) => $router.push('/confirm/healthCareCost/' + t._id)">
@@ -19,7 +19,7 @@
       <hr class="hr" />
       <HealthCareCostCardList
         endpoint="confirm/healthCareCost"
-        :params="params('refunded')"
+        stateFilter="refunded"
         :showOwner="true"
         :showSearch="true"
         @clicked="(t) => $router.push('/confirm/healthCareCost/' + t._id)">

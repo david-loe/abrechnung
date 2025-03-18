@@ -75,12 +75,7 @@
       </template>
       <template v-if="!$root.settings.disableReportType.expenseReport">
         <h3>{{ $t('labels.expenses') }}</h3>
-        <ExpenseReportCardList
-          class="mb-4"
-          ref="expenseReportList"
-          endpoint="expenseReport"
-          :showDropdown="true"
-          @clicked="(e) => $router.push('/expenseReport/' + e._id)"></ExpenseReportCardList>
+        <ExpenseReportList class="mb-4" ref="expenseReportList" endpoint="expenseReport" :columns-to-hide="['owner']"></ExpenseReportList>
       </template>
       <template v-if="!$root.settings.disableReportType.healthCareCost">
         <h3>{{ $t('labels.healthCareCost') }}</h3>
@@ -99,7 +94,7 @@ import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
-import ExpenseReportCardList from './expenseReport/elements/ExpenseReportCardList.vue'
+import ExpenseReportList from './expenseReport/elements/ExpenseReportList.vue'
 import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostCardList from './healthCareCost/elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './healthCareCost/forms/HealthCareCostForm.vue'
@@ -117,7 +112,7 @@ export default defineComponent({
     TravelList,
     TravelApplyForm,
     TravelApplication,
-    ExpenseReportCardList,
+    ExpenseReportList,
     ExpenseReportForm,
     HealthCareCostCardList,
     HealthCareCostForm,
@@ -166,7 +161,7 @@ export default defineComponent({
       const result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
       if (result) {
         if (this.$refs.expenseReportList) {
-          ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
+          ;(this.$refs.expenseReportList as typeof ExpenseReportList).loadFromServer()
         }
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/expenseReport/' + result._id)
