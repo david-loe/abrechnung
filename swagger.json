@@ -1038,6 +1038,10 @@
 					"filterJSON": {
 						"type": "string",
 						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
 					}
 				},
 				"type": "object",
@@ -3045,6 +3049,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -5279,6 +5287,10 @@
 					"filterJSON": {
 						"type": "string",
 						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
 					}
 				},
 				"type": "object",
@@ -5345,6 +5357,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -5632,6 +5648,10 @@
 					"filterJSON": {
 						"type": "string",
 						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
 					}
 				},
 				"type": "object",
@@ -5803,6 +5823,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -6123,6 +6147,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -6530,6 +6558,10 @@
 					"filterJSON": {
 						"type": "string",
 						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
 					}
 				},
 				"type": "object",
@@ -6800,6 +6832,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -7125,6 +7161,10 @@
 						"type": "array"
 					},
 					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
 						"type": "string",
 						"format": "byte"
 					}
@@ -8014,6 +8054,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -8096,6 +8144,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -8541,6 +8597,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -9169,6 +9233,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -9420,6 +9492,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -10050,6 +10130,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -10128,6 +10216,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -10378,6 +10474,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -10459,6 +10563,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -10699,6 +10811,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -10957,6 +11077,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -11380,6 +11508,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -11760,6 +11896,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -11851,6 +11995,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -12065,6 +12217,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -12479,6 +12639,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -13105,6 +13273,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}
@@ -13348,6 +13524,14 @@
 					{
 						"in": "query",
 						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
 						"required": false,
 						"schema": {
 							"type": "string"
