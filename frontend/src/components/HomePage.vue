@@ -3,7 +3,7 @@
     <ModalComponent
       ref="modalComp"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
-      @reset="resetForms()">
+      @close="resetForms()">
       <div v-if="modalObject">
         <template v-if="modalObjectType === 'travel'">
           <TravelApplication
@@ -66,46 +66,37 @@
       </div>
       <template v-if="!$root.settings.disableReportType.travel">
         <h3>{{ $t('labels.travel') }}</h3>
-        <TravelCardList
+        <TravelList
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :showDropdown="true"
-          @clicked="(t) => clickTravelCard(t)"
-          @edit="(t) => showModal('edit', t, 'travel')"></TravelCardList>
+          :columns-to-hide="['owner']"
+          @clicked-applied="(t) => showModal('view', t, 'travel')"></TravelList>
       </template>
       <template v-if="!$root.settings.disableReportType.expenseReport">
         <h3>{{ $t('labels.expenses') }}</h3>
-        <ExpenseReportCardList
-          class="mb-4"
-          ref="expenseReportList"
-          endpoint="expenseReport"
-          :showDropdown="true"
-          @clicked="(e) => $router.push('/expenseReport/' + e._id)"></ExpenseReportCardList>
+        <ExpenseReportList class="mb-4" ref="expenseReportList" endpoint="expenseReport" :columns-to-hide="['owner']"></ExpenseReportList>
       </template>
       <template v-if="!$root.settings.disableReportType.healthCareCost">
         <h3>{{ $t('labels.healthCareCost') }}</h3>
-        <HealthCareCostCardList
-          ref="healthCareCostList"
-          endpoint="healthCareCost"
-          :showDropdown="true"
-          @clicked="(e) => $router.push('/healthCareCost/' + e._id)"></HealthCareCostCardList>
+        <HealthCareCostList ref="healthCareCostList" endpoint="healthCareCost" :columns-to-hide="['owner']"></HealthCareCostList>
       </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
-import ExpenseReportCardList from './expenseReport/elements/ExpenseReportCardList.vue'
+import ExpenseReportList from './expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
-import HealthCareCostCardList from './healthCareCost/elements/HealthCareCostCardList.vue'
 import HealthCareCostForm from './healthCareCost/forms/HealthCareCostForm.vue'
+import HealthCareCostList from './healthCareCost/HealthCareCostList.vue'
 import TravelApplication from './travel/elements/TravelApplication.vue'
-import TravelCardList from './travel/elements/TravelCardList.vue'
 import TravelApplyForm from './travel/forms/TravelApplyForm.vue'
+import TravelList from './travel/TravelList.vue'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost'
@@ -114,12 +105,12 @@ type ModalObject = Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partia
 export default defineComponent({
   name: 'HomePage',
   components: {
-    TravelCardList,
+    TravelList,
     TravelApplyForm,
     TravelApplication,
-    ExpenseReportCardList,
+    ExpenseReportList,
     ExpenseReportForm,
-    HealthCareCostCardList,
+    HealthCareCostList,
     HealthCareCostForm,
     ModalComponent
   },
@@ -132,13 +123,6 @@ export default defineComponent({
     }
   },
   methods: {
-    clickTravelCard(travel: TravelSimple) {
-      if (['appliedFor', 'rejected'].indexOf(travel.state) > -1) {
-        this.showModal('view', travel, 'travel')
-      } else {
-        this.$router.push(`/travel/${travel._id}`)
-      }
-    },
     showModal(mode: ModalMode, object: ModalObject, type: ModalObjectType) {
       this.modalObjectType = type
       this.modalObject = object
@@ -160,41 +144,33 @@ export default defineComponent({
     },
     async applyForTravel(travel: TravelSimple) {
       const result = (
-        await this.$root.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
+        await API.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
       ).ok
       if (result) {
-        if (this.$refs.travelList) {
-          ;(this.$refs.travelList as typeof TravelCardList).getData()
-        }
+        ;(this.$refs.travelList as typeof TravelList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = (await this.$root.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
+      const result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
       if (result) {
-        if (this.$refs.expenseReportList) {
-          ;(this.$refs.expenseReportList as typeof ExpenseReportCardList).getData()
-        }
+        ;(this.$refs.expenseReportList as typeof ExpenseReportList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/expenseReport/' + result._id)
       }
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      const result = (await this.$root.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
+      const result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
       if (result) {
-        if (this.$refs.healthCareCostList) {
-          ;(this.$refs.healthCareCostList as typeof HealthCareCostCardList).getData()
-        }
+        ;(this.$refs.healthCareCostList as typeof HealthCareCostList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
         this.$router.push('/healthCareCost/' + result._id)
       }
     },
     async deleteTravel(_id: string) {
-      const result = await this.$root.deleter('travel', { _id })
+      const result = await API.deleter('travel', { _id })
       if (result) {
-        if (this.$refs.travelList) {
-          ;(this.$refs.travelList as typeof TravelCardList).getData()
-        }
+        ;(this.$refs.travelList as typeof TravelList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     }

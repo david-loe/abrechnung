@@ -18,13 +18,12 @@ import { IdDocument, TravelApplication, TravelPost } from './types.js'
 export class TravelController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
-    const sortFn = (a: ITravel, b: ITravel) => (b.startDate as Date).valueOf() - (a.startDate as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter: { owner: request.user!._id, historic: false },
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
-      sortFn
+      sort: { startDate: -1 }
     })
   }
   @Delete()
@@ -255,12 +254,11 @@ export class TravelApproveController extends Controller {
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
-    const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter,
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
-      sortFn
+      sort: { updatedAt: -1 }
     })
   }
 
@@ -334,13 +332,12 @@ export class TravelExamineController extends Controller {
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
-    const sortFn = (a: ITravel, b: ITravel) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(Travel, {
       query,
       filter,
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
-      sortFn
+      sort: { updatedAt: -1 }
     })
   }
 

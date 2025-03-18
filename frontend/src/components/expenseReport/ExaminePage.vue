@@ -2,7 +2,7 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @reset="resetForms()"
+      @close="resetForms()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
       "
@@ -30,14 +30,13 @@
           </button>
         </div>
       </div>
-      <ExpenseReportCardList
+      <ExpenseReportList
+        key="underExamination"
         class="mb-5"
         endpoint="examine/expenseReport"
-        :params="params('underExamination')"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
-      </ExpenseReportCardList>
+        stateFilter="underExamination"
+        :columns-to-hide="['state', 'editor']">
+      </ExpenseReportList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -46,29 +45,25 @@
           {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <ExpenseReportCardList
-          endpoint="examine/expenseReport"
-          :params="params('refunded')"
-          :showOwner="true"
-          :showSearch="true"
-          @clicked="(t) => $router.push('/examine/expenseReport/' + t._id)">
-        </ExpenseReportCardList>
+        <ExpenseReportList key="refunded" endpoint="examine/expenseReport" stateFilter="refunded" :columns-to-hide="['state']">
+        </ExpenseReportList>
       </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
+import { ExpenseReportSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
-import ExpenseReportCardList from './elements/ExpenseReportCardList.vue'
+import ExpenseReportList from './ExpenseReportList.vue'
 import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
 type ModalMode = 'add' | 'edit'
 export default defineComponent({
   name: 'ExaminePage',
-  components: { ExpenseReportCardList, ExpenseReportForm, ModalComponent },
+  components: { ExpenseReportList, ExpenseReportForm, ModalComponent },
   props: [],
   data() {
     return {
@@ -78,9 +73,6 @@ export default defineComponent({
     }
   },
   methods: {
-    params(state: ExpenseReportState) {
-      return { filter: { $and: [{ state }] } }
-    },
     showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
       this.modalExpenseReport = expenseReport
       this.modalMode = mode
@@ -100,7 +92,7 @@ export default defineComponent({
       this.modalExpenseReport = undefined
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      const result = await this.$root.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
+      const result = await API.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
       if (result.ok) {
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       } else {

@@ -8,8 +8,11 @@
   --easy-table-body-row-height: var(--bs-body-line-height);
   --easy-table-body-item-padding: 0.25rem 0.25rem;
 
-  --easy-table-body-row-hover-font-color: var(--bs-secondary-color);
+  --easy-table-body-row-hover-font-color: var(--bs-body-color);
   --easy-table-body-row-hover-background-color: var(--bs-secondary-bg);
+
+  --easy-table-body-even-row-font-color: var(--bs-body-color);
+  --easy-table-body-even-row-background-color: var(--bs-tertiary-bg);
 
   --easy-table-header-font-color: var(--bs-body-color);
   --easy-table-header-background-color: var(--bs-body-bg);

@@ -4,7 +4,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ $props.header }}</h5>
-          <button type="button" class="btn-close" @click="hideModal()"></button>
+          <button
+            type="button"
+            class="btn-close"
+            @click="
+              //prettier-ignore
+              hideModal();
+              $emit('close')
+            "></button>
         </div>
         <div class="modal-body">
           <slot></slot>
@@ -19,7 +26,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ModalComponent',
-  emits: ['reset'],
+  emits: ['close'],
   data() {
     return {
       modal: undefined as Modal | undefined
@@ -31,7 +38,6 @@ export default defineComponent({
   methods: {
     hideModal() {
       this.modal?.hide()
-      this.$emit('reset')
     }
   },
   mounted() {

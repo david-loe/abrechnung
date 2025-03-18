@@ -86,6 +86,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import axios from 'axios'
 import { defineComponent } from 'vue'
 
@@ -119,7 +120,7 @@ export default defineComponent({
         }
       } catch (error) {
         this.passwordLDAP = ''
-        this.$root.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
+        API.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
       }
     },
     async requestMagicLogin() {
@@ -130,11 +131,11 @@ export default defineComponent({
         })
         if (res.status === 200) {
           this.magicLoginSend = true
-          this.$root.addAlert({ message: this.$t('alerts.mailSend'), title: '', type: 'success', ttl: 10000 })
+          API.addAlert({ message: this.$t('alerts.mailSend'), title: '', type: 'success', ttl: 10000 })
         }
       } catch (error) {
         this.passwordLDAP = ''
-        this.$root.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
+        API.addAlert({ message: this.$t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
       }
     },
     microsoftLink() {

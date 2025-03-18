@@ -26,13 +26,12 @@ import { IdDocument, MoneyPlusPost } from './types.js'
 export class HealthCareCostController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.createdAt as Date).valueOf() - (a.createdAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter: { owner: request.user!._id, historic: false },
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sortFn
+      sort: { createdAt: -1 }
     })
   }
   @Delete()
@@ -178,13 +177,12 @@ export class HealthCareCostExamineController extends Controller {
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sortFn
+      sort: { updatedAt: -1 }
     })
   }
 
@@ -349,13 +347,12 @@ export class HealthCareCostConfirmController extends Controller {
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
-    const sortFn = (a: IHealthCareCost, b: IHealthCareCost) => (b.updatedAt as Date).valueOf() - (a.updatedAt as Date).valueOf()
     return await this.getter(HealthCareCost, {
       query,
       filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sortFn
+      sort: { updatedAt: -1 }
     })
   }
 

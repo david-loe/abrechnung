@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
 import { log } from '../../../../common/logger.js'
@@ -93,7 +94,7 @@ export default defineComponent({
     async showFile(file: Partial<DocumentFile>): Promise<void> {
       const windowProxy = window.open('', '_blank') as Window
       if (file._id) {
-        const result = (await this.$root.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: file._id }, { responseType: 'blob' })).ok
+        const result = (await API.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: file._id }, { responseType: 'blob' })).ok
         if (result) {
           const fileURL = URL.createObjectURL(result.data)
           windowProxy.location.assign(fileURL)
@@ -108,7 +109,7 @@ export default defineComponent({
     async deleteFile(file: Partial<DocumentFile>, index?: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (file._id) {
-          const result = await this.$root.deleter(this.endpointPrefix + 'documentFile', { _id: file._id }, false)
+          const result = await API.deleter(this.endpointPrefix + 'documentFile', { _id: file._id }, false)
           if (!result) {
             return null
           }
@@ -154,7 +155,7 @@ export default defineComponent({
       return null
     },
     async generateToken() {
-      this.token = (await this.$root.setter<Token>('user/token', {}, undefined, false)).ok
+      this.token = (await API.setter<Token>('user/token', {}, undefined, false)).ok
       if (this.token) {
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
         url.searchParams.append('userId', this.$root.user._id)
@@ -172,7 +173,7 @@ export default defineComponent({
       if (this.token) {
         this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
       }
-      const result = (await this.$root.getter<Token>('user/token')).ok
+      const result = (await API.getter<Token>('user/token')).ok
       if (result && result.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
@@ -193,7 +194,7 @@ export default defineComponent({
       this.token = undefined
       this.qr = undefined
       this.secondsLeft = this.expireAfterSeconds
-      this.$root.deleter('user/token', { _id: '' }, false, false)
+      API.deleter('user/token', { _id: '' }, false, false)
     }
   },
   unmounted() {

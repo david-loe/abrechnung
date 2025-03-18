@@ -76,7 +76,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCountry(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @close="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.country') }) }}
@@ -85,6 +85,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { Country, Locale, accesses } from '../../../../../common/types.js'
@@ -121,17 +122,17 @@ export default defineComponent({
       this._showForm = true
     },
     async getCountries() {
-      const result = (await this.$root.getter<Country[]>('country', { additionalFields: ['lumpSums', 'lumpSumsFrom'] })).ok
+      const result = (await API.getter<Country[]>('country', { additionalFields: ['lumpSums', 'lumpSumsFrom'] })).ok
       if (result) {
         this.countries = result.data
       }
-      const rootCountries = (await this.$root.getter<Country[]>('country')).ok?.data
+      const rootCountries = (await API.getter<Country[]>('country')).ok?.data
       if (rootCountries) {
         this.$root.countries = rootCountries
       }
     },
     async postCountry(country: Country) {
-      const result = await this.$root.setter<Country>('admin/country', country)
+      const result = await API.setter<Country>('admin/country', country)
       if (result.ok) {
         this._showForm = false
         this.getCountries()
@@ -139,7 +140,7 @@ export default defineComponent({
       this.countryToEdit = undefined
     },
     async deleteCountry(country: Country) {
-      const result = await this.$root.deleter('admin/country', { _id: country._id })
+      const result = await API.deleter('admin/country', { _id: country._id })
       if (result) {
         this.getCountries()
       }
@@ -157,7 +158,7 @@ export default defineComponent({
   async created() {
     await this.$root.load()
     this.getCountries()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/country/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/country/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

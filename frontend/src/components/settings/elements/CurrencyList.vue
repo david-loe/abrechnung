@@ -74,7 +74,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCurrency(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @close="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.currency') }) }}
@@ -83,6 +83,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { Currency, Locale, accesses } from '../../../../../common/types.js'
 
@@ -117,7 +118,7 @@ export default defineComponent({
       this._showForm = true
     },
     async postCurrency(currency: Currency) {
-      const result = await this.$root.setter<Currency>('admin/currency', currency)
+      const result = await API.setter<Currency>('admin/currency', currency)
       if (result.ok) {
         await this.updateRoot()
         this._showForm = false
@@ -125,13 +126,13 @@ export default defineComponent({
       this.currencyToEdit = undefined
     },
     async deleteCurrency(currency: Currency) {
-      const result = await this.$root.deleter('admin/currency', { _id: currency._id })
+      const result = await API.deleter('admin/currency', { _id: currency._id })
       if (result) {
         await this.updateRoot()
       }
     },
     async updateRoot() {
-      const rootCurrencies = (await this.$root.getter<Currency[]>('currency')).ok?.data
+      const rootCurrencies = (await API.getter<Currency[]>('currency')).ok?.data
       if (rootCurrencies) {
         this.$root.currencies = rootCurrencies
       }
@@ -147,7 +148,7 @@ export default defineComponent({
   },
   async created() {
     await this.$root.load()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/currency/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/currency/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

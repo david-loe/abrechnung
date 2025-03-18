@@ -2,7 +2,7 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @reset="resetForms()"
+      @close="resetForms()"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
       <div v-if="expenseReport._id">
         <ExpenseForm
@@ -242,6 +242,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
 import { log } from '../../../../common/logger.js'
@@ -250,7 +251,6 @@ import { BaseCurrencyMoney, Expense, ExpenseReport, UserSimple, baseCurrency, ex
 import ModalComponent from '../elements/ModalComponent.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
-
 type ModalMode = 'add' | 'edit'
 
 export default defineComponent({
@@ -298,13 +298,13 @@ export default defineComponent({
       this.modalExpense = undefined
     },
     async deleteExpenseReport() {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport', { _id: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'expenseReport', { _id: this._id })
       if (result) {
         this.$router.push({ path: '/' })
       }
     },
     async toExamination() {
-      const result = await this.$root.setter<ExpenseReport>('expenseReport/underExamination', {
+      const result = await API.setter<ExpenseReport>('expenseReport/underExamination', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
@@ -313,7 +313,7 @@ export default defineComponent({
       }
     },
     async backToInWork() {
-      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/inWork', {
+      const result = await API.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/inWork', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
@@ -327,7 +327,7 @@ export default defineComponent({
       }
     },
     async refund() {
-      const result = await this.$root.setter<ExpenseReport>('examine/expenseReport/refunded', {
+      const result = await API.setter<ExpenseReport>('examine/expenseReport/refunded', {
         _id: this.expenseReport._id,
         comment: this.expenseReport.comment
       })
@@ -345,7 +345,7 @@ export default defineComponent({
           'Content-Type': 'multipart/form-data'
         }
       }
-      const result = await this.$root.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, {
+      const result = await API.setter<ExpenseReport>(this.endpointPrefix + 'expenseReport/expense', expense, {
         headers,
         params: { parentId: this.expenseReport._id }
       })
@@ -357,7 +357,7 @@ export default defineComponent({
       }
     },
     async deleteExpense(_id: string) {
-      const result = await this.$root.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
+      const result = await API.deleter(this.endpointPrefix + 'expenseReport/expense', { _id, parentId: this._id })
       if (result) {
         this.setExpenseReport(result)
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
@@ -368,7 +368,7 @@ export default defineComponent({
         _id: this._id,
         additionalFields: ['expenses']
       }
-      const result = (await this.$root.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
+      const result = (await API.getter<ExpenseReport>(this.endpointPrefix + 'expenseReport', params)).ok
       if (result) {
         this.setExpenseReport(result.data)
       }
@@ -380,7 +380,7 @@ export default defineComponent({
       log(this.expenseReport)
     },
     async getExaminerMails() {
-      const result = (await this.$root.getter<UserSimple[]>('expenseReport/examiner')).ok
+      const result = (await API.getter<UserSimple[]>('expenseReport/examiner')).ok
       if (result) {
         return result.data.map((x) => x.email)
       }

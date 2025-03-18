@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { Settings } from '../../../../../common/types.js'
 
@@ -20,7 +21,7 @@ export default defineComponent({
   },
   methods: {
     async postSettings(settings: Settings) {
-      const result = await this.$root.setter<Settings>('admin/settings', settings)
+      const result = await API.setter<Settings>('admin/settings', settings)
       if (result.ok) {
         this.$root.settings = result.ok
         ;(this.$refs.form$ as any).load(this.$root.settings)
@@ -29,7 +30,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.$root.load()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/settings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/settings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

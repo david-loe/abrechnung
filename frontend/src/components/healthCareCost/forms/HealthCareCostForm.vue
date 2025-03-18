@@ -23,14 +23,7 @@
         {{ $t('labels.insurance') }}<span class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.insurance')" />
-      <select
-        class="form-select"
-        id="healthCareCostFormInsurance"
-        v-model="$root.user.settings.insurance"
-        @update:model-value="settingsChanged = true"
-        required>
-        <option v-for="insurance of $root.healthInsurances" :value="insurance" :key="insurance._id">{{ insurance.name }}</option>
-      </select>
+      <HealthInsuranceSelector v-model="formHealthCareCost.insurance" :update-user-insurance="!askOwner"></HealthInsuranceSelector>
     </div>
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
@@ -51,6 +44,7 @@
 </template>
 
 <script lang="ts">
+import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import { defineComponent, PropType } from 'vue'
 import { HealthCareCostSimple } from '../../../../../common/types.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
@@ -59,7 +53,7 @@ import UserSelector from '../../elements/UserSelector.vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint, ProjectSelector, UserSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: {
@@ -77,8 +71,7 @@ export default defineComponent({
   data() {
     return {
       formHealthCareCost: this.default(),
-      loading: false,
-      settingsChanged: false
+      loading: false
     }
   },
   methods: {
@@ -92,14 +85,9 @@ export default defineComponent({
     clear() {
       this.loading = false
       this.formHealthCareCost = this.default()
-      this.settingsChanged = false
     },
     output() {
       this.loading = true
-      if (this.settingsChanged) {
-        this.$root.pushUserSettings(this.$root.user.settings)
-      }
-      this.formHealthCareCost.insurance = this.$root.user.settings.insurance
       return this.formHealthCareCost
     },
     input() {

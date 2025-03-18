@@ -53,6 +53,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { User, UserReplaceReferencesResult, objectIdRegex } from '../../../../../common/types.js'
 import UserSelector from '../../../components/elements/UserSelector.vue'
@@ -81,7 +82,7 @@ export default defineComponent({
   methods: {
     async mergeUser() {
       if (confirm(this.$t('alerts.areYouSureMerge'))) {
-        const result = await this.$root.setter<MergeResult>(
+        const result = await API.setter<MergeResult>(
           'admin/user/merge',
           { userId: this.userId, userIdToOverwrite: this.userIdToOverwrite },
           { params: { delOverwritten: this.delOverwritten } }

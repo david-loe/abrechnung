@@ -85,7 +85,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postUser(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @close="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.user') }) }}
@@ -94,6 +94,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
 
@@ -142,7 +143,7 @@ export default defineComponent({
       this._showForm = true
     },
     async postUser(user: User) {
-      const result = await this.$root.setter<User>('admin/user', user)
+      const result = await API.setter<User>('admin/user', user)
       if (result.ok) {
         this.getUsers()
         this._showForm = false
@@ -150,17 +151,17 @@ export default defineComponent({
       this.userToEdit = undefined
     },
     async deleteUser(user: User) {
-      const result = await this.$root.deleter('admin/user', { _id: user._id })
+      const result = await API.deleter('admin/user', { _id: user._id })
       if (result) {
         this.getUsers()
       }
     },
     async getUsers() {
-      const result = (await this.$root.getter<User[]>('admin/user')).ok
+      const result = (await API.getter<User[]>('admin/user')).ok
       if (result) {
         this.users = result.data
       }
-      const rootUsers = (await this.$root.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)).ok?.data
+      const rootUsers = (await API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)).ok?.data
       if (rootUsers) {
         this.$root.users = rootUsers
       }
@@ -177,7 +178,7 @@ export default defineComponent({
   async beforeMount() {
     await this.$root.load()
     this.getUsers()
-    this.schema = Object.assign({}, (await this.$root.getter<any>('admin/user/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {

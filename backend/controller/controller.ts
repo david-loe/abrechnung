@@ -1,5 +1,5 @@
 import { DeleteResult } from 'mongodb'
-import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, Types } from 'mongoose'
+import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder, Types } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
 import { _id, GETResponse, Meta, User } from '../../common/types.js'
@@ -23,13 +23,17 @@ export interface GetterQuery<ModelType> {
    * @format byte
    */
   filterJSON?: string
+  /**
+   * @format byte
+   */
+  sortJSON?: string
 }
 
 export interface GetterOptions<ModelType> {
   query: GetterQuery<ModelType>
   filter?: FilterQuery<ModelType>
   projection?: ProjectionType<ModelType>
-  sortFn?: (a: ModelType, b: ModelType) => number
+  sort?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null
   cb?: (data: ModelType | ModelType[]) => any
   allowedAdditionalFields?: (keyof ModelType)[]
 }
@@ -188,6 +192,7 @@ export class Controller extends TsoaController {
         }
       }
     }
+    // find by ID
     if (options.query._id) {
       let conditions: any = Object.assign({ _id: options.query._id }, options.filter)
       const result = (await model.findOne(conditions, options.projection).lean()) as ModelType
@@ -199,7 +204,9 @@ export class Controller extends TsoaController {
       } else {
         throw new NotFoundError(`No ${model.modelName} for _id: '${options.query._id}' found.`)
       }
+      // find all
     } else {
+      // conditions
       let conditions: any = {}
       if (options.query.filterJSON) {
         conditions = JSON.parse(Base64.decode(options.query.filterJSON))
@@ -210,19 +217,27 @@ export class Controller extends TsoaController {
         }
         conditions.$and.push(options.filter)
       }
-      const result = (await model.find(conditions, options.projection).lean()) as ModelType[]
-      meta.count = result.length
-      if (options.sortFn) {
-        result.sort(options.sortFn)
+
+      //sorting
+      let sort = options.sort
+      if (options.query.sortJSON) {
+        const sortFromQuery = JSON.parse(Base64.decode(options.query.sortJSON))
+        if (sortFromQuery) {
+          sort = sortFromQuery
+        }
       }
-      let data: ModelType[]
+
+      let query = model.find(conditions, options.projection)
+      meta.count = await model.countDocuments(conditions)
       if (meta.limit > 0) {
+        query = query.limit(meta.limit).skip(meta.limit * (meta.page - 1))
         meta.countPages = Math.ceil(meta.count / meta.limit)
-        data = result.slice(meta.limit * (meta.page - 1), meta.limit * meta.page)
-      } else {
-        meta.countPages = 1
-        data = result
       }
+      if (sort) {
+        query = query.sort(sort)
+      }
+      let data = (await query.lean()) as ModelType[]
+
       if (options.cb) {
         options.cb(data)
       }

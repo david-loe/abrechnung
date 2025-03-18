@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import qs from 'qs'
 import { createApp } from 'vue'
-import App, { Alert } from './App.vue'
+import App from './App.vue'
 import router from './router.js'
 
 import 'vue-select/dist/vue-select.css'
@@ -27,7 +27,6 @@ import {
   CountrySimple,
   Currency,
   DisplaySettings,
-  GETResponse,
   HealthInsurance,
   Locale,
   OrganisationSimple,
@@ -70,10 +69,6 @@ declare module 'vue' {
     $vueform: { i18n: { locale: Locale } }
     $router: typeof router
     $root: {
-      getter: <T>(endpoint: string, params?: any, config?: any, showAlert?: boolean) => Promise<{ ok?: GETResponse<T>; error?: any }>
-      setter: <T>(endpoint: string, data: any, config?: AxiosRequestConfig<any>, showAlert?: Boolean) => Promise<{ ok?: T; error?: any }>
-      deleter: (endpoint: string, params: { [key: string]: any; _id: string }, ask?: Boolean, showAlert?: Boolean) => Promise<boolean | any>
-      addAlert(alert: Alert): void
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
       load: (withoutAuth?: boolean) => Promise<void>
