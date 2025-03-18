@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import TravelList from './elements/TravelList.vue'
+import TravelList from './TravelList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

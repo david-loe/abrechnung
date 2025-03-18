@@ -57,7 +57,7 @@ import API from '@/api.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
-import ExpenseReportList from './elements/ExpenseReportList.vue'
+import ExpenseReportList from './ExpenseReportList.vue'
 import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
 type ModalMode = 'add' | 'edit'

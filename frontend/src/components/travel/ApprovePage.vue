@@ -62,9 +62,9 @@ import { defineComponent } from 'vue'
 import { TravelSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import TravelApply from './elements/TravelApplication.vue'
-import TravelList from './elements/TravelList.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 import TravelApproveForm from './forms/TravelApproveForm.vue'
+import TravelList from './TravelList.vue'
 
 export default defineComponent({
   name: 'ApprovePage',

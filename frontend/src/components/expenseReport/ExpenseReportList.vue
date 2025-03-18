@@ -22,20 +22,8 @@
         <div v-if="showFilter.state">
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of travelStates" :value="state">{{ i18n.global.t('states.' + state) }}</option>
+            <option v-for="state of expenseReportStates" :value="state">{{ i18n.global.t('states.' + state) }}</option>
           </select>
-        </div>
-      </div>
-    </template>
-    <template #header-destinationPlace="header">
-      <div class="filter-column">
-        {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('destinationPlace.country')">
-          <i v-if="showFilter['destinationPlace.country']" class="bi bi-funnel-fill"></i>
-          <i v-else class="bi bi-funnel"></i>
-        </span>
-        <div v-if="showFilter['destinationPlace.country']">
-          <CountrySelector v-model="filter['destinationPlace.country'] as any"></CountrySelector>
         </div>
       </div>
     </template>
@@ -63,28 +51,12 @@
         </div>
       </div>
     </template>
-    <template #item-name="travel: TravelSimple">
-      <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
-        <a
-          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
-          style="cursor: pointer"
-          @click="emits('clickedApplied', travel)">
-          {{ travel.name }}
-        </a>
-      </template>
-      <template v-else>
-        <router-link
-          :to="'/' + endpoint + '/' + travel._id"
-          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
-          {{ travel.name }}
-        </router-link>
-      </template>
-    </template>
-    <template #item-startDate="{ startDate }">
-      {{ $formatter.simpleDate(startDate) }}
-    </template>
-    <template #item-destinationPlace="{ destinationPlace }">
-      <PlaceElement :place="destinationPlace"></PlaceElement>
+    <template #item-name="{ name, _id }">
+      <router-link
+        :to="'/' + endpoint + '/' + _id"
+        class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+        {{ name }}
+      </router-link>
     </template>
     <template #item-editor="{ editor }">
       <span :title="editor.name.givenName + ' ' + editor.name.familyName">
@@ -96,34 +68,28 @@
         {{ owner.name.givenName + ' ' + owner.name.familyName.substring(0, 1) + '.' }}
       </span>
     </template>
-    <template #item-state="{ progress, state }">
+    <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
-      <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
   </ListElement>
 </template>
 
 <script lang="ts" setup>
-import CountrySelector from '@/components/elements/CountrySelector.vue'
+import { ExpenseReportState, expenseReportStates } from '@/../../common/types'
 import ListElement from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import i18n from '@/i18n.js'
 import { ref, useTemplateRef } from 'vue'
 import type { Header } from 'vue3-easy-data-table'
-import { TravelSimple, TravelState, travelStates } from '../../../../../common/types'
-import PlaceElement from '../../elements/PlaceElement.vue'
-import ProgressCircle from '../../elements/ProgressCircle.vue'
-import StateBadge from '../../elements/StateBadge.vue'
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: TravelState
+  stateFilter?: ExpenseReportState
   columnsToHide?: string[]
 }>()
-
-const emits = defineEmits<{ clickedApplied: [travel: TravelSimple] }>()
 
 const headers: Header[] = [
   //@ts-ignore
@@ -133,8 +99,6 @@ const headers: Header[] = [
 if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
-    { text: i18n.global.t('labels.destinationPlace'), value: 'destinationPlace' },
-    { text: i18n.global.t('labels.startDate'), value: 'startDate', sortable: true },
     { text: i18n.global.t('labels.project'), value: 'project.identifier' },
     { text: i18n.global.t('labels.owner'), value: 'owner' },
     { text: i18n.global.t('labels.editor'), value: 'editor' }
@@ -146,7 +110,6 @@ const getEmptyFilter = () =>
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
-    'destinationPlace.country': undefined,
     project: undefined
   } as { [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } })
 
@@ -160,7 +123,6 @@ const showFilter = ref({
   name: false,
   owner: false,
   state: false,
-  'destinationPlace.country': false,
   project: false
 })
 
