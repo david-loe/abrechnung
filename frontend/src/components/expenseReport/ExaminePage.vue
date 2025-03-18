@@ -55,7 +55,7 @@
 <script lang="ts">
 import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { ExpenseReportSimple, ExpenseReportState } from '../../../../common/types.js'
+import { ExpenseReportSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import ExpenseReportList from './ExpenseReportList.vue'
 import ExpenseReportForm from './forms/ExpenseReportForm.vue'
@@ -73,9 +73,6 @@ export default defineComponent({
     }
   },
   methods: {
-    params(state: ExpenseReportState) {
-      return { filter: { $and: [{ state }] } }
-    },
     showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
       this.modalExpenseReport = expenseReport
       this.modalMode = mode
