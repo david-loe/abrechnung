@@ -29,14 +29,12 @@
           </button>
         </div>
       </div>
-      <HealthCareCostCardList
+      <HealthCareCostList
         class="mb-5"
         endpoint="examine/healthCareCost"
         stateFilter="underExamination"
-        :showOwner="true"
-        :showSearch="true"
-        @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
-      </HealthCareCostCardList>
+        :columns-to-hide="['state', 'editor']">
+      </HealthCareCostList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -45,13 +43,8 @@
           {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <HealthCareCostCardList
-          endpoint="examine/healthCareCost"
-          stateFilter="underExaminationByInsurance"
-          :showOwner="true"
-          :showSearch="true"
-          @clicked="(t) => $router.push('/examine/healthCareCost/' + t._id)">
-        </HealthCareCostCardList>
+        <HealthCareCostList endpoint="examine/healthCareCost" stateFilter="underExaminationByInsurance" :columns-to-hide="['state']">
+        </HealthCareCostList>
       </template>
     </div>
   </div>
@@ -60,16 +53,16 @@
 <script lang="ts">
 import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { HealthCareCostSimple, HealthCareCostState } from '../../../../common/types.js'
+import { HealthCareCostSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
-import HealthCareCostCardList from './elements/HealthCareCostCardList.vue'
+import HealthCareCostList from './HealthCareCostList.vue'
 import HealthCareCostForm from './forms/HealthCareCostForm.vue'
 
 type ModalMode = 'add' | 'edit'
 
 export default defineComponent({
   name: 'ExaminePage',
-  components: { HealthCareCostCardList, HealthCareCostForm, ModalComponent },
+  components: { HealthCareCostList, HealthCareCostForm, ModalComponent },
   props: [],
   data() {
     return {
@@ -79,11 +72,6 @@ export default defineComponent({
     }
   },
   methods: {
-    params(state: HealthCareCostState) {
-      return {
-        filter: { $and: [{ state }] }
-      }
-    },
     showModal(mode: ModalMode, healthCareCost: HealthCareCostSimple | undefined) {
       this.modalHealthCareCost = healthCareCost
       this.modalMode = mode
