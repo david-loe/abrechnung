@@ -66,7 +66,7 @@
     <template #item-name="travel: TravelSimple">
       <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
         <a
-          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
+          class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
           style="cursor: pointer"
           @click="emits('clickedApplied', travel)">
           {{ travel.name }}
@@ -75,7 +75,7 @@
       <template v-else>
         <router-link
           :to="'/' + endpoint + '/' + travel._id"
-          class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+          class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
           {{ travel.name }}
         </router-link>
       </template>

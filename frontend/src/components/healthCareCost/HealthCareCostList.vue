@@ -54,7 +54,7 @@
     <template #item-name="{ name, _id }">
       <router-link
         :to="'/' + endpoint + '/' + _id"
-        class="link-dark link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+        class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
         {{ name }}
       </router-link>
     </template>
