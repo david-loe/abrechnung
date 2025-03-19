@@ -5,6 +5,7 @@ import {
   CountryCode,
   CountrySimple,
   LumpSum,
+  LumpsumType,
   Meal,
   Place,
   PurposeSimple,
@@ -181,35 +182,92 @@ export class TravelCalculator {
     travel.days = days as TravelDayFullCountry[]
   }
 
-  async addCateringRefunds(travel: Travel) {
-    for (let i = 0; i < travel.days.length; i++) {
-      const day = travel.days[i] as TravelDayFullCountry
-      if (day.purpose == 'professional') {
-        const result: Partial<Refund> = { type: 'catering24' }
-        if (i == 0 || i == travel.days.length - 1) {
-          result.type = 'catering8'
-        }
-        let amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type!]
-        let leftover = 1
-        if (day.cateringNoRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
-        if (day.cateringNoRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
-        if (day.cateringNoRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
+  async calcCateringRefund(day: TravelDayFullCountry, type: LumpsumType, claimSpouseRefund: boolean | null | undefined) {
+    const result = { type } as Refund
+    let amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type]
+    let leftover = 1
+    if (day.cateringNoRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
+    if (day.cateringNoRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
+    if (day.cateringNoRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
 
-        result.refund = {
-          amount:
-            Math.round(
-              amount *
-                leftover *
-                ((this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1
-                  ? this.travelSettings.factorCateringLumpSum
-                  : 1) *
-                100
-            ) / 100
+    result.refund = {
+      amount:
+        Math.round(
+          amount *
+            leftover *
+            ((this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) == -1
+              ? this.travelSettings.factorCateringLumpSum
+              : 1) *
+            100
+        ) / 100
+    }
+    if (this.travelSettings.allowSpouseRefund && claimSpouseRefund) {
+      result.refund.amount! *= 2
+    }
+    return result
+  }
+
+  getTotalTravelLengthMS(travel: Travel) {
+    let totalTravelLength = 0
+    if (travel.stages.length > 0) {
+      totalTravelLength =
+        new Date(travel.stages[travel.stages.length - 1].arrival).valueOf() - new Date(travel.stages[0].departure).valueOf()
+    }
+    return totalTravelLength
+  }
+
+  async addCateringRefunds(travel: Travel) {
+    const totalTravelLength = this.getTotalTravelLengthMS(travel)
+    const h = 60 * 60 * 1000
+    // Mehrtägige Reise
+    if (totalTravelLength > 24 * h) {
+      for (let i = 0; i < travel.days.length; i++) {
+        const day = travel.days[i] as TravelDayFullCountry
+        if (day.purpose == 'professional') {
+          let refundType: LumpsumType | null = 'catering24'
+          if (i == 0 || i == travel.days.length - 1) {
+            refundType = 'catering8'
+          }
+          if (refundType) {
+            day.refunds.push(await this.calcCateringRefund(day, refundType, travel.claimSpouseRefund))
+          }
         }
-        if (this.travelSettings.allowSpouseRefund && travel.claimSpouseRefund) {
-          result.refund.amount! *= 2
+      }
+    } else if (totalTravelLength > 8 * h) {
+      // "Eintägige" Reise
+      if (travel.days.length == 2) {
+        const day1Length = (travel.days[1].date as Date).valueOf() - new Date(travel.stages[0].departure).valueOf()
+        const day2Length = new Date(travel.stages[travel.stages.length - 1].arrival).valueOf() - (travel.days[1].date as Date).valueOf()
+        if (day1Length > 8 * h && day2Length > 8 * h) {
+          travel.days[0].refunds.push(
+            await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+          )
+          travel.days[1].refunds.push(
+            await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+          )
+        } else if (day1Length > 8 * h) {
+          travel.days[0].refunds.push(
+            await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+          )
+        } else if (day2Length > 8 * h) {
+          travel.days[1].refunds.push(
+            await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+          )
+        } else {
+          if (day1Length >= day2Length) {
+            travel.days[0].refunds.push(
+              await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+            )
+          } else {
+            travel.days[1].refunds.push(
+              await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+            )
+          }
         }
-        day.refunds.push(result as Refund)
+      } else if (travel.days.length == 1) {
+        travel.days[0].refunds.push(
+          await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
+        )
       }
     }
   }
