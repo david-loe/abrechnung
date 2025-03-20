@@ -20,6 +20,7 @@ import { File, IdDocument, idDocumentToId } from './types.js'
 
 @Route('user')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class UserController extends Controller {
   @Get()
   public getMe(@Request() request: ExRequest) {
@@ -81,11 +82,17 @@ export class UserController extends Controller {
 
 @Route('users')
 @Security('cookieAuth', ['user', 'approve/travel'])
+@Security('httpBearer', ['user', 'approve/travel'])
 @Security('cookieAuth', ['user', 'examine/travel'])
+@Security('httpBearer', ['user', 'examine/travel'])
 @Security('cookieAuth', ['user', 'examine/expenseReport'])
+@Security('httpBearer', ['user', 'examine/expenseReport'])
 @Security('cookieAuth', ['user', 'examine/healthCareCost'])
+@Security('httpBearer', ['user', 'examine/healthCareCost'])
 @Security('cookieAuth', ['user', 'confirm/healthCareCost'])
+@Security('httpBearer', ['user', 'confirm/healthCareCost'])
 @Security('cookieAuth', ['user', 'admin'])
+@Security('httpBearer', ['user', 'admin'])
 export class UsersController extends Controller {
   @Get()
   public async getUsers(@Queries() query: GetterQuery<IUser>) {
@@ -113,6 +120,7 @@ interface SetterBodyUser extends SetterBody<IUser> {
 
 @Route('admin/user')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class UserAdminController extends Controller {
   @Get()
   public async getUser(@Queries() query: GetterQuery<IUser>) {

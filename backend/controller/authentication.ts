@@ -1,5 +1,7 @@
 import { Request } from 'express'
+import passport, { AuthenticateCallback } from 'passport'
 import { Access } from '../../common/types.js'
+import httpBearerStrategy from '../authStrategies/http-bearer.js'
 import { AuthorizationError } from './error.js'
 
 export async function expressAuthentication(req: Request, securityName: string, scopes?: string[]): Promise<any> {
@@ -13,8 +15,15 @@ export async function expressAuthentication(req: Request, securityName: string, 
         }
       }
       return req.user!
-    } else {
-      throw new AuthorizationError()
     }
+  } else if (securityName === 'httpBearer') {
+    return new Promise((resolve) => {
+      const authenticateCallback: AuthenticateCallback = (err, user, info, status) => {
+        if (err || !user) throw new AuthorizationError()
+        resolve(user)
+      }
+      passport.authenticate(httpBearerStrategy, authenticateCallback)(req)
+    })
   }
+  throw new AuthorizationError()
 }

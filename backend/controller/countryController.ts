@@ -6,6 +6,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Route('')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class CountryController extends Controller {
   @Get('country')
   public async getCountry(@Queries() query: GetterQuery<ICountry>) {
@@ -40,6 +41,7 @@ export class CountryController extends Controller {
 
 @Route('admin/country')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class CountryAdminController extends Controller {
   @Post()
   public async postCountry(@Body() requestBody: SetterBody<ICountry>) {

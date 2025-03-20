@@ -170,6 +170,7 @@ export class AuthController extends Controller {
 }
 
 @Security('cookieAuth')
+@Security('httpBearer')
 @Route('auth')
 export class logoutController extends Controller {
   /**
