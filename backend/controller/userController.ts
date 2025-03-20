@@ -4,6 +4,7 @@ import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
 import { PushSubscription } from 'web-push'
 import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
+import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -68,6 +69,14 @@ export class UserController extends Controller {
     request.session.subscription = requestBody
     return { message: 'alerts.successSaving', result: requestBody }
   }
+
+  @Post('httpBearer')
+  public async postHttpBearer(@Request() request: ExRequest) {
+    const token = generateBearerToken(request.user!._id)
+    request.user!.fk.httpBearer = await hashToken(token)
+    await request.user!.save()
+    return { message: 'alerts.successSaving', result: token }
+  }
 }
 
 @Route('users')
@@ -122,6 +131,19 @@ export class UserAdminController extends Controller {
       cb = sendNewMagicloginMail
     }
     return await this.setter(User, { requestBody: requestBody, allowNew: true, cb })
+  }
+
+  @Post('httpBearer')
+  public async postHttpBearer(@Body() requestBody: { userId: IdDocument }) {
+    const user = await User.findOne({ _id: idDocumentToId(requestBody.userId) })
+    if (user) {
+      const token = generateBearerToken(user._id)
+      user.fk.httpBearer = await hashToken(token)
+      await user.save()
+      return { message: 'alerts.successSaving', result: token }
+    } else {
+      throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
+    }
   }
 
   @Post('bulk')

@@ -243,6 +243,7 @@ export interface User extends UserSimple {
     ldapauth?: string | null
     magiclogin?: string | null
     oidc?: string | null
+    httpBearer?: string | null
   }
   access: {
     [key in Access]: boolean

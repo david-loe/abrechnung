@@ -43,6 +43,15 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         validate: emailRegex,
         label: 'Magic Login Email',
         hide: !displaySettings.auth.magiclogin
+      },
+      httpBearer: {
+        type: String,
+        index: true,
+        unique: true,
+        sparse: true,
+        validate: emailRegex,
+        label: 'Magic Login Email',
+        hide: !displaySettings.auth.magiclogin
       }
     },
     required: true
