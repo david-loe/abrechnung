@@ -22,7 +22,7 @@ export async function expressAuthentication(req: Request, securityName: string, 
         if (err || !user) throw new AuthorizationError()
         resolve(user)
       }
-      passport.authenticate(httpBearerStrategy, authenticateCallback)(req)
+      passport.authenticate(httpBearerStrategy, { session: false }, authenticateCallback)(req)
     })
   }
   throw new AuthorizationError()
