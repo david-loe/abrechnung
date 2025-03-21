@@ -1,7 +1,7 @@
 <template>
   <div v-if="props.user.fk && props.user.fk.httpBearer && !token" class="alert alert-warning d-flex align-items-center" role="alert">
     <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    <div>{{ $t('alerts.apiKeyAlreadyExsits') }}</div>
+    <div>{{ $t('alerts.apiKeyAlreadyExists') }}</div>
   </div>
 
   <template v-if="token">
