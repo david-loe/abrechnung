@@ -6,6 +6,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Route('healthInsurance')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class HealthInsuranceController extends Controller {
   @Get()
   public async getHealthInsurance(@Queries() query: GetterQuery<IHealthInsurance>) {
@@ -15,6 +16,7 @@ export class HealthInsuranceController extends Controller {
 
 @Route('admin/healthInsurance')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class HealthInsuranceAdminController extends Controller {
   @Post()
   public async postHealthInsurance(@Body() requestBody: SetterBody<IHealthInsurance>) {

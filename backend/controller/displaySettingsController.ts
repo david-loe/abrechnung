@@ -14,6 +14,7 @@ export class DisplaySettingsController extends Controller {
 
 @Route('admin/displaySettings')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class DisplaySettingsAdminController extends Controller {
   @Post()
   public async postDisplaySettings(@Body() requestBody: SetterBody<IDisplaySettings>) {

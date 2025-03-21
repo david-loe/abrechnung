@@ -9,6 +9,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Route('organisation')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class OrganisationController extends Controller {
   @Get()
   public async getOrganisation(@Queries() query: GetterQuery<IOrganisation>) {
@@ -18,6 +19,7 @@ export class OrganisationController extends Controller {
 
 @Route('admin/organisation')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class OrganisationAdminController extends Controller {
   @Get()
   public async getOrganisation(@Queries() query: GetterQuery<IOrganisation>) {

@@ -23,6 +23,7 @@ import { IdDocument, MoneyPlusPost } from './types.js'
 
 @Route('healthCareCost')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class HealthCareCostController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
@@ -168,6 +169,7 @@ export class HealthCareCostController extends Controller {
 
 @Route('examine/healthCareCost')
 @Security('cookieAuth', ['examine/healthCareCost'])
+@Security('httpBearer', ['examine/healthCareCost'])
 export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
@@ -338,6 +340,7 @@ export class HealthCareCostExamineController extends Controller {
 
 @Route('confirm/healthCareCost')
 @Security('cookieAuth', ['confirm/healthCareCost'])
+@Security('httpBearer', ['confirm/healthCareCost'])
 export class HealthCareCostConfirmController extends Controller {
   @Get()
   public async getHealthCareCost(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {

@@ -6,6 +6,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 
 @Route('currency')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class CurrencyController extends Controller {
   @Get()
   public async getCurrency(@Queries() query: GetterQuery<ICurrency>) {
@@ -15,6 +16,7 @@ export class CurrencyController extends Controller {
 
 @Route('admin/currency')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class CurrencyAdminController extends Controller {
   @Post()
   public async postCurrency(@Body() requestBody: SetterBody<ICurrency>) {

@@ -15,6 +15,7 @@ import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
 @Route('travel')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class TravelController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
@@ -247,6 +248,7 @@ export class TravelController extends Controller {
 
 @Route('approve/travel')
 @Security('cookieAuth', ['approve/travel'])
+@Security('httpBearer', ['approve/travel'])
 export class TravelApproveController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
@@ -325,6 +327,7 @@ export class TravelApproveController extends Controller {
 
 @Route('examine/travel')
 @Security('cookieAuth', ['examine/travel'])
+@Security('httpBearer', ['examine/travel'])
 export class TravelExamineController extends Controller {
   @Get()
   public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {

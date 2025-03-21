@@ -13,6 +13,7 @@ import { AuthorizationError } from './error.js'
 
 @Route('project')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class ProjectController extends Controller {
   @Get()
   public async getProject(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
@@ -35,6 +36,7 @@ export class ProjectController extends Controller {
 
 @Route('admin/project')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class ProjectAdminController extends Controller {
   @Get()
   public async getProject(@Queries() query: GetterQuery<IProject>) {

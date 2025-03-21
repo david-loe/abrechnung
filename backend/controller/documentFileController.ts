@@ -7,6 +7,7 @@ import { NotAllowedError, NotFoundError } from './error.js'
 
 @Route('documentFile')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class DocumentFileController extends Controller {
   @Get()
   @Produces(documentFileTypes[0])
@@ -32,8 +33,11 @@ export class DocumentFileController extends Controller {
 
 @Route('examine/documentFile')
 @Security('cookieAuth', ['user', 'examine/travel'])
+@Security('httpBearer', ['user', 'examine/travel'])
 @Security('cookieAuth', ['user', 'examine/expenseReport'])
+@Security('httpBearer', ['user', 'examine/expenseReport'])
 @Security('cookieAuth', ['user', 'examine/healthCareCost'])
+@Security('httpBearer', ['user', 'examine/healthCareCost'])
 export class DocumentFileAdminController extends Controller {
   @Get()
   @Produces(documentFileTypes[0])

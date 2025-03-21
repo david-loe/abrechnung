@@ -15,6 +15,7 @@ import { IdDocument, MoneyPost } from './types.js'
 
 @Route('expenseReport')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class ExpenseReportController extends Controller {
   @Get()
   public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
@@ -161,6 +162,7 @@ export class ExpenseReportController extends Controller {
 
 @Route('examine/expenseReport')
 @Security('cookieAuth', ['examine/expenseReport'])
+@Security('httpBearer', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {

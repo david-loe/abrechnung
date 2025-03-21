@@ -1,5 +1,23 @@
 <template>
   <div v-if="$root.settings.accessIcons">
+    <template v-if="userToEdit">
+      <ModalComponent
+        :header="`API Key (${userToEdit.name.givenName} ${userToEdit.name.familyName})`"
+        @close=";($refs.apiKeyForm as any).resetForm()"
+        ref="modal">
+        <ApiKeyForm
+          :user="userToEdit"
+          ref="apiKeyForm"
+          endpoint="admin/user/httpBearer"
+          @cancel=";($refs.modal as any).hideModal()"
+          @new-key="
+            //prettier-ignore
+            getUsers();
+            _showForm = false
+          "
+          include-user-id-in-request></ApiKeyForm>
+      </ModalComponent>
+    </template>
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
@@ -84,8 +102,10 @@
         v-model="userToEdit"
         :sync="true"
         :endpoint="false"
+        ref="form$"
         @submit="(form$: any) => postUser(form$.data)"
-        @close="_showForm = false"></Vueform>
+        @close="_showForm = false"
+        @mounted="addApiKeyListen"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.user') }) }}
@@ -95,6 +115,8 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
 import { defineComponent } from 'vue'
 import { User, accesses } from '../../../../../common/types.js'
 
@@ -105,7 +127,7 @@ interface Filter<T> {
 
 export default defineComponent({
   name: 'UserList',
-  components: {},
+  components: { ModalComponent, ApiKeyForm },
   data() {
     return {
       users: [] as User[],
@@ -121,7 +143,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      schema: {}
+      schema: {} as any
     }
   },
   methods: {
@@ -173,6 +195,13 @@ export default defineComponent({
       } else {
         this._filter[header] = true
       }
+    },
+    addApiKeyListen() {
+      queueMicrotask(() => {
+        ;(this.$refs.form$ as any).el$('fk.genApiKey').on('click', () => {
+          ;(this.$refs.modal as any).modal.show()
+        })
+      })
     }
   },
   async beforeMount() {
@@ -187,6 +216,9 @@ export default defineComponent({
         }
       },
       _id: { type: 'hidden', meta: true }
+    })
+    Object.assign(this.schema.fk.schema, {
+      genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true }
     })
   }
 })

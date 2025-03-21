@@ -6,6 +6,7 @@ import { Controller, SetterBody } from './controller.js'
 
 @Route('settings')
 @Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
 export class SettingsController extends Controller {
   @Get()
   public async getSettings() {
@@ -15,6 +16,7 @@ export class SettingsController extends Controller {
 
 @Route('admin/settings')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class SettingsAdminController extends Controller {
   @Post()
   public async postUser(@Body() requestBody: SetterBody<ISettings>) {

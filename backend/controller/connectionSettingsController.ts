@@ -6,6 +6,7 @@ import { Controller, SetterBody } from './controller.js'
 
 @Route('admin/connectionSettings')
 @Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
 export class ConnectionSettingsController extends Controller {
   @Get()
   public async getConnectionSettings() {
