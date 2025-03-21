@@ -1,6 +1,9 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
+    <ModalComponent header="API Key" ref="modalComp" @close=";($refs.apiKeyForm as any).resetForm()">
+      <ApiKeyForm :user="user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm"></ApiKeyForm>
+    </ModalComponent>
     <header class="mb-3 border-bottom">
       <div class="container">
         <div class="d-flex flex-row align-items-center nav">
@@ -39,6 +42,15 @@
                       {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
                     </option>
                   </select>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <button @click=";($refs.modalComp as any).modal.show()" class="d-flex align-items-center dropdown-item">
+                    <i class="fs-4 bi bi-key"></i>
+                    <span class="ms-1">API Key</span>
+                  </button>
                 </li>
                 <template v-if="user.access.admin">
                   <li>
@@ -168,7 +180,9 @@ import {
   User
 } from '../../common/types.js'
 import API from './api.js'
+import ApiKeyForm from './components/elements/ApiKeyForm.vue'
 import Installation from './components/elements/Installation.vue'
+import ModalComponent from './components/elements/ModalComponent.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from './helper.js'
 import i18n from './i18n.js'
@@ -203,7 +217,7 @@ export default defineComponent({
       promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
     }
   },
-  components: { OfflineBanner, Installation },
+  components: { OfflineBanner, Installation, ModalComponent, ApiKeyForm },
   methods: {
     async load(withoutAuth = false) {
       if (this.loadState === 'UNLOADED') {

@@ -5,8 +5,7 @@
       @close="resetForms()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
-      "
-      :showModalBody="modalExpenseReport ? true : false">
+      ">
       <div v-if="modalExpenseReport">
         <ExpenseReportForm
           ref="expenseReportForm"

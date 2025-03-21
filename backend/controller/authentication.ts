@@ -17,9 +17,11 @@ export async function expressAuthentication(req: Request, securityName: string, 
       return req.user!
     }
   } else if (securityName === 'httpBearer') {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const authenticateCallback: AuthenticateCallback = (err, user, info, status) => {
-        if (err || !user) throw new AuthorizationError()
+        if (err || !user) {
+          reject(new AuthorizationError())
+        }
         resolve(user)
       }
       passport.authenticate(httpBearerStrategy, { session: false }, authenticateCallback)(req)

@@ -49,9 +49,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
         index: true,
         unique: true,
         sparse: true,
-        validate: emailRegex,
-        label: 'Magic Login Email',
-        hide: !displaySettings.auth.magiclogin
+        label: 'API Key Hash'
       }
     },
     required: true

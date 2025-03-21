@@ -13,6 +13,8 @@
     "user": "Home"
   },
   "alerts": {
+    "apiKeyAlreadyExsits": "An API key already exists. This action will permanently overwrite it.",
+    "apiKeyShownOnlyOnce": "This API key is shown only once. Please copy and store it securely—you won't be able to view it again.",
     "areYouSureDelete": "Are you sure that you want to delete this?",
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "conflict": "Conflict!",

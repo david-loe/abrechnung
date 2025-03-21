@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal fade" ref="modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
       <div class="modal-content">
         <div class="modal-header">
@@ -41,7 +41,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    const modalEl = document.getElementById('modal')
+    const modalEl = this.$refs.modal as HTMLElement
     if (modalEl) {
       this.modal = new Modal(modalEl, {})
     }

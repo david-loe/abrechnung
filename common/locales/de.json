@@ -13,6 +13,8 @@
     "user": "Home"
   },
   "alerts": {
+    "apiKeyAlreadyExsits": "Ein API-Schlüssel ist bereits vorhanden. Durch diese Aktion wird er unwiderruflich überschrieben.",
+    "apiKeyShownOnlyOnce": "Dieser API Key wird nur einmal angezeigt. Bitte speichere ihn jetzt sicher, da er später nicht mehr abrufbar ist.",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "conflict": "Konflikt!",
@@ -170,7 +172,6 @@
     }
   },
   "labels": {
-    "label": "Bezeichnung",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",
@@ -296,6 +297,7 @@
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "isCrossBorder": "Ist eine Grenzüberschreitende Reise",
+    "label": "Bezeichnung",
     "language": "Sprache",
     "lastCountries": "Letzte Länder",
     "lastCurrencies": "Letzte Währungen",
