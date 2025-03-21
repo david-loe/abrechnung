@@ -28,7 +28,9 @@ const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFuncti
 
 const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    req.session.redirect = String(req.query.redirect)
+    if (req.query.redirect && typeof req.query.redirect === 'string') {
+      req.session.redirect = req.query.redirect
+    }
     passport.authenticate(await getMicrosoftStrategy())(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -37,7 +39,7 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
 
 const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
+    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : process.env.VITE_FRONTEND_URL
     passport.authenticate(await getMicrosoftStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -59,7 +61,9 @@ const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunc
 
 const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.oidc) {
-    req.session.redirect = String(req.query.redirect)
+    if (req.query.redirect && typeof req.query.redirect === 'string') {
+      req.session.redirect = req.query.redirect
+    }
     passport.authenticate(await getOidcStrategy())(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -68,7 +72,7 @@ const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) 
 
 const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.oidc) {
-    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : undefined
+    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : process.env.VITE_FRONTEND_URL
     passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
