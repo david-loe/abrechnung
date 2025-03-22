@@ -1,29 +1,31 @@
-import { Body, Get, Post, Route, Security } from 'tsoa'
+import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import { Settings as ISettings, locales } from '../../common/types.js'
 import Settings, { settingsSchema } from '../models/settings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'
 
+@Tags('Settings')
 @Route('settings')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
 export class SettingsController extends Controller {
   @Get()
-  public async getSettings() {
+  public async get() {
     return { data: (await Settings.findOne({}, { __v: 0 }).lean()) as ISettings }
   }
 }
 
+@Tags('Settings')
 @Route('admin/settings')
 @Security('cookieAuth', ['admin'])
 @Security('httpBearer', ['admin'])
 export class SettingsAdminController extends Controller {
   @Post()
-  public async postUser(@Body() requestBody: SetterBody<ISettings>) {
+  public async post(@Body() requestBody: SetterBody<ISettings>) {
     return await this.setter(Settings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')
-  public async getSettingsForm() {
+  public async getForm() {
     return { data: mongooseSchemaToVueformSchema(settingsSchema.obj, locales) }
   }
 }

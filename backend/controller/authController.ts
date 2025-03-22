@@ -1,7 +1,7 @@
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse } from 'tsoa'
+import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { escapeRegExp } from '../../common/scripts.js'
 import { tokenAdminUser } from '../../common/types.js'
 import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
@@ -99,6 +99,7 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
   }
 }
 
+@Tags('Auth')
 @Route('auth')
 @Response(501, disabledMessage)
 export class AuthController extends Controller {
@@ -173,6 +174,7 @@ export class AuthController extends Controller {
   }
 }
 
+@Tags('Auth')
 @Security('cookieAuth')
 @Security('httpBearer')
 @Route('auth')

@@ -1,6 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
@@ -13,12 +13,13 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { IdDocument, MoneyPost } from './types.js'
 
+@Tags('Expense Report')
 @Route('expenseReport')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
 export class ExpenseReportController extends Controller {
   @Get()
-  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+  public async getOwn(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
     return await this.getter(ExpenseReport, {
       query,
       filter: { owner: request.user!._id, historic: false },
@@ -28,13 +29,13 @@ export class ExpenseReportController extends Controller {
     })
   }
   @Delete()
-  public async deleteExpenseReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async deleteOwn(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: this.checkOwner(request.user!) })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
+  public async postExpenseToOwn(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
@@ -53,7 +54,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpenseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
@@ -69,7 +70,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postInWork(
+  public async postOwnInWork(
     @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined },
     @Request() request: ExRequest
   ) {
@@ -111,7 +112,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('underExamination')
-  public async postUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postOwnUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user?._id })
 
     return await this.setter(ExpenseReport, {
@@ -132,7 +133,7 @@ export class ExpenseReportController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getReportForOwn(@Query() _id: _id, @Request() request: ExRequest) {
     const expenseReport = await ExpenseReport.findOne({
       _id: _id,
       owner: request.user!._id,
@@ -160,12 +161,13 @@ export class ExpenseReportController extends Controller {
   }
 }
 
+@Tags('Expense Report')
 @Route('examine/expenseReport')
 @Security('cookieAuth', ['examine/expenseReport'])
 @Security('httpBearer', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()
-  public async getExpenseReport(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+  public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
     const filter: Condition<IExpenseReport> = {
       $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }]
     }
@@ -182,7 +184,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteExpenseReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async delete(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: IExpenseReport) {
@@ -193,7 +195,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
+  public async postExpenseToAny(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
@@ -216,7 +218,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpenseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,

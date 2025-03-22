@@ -1,7 +1,7 @@
 import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security } from 'tsoa'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PushSubscription } from 'web-push'
 import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
@@ -18,6 +18,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { File, IdDocument, idDocumentToId } from './types.js'
 
+@Tags('User')
 @Route('user')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
@@ -28,18 +29,18 @@ export class UserController extends Controller {
   }
 
   @Get('token')
-  public getToken(@Request() request: ExRequest) {
+  public getUploadToken(@Request() request: ExRequest) {
     return { data: request.user!.token }
   }
 
   @Delete('token')
-  public async deleteToken(@Request() request: ExRequest) {
+  public async deleteUploadToken(@Request() request: ExRequest) {
     request.user!.token = undefined
     await request.user!.save()
   }
 
   @Post('token')
-  public async postToken(@Request() request: ExRequest) {
+  public async postUploadToken(@Request() request: ExRequest) {
     const token = (await new Token().save()).toObject()
     request.user!.token = token as unknown as any
     await request.user!.save()
@@ -66,13 +67,13 @@ export class UserController extends Controller {
   }
 
   @Post('subscription')
-  public async subscribe(@Body() requestBody: PushSubscription, @Request() request: ExRequest) {
+  public async postPushNotificationSubscription(@Body() requestBody: PushSubscription, @Request() request: ExRequest) {
     request.session.subscription = requestBody
     return { message: 'alerts.successSaving', result: requestBody }
   }
 
   @Post('httpBearer')
-  public async postHttpBearer(@Request() request: ExRequest) {
+  public async genOwnApiKey(@Request() request: ExRequest) {
     const token = generateBearerToken(request.user!._id)
     request.user!.fk.httpBearer = await hashToken(token)
     await request.user!.save()
@@ -80,6 +81,7 @@ export class UserController extends Controller {
   }
 }
 
+@Tags('User')
 @Route('users')
 @Security('cookieAuth', ['user', 'approve/travel'])
 @Security('httpBearer', ['user', 'approve/travel'])
@@ -95,7 +97,7 @@ export class UserController extends Controller {
 @Security('httpBearer', ['user', 'admin'])
 export class UsersController extends Controller {
   @Get()
-  public async getUsers(@Queries() query: GetterQuery<IUser>) {
+  public async getOnlyNames(@Queries() query: GetterQuery<IUser>) {
     return await this.getter(User, {
       query,
       projection: { name: 1 },
@@ -118,12 +120,13 @@ interface SetterBodyUser extends SetterBody<IUser> {
   loseAccessAt: null | Date | undefined
 }
 
+@Tags('User')
 @Route('admin/user')
 @Security('cookieAuth', ['admin'])
 @Security('httpBearer', ['admin'])
 export class UserAdminController extends Controller {
   @Get()
-  public async getUser(@Queries() query: GetterQuery<IUser>) {
+  public async get(@Queries() query: GetterQuery<IUser>) {
     return await this.getter(User, {
       query,
       projection: { vehicleRegistration: 0 },
@@ -132,7 +135,7 @@ export class UserAdminController extends Controller {
   }
 
   @Post()
-  public async postUser(@Body() requestBody: SetterBodyUser) {
+  public async post(@Body() requestBody: SetterBodyUser) {
     let cb: ((data: IUser) => any) | undefined = undefined
 
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
@@ -142,7 +145,7 @@ export class UserAdminController extends Controller {
   }
 
   @Post('httpBearer')
-  public async postHttpBearer(@Body() requestBody: { userId: IdDocument }) {
+  public async genAnyApiKey(@Body() requestBody: { userId: IdDocument }) {
     const user = await User.findOne({ _id: idDocumentToId(requestBody.userId) })
     if (user) {
       const token = generateBearerToken(user._id)
@@ -155,7 +158,7 @@ export class UserAdminController extends Controller {
   }
 
   @Post('bulk')
-  public async postManyProjects(@Body() requestBody: SetterBodyUser[]) {
+  public async postMany(@Body() requestBody: SetterBodyUser[]) {
     const newMagicloginUsers: number[] = []
     for (let i = 0; i < requestBody.length; i++) {
       if (!requestBody[i]._id && requestBody[i].fk && requestBody[i].fk!.magiclogin) {
@@ -171,7 +174,7 @@ export class UserAdminController extends Controller {
   }
 
   @Delete()
-  public async deleteUser(@Query() _id: _id) {
+  public async delete(@Query() _id: _id) {
     return await this.deleter(User, {
       _id,
       referenceChecks: [
@@ -183,7 +186,7 @@ export class UserAdminController extends Controller {
   }
 
   @Post('merge')
-  public async mergeUsers(@Body() requestBody: { userId: IdDocument; userIdToOverwrite: IdDocument }, @Query() delOverwritten?: boolean) {
+  public async merge(@Body() requestBody: { userId: IdDocument; userIdToOverwrite: IdDocument }, @Query() delOverwritten?: boolean) {
     if (idDocumentToId(requestBody.userId) === idDocumentToId(requestBody.userIdToOverwrite)) {
       throw new NotAllowedError(`Users are the same.`)
     }
@@ -211,7 +214,7 @@ export class UserAdminController extends Controller {
     }
   }
   @Get('form')
-  public async getUserForm() {
+  public async getForm() {
     return { data: mongooseSchemaToVueformSchema(userSchema.obj, locales) }
   }
 }

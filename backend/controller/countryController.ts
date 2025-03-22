@@ -1,15 +1,16 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Country as ICountry, _id, locales } from '../../common/types.js'
 import Country, { countrySchema } from '../models/country.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
+@Tags('Country')
 @Route('')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
 export class CountryController extends Controller {
   @Get('country')
-  public async getCountry(@Queries() query: GetterQuery<ICountry>) {
+  public async get(@Queries() query: GetterQuery<ICountry>) {
     return await this.getter(Country, {
       query,
       projection: { lumpSums: 0, lumpSumsFrom: 0 },
@@ -39,24 +40,25 @@ export class CountryController extends Controller {
   }
 }
 
+@Tags('Country')
 @Route('admin/country')
 @Security('cookieAuth', ['admin'])
 @Security('httpBearer', ['admin'])
 export class CountryAdminController extends Controller {
   @Post()
-  public async postCountry(@Body() requestBody: SetterBody<ICountry>) {
+  public async post(@Body() requestBody: SetterBody<ICountry>) {
     return await this.setter(Country, { requestBody: requestBody, allowNew: true })
   }
   @Post('bulk')
-  public async postManyProjects(@Body() requestBody: SetterBody<ICountry>[]) {
+  public async postMany(@Body() requestBody: SetterBody<ICountry>[]) {
     return await this.insertMany(Country, { requestBody })
   }
   @Delete()
-  public async deleteCountry(@Query() _id: _id) {
+  public async delete(@Query() _id: _id) {
     return await this.deleter(Country, { _id: _id })
   }
   @Get('form')
-  public async getCountryForm() {
+  public async getForm() {
     return { data: mongooseSchemaToVueformSchema(countrySchema.obj, locales) }
   }
 }

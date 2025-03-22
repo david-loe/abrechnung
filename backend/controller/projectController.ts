@@ -1,5 +1,5 @@
 import { Request as ExRequest } from 'express'
-import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security } from 'tsoa'
+import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -11,12 +11,13 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
+@Tags('Project')
 @Route('project')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
 export class ProjectController extends Controller {
   @Get()
-  public async getProject(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
+  public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
     const settings = await getSettings()
     if (
       settings.userCanSeeAllProjects ||
@@ -34,16 +35,17 @@ export class ProjectController extends Controller {
   }
 }
 
+@Tags('Project')
 @Route('admin/project')
 @Security('cookieAuth', ['admin'])
 @Security('httpBearer', ['admin'])
 export class ProjectAdminController extends Controller {
   @Get()
-  public async getProject(@Queries() query: GetterQuery<IProject>) {
+  public async getComplete(@Queries() query: GetterQuery<IProject>) {
     return await this.getter(Project, { query })
   }
   @Post()
-  public async postProject(@Body() requestBody: SetterBody<ProjectWithUsers>) {
+  public async post(@Body() requestBody: SetterBody<ProjectWithUsers>) {
     async function cb(project: IProject) {
       if (requestBody.assignees) {
         for (const userId of requestBody.assignees) {
@@ -59,11 +61,11 @@ export class ProjectAdminController extends Controller {
     return await this.setter(Project, { requestBody: requestBody, allowNew: true, cb })
   }
   @Post('bulk')
-  public async postManyProjects(@Body() requestBody: SetterBody<IProject>[]) {
+  public async postMany(@Body() requestBody: SetterBody<IProject>[]) {
     return await this.insertMany(Project, { requestBody })
   }
   @Delete()
-  public async deleteProject(@Query() _id: _id) {
+  public async delete(@Query() _id: _id) {
     return await this.deleter(Project, {
       _id: _id,
       referenceChecks: [
@@ -74,7 +76,7 @@ export class ProjectAdminController extends Controller {
     })
   }
   @Get('form')
-  public async getProjectForm() {
+  public async getForm() {
     return { data: mongooseSchemaToVueformSchema(Object.assign(projectSchema.obj, projectUsersSchema.obj), locales) }
   }
 }

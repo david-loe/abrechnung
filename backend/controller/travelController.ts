@@ -1,6 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security } from 'tsoa'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
@@ -13,12 +13,13 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError } from './error.js'
 import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
+@Tags('Travel')
 @Route('travel')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])
 export class TravelController extends Controller {
   @Get()
-  public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+  public async getOwn(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
     return await this.getter(Travel, {
       query,
       filter: { owner: request.user!._id, historic: false },
@@ -28,7 +29,7 @@ export class TravelController extends Controller {
     })
   }
   @Delete()
-  public async deleteTravel(@Query() _id: _id, @Request() request: ExRequest) {
+  public async deleteOwn(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(Travel, {
       _id: _id,
       checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.owner._id.equals(request.user!._id)
@@ -36,7 +37,7 @@ export class TravelController extends Controller {
   }
 
   @Post()
-  public async postTravel(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
+  public async post(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -48,7 +49,7 @@ export class TravelController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(
+  public async postExpenseToOwn(
     @Query('parentId') parentId: _id,
     @Body() requestBody: SetterBody<TravelExpense>,
     @Request() request: ExRequest
@@ -72,7 +73,7 @@ export class TravelController extends Controller {
 
   @Post('stage')
   @Middlewares(fileHandler.any())
-  public async postStage(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
+  public async postStageToOwn(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -91,7 +92,7 @@ export class TravelController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpeneseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -102,7 +103,7 @@ export class TravelController extends Controller {
   }
 
   @Delete('stage')
-  public async deleteStage(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteStageFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -113,7 +114,7 @@ export class TravelController extends Controller {
   }
 
   @Post('appliedFor')
-  public async postInWork(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
+  public async postOwnInWork(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'appliedFor' as TravelState,
       owner: request.user?._id,
@@ -147,7 +148,7 @@ export class TravelController extends Controller {
   }
 
   @Post('approved')
-  public async postApproved(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
+  public async postOwnApproved(@Body() requestBody: TravelApplication, @Request() request: ExRequest) {
     let extendedBody: SetterBody<ITravel> = requestBody
     let cb = (travel: ITravel) => {}
     if (!extendedBody._id) {
@@ -197,7 +198,7 @@ export class TravelController extends Controller {
   }
 
   @Post('underExamination')
-  public async postUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postOwnUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user?._id })
 
     return await this.setter(Travel, {
@@ -218,7 +219,7 @@ export class TravelController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getOwnReport(@Query() _id: _id, @Request() request: ExRequest) {
     const travel = await Travel.findOne({
       _id: _id,
       owner: request.user!._id,
@@ -246,12 +247,13 @@ export class TravelController extends Controller {
   }
 }
 
+@Tags('Travel')
 @Route('approve/travel')
 @Security('cookieAuth', ['approve/travel'])
 @Security('httpBearer', ['approve/travel'])
 export class TravelApproveController extends Controller {
   @Get()
-  public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+  public async getToApprove(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
     const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
@@ -265,7 +267,7 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postApproved(
+  public async postAnyBackApproved(
     @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
     @Request() request: ExRequest
   ) {
@@ -312,7 +314,7 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('rejected')
-  public async postRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postAnyRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'rejected' as TravelState, editor: request.user?._id })
 
     return await this.setter(Travel, {
@@ -325,12 +327,13 @@ export class TravelApproveController extends Controller {
   }
 }
 
+@Tags('Travel')
 @Route('examine/travel')
 @Security('cookieAuth', ['examine/travel'])
 @Security('httpBearer', ['examine/travel'])
 export class TravelExamineController extends Controller {
   @Get()
-  public async getTravel(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+  public async getToExamine(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
     const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
@@ -345,7 +348,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Post()
-  public async postTravel(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
+  public async postAny(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
 
     return await this.setter(Travel, {
@@ -357,7 +360,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteTravel(@Query() _id: _id, @Request() request: ExRequest) {
+  public async deleteAny(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(Travel, {
       _id: _id,
       async checkOldObject(oldObject: TravelDoc) {
@@ -368,7 +371,7 @@ export class TravelExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpense(
+  public async postExpenseToAny(
     @Query('parentId') parentId: _id,
     @Body() requestBody: SetterBody<TravelExpense>,
     @Request() request: ExRequest
@@ -396,7 +399,7 @@ export class TravelExamineController extends Controller {
 
   @Post('stage')
   @Middlewares(fileHandler.any())
-  public async postStage(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
+  public async postStageToAny(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Stage>, @Request() request: ExRequest) {
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -419,7 +422,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenese(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpeneseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -435,7 +438,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete('stage')
-  public async deleteStage(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteStageFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -483,7 +486,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Post('approved')
-  public async postApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+  public async postAnyApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user?._id })
 
     return await this.setter(Travel, {
@@ -504,7 +507,7 @@ export class TravelExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getAnyReport(@Query() _id: _id, @Request() request: ExRequest) {
     const filter: Condition<ITravel> = { _id, historic: false, state: 'refunded' }
     if (request.user!.projects.supervised.length > 0) {
       filter.project = { $in: request.user!.projects.supervised }

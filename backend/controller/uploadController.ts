@@ -1,6 +1,6 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
-import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse } from 'tsoa'
+import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
 import { _id } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
@@ -19,13 +19,14 @@ async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction
   next()
 }
 
+@Tags('Upload')
 @Route('upload')
 export class UploadController extends Controller {
   @Get('new')
   @Middlewares(validateToken)
   @Produces('text/html')
   @SuccessResponse(200)
-  public async uploadPage(
+  public async getUploadPage(
     @Request() req: ExRequest,
     @Query() userId: string,
     @Query() tokenId: string,
@@ -67,7 +68,7 @@ export class UploadController extends Controller {
   @Post('new')
   @Middlewares(validateToken, fileHandler.any())
   @Consumes('multipart/form-data')
-  public async upload(
+  public async postFiles(
     @Request() req: ExRequest,
     @Body() requestBody: { files: File[] },
     @Query() userId: string,
