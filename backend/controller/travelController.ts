@@ -229,7 +229,7 @@ export class TravelController extends Controller {
     }).lean()
     if (travel) {
       const report = await reportPrinter.print(travel, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${travel.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
@@ -516,7 +516,7 @@ export class TravelExamineController extends Controller {
     const travel = await Travel.findOne(filter).lean()
     if (travel) {
       const report = await reportPrinter.print(travel, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${travel.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])

@@ -150,7 +150,7 @@ export class HealthCareCostController extends Controller {
     }).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${healthCareCost.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
@@ -326,7 +326,7 @@ export class HealthCareCostExamineController extends Controller {
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${healthCareCost.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
@@ -418,7 +418,7 @@ export class HealthCareCostConfirmController extends Controller {
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${healthCareCost.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])

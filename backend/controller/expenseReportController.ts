@@ -143,7 +143,7 @@ export class ExpenseReportController extends Controller {
     }).lean()
     if (expenseReport) {
       const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${expenseReport.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
@@ -308,7 +308,7 @@ export class ExpenseReportExamineController extends Controller {
     const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (expenseReport) {
       const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      this.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
+      this.setHeader('Content-disposition', `attachment; filename="${expenseReport.name}.pdf"`)
       this.setHeader('Content-Type', 'application/pdf')
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
