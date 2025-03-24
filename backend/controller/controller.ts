@@ -9,12 +9,14 @@ import { IdDocument } from './types.js'
 export interface GetterQuery<ModelType> {
   /**
    * @isInt
-   * @minimum 1
+   * @minimum 0
+   * @default 0
    */
   limit?: number
   /**
    * @isInt
    * @minimum 1
+   * @default 1
    */
   page?: number
   _id?: _id
