@@ -1014,11 +1014,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -3012,11 +3014,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -5276,11 +5280,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -5345,11 +5351,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -5631,11 +5639,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -5814,11 +5824,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -6122,11 +6134,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -6533,11 +6547,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -6821,11 +6837,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -7147,11 +7165,13 @@
 					"limit": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"default": 0,
+						"minimum": 0
 					},
 					"page": {
 						"type": "integer",
 						"format": "int32",
+						"default": 1,
 						"minimum": 1
 					},
 					"_id": {
@@ -7621,16 +7641,7 @@
 			"cookieAuth": {
 				"type": "apiKey",
 				"name": "abrechnung",
-				"in": "cookie",
-				"scopes": {
-					"user": "make requests",
-					"approve/travel": "approve travel requests",
-					"examine/travel": "examine travel expense requests",
-					"examine/expenseReport": "examine expense report requests",
-					"examine/healthCareCost": "examine healthcare cost requests",
-					"confirm/healthCareCost": "confirm healthcare cost requests",
-					"admin": "admin"
-				}
+				"in": "cookie"
 			}
 		}
 	},
@@ -8158,9 +8169,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -8168,6 +8180,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -8260,9 +8273,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -8270,6 +8284,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -8809,9 +8824,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -8819,6 +8835,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -9545,9 +9562,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -9555,6 +9573,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -9832,9 +9851,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -9842,6 +9862,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -10606,9 +10627,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -10616,6 +10638,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -10701,9 +10724,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -10711,6 +10735,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -10992,9 +11017,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -11002,6 +11028,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -11093,9 +11120,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -11103,6 +11131,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -11387,9 +11416,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -11397,6 +11427,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -11677,9 +11708,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -11687,6 +11719,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -12176,9 +12209,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -12186,6 +12220,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -12638,9 +12673,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -12648,6 +12684,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -12739,9 +12776,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -12749,6 +12787,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -13003,9 +13042,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -13013,6 +13053,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -13497,9 +13538,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -13507,6 +13549,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -14290,9 +14333,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -14300,6 +14344,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
@@ -14582,9 +14627,10 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
+							"default": 0,
 							"format": "int32",
 							"type": "integer",
-							"minimum": 1
+							"minimum": 0
 						}
 					},
 					{
@@ -14592,6 +14638,7 @@
 						"name": "page",
 						"required": false,
 						"schema": {
+							"default": 1,
 							"format": "int32",
 							"type": "integer",
 							"minimum": 1
