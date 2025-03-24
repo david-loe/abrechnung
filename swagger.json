@@ -5103,6 +5103,20 @@
 									"none"
 								]
 							},
+							"toleranceStageDatesToApprovedTravelDates": {
+								"type": "number",
+								"format": "double"
+							},
+							"allowTravelApplicationForThePast": {
+								"type": "boolean"
+							},
+							"allowSpouseRefund": {
+								"type": "boolean"
+							},
+							"maxTravelDayCount": {
+								"type": "number",
+								"format": "double"
+							},
 							"distanceRefunds": {
 								"properties": {
 									"halfCar": {
@@ -5119,20 +5133,6 @@
 									}
 								},
 								"type": "object"
-							},
-							"toleranceStageDatesToApprovedTravelDates": {
-								"type": "number",
-								"format": "double"
-							},
-							"allowTravelApplicationForThePast": {
-								"type": "boolean"
-							},
-							"allowSpouseRefund": {
-								"type": "boolean"
-							},
-							"maxTravelDayCount": {
-								"type": "number",
-								"format": "double"
 							}
 						},
 						"type": "object"
@@ -5673,9 +5673,6 @@
 			},
 			"SetterPartial_IOrganisation.NoPost_": {
 				"properties": {
-					"website": {
-						"type": "string"
-					},
 					"logo": {
 						"properties": {
 							"data": {
@@ -5719,6 +5716,9 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"website": {
+						"type": "string"
+					},
 					"name": {
 						"type": "string"
 					},
@@ -5733,9 +5733,6 @@
 			},
 			"SetterPartial_Omit_IOrganisation.logo_.NoPost_": {
 				"properties": {
-					"website": {
-						"type": "string"
-					},
 					"companyNumber": {
 						"type": "string"
 					},
@@ -5749,6 +5746,9 @@
 						"type": "string"
 					},
 					"subfolderPath": {
+						"type": "string"
+					},
+					"website": {
 						"type": "string"
 					},
 					"name": {
@@ -9437,8 +9437,16 @@
 			"get": {
 				"operationId": "GetOwnReport",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -10388,8 +10396,16 @@
 			"get": {
 				"operationId": "GetAnyReport",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -12052,8 +12068,16 @@
 			"get": {
 				"operationId": "GetReportFromOwn",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -12539,8 +12563,16 @@
 			"get": {
 				"operationId": "GetunderExaminationByInsuranceReport",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -12896,8 +12928,16 @@
 			"get": {
 				"operationId": "GetConfirmedReport",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -13349,8 +13389,16 @@
 			"get": {
 				"operationId": "GetReportForOwn",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -13831,8 +13879,16 @@
 			"get": {
 				"operationId": "GetReport",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -13867,7 +13923,15 @@
 				"operationId": "GetOwn",
 				"responses": {
 					"200": {
-						"description": ""
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -13942,7 +14006,15 @@
 				"operationId": "GetAny",
 				"responses": {
 					"200": {
-						"description": ""
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
 					}
 				},
 				"security": [
