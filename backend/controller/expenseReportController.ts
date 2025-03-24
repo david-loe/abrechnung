@@ -1,5 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
+import { Readable } from 'stream'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
@@ -142,10 +143,10 @@ export class ExpenseReportController extends Controller {
     }).lean()
     if (expenseReport) {
       const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotFoundError(`No expense report found or not allowed`)
     }
@@ -307,10 +308,10 @@ export class ExpenseReportExamineController extends Controller {
     const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (expenseReport) {
       const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + expenseReport.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotFoundError(`No expense report found or unauthorized`)
     }

@@ -1,5 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
+import { Readable } from 'stream'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
@@ -228,10 +229,10 @@ export class TravelController extends Controller {
     }).lean()
     if (travel) {
       const report = await reportPrinter.print(travel, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
     }
@@ -515,10 +516,10 @@ export class TravelExamineController extends Controller {
     const travel = await Travel.findOne(filter).lean()
     if (travel) {
       const report = await reportPrinter.print(travel, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + travel.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
     }

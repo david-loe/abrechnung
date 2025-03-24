@@ -1,4 +1,5 @@
 import { Request as ExRequest } from 'express'
+import { Readable } from 'stream'
 import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
@@ -18,9 +19,9 @@ export class DocumentFileController extends Controller {
   public async getOwn(@Query() _id: _id, @Request() request: ExRequest) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file && request.user!._id.equals(file.owner._id)) {
-      request.res?.setHeader('Content-Type', file.type)
-      request.res?.setHeader('Content-Length', file.data.length().toString())
-      request.res?.send(file.data.buffer)
+      this.setHeader('Content-Type', file.type)
+      this.setHeader('Content-Length', file.data.length().toString())
+      return Readable.from([file.data.value()])
     } else {
       throw new NotAllowedError()
     }
@@ -45,12 +46,12 @@ export class DocumentFileAdminController extends Controller {
   @Produces(documentFileTypes[1])
   @Produces(documentFileTypes[2])
   @SuccessResponse(200)
-  public async getAny(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getAny(@Query() _id: _id) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file) {
-      request.res?.setHeader('Content-Type', file.type)
-      request.res?.setHeader('Content-Length', file.data.length().toString())
-      request.res?.send(file.data.buffer)
+      this.setHeader('Content-Type', file.type)
+      this.setHeader('Content-Length', file.data.length().toString())
+      return Readable.from([file.data.value()])
     } else {
       throw new NotFoundError('No file found')
     }

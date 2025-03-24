@@ -1,5 +1,6 @@
 import { Request as ExRequest } from 'express'
 import { Condition } from 'mongoose'
+import { Readable } from 'stream'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import {
   Expense,
@@ -149,10 +150,10 @@ export class HealthCareCostController extends Controller {
     }).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
@@ -325,10 +326,10 @@ export class HealthCareCostExamineController extends Controller {
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
@@ -417,10 +418,10 @@ export class HealthCareCostConfirmController extends Controller {
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (healthCareCost) {
       const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
-      request.res?.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
-      request.res?.setHeader('Content-Type', 'application/pdf')
-      request.res?.setHeader('Content-Length', report.length)
-      request.res?.send(Buffer.from(report))
+      this.setHeader('Content-disposition', 'attachment; filename=' + healthCareCost.name + '.pdf')
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
     } else {
       throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
     }
