@@ -31,7 +31,6 @@ import {
   TravelDay,
   TravelExpense
 } from '../../common/types.js'
-import i18n from '../i18n.js'
 
 export interface PrinterSettings extends PrintSettingsBase {
   fontName: FontName
@@ -69,7 +68,7 @@ export interface Column {
   width: number
   alignment: pdf_lib.TextAlignment
   title: string
-  fn?: (p: any) => string
+  fn?: (p: any) => string | undefined
   countryCodeForFlag?: (p: any) => CountryCode
 }
 interface ReceiptMapEntry extends DocumentFile {
@@ -99,11 +98,13 @@ export class ReportPrinter {
   settings: PrinterSettings
   getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById']
   getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
+  translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
 
   constructor(
     settings: PrinterSettings,
-    formatter: Formatter,
     distanceRefunds: SettingsTravel['distanceRefunds'],
+    formatter: Formatter,
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
   ) {
@@ -112,6 +113,7 @@ export class ReportPrinter {
     this.distanceRefunds = distanceRefunds
     this.getDocumentFileBufferById = getDocumentFileBufferById
     this.getOrganisationLogoIdById = getOrganisationLogoIdById
+    this.translateFunc = translateFunc
   }
 
   async print(report: Travel | ExpenseReport | HealthCareCost, language: Locale) {
@@ -122,6 +124,7 @@ export class ReportPrinter {
       this.getOrganisationLogoIdById,
       this.distanceRefunds,
       this.formatter,
+      this.translateFunc,
       language
     )
     return await print.run()
@@ -140,11 +143,18 @@ class ReportPrint {
   drawer: PDFDrawer
   report: Travel | ExpenseReport | HealthCareCost
   distanceRefunds: SettingsTravel['distanceRefunds']
+  translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
 
-  constructor(report: Travel | ExpenseReport | HealthCareCost, drawer: PDFDrawer, distanceRefunds: SettingsTravel['distanceRefunds']) {
+  constructor(
+    report: Travel | ExpenseReport | HealthCareCost,
+    drawer: PDFDrawer,
+    distanceRefunds: SettingsTravel['distanceRefunds'],
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
+  ) {
     this.report = report
     this.drawer = drawer
     this.distanceRefunds = distanceRefunds
+    this.translateFunc = translateFunc
   }
 
   static async create(
@@ -154,15 +164,16 @@ class ReportPrint {
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
     distanceRefunds: SettingsTravel['distanceRefunds'],
     formatter: Formatter,
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
     language: Locale
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
-    return new ReportPrint(report, drawer, distanceRefunds)
+    return new ReportPrint(report, drawer, distanceRefunds, translateFunc)
   }
 
   async run() {
     let y = this.drawer.currentPage.getSize().height
-    await this.drawer.drawLogo({
+    await this.drawer.drawLogo(this.t('headlines.title'), {
       fontSize: this.drawer.settings.fontSizes.L,
       xStart: this.drawer.settings.pagePadding / 3,
       yStart: y - this.drawer.settings.pagePadding / 3
@@ -532,10 +543,11 @@ class ReportPrint {
           : this.t('labels.' + t.type)
     })
     columns.push({
-      key: 'distance',
+      key: 'transport',
       width: 65,
       alignment: pdf_lib.TextAlignment.Right,
-      title: this.t('labels.distance')
+      title: this.t('labels.distance'),
+      fn: (t: Transport) => (t.type === 'ownCar' ? String(t.distance) : undefined)
     })
     columns.push({
       key: 'purpose',
@@ -712,9 +724,8 @@ class ReportPrint {
 
     return await this.drawer.drawTable(this.report.days, columns, options)
   }
-
   t(textIdentifier: string, interpolation: any = {}) {
-    return i18n.t(textIdentifier, { lng: this.drawer.settings.language, ...interpolation }) as string
+    return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation) as string
   }
 }
 
@@ -814,7 +825,8 @@ const layoutMultilineText = (
   }
 }
 
-const flagPseudoSuffix = 'mim'
+const FLAG_PSEUDO_SUFFIX = 'mim'
+const EMPTY_CELL = '---'
 
 class PDFDrawer {
   font: pdf_lib.PDFFont
@@ -900,12 +912,12 @@ class PDFDrawer {
       width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
     })
     const flagPseudoSuffixWidth =
-      this.font.widthOfTextAtSize(flagPseudoSuffix, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
+      this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
     if (place.place) {
       text += place.place + ', '
     }
     text += place.country.name[this.settings.language]
-    text += flagPseudoSuffix
+    text += FLAG_PSEUDO_SUFFIX
 
     const multiLineText = layoutMultilineText(text, {
       alignment: opts.alignment,
@@ -917,7 +929,7 @@ class PDFDrawer {
     const len = multiLineText.lines.length
     if (len > 0) {
       const lastLine = multiLineText.lines[len - 1]
-      lastLine.text = lastLine.text.slice(0, lastLine.text.length - flagPseudoSuffix.length)
+      lastLine.text = lastLine.text.slice(0, lastLine.text.length - FLAG_PSEUDO_SUFFIX.length)
 
       for (const line of multiLineText.lines) {
         this.drawText(line.text, { xStart: line.x, yStart: line.y, fontSize: opts.fontSize })
@@ -1034,7 +1046,7 @@ class PDFDrawer {
   /**
    * Oben links (xStart, yStart)
    */
-  async drawLogo(options: Options) {
+  async drawLogo(title: string, options: Options) {
     let filename = 'receipt'
     if (options.fontSize > 24) {
       filename = filename + '36'
@@ -1055,7 +1067,7 @@ class PDFDrawer {
       width: logoSize
     })
 
-    this.drawText(i18n.t('headlines.title', { lng: this.settings.language }), {
+    this.drawText(title, {
       xStart: options.xStart + logoSize + options.fontSize / 4,
       yStart: y,
       fontSize: options.fontSize
@@ -1123,7 +1135,7 @@ class PDFDrawer {
       return options.yStart
     }
     const flagPseudoSuffixWidth =
-      this.font.widthOfTextAtSize(flagPseudoSuffix, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
+      this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
     const opts = Object.assign(
       {
         cellHeight: options.fontSize * 1.5,
@@ -1173,10 +1185,10 @@ class PDFDrawer {
           cell = column.title
         }
         if (cell == undefined) {
-          cell = '---'
+          cell = EMPTY_CELL
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
-        const multiText = layoutMultilineText(cell.toString() + (column.countryCodeForFlag && !opts.firstRow ? flagPseudoSuffix : ''), {
+        const multiText = layoutMultilineText(cell.toString() + (column.countryCodeForFlag && !opts.firstRow ? FLAG_PSEUDO_SUFFIX : ''), {
           alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
           font: this.font,
           fontSize: fontSize,
@@ -1203,7 +1215,7 @@ class PDFDrawer {
           if (column.countryCodeForFlag) {
             cellTexts[cellTexts.length - 1].text = cellTexts[cellTexts.length - 1].text.slice(
               0,
-              cellTexts[cellTexts.length - 1].text.length - flagPseudoSuffix.length
+              cellTexts[cellTexts.length - 1].text.length - FLAG_PSEUDO_SUFFIX.length
             )
             cellTexts[cellTexts.length - 1].countryCodeForFlag = column.countryCodeForFlag(datum)
           }
