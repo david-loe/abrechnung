@@ -55,9 +55,9 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import { logger } from '@/logger.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
-import { log } from '../../../../common/logger.js'
 import { resizeImage } from '../../../../common/scripts.js'
 import { DocumentFile, Token } from '../../../../common/types.js'
 import FileUploadFileElement from './FileUploadFileElement.vue'
@@ -163,8 +163,8 @@ export default defineComponent({
         if (this.ownerId) {
           url.searchParams.append('ownerId', this.ownerId)
         }
-        log(this.$t('labels.uploadLink') + ':')
-        log(url.href)
+        logger.info(this.$t('labels.uploadLink') + ':')
+        logger.info(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
         this.fetchTokenInterval = setInterval(this.getTokenFiles, 3000)
       }

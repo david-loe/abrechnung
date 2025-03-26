@@ -497,9 +497,9 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
-import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
   BaseCurrencyMoney,
@@ -811,8 +811,8 @@ export default defineComponent({
           }
         }
       }
-      log(this.$t('labels.travel') + ':')
-      log(this.travel)
+      logger.info(this.$t('labels.travel') + ':')
+      logger.info(this.travel)
       this.renderTable()
     },
     async getExaminerMails() {

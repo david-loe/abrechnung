@@ -1,6 +1,7 @@
 import { SessionData } from 'express-session'
 import webpush from 'web-push'
 import { sessionStore } from '../db.js'
+import { logger } from '../logger.js'
 import { User } from './../../common/types.js'
 
 export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
@@ -30,7 +31,7 @@ export async function sendPushNotification(title: string, body: string, users: U
             }
           })
         } catch (error) {
-          console.error(error)
+          logger.error(error)
         }
       }
     }

@@ -1,7 +1,7 @@
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import { Error as MongooseErrors } from 'mongoose'
 import { ValidateError } from 'tsoa'
-import { log } from '../../common/logger.js'
+import { logger } from '../logger.js'
 
 class ClientError extends Error {
   status = 400
@@ -39,8 +39,8 @@ export class NotImplementedError extends ClientError {
 
 export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): void {
   if (!(err instanceof AuthorizationError)) {
-    log(`Error on request of ${req.path}`, 'warn')
-    log(err, 'warn')
+    logger.warn(`Error on request of ${req.path}`)
+    logger.warn(err)
   }
 
   if (err instanceof ValidateError) {

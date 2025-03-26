@@ -1,6 +1,7 @@
 import { CronJob } from 'cron'
 import app from './app.js'
 import { fetchAndUpdateLumpSums } from './db.js'
+import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
 import { retentionPolicy } from './retentionpolicy.js'
 const port = parseInt(process.env.BACKEND_PORT)
@@ -21,7 +22,6 @@ declare global {
       readonly VITE_BACKEND_URL: string
       readonly COOKIE_SECRET: string
       readonly MAGIC_LOGIN_SECRET: string
-
       readonly BACKEND_PORT: string
       readonly MONGO_URL: string
       readonly BACKEND_SAVE_REPORTS_ON_DISK: 'TRUE' | 'FALSE'
@@ -31,12 +31,13 @@ declare global {
       readonly RATE_LIMIT_WINDOW_MS: string
       readonly RATE_LIMIT: string
       readonly TRUST_PROXY: string
+      readonly LOG_LEVEL: 'debug' | 'info' | 'warn' | 'error'
     }
   }
 }
 
 app.listen(port, () => {
-  console.log(`Backend listening at ${url}`)
+  logger.info(`Backend listening at ${url}`)
 })
 
 // Update lump sums every day at 1 AM

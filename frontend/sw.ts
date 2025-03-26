@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { logger } from '@/logger.js'
 import { clientsClaim, RouteHandler } from 'workbox-core'
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
@@ -107,12 +108,12 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data?.json()
   } catch (e) {
-    console.error('Push-Daten konnten nicht geparst werden:', e)
+    logger.error('Push-Daten konnten nicht geparst werden:\n' + e)
     return
   }
   // Überprüfe, ob alle nötigen Felder vorhanden sind
   if (!data || !data.title || !data.url) {
-    console.error('Push-Daten unvollständig:', data)
+    logger.error('Push-Daten unvollständig:\n' + data)
     return
   }
   event.waitUntil(

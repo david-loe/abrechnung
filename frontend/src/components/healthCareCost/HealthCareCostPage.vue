@@ -265,8 +265,8 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import { logger } from '@/logger.js'
 import { defineComponent, PropType } from 'vue'
-import { log } from '../../../../common/logger.js'
 import { addUp, getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
   BaseCurrencyMoney,
@@ -441,8 +441,8 @@ export default defineComponent({
     setHealthCareCost(healthCareCost: HealthCareCost) {
       this.healthCareCost = healthCareCost
       this.addUp = addUp(this.healthCareCost)
-      log(this.$t('labels.healthCareCost') + ':')
-      log(this.healthCareCost)
+      logger.info(this.$t('labels.healthCareCost') + ':')
+      logger.info(this.healthCareCost)
     },
     async getExaminerMails() {
       const result = (await API.getter<UserSimple[]>('healthCareCost/examiner')).ok

@@ -243,9 +243,9 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
-import { log } from '../../../../common/logger.js'
 import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import { BaseCurrencyMoney, Expense, ExpenseReport, UserSimple, baseCurrency, expenseReportStates } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -376,8 +376,8 @@ export default defineComponent({
     setExpenseReport(expenseReport: ExpenseReport) {
       this.expenseReport = expenseReport
       this.addUp = addUp(this.expenseReport)
-      log(this.$t('labels.expenseReport') + ':')
-      log(this.expenseReport)
+      logger.info(this.$t('labels.expenseReport') + ':')
+      logger.info(this.expenseReport)
     },
     async getExaminerMails() {
       const result = (await API.getter<UserSimple[]>('expenseReport/examiner')).ok

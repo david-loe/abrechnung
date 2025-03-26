@@ -3,6 +3,7 @@ import { Reactive, reactive } from 'vue'
 import { Router, useRoute, useRouter } from 'vue-router'
 import { GETResponse, SETResponse } from '../../common/types'
 import i18n from './i18n.js'
+import { logger } from './logger.js'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -42,7 +43,7 @@ class API {
         if (error.response.status === 401) {
           this.redirectToLogin()
         } else {
-          console.log(error.response.data)
+          logger.error(error.response.data)
           this.addAlert({
             message: error.response.data.message, //@ts-ignore
             title: error.response.data.name ? i18n.global.t(error.response.data.name) : 'ERROR',
@@ -72,7 +73,7 @@ class API {
         if (error.response.status === 401) {
           this.redirectToLogin()
         } else {
-          console.log(error.response.data)
+          logger.error(error.response.data)
           this.addAlert({
             message: error.response.data.message,
             title: error.response.data.name ? i18n.global.t(error.response.data.name) : 'ERROR',
@@ -107,7 +108,7 @@ class API {
       if (error.response.status === 401) {
         this.redirectToLogin()
       } else {
-        console.log(error.response.data)
+        logger.error(error.response.data)
         this.addAlert({
           message: error.response.data.message,
           title: error.response.data.name ? i18n.global.t(error.response.data.name) : 'ERROR',

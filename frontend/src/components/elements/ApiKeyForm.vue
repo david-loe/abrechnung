@@ -39,6 +39,7 @@
 
 <script lang="ts" setup>
 import API from '@/api'
+import { logger } from '@/logger.js'
 import { ref } from 'vue'
 import { User } from '../../../../common/types'
 
@@ -71,7 +72,7 @@ const copyToClipboard = async () => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000) // Meldung nach 2 Sek. ausblenden
   } catch (err) {
-    console.error('Fehler beim Kopieren:', err)
+    logger.error('Fehler beim Kopieren:\n' + err)
   }
 }
 

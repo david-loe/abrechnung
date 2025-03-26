@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
+import { logger } from './logger.js'
 import Settings from './models/settings.js'
 
 export async function checkForMigrations() {
@@ -7,7 +8,7 @@ export async function checkForMigrations() {
   if (settings?.migrateFrom) {
     const migrateFrom = settings?.migrateFrom
     if (semver.lte(migrateFrom, '1.1.0')) {
-      console.log('Apply migration from v1.1.0: Rewrite history dates to reflect submission date')
+      logger.info('Apply migration from v1.1.0: Rewrite history dates to reflect submission date')
       async function rewriteSubmissionDate(collection: string, state: string) {
         const allReports = mongoose.connection.collection(collection).find({ historic: false })
         for await (const report of allReports) {
@@ -26,7 +27,7 @@ export async function checkForMigrations() {
       await rewriteSubmissionDate('healthcarecosts', 'inWork')
     }
     if (semver.lte(migrateFrom, '1.2.0')) {
-      console.log('Apply migration from v1.2.0: New settings structure')
+      logger.info('Apply migration from v1.2.0: New settings structure')
       const oldSettings = await mongoose.connection.collection('settings').findOne()
       if (settings && oldSettings) {
         settings.travelSettings = {
@@ -57,11 +58,11 @@ export async function checkForMigrations() {
       }
     }
     if (semver.lte(migrateFrom, '1.2.3')) {
-      console.log('Apply migration from v1.2.3: Move projects from settings.projects to projects.assigned')
+      logger.info('Apply migration from v1.2.3: Move projects from settings.projects to projects.assigned')
       await mongoose.connection.collection('users').updateMany({}, { $rename: { 'settings.projects': 'projects.assigned' } })
     }
     if (semver.lte(migrateFrom, '1.2.6')) {
-      console.log('Apply migration from v1.2.6: Fix Settings')
+      logger.info('Apply migration from v1.2.6: Fix Settings')
       await mongoose.connection.collection('settings').updateMany(
         {},
         {
@@ -76,7 +77,7 @@ export async function checkForMigrations() {
       }
     }
     if (semver.lte(migrateFrom, '1.3.1')) {
-      console.log('Apply migration from v1.3.1: Move ENV to Connection and Display Settings')
+      logger.info('Apply migration from v1.3.1: Move ENV to Connection and Display Settings')
       const connectionSettingsFromEnv: any = {
         auth: {
           microsoft: {
@@ -126,7 +127,7 @@ export async function checkForMigrations() {
     }
 
     if (semver.lte(migrateFrom, '1.4.1')) {
-      console.log('Apply migration from v1.4.1: Add PDFReportsViaEmail Settings')
+      logger.info('Apply migration from v1.4.1: Add PDFReportsViaEmail Settings')
       const displaySettings = await mongoose.connection.collection('displaysettings').findOne({})
       await mongoose.connection
         .collection('connectionsettings')
@@ -137,7 +138,7 @@ export async function checkForMigrations() {
     }
 
     if (semver.lte(migrateFrom, '1.5.2')) {
-      console.log('Apply migration from v1.5.2: Add log to reports')
+      logger.info('Apply migration from v1.5.2: Add log to reports')
       async function writeLogFromHistory(collection: string) {
         const allReports = mongoose.connection.collection(collection).find({ historic: false })
         for await (const report of allReports) {
@@ -157,7 +158,7 @@ export async function checkForMigrations() {
     }
 
     if (semver.lte(migrateFrom, '1.5.4')) {
-      console.log('Apply migration from v1.5.4: Add needsA1Certificate to countries')
+      logger.info('Apply migration from v1.5.4: Add needsA1Certificate to countries')
       // prettier-ignore
       const a1countries = [
         // andere Mitgliedstaaten der Europäischen Union (EU)
@@ -173,7 +174,7 @@ export async function checkForMigrations() {
     }
 
     if (semver.lte(migrateFrom, '1.5.4')) {
-      console.log('Apply migration from v1.5.4: migrate travelInsideOfEU to isCrossBorder and a1Certificate')
+      logger.info('Apply migration from v1.5.4: migrate travelInsideOfEU to isCrossBorder and a1Certificate')
 
       await mongoose.connection.collection<{ _id: string }>('travels').updateMany({ travelInsideOfEU: true }, [
         {

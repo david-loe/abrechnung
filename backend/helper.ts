@@ -14,6 +14,7 @@ import {
   reportIsHealthCareCost,
   reportIsTravel
 } from '../common/types.js'
+import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 import ExpenseReport from './models/expenseReport.js'
 import HealthCareCost from './models/healthCareCost.js'
@@ -151,7 +152,7 @@ export async function writeToDisk(
   try {
     await fs.writeFile(filePath, data)
   } catch (error) {
-    console.error(error)
+    logger.error(error)
   }
 }
 

@@ -164,7 +164,6 @@
 import axios from 'axios'
 import { defineComponent } from 'vue'
 import { loadLocales } from '../../common/locales/load.js'
-import { log } from '../../common/logger.js'
 import { getFlagEmoji } from '../../common/scripts.js'
 import {
   accesses,
@@ -186,6 +185,7 @@ import ModalComponent from './components/elements/ModalComponent.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from './helper.js'
 import i18n from './i18n.js'
+import { logger } from './logger.js'
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[]
@@ -265,8 +265,8 @@ export default defineComponent({
             this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
             this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
 
-            log(this.$t('labels.user') + ':')
-            log(this.user)
+            logger.info(this.$t('labels.user') + ':')
+            logger.info(this.user)
             if (this.user._id) {
               this.updateLocale(this.user.settings.language)
               this.auth = true
@@ -298,7 +298,7 @@ export default defineComponent({
         }
       } catch (error: any) {
         API.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
-        console.log(error.response.data)
+        logger.error(error.response.data)
       }
     },
     async pushUserSettings(settings: User['settings']) {
@@ -312,7 +312,7 @@ export default defineComponent({
         if (error.response.status === 401) {
           this.$router.push('login')
         } else {
-          console.log(error.response.data)
+          logger.error(error.response.data)
         }
       }
     },

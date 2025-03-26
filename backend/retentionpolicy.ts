@@ -13,6 +13,7 @@ import {
 } from '../common/types.js'
 import { getSettings } from './db.js'
 import i18n from './i18n.js'
+import { logger } from './logger.js'
 import User from './models/user.js'
 import { sendMail } from './notifications/mail.js'
 
@@ -68,7 +69,7 @@ async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCo
   for (let i = 0; i < reports.length; i++) {
     result = await model(schema).deleteOne({ _id: reports[i]._id })
     if (result && result.deletedCount == 1) {
-      console.log(
+      logger.info(
         `Deleted ${schema} from owner ${reports[i].owner.name.givenName} ${reports[i].owner.name.familyName} with name ${reports[i].name}.`
       )
     }

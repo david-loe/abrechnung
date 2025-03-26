@@ -81,6 +81,7 @@
   </div>
 </template>
 <script lang="ts">
+import { logger } from '@/logger.js'
 import axios from 'axios'
 import { defineComponent } from 'vue'
 
@@ -126,7 +127,7 @@ export default defineComponent({
         if (error.response.status === 401) {
           this.$router.push('login') // macht das hier sinn - wahrscheinlich schon
         } else {
-          console.log(error.response.data)
+          logger.error(error.response.data)
         }
       }
     },

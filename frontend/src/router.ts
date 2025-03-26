@@ -11,6 +11,7 @@ import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
+import { logger } from './logger.js'
 
 const routes = [
   {
@@ -150,7 +151,7 @@ async function auth() {
     auth = res.status === 204
   } catch (error: any) {
     if (error.response && error.response.status !== 401) {
-      console.log(error)
+      logger.error(error)
     }
   }
   return auth

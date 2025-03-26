@@ -17,6 +17,7 @@ import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
 import { genAuthenticatedLink } from './helper.js'
+import { logger } from './logger.js'
 import ConnectionSettings from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
@@ -28,8 +29,8 @@ import Project from './models/project.js'
 export async function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
-    mongoose.connection.on('connected', () => console.log('Connected to Database'))
-    mongoose.connection.on('disconnected', () => console.log('Disconnected from Database'))
+    mongoose.connection.on('connected', () => logger.debug('Connected to Database'))
+    mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
     await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
     await initDB()
   } else {
@@ -53,10 +54,10 @@ export async function initDB() {
     const mergedSettings = mergeDeep({}, settings, DBsettings)
     await mongoose.connection.collection('settings').findOneAndDelete({})
     await mongoose.connection.collection('settings').insertOne(mergedSettings)
-    console.log('Updated Settings')
+    logger.info('Updated Settings')
   } else {
     await mongoose.connection.collection('settings').insertOne(settings)
-    console.log('Created Settings from Default')
+    logger.info('Created Settings from Default')
   }
 
   if (process.env.NODE_ENV === 'production') {
@@ -84,7 +85,7 @@ export async function initDB() {
   } else {
     await mongoose.connection.collection('users').insertOne(tokenAdminUser)
   }
-  console.log(
+  logger.info(
     `SignIn Link: ${await genAuthenticatedLink({ destination: 'admin@to.ken', redirect: '/settings' }, { expiresIn: 60 * 60 * 24 * 365 * 100 })}`
   )
 }
@@ -93,7 +94,7 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
   const doc = await model.exists({})
   if (doc === null) {
     const newDocs = await model.insertMany(data, { lean })
-    console.log('Added ' + newDocs.length + ' ' + name)
+    logger.info('Added ' + newDocs.length + ' ' + name)
   }
 }
 
@@ -105,8 +106,8 @@ export async function fetchAndUpdateLumpSums() {
       await addLumpSumsToCountries(res.data)
     }
   } catch (error) {
-    console.log('Unable to fetch lump sums from: ' + pauschbetrag_api)
-    console.log(error)
+    logger.error('Unable to fetch lump sums from: ' + pauschbetrag_api, 'error')
+    logger.error(error, 'error')
   }
 }
 
@@ -139,7 +140,7 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
       }
     }
     if (count > 0) {
-      console.log('Added ' + count + ' lump sums for ' + new Date(lumpSums.validFrom))
+      logger.info('Added ' + count + ' lump sums for ' + new Date(lumpSums.validFrom))
     }
   }
 }
