@@ -8953,7 +8953,7 @@
 				]
 			},
 			"post": {
-				"operationId": "Post",
+				"operationId": "PostOwn",
 				"responses": {
 					"200": {
 						"description": "Ok",
