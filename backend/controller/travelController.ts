@@ -38,7 +38,7 @@ export class TravelController extends Controller {
   }
 
   @Post()
-  public async post(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
+  public async postOwn(@Body() requestBody: SetterBody<TravelPost>, @Request() request: ExRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user?._id })
     return await this.setter(Travel, {
       requestBody: extendedBody,

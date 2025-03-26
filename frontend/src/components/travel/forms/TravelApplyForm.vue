@@ -68,7 +68,7 @@
       </div>
       <div class="col-auto">
         <label for="endDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
-        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="formTravel.startDate as string" :max="getMaxDate()" required />
+        <DateInput id="endDateInput" v-model="formTravel.endDate" :min="formTravel.startDate" :max="getMaxDate()" required />
       </div>
     </div>
 
@@ -164,8 +164,7 @@ export default defineComponent({
   data() {
     return {
       formTravel: this.default(),
-      loading: false,
-      settingsChanged: false
+      loading: false
     }
   },
   methods: {
@@ -192,12 +191,13 @@ export default defineComponent({
     clear() {
       this.loading = false
       this.formTravel = this.default()
-      this.settingsChanged = false
     },
     output() {
       this.loading = true
-      if (this.settingsChanged) {
-        this.$root.pushUserSettings(this.$root.user.settings)
+      if (this.formTravel.advance.amount === null) {
+        this.formTravel.advance = undefined
+      } else if (this.formTravel.advance.amount === '') {
+        this.formTravel.advance.amount = 0
       }
       if (!this.formTravel.isCrossBorder) {
         this.formTravel.a1Certificate = undefined
@@ -222,6 +222,7 @@ export default defineComponent({
   },
   watch: {
     travel: function () {
+      this.clear()
       this.formTravel = this.input()
     }
   }

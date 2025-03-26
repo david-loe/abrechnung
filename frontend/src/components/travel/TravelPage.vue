@@ -45,7 +45,7 @@
           :mode="modalMode"
           @cancel="hideModal"
           :travel="modalObject as TravelSimple"
-          @edit="applyForTravel"
+          @edit="editTravelDetails"
           ref="travelApplyForm"></TravelApplyForm>
       </div>
     </ModalComponent>
@@ -593,6 +593,9 @@ export default defineComponent({
       if (this.$refs.expenseForm) {
         ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
       }
+      if (this.$refs.travelApplyForm) {
+        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
+      }
       this.modalObject = undefined
       this.error = undefined
     },
@@ -610,14 +613,24 @@ export default defineComponent({
         await this.getTravel()
       }
     },
-    async applyForTravel(travel: Travel) {
-      if (confirm(this.$t('alerts.warningReapply'))) {
-        const result = await API.setter<Travel>('travel/appliedFor', travel)
+    async editTravelDetails(travel: Travel) {
+      if (this.endpointPrefix === 'examine/') {
+        const result = await API.setter<Travel>(this.endpointPrefix + 'travel', travel)
         if (result.ok) {
+          this.setTravel(result.ok)
           this.hideModal()
-          this.$router.push({ path: '/' })
         } else {
           await this.getTravel()
+        }
+      } else {
+        if (confirm(this.$t('alerts.warningReapply'))) {
+          const result = await API.setter<Travel>('travel/appliedFor', travel)
+          if (result.ok) {
+            this.hideModal()
+            this.$router.push({ path: '/' })
+          } else {
+            await this.getTravel()
+          }
         }
       }
     },
