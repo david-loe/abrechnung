@@ -503,6 +503,9 @@ export const accesses = [
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
+  'refunded/travel',
+  'refunded/expenseReport',
+  'refunded/healthCareCost',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]
