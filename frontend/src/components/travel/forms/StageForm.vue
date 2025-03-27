@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form v-if="APP_DATA" @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div class="mb-3">
       <div class="row">
         <div class="col">
@@ -94,7 +94,7 @@
             {{
               $t('distanceRefundTypes.' + distanceRefundType) +
               ' (' +
-              $root.settings.travelSettings.distanceRefunds[distanceRefundType] +
+              APP_DATA.settings.travelSettings.distanceRefunds[distanceRefundType] +
               ' ' +
               baseCurrency.symbol +
               '/km)'
@@ -116,19 +116,19 @@
           :disabled="disabled"
           required />
       </div>
-      <div class="mb-3" v-if="showVehicleRegistration && $root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
+      <div class="mb-3" v-if="showVehicleRegistration && APP_DATA.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
           {{ $t('labels.vehicleRegistration') }}
-          <span v-if="$root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'" class="text-danger">*</span>
+          <span v-if="APP_DATA.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'" class="text-danger">*</span>
         </label>
         <InfoPoint :text="$t('info.vehicleRegistration')" />
         <FileUpload
           ref="fileUpload"
           id="stageFormVehicleRegistration"
-          v-model="$root.user.vehicleRegistration as DocumentFile[] | undefined"
+          v-model="APP_DATA.user.vehicleRegistration as DocumentFile[] | undefined"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
-          :required="$root.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'"
+          :required="APP_DATA.settings.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'"
           :endpointPrefix="endpointPrefix"
           :ownerId="ownerId" />
       </div>
@@ -218,6 +218,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDate, datetimeToDateString, getDayList } from '../../../../../common/scripts.js'
 import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
@@ -255,6 +256,7 @@ export default defineComponent({
       loading: false,
       vehicleRegistrationChanged: false,
       showDepartureAndArrivalOnDifferentDaysAlert: false,
+      APP_DATA: null as APP_DATA | null,
       transportTypes,
       distanceRefundTypes,
       baseCurrency
@@ -342,7 +344,7 @@ export default defineComponent({
     },
     output() {
       if (this.vehicleRegistrationChanged) {
-        this.$emit('postVehicleRegistration', this.$root.user.vehicleRegistration)
+        this.$emit('postVehicleRegistration', this.APP_DATA!.user.vehicleRegistration)
       }
       this.loading = true
       if (!this.showMidnightCountries()) {
@@ -355,19 +357,20 @@ export default defineComponent({
 
       this.minDate = new Date(
         new Date(this.travelStartDate).valueOf() -
-          this.$root.settings.travelSettings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+          this.APP_DATA!.settings.travelSettings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
       )
 
       this.maxDate = new Date(
         new Date(this.travelEndDate).valueOf() +
-          (this.$root.settings.travelSettings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
+          (this.APP_DATA!.settings.travelSettings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
           1
       )
 
       return Object.assign({}, this.default(), this.stage)
     }
   },
-  created() {
+  async created() {
+    this.APP_DATA = await APP_LOADER.loadData()
     this.formStage = this.input()
   },
   watch: {

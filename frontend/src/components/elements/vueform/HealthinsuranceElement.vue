@@ -6,8 +6,8 @@
       <!-- @vueform/multiselect copmonent -->
       <Multiselect
         v-bind="fieldOptions"
-        v-if="$root.healthInsurances.length > 0"
-        :options="$root.healthInsurances"
+        v-if="APP_DATA"
+        :options="APP_DATA.healthInsurances"
         valueProp="_id"
         searchable
         :searchFilter="customFilterFunction"
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
 import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
@@ -90,6 +91,9 @@ export default defineElement({
   props: Object.assign(SelectElement.props, {
     native: { type: Boolean, default: false }
   }),
+  data() {
+    return { APP_DATA: null }
+  },
   methods: {
     customFilterFunction(option, search) {
       return option.name.toLowerCase().indexOf(search.toLowerCase()) > -1
@@ -104,6 +108,9 @@ export default defineElement({
       ...element,
       defaultClasses
     }
+  },
+  created() {
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
   }
 })
 </script>

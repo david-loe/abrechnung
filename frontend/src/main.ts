@@ -23,17 +23,7 @@ import vueformConfig from './vueform.config.js'
 import './vueform.css'
 
 import Formatter from '../../common/formatter'
-import {
-  CountrySimple,
-  Currency,
-  DisplaySettings,
-  HealthInsurance,
-  Locale,
-  OrganisationSimple,
-  ProjectSimple,
-  Settings,
-  User
-} from '../../common/types.js'
+import { CountrySimple, Currency, Locale, User } from '../../common/types.js'
 import formatter from './formatter.js'
 import i18n from './i18n.js'
 
@@ -55,11 +45,6 @@ function updateBootstrapTheme() {
 updateBootstrapTheme()
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateBootstrapTheme)
 
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[]
-  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
-  prompt(): Promise<void>
-}
 // globally config axios
 axios.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 
@@ -71,23 +56,11 @@ declare module 'vue' {
     $root: {
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
-      load: (withoutAuth?: boolean) => Promise<void>
+      load: (reload?: boolean) => Promise<void>
       pushUserSettings: (settings: User['settings']) => Promise<void>
-      loadState: 'UNLOADED' | 'LOADING' | 'LOADED'
-      currencies: Currency[]
-      countries: CountrySimple[]
-      user: User
-      settings: Settings
-      displaySettings: DisplaySettings
-      healthInsurances: HealthInsurance[]
-      organisations: OrganisationSimple[]
-      projects: ProjectSimple[]
-      specialLumpSums: { [key: string]: string[] }
-      users: { name: User['name']; _id: string }[]
       isOffline: boolean
       alreadyInstalled: boolean
       mobile: boolean
-      promptInstallEvent: BeforeInstallPromptEvent | undefined
     }
   }
 }

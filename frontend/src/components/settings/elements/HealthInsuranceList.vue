@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div v-if="APP_DATA">
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
       :rows-per-page="5"
       sort-by="name"
-      :items="$root.healthInsurances"
+      :items="APP_DATA.healthInsurances"
       :filter-options="[
         {
           field: 'name',
@@ -78,6 +78,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { HealthInsurance, accesses } from '../../../../../common/types.js'
@@ -103,6 +104,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
+      APP_DATA: null as APP_DATA | null,
       schema: {}
     }
   },
@@ -128,8 +130,8 @@ export default defineComponent({
     },
     async updateRoot() {
       const rootHealthInsurances = (await API.getter<HealthInsurance[]>('healthInsurance')).ok?.data
-      if (rootHealthInsurances) {
-        this.$root.healthInsurances = rootHealthInsurances
+      if (rootHealthInsurances && this.APP_DATA) {
+        this.APP_DATA.healthInsurances = rootHealthInsurances
       }
     },
     clickFilter(header: keyof Filter<string>) {
@@ -143,7 +145,7 @@ export default defineComponent({
     getById
   },
   async created() {
-    await this.$root.load()
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
     this.schema = Object.assign({}, (await API.getter<any>('admin/healthInsurance/form')).ok?.data, {
       buttons: {
         type: 'group',

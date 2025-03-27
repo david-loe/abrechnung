@@ -30,7 +30,6 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.$root.load()
     this.schema = Object.assign({}, (await API.getter<any>('admin/displaySettings/form')).ok?.data, {
       buttons: {
         type: 'group',

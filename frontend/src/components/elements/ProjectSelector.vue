@@ -1,13 +1,13 @@
 <template>
-  <div :class="$root.organisations.length > 1 ? 'input-group' : ''">
+  <div :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'input-group' : ''">
     <select
-      v-if="$root.organisations.length > 1"
+      v-if="APP_DATA && APP_DATA.organisations.length > 1"
       :class="'form-select col-' + orgSelectSplit"
       id="healthCareCostFormProject"
       v-model="org"
       @update:model-value="changeOrganisation(org!)"
       :disabled="disabled">
-      <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
+      <option v-for="organisation of APP_DATA.organisations" :value="organisation" :key="organisation._id">
         {{ organisation.name }}
       </option>
     </select>
@@ -20,7 +20,7 @@
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
       :filter="filter"
       :disabled="disabled"
-      :class="$root.organisations.length > 1 ? 'col-' + (12 - orgSelectSplit) : ''">
+      :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'col-' + (12 - orgSelectSplit) : ''">
       <template #option="{ identifier, name }: Project">
         <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
 
@@ -43,7 +44,8 @@ export default defineComponent({
   data() {
     return {
       projects: [] as ProjectSimple[],
-      org: undefined as undefined | null | OrganisationSimple
+      org: undefined as undefined | null | OrganisationSimple,
+      APP_DATA: null as APP_DATA | null
     }
   },
   components: {},
@@ -59,33 +61,35 @@ export default defineComponent({
     changeOrganisation(newOrga: OrganisationSimple) {
       this.getProjects(newOrga._id)
       if (this.updateUserOrg) {
-        this.$root.user.settings.organisation = newOrga
-        this.$root.pushUserSettings(this.$root.user.settings)
+        this.APP_DATA!.user.settings.organisation = newOrga
+        this.$root.pushUserSettings(this.APP_DATA!.user.settings)
       }
     },
     getProjects(orgaId?: string) {
       const projects: ProjectSimple[] = []
-      for (const project of this.$root.user.projects.assigned) {
-        if (!orgaId || project.organisation === orgaId) {
-          projects.push(project)
-        }
-      }
-
-      for (const project of this.$root.projects) {
-        let alreadyIn = false
-        for (const userProject of this.$root.user.projects.assigned) {
-          if (project._id === userProject._id) {
-            alreadyIn = true
-            break
-          }
-        }
-        if (!alreadyIn) {
+      if (this.APP_DATA) {
+        for (const project of this.APP_DATA.user.projects.assigned) {
           if (!orgaId || project.organisation === orgaId) {
             projects.push(project)
           }
         }
+        if (this.APP_DATA.projects) {
+          for (const project of this.APP_DATA.projects) {
+            let alreadyIn = false
+            for (const userProject of this.APP_DATA.user.projects.assigned) {
+              if (project._id === userProject._id) {
+                alreadyIn = true
+                break
+              }
+            }
+            if (!alreadyIn) {
+              if (!orgaId || project.organisation === orgaId) {
+                projects.push(project)
+              }
+            }
+          }
+        }
       }
-
       this.projects = projects
     },
     filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
@@ -97,9 +101,10 @@ export default defineComponent({
       })
     }
   },
-  beforeMount() {
+  async beforeMount() {
+    this.APP_DATA = await APP_LOADER.loadData()
     if (this.updateUserOrg) {
-      this.org = this.$root.user.settings.organisation
+      this.org = this.APP_DATA.user.settings.organisation
     }
     this.getProjects(this.org?._id)
   }

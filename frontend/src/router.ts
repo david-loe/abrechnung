@@ -139,7 +139,7 @@ const router = createRouter({
   }
 })
 
-async function auth() {
+export async function auth() {
   var auth = false
   if (!navigator.onLine) {
     return true

@@ -13,9 +13,9 @@
             <hr
               :style="
                 'background: linear-gradient(to right, ' +
-                $root.settings.stateColors[value].color +
+                APP_DATA?.settings.stateColors[value].color +
                 ', ' +
-                $root.settings.stateColors[states[index + 1]].color +
+                APP_DATA?.settings.stateColors[states[index + 1]].color +
                 '); height: 5px; border: 0px'
               " />
           </div>
@@ -26,11 +26,17 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { Settings } from '../../../../common/types.js'
 import StateBadge from './StateBadge.vue'
 
 export default defineComponent({
+  data() {
+    return {
+      APP_DATA: null as APP_DATA | null
+    }
+  },
   name: 'StatePipeline',
   components: { StateBadge },
   props: {
@@ -39,7 +45,7 @@ export default defineComponent({
   },
   mounted() {},
   async created() {
-    await this.$root.load()
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
   }
 })
 </script>

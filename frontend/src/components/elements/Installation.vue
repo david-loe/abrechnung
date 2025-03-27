@@ -10,7 +10,7 @@
         <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
       <div>
-        <div v-if="!$root.promptInstallEvent" id="installationBody" class="my-1">
+        <div v-if="!promptInstallEvent" id="installationBody" class="my-1">
           <div v-if="operationSystem === 'iOS'">
             <div v-if="browser === 'Safari'">
               <div>
@@ -72,7 +72,7 @@
         </div>
       </div>
       <div id="installationFooter" class="mt-auto" style="bottom: 0px">
-        <button v-if="$root.promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">
+        <button v-if="promptInstallEvent" type="button" class="btn btn-primary m-1" @click="install()">
           {{ $t('labels.install') }}
         </button>
         <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontShowAgain') }}</button>
@@ -81,12 +81,19 @@
   </div>
 </template>
 <script lang="ts">
-import { logger } from '@/logger.js'
-import axios from 'axios'
+import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 
 type OperationSystems = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
 type BrowserTypes = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge' | 'SamsungInternet'
+
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
+
+let APP_DATA = null as IAPP_DATA | null
 
 export default defineComponent({
   name: 'Installation',
@@ -94,7 +101,8 @@ export default defineComponent({
     return {
       showInstallationBanner: false as boolean,
       operationSystem: 'Unknown' as OperationSystems,
-      browser: 'Unknown' as BrowserTypes
+      browser: 'Unknown' as BrowserTypes,
+      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
     }
   },
   props: {},
@@ -106,30 +114,18 @@ export default defineComponent({
       this.showInstallationBanner = true
     },
     async dontShowAgain() {
-      let settings = this.$root.user.settings
-      settings.showInstallBanner = false
-      await this.postSettings(settings)
+      if (APP_DATA) {
+        APP_DATA.user.settings.showInstallBanner = false
+        await this.$root.pushUserSettings(APP_DATA.user.settings)
+      }
       this.hideBanner()
     },
     async install() {
-      if (this.$root.promptInstallEvent) {
-        await this.$root.promptInstallEvent.prompt()
+      if (this.promptInstallEvent) {
+        await this.promptInstallEvent.prompt()
       }
-      this.$root.promptInstallEvent = undefined
+      this.promptInstallEvent = undefined
       this.hideBanner()
-    },
-    async postSettings(settings: {}) {
-      try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
-          withCredentials: true
-        })
-      } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push('login') // macht das hier sinn - wahrscheinlich schon
-        } else {
-          logger.error(error.response.data)
-        }
-      }
     },
     detectBrowser() {
       const userAgent = navigator.userAgent
@@ -150,11 +146,18 @@ export default defineComponent({
       return 'Unknown'
     }
   },
+  created() {
+    APP_LOADER.loadData().then((LOADED_APP_DATA) => (APP_DATA = LOADED_APP_DATA))
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      this.promptInstallEvent = event as BeforeInstallPromptEvent
+    })
+  },
   beforeMount() {
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
     // showing Installbanner if alreadyInstalled is not true AND user setting is true
-    this.showInstallationBanner = this.$root.user.settings.showInstallBanner && !this.$root.alreadyInstalled
+    this.showInstallationBanner = !APP_DATA || APP_DATA.user.settings.showInstallBanner
   }
 })
 </script>
