@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-if="APP_DATA" class="container">
     <div class="row">
       <div class="col-auto">
         <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px; height: 100%">
@@ -28,8 +28,8 @@
             class="mb-5"
             endpoint="admin/user/bulk"
             :transformers="[
-              { path: 'projects.assigned', key: 'identifier', array: $root.projects },
-              { path: 'settings.organisation', key: 'name', array: $root.organisations },
+              { path: 'projects.assigned', key: 'identifier', array: APP_DATA.projects! },
+              { path: 'settings.organisation', key: 'name', array: APP_DATA.organisations },
               {path: 'loseAccessAt', fn: (val:string|undefined) => {
                 if(val){
                   const match = val.match(/^(?<d>[0-3]?\d)\.(?<m>[0-1]?\d).(?<y>\d\d\d\d)$/)
@@ -59,7 +59,7 @@
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
-            :transformers="[{ path: 'organisation', key: 'name', array: $root.organisations }]"
+            :transformers="[{ path: 'organisation', key: 'name', array: APP_DATA.organisations }]"
             :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
             @imported=";($refs.projectList as any).getProjects()" />
         </template>
@@ -74,6 +74,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 import ConnectionSettingsForm from './elements/ConnectionSettingsForm.vue'
 import CountryList from './elements/CountryList.vue'
@@ -117,13 +118,14 @@ export default defineComponent({
   data() {
     return {
       entries,
+      APP_DATA: null as APP_DATA | null,
       entry: 'users' as (typeof entries)[number]
     }
   },
   props: [],
 
   async created() {
-    await this.$root.load()
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
   }
 })
 </script>

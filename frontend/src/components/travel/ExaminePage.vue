@@ -34,10 +34,7 @@ export default defineComponent({
       showRefunded: false
     }
   },
-  methods: {},
-  async created() {
-    await this.$root.load()
-  }
+  methods: {}
 })
 </script>
 

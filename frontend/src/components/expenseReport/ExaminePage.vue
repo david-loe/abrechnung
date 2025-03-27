@@ -98,9 +98,6 @@ export default defineComponent({
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
     }
-  },
-  async created() {
-    await this.$root.load()
   }
 })
 </script>

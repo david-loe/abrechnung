@@ -123,9 +123,6 @@ export default defineComponent({
       this.showTravel(this._id)
     }
   },
-  async created() {
-    await this.$root.load()
-  },
   watch: {
     _id: function (value) {
       this.showTravel(value)

@@ -98,9 +98,6 @@ export default defineComponent({
         ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
       }
     }
-  },
-  async created() {
-    await this.$root.load()
   }
 })
 </script>

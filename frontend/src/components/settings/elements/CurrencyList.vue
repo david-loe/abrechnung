@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div v-if="APP_DATA">
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
       :rows-per-page="5"
       sort-by="name"
-      :items="$root.currencies"
+      :items="APP_DATA.currencies"
       :filter-options="[
         {
           field: 'name',
@@ -84,6 +84,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 import { Currency, Locale, accesses } from '../../../../../common/types.js'
 
@@ -108,6 +109,7 @@ export default defineComponent({
         _id: false
       } as Filter<boolean>,
       accesses,
+      APP_DATA: null as APP_DATA | null,
       schema: {}
     }
   },
@@ -133,8 +135,8 @@ export default defineComponent({
     },
     async updateRoot() {
       const rootCurrencies = (await API.getter<Currency[]>('currency')).ok?.data
-      if (rootCurrencies) {
-        this.$root.currencies = rootCurrencies
+      if (rootCurrencies && this.APP_DATA) {
+        this.APP_DATA.currencies = rootCurrencies
       }
     },
     clickFilter(header: keyof Filter<string>) {
@@ -147,7 +149,7 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
     this.schema = Object.assign({}, (await API.getter<any>('admin/currency/form')).ok?.data, {
       buttons: {
         type: 'group',

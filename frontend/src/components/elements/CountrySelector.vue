@@ -1,7 +1,7 @@
 <template>
   <v-select
-    v-if="$root.countries.length > 0"
-    :options="$root.user.settings.lastCountries.concat($root.countries)"
+    v-if="APP_DATA"
+    :options="APP_DATA.user.settings.lastCountries.concat(APP_DATA.countries)"
     :modelValue="modelValue"
     :placeholder="$t('labels.country')"
     @update:modelValue="(v: CountrySimple) => $emit('update:modelValue', v)"
@@ -32,13 +32,14 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { CountrySimple, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CountrySelector',
   data() {
-    return {}
+    return { APP_DATA: null as APP_DATA | null }
   },
   components: {},
   props: {
@@ -67,6 +68,9 @@ export default defineComponent({
         return code
       })
     }
+  },
+  created() {
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
   }
 })
 </script>

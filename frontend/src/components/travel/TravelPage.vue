@@ -178,13 +178,15 @@
             </div>
           </div>
         </div>
-        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
+        <div
+          v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1 && APP_DATA"
+          class="col-auto">
           <label class="form-check-label me-2" for="travelProfessionalShare">
             {{ $t('labels.professionalShare') + ':' }}
           </label>
           <span
             id="travelProfessionalShare"
-            :class="travel.professionalShare <= $root.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
+            :class="travel.professionalShare <= APP_DATA.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
           <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />
@@ -497,6 +499,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
@@ -524,6 +527,7 @@ import PlaceElement from '../elements/PlaceElement.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
+
 import StageForm from './forms/StageForm.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 
@@ -550,6 +554,8 @@ export default defineComponent({
       travelStates,
       mailToLink: '',
       msTeamsToLink: '',
+      APP_DATA: null as APP_DATA | null,
+
       error: undefined as any,
       addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
       tooltip: undefined as Tooltip | undefined
@@ -738,8 +744,8 @@ export default defineComponent({
           }
         }
       )
-      if (result.ok) {
-        this.$root.user = result.ok
+      if (result.ok && this.APP_DATA) {
+        this.APP_DATA.user = result.ok
       }
     },
     getStageIcon(stage: Stage) {
@@ -864,7 +870,7 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
     try {
       await this.getTravel()
     } catch (e) {

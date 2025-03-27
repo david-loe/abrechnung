@@ -38,33 +38,33 @@
         </HealthCareCostForm>
       </div>
     </ModalComponent>
-    <div v-if="$root.settings._id" class="container">
+    <div v-if="APP_DATA?.settings._id" class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('headlines.home') }}</h1>
         </div>
-        <div v-if="!$root.settings.disableReportType.travel && $root.user.access['appliedFor:travel']" class="col-auto">
+        <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{
-              $t($root.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
+              $t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
             }}</span>
           </button>
         </div>
-        <div v-if="!$root.settings.disableReportType.expenseReport && $root.user.access['inWork:expenseReport']" class="col-auto">
+        <div v-if="!APP_DATA.settings.disableReportType.expenseReport && APP_DATA.user.access['inWork:expenseReport']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'expenseReport')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
           </button>
         </div>
-        <div v-if="!$root.settings.disableReportType.healthCareCost && $root.user.access['inWork:healthCareCost']" class="col-auto">
+        <div v-if="!APP_DATA.settings.disableReportType.healthCareCost && APP_DATA.user.access['inWork:healthCareCost']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'healthCareCost')">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.submitX', { X: $t('labels.healthCareCost') }) }}</span>
           </button>
         </div>
       </div>
-      <template v-if="!$root.settings.disableReportType.travel">
+      <template v-if="!APP_DATA.settings.disableReportType.travel">
         <h3>{{ $t('labels.travel') }}</h3>
         <TravelList
           class="mb-4"
@@ -73,11 +73,11 @@
           :columns-to-hide="['owner']"
           @clicked-applied="(t) => showModal('view', t, 'travel')"></TravelList>
       </template>
-      <template v-if="!$root.settings.disableReportType.expenseReport">
+      <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
         <h3>{{ $t('labels.expenses') }}</h3>
         <ExpenseReportList class="mb-4" ref="expenseReportList" endpoint="expenseReport" :columns-to-hide="['owner']"></ExpenseReportList>
       </template>
-      <template v-if="!$root.settings.disableReportType.healthCareCost">
+      <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ $t('labels.healthCareCost') }}</h3>
         <HealthCareCostList ref="healthCareCostList" endpoint="healthCareCost" :columns-to-hide="['owner']"></HealthCareCostList>
       </template>
@@ -87,6 +87,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER, { APP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
@@ -119,7 +120,8 @@ export default defineComponent({
     return {
       modalMode: 'add' as ModalMode,
       modalObject: undefined as ModalObject,
-      modalObjectType: 'travel'
+      modalObjectType: 'travel',
+      APP_DATA: null as APP_DATA | null
     }
   },
   methods: {
@@ -144,7 +146,7 @@ export default defineComponent({
     },
     async applyForTravel(travel: TravelSimple) {
       const result = (
-        await API.setter<TravelSimple>(this.$root.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
+        await API.setter<TravelSimple>(this.APP_DATA?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
       ).ok
       if (result) {
         ;(this.$refs.travelList as typeof TravelList).loadFromServer()
@@ -175,8 +177,8 @@ export default defineComponent({
       }
     }
   },
-  async created() {
-    await this.$root.load()
+  created() {
+    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
   }
 })
 </script>

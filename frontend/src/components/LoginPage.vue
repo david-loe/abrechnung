@@ -1,9 +1,9 @@
 <template>
-  <div v-if="$root.displaySettings.auth" class="text-center" id="loginPage">
+  <div v-if="displaySettings?.auth" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
     <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
     <div v-if="strategy === 'ldapauth'">
-      <form v-if="$root.displaySettings.auth.ldapauth" class="form-signin" @submit.prevent="login()">
+      <form v-if="displaySettings.auth.ldapauth" class="form-signin" @submit.prevent="login()">
         <div class="form-floating">
           <input
             type="text"
@@ -35,7 +35,7 @@
       </form>
     </div>
     <div v-else-if="strategy === 'magiclogin'">
-      <form v-if="$root.displaySettings.auth.magiclogin" class="form-signin" @submit.prevent="requestMagicLogin()">
+      <form v-if="displaySettings.auth.magiclogin" class="form-signin" @submit.prevent="requestMagicLogin()">
         <div class="form-floating">
           <input
             type="email"
@@ -55,28 +55,28 @@
       </form>
     </div>
 
-    <div v-if="$root.displaySettings.auth.ldapauth" class="mt-4">
+    <div v-if="displaySettings.auth.ldapauth" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
         <i class="bi bi-people-fill me-1"></i>
         {{ $t('labels.signInX', { X: 'LDAP' }) }}
       </button>
     </div>
 
-    <div v-if="$root.displaySettings.auth.microsoft" class="mt-4">
+    <div v-if="displaySettings.auth.microsoft" class="mt-4">
       <a class="btn btn-lg btn-primary" :href="microsoftLink()">
         <i class="bi bi-microsoft me-1"></i>
         {{ $t('labels.signInX', { X: 'Microsoft' }) }}
       </a>
     </div>
 
-    <div v-if="$root.displaySettings.auth.oidc" class="mt-4">
+    <div v-if="displaySettings.auth.oidc" class="mt-4">
       <a class="btn btn-lg btn-primary" :href="oidcLink()">
-        <i :class="`bi bi-${$root.displaySettings.oidc.icon} me-1`"></i>
-        {{ $t('labels.signInX', { X: $root.displaySettings.oidc.label }) }}
+        <i :class="`bi bi-${displaySettings.oidc.icon} me-1`"></i>
+        {{ $t('labels.signInX', { X: displaySettings.oidc.label }) }}
       </a>
     </div>
 
-    <div v-if="$root.displaySettings.auth.magiclogin" class="mt-4">
+    <div v-if="displaySettings.auth.magiclogin" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
         {{ $t('labels.signInX', { X: 'E-Mail' }) }}
@@ -87,8 +87,10 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import axios from 'axios'
 import { defineComponent } from 'vue'
+import { DisplaySettings } from '../../../common/types'
 
 type Strategy = 'ldapauth' | 'magiclogin'
 
@@ -100,7 +102,8 @@ export default defineComponent({
       passwordLDAP: '',
       usernameLDAP: '',
       magicLoginMail: '',
-      magicLoginSend: false
+      magicLoginSend: false,
+      displaySettings: null as DisplaySettings | null
     }
   },
   methods: {
@@ -115,7 +118,7 @@ export default defineComponent({
           { withCredentials: true }
         )
         if (res.status === 204) {
-          this.$root.loadState = 'UNLOADED'
+          await this.$root.load(true)
           this.$router.push(this.$route.query.redirect ? (this.$route.query.redirect as string) : '/')
         }
       } catch (error) {
@@ -153,8 +156,8 @@ export default defineComponent({
       )
     }
   },
-  async created() {
-    await this.$root.load(true)
+  beforeMount() {
+    APP_LOADER.loadDisplaySettings().then((displaySettings) => (this.displaySettings = displaySettings))
   }
 })
 </script>

@@ -9,8 +9,11 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import { defineComponent } from 'vue'
 import { Settings } from '../../../../../common/types.js'
+
+let APP_DATA = null as IAPP_DATA | null
 
 export default defineComponent({
   name: 'SettingsForm',
@@ -22,14 +25,14 @@ export default defineComponent({
   methods: {
     async postSettings(settings: Settings) {
       const result = await API.setter<Settings>('admin/settings', settings)
-      if (result.ok) {
-        this.$root.settings = result.ok
-        ;(this.$refs.form$ as any).load(this.$root.settings)
+      if (result.ok && APP_DATA) {
+        APP_DATA.settings = result.ok
+        ;(this.$refs.form$ as any).load(APP_DATA.settings)
       }
     }
   },
-  async mounted() {
-    await this.$root.load()
+  async created() {
+    APP_DATA = await APP_LOADER.loadData()
     this.schema = Object.assign({}, (await API.getter<any>('admin/settings/form')).ok?.data, {
       buttons: {
         type: 'group',
@@ -39,7 +42,8 @@ export default defineComponent({
       },
       _id: { type: 'hidden', meta: true }
     })
-    queueMicrotask(() => (this.$refs.form$ as any).load(this.$root.settings))
+
+    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA!.settings))
   }
 })
 </script>

@@ -453,7 +453,6 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
     if (this.endpointPrefix === 'examine/') {
       const result = (await API.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
       if (result) {

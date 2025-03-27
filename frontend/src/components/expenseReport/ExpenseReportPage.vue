@@ -388,7 +388,6 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
     try {
       await this.getExpenseReport()
     } catch (e) {
