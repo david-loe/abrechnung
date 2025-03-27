@@ -317,3 +317,24 @@ export class ExpenseReportExamineController extends Controller {
     }
   }
 }
+
+@Tags('Expense Report')
+@Route('refunded/expenseReport')
+@Security('cookieAuth', ['refunded/expenseReport'])
+@Security('httpBearer', ['refunded/expenseReport'])
+export class ExpenseReportRefundedController extends Controller {
+  @Get()
+  public async getRefunded(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = { historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    return await this.getter(ExpenseReport, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0, expenses: 0 },
+      allowedAdditionalFields: ['expenses'],
+      sort: { updatedAt: -1 }
+    })
+  }
+}

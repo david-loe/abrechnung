@@ -10,6 +10,9 @@
     "examine/travel": ["bi-airplane", "bi-pencil-square"],
     "inWork:expenseReport": ["bi-coin", "bi-plus"],
     "inWork:healthCareCost": ["bi-hospital", "bi-plus"],
+    "refunded/expenseReport": ["bi-bank", "bi-coin"],
+    "refunded/healthCareCost": ["bi-bank", "bi-hospital"],
+    "refunded/travel": ["bi-airplane", "bi-bank"],
     "user": ["bi-card-list"]
   },
   "defaultAccess": {
@@ -23,6 +26,9 @@
     "examine/travel": false,
     "inWork:expenseReport": true,
     "inWork:healthCareCost": true,
+    "refunded/expenseReport": false,
+    "refunded/healthCareCost": false,
+    "refunded/travel": false,
     "user": true
   },
   "disableReportType": {

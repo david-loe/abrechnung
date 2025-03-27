@@ -2,6 +2,7 @@ import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
+import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
 import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
@@ -57,6 +58,11 @@ const routes = [
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
+  },
+  {
+    path: '/refunded/expenseReport',
+    component: RefundedExpenseReportPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/expenseReport',
