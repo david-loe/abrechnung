@@ -353,6 +353,7 @@ export interface TravelSimple extends RequestSimple {
   endDate: Date | string
   advance: Money
   progress: number
+  addUp: AddUpResult<Travel>
   isCrossBorder?: boolean | null
   a1Certificate?: {
     exactAddress: string
@@ -427,6 +428,7 @@ export interface ExpenseReportSimple extends RequestSimple {
   log: Log<ExpenseReportState>
   advance: Money
   comments: ExpenseReportComment[]
+  addUp: AddUpResult<ExpenseReport>
   comment?: string | null
 }
 
@@ -443,6 +445,7 @@ export interface HealthCareCostSimple extends RequestSimple {
   state: HealthCareCostState
   log: Log<HealthCareCostState>
   comments: HealthCareCostComment[]
+  addUp: AddUpResult<HealthCareCost>
   comment?: string | null
 }
 
@@ -565,6 +568,26 @@ export function reportIsExpenseReport(report: TravelSimple | ExpenseReportSimple
 export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsHealthCareCost(report)
 }
+
+export type AddUpResult<T> = T extends Travel
+  ? {
+      total: BaseCurrencyMoney
+      advance: BaseCurrencyMoney
+      expenses: BaseCurrencyMoney
+      lumpSums: BaseCurrencyMoney
+    }
+  : T extends ExpenseReport
+  ? {
+      total: BaseCurrencyMoney
+      advance: BaseCurrencyMoney
+      expenses: BaseCurrencyMoney
+    }
+  : T extends HealthCareCost
+  ? {
+      total: BaseCurrencyMoney
+      expenses: BaseCurrencyMoney
+    }
+  : never
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

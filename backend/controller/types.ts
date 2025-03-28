@@ -25,11 +25,12 @@ export interface MoneyPlusPost extends MoneyPost {
   date?: Date
 }
 
-export interface TravelApplication extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log'>> {
+export interface TravelApplication
+  extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log' | 'addUp'>> {
   advance: MoneyPost | undefined
 }
 
-export interface TravelPost extends Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress' | 'log'> {
+export interface TravelPost extends Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress' | 'log' | 'addUp'> {
   claimOvernightLumpSum: Travel['claimOvernightLumpSum']
   lastPlaceOfWork: Travel['lastPlaceOfWork']
   days: TravelDayPost[]

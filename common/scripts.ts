@@ -1,4 +1,5 @@
 import {
+  AddUpResult,
   BaseCurrencyMoney,
   ExpenseReport,
   HealthCareCost,
@@ -182,26 +183,6 @@ function getTravelExpensesSum(travel: Travel) {
   }
   return { amount: sum }
 }
-
-type AddUpResult<T> = T extends Travel
-  ? {
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-      lumpSums: BaseCurrencyMoney
-    }
-  : T extends ExpenseReport
-  ? {
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-    }
-  : T extends HealthCareCost
-  ? {
-      total: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-    }
-  : never
 
 export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report: T): AddUpResult<T> {
   let expenses = 0

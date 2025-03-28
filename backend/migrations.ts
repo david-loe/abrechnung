@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
+import { addUp } from '../common/scripts.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
 
@@ -187,6 +188,23 @@ export async function checkForMigrations() {
           }
         }
       ])
+    }
+
+    if (semver.lte(migrateFrom, '1.6.1')) {
+      logger.info('Apply migration from v1.6.1: add addUp to all reports')
+
+      async function calcAddUp(collection: string) {
+        const allReports = mongoose.connection.collection(collection).find()
+        for await (const report of allReports) {
+          if (report.addUp === undefined) {
+            mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any) } })
+          }
+        }
+      }
+
+      await calcAddUp('travels')
+      await calcAddUp('expensereports')
+      await calcAddUp('healthcarecosts')
     }
 
     if (settings) {
