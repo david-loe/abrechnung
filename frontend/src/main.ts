@@ -73,3 +73,5 @@ app.use(formatter)
 app.use(router)
 app.use(Vueform as any, vueformConfig)
 app.mount('#app')
+
+export const vueform = app.config.globalProperties.$vueform

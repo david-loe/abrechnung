@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { Place } from '../../../../common/types.js'
 import CountrySelector from './CountrySelector.vue'
@@ -50,7 +50,7 @@ const defaultPlace = {
 export default defineComponent({
   name: 'PlaceInput',
   data() {
-    return { APP_DATA: null as APP_DATA | null }
+    return { APP_DATA: APP_LOADER.data }
   },
   components: { CountrySelector, InfoPoint },
   props: {
@@ -93,8 +93,8 @@ export default defineComponent({
       this.matchSpecials()
     }
   },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

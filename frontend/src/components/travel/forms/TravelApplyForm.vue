@@ -130,7 +130,7 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 import { baseCurrency, TravelSimple } from '../../../../../common/types.js'
@@ -164,7 +164,7 @@ export default defineComponent({
   },
   data() {
     return {
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       formTravel: this.default(),
       loading: false
     }

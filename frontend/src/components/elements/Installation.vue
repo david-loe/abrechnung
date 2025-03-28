@@ -81,7 +81,7 @@
   </div>
 </template>
 <script lang="ts">
-import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 
 type OperationSystems = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
@@ -93,7 +93,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-let APP_DATA = null as IAPP_DATA | null
+let APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'Installation',
@@ -114,9 +114,9 @@ export default defineComponent({
       this.showInstallationBanner = true
     },
     async dontShowAgain() {
-      if (APP_DATA) {
-        APP_DATA.user.settings.showInstallBanner = false
-        await this.$root.pushUserSettings(APP_DATA.user.settings)
+      if (APP_DATA.value) {
+        APP_DATA.value.user.settings.showInstallBanner = false
+        await this.$root.pushUserSettings(APP_DATA.value.user.settings)
       }
       this.hideBanner()
     },
@@ -146,8 +146,8 @@ export default defineComponent({
       return 'Unknown'
     }
   },
-  created() {
-    APP_LOADER.loadData().then((LOADED_APP_DATA) => (APP_DATA = LOADED_APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault()
       this.promptInstallEvent = event as BeforeInstallPromptEvent
@@ -157,7 +157,7 @@ export default defineComponent({
     this.browser = this.detectBrowser()
     this.operationSystem = this.detectOS()
     // showing Installbanner if alreadyInstalled is not true AND user setting is true
-    this.showInstallationBanner = !APP_DATA || APP_DATA.user.settings.showInstallBanner
+    this.showInstallationBanner = !APP_DATA.value || APP_DATA.value.user.settings.showInstallBanner
   }
 })
 </script>

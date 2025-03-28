@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
 
@@ -45,7 +45,7 @@ export default defineComponent({
     return {
       projects: [] as ProjectSimple[],
       org: undefined as undefined | null | OrganisationSimple,
-      APP_DATA: null as APP_DATA | null
+      APP_DATA: APP_LOADER.data
     }
   },
   components: {},

@@ -170,20 +170,19 @@ import { defineComponent } from 'vue'
 import { getFlagEmoji } from '../../common/scripts.js'
 import { accesses, CountrySimple, Currency, Locale, locales, User } from '../../common/types.js'
 import API from './api.js'
-import APP_LOADER, { APP_DATA as IAPP_DATA } from './appData.js'
+import APP_LOADER from './appData.js'
 import ApiKeyForm from './components/elements/ApiKeyForm.vue'
 import Installation from './components/elements/Installation.vue'
 import ModalComponent from './components/elements/ModalComponent.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from './helper.js'
 import { logger } from './logger.js'
-import { auth } from './router.js'
 
 export default defineComponent({
   data() {
     return {
       alerts: API.alerts,
-      APP_DATA: null as IAPP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       loadState: APP_LOADER.state,
       locales,
       accesses,
@@ -210,7 +209,8 @@ export default defineComponent({
       }
     },
     async pushUserSettings(settings: User['settings']) {
-      this.updateLocale(this.$i18n.locale as Locale, false)
+      this.$vueform.i18n.locale = this.$i18n.locale as Locale
+      this.$formatter.setLocale(this.$i18n.locale as Locale)
       settings.language = this.$i18n.locale as Locale
       try {
         await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
@@ -223,13 +223,6 @@ export default defineComponent({
           logger.error(error.response.data)
         }
       }
-    },
-    updateLocale(locale: Locale, updateI18n = true) {
-      if (updateI18n) {
-        this.$i18n.locale = locale
-      }
-      this.$vueform.i18n.locale = locale
-      this.$formatter.setLocale(locale)
     },
     setLastCurrency(currency: Currency) {
       this.setLast(currency, this.APP_DATA!.user.settings.lastCurrencies)
@@ -259,8 +252,7 @@ export default defineComponent({
       }
     },
     async load(reload = false) {
-      this.APP_DATA = await APP_LOADER.loadData(reload)
-      this.updateLocale(this.APP_DATA.displaySettings.locale.default)
+      await APP_LOADER.loadData(reload)
     }
   },
   mounted() {
@@ -270,12 +262,7 @@ export default defineComponent({
       subscribeToPush()
     }
   },
-  async created() {
-    // Nicht ideal da auth dann doppelt gecheckt wird..
-    if (await auth()) {
-      await this.load()
-    }
-  }
+  async created() {}
 })
 </script>
 

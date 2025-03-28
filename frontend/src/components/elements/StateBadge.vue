@@ -11,20 +11,20 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { Settings } from '../../../../common/types.js'
 
 export default defineComponent({
   data() {
     return {
-      APP_DATA: null as APP_DATA | null
+      APP_DATA: APP_LOADER.data
     }
   },
   name: 'StateBadge',
   props: { state: { type: String as PropType<keyof Settings['stateColors']>, required: true } },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

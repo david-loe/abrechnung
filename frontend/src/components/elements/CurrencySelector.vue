@@ -40,14 +40,14 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { Currency, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CurrencySelector',
   data() {
-    return { APP_DATA: null as APP_DATA | null }
+    return { APP_DATA: APP_LOADER.data }
   },
   components: {},
   props: {
@@ -68,8 +68,8 @@ export default defineComponent({
       })
     }
   },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>
