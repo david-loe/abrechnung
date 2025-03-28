@@ -1,4 +1,16 @@
-import { BaseCurrencyMoney, ExpenseReport, HealthCareCost, Locale, Money, Place, Travel, baseCurrency, reportIsTravel } from './types.js'
+import {
+  AddUpResult,
+  BaseCurrencyMoney,
+  ExpenseReport,
+  HealthCareCost,
+  Locale,
+  Money,
+  Place,
+  Travel,
+  baseCurrency,
+  reportIsHealthCareCost,
+  reportIsTravel
+} from './types.js'
 
 export function PlaceToString(place: Place, language?: Locale) {
   return (
@@ -172,12 +184,7 @@ function getTravelExpensesSum(travel: Travel) {
   return { amount: sum }
 }
 
-export function addUp(report: Travel | ExpenseReport | HealthCareCost): {
-  total: BaseCurrencyMoney
-  advance: BaseCurrencyMoney
-  expenses: BaseCurrencyMoney
-  lumpSums: BaseCurrencyMoney
-} {
+export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report: T): AddUpResult<T> {
   let expenses = 0
   let advance = 0
   let lumpSums = 0
@@ -196,11 +203,24 @@ export function addUp(report: Travel | ExpenseReport | HealthCareCost): {
   }
   let total = expenses + lumpSums - advance
 
-  return {
-    total: { amount: total },
-    advance: { amount: advance },
-    expenses: { amount: expenses },
-    lumpSums: { amount: lumpSums }
+  if (reportIsTravel(report)) {
+    return {
+      total: { amount: total },
+      advance: { amount: advance },
+      expenses: { amount: expenses },
+      lumpSums: { amount: lumpSums }
+    } as AddUpResult<T>
+  } else if (reportIsHealthCareCost(report)) {
+    return {
+      total: { amount: total },
+      expenses: { amount: expenses }
+    } as AddUpResult<T>
+  } else {
+    return {
+      total: { amount: total },
+      advance: { amount: advance },
+      expenses: { amount: expenses }
+    } as AddUpResult<T>
   }
 }
 

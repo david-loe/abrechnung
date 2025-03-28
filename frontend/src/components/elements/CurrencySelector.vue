@@ -1,7 +1,7 @@
 <template>
   <v-select
-    v-if="$root.currencies.length > 0"
-    :options="$root.user.settings.lastCurrencies.concat($root.currencies)"
+    v-if="APP_DATA"
+    :options="APP_DATA.user.settings.lastCurrencies.concat(APP_DATA.currencies)"
     :modelValue="modelValue"
     :placeholder="$t('labels.currency')"
     @update:modelValue="(v: Currency) => $emit('update:modelValue', v)"
@@ -40,13 +40,14 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { Currency, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CurrencySelector',
   data() {
-    return {}
+    return { APP_DATA: APP_LOADER.data }
   },
   components: {},
   props: {
@@ -66,6 +67,9 @@ export default defineComponent({
         return code
       })
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

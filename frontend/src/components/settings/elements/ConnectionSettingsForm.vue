@@ -40,7 +40,6 @@ export default defineComponent({
   },
 
   async mounted() {
-    await this.$root.load()
     this.schema = Object.assign({}, (await API.getter<any>('admin/connectionSettings/form')).ok?.data, {
       buttons: {
         type: 'group',

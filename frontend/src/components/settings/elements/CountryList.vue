@@ -86,6 +86,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { Country, Locale, accesses } from '../../../../../common/types.js'
@@ -94,6 +95,9 @@ interface Filter<T> {
   name: T
   _id: T
 }
+
+let APP_DATA = APP_LOADER.data
+
 export default defineComponent({
   name: 'CountryList',
   components: {},
@@ -127,8 +131,8 @@ export default defineComponent({
         this.countries = result.data
       }
       const rootCountries = (await API.getter<Country[]>('country')).ok?.data
-      if (rootCountries) {
-        this.$root.countries = rootCountries
+      if (rootCountries && APP_DATA.value) {
+        APP_DATA.value.countries = rootCountries
       }
     },
     async postCountry(country: Country) {
@@ -156,7 +160,7 @@ export default defineComponent({
     getById
   },
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
     this.getCountries()
     this.schema = Object.assign({}, (await API.getter<any>('admin/country/form')).ok?.data, {
       buttons: {

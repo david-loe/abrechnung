@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$root.settings.accessIcons">
+  <div v-if="APP_DATA?.settings.accessIcons">
     <template v-if="userToEdit">
       <ModalComponent
         :header="`API Key (${userToEdit.name.givenName} ${userToEdit.name.familyName})`"
@@ -77,7 +77,7 @@
       <template #item-access="user">
         <template v-for="access of accesses">
           <span v-if="user.access[access]" class="ms-3" :title="$t('accesses.' + access)">
-            <i v-for="icon of $root.settings.accessIcons[access]" :class="'bi ' + icon"></i>
+            <i v-for="icon of APP_DATA.settings.accessIcons[access]" :class="'bi ' + icon"></i>
           </span>
         </template>
       </template>
@@ -115,6 +115,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import { defineComponent } from 'vue'
@@ -142,6 +143,7 @@ export default defineComponent({
         name: false,
         email: false
       } as Filter<boolean>,
+      APP_DATA: APP_LOADER.data,
       accesses,
       schema: {} as any
     }
@@ -184,8 +186,8 @@ export default defineComponent({
         this.users = result.data
       }
       const rootUsers = (await API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)).ok?.data
-      if (rootUsers) {
-        this.$root.users = rootUsers
+      if (rootUsers && this.APP_DATA) {
+        this.APP_DATA.users = rootUsers
       }
     },
     clickFilter(header: keyof Filter<string>) {
@@ -205,7 +207,7 @@ export default defineComponent({
     }
   },
   async beforeMount() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
     this.getUsers()
     this.schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.data, {
       buttons: {

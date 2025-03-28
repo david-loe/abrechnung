@@ -22,7 +22,7 @@
         <div v-if="showFilter.state">
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of healthCareCostStates" :value="state">{{ i18n.global.t('states.' + state) }}</option>
+            <option v-for="state of healthCareCostStates" :value="state">{{ t('states.' + state) }}</option>
           </select>
         </div>
       </div>
@@ -71,6 +71,9 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
+    <template #item-addUp="{ addUp }">
+      {{ $formatter.money(addUp.total) }}
+    </template>
   </ListElement>
 </template>
 
@@ -80,10 +83,12 @@ import ListElement from '@/components/elements/ListElement.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
-import i18n from '@/i18n.js'
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import HealthInsuranceSelector from '../elements/HealthInsuranceSelector.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
@@ -93,15 +98,16 @@ const props = defineProps<{
 
 const headers: Header[] = [
   //@ts-ignore
-  { text: i18n.global.t('labels.name'), value: 'name' },
-  { text: i18n.global.t('labels.state'), value: 'state' }
+  { text: t('labels.name'), value: 'name' },
+  { text: t('labels.state'), value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
-    { text: i18n.global.t('labels.healthInsurance'), value: 'insurance.name' },
-    { text: i18n.global.t('labels.owner'), value: 'owner' },
-    { text: i18n.global.t('labels.editor'), value: 'editor' }
+    { text: t('labels.healthInsurance'), value: 'insurance.name' },
+    { text: t('labels.total'), value: 'addUp' },
+    { text: t('labels.owner'), value: 'owner' },
+    { text: t('labels.editor'), value: 'editor' }
   )
 }
 
