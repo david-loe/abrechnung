@@ -100,6 +100,9 @@
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
+    <template #item-addUp="{ addUp }">
+      {{ $formatter.money(addUp.total) }}
+    </template>
   </ListElement>
 </template>
 
@@ -138,6 +141,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.destinationPlace'), value: 'destinationPlace' },
     { text: t('labels.startDate'), value: 'startDate', sortable: true },
     { text: t('labels.project'), value: 'project.identifier' },
+    { text: t('labels.total'), value: 'addUp' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' }
   )
