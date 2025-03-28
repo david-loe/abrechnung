@@ -33,7 +33,7 @@ const props = defineProps<{
 
 if (props.columnsToHide) {
   for (const columnToHide of props.columnsToHide) {
-    for (let i = 0; i <= props.headers.length; i++) {
+    for (let i = 0; i < props.headers.length; i++) {
       if (props.headers[i].value === columnToHide) {
         props.headers.splice(i, 1)
         break
