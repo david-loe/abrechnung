@@ -21,14 +21,14 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { HealthInsurance } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',
   data() {
-    return { APP_DATA: null as APP_DATA | null }
+    return { APP_DATA: APP_LOADER.data }
   },
   props: {
     modelValue: { type: Object as PropType<HealthInsurance> },
@@ -57,8 +57,8 @@ export default defineComponent({
       }
     }
   },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

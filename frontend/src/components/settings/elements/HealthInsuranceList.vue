@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { HealthInsurance, accesses } from '../../../../../common/types.js'
@@ -104,7 +104,7 @@ export default defineComponent({
         email: false
       } as Filter<boolean>,
       accesses,
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       schema: {}
     }
   },
@@ -145,7 +145,7 @@ export default defineComponent({
     getById
   },
   async created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+    await APP_LOADER.loadData()
     this.schema = Object.assign({}, (await API.getter<any>('admin/healthInsurance/form')).ok?.data, {
       buttons: {
         type: 'group',

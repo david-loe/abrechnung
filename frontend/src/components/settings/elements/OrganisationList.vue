@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
-import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { Organisation, accesses } from '../../../../../common/types.js'
 
@@ -72,7 +72,8 @@ interface Filter<T> {
   email: T
 }
 
-let APP_DATA = null as IAPP_DATA | null
+let APP_DATA = APP_LOADER.data
+
 export default defineComponent({
   name: 'OrganisationList',
   components: {},
@@ -124,8 +125,8 @@ export default defineComponent({
         this.organisations = result.data
       }
       const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
-      if (rootOrganisations && APP_DATA) {
-        APP_DATA.organisations = rootOrganisations
+      if (rootOrganisations && APP_DATA.value) {
+        APP_DATA.value.organisations = rootOrganisations
       }
     },
     clickFilter(header: keyof Filter<string>) {
@@ -138,7 +139,7 @@ export default defineComponent({
     }
   },
   async created() {
-    APP_LOADER.loadData().then((LOADED_APP_DATA) => (APP_DATA = LOADED_APP_DATA))
+    await APP_LOADER.loadData()
     this.getOrganisations()
     this.schema = Object.assign({}, (await API.getter<any>('admin/organisation/form')).ok?.data, {
       buttons: {

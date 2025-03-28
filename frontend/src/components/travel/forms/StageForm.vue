@@ -218,7 +218,7 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDate, datetimeToDateString, getDayList } from '../../../../../common/scripts.js'
 import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
@@ -256,7 +256,7 @@ export default defineComponent({
       loading: false,
       vehicleRegistrationChanged: false,
       showDepartureAndArrivalOnDifferentDaysAlert: false,
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       transportTypes,
       distanceRefundTypes,
       baseCurrency

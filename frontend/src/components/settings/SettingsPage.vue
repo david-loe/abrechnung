@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import ConnectionSettingsForm from './elements/ConnectionSettingsForm.vue'
 import CountryList from './elements/CountryList.vue'
@@ -118,14 +118,14 @@ export default defineComponent({
   data() {
     return {
       entries,
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       entry: 'users' as (typeof entries)[number]
     }
   },
   props: [],
 
   async created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+    await APP_LOADER.loadData()
   }
 })
 </script>

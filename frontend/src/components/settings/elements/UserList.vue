@@ -115,7 +115,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import { defineComponent } from 'vue'
@@ -143,7 +143,7 @@ export default defineComponent({
         name: false,
         email: false
       } as Filter<boolean>,
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
       accesses,
       schema: {} as any
     }
@@ -207,7 +207,7 @@ export default defineComponent({
     }
   },
   async beforeMount() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+    await APP_LOADER.loadData()
     this.getUsers()
     this.schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.data, {
       buttons: {

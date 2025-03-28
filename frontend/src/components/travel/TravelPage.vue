@@ -499,7 +499,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
@@ -554,7 +554,7 @@ export default defineComponent({
       travelStates,
       mailToLink: '',
       msTeamsToLink: '',
-      APP_DATA: null as APP_DATA | null,
+      APP_DATA: APP_LOADER.data,
 
       error: undefined as any,
       addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
@@ -870,7 +870,7 @@ export default defineComponent({
     }
   },
   async created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+    await APP_LOADER.loadData()
     try {
       await this.getTravel()
     } catch (e) {

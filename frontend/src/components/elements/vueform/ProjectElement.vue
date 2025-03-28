@@ -113,8 +113,8 @@ export default defineElement({
       defaultClasses
     }
   },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

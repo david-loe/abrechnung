@@ -87,7 +87,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
-import APP_LOADER, { APP_DATA } from '@/appData.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
 import ModalComponent from './elements/ModalComponent.vue'
@@ -121,7 +121,7 @@ export default defineComponent({
       modalMode: 'add' as ModalMode,
       modalObject: undefined as ModalObject,
       modalObjectType: 'travel',
-      APP_DATA: null as APP_DATA | null
+      APP_DATA: APP_LOADER.data
     }
   },
   methods: {
@@ -177,8 +177,8 @@ export default defineComponent({
       }
     }
   },
-  created() {
-    APP_LOADER.loadData().then((APP_DATA) => (this.APP_DATA = APP_DATA))
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

@@ -12,8 +12,10 @@ import {
   User
 } from '../../common/types'
 import API from './api.js'
+import { formatter } from './formatter'
 import i18n from './i18n'
 import { logger } from './logger'
+import { vueform } from './main'
 
 export class APP_DATA {
   currencies: Currency[]
@@ -56,6 +58,7 @@ export class APP_DATA {
 }
 
 class APP_LOADER {
+  data: Ref<APP_DATA | null> = ref(null)
   dataPromise?: Promise<APP_DATA>
   displaySettingsPromise?: Promise<DisplaySettings>
   state: Ref<'UNLOADED' | 'LOADING' | 'LOADED'> = ref('UNLOADED')
@@ -115,22 +118,23 @@ class APP_LOADER {
             ) {
               reject('Error loading essential data')
             }
-            resolve(
-              new APP_DATA(
-                currenciesRes.ok!.data,
-                countriesRes.ok!.data,
-                userRes.ok!.data,
-                settingsRes.ok!.data,
-                displaySettingsRes.ok!.data,
-                healthInsurancesRes.ok!.data,
-                organisationsRes.ok!.data,
-                specialLumpSumsRes.ok!.data,
-                projects?.ok?.data,
-                users?.ok?.data
-              )
+            const data = new APP_DATA(
+              currenciesRes.ok!.data,
+              countriesRes.ok!.data,
+              userRes.ok!.data,
+              settingsRes.ok!.data,
+              displaySettingsRes.ok!.data,
+              healthInsurancesRes.ok!.data,
+              organisationsRes.ok!.data,
+              specialLumpSumsRes.ok!.data,
+              projects?.ok?.data,
+              users?.ok?.data
             )
-            this.state.value = 'LOADED'
+            resolve(data)
+            this.data.value = data
             this.updateLocales(displaySettingsRes.ok!.data)
+            this.setLanguage(data.user.settings.language)
+            this.state.value = 'LOADED'
             logger.info(i18n.global.t('labels.user') + ':')
             logger.info(userRes.ok!.data)
           }
@@ -163,9 +167,15 @@ class APP_LOADER {
     for (const locale in messages) {
       i18n.global.setLocaleMessage(locale, messages[locale as Locale])
     }
-    i18n.global.fallbackLocale = displaySettings.locale.fallback
-    // @ts-ignore
+    ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
+    //@ts-ignore
     document.title = i18n.global.t('headlines.title') + ' ' + i18n.global.t('headlines.emoji')
+  }
+
+  setLanguage(locale: Locale) {
+    ;(i18n.global.locale as unknown as Ref<Locale>).value = locale
+    vueform.i18n.locale = locale
+    formatter.setLocale(locale)
   }
 
   private withProgress<T>(promise: Promise<T>): Promise<T> {
