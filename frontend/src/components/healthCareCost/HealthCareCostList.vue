@@ -71,6 +71,9 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
+    <template #item-addUp="{ addUp }">
+      {{ $formatter.money(addUp.total) }}
+    </template>
   </ListElement>
 </template>
 
@@ -102,6 +105,7 @@ if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
     { text: t('labels.healthInsurance'), value: 'insurance.name' },
+    { text: t('labels.total'), value: 'addUp' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' }
   )
