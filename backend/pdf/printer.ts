@@ -421,23 +421,31 @@ class ReportPrint {
       fn: (m: Money) => this.drawer.formatter.detailedMoney(m, true)
     })
 
-    const addedUp = addUp(this.report)
     const summary = []
-    const hasAdvance = addedUp.advance.amount !== null && addedUp.advance.amount > 0
-    if (reportIsTravel(this.report)) {
-      summary.push({ reference: this.t('labels.lumpSums'), sum: addedUp.lumpSums })
-    }
-    if (reportIsTravel(this.report) || hasAdvance) {
-      summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
-    }
-    if (hasAdvance) {
-      addedUp.advance.amount = -1 * addedUp.advance.amount!
-      summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
-    }
-    summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
 
-    if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {
-      summary.push({ reference: this.t('labels.refundSum'), sum: this.report.refundSum })
+    if (reportIsTravel(this.report)) {
+      const addedUp = addUp(this.report)
+      summary.push({ reference: this.t('labels.lumpSums'), sum: addedUp.lumpSums })
+      summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
+      if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
+        addedUp.advance.amount = -1 * addedUp.advance.amount
+        summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
+      }
+      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
+    } else if (reportIsHealthCareCost(this.report)) {
+      const addedUp = addUp(this.report)
+      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
+      if (this.report.state === 'refunded') {
+        summary.push({ reference: this.t('labels.refundSum'), sum: this.report.refundSum })
+      }
+    } else {
+      const addedUp = addUp(this.report)
+      if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
+        addedUp.advance.amount = -1 * addedUp.advance.amount
+        summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
+        summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
+      }
+      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
     }
 
     const fontSize = options.fontSize + 2
