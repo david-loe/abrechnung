@@ -190,8 +190,8 @@ export async function checkForMigrations() {
       ])
     }
 
-    if (semver.lte(migrateFrom, '1.6.1')) {
-      logger.info('Apply migration from v1.6.1: add addUp to all reports')
+    if (semver.lte(migrateFrom, '1.6.2')) {
+      logger.info('Apply migration from v1.6.2: add addUp to all reports')
 
       async function calcAddUp(collection: string) {
         const allReports = mongoose.connection.collection(collection).find()
