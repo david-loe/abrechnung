@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import HealthCareCostList from './HealthCareCostList.vue'
 
@@ -33,7 +34,10 @@ export default defineComponent({
       showRefunded: false
     }
   },
-  methods: {}
+  methods: {},
+  async created() {
+    await APP_LOADER.loadData()
+  }
 })
 </script>
 

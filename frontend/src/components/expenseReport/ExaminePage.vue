@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { ExpenseReportSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -98,6 +99,9 @@ export default defineComponent({
         ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
       }
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>
