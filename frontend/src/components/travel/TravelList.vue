@@ -109,6 +109,14 @@
         {{ $formatter.money(addUp.total) }}
       </TooltipElement>
     </template>
+    <template #item-report="{ _id, name }">
+      <a class="btn btn-primary" :href="reportLink(_id)" :download="name + '.pdf'">
+        <i class="bi bi-download"></i>
+      </a>
+    </template>
+    <template #item-updatedAt="{ updatedAt }">
+      {{ $formatter.simpleDateTime(updatedAt) }}
+    </template>
   </ListElement>
 </template>
 
@@ -150,7 +158,9 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.project'), value: 'project.identifier' },
     { text: t('labels.total'), value: 'addUp' },
     { text: t('labels.owner'), value: 'owner' },
-    { text: t('labels.editor'), value: 'editor' }
+    { text: t('labels.editor'), value: 'editor' },
+    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
+    { text: t('labels.report'), value: 'report' }
   )
 }
 
@@ -167,6 +177,9 @@ const filter = ref(getEmptyFilter())
 
 if (props.stateFilter) {
   filter.value.state = props.stateFilter
+}
+const reportLink = (_id: string) => {
+  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpoint + '/report?_id=' + _id
 }
 
 const showFilter = ref({

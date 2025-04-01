@@ -74,6 +74,14 @@
     <template #item-addUp="{ addUp }">
       {{ $formatter.money(addUp.total) }}
     </template>
+    <template #item-report="{ _id, name }">
+      <a class="btn btn-primary" :href="reportLink(_id)" :download="name + '.pdf'">
+        <i class="bi bi-download"></i>
+      </a>
+    </template>
+    <template #item-updatedAt="{ updatedAt }">
+      {{ $formatter.simpleDateTime(updatedAt) }}
+    </template>
   </ListElement>
 </template>
 
@@ -96,6 +104,10 @@ const props = defineProps<{
   columnsToHide?: string[]
 }>()
 
+const reportLink = (_id: string) => {
+  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpoint + '/report?_id=' + _id
+}
+
 const headers: Header[] = [
   //@ts-ignore
   { text: t('labels.name'), value: 'name' },
@@ -107,7 +119,9 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.healthInsurance'), value: 'insurance.name' },
     { text: t('labels.total'), value: 'addUp' },
     { text: t('labels.owner'), value: 'owner' },
-    { text: t('labels.editor'), value: 'editor' }
+    { text: t('labels.editor'), value: 'editor' },
+    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
+    { text: t('labels.report'), value: 'report' }
   )
 }
 

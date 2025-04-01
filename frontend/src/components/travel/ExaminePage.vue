@@ -6,7 +6,7 @@
       ref="travelListRef"
       endpoint="examine/travel"
       stateFilter="underExamination"
-      :columns-to-hide="['state', 'editor']">
+      :columns-to-hide="['state', 'editor', 'updatedAt', 'report']">
     </TravelList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
       {{ $t('labels.showX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-down"></i>
@@ -16,7 +16,7 @@
         {{ $t('labels.hideX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <TravelList endpoint="examine/travel" stateFilter="refunded" :columns-to-hide="['state']"> </TravelList>
+      <TravelList endpoint="examine/travel" stateFilter="refunded" :columns-to-hide="['state', 'report']"> </TravelList>
     </template>
   </div>
 </template>
