@@ -73,7 +73,10 @@ export const userSchema = new Schema<User, UserModel, Methods>({
             ['access.examine/travel', true],
             ['access.examine/expenseReport', true],
             ['access.examine/healthCareCost', true],
-            ['access.confirm/healthCareCost', true]
+            ['access.confirm/healthCareCost', true],
+            ['access.refunded/travel', true],
+            ['access.refunded/expenseReport', true],
+            ['access.refunded/healthCareCost', true]
           ]
         ]
       }

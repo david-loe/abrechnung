@@ -337,4 +337,23 @@ export class ExpenseReportRefundedController extends Controller {
       sort: { updatedAt: -1 }
     })
   }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const expenseReport = await ExpenseReport.findOne(filter).lean()
+    if (expenseReport) {
+      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
+      this.setHeader('Content-disposition', `attachment; filename="${expenseReport.name}.pdf"`)
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
+    } else {
+      throw new NotFoundError(`No expense report found or unauthorized`)
+    }
+  }
 }
