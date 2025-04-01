@@ -92,7 +92,7 @@ export default defineElement({
     native: { type: Boolean, default: false }
   }),
   data() {
-    return { APP_DATA: null }
+    return { APP_DATA: APP_LOADER.data }
   },
   methods: {
     customFilterFunction(option, search) {
