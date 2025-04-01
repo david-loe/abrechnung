@@ -101,7 +101,13 @@
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
     <template #item-addUp="{ addUp }">
-      {{ $formatter.money(addUp.total) }}
+      <TooltipElement
+        html
+        :text="`${t('labels.lumpSums')}: ${$formatter.money(addUp.lumpSums)}<br>
+        ${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
+        ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
+        {{ $formatter.money(addUp.total) }}
+      </TooltipElement>
     </template>
   </ListElement>
 </template>
@@ -114,6 +120,7 @@ import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import { ref, useTemplateRef } from 'vue'

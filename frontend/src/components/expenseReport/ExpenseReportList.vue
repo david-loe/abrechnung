@@ -72,7 +72,12 @@
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
     <template #item-addUp="{ addUp }">
-      {{ $formatter.money(addUp.total) }}
+      <TooltipElement
+        html
+        :text="`${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
+        ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
+        {{ $formatter.money(addUp.total) }}
+      </TooltipElement>
     </template>
   </ListElement>
 </template>
@@ -82,6 +87,7 @@ import { ExpenseReportState, expenseReportStates } from '@/../../common/types'
 import ListElement from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import { ref, useTemplateRef } from 'vue'
