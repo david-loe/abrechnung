@@ -118,7 +118,7 @@ export default defineComponent({
           { withCredentials: true }
         )
         if (res.status === 204) {
-          await this.$root.load(true)
+          await APP_LOADER.loadData(true)
           this.$router.push(this.$route.query.redirect ? (this.$route.query.redirect as string) : '/')
         }
       } catch (error) {

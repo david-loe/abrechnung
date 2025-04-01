@@ -250,9 +250,6 @@ export default defineComponent({
       if (this.$refs.InstallBanner as typeof Installation) {
         ;(this.$refs.InstallBanner as typeof Installation).showBanner()
       }
-    },
-    async load(reload = false) {
-      await APP_LOADER.loadData(reload)
     }
   },
   mounted() {
@@ -261,8 +258,7 @@ export default defineComponent({
     if (!this.isOffline) {
       subscribeToPush()
     }
-  },
-  async created() {}
+  }
 })
 </script>
 
