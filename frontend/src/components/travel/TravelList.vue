@@ -100,7 +100,15 @@
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
-    <template #item-addUp="{ addUp }">
+    <template #item-addUp.total.amount="{ addUp }">
+      <TooltipElement
+        html
+        :text="`${t('labels.lumpSums')}: ${$formatter.money(addUp.lumpSums)}<br>
+        ${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}`">
+        {{ $formatter.money(addUp.total) }}
+      </TooltipElement>
+    </template>
+    <template #item-addUp.balance.amount="{ addUp }">
       <TooltipElement
         html
         :text="`${t('labels.lumpSums')}: ${$formatter.money(addUp.lumpSums)}<br>
@@ -156,7 +164,8 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.destinationPlace'), value: 'destinationPlace' },
     { text: t('labels.startDate'), value: 'startDate', sortable: true },
     { text: t('labels.project'), value: 'project.identifier' },
-    { text: t('labels.balance'), value: 'addUp' },
+    { text: t('labels.total'), value: 'addUp.total.amount' },
+    { text: t('labels.balance'), value: 'addUp.balance.amount' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },

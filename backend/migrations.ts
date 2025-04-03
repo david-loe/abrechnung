@@ -196,9 +196,7 @@ export async function checkForMigrations() {
       async function calcAddUp(collection: string) {
         const allReports = mongoose.connection.collection(collection).find()
         for await (const report of allReports) {
-          if (report.addUp === undefined) {
-            mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any) } })
-          }
+          mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any) } })
         }
       }
 

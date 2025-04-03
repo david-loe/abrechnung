@@ -71,8 +71,8 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
-    <template #item-addUp="{ addUp }">
-      {{ $formatter.money(addUp.balance) }}
+    <template #item-addUp.total.amount="{ addUp }">
+      {{ $formatter.money(addUp.total) }}
     </template>
     <template #item-report="{ _id, name }">
       <a class="btn btn-primary" :href="reportLink(_id)" :download="name + '.pdf'">
@@ -117,7 +117,7 @@ if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
     { text: t('labels.healthInsurance'), value: 'insurance.name' },
-    { text: t('labels.balance'), value: 'addUp' },
+    { text: t('labels.total'), value: 'addUp.total.amount' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },

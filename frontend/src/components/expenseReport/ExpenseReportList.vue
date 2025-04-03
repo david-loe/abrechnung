@@ -71,7 +71,10 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
-    <template #item-addUp="{ addUp }">
+    <template #item-addUp.total.amount="{ addUp }">
+      {{ $formatter.money(addUp.total) }}
+    </template>
+    <template #item-addUp.balance.amount="{ addUp }">
       <TooltipElement
         html
         :text="`${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
@@ -117,7 +120,8 @@ const headers: Header[] = [
 if (window.innerWidth > bp.md) {
   headers.push(
     { text: t('labels.project'), value: 'project.identifier' },
-    { text: t('labels.balance'), value: 'addUp' },
+    { text: t('labels.total'), value: 'addUp.total.amount' },
+    { text: t('labels.balance'), value: 'addUp.balance.amount' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },

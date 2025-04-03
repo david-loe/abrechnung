@@ -34,7 +34,7 @@
         class="mb-5"
         endpoint="examine/expenseReport"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.total.amount']">
       </ExpenseReportList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
@@ -44,7 +44,11 @@
           {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <ExpenseReportList key="refunded" endpoint="examine/expenseReport" stateFilter="refunded" :columns-to-hide="['state', 'report']">
+        <ExpenseReportList
+          key="refunded"
+          endpoint="examine/expenseReport"
+          stateFilter="refunded"
+          :columns-to-hide="['state', 'report', 'addUp.total.amount']">
         </ExpenseReportList>
       </template>
     </div>
