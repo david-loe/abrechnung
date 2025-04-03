@@ -220,7 +220,7 @@ export default defineComponent({
     }
   },
   async created() {
-    this.APP_DATA = await APP_LOADER.loadData()
+    await APP_LOADER.loadData()
     this.formTravel = this.input()
   },
   watch: {

@@ -5,7 +5,7 @@
       class="mb-5"
       endpoint="confirm/healthCareCost"
       stateFilter="underExaminationByInsurance"
-      :columns-to-hide="['state', 'editor', 'updatedAt', 'report']">
+      :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation']">
     </HealthCareCostList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
       {{ $t('labels.showX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
@@ -15,7 +15,7 @@
         {{ $t('labels.hideX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <HealthCareCostList endpoint="confirm/healthCareCost" stateFilter="refunded" :columns-to-hide="['state', 'report']">
+      <HealthCareCostList endpoint="confirm/healthCareCost" stateFilter="refunded" :columns-to-hide="['state', 'report', 'organisation']">
       </HealthCareCostList>
     </template>
   </div>

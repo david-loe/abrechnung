@@ -39,6 +39,30 @@
         </div>
       </div>
     </template>
+    <template #header-project.identifier="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('project')">
+          <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.project">
+          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
+        </div>
+      </div>
+    </template>
+    <template #header-organisation="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('project.organisation')">
+          <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter['project.organisation']">
+          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
+        </div>
+      </div>
+    </template>
     <template #header-owner="header">
       <div class="filter-column">
         {{ header.text }}
@@ -75,6 +99,9 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
+    <template #item-organisation="{ project }">
+      <span v-if="APP_LOADER.data.value">{{ getById(project.organisation, APP_LOADER.data.value.organisations)?.name }}</span>
+    </template>
     <template #item-addUp.total.amount="{ addUp }">
       {{ $formatter.money(addUp.total) }}
     </template>
@@ -91,13 +118,17 @@
 
 <script lang="ts" setup>
 import { HealthCareCostState, healthCareCostStates } from '@/../../common/types'
-import ListElement from '@/components/elements/ListElement.vue'
+import APP_LOADER from '@/appData'
+import ListElement, { Filter } from '@/components/elements/ListElement.vue'
+import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
+import { getById } from '../../../../common/scripts'
 import HealthInsuranceSelector from '../elements/HealthInsuranceSelector.vue'
 
 const { t } = useI18n()
@@ -122,6 +153,8 @@ if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
     { text: t('labels.healthInsurance'), value: 'insurance.name' },
+    { text: t('labels.project'), value: 'project.identifier' },
+    { text: t('labels.organisation'), value: 'organisation' },
     { text: t('labels.total'), value: 'addUp.total.amount' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
@@ -135,8 +168,9 @@ const getEmptyFilter = () =>
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
-    insurance: undefined
-  } as { [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } })
+    insurance: undefined,
+    project: { $in: [undefined] }
+  } as Filter)
 
 const filter = ref(getEmptyFilter())
 
@@ -148,12 +182,17 @@ const showFilter = ref({
   name: false,
   owner: false,
   state: false,
-  insurance: false
+  insurance: false,
+  project: false,
+  'project.organisation': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value) {
   if (showFilter.value[header]) {
     showFilter.value[header] = false
+    if (header === 'project.organisation') {
+      header = 'project'
+    }
     filter.value[header] = getEmptyFilter()[header]
   } else {
     showFilter.value[header] = true

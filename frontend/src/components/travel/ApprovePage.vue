@@ -41,7 +41,15 @@
         ref="travelListRef"
         endpoint="approve/travel"
         stateFilter="appliedFor"
-        :columns-to-hide="['state', 'editor', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report']"></TravelList>
+        :columns-to-hide="[
+          'state',
+          'editor',
+          'addUp.total.amount',
+          'addUp.balance.amount',
+          'updatedAt',
+          'report',
+          'organisation'
+        ]"></TravelList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -53,7 +61,7 @@
         <TravelList
           endpoint="approve/travel"
           stateFilter="approved"
-          :columns-to-hide="['state', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report']">
+          :columns-to-hide="['state', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report', 'organisation']">
         </TravelList>
       </template>
     </div>

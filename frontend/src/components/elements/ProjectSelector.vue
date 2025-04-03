@@ -1,16 +1,11 @@
 <template>
   <div :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'input-group' : ''">
-    <select
-      v-if="APP_DATA && APP_DATA.organisations.length > 1"
-      :class="'form-select col-' + orgSelectSplit"
-      id="healthCareCostFormProject"
-      v-model="org"
-      @update:model-value="changeOrganisation(org!)"
-      :disabled="disabled">
-      <option v-for="organisation of APP_DATA.organisations" :value="organisation" :key="organisation._id">
-        {{ organisation.name }}
-      </option>
-    </select>
+    <ProjectsOfOrganisationSelector
+      v-model="projects"
+      :class="'col-' + orgSelectSplit"
+      :updateUserOrg="updateUserOrg"
+      :disabled="disabled"
+      load-projects-on-init></ProjectsOfOrganisationSelector>
 
     <v-select
       v-if="projects"
@@ -35,21 +30,20 @@
 </template>
 
 <script lang="ts">
-import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import { PropType, defineComponent } from 'vue'
-import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
+import { Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ProjectSelector',
   data() {
     return {
       projects: [] as ProjectSimple[],
-      org: undefined as undefined | null | OrganisationSimple,
       APP_DATA: APP_LOADER.data
     }
   },
-  components: {},
+  components: { ProjectsOfOrganisationSelector },
   props: {
     modelValue: { type: Object as PropType<ProjectSimple> },
     required: { type: Boolean, default: false },
@@ -59,40 +53,6 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    changeOrganisation(newOrga: OrganisationSimple) {
-      this.getProjects(newOrga._id)
-      if (this.updateUserOrg) {
-        this.APP_DATA!.user.settings.organisation = newOrga
-        API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
-      }
-    },
-    getProjects(orgaId?: string) {
-      const projects: ProjectSimple[] = []
-      if (this.APP_DATA) {
-        for (const project of this.APP_DATA.user.projects.assigned) {
-          if (!orgaId || project.organisation === orgaId) {
-            projects.push(project)
-          }
-        }
-        if (this.APP_DATA.projects) {
-          for (const project of this.APP_DATA.projects) {
-            let alreadyIn = false
-            for (const userProject of this.APP_DATA.user.projects.assigned) {
-              if (project._id === userProject._id) {
-                alreadyIn = true
-                break
-              }
-            }
-            if (!alreadyIn) {
-              if (!orgaId || project.organisation === orgaId) {
-                projects.push(project)
-              }
-            }
-          }
-        }
-      }
-      this.projects = projects
-    },
     filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
       return options.filter((option) => {
         return (
@@ -103,11 +63,7 @@ export default defineComponent({
     }
   },
   async beforeMount() {
-    this.APP_DATA = await APP_LOADER.loadData()
-    if (this.updateUserOrg) {
-      this.org = this.APP_DATA.user.settings.organisation
-    }
-    this.getProjects(this.org?._id)
+    await APP_LOADER.loadData()
   }
 })
 </script>

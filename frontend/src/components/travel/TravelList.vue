@@ -47,7 +47,19 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.project">
-          <ProjectSelector v-model="filter.project as any"></ProjectSelector>
+          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
+        </div>
+      </div>
+    </template>
+    <template #header-organisation="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('project.organisation')">
+          <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter['project.organisation']">
+          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
         </div>
       </div>
     </template>
@@ -105,6 +117,9 @@
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
+    <template #item-organisation="{ project }">
+      <span v-if="APP_LOADER.data.value">{{ getById(project.organisation, APP_LOADER.data.value.organisations)?.name }}</span>
+    </template>
     <template #item-addUp.total.amount="{ addUp }">
       <TooltipElement
         html
@@ -135,11 +150,13 @@
 
 <script lang="ts" setup>
 import { TravelSimple, TravelState, travelStates } from '@/../../common/types'
+import APP_LOADER from '@/appData'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
-import ListElement from '@/components/elements/ListElement.vue'
+import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -147,6 +164,7 @@ import { bp } from '@/helper'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
+import { getById } from '../../../../common/scripts'
 
 const { t } = useI18n()
 
@@ -170,6 +188,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.destinationPlace'), value: 'destinationPlace' },
     { text: t('labels.startDate'), value: 'startDate', sortable: true },
     { text: t('labels.project'), value: 'project.identifier' },
+    { text: t('labels.organisation'), value: 'organisation' },
     { text: t('labels.total'), value: 'addUp.total.amount' },
     { text: t('labels.balance'), value: 'addUp.balance.amount' },
     { text: t('labels.owner'), value: 'owner' },
@@ -185,8 +204,8 @@ const getEmptyFilter = () =>
     owner: undefined,
     state: undefined,
     'destinationPlace.country': undefined,
-    project: undefined
-  } as { [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } })
+    project: { $in: [undefined] }
+  } as Filter)
 
 const filter = ref(getEmptyFilter())
 
@@ -202,12 +221,16 @@ const showFilter = ref({
   owner: false,
   state: false,
   'destinationPlace.country': false,
-  project: false
+  project: false,
+  'project.organisation': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value) {
   if (showFilter.value[header]) {
     showFilter.value[header] = false
+    if (header === 'project.organisation') {
+      header = 'project'
+    }
     filter.value[header] = getEmptyFilter()[header]
   } else {
     showFilter.value[header] = true
