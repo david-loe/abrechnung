@@ -52,7 +52,11 @@
       </div>
     </template>
     <template #item-name="{ name, _id }">
+      <span v-if="props.makeNameNoLink">
+        {{ name }}
+      </span>
       <router-link
+        v-else
         :to="'/' + endpoint + '/' + _id"
         class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
         {{ name }}
@@ -75,7 +79,7 @@
       {{ $formatter.money(addUp.total) }}
     </template>
     <template #item-report="{ _id, name }">
-      <a class="btn btn-primary" :href="reportLink(_id)" :download="name + '.pdf'">
+      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'">
         <i class="bi bi-download"></i>
       </a>
     </template>
@@ -102,6 +106,7 @@ const props = defineProps<{
   endpoint: string
   stateFilter?: HealthCareCostState
   columnsToHide?: string[]
+  makeNameNoLink?: boolean
 }>()
 
 const reportLink = (_id: string) => {

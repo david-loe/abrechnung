@@ -64,20 +64,25 @@
       </div>
     </template>
     <template #item-name="travel: TravelSimple">
-      <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
-        <a
-          class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
-          style="cursor: pointer"
-          @click="emits('clickedApplied', travel)">
-          {{ travel.name }}
-        </a>
-      </template>
+      <span v-if="props.makeNameNoLink">
+        {{ travel.name }}
+      </span>
       <template v-else>
-        <router-link
-          :to="'/' + endpoint + '/' + travel._id"
-          class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
-          {{ travel.name }}
-        </router-link>
+        <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
+          <a
+            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
+            style="cursor: pointer"
+            @click="emits('clickedApplied', travel)">
+            {{ travel.name }}
+          </a>
+        </template>
+        <template v-else>
+          <router-link
+            :to="'/' + endpoint + '/' + travel._id"
+            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+            {{ travel.name }}
+          </router-link>
+        </template>
       </template>
     </template>
     <template #item-startDate="{ startDate }">
@@ -118,7 +123,7 @@
       </TooltipElement>
     </template>
     <template #item-report="{ _id, name }">
-      <a class="btn btn-primary" :href="reportLink(_id)" :download="name + '.pdf'">
+      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'">
         <i class="bi bi-download"></i>
       </a>
     </template>
@@ -149,6 +154,7 @@ const props = defineProps<{
   endpoint: string
   stateFilter?: TravelState
   columnsToHide?: string[]
+  makeNameNoLink?: boolean
 }>()
 
 const emits = defineEmits<{ clickedApplied: [travel: TravelSimple] }>()
