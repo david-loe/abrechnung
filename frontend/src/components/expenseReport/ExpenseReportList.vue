@@ -85,7 +85,7 @@
       </a>
     </template>
     <template #item-updatedAt="{ updatedAt }">
-      {{ $formatter.simpleDateTime(updatedAt) }}
+      {{ $formatter.dateTime(updatedAt) }}
     </template>
   </ListElement>
 </template>
