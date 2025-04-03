@@ -40,6 +40,7 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
     advance: costObject(true, false, false, baseCurrency._id),
     addUp: {
       type: {
+        balance: costObject(false, false, true, null, 0, null),
         total: costObject(false, false, true, null, 0),
         expenses: costObject(false, false, true, null, 0),
         advance: costObject(false, false, true, null, 0)

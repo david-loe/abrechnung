@@ -408,7 +408,7 @@
                         </small>
                       </td>
                       <td class="text-end align-top">
-                        <small>{{ $formatter.money(addUp.lumpSums) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.lumpSums) }}</small>
                       </td>
                     </tr>
                     <tr>
@@ -416,7 +416,7 @@
                         <small>{{ $t('labels.expenses') }}</small>
                       </td>
                       <td class="text-end">
-                        <small>{{ $formatter.money(addUp.expenses) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.expenses) }}</small>
                       </td>
                     </tr>
                     <tr v-if="travel.advance.amount">
@@ -424,12 +424,12 @@
                         <small>{{ $t('labels.advance') }}</small>
                       </td>
                       <td class="text-end text-secondary">
-                        <small>{{ $formatter.money(addUp.advance, { func: (x) => 0 - x }) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
                       </td>
                     </tr>
                     <tr>
-                      <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ $formatter.money(addUp.total) }}</td>
+                      <th>{{ $t('labels.balance') }}</th>
+                      <td class="text-end">{{ $formatter.money(travel.addUp.balance) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -503,9 +503,8 @@ import APP_LOADER from '@/appData.js'
 import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
-import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  BaseCurrencyMoney,
   DocumentFile,
   Place,
   Record,
@@ -557,7 +556,6 @@ export default defineComponent({
       APP_DATA: APP_LOADER.data,
 
       error: undefined as any,
-      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
       tooltip: undefined as Tooltip | undefined
     }
   },
@@ -818,7 +816,6 @@ export default defineComponent({
     setTravel(travel: Travel) {
       const oldTravel = this.travel
       this.travel = travel
-      this.addUp = addUp(this.travel)
       if (oldTravel.days && this.travel.days) {
         for (const oldDay of oldTravel.days) {
           if ((oldDay as Day).showSettings) {

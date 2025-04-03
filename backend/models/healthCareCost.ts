@@ -37,6 +37,7 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
     refundSum: costObject(true, true, false, baseCurrency._id),
     addUp: {
       type: {
+        balance: costObject(false, false, true, null, 0, null),
         total: costObject(false, false, true, null, 0),
         expenses: costObject(false, false, true, null, 0)
       }

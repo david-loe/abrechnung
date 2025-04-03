@@ -76,7 +76,7 @@
         html
         :text="`${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
         ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
-        {{ $formatter.money(addUp.total) }}
+        {{ $formatter.money(addUp.balance) }}
       </TooltipElement>
     </template>
     <template #item-report="{ _id, name }">
@@ -117,7 +117,7 @@ const headers: Header[] = [
 if (window.innerWidth > bp.md) {
   headers.push(
     { text: t('labels.project'), value: 'project.identifier' },
-    { text: t('labels.total'), value: 'addUp' },
+    { text: t('labels.balance'), value: 'addUp' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },

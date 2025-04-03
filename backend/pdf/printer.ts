@@ -431,10 +431,10 @@ class ReportPrint {
         addedUp.advance.amount = -1 * addedUp.advance.amount
         summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
       }
-      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
+      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
     } else if (reportIsHealthCareCost(this.report)) {
       const addedUp = addUp(this.report)
-      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
+      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
       if (this.report.state === 'refunded') {
         summary.push({ reference: this.t('labels.refundSum'), sum: this.report.refundSum })
       }
@@ -445,7 +445,7 @@ class ReportPrint {
         summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
         summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
       }
-      summary.push({ reference: this.t('labels.total'), sum: addedUp.total })
+      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
     }
 
     const fontSize = options.fontSize + 2

@@ -80,6 +80,7 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     advance: costObject(true, false, false, baseCurrency._id),
     addUp: {
       type: {
+        balance: costObject(false, false, true, null, 0, null),
         total: costObject(false, false, true, null, 0),
         expenses: costObject(false, false, true, null, 0),
         advance: costObject(false, false, true, null, 0),

@@ -6,16 +6,17 @@ export function costObject(
   receipts = true,
   required = false,
   defaultCurrency: string | null = null,
-  defaultAmount: number | null = null
+  defaultAmount: number | null = null,
+  min: number | null = 0
 ) {
   const type: any = {
-    amount: { type: Number, min: 0, required: required, default: defaultAmount }
+    amount: { type: Number, min, required: required, default: defaultAmount }
   }
   if (exchangeRate) {
     type.exchangeRate = {
       date: { type: Date },
       rate: { type: Number, min: 0 },
-      amount: { type: Number, min: 0 }
+      amount: { type: Number, min }
     }
     type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }

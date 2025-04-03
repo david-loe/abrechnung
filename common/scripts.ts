@@ -201,10 +201,12 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   if ((report as Travel | ExpenseReport).advance) {
     advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
   }
-  let total = expenses + lumpSums - advance
+  let total = expenses + lumpSums
+  let balance = total - advance
 
   if (reportIsTravel(report)) {
     return {
+      balance: { amount: balance },
       total: { amount: total },
       advance: { amount: advance },
       expenses: { amount: expenses },
@@ -212,11 +214,13 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
     } as AddUpResult<T>
   } else if (reportIsHealthCareCost(report)) {
     return {
+      balance: { amount: balance },
       total: { amount: total },
       expenses: { amount: expenses }
     } as AddUpResult<T>
   } else {
     return {
+      balance: { amount: balance },
       total: { amount: total },
       advance: { amount: advance },
       expenses: { amount: expenses }

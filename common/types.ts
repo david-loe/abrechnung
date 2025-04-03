@@ -571,6 +571,7 @@ export function reportIsExpenseReport(report: any): report is any {
 
 export type AddUpResult<T> = T extends Travel
   ? {
+      balance: BaseCurrencyMoney
       total: BaseCurrencyMoney
       advance: BaseCurrencyMoney
       expenses: BaseCurrencyMoney
@@ -578,12 +579,14 @@ export type AddUpResult<T> = T extends Travel
     }
   : T extends ExpenseReport
   ? {
+      balance: BaseCurrencyMoney
       total: BaseCurrencyMoney
       advance: BaseCurrencyMoney
       expenses: BaseCurrencyMoney
     }
   : T extends HealthCareCost
   ? {
+      balance: BaseCurrencyMoney
       total: BaseCurrencyMoney
       expenses: BaseCurrencyMoney
     }

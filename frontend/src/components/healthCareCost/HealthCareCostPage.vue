@@ -158,8 +158,8 @@
                 <table class="table align-bottom">
                   <tbody>
                     <tr>
-                      <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ $formatter.money(addUp.total) }}</td>
+                      <th>{{ $t('labels.balance') }}</th>
+                      <td class="text-end">{{ $formatter.money(healthCareCost.addUp.balance) }}</td>
                     </tr>
                     <tr v-if="healthCareCost.state === 'refunded'">
                       <th>{{ $t('labels.refundSum') }}</th>
@@ -267,16 +267,8 @@
 import API from '@/api.js'
 import { logger } from '@/logger.js'
 import { defineComponent, PropType } from 'vue'
-import { addUp, getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import {
-  BaseCurrencyMoney,
-  DocumentFile,
-  Expense,
-  HealthCareCost,
-  healthCareCostStates,
-  Organisation,
-  UserSimple
-} from '../../../../common/types.js'
+import { getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '../../../../common/types.js'
 import CurrencySelector from '../elements/CurrencySelector.vue'
 import FileUpload from '../elements/FileUpload.vue'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -296,8 +288,7 @@ export default defineComponent({
       healthCareCostStates,
       mailToLink: '',
       msTeamsToLink: '',
-      organisations: [] as Organisation[],
-      addUp: {} as { total: BaseCurrencyMoney; expenses: BaseCurrencyMoney }
+      organisations: [] as Organisation[]
     }
   },
   components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload, ModalComponent },
@@ -376,7 +367,7 @@ export default defineComponent({
           owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
           bankDetails: orga?.bankDetails,
           organisationName: orga?.name,
-          amount: this.$formatter.money(this.addUp.total)
+          amount: this.$formatter.money(healthCareCost.addUp.total)
         })
       )
     },
@@ -440,7 +431,6 @@ export default defineComponent({
     },
     setHealthCareCost(healthCareCost: HealthCareCost) {
       this.healthCareCost = healthCareCost
-      this.addUp = addUp(this.healthCareCost)
       logger.info(this.$t('labels.healthCareCost') + ':')
       logger.info(this.healthCareCost)
     },
