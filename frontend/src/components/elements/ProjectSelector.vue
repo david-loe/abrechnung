@@ -15,7 +15,7 @@
     <v-select
       v-if="projects"
       :options="projects"
-      :modelValue="modelValue"
+      :modelValue="typeof modelValue === 'object' ? modelValue : null"
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
       :filter="filter"
@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
@@ -62,7 +63,7 @@ export default defineComponent({
       this.getProjects(newOrga._id)
       if (this.updateUserOrg) {
         this.APP_DATA!.user.settings.organisation = newOrga
-        this.$root.pushUserSettings(this.APP_DATA!.user.settings)
+        API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
       }
     },
     getProjects(orgaId?: string) {

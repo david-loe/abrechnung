@@ -23,7 +23,7 @@ import vueformConfig from './vueform.config.js'
 import './vueform.css'
 
 import Formatter from '../../common/formatter'
-import { CountrySimple, Currency, Locale, User } from '../../common/types.js'
+import { CountrySimple, Currency, Locale } from '../../common/types.js'
 import formatter from './formatter.js'
 import i18n from './i18n.js'
 
@@ -56,8 +56,6 @@ declare module 'vue' {
     $root: {
       setLastCountry(country: CountrySimple): void
       setLastCurrency(currency: Currency): void
-      load: (reload?: boolean) => Promise<void>
-      pushUserSettings: (settings: User['settings']) => Promise<void>
       isOffline: boolean
       alreadyInstalled: boolean
       mobile: boolean

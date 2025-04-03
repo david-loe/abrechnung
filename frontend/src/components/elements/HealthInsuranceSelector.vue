@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { HealthInsurance } from '../../../../common/types.js'
@@ -45,7 +46,7 @@ export default defineComponent({
     updateInsurance(insurance: HealthInsurance) {
       if (this.updateUserInsurance) {
         this.APP_DATA!.user.settings.insurance = insurance
-        this.$root.pushUserSettings(this.APP_DATA!.user.settings)
+        API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
       }
       this.$emit('update:modelValue', insurance)
     }

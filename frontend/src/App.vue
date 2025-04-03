@@ -37,11 +37,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <select
-                    class="form-select mx-auto"
-                    v-model="$i18n.locale"
-                    style="max-width: 68px"
-                    @change="pushUserSettings(APP_DATA.user.settings)">
+                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="updateLanguage()">
                     <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
                       {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
                     </option>
@@ -168,7 +164,7 @@
 import axios from 'axios'
 import { defineComponent } from 'vue'
 import { getFlagEmoji } from '../../common/scripts.js'
-import { accesses, CountrySimple, Currency, Locale, locales, User } from '../../common/types.js'
+import { accesses, CountrySimple, Currency, Locale, locales } from '../../common/types.js'
 import API from './api.js'
 import APP_LOADER from './appData.js'
 import ApiKeyForm from './components/elements/ApiKeyForm.vue'
@@ -208,29 +204,19 @@ export default defineComponent({
         logger.error(error.response.data)
       }
     },
-    async pushUserSettings(settings: User['settings']) {
+    async updateLanguage() {
       this.$vueform.i18n.locale = this.$i18n.locale as Locale
       this.$formatter.setLocale(this.$i18n.locale as Locale)
-      settings.language = this.$i18n.locale as Locale
-      try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
-          withCredentials: true
-        })
-      } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push('login')
-        } else {
-          logger.error(error.response.data)
-        }
-      }
+      this.APP_DATA!.user.settings.language = this.$i18n.locale as Locale
+      await API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
     },
     setLastCurrency(currency: Currency) {
       this.setLast(currency, this.APP_DATA!.user.settings.lastCurrencies)
-      this.pushUserSettings(this.APP_DATA!.user.settings)
+      API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
     },
     setLastCountry(country: CountrySimple) {
       this.setLast(country, this.APP_DATA!.user.settings.lastCountries)
-      this.pushUserSettings(this.APP_DATA!.user.settings)
+      API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
     },
     setLast<T>(item: T, list: T[], limit = 3) {
       const index = list.indexOf(item)
