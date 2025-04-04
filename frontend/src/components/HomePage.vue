@@ -70,7 +70,7 @@
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"
           @clicked-applied="(t) => showModal('view', t, 'travel')"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
@@ -79,14 +79,14 @@
           class="mb-4"
           ref="expenseReportList"
           endpoint="expenseReport"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation']"></ExpenseReportList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ $t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation']"></HealthCareCostList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments']"></HealthCareCostList>
       </template>
     </div>
   </div>

@@ -109,11 +109,20 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
+    <template #item-comments="{ comments }">
+      <span v-if="comments.length > 0">
+        <TooltipElement
+          html
+          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName[0]}</b>: ${comment.text}`).join('<br>')">
+          <i class="bi bi-chat-left-text"></i>
+        </TooltipElement>
+      </span>
+    </template>
   </ListElement>
 </template>
 
 <script lang="ts" setup>
-import { ExpenseReportState, expenseReportStates } from '@/../../common/types'
+import { Comment, ExpenseReportState, expenseReportStates } from '@/../../common/types'
 import APP_LOADER from '@/appData'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -149,7 +158,8 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.report'), value: 'report' }
+    { text: t('labels.report'), value: 'report' },
+    { text: '', value: 'comments', width: 25 }
   )
 }
 

@@ -16,6 +16,7 @@ import './vue3-easy-data-table.css'
 import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import './bootstrap.css'
 
 import Vueform from '@vueform/vueform'
 import '@vueform/vueform/dist/vueform.css'

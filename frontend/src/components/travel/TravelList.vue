@@ -145,11 +145,20 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
+    <template #item-comments="{ comments }">
+      <span v-if="comments.length > 0">
+        <TooltipElement
+          html
+          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName[0]}</b>: ${comment.text}`).join('<br>')">
+          <i class="bi bi-chat-left-text"></i>
+        </TooltipElement>
+      </span>
+    </template>
   </ListElement>
 </template>
 
 <script lang="ts" setup>
-import { TravelSimple, TravelState, travelStates } from '@/../../common/types'
+import { Comment, TravelSimple, TravelState, travelStates } from '@/../../common/types'
 import APP_LOADER from '@/appData'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
@@ -194,7 +203,8 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.report'), value: 'report' }
+    { text: t('labels.report'), value: 'report' },
+    { text: '', value: 'comments', width: 25 }
   )
 }
 
