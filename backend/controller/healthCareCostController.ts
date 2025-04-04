@@ -454,7 +454,7 @@ export class HealthCareCostRefundedController extends Controller {
   @Produces('application/pdf')
   public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
     }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
