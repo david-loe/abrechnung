@@ -467,7 +467,7 @@ export class HealthCareCostRefundedController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 }

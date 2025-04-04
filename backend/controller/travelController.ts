@@ -526,7 +526,7 @@ export class TravelExamineController extends Controller {
   }
 }
 
-@Tags('Expense Report')
+@Tags('Travel')
 @Route('refunded/travel')
 @Security('cookieAuth', ['refunded/travel'])
 @Security('httpBearer', ['refunded/travel'])
@@ -561,7 +561,7 @@ export class TravelRefundedController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
   }
 }

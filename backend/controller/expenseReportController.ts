@@ -148,7 +148,7 @@ export class ExpenseReportController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or not allowed`)
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -313,7 +313,7 @@ export class ExpenseReportExamineController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
   }
 }
@@ -353,7 +353,7 @@ export class ExpenseReportRefundedController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
   }
 }
