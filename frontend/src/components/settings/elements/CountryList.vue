@@ -76,7 +76,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCountry(form$.data)"
-        @close="_showForm = false"></Vueform>
+        @reset="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
       {{ $t('labels.addX', { X: $t('labels.country') }) }}
