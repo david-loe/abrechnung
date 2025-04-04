@@ -6,7 +6,7 @@ export const organisationSchema = new Schema<Organisation>({
   reportEmail: { type: String, validate: emailRegex },
   a1CertificateEmail: { type: String, validate: emailRegex },
   website: { type: String },
-  bankDetails: { type: String },
+  bankDetails: { type: String, multiline: true },
   companyNumber: { type: String, trim: true },
   logo: { type: Schema.Types.ObjectId, ref: 'DocumentFile' },
   subfolderPath: { type: String, trim: true, default: '' }

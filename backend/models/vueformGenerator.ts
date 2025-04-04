@@ -84,6 +84,8 @@ function mapSchemaTypeToVueformElement(
         items[value!] = translate('labels.' + value, language)
       }
       vueformElement['items'] = items
+    } else if (schemaType.multiline) {
+      vueformElement['type'] = 'textarea'
     } else {
       vueformElement['type'] = 'text'
       if (schemaType.validate === emailRegex) {
