@@ -6,6 +6,7 @@ import { addUp } from '../../common/scripts.js'
 import {
   _id,
   baseCurrency,
+  Comment,
   Cost,
   CountryCode,
   CountrySimple,
@@ -257,6 +258,11 @@ class ReportPrint {
       yStart: y - 16,
       fontSize: this.drawer.settings.fontSizes.S
     })
+    y = await this.drawComments({
+      xStart: this.drawer.settings.pagePadding,
+      yStart: y - 16,
+      fontSize: this.drawer.settings.fontSizes.S
+    })
 
     await this.drawer.attachReceipts(receiptMap)
 
@@ -500,8 +506,41 @@ class ReportPrint {
     return await this.drawer.drawTable(summary, columns, tabelOptions)
   }
 
+  async drawComments(options: Options) {
+    if (this.report.comments.length === 0) {
+      return options.yStart
+    }
+    const columns: Column[] = []
+    columns.push({
+      key: 'author',
+      width: 120,
+      alignment: pdf_lib.TextAlignment.Left,
+      title: 'author',
+      fn: (a: Comment['author']) => a.name.givenName + ' ' + a.name.familyName
+    })
+    columns.push({
+      key: 'text',
+      width: 300,
+      alignment: pdf_lib.TextAlignment.Left,
+      title: 'value'
+    })
+
+    const fontSize = options.fontSize + 2
+    this.drawer.drawText(this.t('labels.comments'), {
+      xStart: options.xStart,
+      yStart: options.yStart - fontSize,
+      fontSize: fontSize
+    })
+    options.yStart -= fontSize * 1.25
+
+    const tabelOptions: TableOptions = options
+    tabelOptions.firstRow = false
+
+    return await this.drawer.drawTable(this.report.comments, columns, tabelOptions)
+  }
+
   async drawStages(receiptMap: ReceiptMap, options: Options) {
-    if (!reportIsTravel(this.report) || this.report.stages.length == 0) {
+    if (!reportIsTravel(this.report) || this.report.stages.length === 0) {
       return options.yStart
     }
     const columns: Column[] = []
@@ -598,7 +637,7 @@ class ReportPrint {
   }
 
   async drawExpenses(receiptMap: ReceiptMap, options: Options) {
-    if (this.report.expenses.length == 0) {
+    if (this.report.expenses.length === 0) {
       return options.yStart
     }
     const columns: Column[] = []
@@ -658,7 +697,7 @@ class ReportPrint {
   }
 
   async drawDays(options: Options) {
-    if (!reportIsTravel(this.report) || this.report.days.length == 0) {
+    if (!reportIsTravel(this.report) || this.report.days.length === 0) {
       return options.yStart
     }
     const columns: Column[] = []
@@ -714,8 +753,8 @@ class ReportPrint {
       alignment: pdf_lib.TextAlignment.Right,
       title: this.t('lumpSums.overnight\n'),
       fn: (r: Refund[]) =>
-        r.filter((r) => r.type == 'overnight').length > 0
-          ? this.drawer.formatter.detailedMoney(r.filter((r) => r.type == 'overnight')[0].refund)
+        r.filter((r) => r.type === 'overnight').length > 0
+          ? this.drawer.formatter.detailedMoney(r.filter((r) => r.type === 'overnight')[0].refund)
           : ''
     })
 
@@ -990,7 +1029,7 @@ class PDFDrawer {
         console.error('No DocumentFile found for id: ' + receipt._id)
         continue
       }
-      if (receipt.type == 'application/pdf') {
+      if (receipt.type === 'application/pdf') {
         const insertPDF = await pdf_lib.PDFDocument.load(doc.buffer)
         const pages = await this.doc.copyPages(insertPDF, insertPDF.getPageIndices())
         for (const p of pages) {
@@ -1139,7 +1178,7 @@ class PDFDrawer {
   }
 
   async drawTable(data: any[], columns: Column[], options: TableOptions) {
-    if (data.length == 0) {
+    if (data.length === 0) {
       return options.yStart
     }
     const flagPseudoSuffixWidth =
@@ -1192,7 +1231,7 @@ class PDFDrawer {
         if (opts.firstRow) {
           cell = column.title
         }
-        if (cell == undefined) {
+        if (cell === undefined) {
           cell = EMPTY_CELL
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
