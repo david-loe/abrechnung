@@ -86,7 +86,7 @@
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments']"></HealthCareCostList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments', 'log.underExamination.date']"></HealthCareCostList>
       </template>
     </div>
   </div>

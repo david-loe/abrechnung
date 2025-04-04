@@ -340,7 +340,7 @@ export class ExpenseReportRefundedController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
     const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
     if (request.user!.projects.supervised.length > 0) {
       filter.project = { $in: request.user!.projects.supervised }

@@ -113,6 +113,11 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
+    <template #item-log.underExamination.date="{ log }">
+      <span v-if="(log as Log<HealthCareCostState>).underExamination">
+      {{ $formatter.dateTime((log as Log<HealthCareCostState>).underExamination!.date) }}
+      </span>
+    </template>
     <template #item-comments="{ comments }">
       <span v-if="comments.length > 0">
         <TooltipElement
@@ -126,12 +131,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Comment, HealthCareCostState, healthCareCostStates } from '@/../../common/types'
+import { Comment, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types'
 import APP_LOADER from '@/appData'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper'
 import { ref, useTemplateRef } from 'vue'
@@ -168,6 +174,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
+    { text: t('labels.examinedOn'), value: 'log.underExamination.date', sortable: true },
     { text: t('labels.report'), value: 'report' },
     { text: '', value: 'comments', width: 25 }
   )

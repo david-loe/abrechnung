@@ -6,11 +6,13 @@ import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.v
 import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
+import RefundedHealthCareCostPage from './components/healthCareCost/RefundedPage.vue'
 import HomePage from './components/HomePage.vue'
 import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
+import RefundedTravelPage from './components/travel/RefundedPage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import { logger } from './logger.js'
 
@@ -37,6 +39,11 @@ const routes = [
     component: ApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
+  {
+    path: '/refunded/travel',
+    component: RefundedTravelPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/travel',
@@ -99,6 +106,11 @@ const routes = [
       parentPages: [{ link: '/confirm/healthCareCost', title: 'accesses.confirm/healthCareCost' }],
       endpointPrefix: 'confirm/'
     })
+  },
+  {
+    path: '/refunded/healthCareCost',
+    component: RefundedHealthCareCostPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/healthCareCost',

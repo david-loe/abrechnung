@@ -11,7 +11,7 @@ import User from '../models/user.js'
 import { sendA1Notification, sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotAllowedError } from './error.js'
+import { AuthorizationError, NotFoundError } from './error.js'
 import { IdDocument, TravelApplication, TravelPost } from './types.js'
 
 @Tags('Travel')
@@ -234,7 +234,7 @@ export class TravelController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -521,7 +521,47 @@ export class TravelExamineController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotAllowedError(`No travel with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
+    }
+  }
+}
+
+@Tags('Expense Report')
+@Route('refunded/travel')
+@Security('cookieAuth', ['refunded/travel'])
+@Security('httpBearer', ['refunded/travel'])
+export class TravelRefundedController extends Controller {
+  @Get()
+  public async getRefunded(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
+    const filter: Condition<ITravel> = { historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    return await this.getter(Travel, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0, expenses: 0 },
+      allowedAdditionalFields: ['expenses'],
+      sort: { updatedAt: -1 }
+    })
+  }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
+    const filter: Condition<ITravel> = { _id, historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const travel = await Travel.findOne(filter).lean()
+    if (travel) {
+      const report = await reportPrinter.print(travel, request.user!.settings.language)
+      this.setHeader('Content-disposition', `attachment; filename="${travel.name}.pdf"`)
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
+    } else {
+      throw new NotFoundError(`No expense report found or unauthorized`)
     }
   }
 }

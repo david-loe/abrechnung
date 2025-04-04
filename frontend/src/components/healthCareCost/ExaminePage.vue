@@ -33,7 +33,7 @@
         class="mb-5"
         endpoint="examine/healthCareCost"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date']">
       </HealthCareCostList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
@@ -46,7 +46,7 @@
         <HealthCareCostList
           endpoint="examine/healthCareCost"
           stateFilter="underExaminationByInsurance"
-          :columns-to-hide="['state', 'report', 'organisation']">
+          :columns-to-hide="['state', 'report', 'organisation', 'log.underExamination.date']">
         </HealthCareCostList>
       </template>
     </div>
