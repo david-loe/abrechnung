@@ -1,5 +1,4 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
-import { addUp } from '../../common/scripts.js'
 import { ExpenseReport, HealthCareCost, Project, ProjectUsers, Travel, _id } from '../../common/types.js'
 import { costObject } from './helper.js'
 
@@ -13,8 +12,8 @@ export const projectSchema = new Schema<Project, ProjectModel, Methods>({
   identifier: { type: String, trim: true, required: true, unique: true, index: true },
   organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
   name: { type: String, trim: true },
-  budget: costObject(false, false, false),
-  balance: costObject(false, false, true, null, 0)
+  budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false)),
+  balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, null, 0))
 })
 
 projectSchema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
@@ -23,24 +22,18 @@ projectSchema.methods.updateBalance = async function (this: ProjectDoc): Promise
   const expenseReports = mongoose.connection.collection('expensereports').find({ project: this._id, state: 'refunded', historic: false })
   const healthCareCosts = mongoose.connection.collection('healthcarecosts').find({ project: this._id, state: 'refunded', historic: false })
   for await (const travel of travels) {
-    const addedUp = addUp(travel as Travel)
-    if (addedUp.expenses.amount) {
-      sum += addedUp.expenses.amount
-    }
-    if (addedUp.lumpSums.amount) {
-      sum += addedUp.lumpSums.amount
+    if ((travel as Travel).addUp.total.amount) {
+      sum += (travel as Travel).addUp.total.amount!
     }
   }
   for await (const expenseReport of expenseReports) {
-    const addedUp = addUp(expenseReport as ExpenseReport)
-    if (addedUp.expenses.amount) {
-      sum += addedUp.expenses.amount
+    if ((expenseReport as ExpenseReport).addUp.total.amount) {
+      sum += (expenseReport as ExpenseReport).addUp.total.amount!
     }
   }
   for await (const healthCareCost of healthCareCosts) {
-    const addedUp = addUp(healthCareCost as HealthCareCost)
-    if (addedUp.expenses.amount) {
-      sum += addedUp.expenses.amount
+    if ((healthCareCost as HealthCareCost).addUp.total.amount) {
+      sum += (healthCareCost as HealthCareCost).addUp.total.amount!
     }
   }
   this.balance = { amount: sum }

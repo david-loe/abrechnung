@@ -78,7 +78,7 @@ function getProjects(orgaId?: string) {
 function changeOrganisation(newOrga: OrganisationSimple) {
   getProjects(newOrga._id)
   if (props.updateUserOrg && APP_DATA.value) {
-    APP_DATA.value!.user.settings.organisation = newOrga
+    APP_DATA.value.user.settings.organisation = newOrga
     API.setter('user/settings', APP_DATA.value.user.settings, {}, false)
   }
 }

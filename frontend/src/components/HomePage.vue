@@ -8,7 +8,7 @@
         <template v-if="modalObjectType === 'travel'">
           <TravelApplication
             v-if="modalMode === 'view'"
-            :travel="modalObject as TravelSimple"
+            :travel="(modalObject as TravelSimple)"
             @cancel="hideModal()"
             @edit="showModal('edit', modalObject, 'travel')"
             @deleted="deleteTravel">
@@ -17,28 +17,28 @@
             v-else
             :mode="modalMode"
             @cancel="hideModal()"
-            :travel="modalObject as Partial<TravelSimple>"
+            :travel="(modalObject as Partial<TravelSimple>)"
             @add="applyForTravel"
             @edit="applyForTravel"
             ref="travelApplyForm"></TravelApplyForm>
         </template>
         <ExpenseReportForm
           v-else-if="modalObjectType === 'expenseReport'"
-          :mode="modalMode as 'add' | 'edit'"
-          :expenseReport="modalObject as Partial<ExpenseReportSimple>"
+          :mode="(modalMode as 'add' | 'edit')"
+          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
           @cancel="hideModal()"
           @add="addExpenseReport">
         </ExpenseReportForm>
         <HealthCareCostForm
           v-else
-          :mode="modalMode as 'add' | 'edit'"
-          :healthCareCost="modalObject as Partial<HealthCareCostSimple>"
+          :mode="(modalMode as 'add' | 'edit')"
+          :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
           @cancel="hideModal()"
           @add="addHealthCareCost">
         </HealthCareCostForm>
       </div>
     </ModalComponent>
-    <div v-if="APP_DATA?.settings._id" class="container">
+    <div v-if="APP_DATA" class="container">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('headlines.home') }}</h1>

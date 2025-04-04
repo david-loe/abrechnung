@@ -207,16 +207,22 @@ export default defineComponent({
     async updateLanguage() {
       this.$vueform.i18n.locale = this.$i18n.locale as Locale
       this.$formatter.setLocale(this.$i18n.locale as Locale)
-      this.APP_DATA!.user.settings.language = this.$i18n.locale as Locale
-      await API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
+      if (this.APP_DATA) {
+        this.APP_DATA.user.settings.language = this.$i18n.locale as Locale
+        await API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+      }
     },
     setLastCurrency(currency: Currency) {
-      this.setLast(currency, this.APP_DATA!.user.settings.lastCurrencies)
-      API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
+      if (this.APP_DATA) {
+        this.setLast(currency, this.APP_DATA.user.settings.lastCurrencies)
+        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+      }
     },
     setLastCountry(country: CountrySimple) {
-      this.setLast(country, this.APP_DATA!.user.settings.lastCountries)
-      API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
+      if (this.APP_DATA) {
+        this.setLast(country, this.APP_DATA.user.settings.lastCountries)
+        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+      }
     },
     setLast<T>(item: T, list: T[], limit = 3) {
       const index = list.indexOf(item)
