@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="APP_DATA">
     <EasyDataTable
       class="mb-3"
       :rows-items="[5, 15, 25]"
@@ -51,7 +51,7 @@
         </div>
       </template>
       <template #item-organisation="{ organisation }">
-        {{ getById(organisation, $root.organisations)?.name }}
+        {{ getById(organisation, APP_DATA.organisations)?.name }}
       </template>
       <template #item-buttons="project">
         <button type="button" class="btn btn-light" @click="showForm('edit', project)">
@@ -85,6 +85,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { getById } from '../../../../../common/scripts.js'
 import { Project, accesses } from '../../../../../common/types.js'
@@ -111,6 +112,7 @@ export default defineComponent({
         identifier: false
       } as Filter<boolean>,
       accesses,
+      APP_DATA: APP_LOADER.data,
       schema: {}
     }
   },
@@ -140,8 +142,8 @@ export default defineComponent({
         this.projects = result.data
       }
       const rootProjects = (await API.getter<Project[]>('project', {}, {}, false)).ok?.data
-      if (rootProjects) {
-        this.$root.projects = rootProjects
+      if (rootProjects && this.APP_DATA) {
+        this.APP_DATA.projects = rootProjects
       }
     },
     clickFilter(header: keyof Filter<string>) {
@@ -155,7 +157,7 @@ export default defineComponent({
     getById
   },
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
     this.getProjects()
     this.schema = Object.assign({}, (await API.getter<any>('admin/project/form')).ok?.data, {
       buttons: {

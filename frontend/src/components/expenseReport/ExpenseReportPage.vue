@@ -148,7 +148,7 @@
                           <small>{{ $t('labels.expenses') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ $formatter.money(addUp.expenses) }}</small>
+                          <small>{{ $formatter.money(expenseReport.addUp.expenses) }}</small>
                         </td>
                       </tr>
                       <tr>
@@ -156,14 +156,14 @@
                           <small>{{ $t('labels.advance') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ $formatter.money(addUp.advance, { func: (x) => 0 - x }) }}</small>
+                          <small>{{ $formatter.money(expenseReport.addUp.advance, { func: (x) => 0 - x }) }}</small>
                         </td>
                       </tr>
                     </template>
 
                     <tr>
-                      <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ $formatter.money(addUp.total) }}</td>
+                      <th>{{ $t('labels.balance') }}</th>
+                      <td class="text-end">{{ $formatter.money(expenseReport.addUp.balance) }}</td>
                     </tr>
                     <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
                       <td>
@@ -246,8 +246,8 @@ import API from '@/api.js'
 import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
-import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { BaseCurrencyMoney, Expense, ExpenseReport, UserSimple, baseCurrency, expenseReportStates } from '../../../../common/types.js'
+import { mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { Expense, ExpenseReport, UserSimple, baseCurrency, expenseReportStates } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
@@ -264,7 +264,6 @@ export default defineComponent({
       expenseReportStates,
       mailToLink: '',
       msTeamsToLink: '',
-      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney },
       baseCurrency,
       tooltip: undefined as Tooltip | undefined
     }
@@ -375,7 +374,6 @@ export default defineComponent({
     },
     setExpenseReport(expenseReport: ExpenseReport) {
       this.expenseReport = expenseReport
-      this.addUp = addUp(this.expenseReport)
       logger.info(this.$t('labels.expenseReport') + ':')
       logger.info(this.expenseReport)
     },
@@ -388,7 +386,6 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
     try {
       await this.getExpenseReport()
     } catch (e) {

@@ -148,7 +148,7 @@ export class ExpenseReportController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or not allowed`)
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -313,7 +313,47 @@ export class ExpenseReportExamineController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotFoundError(`No expense report found or unauthorized`)
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
+    }
+  }
+}
+
+@Tags('Expense Report')
+@Route('refunded/expenseReport')
+@Security('cookieAuth', ['refunded/expenseReport'])
+@Security('httpBearer', ['refunded/expenseReport'])
+export class ExpenseReportRefundedController extends Controller {
+  @Get()
+  public async getRefunded(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = { historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    return await this.getter(ExpenseReport, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0, expenses: 0 },
+      allowedAdditionalFields: ['expenses'],
+      sort: { updatedAt: -1 }
+    })
+  }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
+    const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.project = { $in: request.user!.projects.supervised }
+    }
+    const expenseReport = await ExpenseReport.findOne(filter).lean()
+    if (expenseReport) {
+      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
+      this.setHeader('Content-disposition', `attachment; filename="${expenseReport.name}.pdf"`)
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
+    } else {
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
   }
 }

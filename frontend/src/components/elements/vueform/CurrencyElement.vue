@@ -6,8 +6,8 @@
       <!-- @vueform/multiselect copmonent -->
       <Multiselect
         v-bind="fieldOptions"
-        v-if="$root.currencies.length > 0"
-        :options="$root.currencies"
+        v-if="APP_DATA"
+        :options="APP_DATA.currencies"
         valueProp="_id"
         searchable
         :searchFilter="customFilterFunction"
@@ -87,13 +87,14 @@
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]
-      ><slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot
-    ></template>
+    <template v-for="(component, slot) in elementSlots" #[slot]>
+      <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
+    </template>
   </component>
 </template>
 
 <script>
+import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
 import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
@@ -106,6 +107,9 @@ export default defineElement({
   props: Object.assign(SelectElement.props, {
     native: { type: Boolean, default: false }
   }),
+  data() {
+    return { APP_DATA: APP_LOADER.data }
+  },
   methods: {
     customFilterFunction(option, search) {
       const name = option.name[this.$i18n.locale].toLowerCase().indexOf(search.toLowerCase()) > -1
@@ -125,6 +129,9 @@ export default defineElement({
       ...element,
       defaultClasses
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

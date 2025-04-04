@@ -33,7 +33,7 @@
         class="mb-5"
         endpoint="examine/healthCareCost"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date']">
       </HealthCareCostList>
       <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
         {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
@@ -43,7 +43,10 @@
           {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <HealthCareCostList endpoint="examine/healthCareCost" stateFilter="underExaminationByInsurance" :columns-to-hide="['state']">
+        <HealthCareCostList
+          endpoint="examine/healthCareCost"
+          stateFilter="underExaminationByInsurance"
+          :columns-to-hide="['state', 'report', 'organisation', 'log.underExamination.date']">
         </HealthCareCostList>
       </template>
     </div>
@@ -52,6 +55,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { HealthCareCostSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -100,7 +104,7 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
   }
 })
 </script>

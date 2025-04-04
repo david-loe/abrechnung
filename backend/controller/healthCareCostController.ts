@@ -19,7 +19,7 @@ import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotAllowedError } from './error.js'
+import { AuthorizationError, NotFoundError } from './error.js'
 import { IdDocument, MoneyPlusPost } from './types.js'
 
 @Tags('Health Care Cost')
@@ -155,7 +155,7 @@ export class HealthCareCostController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -331,7 +331,7 @@ export class HealthCareCostExamineController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 
@@ -423,7 +423,51 @@ export class HealthCareCostConfirmController extends Controller {
       this.setHeader('Content-Length', report.length)
       return Readable.from([report])
     } else {
-      throw new NotAllowedError(`No health care cost with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
+    }
+  }
+}
+
+@Tags('Health Care Cost')
+@Route('refunded/healthCareCost')
+@Security('cookieAuth', ['refunded/healthCareCost'])
+@Security('httpBearer', ['refunded/healthCareCost'])
+export class HealthCareCostRefundedController extends Controller {
+  @Get()
+  public async getRefunded(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
+    const filter: Condition<IHealthCareCost> = {
+      $and: [{ historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+    }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
+    return await this.getter(HealthCareCost, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0, expenses: 0 },
+      allowedAdditionalFields: ['expenses'],
+      sort: { 'log.underExamination.date': -1 }
+    })
+  }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
+    const filter: Condition<IHealthCareCost> = {
+      $and: [{ historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+    }
+    if (request.user!.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+    }
+    const healthCareCost = await HealthCareCost.findOne(filter).lean()
+    if (healthCareCost) {
+      const report = await reportPrinter.print(healthCareCost, request.user!.settings.language)
+      this.setHeader('Content-disposition', `attachment; filename="${healthCareCost.name}.pdf"`)
+      this.setHeader('Content-Type', 'application/pdf')
+      this.setHeader('Content-Length', report.length)
+      return Readable.from([report])
+    } else {
+      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
   }
 }

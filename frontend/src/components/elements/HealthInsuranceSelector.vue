@@ -1,7 +1,7 @@
 <template>
   <v-select
-    v-if="$root.healthInsurances.length > 0"
-    :options="$root.healthInsurances"
+    v-if="APP_DATA"
+    :options="APP_DATA.healthInsurances"
     :modelValue="modelValue"
     :placeholder="placeholder"
     @update:modelValue="updateInsurance"
@@ -21,11 +21,16 @@
 </template>
 
 <script lang="ts">
+import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { HealthInsurance } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',
+  data() {
+    return { APP_DATA: APP_LOADER.data }
+  },
   props: {
     modelValue: { type: Object as PropType<HealthInsurance> },
     required: { type: Boolean, default: false },
@@ -40,18 +45,21 @@ export default defineComponent({
     },
     updateInsurance(insurance: HealthInsurance) {
       if (this.updateUserInsurance) {
-        this.$root.user.settings.insurance = insurance
-        this.$root.pushUserSettings(this.$root.user.settings)
+        this.APP_DATA!.user.settings.insurance = insurance
+        API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
       }
       this.$emit('update:modelValue', insurance)
     }
   },
   beforeMount() {
     if (this.updateUserInsurance) {
-      if (this.$root.user.settings.insurance) {
-        this.$emit('update:modelValue', this.$root.user.settings.insurance)
+      if (this.APP_DATA?.user.settings.insurance) {
+        this.$emit('update:modelValue', this.APP_DATA.user.settings.insurance)
       }
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

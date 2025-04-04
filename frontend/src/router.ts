@@ -2,14 +2,17 @@ import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
+import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
 import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
+import RefundedHealthCareCostPage from './components/healthCareCost/RefundedPage.vue'
 import HomePage from './components/HomePage.vue'
 import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
+import RefundedTravelPage from './components/travel/RefundedPage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import { logger } from './logger.js'
 
@@ -38,6 +41,11 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
+    path: '/refunded/travel',
+    component: RefundedTravelPage,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/examine/travel',
     component: ExamineTravelPage,
     meta: { requiresAuth: true }
@@ -57,6 +65,11 @@ const routes = [
     component: TravelPage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
+  },
+  {
+    path: '/refunded/expenseReport',
+    component: RefundedExpenseReportPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/expenseReport',
@@ -93,6 +106,11 @@ const routes = [
       parentPages: [{ link: '/confirm/healthCareCost', title: 'accesses.confirm/healthCareCost' }],
       endpointPrefix: 'confirm/'
     })
+  },
+  {
+    path: '/refunded/healthCareCost',
+    component: RefundedHealthCareCostPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examine/healthCareCost',
@@ -139,7 +157,7 @@ const router = createRouter({
   }
 })
 
-async function auth() {
+export async function auth() {
   var auth = false
   if (!navigator.onLine) {
     return true

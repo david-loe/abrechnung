@@ -55,12 +55,15 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { logger } from '@/logger.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
 import { resizeImage } from '../../../../common/scripts.js'
 import { DocumentFile, Token } from '../../../../common/types.js'
 import FileUploadFileElement from './FileUploadFileElement.vue'
+
+let APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'FileUpload',
@@ -85,8 +88,8 @@ export default defineComponent({
       token: undefined as Token | undefined,
       qr: undefined as string | undefined,
       fetchTokenInterval: undefined as NodeJS.Timeout | undefined,
-      secondsLeft: this.$root.settings.uploadTokenExpireAfterSeconds,
-      expireAfterSeconds: this.$root.settings.uploadTokenExpireAfterSeconds
+      secondsLeft: 1,
+      expireAfterSeconds: 1
     }
   },
   emits: ['update:modelValue'],
@@ -158,7 +161,7 @@ export default defineComponent({
       this.token = (await API.setter<Token>('user/token', {}, undefined, false)).ok
       if (this.token) {
         const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
-        url.searchParams.append('userId', this.$root.user._id)
+        url.searchParams.append('userId', APP_DATA.value!.user._id)
         url.searchParams.append('tokenId', this.token._id)
         if (this.ownerId) {
           url.searchParams.append('ownerId', this.ownerId)
@@ -199,6 +202,10 @@ export default defineComponent({
   },
   unmounted() {
     this.clear()
+  },
+  async created() {
+    await APP_LOADER.loadData()
+    this.secondsLeft = this.expireAfterSeconds = APP_DATA.value!.settings.uploadTokenExpireAfterSeconds
   }
 })
 </script>

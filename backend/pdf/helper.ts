@@ -24,7 +24,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
     path += 'expenseReport/'
   }
   formatter.setLocale(i18n.language as Locale)
-  const totalSum = formatter.money(addUp(report).total)
+  const totalSum = formatter.money(addUp(report).balance)
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   const filename = sanitizeFilename(
@@ -60,13 +60,13 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
       }
       const appName = i18n.t('headlines.title', { lng }) + ' ' + i18n.t('headlines.emoji', { lng })
       formatter.setLocale(lng)
-      const totalSum = formatter.money(addUp(report).total)
+      const totalSum = formatter.money(addUp(report).balance)
 
       const text =
         `${i18n.t('labels.project', { lng })}: ${report.project.identifier}\n` +
         `${i18n.t('labels.name', { lng })}: ${report.name}\n` +
         `${i18n.t('labels.owner', { lng })}: ${report.owner.name.givenName} ${report.owner.name.familyName}\n` +
-        `${i18n.t('labels.total', { lng })}: ${totalSum}\n`
+        `${i18n.t('labels.balance', { lng })}: ${totalSum}\n`
 
       return await mailClient.sendMail({
         from: '"' + appName + '" <' + mailClient.options.from + '>', // sender address

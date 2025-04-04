@@ -1,4 +1,5 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { addUp } from '../../common/scripts.js'
 import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
 import { costObject, logObject } from './helper.js'
@@ -37,6 +38,14 @@ const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Method
       }
     ],
     advance: costObject(true, false, false, baseCurrency._id),
+    addUp: {
+      type: {
+        balance: costObject(false, false, true, null, 0, null),
+        total: costObject(false, false, true, null, 0),
+        expenses: costObject(false, false, true, null, 0),
+        advance: costObject(false, false, true, null, 0)
+      }
+    },
     history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
     historic: { type: Boolean, required: true, default: false },
     expenses: [
@@ -132,7 +141,7 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
   await populate(this)
 
   await this.calculateExchangeRates()
-
+  this.addUp = addUp(this)
   next()
 })
 

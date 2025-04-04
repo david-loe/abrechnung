@@ -1,5 +1,5 @@
 <template>
-  <form class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form v-if="APP_DATA" class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
     <div v-if="askOwner" class="mb-2">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formTravel.owner" required></UserSelector>
@@ -63,7 +63,7 @@
         <DateInput
           id="startDateInput"
           v-model="formTravel.startDate"
-          :min="$root.settings.travelSettings.allowTravelApplicationForThePast ? undefined : minStartDate"
+          :min="APP_DATA.settings.travelSettings.allowTravelApplicationForThePast ? undefined : minStartDate"
           required />
       </div>
       <div class="col-auto">
@@ -72,7 +72,7 @@
       </div>
     </div>
 
-    <template v-if="$root.settings.travelSettings.allowSpouseRefund">
+    <template v-if="APP_DATA.settings.travelSettings.allowSpouseRefund">
       <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" />
         <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">
@@ -130,6 +130,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { datetimeToDateString, isValidDate } from '../../../../../common/scripts.js'
 import { baseCurrency, TravelSimple } from '../../../../../common/types.js'
@@ -163,6 +164,7 @@ export default defineComponent({
   },
   data() {
     return {
+      APP_DATA: APP_LOADER.data,
       formTravel: this.default(),
       loading: false
     }
@@ -211,13 +213,14 @@ export default defineComponent({
     getMaxDate() {
       const date = isValidDate(this.formTravel.startDate as string)
       if (date) {
-        return datetimeToDateString(date.valueOf() + this.$root.settings.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
+        return datetimeToDateString(date.valueOf() + this.APP_DATA!.settings.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       } else {
         return ''
       }
     }
   },
-  created() {
+  async created() {
+    await APP_LOADER.loadData()
     this.formTravel = this.input()
   },
   watch: {

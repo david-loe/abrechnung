@@ -1,8 +1,12 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <ModalComponent header="API Key" ref="modalComp" @close=";($refs.apiKeyForm as any).resetForm()">
-      <ApiKeyForm :user="user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm"></ApiKeyForm>
+    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @close=";($refs.apiKeyForm as any).resetForm()">
+      <ApiKeyForm
+        :user="APP_DATA.user"
+        endpoint="user/httpBearer"
+        @cancel=";($refs.modalComp as any).hideModal()"
+        ref="apiKeyForm"></ApiKeyForm>
     </ModalComponent>
     <header class="mb-3 border-bottom">
       <div class="container">
@@ -13,11 +17,11 @@
               <span class="fs-4 ms-2 d-none d-md-block">{{ $t('headlines.title') }}</span>
             </a>
           </div>
-          <template v-if="auth">
+          <template v-if="APP_DATA">
             <div v-for="access of accesses" :key="access">
-              <template v-if="access !== 'admin' && access.indexOf(':') === -1 && user.access[access]">
+              <template v-if="access !== 'admin' && access.indexOf(':') === -1 && APP_DATA.user.access[access]">
                 <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
-                  <i v-for="icon of $root.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
+                  <i v-for="icon of APP_DATA.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
                   <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
                 </router-link>
               </template>
@@ -29,15 +33,11 @@
                 href="#"
                 role="button">
                 <i class="fs-4 bi bi-person-circle"></i>
-                <span class="ms-1 d-none d-md-block">{{ user.name.givenName }}</span>
+                <span class="ms-1 d-none d-md-block">{{ APP_DATA.user.name.givenName }}</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <select
-                    class="form-select mx-auto"
-                    v-model="$i18n.locale"
-                    style="max-width: 68px"
-                    @change="pushUserSettings(user.settings)">
+                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="updateLanguage()">
                     <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
                       {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
                     </option>
@@ -52,7 +52,7 @@
                     <span class="ms-1">API Key</span>
                   </button>
                 </li>
-                <template v-if="user.access.admin">
+                <template v-if="APP_DATA?.user.access.admin">
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
@@ -144,12 +144,12 @@
 
           <span class="ps-2 text-muted">
             © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
-            <small v-if="settings.version"
+            <small v-if="APP_DATA?.settings.version"
               ><a
                 class="text-decoration-none link-body-emphasis"
                 target="_blank"
-                :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + settings.version"
-                >v{{ settings.version }}</a
+                :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + APP_DATA.settings.version"
+                >v{{ APP_DATA.settings.version }}</a
               ></small
             >
           </span>
@@ -157,142 +157,45 @@
       </div>
     </footer>
   </div>
-  <Installation ref="InstallBanner" v-if="$root.loadState === 'LOADED' && auth && !isOffline"></Installation>
+  <Installation ref="InstallBanner" v-if="loadState === 'LOADED' && APP_DATA?.user && !isOffline && !alreadyInstalled"></Installation>
 </template>
 
 <script lang="ts">
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { loadLocales } from '../../common/locales/load.js'
 import { getFlagEmoji } from '../../common/scripts.js'
-import {
-  accesses,
-  CountrySimple,
-  Currency,
-  DisplaySettings,
-  HealthInsurance,
-  Locale,
-  locales,
-  OrganisationSimple,
-  ProjectSimple,
-  Settings,
-  User
-} from '../../common/types.js'
+import { accesses, CountrySimple, Currency, Locale, locales } from '../../common/types.js'
 import API from './api.js'
+import APP_LOADER from './appData.js'
 import ApiKeyForm from './components/elements/ApiKeyForm.vue'
 import Installation from './components/elements/Installation.vue'
 import ModalComponent from './components/elements/ModalComponent.vue'
 import OfflineBanner from './components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from './helper.js'
-import i18n from './i18n.js'
 import { logger } from './logger.js'
 
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[]
-  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
-  prompt(): Promise<void>
-}
 export default defineComponent({
   data() {
     return {
       alerts: API.alerts,
-      auth: false,
-      user: {} as User,
-      currencies: [] as Currency[],
-      countries: [] as CountrySimple[],
-      settings: {} as Settings,
-      displaySettings: {} as DisplaySettings,
-      healthInsurances: [] as HealthInsurance[],
-      organisations: [] as OrganisationSimple[],
-      projects: [] as ProjectSimple[],
-      specialLumpSums: {} as { [key: string]: string[] },
-      users: [] as { name: User['name']; _id: string }[],
-      loadState: 'UNLOADED' as 'UNLOADED' | 'LOADING' | 'LOADED',
-      loadingPromise: null as Promise<void> | null,
+      APP_DATA: APP_LOADER.data,
+      loadState: APP_LOADER.state,
       locales,
       accesses,
-      isOffline: false as boolean,
-      alreadyInstalled: false as boolean,
-      mobile: false as boolean,
-      promptInstallEvent: undefined as BeforeInstallPromptEvent | undefined
+      isOffline: !navigator.onLine,
+      alreadyInstalled: window.matchMedia('(display-mode: standalone)').matches,
+      mobile: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
     }
   },
   components: { OfflineBanner, Installation, ModalComponent, ApiKeyForm },
   methods: {
-    async load(withoutAuth = false) {
-      if (this.loadState === 'UNLOADED') {
-        this.loadState = 'LOADING'
-        const displayPromise = Promise.allSettled([API.getter<DisplaySettings>('displaySettings')]).then((result) => {
-          this.displaySettings =
-            result[0].status === 'fulfilled'
-              ? result[0].value.ok
-                ? result[0].value.ok.data
-                : ({} as DisplaySettings)
-              : ({} as DisplaySettings)
-          const messages = loadLocales(this.displaySettings.locale.overwrite)
-          for (const locale in messages) {
-            i18n.global.setLocaleMessage(locale, messages[locale as Locale])
-          }
-          this.updateLocale(this.displaySettings.locale.default)
-          this.$i18n.fallbackLocale = this.displaySettings.locale.fallback
-          document.title = this.$t('headlines.title') + ' ' + this.$t('headlines.emoji')
-        })
-        if (withoutAuth) {
-          this.loadingPromise = displayPromise.then(() => {
-            this.loadState = 'LOADED'
-          })
-        } else {
-          this.loadingPromise = Promise.allSettled([
-            API.getter<User>('user'),
-            API.getter<Currency[]>('currency'),
-            API.getter<CountrySimple[]>('country'),
-            API.getter<Settings>('settings'),
-            API.getter<HealthInsurance[]>('healthInsurance'),
-            API.getter<OrganisationSimple[]>('organisation'),
-            API.getter<ProjectSimple[]>('project', {}, {}, false),
-            API.getter<{ [key: string]: string[] }>('specialLumpSums'),
-            API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false),
-            displayPromise
-          ]).then((result) => {
-            this.user = result[0].status === 'fulfilled' ? (result[0].value.ok ? result[0].value.ok.data : ({} as User)) : ({} as User)
-            this.currencies = result[1].status === 'fulfilled' ? (result[1].value.ok ? result[1].value.ok.data : []) : []
-            this.countries = result[2].status === 'fulfilled' ? (result[2].value.ok ? result[2].value.ok.data : []) : []
-            this.settings =
-              result[3].status === 'fulfilled' ? (result[3].value.ok ? result[3].value.ok.data : ({} as Settings)) : ({} as Settings)
-            this.healthInsurances = result[4].status === 'fulfilled' ? (result[4].value.ok ? result[4].value.ok.data : []) : []
-            this.organisations = result[5].status === 'fulfilled' ? (result[5].value.ok ? result[5].value.ok.data : []) : []
-            this.projects = result[6].status === 'fulfilled' ? (result[6].value.ok ? result[6].value.ok.data : []) : []
-            this.specialLumpSums = result[7].status === 'fulfilled' ? (result[7].value.ok ? result[7].value.ok.data : {}) : {}
-            this.users = result[8].status === 'fulfilled' ? (result[8].value.ok ? result[8].value.ok.data : []) : []
-
-            logger.info(this.$t('labels.user') + ':')
-            logger.info(this.user)
-            if (this.user._id) {
-              this.updateLocale(this.user.settings.language)
-              this.auth = true
-            }
-            this.isOffline = !navigator.onLine
-            this.mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-            this.alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
-            this.loadState = 'LOADED'
-          })
-        }
-        await this.loadingPromise
-        //subscribing to push notifications if network connection avaiable
-        if (!this.isOffline) {
-          await subscribeToPush()
-        }
-      } else if (this.loadState === 'LOADING') {
-        await this.loadingPromise
-      }
-    },
     async logout() {
       try {
         const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/auth/logout', {
           withCredentials: true
         })
         if (res.status === 204) {
-          this.auth = false
+          this.APP_DATA = null
           clearingDB()
           this.$router.push({ path: '/login' })
         }
@@ -301,35 +204,25 @@ export default defineComponent({
         logger.error(error.response.data)
       }
     },
-    async pushUserSettings(settings: User['settings']) {
-      this.updateLocale(this.$i18n.locale as Locale, false)
-      settings.language = this.$i18n.locale as Locale
-      try {
-        await axios.post(import.meta.env.VITE_BACKEND_URL + '/user/settings', settings, {
-          withCredentials: true
-        })
-      } catch (error: any) {
-        if (error.response.status === 401) {
-          this.$router.push('login')
-        } else {
-          logger.error(error.response.data)
-        }
+    async updateLanguage() {
+      this.$vueform.i18n.locale = this.$i18n.locale as Locale
+      this.$formatter.setLocale(this.$i18n.locale as Locale)
+      if (this.APP_DATA) {
+        this.APP_DATA.user.settings.language = this.$i18n.locale as Locale
+        await API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
       }
-    },
-    updateLocale(locale: Locale, updateI18n = true) {
-      if (updateI18n) {
-        this.$i18n.locale = locale
-      }
-      this.$vueform.i18n.locale = locale
-      this.$formatter.setLocale(locale)
     },
     setLastCurrency(currency: Currency) {
-      this.setLast(currency, this.user.settings.lastCurrencies)
-      this.pushUserSettings(this.user.settings)
+      if (this.APP_DATA) {
+        this.setLast(currency, this.APP_DATA.user.settings.lastCurrencies)
+        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+      }
     },
     setLastCountry(country: CountrySimple) {
-      this.setLast(country, this.user.settings.lastCountries)
-      this.pushUserSettings(this.user.settings)
+      if (this.APP_DATA) {
+        this.setLast(country, this.APP_DATA.user.settings.lastCountries)
+        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+      }
     },
     setLast<T>(item: T, list: T[], limit = 3) {
       const index = list.indexOf(item)
@@ -354,12 +247,9 @@ export default defineComponent({
   mounted() {
     window.addEventListener('online', this.updateConnectionStatus)
     window.addEventListener('offline', this.updateConnectionStatus)
-  },
-  created() {
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault()
-      this.promptInstallEvent = event as BeforeInstallPromptEvent
-    })
+    if (!this.isOffline) {
+      subscribeToPush()
+    }
   }
 })
 </script>

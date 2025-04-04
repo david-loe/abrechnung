@@ -1,4 +1,5 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { addUp } from '../../common/scripts.js'
 import {
   HealthCareCost,
   HealthCareCostComment,
@@ -34,6 +35,13 @@ const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Met
     },
     log: logObject(healthCareCostStates),
     refundSum: costObject(true, true, false, baseCurrency._id),
+    addUp: {
+      type: {
+        balance: costObject(false, false, true, null, 0, null),
+        total: costObject(false, false, true, null, 0),
+        expenses: costObject(false, false, true, null, 0)
+      }
+    },
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [
       {
@@ -143,7 +151,7 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
   await populate(this)
 
   await this.calculateExchangeRates()
-
+  this.addUp = addUp(this)
   next()
 })
 

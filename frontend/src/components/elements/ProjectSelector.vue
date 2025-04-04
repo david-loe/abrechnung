@@ -1,26 +1,21 @@
 <template>
-  <div :class="$root.organisations.length > 1 ? 'input-group' : ''">
-    <select
-      v-if="$root.organisations.length > 1"
-      :class="'form-select col-' + orgSelectSplit"
-      id="healthCareCostFormProject"
-      v-model="org"
-      @update:model-value="changeOrganisation(org!)"
-      :disabled="disabled">
-      <option v-for="organisation of $root.organisations" :value="organisation" :key="organisation._id">
-        {{ organisation.name }}
-      </option>
-    </select>
+  <div :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'input-group' : ''">
+    <ProjectsOfOrganisationSelector
+      v-model="projects"
+      :class="'col-' + orgSelectSplit"
+      :updateUserOrg="updateUserOrg"
+      :disabled="disabled"
+      load-projects-on-init></ProjectsOfOrganisationSelector>
 
     <v-select
       v-if="projects"
       :options="projects"
-      :modelValue="modelValue"
+      :modelValue="typeof modelValue === 'object' ? modelValue : null"
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
       :filter="filter"
       :disabled="disabled"
-      :class="$root.organisations.length > 1 ? 'col-' + (12 - orgSelectSplit) : ''">
+      :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'col-' + (12 - orgSelectSplit) : ''">
       <template #option="{ identifier, name }: Project">
         <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
@@ -35,18 +30,20 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
+import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import { PropType, defineComponent } from 'vue'
-import { OrganisationSimple, Project, ProjectSimple } from '../../../../common/types.js'
+import { Project, ProjectSimple } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'ProjectSelector',
   data() {
     return {
       projects: [] as ProjectSimple[],
-      org: undefined as undefined | null | OrganisationSimple
+      APP_DATA: APP_LOADER.data
     }
   },
-  components: {},
+  components: { ProjectsOfOrganisationSelector },
   props: {
     modelValue: { type: Object as PropType<ProjectSimple> },
     required: { type: Boolean, default: false },
@@ -56,38 +53,6 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    changeOrganisation(newOrga: OrganisationSimple) {
-      this.getProjects(newOrga._id)
-      if (this.updateUserOrg) {
-        this.$root.user.settings.organisation = newOrga
-        this.$root.pushUserSettings(this.$root.user.settings)
-      }
-    },
-    getProjects(orgaId?: string) {
-      const projects: ProjectSimple[] = []
-      for (const project of this.$root.user.projects.assigned) {
-        if (!orgaId || project.organisation === orgaId) {
-          projects.push(project)
-        }
-      }
-
-      for (const project of this.$root.projects) {
-        let alreadyIn = false
-        for (const userProject of this.$root.user.projects.assigned) {
-          if (project._id === userProject._id) {
-            alreadyIn = true
-            break
-          }
-        }
-        if (!alreadyIn) {
-          if (!orgaId || project.organisation === orgaId) {
-            projects.push(project)
-          }
-        }
-      }
-
-      this.projects = projects
-    },
     filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
       return options.filter((option) => {
         return (
@@ -97,11 +62,8 @@ export default defineComponent({
       })
     }
   },
-  beforeMount() {
-    if (this.updateUserOrg) {
-      this.org = this.$root.user.settings.organisation
-    }
-    this.getProjects(this.org?._id)
+  async beforeMount() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

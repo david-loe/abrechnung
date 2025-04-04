@@ -20,10 +20,12 @@
 <script lang="ts" setup>
 import { Base64 } from '@/../../common/scripts'
 import API from '@/api.js'
-import { ref, toRaw, watch } from 'vue'
+import { ref, watch } from 'vue'
 import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
 
-type Filter = { [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } }
+export type Filter = {
+  [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } | { $in: Array<any> | [undefined] | [null] }
+}
 const props = defineProps<{
   endpoint: string
   columnsToHide?: string[]
@@ -77,12 +79,22 @@ const loadFromServer = async () => {
   loading.value = false
 }
 const prepareFilter = (filter: Filter) => {
-  const filterCopy = structuredClone(toRaw(filter))
+  const filterCopy: Filter = JSON.parse(JSON.stringify(filter))
   for (const filterKey in filterCopy) {
     if (filterCopy[filterKey] === null || filterCopy[filterKey] === undefined) {
       delete filterCopy[filterKey]
-    } else if (typeof filterCopy[filterKey] === 'object' && !filterCopy[filterKey].$regex && filterCopy[filterKey].$options) {
-      delete filterCopy[filterKey]
+    } else if (typeof filterCopy[filterKey] === 'object') {
+      if (Object.keys(filterCopy[filterKey]).length === 0) {
+        delete filterCopy[filterKey]
+      } else if ('$options' in filterCopy[filterKey] && !filterCopy[filterKey].$regex) {
+        delete filterCopy[filterKey]
+      } else if (
+        '$in' in filterCopy[filterKey] &&
+        (filterCopy[filterKey].$in.length === 0 ||
+          (filterCopy[filterKey].$in.length === 1 && (filterCopy[filterKey].$in[0] === undefined || filterCopy[filterKey].$in[0] === null)))
+      ) {
+        delete filterCopy[filterKey]
+      }
     }
   }
   return filterCopy

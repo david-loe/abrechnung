@@ -178,13 +178,15 @@
             </div>
           </div>
         </div>
-        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
+        <div
+          v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1 && APP_DATA"
+          class="col-auto">
           <label class="form-check-label me-2" for="travelProfessionalShare">
             {{ $t('labels.professionalShare') + ':' }}
           </label>
           <span
             id="travelProfessionalShare"
-            :class="travel.professionalShare <= $root.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
+            :class="travel.professionalShare <= APP_DATA.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
           <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />
@@ -406,7 +408,7 @@
                         </small>
                       </td>
                       <td class="text-end align-top">
-                        <small>{{ $formatter.money(addUp.lumpSums) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.lumpSums) }}</small>
                       </td>
                     </tr>
                     <tr>
@@ -414,7 +416,7 @@
                         <small>{{ $t('labels.expenses') }}</small>
                       </td>
                       <td class="text-end">
-                        <small>{{ $formatter.money(addUp.expenses) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.expenses) }}</small>
                       </td>
                     </tr>
                     <tr v-if="travel.advance.amount">
@@ -422,12 +424,12 @@
                         <small>{{ $t('labels.advance') }}</small>
                       </td>
                       <td class="text-end text-secondary">
-                        <small>{{ $formatter.money(addUp.advance, { func: (x) => 0 - x }) }}</small>
+                        <small>{{ $formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
                       </td>
                     </tr>
                     <tr>
-                      <th>{{ $t('labels.total') }}</th>
-                      <td class="text-end">{{ $formatter.money(addUp.total) }}</td>
+                      <th>{{ $t('labels.balance') }}</th>
+                      <td class="text-end">{{ $formatter.money(travel.addUp.balance) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -497,12 +499,12 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { logger } from '@/logger.js'
 import { Tooltip } from 'bootstrap'
 import { PropType, defineComponent } from 'vue'
-import { addUp, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
+import { mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
 import {
-  BaseCurrencyMoney,
   DocumentFile,
   Place,
   Record,
@@ -524,6 +526,7 @@ import PlaceElement from '../elements/PlaceElement.vue'
 import ProgressCircle from '../elements/ProgressCircle.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
+
 import StageForm from './forms/StageForm.vue'
 import TravelApplyForm from './forms/TravelApplyForm.vue'
 
@@ -550,8 +553,9 @@ export default defineComponent({
       travelStates,
       mailToLink: '',
       msTeamsToLink: '',
+      APP_DATA: APP_LOADER.data,
+
       error: undefined as any,
-      addUp: {} as { total: BaseCurrencyMoney; advance: BaseCurrencyMoney; expenses: BaseCurrencyMoney; lumpSums: BaseCurrencyMoney },
       tooltip: undefined as Tooltip | undefined
     }
   },
@@ -738,8 +742,8 @@ export default defineComponent({
           }
         }
       )
-      if (result.ok) {
-        this.$root.user = result.ok
+      if (result.ok && this.APP_DATA) {
+        this.APP_DATA.user = result.ok
       }
     },
     getStageIcon(stage: Stage) {
@@ -812,7 +816,6 @@ export default defineComponent({
     setTravel(travel: Travel) {
       const oldTravel = this.travel
       this.travel = travel
-      this.addUp = addUp(this.travel)
       if (oldTravel.days && this.travel.days) {
         for (const oldDay of oldTravel.days) {
           if ((oldDay as Day).showSettings) {
@@ -864,7 +867,7 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
     try {
       await this.getTravel()
     } catch (e) {

@@ -1,7 +1,7 @@
 <template>
   <v-select
-    v-if="$root.users.length > 0"
-    :options="$root.users"
+    v-if="APP_DATA?.users"
+    :options="APP_DATA.users"
     :modelValue="modelValue"
     :placeholder="placeholder"
     @update:modelValue="(_id: string) => $emit('update:modelValue', _id)"
@@ -22,6 +22,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { User } from '../../../../common/types.js'
 
@@ -32,7 +33,7 @@ interface UserWithName {
 export default defineComponent({
   name: 'UserSelector',
   data() {
-    return {}
+    return { APP_DATA: APP_LOADER.data }
   },
   components: {},
   props: {
@@ -56,6 +57,9 @@ export default defineComponent({
         return (option.name.givenName + ' ' + option.name.familyName).toLowerCase().indexOf(search.toLowerCase()) > -1
       })
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

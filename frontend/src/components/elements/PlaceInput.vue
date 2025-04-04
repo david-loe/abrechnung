@@ -15,7 +15,7 @@
         :disabled="disabled"
         :required="required"></CountrySelector>
     </div>
-    <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && $root.specialLumpSums[modelValue.country._id]">
+    <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && APP_DATA?.specialLumpSums[modelValue.country._id]">
       <label class="form-label me-2">{{ $t('labels.city') }}</label>
       <InfoPoint :text="$t('info.special')" />
       <select
@@ -24,7 +24,7 @@
         :disabled="disabled">
         <option value=""></option>
         <option
-          v-for="special of $root.specialLumpSums[modelValue.country._id]"
+          v-for="special of APP_DATA.specialLumpSums[modelValue.country._id]"
           :value="special"
           :key="special"
           :selected="special == modelValue.special">
@@ -36,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
 import { Place } from '../../../../common/types.js'
 import CountrySelector from './CountrySelector.vue'
@@ -49,7 +50,7 @@ const defaultPlace = {
 export default defineComponent({
   name: 'PlaceInput',
   data() {
-    return {}
+    return { APP_DATA: APP_LOADER.data }
   },
   components: { CountrySelector, InfoPoint },
   props: {
@@ -65,11 +66,14 @@ export default defineComponent({
     },
     matchSpecials() {
       if (this.withSpecialLumpSumInput) {
-        if (this.modelValue.country && this.$root.specialLumpSums[this.modelValue.country._id]) {
-          if (this.modelValue.special && this.$root.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1) {
+        if (this.modelValue.country && this.APP_DATA?.specialLumpSums[this.modelValue.country._id]) {
+          if (
+            this.modelValue.special &&
+            this.APP_DATA.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1
+          ) {
             this.update({ special: undefined })
           }
-          for (const special of this.$root.specialLumpSums[this.modelValue.country._id]) {
+          for (const special of this.APP_DATA.specialLumpSums[this.modelValue.country._id]) {
             if (special === this.modelValue.place) {
               this.update({ special: special })
               break
@@ -88,6 +92,9 @@ export default defineComponent({
     'modelValue.place': function () {
       this.matchSpecials()
     }
+  },
+  async created() {
+    await APP_LOADER.loadData()
   }
 })
 </script>

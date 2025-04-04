@@ -1,4 +1,5 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { addUp } from '../../common/scripts.js'
 import { TravelCalculator } from '../../common/travel.js'
 import {
   CountryCode,
@@ -77,6 +78,15 @@ const travelSchema = new Schema<Travel, TravelModel, Methods>(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     advance: costObject(true, false, false, baseCurrency._id),
+    addUp: {
+      type: {
+        balance: costObject(false, false, true, null, 0, null),
+        total: costObject(false, false, true, null, 0),
+        expenses: costObject(false, false, true, null, 0),
+        advance: costObject(false, false, true, null, 0),
+        lumpSums: costObject(false, false, true, null, 0)
+      }
+    },
     claimSpouseRefund: { type: Boolean },
     fellowTravelersNames: { type: String },
     professionalShare: { type: Number, min: 0, max: 1 },
@@ -264,7 +274,7 @@ travelSchema.pre('validate', async function (this: TravelDoc, next) {
   }
 
   await this.calculateExchangeRates()
-
+  this.addUp = addUp(this)
   await populate(this)
 
   next()

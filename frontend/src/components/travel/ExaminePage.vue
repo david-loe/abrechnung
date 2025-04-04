@@ -6,7 +6,7 @@
       ref="travelListRef"
       endpoint="examine/travel"
       stateFilter="underExamination"
-      :columns-to-hide="['state', 'editor']">
+      :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.total.amount', 'organisation']">
     </TravelList>
     <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
       {{ $t('labels.showX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-down"></i>
@@ -16,12 +16,17 @@
         {{ $t('labels.hideX', { X: $t('labels.refundedTravels') }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <TravelList endpoint="examine/travel" stateFilter="refunded" :columns-to-hide="['state']"> </TravelList>
+      <TravelList
+        endpoint="examine/travel"
+        stateFilter="refunded"
+        :columns-to-hide="['state', 'report', 'addUp.total.amount', 'organisation']">
+      </TravelList>
     </template>
   </div>
 </template>
 
 <script lang="ts">
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import TravelList from './TravelList.vue'
 
@@ -36,7 +41,7 @@ export default defineComponent({
   },
   methods: {},
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
   }
 })
 </script>

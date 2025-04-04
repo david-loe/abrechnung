@@ -8,6 +8,7 @@ import Project, { projectSchema, projectUsersSchema } from '../models/project.js
 import Travel from '../models/travel.js'
 import User from '../models/user.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
+import { isUserAllowedToAccess } from './authentication.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
 
@@ -21,12 +22,17 @@ export class ProjectController extends Controller {
     const settings = await getSettings()
     if (
       settings.userCanSeeAllProjects ||
-      request.user?.access['approve/travel'] ||
-      request.user?.access['examine/travel'] ||
-      request.user?.access['examine/expenseReport'] ||
-      request.user?.access['examine/healthCareCost'] ||
-      request.user?.access['confirm/healthCareCost'] ||
-      request.user?.access['admin']
+      (await isUserAllowedToAccess(request.user!, [
+        'admin',
+        'approve/travel',
+        'examine/travel',
+        'examine/expenseReport',
+        'examine/healthCareCost',
+        'confirm/healthCareCost',
+        'refunded/expenseReport',
+        'refunded/travel',
+        'refunded/healthCareCost'
+      ]))
     ) {
       return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
     } else {

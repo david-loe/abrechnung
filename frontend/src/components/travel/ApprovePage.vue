@@ -41,7 +41,16 @@
         ref="travelListRef"
         endpoint="approve/travel"
         stateFilter="appliedFor"
-        :columns-to-hide="['state', 'editor']"></TravelList>
+        :columns-to-hide="[
+          'state',
+          'editor',
+          'addUp.total.amount',
+          'addUp.balance.amount',
+          'updatedAt',
+          'report',
+          'organisation',
+          'comments'
+        ]"></TravelList>
       <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
         {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -50,7 +59,11 @@
           {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
-        <TravelList endpoint="approve/travel" stateFilter="approved" :columns-to-hide="['state']"> </TravelList>
+        <TravelList
+          endpoint="approve/travel"
+          stateFilter="approved"
+          :columns-to-hide="['state', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report', 'organisation', 'comments']">
+        </TravelList>
       </template>
     </div>
   </div>
@@ -58,6 +71,7 @@
 
 <script lang="ts">
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 import { TravelSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
@@ -124,7 +138,7 @@ export default defineComponent({
     }
   },
   async created() {
-    await this.$root.load()
+    await APP_LOADER.loadData()
   },
   watch: {
     _id: function (value) {
