@@ -14,7 +14,7 @@
           v-if="modalObjectType === 'stage'"
           ref="stageForm"
           :mode="modalMode"
-          :stage="modalObject as Partial<Stage> | Gap | undefined"
+          :stage="(modalObject as Partial<Stage> | Gap | undefined)"
           :travelStartDate="travel.startDate"
           :travelEndDate="travel.endDate"
           :disabled="isReadOnly"
@@ -30,7 +30,7 @@
         <ExpenseForm
           v-else-if="modalObjectType === 'expense'"
           ref="expenseForm"
-          :expense="modalObject as Partial<TravelExpense> | undefined"
+          :expense="(modalObject as Partial<TravelExpense> | undefined)"
           :disabled="isReadOnly"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
@@ -44,9 +44,10 @@
           v-else-if="modalObjectType === 'travel'"
           :mode="modalMode"
           @cancel="hideModal"
-          :travel="modalObject as TravelSimple"
+          :travel="(modalObject as TravelSimple)"
           @edit="editTravelDetails"
-          ref="travelApplyForm"></TravelApplyForm>
+          ref="travelApplyForm"
+          :minStartDate="endpointPrefix === 'examine/' ? '' : undefined"></TravelApplyForm>
       </div>
     </ModalComponent>
     <div class="container" v-if="travel._id">
