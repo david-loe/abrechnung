@@ -363,6 +363,15 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
+							"refunded/travel": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -378,6 +387,9 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"refunded/travel",
+							"refunded/expenseReport",
+							"refunded/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -884,6 +896,15 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
+							"refunded/travel": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -899,6 +920,9 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"refunded/travel",
+							"refunded/expenseReport",
+							"refunded/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -1164,6 +1188,15 @@
 					"access": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/travel": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -1484,6 +1517,15 @@
 					"access": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/travel": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -2415,6 +2457,33 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AddUpResult_Travel_": {
+				"properties": {
+					"lumpSums": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"expenses": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"advance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"total": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"lumpSums",
+					"expenses",
+					"advance",
+					"total",
+					"balance"
+				],
+				"type": "object"
+			},
 			"HealthCareCostState": {
 				"type": "string",
 				"enum": [
@@ -2701,6 +2770,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_Travel_"
+					},
 					"isCrossBorder": {
 						"type": "boolean",
 						"nullable": true
@@ -2785,6 +2857,7 @@
 					"endDate",
 					"advance",
 					"progress",
+					"addUp",
 					"claimOvernightLumpSum",
 					"lastPlaceOfWork",
 					"professionalShare",
@@ -2913,6 +2986,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_Travel_"
+					},
 					"isCrossBorder": {
 						"type": "boolean",
 						"nullable": true
@@ -2997,6 +3073,7 @@
 					"endDate",
 					"advance",
 					"progress",
+					"addUp",
 					"claimOvernightLumpSum",
 					"lastPlaceOfWork",
 					"professionalShare",
@@ -3049,6 +3126,7 @@
 								"endDate",
 								"advance",
 								"progress",
+								"addUp",
 								"isCrossBorder",
 								"a1Certificate",
 								"claimSpouseRefund",
@@ -3629,6 +3707,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_Travel_"
+					},
 					"isCrossBorder": {
 						"type": "boolean",
 						"nullable": true
@@ -3674,7 +3755,8 @@
 					"startDate",
 					"endDate",
 					"advance",
-					"progress"
+					"progress",
+					"addUp"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -3777,6 +3859,29 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AddUpResult_ExpenseReport_": {
+				"properties": {
+					"expenses": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"advance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"total": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"expenses",
+					"advance",
+					"total",
+					"balance"
+				],
+				"type": "object"
+			},
 			"ExpenseReportSimple": {
 				"properties": {
 					"name": {
@@ -3831,6 +3936,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -3847,7 +3955,8 @@
 					"updatedAt",
 					"_id",
 					"advance",
-					"comments"
+					"comments",
+					"addUp"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4040,6 +4149,25 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AddUpResult_HealthCareCost_": {
+				"properties": {
+					"expenses": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"total": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"expenses",
+					"total",
+					"balance"
+				],
+				"type": "object"
+			},
 			"HealthCareCostSimple": {
 				"properties": {
 					"name": {
@@ -4100,6 +4228,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -4118,7 +4249,8 @@
 					"patientName",
 					"insurance",
 					"refundSum",
-					"comments"
+					"comments",
+					"addUp"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4238,7 +4370,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance-or-log_.NoPost_": {
+			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance-or-log-or-addUp_.NoPost_": {
 				"properties": {
 					"project": {
 						"anyOf": [
@@ -4580,6 +4712,15 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
+							"refunded/travel": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -4595,6 +4736,9 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"refunded/travel",
+							"refunded/expenseReport",
+							"refunded/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -4833,6 +4977,24 @@
 								},
 								"type": "array"
 							},
+							"refunded/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"admin": {
 								"items": {
 									"type": "string"
@@ -4851,6 +5013,9 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"refunded/travel",
+							"refunded/expenseReport",
+							"refunded/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -4889,6 +5054,24 @@
 					"accessIcons": {
 						"properties": {
 							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/travel": {
 								"items": {
 									"type": "string"
 								},
@@ -5179,6 +5362,15 @@
 					"defaultAccess": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"refunded/healthCareCost": {
+								"type": "boolean"
+							},
+							"refunded/expenseReport": {
+								"type": "boolean"
+							},
+							"refunded/travel": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -5961,6 +6153,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -5995,6 +6190,7 @@
 					"insurance",
 					"refundSum",
 					"comments",
+					"addUp",
 					"history",
 					"historic",
 					"expenses"
@@ -6088,6 +6284,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -6122,6 +6321,7 @@
 					"insurance",
 					"refundSum",
 					"comments",
+					"addUp",
 					"history",
 					"historic",
 					"expenses"
@@ -6165,6 +6365,7 @@
 								"state",
 								"log",
 								"comments",
+								"addUp",
 								"comment",
 								"history",
 								"historic",
@@ -6384,6 +6585,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -6416,6 +6620,7 @@
 					"_id",
 					"advance",
 					"comments",
+					"addUp",
 					"history",
 					"historic",
 					"expenses"
@@ -6503,6 +6708,9 @@
 						},
 						"type": "array"
 					},
+					"addUp": {
+						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					},
 					"comment": {
 						"type": "string",
 						"nullable": true
@@ -6535,6 +6743,7 @@
 					"_id",
 					"advance",
 					"comments",
+					"addUp",
 					"history",
 					"historic",
 					"expenses"
@@ -6576,6 +6785,7 @@
 								"log",
 								"advance",
 								"comments",
+								"addUp",
 								"comment",
 								"history",
 								"historic",
@@ -8153,6 +8363,42 @@
 					{
 						"cookieAuth": [
 							"user",
+							"refunded/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"refunded/expenseReport"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"refunded/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"refunded/travel"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"refunded/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"refunded/healthCareCost"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
 							"admin"
 						]
 					},
@@ -8877,6 +9123,7 @@
 									"endDate",
 									"advance",
 									"progress",
+									"addUp",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
@@ -9615,6 +9862,7 @@
 									"endDate",
 									"advance",
 									"progress",
+									"addUp",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
@@ -9904,6 +10152,7 @@
 									"endDate",
 									"advance",
 									"progress",
+									"addUp",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
@@ -10441,6 +10690,175 @@
 					{
 						"httpBearer": [
 							"examine/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/refunded/travel": {
+			"get": {
+				"operationId": "GetRefunded",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Travel-or-Travel-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"log",
+									"project",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"log",
+									"comments",
+									"comment",
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"advance",
+									"progress",
+									"addUp",
+									"isCrossBorder",
+									"a1Certificate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
+									"claimOvernightLumpSum",
+									"lastPlaceOfWork",
+									"professionalShare",
+									"history",
+									"historic",
+									"stages",
+									"expenses",
+									"days"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/refunded/travel/report": {
+			"get": {
+				"operationId": "GetRefundedReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/travel"
 						]
 					}
 				],
@@ -11757,6 +12175,7 @@
 									"state",
 									"log",
 									"comments",
+									"addUp",
 									"comment",
 									"history",
 									"historic",
@@ -12258,6 +12677,7 @@
 									"state",
 									"log",
 									"comments",
+									"addUp",
 									"comment",
 									"history",
 									"historic",
@@ -12825,6 +13245,7 @@
 									"state",
 									"log",
 									"comments",
+									"addUp",
 									"comment",
 									"history",
 									"historic",
@@ -13006,6 +13427,163 @@
 				]
 			}
 		},
+		"/refunded/healthCareCost": {
+			"get": {
+				"operationId": "GetRefunded",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost-or-HealthCareCost-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"log",
+									"project",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"patientName",
+									"insurance",
+									"refundSum",
+									"state",
+									"log",
+									"comments",
+									"addUp",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/refunded/healthCareCost/report": {
+			"get": {
+				"operationId": "GetRefundedReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
 		"/expenseReport": {
 			"get": {
 				"operationId": "GetOwn",
@@ -13089,6 +13667,7 @@
 									"log",
 									"advance",
 									"comments",
+									"addUp",
 									"comment",
 									"history",
 									"historic",
@@ -13585,6 +14164,7 @@
 									"log",
 									"advance",
 									"comments",
+									"addUp",
 									"comment",
 									"history",
 									"historic",
@@ -13946,6 +14526,161 @@
 					{
 						"httpBearer": [
 							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/refunded/expenseReport": {
+			"get": {
+				"operationId": "GetRefunded",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport-or-ExpenseReport-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"state",
+									"log",
+									"project",
+									"editor",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"state",
+									"log",
+									"advance",
+									"comments",
+									"addUp",
+									"comment",
+									"history",
+									"historic",
+									"expenses"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/refunded/expenseReport/report": {
+			"get": {
+				"operationId": "GetRefundedReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"refunded/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"refunded/expenseReport"
 						]
 					}
 				],
