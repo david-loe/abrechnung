@@ -53,7 +53,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postOrganisation(form$.data)"
-        @close="_showForm = false"></Vueform>
+        @reset="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.organisation') }) }}

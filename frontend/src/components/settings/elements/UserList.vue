@@ -104,7 +104,7 @@
         :endpoint="false"
         ref="form$"
         @submit="(form$: any) => postUser(form$.data)"
-        @close="_showForm = false"
+        @reset="_showForm = false"
         @mounted="addApiKeyListen"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
