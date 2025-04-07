@@ -4,7 +4,6 @@
       class="mb-3"
       :rows-items="[5, 15, 25]"
       :rows-per-page="5"
-      sort-by="name"
       :items="projects"
       :filter-options="[
         {
