@@ -193,11 +193,15 @@ export default defineComponent({
       }
     },
     clear() {
-      clearInterval(this.fetchTokenInterval)
+      if (this.fetchTokenInterval) {
+        clearInterval(this.fetchTokenInterval)
+      }
+      if (this.token) {
+        API.deleter('user/token', { _id: '' }, false, false)
+      }
       this.token = undefined
       this.qr = undefined
       this.secondsLeft = this.expireAfterSeconds
-      API.deleter('user/token', { _id: '' }, false, false)
     }
   },
   unmounted() {
