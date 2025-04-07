@@ -44,7 +44,7 @@
         rows="1"></textarea>
     </div>
 
-    <div class="mb-1">
+    <div class="mb-1 d-flex">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expense') }) : $t('labels.save') }}
@@ -59,6 +59,22 @@
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
+      <div class="ms-auto">
+        <button
+          type="button"
+          :class="'btn btn-light' + (showPrevButton ? '' : ' invisible')"
+          :title="$t('labels.previous')"
+          @click="$emit('prev')">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          :class="'btn btn-light ms-2' + (showNextButton ? '' : ' invisible')"
+          :title="$t('labels.next')"
+          @click="$emit('next')">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </form>
 </template>
@@ -74,7 +90,7 @@ import InfoPoint from '../../elements/InfoPoint.vue'
 export default defineComponent({
   name: 'ExpenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
-  emits: ['cancel', 'edit', 'add', 'deleted'],
+  emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev'],
   props: {
     expense: {
       type: Object as PropType<Partial<Expense>>
@@ -85,7 +101,9 @@ export default defineComponent({
     },
     disabled: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
-    ownerId: {type: String}
+    ownerId: { type: String },
+    showPrevButton: { type: Boolean, default: false },
+    showNextButton: { type: Boolean, default: false }
   },
   data() {
     return {

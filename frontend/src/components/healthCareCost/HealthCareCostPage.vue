@@ -12,10 +12,14 @@
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalExpense as Expense))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalExpense as Expense))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
-          @cancel="hideModal">
+          @cancel="hideModal"
+          @next="() => {const next = getNext(modalExpense as Expense); if(next){showModal('edit', next)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev(modalExpense as Expense); if(prev){showModal('edit', prev)}else{hideModal()}}">
         </ExpenseForm>
       </div>
     </ModalComponent>
@@ -440,6 +444,20 @@ export default defineComponent({
         return result.data.map((x) => x.email)
       }
       return []
+    },
+    getNext(expense: Expense) {
+      const index = this.healthCareCost.expenses.findIndex((e) => e._id === expense._id)
+      if (index === -1 || index + 1 === this.healthCareCost.expenses.length) {
+        return undefined
+      }
+      return this.healthCareCost.expenses[index + 1]
+    },
+    getPrev(expense: Expense) {
+      const index = this.healthCareCost.expenses.findIndex((e) => e._id === expense._id)
+      if (index === -1 || index === 0) {
+        return undefined
+      }
+      return this.healthCareCost.expenses[index - 1]
     }
   },
   async created() {
