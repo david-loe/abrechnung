@@ -3,6 +3,8 @@ import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder,
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
 import { _id, GETResponse, Meta, User } from '../../common/types.js'
+import Country from '../models/country.js'
+import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
 import { IdDocument } from './types.js'
 
@@ -252,7 +254,11 @@ export class Controller extends TsoaController {
     if (options.requestBody._id) {
       let oldObject = await model.findOne({ _id: options.requestBody._id })
       if (!oldObject) {
-        throw new NotFoundError(`No ${model.modelName} for _id: '${options.requestBody._id}' found.`)
+        if (options.allowNew && (model.modelName === Country.modelName || model.modelName === Currency.modelName)) {
+          oldObject = new model(options.requestBody)
+        } else {
+          throw new NotFoundError(`No ${model.modelName} for _id: '${options.requestBody._id}' found.`)
+        }
       }
       if (options.checkOldObject && !(await options.checkOldObject(oldObject))) {
         throw new NotAllowedError(`Not allowed to modify this ${model.modelName}`)

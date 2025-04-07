@@ -34,7 +34,7 @@ export class ProjectController extends Controller {
         'refunded/healthCareCost'
       ]))
     ) {
-      return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 } })
+      return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 }, sort: { identifier: 1 } })
     } else {
       throw new AuthorizationError()
     }
@@ -48,7 +48,7 @@ export class ProjectController extends Controller {
 export class ProjectAdminController extends Controller {
   @Get()
   public async getComplete(@Queries() query: GetterQuery<IProject>) {
-    return await this.getter(Project, { query })
+    return await this.getter(Project, { query, sort: { identifier: 1 } })
   }
   @Post()
   public async post(@Body() requestBody: SetterBody<ProjectWithUsers>) {

@@ -1,51 +1,34 @@
 <template>
   <div>
-    <EasyDataTable
-      class="mb-3"
-      :rows-items="[5, 15, 25]"
-      :rows-per-page="5"
-      sort-by="name"
-      :items="organisations"
-      :filter-options="[
-        {
-          field: 'name',
-          criteria: filter.name,
-          comparison: (value: Organisation['name'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
-        }
-      ]"
-      :headers="[
-        { text: $t('labels.name'), value: 'name' },
-        { text: $t('labels.reportEmail'), value: 'reportEmail' },
-        { text: $t('labels.website'), value: 'website' },
-        { value: 'buttons' }
-      ]">
+    <ListElement class="mb-3" ref="list" endpoint="admin/organisation" :filter="filter" :headers="headers">
       <template #header-name="header">
         <div class="filter-column">
           {{ header.text }}
           <span style="cursor: pointer" @click="clickFilter('name')">
-            <i v-if="_filter.name" class="bi bi-funnel-fill"></i>
+            <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="_filter.name">
-            <input type="text" class="form-control" v-model="filter.name" />
+          <div v-if="showFilter.name">
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
           </div>
         </div>
       </template>
+
       <template #item-buttons="organisation">
-        <button type="button" class="btn btn-light" @click="showForm(organisation)">
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(organisation)">
           <div class="d-none d-md-block">
             <i class="bi bi-pencil"></i>
           </div>
           <i class="bi bi-pencil d-block d-md-none"></i>
         </button>
-        <button type="button" class="btn btn-danger ms-2" @click="deleteOrganisation(organisation)">
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteOrganisation(organisation)">
           <div class="d-none d-md-block">
             <i class="bi bi-trash"></i>
           </div>
           <i class="bi bi-trash d-block d-md-none"></i>
         </button>
       </template>
-    </EasyDataTable>
+    </ListElement>
     <div v-if="_showForm" class="container" style="max-width: 650px">
       <Vueform
         :schema="schema"
@@ -61,97 +44,87 @@
   </div>
 </template>
 
-<script lang="ts">
-import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
-import { defineComponent } from 'vue'
-import { Organisation, accesses } from '../../../../../common/types.js'
+<script lang="ts" setup>
+import { Organisation } from '@/../../common/types'
+import API from '@/api'
+import APP_LOADER from '@/appData'
+import ListElement from '@/components/elements/ListElement.vue'
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 
-interface Filter<T> {
-  name: T
-  email: T
+const { t } = useI18n()
+await APP_LOADER.loadData()
+
+const headers: Header[] = [
+  { text: t('labels.name'), value: 'name' },
+  { text: t('labels.reportEmail'), value: 'reportEmail' },
+  { text: t('labels.website'), value: 'website' },
+  { text: '', value: 'buttons', width: 80 }
+]
+
+const APP_DATA = APP_LOADER.data
+
+const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
+
+const filter = ref(getEmptyFilter())
+
+const showFilter = ref({
+  name: false
+})
+
+function clickFilter(header: keyof typeof showFilter.value) {
+  if (showFilter.value[header]) {
+    showFilter.value[header] = false
+    filter.value[header] = getEmptyFilter()[header]
+  } else {
+    showFilter.value[header] = true
+  }
 }
 
-let APP_DATA = APP_LOADER.data
-
-export default defineComponent({
-  name: 'OrganisationList',
-  components: {},
-  data() {
-    return {
-      organisations: [] as Organisation[],
-      organisationToEdit: undefined as Organisation | undefined,
-      _showForm: false,
-      filter: {
-        name: '',
-        email: ''
-      } as Filter<string>,
-      _filter: {
-        name: false,
-        email: false
-      } as Filter<boolean>,
-      accesses,
-      schema: {}
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
+    if (rootOrganisations && APP_DATA.value) {
+      APP_DATA.value.organisations = rootOrganisations
     }
-  },
-  methods: {
-    showForm(organisation?: Organisation) {
-      this.organisationToEdit = organisation
-      this._showForm = true
-    },
-    async postOrganisation(organisation: Organisation) {
-      let headers = {}
-      if (organisation.logo && organisation.logo.data) {
-        headers = {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-      const result = await API.setter<Organisation>('admin/organisation', organisation, { headers })
-      if (result.ok) {
-        this.getOrganisations()
-        this._showForm = false
-      }
-      this.organisationToEdit = undefined
-    },
-    async deleteOrganisation(organisation: Organisation) {
-      const result = await API.deleter('admin/organisation', { _id: organisation._id })
-      if (result) {
-        this.getOrganisations()
-      }
-    },
-    async getOrganisations() {
-      const result = (await API.getter<Organisation[]>('admin/organisation')).ok
-      if (result) {
-        this.organisations = result.data
-      }
-      const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
-      if (rootOrganisations && APP_DATA.value) {
-        APP_DATA.value.organisations = rootOrganisations
-      }
-    },
-    clickFilter(header: keyof Filter<string>) {
-      if (this._filter[header]) {
-        this._filter[header] = false
-        this.filter[header] = ''
-      } else {
-        this._filter[header] = true
-      }
-    }
-  },
-  async created() {
-    await APP_LOADER.loadData()
-    this.getOrganisations()
-    this.schema = Object.assign({}, (await API.getter<any>('admin/organisation/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-        }
-      },
-      _id: { type: 'hidden', meta: true }
-    })
   }
+}
+defineExpose({ loadFromServer })
+
+let organisationToEdit: Ref<Organisation | undefined> = ref(undefined)
+let _showForm = ref(false)
+
+function showForm(organisation?: Organisation) {
+  organisationToEdit.value = organisation
+  _showForm.value = true
+}
+async function postOrganisation(organisation: Organisation) {
+  const result = await API.setter<Organisation>('admin/organisation', organisation)
+  if (result.ok) {
+    _showForm.value = false
+    loadFromServer()
+  }
+  organisationToEdit.value = undefined
+}
+async function deleteOrganisation(organisation: Organisation) {
+  const result = await API.deleter('admin/organisation', { _id: organisation._id })
+  if (result) {
+    loadFromServer()
+  }
+}
+
+const schema = Object.assign({}, (await API.getter<any>('admin/organisation/form')).ok?.data, {
+  buttons: {
+    type: 'group',
+    schema: {
+      submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
+      reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
+    }
+  },
+  _id: { type: 'hidden', meta: true }
 })
 </script>
 

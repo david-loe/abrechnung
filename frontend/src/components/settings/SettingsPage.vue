@@ -21,7 +21,12 @@
         <ConnectionSettingsForm v-if="entry === 'connectionSettings'" />
         <DisplaySettingsForm v-if="entry === 'displaySettings'" />
         <template v-else-if="entry === 'users'">
-          <UserList class="mb-5" ref="userList" />
+          <Suspense>
+            <template #default>
+              <UserList class="mb-5" ref="userList" />
+            </template>
+            <template #fallback> Loading.. </template>
+          </Suspense>
 
           <h2>{{ $t('labels.csvImport') }}</h2>
           <CSVImport
@@ -49,25 +54,50 @@
               'projects.assigned',
               'settings.organisation'
             ]"
-            @imported=";($refs.userList as any).getUsers()" />
+            @imported=";($refs.userList as any).loadFromServer()" />
           <h2>{{ $t('labels.mergeUsers') }}</h2>
           <UserMerge />
         </template>
         <template v-else-if="entry === 'projects'">
-          <ProjectList class="mb-5" ref="projectList" />
+          <Suspense>
+            <template #default>
+              <ProjectList class="mb-5" ref="projectList" />
+            </template>
+            <template #fallback> Loading.. </template>
+          </Suspense>
+
           <h2>{{ $t('labels.csvImport') }}</h2>
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
             :transformers="[{ path: 'organisation', key: 'name', array: APP_DATA.organisations }]"
             :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
-            @imported=";($refs.projectList as any).getProjects()" />
+            @imported=";($refs.projectList as any).loadFromServer()" />
         </template>
-
-        <OrganisationList v-else-if="entry === 'organisations'" />
-        <CountryList v-else-if="entry === 'countries'" />
-        <CurrencyList v-else-if="entry === 'currencies'" />
-        <HealthInsuranceList v-else-if="entry === 'healthInsurances'" />
+        <Suspense v-else-if="entry === 'organisations'">
+          <template #default>
+            <OrganisationList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
+        <Suspense v-else-if="entry === 'countries'">
+          <template #default>
+            <CountryList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
+        <Suspense v-else-if="entry === 'currencies'">
+          <template #default>
+            <CurrencyList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
+        <Suspense v-else-if="entry === 'healthInsurances'">
+          <template #default>
+            <HealthInsuranceList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
       </div>
     </div>
   </div>
