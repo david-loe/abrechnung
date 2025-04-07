@@ -1,52 +1,34 @@
 <template>
   <div>
-    <EasyDataTable
+    <ListElement
       class="mb-3"
-      :rows-items="[5, 15, 25]"
-      :rows-per-page="5"
-      sort-by="name"
-      :items="countries"
-      :filter-options="[
-        {
-          field: 'name',
-          criteria: filter.name,
-          comparison: (value: Country['name'], criteria: string): boolean =>
-            value[$i18n.locale as Locale].toLowerCase().indexOf(criteria.toLowerCase()) !== -1
-        },
-        {
-          field: '_id',
-          criteria: filter._id,
-          comparison: (value: Country['_id'], criteria: string): boolean => value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
-        }
-      ]"
-      :headers="[
-        { text: $t('labels.name'), value: 'name' },
-        { text: $t('labels.code'), value: '_id' },
-        { text: $t('labels.flag'), value: 'flag' },
-        { text: $t('labels.currency'), value: 'currency' },
-        { value: 'buttons' }
-      ]">
+      ref="list"
+      endpoint="country"
+      :filter="filter"
+      :headers="headers"
+      :params="{ additionalFields: ['lumpSums', 'lumpSumsFrom'] }">
       <template #header-name="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('name')">
-            <i v-if="_filter.name" class="bi bi-funnel-fill"></i>
+          <span style="cursor: pointer" @click="clickFilter(nameFilterKey)">
+            <i v-if="showFilter[nameFilterKey]" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="_filter.name">
-            <input type="text" class="form-control" v-model="filter.name" />
+          <div v-if="showFilter[nameFilterKey]">
+            <input type="text" class="form-control" v-model="(filter[nameFilterKey] as any).$regex" />
           </div>
         </div>
       </template>
+
       <template #header-_id="header">
         <div class="filter-column">
           {{ header.text }}
           <span style="cursor: pointer" @click="clickFilter('_id')">
-            <i v-if="_filter._id" class="bi bi-funnel-fill"></i>
+            <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="_filter._id">
-            <input type="text" class="form-control" v-model="filter._id" />
+          <div v-if="showFilter._id">
+            <input type="text" class="form-control" v-model="(filter._id as any).$regex" style="max-width: 80px" />
           </div>
         </div>
       </template>
@@ -55,20 +37,20 @@
       </template>
 
       <template #item-buttons="country">
-        <button type="button" class="btn btn-light" @click="showForm('edit', country)">
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(country)">
           <div class="d-none d-md-block">
             <i class="bi bi-pencil"></i>
           </div>
           <i class="bi bi-pencil d-block d-md-none"></i>
         </button>
-        <button type="button" class="btn btn-danger ms-2" @click="deleteCountry(country)">
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCountry(country)">
           <div class="d-none d-md-block">
             <i class="bi bi-trash"></i>
           </div>
           <i class="bi bi-trash d-block d-md-none"></i>
         </button>
       </template>
-    </EasyDataTable>
+    </ListElement>
     <div v-if="_showForm" class="container" style="max-width: 650px">
       <Vueform
         :schema="schema"
@@ -78,99 +60,100 @@
         @submit="(form$: any) => postCountry(form$.data)"
         @reset="_showForm = false"></Vueform>
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.country') }) }}
     </button>
   </div>
 </template>
 
-<script lang="ts">
-import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
-import { defineComponent } from 'vue'
-import { getById } from '../../../../../common/scripts.js'
-import { Country, Locale, accesses } from '../../../../../common/types.js'
+<script lang="ts" setup>
+import { Country } from '@/../../common/types'
+import API from '@/api'
+import APP_LOADER from '@/appData'
+import ListElement, { Filter } from '@/components/elements/ListElement.vue'
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 
-interface Filter<T> {
-  name: T
-  _id: T
+const { t } = useI18n()
+await APP_LOADER.loadData()
+
+const headers: Header[] = [
+  { text: t('labels.name'), value: 'name' },
+  { text: t('labels.code'), value: '_id' },
+  { text: t('labels.flag'), value: 'flag' },
+  { text: t('labels.currency'), value: 'currency' },
+  { text: '', value: 'buttons', width: 80 }
+]
+
+const APP_DATA = APP_LOADER.data
+
+const nameFilterKey = 'name.' + APP_DATA.value!.user.settings.language
+
+const getEmptyFilter = () => {
+  const emptyFilter: Filter = { _id: { $regex: undefined, $options: 'i' } }
+  emptyFilter[nameFilterKey] = { $regex: undefined, $options: 'i' }
+  return emptyFilter
 }
 
-let APP_DATA = APP_LOADER.data
+const filter = ref(getEmptyFilter())
 
-export default defineComponent({
-  name: 'CountryList',
-  components: {},
-  data() {
-    return {
-      countries: [] as Country[],
-      countryToEdit: undefined as Country | undefined,
-      countryFormMode: 'add' as 'add' | 'edit',
-      _showForm: false,
-      filter: {
-        name: '',
-        _id: ''
-      } as Filter<string>,
-      _filter: {
-        name: false,
-        _id: false
-      } as Filter<boolean>,
-      accesses,
-      schema: {}
+const showFilter = ref({
+  _id: false
+} as {
+  [key: string]: boolean
+})
+showFilter.value[nameFilterKey] = false
+
+function clickFilter(header: string) {
+  if (showFilter.value[header]) {
+    showFilter.value[header] = false
+    filter.value[header] = getEmptyFilter()[header]
+  } else {
+    showFilter.value[header] = true
+  }
+}
+
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootCountries = (await API.getter<Country[]>('country')).ok?.data
+    if (rootCountries && APP_DATA.value) {
+      APP_DATA.value.countries = rootCountries
     }
-  },
-  methods: {
-    showForm(mode: 'add' | 'edit', country?: Country) {
-      this.countryFormMode = mode
-      this.countryToEdit = country
-      this._showForm = true
-    },
-    async getCountries() {
-      const result = (await API.getter<Country[]>('country', { additionalFields: ['lumpSums', 'lumpSumsFrom'] })).ok
-      if (result) {
-        this.countries = result.data
-      }
-      const rootCountries = (await API.getter<Country[]>('country')).ok?.data
-      if (rootCountries && APP_DATA.value) {
-        APP_DATA.value.countries = rootCountries
-      }
-    },
-    async postCountry(country: Country) {
-      const result = await API.setter<Country>('admin/country', country)
-      if (result.ok) {
-        this._showForm = false
-        this.getCountries()
-      }
-      this.countryToEdit = undefined
-    },
-    async deleteCountry(country: Country) {
-      const result = await API.deleter('admin/country', { _id: country._id })
-      if (result) {
-        this.getCountries()
-      }
-    },
-    clickFilter(header: keyof Filter<string>) {
-      if (this._filter[header]) {
-        this._filter[header] = false
-        this.filter[header] = ''
-      } else {
-        this._filter[header] = true
-      }
-    },
-    getById
-  },
-  async created() {
-    await APP_LOADER.loadData()
-    this.getCountries()
-    this.schema = Object.assign({}, (await API.getter<any>('admin/country/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-        }
-      }
-    })
+  }
+}
+defineExpose({ loadFromServer })
+
+let countryToEdit: Ref<Country | undefined> = ref(undefined)
+let _showForm = ref(false)
+
+function showForm(country?: Country) {
+  countryToEdit.value = country
+  _showForm.value = true
+}
+async function postCountry(country: Country) {
+  const result = await API.setter<Country>('admin/country', country)
+  if (result.ok) {
+    _showForm.value = false
+    loadFromServer()
+  }
+  countryToEdit.value = undefined
+}
+async function deleteCountry(country: Country) {
+  const result = await API.deleter('admin/country', { _id: country._id })
+  if (result) {
+    loadFromServer()
+  }
+}
+const schema = Object.assign({}, (await API.getter<any>('admin/country/form')).ok?.data, {
+  buttons: {
+    type: 'group',
+    schema: {
+      submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
+      reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
+    }
   }
 })
 </script>

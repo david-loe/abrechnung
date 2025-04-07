@@ -1,72 +1,49 @@
 <template>
-  <div v-if="APP_DATA">
-    <EasyDataTable
-      class="mb-3"
-      :rows-items="[5, 15, 25]"
-      :rows-per-page="5"
-      :items="projects"
-      :filter-options="[
-        {
-          field: 'identifier',
-          criteria: filter.identifier,
-          comparison: (value: Project['identifier'], criteria: string): boolean =>
-            value.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
-        },
-        {
-          field: 'name',
-          criteria: filter.name,
-          comparison: (value: Project['name'], criteria: string): boolean =>
-            (!Boolean(value) && !Boolean(criteria)) || value!.toLowerCase().indexOf(criteria.toLowerCase()) !== -1
-        }
-      ]"
-      :headers="[
-        { text: $t('labels.identifier'), value: 'identifier' },
-        { text: $t('labels.name'), value: 'name' },
-        { text: $t('labels.organisation'), value: 'organisation', sortable: true },
-        { value: 'buttons' }
-      ]">
-      <template #header-name="header">
-        <div class="filter-column">
-          {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('name')">
-            <i v-if="_filter.name" class="bi bi-funnel-fill"></i>
-            <i v-else class="bi bi-funnel"></i>
-          </span>
-          <div v-if="_filter.name">
-            <input type="text" class="form-control" v-model="filter.name" />
-          </div>
-        </div>
-      </template>
+  <div>
+    <ListElement class="mb-3" ref="list" endpoint="admin/project" :filter="filter" :headers="headers">
       <template #header-identifier="header">
         <div class="filter-column">
           {{ header.text }}
           <span style="cursor: pointer" @click="clickFilter('identifier')">
-            <i v-if="_filter.identifier" class="bi bi-funnel-fill"></i>
+            <i v-if="showFilter.identifier" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="_filter.identifier">
-            <input type="text" class="form-control" v-model="filter.identifier" />
+          <div v-if="showFilter.identifier">
+            <input type="text" class="form-control" v-model="(filter.identifier as any).$regex" />
           </div>
         </div>
       </template>
+      <template #header-name="header">
+        <div class="filter-column">
+          {{ header.text }}
+          <span style="cursor: pointer" @click="clickFilter('name')">
+            <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="showFilter.name">
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+          </div>
+        </div>
+      </template>
+
       <template #item-organisation="{ organisation }">
-        {{ getById(organisation, APP_DATA.organisations)?.name }}
+        {{ getById(organisation, APP_DATA!.organisations)?.name }}
       </template>
       <template #item-buttons="project">
-        <button type="button" class="btn btn-light" @click="showForm('edit', project)">
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(project)">
           <div class="d-none d-md-block">
             <i class="bi bi-pencil"></i>
           </div>
           <i class="bi bi-pencil d-block d-md-none"></i>
         </button>
-        <button type="button" class="btn btn-danger ms-2" @click="deleteProject(project)">
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteProject(project)">
           <div class="d-none d-md-block">
             <i class="bi bi-trash"></i>
           </div>
           <i class="bi bi-trash d-block d-md-none"></i>
         </button>
       </template>
-    </EasyDataTable>
+    </ListElement>
     <div v-if="_showForm" class="container" style="max-width: 650px">
       <Vueform
         :schema="schema"
@@ -76,99 +53,95 @@
         @submit="(form$: any) => postProject(form$.data)"
         @reset="_showForm = false"></Vueform>
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm('add')">
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.project') }) }}
     </button>
   </div>
 </template>
 
-<script lang="ts">
-import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
-import { defineComponent } from 'vue'
-import { getById } from '../../../../../common/scripts.js'
-import { Project, accesses } from '../../../../../common/types.js'
+<script lang="ts" setup>
+import { getById } from '@/../../common/scripts.js'
+import { Project } from '@/../../common/types'
+import API from '@/api'
+import APP_LOADER from '@/appData'
+import ListElement from '@/components/elements/ListElement.vue'
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 
-interface Filter<T> {
-  name: T
-  identifier: T
+const { t } = useI18n()
+await APP_LOADER.loadData()
+
+const headers: Header[] = [
+  { text: t('labels.identifier'), value: 'identifier' },
+  { text: t('labels.name'), value: 'name' },
+  { text: t('labels.organisation'), value: 'organisation', sortable: true },
+  { text: '', value: 'buttons', width: 80 }
+]
+
+const APP_DATA = APP_LOADER.data
+
+const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' }, identifier: { $regex: undefined, $options: 'i' } })
+
+const filter = ref(getEmptyFilter())
+
+const showFilter = ref({
+  name: false,
+  identifier: false
+})
+
+function clickFilter(header: keyof typeof showFilter.value) {
+  if (showFilter.value[header]) {
+    showFilter.value[header] = false
+    filter.value[header] = getEmptyFilter()[header]
+  } else {
+    showFilter.value[header] = true
+  }
 }
-export default defineComponent({
-  name: 'ProjectList',
-  components: {},
-  data() {
-    return {
-      projects: [] as Project[],
-      projectToEdit: undefined as Project | undefined,
-      projectFormMode: 'add' as 'add' | 'edit',
-      _showForm: false,
-      filter: {
-        name: '',
-        identifier: ''
-      } as Filter<string>,
-      _filter: {
-        name: false,
-        identifier: false
-      } as Filter<boolean>,
-      accesses,
-      APP_DATA: APP_LOADER.data,
-      schema: {}
+
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootProjects = (await API.getter<Project[]>('project')).ok?.data
+    if (rootProjects && APP_DATA.value) {
+      APP_DATA.value.projects = rootProjects
+    }
+  }
+}
+defineExpose({ loadFromServer })
+
+let projectToEdit: Ref<Project | undefined> = ref(undefined)
+let _showForm = ref(false)
+
+function showForm(project?: Project) {
+  projectToEdit.value = project
+  _showForm.value = true
+}
+async function postProject(project: Project) {
+  const result = await API.setter<Project>('admin/project', project)
+  if (result.ok) {
+    _showForm.value = false
+    loadFromServer()
+  }
+  projectToEdit.value = undefined
+}
+async function deleteProject(project: Project) {
+  const result = await API.deleter('admin/project', { _id: project._id })
+  if (result) {
+    loadFromServer()
+  }
+}
+
+const schema = Object.assign({}, (await API.getter<any>('admin/project/form')).ok?.data, {
+  buttons: {
+    type: 'group',
+    schema: {
+      submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
+      reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
     }
   },
-  methods: {
-    showForm(mode: 'add' | 'edit', project?: Project) {
-      this.projectFormMode = mode
-      this.projectToEdit = project
-      this._showForm = true
-    },
-    async postProject(project: Project) {
-      const result = await API.setter<Project>('admin/project', project)
-      if (result.ok) {
-        this.getProjects()
-        this._showForm = false
-      }
-      this.projectToEdit = undefined
-    },
-    async deleteProject(project: Project) {
-      const result = await API.deleter('admin/project', { _id: project._id })
-      if (result) {
-        this.getProjects()
-      }
-    },
-    async getProjects() {
-      const result = (await API.getter<Project[]>('admin/project')).ok
-      if (result) {
-        this.projects = result.data
-      }
-      const rootProjects = (await API.getter<Project[]>('project', {}, {}, false)).ok?.data
-      if (rootProjects && this.APP_DATA) {
-        this.APP_DATA.projects = rootProjects
-      }
-    },
-    clickFilter(header: keyof Filter<string>) {
-      if (this._filter[header]) {
-        this._filter[header] = false
-        this.filter[header] = ''
-      } else {
-        this._filter[header] = true
-      }
-    },
-    getById
-  },
-  async created() {
-    await APP_LOADER.loadData()
-    this.getProjects()
-    this.schema = Object.assign({}, (await API.getter<any>('admin/project/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } },
-          reset: { type: 'button', resets: true, buttonLabel: this.$t('labels.cancel'), columns: { container: 6 }, secondary: true }
-        }
-      },
-      _id: { type: 'hidden', meta: true }
-    })
-  }
+  _id: { type: 'hidden', meta: true }
 })
 </script>
 

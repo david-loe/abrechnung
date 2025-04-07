@@ -31,6 +31,7 @@ const props = defineProps<{
   columnsToHide?: string[]
   headers: Header[]
   filter: Filter
+  params?: any
 }>()
 
 if (props.columnsToHide) {
@@ -56,7 +57,7 @@ let oldFilterValue = ''
 const loadFromServer = async () => {
   loading.value = true
 
-  const params = { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage } as any
+  const params = Object.assign({}, props.params || {}, { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage })
 
   if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
     const sortObj = {} as any
