@@ -198,7 +198,7 @@
         rows="1"></textarea>
     </div>
 
-    <div class="mb-1">
+    <div class="mb-1 d-flex">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.stage') }) : $t('labels.save') }}
@@ -213,6 +213,22 @@
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
+      <div class="ms-auto">
+        <button
+          type="button"
+          :class="'btn btn-light' + (showPrevButton ? '' : ' invisible')"
+          :title="$t('labels.previous')"
+          @click="$emit('prev')">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          :class="'btn btn-light ms-2' + (showNextButton ? '' : ' invisible')"
+          :title="$t('labels.next')"
+          @click="$emit('next')">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </form>
 </template>
@@ -232,7 +248,7 @@ import PlaceInput from '../../elements/PlaceInput.vue'
 export default defineComponent({
   name: 'StageForm',
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
-  emits: ['cancel', 'edit', 'add', 'deleted', 'postVehicleRegistration'],
+  emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev', 'postVehicleRegistration'],
   props: {
     stage: {
       type: Object as PropType<Partial<Stage>>
@@ -246,7 +262,9 @@ export default defineComponent({
     travelEndDate: { type: [String, Date], required: true },
     showVehicleRegistration: { type: Boolean, default: true },
     endpointPrefix: { type: String, default: '' },
-    ownerId: { type: String }
+    ownerId: { type: String },
+    showPrevButton: { type: Boolean, default: false },
+    showNextButton: { type: Boolean, default: false }
   },
   data() {
     return {

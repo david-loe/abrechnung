@@ -21,11 +21,15 @@
           :showVehicleRegistration="travel.state === 'approved'"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext((modalObject as Stage), modalObjectType))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev((modalObject as Stage), modalObjectType))"
           @add="postStage"
           @edit="postStage"
           @deleted="deleteStage"
           @cancel="hideModal"
-          @postVehicleRegistration="postVehicleRegistration">
+          @postVehicleRegistration="postVehicleRegistration"
+          @next="() => {const next = getNext((modalObject as Stage), 'stage'); if(next){showModal('edit', next.data, next.type)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev((modalObject as Stage), 'stage'); if(prev){showModal('edit', prev.data, prev.type)}else{hideModal()}}">
         </StageForm>
         <ExpenseForm
           v-else-if="modalObjectType === 'expense'"
@@ -35,10 +39,14 @@
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext((modalObject as TravelExpense), modalObjectType))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev((modalObject as TravelExpense), modalObjectType))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
-          @cancel="hideModal">
+          @cancel="hideModal"
+          @next="() => {const next = getNext((modalObject as TravelExpense), 'expense'); if(next){showModal('edit', next.data, next.type)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev((modalObject as TravelExpense), 'expense'); if(prev){showModal('edit', prev.data, prev.type)}else{hideModal()}}">
         </ExpenseForm>
         <TravelApplyForm
           v-else-if="modalObjectType === 'travel'"
@@ -536,6 +544,12 @@ type ModalMode = 'add' | 'edit'
 type ModalObject = Record | TravelSimple | Gap | undefined
 type ModalObjectType = RecordType | 'travel'
 type Day = TravelDay & { showSettings?: boolean }
+type Table = (
+  | { type: 'stage'; data: Stage }
+  | { type: 'expense'; data: TravelExpense }
+  | { type: 'day'; data: Day }
+  | { type: 'gap'; data: Gap }
+)[]
 export default defineComponent({
   name: 'TravelPage',
   data() {
@@ -544,10 +558,7 @@ export default defineComponent({
       modalObject: undefined as ModalObject,
       modalMode: 'add' as ModalMode,
       modalObjectType: 'stage' as ModalObjectType,
-      table: [] as {
-        type: RecordType | 'gap' | 'day'
-        data: Record | Day | Gap
-      }[],
+      table: [] as Table,
       configCateringRefund: false,
       isReadOnly: false,
       meals,
@@ -601,6 +612,7 @@ export default defineComponent({
       if (this.$refs.travelApplyForm) {
         ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
       }
+      this.modalMode = 'add'
       this.modalObject = undefined
       this.error = undefined
     },
@@ -865,6 +877,28 @@ export default defineComponent({
         add(stage.endLocation, list)
       }
       return list
+    },
+    getNext(record: Record, type: RecordType) {
+      const index = this.table.findIndex((e) => e.type === type && e.data._id === record._id)
+      if (index === -1) {
+        return undefined
+      }
+      for (let i = index + 1; i < this.table.length; i++) {
+        if (this.table[i].type === 'stage' || this.table[i].type === 'expense') {
+          return this.table[i] as { type: 'stage'; data: Stage } | { type: 'expense'; data: TravelExpense }
+        }
+      }
+    },
+    getPrev(record: Record, type: RecordType) {
+      const index = this.table.findIndex((e) => e.type === type && e.data._id === record._id)
+      if (index === -1 || index === 0) {
+        return undefined
+      }
+      for (let i = index - 1; i >= 0; i--) {
+        if (this.table[i].type === 'stage' || this.table[i].type === 'expense') {
+          return this.table[i] as { type: 'stage'; data: Stage } | { type: 'expense'; data: TravelExpense }
+        }
+      }
     }
   },
   async created() {
