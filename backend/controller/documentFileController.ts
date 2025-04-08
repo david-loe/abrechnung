@@ -19,7 +19,7 @@ export class DocumentFileController extends Controller {
   public async getOwn(@Query() _id: _id, @Request() request: ExRequest) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file && request.user!._id.equals(file.owner._id)) {
-      this.setHeader('Content-disposition', `inline; filename="${file.name}"`)
+      this.setHeader('Content-disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`)
       this.setHeader('Content-Type', file.type)
       this.setHeader('Content-Length', file.data.length().toString())
       return Readable.from([file.data.value()])
@@ -50,7 +50,7 @@ export class DocumentFileAdminController extends Controller {
   public async getAny(@Query() _id: _id) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (file) {
-      this.setHeader('Content-disposition', `inline; filename="${file.name}"`)
+      this.setHeader('Content-disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`)
       this.setHeader('Content-Type', file.type)
       this.setHeader('Content-Length', file.data.length().toString())
       return Readable.from([file.data.value()])
