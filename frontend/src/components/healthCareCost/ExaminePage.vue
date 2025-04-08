@@ -35,17 +35,20 @@
         stateFilter="underExamination"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date']">
       </HealthCareCostList>
-      <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-        {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
-      </button>
-      <template v-else>
-        <button type="button" class="btn btn-light" @click="showRefunded = false">
-          {{ $t('labels.hideX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
+      <template v-if="!show">
+        <button type="button" class="btn btn-light me-2" @click="show = 'underExaminationByInsurance'">
+          {{ $t('labels.showX', { X: $t('labels.underExaminationByInsuranceHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
         </button>
+        <button type="button" class="btn btn-light" @click="show = 'inWork'">
+          {{ $t('labels.showX', { X: $t('labels.inWorkX', { X: $t('labels.healthCareCosts') }) }) }} <i class="bi bi-chevron-down"></i>
+        </button>
+      </template>
+      <template v-else>
+        <button type="button" class="btn btn-light" @click="show = null">{{ $t('labels.hide') }} <i class="bi bi-chevron-up"></i></button>
         <hr class="hr" />
         <HealthCareCostList
           endpoint="examine/healthCareCost"
-          stateFilter="underExaminationByInsurance"
+          :stateFilter="show"
           :columns-to-hide="['state', 'report', 'organisation', 'log.underExamination.date']">
         </HealthCareCostList>
       </template>
@@ -72,7 +75,7 @@ export default defineComponent({
     return {
       modalHealthCareCost: undefined as HealthCareCostSimple | undefined,
       modalMode: 'add' as ModalMode,
-      showRefunded: false
+      show: null as 'inWork' | 'underExaminationByInsurance' | null
     }
   },
   methods: {

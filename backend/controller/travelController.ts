@@ -335,7 +335,9 @@ export class TravelApproveController extends Controller {
 export class TravelExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
-    const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
+    const filter: Condition<ITravel> = {
+      $and: [{ historic: false }, { $or: [{ state: 'approved' }, { state: 'underExamination' }, { state: 'refunded' }] }]
+    }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }

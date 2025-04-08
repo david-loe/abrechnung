@@ -170,10 +170,10 @@ export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
     const filter: Condition<IExpenseReport> = {
-      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }]
+      historic: false
     }
     if (request.user!.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+      filter.project = { $in: request.user!.projects.supervised }
     }
     return await this.getter(ExpenseReport, {
       query,

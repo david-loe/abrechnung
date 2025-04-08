@@ -30,24 +30,25 @@
         </div>
       </div>
       <ExpenseReportList
-        key="underExamination"
         class="mb-5"
         endpoint="examine/expenseReport"
         stateFilter="underExamination"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.total.amount', 'organisation']">
       </ExpenseReportList>
-      <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-        {{ $t('labels.showX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-down"></i>
-      </button>
-      <template v-else>
-        <button type="button" class="btn btn-light" @click="showRefunded = false">
-          {{ $t('labels.hideX', { X: $t('labels.refundedExpenseReports') }) }} <i class="bi bi-chevron-up"></i>
+      <template v-if="!show">
+        <button type="button" class="btn btn-light me-2" @click="show = 'refunded'">
+          {{ $t('labels.showX', { X: $t('labels.refundedX', { X: $t('labels.expenseReports') }) }) }} <i class="bi bi-chevron-down"></i>
         </button>
+        <button type="button" class="btn btn-light" @click="show = 'inWork'">
+          {{ $t('labels.showX', { X: $t('labels.inWorkX', { X: $t('labels.expenseReports') }) }) }} <i class="bi bi-chevron-down"></i>
+        </button>
+      </template>
+      <template v-else>
+        <button type="button" class="btn btn-light" @click="show = null">{{ $t('labels.hide') }} <i class="bi bi-chevron-up"></i></button>
         <hr class="hr" />
         <ExpenseReportList
-          key="refunded"
           endpoint="examine/expenseReport"
-          stateFilter="refunded"
+          :stateFilter="show"
           :columns-to-hide="['state', 'report', 'addUp.total.amount', 'organisation']">
         </ExpenseReportList>
       </template>
@@ -71,7 +72,7 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      showRefunded: false,
+      show: null as 'inWork' | 'refunded' | null,
       modalExpenseReport: undefined as ExpenseReportSimple | undefined,
       modalMode: 'add' as ModalMode
     }

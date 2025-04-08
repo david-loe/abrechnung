@@ -177,7 +177,7 @@ export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ historic: false }, { $or: [{ state: 'inWork' }, { state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }]
     }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })

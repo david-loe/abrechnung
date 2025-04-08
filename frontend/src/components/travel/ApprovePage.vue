@@ -51,12 +51,12 @@
           'organisation',
           'comments'
         ]"></TravelList>
-      <button v-if="!showApproved" type="button" class="btn btn-light" @click="showApproved = true">
-        {{ $t('labels.showX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-down"></i>
+      <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
+        {{ $t('labels.showX', { X: $t('labels.approvedX', { X: $t('labels.travels') }) }) }} <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
-        <button type="button" class="btn btn-light" @click="showApproved = false">
-          {{ $t('labels.hideX', { X: $t('labels.approvedTravels') }) }} <i class="bi bi-chevron-up"></i>
+        <button type="button" class="btn btn-light" @click="show = null">
+          {{ $t('labels.hideX', { X: $t('labels.approvedX', { X: $t('labels.travels') }) }) }} <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <TravelList
@@ -88,7 +88,7 @@ export default defineComponent({
     return {
       modalTravel: undefined as TravelSimple | undefined,
       modalMode: 'view' as 'view' | 'add' | 'edit',
-      showApproved: false
+      show: null as 'approved' | null
     }
   },
   methods: {
