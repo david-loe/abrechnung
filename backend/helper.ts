@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import jwt from 'jsonwebtoken'
 import { Model, Types } from 'mongoose'
 import multer from 'multer'
+import path from 'path'
 import {
   _id,
   AnyState,
@@ -130,29 +131,27 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
 
 export async function writeToDisk(
   filePath: string,
-  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
-) {
-  // create folders
-  let root = ''
-  let folderPath = filePath
-  if (folderPath[0] === '/') {
-    root = '/'
-    folderPath = folderPath.slice(1)
-  }
-  const folders = folderPath.split('/').slice(0, -1) // remove last item (file)
-  let cfolderPath = root
-  for (const folder of folders) {
-    cfolderPath = cfolderPath + folder + '/'
-    try {
-      await fs.access(cfolderPath)
-    } catch {
-      await fs.mkdir(cfolderPath)
-    }
-  }
+  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>,
+  retries: number = 5
+): Promise<void> {
   try {
-    await fs.writeFile(filePath, data)
-  } catch (error) {
-    logger.error(error)
+    await fs.mkdir(path.dirname(filePath), { recursive: true })
+  } catch (dirError: any) {
+    logger.error(`Fehler beim Erstellen des Verzeichnisses: ${dirError}`)
+  }
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await fs.writeFile(filePath, data)
+      return
+    } catch (err: any) {
+      if (err.code === 'EAGAIN' && attempt < retries) {
+        logger.warn(`EAGAIN-Fehler beim Versuch ${attempt}. Neuer Versuch in 1 Sekunde...`)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      } else {
+        logger.error(`Fehler beim Schreiben der Datei '${filePath}': ${err}`)
+      }
+    }
   }
 }
 
