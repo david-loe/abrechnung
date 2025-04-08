@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "type": "module",
   "scripts": {
