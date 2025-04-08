@@ -9,7 +9,8 @@
     sort-by="name"
     :headers="headers"
     alternating
-    :preventContextMenuRow="false">
+    :preventContextMenuRow="false"
+    body-item-class-name="text-truncate">
     <!-- Standard-Slot weiterleiten -->
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope"></slot>
@@ -126,4 +127,8 @@ watch(
 defineExpose({ loadFromServer })
 </script>
 
-<style></style>
+<style>
+td {
+  max-width: 100px;
+}
+</style>

@@ -393,7 +393,7 @@ export interface TravelDay {
   _id: _id
 }
 
-export type Log<StateType extends AnyState> = {
+export type Log<StateType extends AnyState = AnyState> = {
   [key in StateType]?: {
     date: Date | string
     editor: UserSimple

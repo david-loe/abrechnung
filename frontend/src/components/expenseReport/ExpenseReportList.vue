@@ -70,7 +70,7 @@
       <router-link
         v-else
         :to="'/' + endpoint + '/' + _id"
-        class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+        class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover">
         {{ name }}
       </router-link>
     </template>
@@ -102,7 +102,7 @@
       </TooltipElement>
     </template>
     <template #item-report="{ _id, name }">
-      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'">
+      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
         <i class="bi bi-download"></i>
       </a>
     </template>
@@ -158,7 +158,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.report'), value: 'report' },
+    { text: '', value: 'report', width: 40 },
     { text: '', value: 'comments', width: 25 }
   )
 }

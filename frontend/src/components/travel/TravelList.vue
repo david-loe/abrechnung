@@ -82,7 +82,7 @@
       <template v-else>
         <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
           <a
-            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate"
+            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover"
             style="cursor: pointer"
             @click="emits('clickedApplied', travel)">
             {{ travel.name }}
@@ -91,7 +91,7 @@
         <template v-else>
           <router-link
             :to="'/' + endpoint + '/' + travel._id"
-            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover text-truncate">
+            class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover">
             {{ travel.name }}
           </router-link>
         </template>
@@ -138,7 +138,7 @@
       </TooltipElement>
     </template>
     <template #item-report="{ _id, name }">
-      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'">
+      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
         <i class="bi bi-download"></i>
       </a>
     </template>
@@ -203,7 +203,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.report'), value: 'report' },
+    { text: '', value: 'report', width: 40 },
     { text: '', value: 'comments', width: 25 }
   )
 }
