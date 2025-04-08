@@ -29,7 +29,7 @@ services:
       dockerfile: ./frontend/Dockerfile.${NODE_ENV}
     volumes:
       - ./frontend:/app
-      - ./common:/common:ro
+      - ./common:/common
     restart: always
     depends_on:
       - backend

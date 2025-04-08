@@ -6,6 +6,12 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 RUN mkdir /reports
 
+COPY common/package*.json /common/
+
+RUN npm install --prefix /common
+
+COPY common /common
+
 WORKDIR /build
 
 COPY backend/package*.json ./
@@ -13,8 +19,6 @@ COPY backend/package*.json ./
 RUN npm install
 
 COPY backend/ .
-
-COPY common /common
 
 RUN npm run build
 

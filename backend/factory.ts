@@ -1,23 +1,11 @@
-import pdf_lib from 'pdf-lib'
+import { ReportPrinter } from '../common/print/printer.js'
 import { _id, Locale } from '../common/types.js'
 import { getSettings } from './db.js'
 import i18n, { formatter } from './i18n.js'
 import DocumentFile from './models/documentFile.js'
 import Organisation from './models/organisation.js'
-import { ReportPrinter } from './pdf/printer.js'
 
 export const reportPrinter = new ReportPrinter(
-  {
-    fontName: 'NotoSans',
-    fontSizes: { S: 9, M: 11, L: 16 },
-    textColor: pdf_lib.rgb(0, 0, 0),
-    pagePadding: 36,
-    borderColor: pdf_lib.rgb(0, 0, 0),
-    borderThickness: 1,
-    cellPadding: { x: 2, bottom: 4 },
-    pageSize: pdf_lib.PageSizes.A4
-  },
-
   (await getSettings()).travelSettings.distanceRefunds,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: any) => {

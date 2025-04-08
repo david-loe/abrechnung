@@ -2,5 +2,9 @@
   "name": "abrechnung-common",
   "version": "1.6.5",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "pdf-fontkit": "^1.8.9",
+    "pdf-lib": "^1.17.1"
+  }
 }

@@ -96,25 +96,34 @@ function getReceiptMap(costList: { cost: Cost }[], number: number = 1) {
 export class ReportPrinter {
   formatter: Formatter
   distanceRefunds: SettingsTravel['distanceRefunds']
-  settings: PrinterSettings
+  settings: PrinterSettings = {
+    fontName: 'NotoSans',
+    fontSizes: { S: 9, M: 11, L: 16 },
+    textColor: pdf_lib.rgb(0, 0, 0),
+    pagePadding: 36,
+    borderColor: pdf_lib.rgb(0, 0, 0),
+    borderThickness: 1,
+    cellPadding: { x: 2, bottom: 4 },
+    pageSize: pdf_lib.PageSizes.A4
+  }
   getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById']
   getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
 
   constructor(
-    settings: PrinterSettings,
     distanceRefunds: SettingsTravel['distanceRefunds'],
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
+    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
+    settings?: Partial<PrinterSettings>
   ) {
-    this.settings = settings
     this.formatter = formatter
     this.distanceRefunds = distanceRefunds
     this.getDocumentFileBufferById = getDocumentFileBufferById
     this.getOrganisationLogoIdById = getOrganisationLogoIdById
     this.translateFunc = translateFunc
+    this.settings = Object.assign(this.settings, settings)
   }
 
   async print(report: Travel | ExpenseReport | HealthCareCost, language: Locale) {
@@ -881,7 +890,7 @@ class PDFDrawer {
   formatter: Formatter
   settings: PrintSettings
   currentPage!: pdf_lib.PDFPage
-  getDocumentFileBufferById: (id: _id) => Promise<{ buffer: Uint8Array<ArrayBufferLike>; type: DocumentFileType } | null>
+  getDocumentFileBufferById: (id: _id) => Promise<{ buffer: Uint8Array; type: DocumentFileType } | null>
   getOrganisationLogoIdById: (id: _id) => Promise<{ logoId: _id; website?: string | null } | null>
 
   constructor(
@@ -1039,8 +1048,8 @@ class PDFDrawer {
       } else {
         let image: pdf_lib.PDFImage
         if (receipt.type === 'image/jpeg') {
-          const zeroOffsetData = new Uint8Array(doc.buffer, 0)
-          image = await this.doc.embedJpg(zeroOffsetData)
+          //const zeroOffsetData = new Uint8Array(doc.buffer.buffer, 0)
+          image = await this.doc.embedJpg(doc.buffer)
         } else {
           // receipt.type === 'image/png'
           image = await this.doc.embedPng(doc.buffer)
@@ -1079,7 +1088,7 @@ class PDFDrawer {
       // 0.75 px <=> 1 pt
       filename = filename + '@2x'
     }
-    const flagBytes = await fs.readFile('./pdf/flags/' + filename + '.png')
+    const flagBytes = await fs.readFile('../common/print/flags/' + filename + '.png')
     const flag = await this.doc.embedPng(flagBytes)
 
     this.currentPage.drawImage(flag, {
@@ -1102,7 +1111,7 @@ class PDFDrawer {
     } else {
       filename = filename + '12'
     }
-    const logoBytes = await fs.readFile('./pdf/receipt/' + filename + '.png')
+    const logoBytes = await fs.readFile('../common/print/receipt/' + filename + '.png')
     const logo = await this.doc.embedPng(logoBytes)
     const logoSize = this.font.heightAtSize(options.fontSize)
     const y = options.yStart - logoSize * 0.8
@@ -1134,8 +1143,8 @@ class PDFDrawer {
 
     let image: pdf_lib.PDFImage
     if (doc.type === 'image/jpeg') {
-      const zeroOffsetData = new Uint8Array(doc.buffer, 0)
-      image = await this.doc.embedJpg(zeroOffsetData)
+      //const zeroOffsetData = new Uint8Array(doc.buffer.buffer, 0)
+      image = await this.doc.embedJpg(doc.buffer)
     } else {
       // receipt.type === 'image/png'
       image = await this.doc.embedPng(doc.buffer)
