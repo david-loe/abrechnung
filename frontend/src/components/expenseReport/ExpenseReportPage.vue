@@ -243,33 +243,25 @@
 <script lang="ts" setup>
 import API from '@/api.js'
 import { logger } from '@/logger.js'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '../../../../common/types.js'
+import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
 import ModalComponent from '../elements/ModalComponent.vue'
 import StatePipeline from '../elements/StatePipeline.vue'
 import TooltipElement from '../elements/TooltipElement.vue'
 import ExpenseForm from './forms/ExpenseForm.vue'
 
-// Definiere die Props über defineProps
+const props = defineProps({
+  _id: { type: String, required: true },
+  parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
+  endpointPrefix: { type: String, default: '' }
+})
 
-const props = defineProps<{
-  _id: string
-  parentPages: {
-    link: string
-    title: string
-  }[]
-  endpointPrefix?: string
-}>()
-const endpointPrefix = props.endpointPrefix || ''
-
-// Zugriff auf Router und I18n
 const router = useRouter()
 const { t } = useI18n()
 
-// Reaktive Zustände
 const expenseReport = ref<ExpenseReport>({} as ExpenseReport)
 const modalExpense = ref<Expense | undefined>(undefined)
 const modalMode = ref<'add' | 'edit'>('add')
@@ -279,16 +271,14 @@ const isReadOnly = computed(() => {
   return (
     (expenseReport.value.state === 'underExamination' ||
       expenseReport.value.state === 'refunded' ||
-      (expenseReport.value.state === 'inWork' && endpointPrefix === 'examine/')) &&
+      (expenseReport.value.state === 'inWork' && props.endpointPrefix === 'examine/')) &&
     isReadOnlySwitchOn.value
   )
 })
 
-// Refs für Kindkomponenten und DOM-Elemente
 const modalComp = useTemplateRef('modalComp')
 const expenseForm = useTemplateRef('expenseForm')
 
-// Funktionen (entsprechend der früheren methods)
 function showModal(mode: 'add' | 'edit', expense?: Expense) {
   modalExpense.value = expense
   modalMode.value = mode
@@ -312,14 +302,14 @@ function resetForms() {
 }
 
 async function deleteExpenseReport() {
-  const result = await API.deleter(endpointPrefix + 'expenseReport', { _id: props._id })
+  const result = await API.deleter(props.endpointPrefix + 'expenseReport', { _id: props._id })
   if (result) {
     router.push({ path: '/' })
   }
 }
 
 async function toExamination() {
-  const result = await API.setter<ExpenseReport>(endpointPrefix + 'expenseReport/underExamination', {
+  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/underExamination', {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment
   })
@@ -329,12 +319,12 @@ async function toExamination() {
 }
 
 async function backToInWork() {
-  const result = await API.setter<ExpenseReport>(endpointPrefix + 'expenseReport/inWork', {
+  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/inWork', {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment
   })
   if (result.ok) {
-    if (endpointPrefix === 'examine/') {
+    if (props.endpointPrefix === 'examine/') {
       router.push({ path: '/examine/expenseReport' })
     } else {
       setExpenseReport(result.ok)
@@ -353,7 +343,7 @@ async function refund() {
 }
 
 const reportLink = computed(() => {
-  return import.meta.env.VITE_BACKEND_URL + '/' + endpointPrefix + 'expenseReport/report?_id=' + expenseReport.value._id
+  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'expenseReport/report?_id=' + expenseReport.value._id
 })
 
 async function postExpense(expense: Expense) {
@@ -361,7 +351,7 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  const result = await API.setter<ExpenseReport>(endpointPrefix + 'expenseReport/expense', expense, {
+  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/expense', expense, {
     headers,
     params: { parentId: expenseReport.value._id }
   })
@@ -376,7 +366,7 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  const result = await API.deleter(endpointPrefix + 'expenseReport/expense', { _id, parentId: props._id })
+  const result = await API.deleter(props.endpointPrefix + 'expenseReport/expense', { _id, parentId: props._id })
   if (result) {
     setExpenseReport(result)
     modalComp.value?.hideModal()
@@ -388,7 +378,7 @@ async function getExpenseReport() {
     _id: props._id,
     additionalFields: ['expenses']
   }
-  const response = await API.getter<ExpenseReport>(endpointPrefix + 'expenseReport', params)
+  const response = await API.getter<ExpenseReport>(props.endpointPrefix + 'expenseReport', params)
   const result = response.ok
   if (result) {
     setExpenseReport(result.data)
