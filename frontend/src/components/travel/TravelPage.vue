@@ -5,8 +5,8 @@
       @close="resetForms()"
       :header="
         modalMode === 'add'
-          ? $t('labels.newX', { X: $t('labels.' + modalObjectType) })
-          : $t('labels.editX', { X: $t('labels.' + modalObjectType) })
+          ? t('labels.newX', { X: t('labels.' + modalObjectType) })
+          : t('labels.editX', { X: t('labels.' + modalObjectType) })
       ">
       <div v-if="travel._id">
         <ErrorBanner :error="error"></ErrorBanner>
@@ -64,7 +64,7 @@
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
-                <router-link :to="page.link">{{ $t(page.title) }}</router-link>
+                <router-link :to="page.link">{{ t(page.title) }}</router-link>
               </li>
               <li class="breadcrumb-item active" aria-current="page">{{ travel.name }}</li>
             </ol>
@@ -73,7 +73,7 @@
         <div class="col-auto">
           <div class="dropdown">
             <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ $t('labels.help') }}
+              {{ t('labels.help') }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
@@ -94,7 +94,7 @@
           </div>
           <div class="col">
             <h4 class="text-secondary m-0">
-              {{ $formatter.simpleDate(travel.startDate) + ' - ' + $formatter.simpleDate(travel.endDate) }}
+              {{ formatter.simpleDate(travel.startDate) + ' - ' + formatter.simpleDate(travel.endDate) }}
             </h4>
           </div>
           <div class="col-auto">
@@ -110,7 +110,7 @@
                         <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnlySwitchOn" />
                         <label class="form-check-label text-nowrap" for="editTravel">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
-                          <span>{{ $t('labels.readOnly') }}</span>
+                          <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
@@ -122,7 +122,7 @@
                 <li>
                   <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', travel, 'travel')">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
-                    <span>{{ $t('labels.editX', { X: $t('labels.travelDetails') }) }}</span>
+                    <span>{{ t('labels.editX', { X: t('labels.travelDetails') }) }}</span>
                   </a>
                 </li>
                 <li>
@@ -133,7 +133,7 @@
                     href="#"
                     @click="isReadOnly && endpointPrefix === 'examine/' && travel.state !== 'refunded' ? null : deleteTravel()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
-                    <span>{{ $t('labels.delete') }}</span>
+                    <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
               </ul>
@@ -162,14 +162,14 @@
               v-model="travel.claimOvernightLumpSum"
               @change="postTravelSettings"
               :disabled="isReadOnly" />
-            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ $t('labels.claimOvernightLumpSum') }}</label>
-            <InfoPoint class="ms-1" :text="$t('info.claimOvernightLumpSum')" />
+            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ t('labels.claimOvernightLumpSum') }}</label>
+            <InfoPoint class="ms-1" :text="t('info.claimOvernightLumpSum')" />
           </div>
         </div>
         <div class="col-auto">
           <div class="row align-items-center">
             <div class="col-auto pe-2">
-              <label class="form-lable mb-0">{{ $t('labels.lastPlaceOfWork') }}</label>
+              <label class="form-lable mb-0">{{ t('labels.lastPlaceOfWork') }}</label>
             </div>
             <div class="col-auto p-0">
               <select
@@ -183,20 +183,20 @@
               </select>
             </div>
             <div class="col-auto ps-2">
-              <InfoPoint :text="$t('info.lastPlaceOfWork')" />
+              <InfoPoint :text="t('info.lastPlaceOfWork')" />
             </div>
           </div>
         </div>
         <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
           <label class="form-check-label me-2" for="travelProfessionalShare">
-            {{ $t('labels.professionalShare') + ':' }}
+            {{ t('labels.professionalShare') + ':' }}
           </label>
           <span
             id="travelProfessionalShare"
             :class="travel.professionalShare <= APP_DATA!.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
-          <InfoPoint class="ms-1" :text="$t('info.professionalShare')" />
+          <InfoPoint class="ms-1" :text="t('info.professionalShare')" />
         </div>
       </div>
 
@@ -206,15 +206,15 @@
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.stage') }) }}</span>
-                <span class="ms-1 d-md-none">{{ $t('labels.stage') }}</span>
+                <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.stage') }) }}</span>
+                <span class="ms-1 d-md-none">{{ t('labels.stage') }}</span>
               </button>
             </div>
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.expense') }) }}</span>
-                <span class="ms-1 d-md-none">{{ $t('labels.expense') }}</span>
+                <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
+                <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
               </button>
             </div>
           </div>
@@ -224,7 +224,7 @@
                 class="btn btn-link btn-sm"
                 @click="travel.days.map((d) => ((d as Day).showSettings = true))"
                 :disabled="travel.stages.length == 0">
-                {{ $t('labels.expandAll') }}
+                {{ t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
               </button>
             </div>
@@ -233,13 +233,13 @@
                 class="btn btn-link btn-sm"
                 @click="travel.days.map((d) => ((d as Day).showSettings = false))"
                 :disabled="travel.stages.length == 0">
-                {{ $t('labels.collapseAll') }}
+                {{ t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
               </button>
             </div>
           </div>
           <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">
-            {{ $t('alerts.noData.stage') }}
+            {{ t('alerts.noData.stage') }}
           </div>
 
           <div
@@ -252,10 +252,10 @@
                 <h5 class="m-0">
                   <small
                     v-if="(row.data as Day).purpose === 'private'"
-                    :title="$t('labels.private')"
+                    :title="t('labels.private')"
                     style="margin-left: -1.25rem; margin-right: 0.156rem">
                     <i class="bi bi-file-person"></i> </small
-                  >{{ $formatter.simpleDate((row.data as Day).date) }}
+                  >{{ formatter.simpleDate((row.data as Day).date) }}
                 </h5>
               </div>
               <div class="col">
@@ -269,13 +269,13 @@
                         class="col-auto text-secondary"
                         :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
+                          t('lumpSums.' + refund.type) +
                           ' ' +
                           (row.data as Day).country.flag +
                           ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-sun"></i>
-                        {{ $formatter.money(refund.refund) }}
+                        {{ formatter.money(refund.refund) }}
                       </div>
                       <!-- overnight -->
                       <div
@@ -283,19 +283,19 @@
                         class="col-auto text-secondary"
                         :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          $t('lumpSums.' + refund.type) +
+                          t('lumpSums.' + refund.type) +
                           ' ' +
                           (row.data as Day).country.flag +
                           ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
                         ">
                         <i class="bi bi-moon"></i>
-                        {{ $formatter.money(refund.refund) }}
+                        {{ formatter.money(refund.refund) }}
                       </div>
                     </template>
                   </template>
                   <template v-else>
                     <div class="col-auto pe-1">
-                      <InfoPoint :text="$t('info.cateringNoRefund')" />
+                      <InfoPoint :text="t('info.cateringNoRefund')" />
                     </div>
                     <div v-for="key of meals" class="form-check col-auto" :key="key">
                       <input
@@ -307,13 +307,13 @@
                         @change="isReadOnly ? null : postTravelSettings()"
                         :disabled="isReadOnly" />
                       <label class="form-check-label" :for="'configCateringRefund' + key + (row.data as Day).date">
-                        {{ $t('labels.' + key) }}
+                        {{ t('labels.' + key) }}
                       </label>
                     </div>
                     <div class="col-auto">
                       <div class="row align-items-center">
                         <div class="col-auto pe-1">
-                          <InfoPoint :text="$t('info.purpose')" />
+                          <InfoPoint :text="t('info.purpose')" />
                         </div>
                         <div class="col-auto ps-0">
                           <select
@@ -323,7 +323,7 @@
                             :disabled="isReadOnly"
                             required>
                             <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
-                              {{ $t('labels.' + purpose) }}
+                              {{ t('labels.' + purpose) }}
                             </option>
                           </select>
                         </div>
@@ -353,13 +353,13 @@
                 <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i class="bi bi-arrow-right mx-2"></i>
                 <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
                   <i class="bi bi-coin"></i>
-                  {{ $formatter.money((row.data as Stage).cost) }}
+                  {{ formatter.money((row.data as Stage).cost) }}
                 </div>
                 <PlaceElement :place="(row.data as Stage).endLocation"></PlaceElement>
               </div>
               <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary d-none d-md-block">
                 <i class="bi bi-coin"></i>
-                {{ $formatter.money((row.data as Stage).cost) }}
+                {{ formatter.money((row.data as Stage).cost) }}
               </div>
             </div>
             <!-- expense -->
@@ -374,11 +374,11 @@
               <div class="col-auto">
                 <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as TravelExpense).description }}&nbsp;
                 <div class="text-secondary d-inline d-md-none">
-                  {{ $formatter.money((row.data as TravelExpense).cost) }}
+                  {{ formatter.money((row.data as TravelExpense).cost) }}
                 </div>
               </div>
               <div class="col-auto text-secondary d-none d-md-block">
-                {{ $formatter.money((row.data as TravelExpense).cost) }}
+                {{ formatter.money((row.data as TravelExpense).cost) }}
               </div>
             </div>
             <!-- gap -->
@@ -394,12 +394,12 @@
         <div class="col-lg-3 col">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ $t('labels.summary') }}</h5>
+              <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
                 <table class="table align-bottom">
                   <tbody>
                     <tr>
-                      <th>{{ $t('labels.progress') }}</th>
+                      <th>{{ t('labels.progress') }}</th>
                       <td class="text-end">
                         <ProgressCircle :progress="travel.progress"></ProgressCircle>
                       </td>
@@ -407,36 +407,36 @@
                     <tr>
                       <td>
                         <small>
-                          {{ $t('labels.lumpSums') }}
+                          {{ t('labels.lumpSums') }}
                           <small v-if="travel.claimSpouseRefund">
                             <br />
-                            {{ $t('labels.includingSpouseRefund') }}
+                            {{ t('labels.includingSpouseRefund') }}
                           </small>
                         </small>
                       </td>
                       <td class="text-end align-top">
-                        <small>{{ $formatter.money(travel.addUp.lumpSums) }}</small>
+                        <small>{{ formatter.money(travel.addUp.lumpSums) }}</small>
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        <small>{{ $t('labels.expenses') }}</small>
+                        <small>{{ t('labels.expenses') }}</small>
                       </td>
                       <td class="text-end">
-                        <small>{{ $formatter.money(travel.addUp.expenses) }}</small>
+                        <small>{{ formatter.money(travel.addUp.expenses) }}</small>
                       </td>
                     </tr>
                     <tr v-if="travel.advance.amount">
                       <td class="text-secondary">
-                        <small>{{ $t('labels.advance') }}</small>
+                        <small>{{ t('labels.advance') }}</small>
                       </td>
                       <td class="text-end text-secondary">
-                        <small>{{ $formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
+                        <small>{{ formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
                       </td>
                     </tr>
                     <tr>
-                      <th>{{ $t('labels.balance') }}</th>
-                      <td class="text-end">{{ $formatter.money(travel.addUp.balance) }}</td>
+                      <th>{{ t('labels.balance') }}</th>
+                      <td class="text-end">{{ formatter.money(travel.addUp.balance) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -450,7 +450,7 @@
                 </div>
                 <template v-if="travel.state !== 'refunded'">
                   <div class="mb-3">
-                    <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
+                    <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                     <textarea
                       class="form-control"
                       id="comment"
@@ -458,35 +458,35 @@
                       v-model="travel.comment"
                       :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></textarea>
                   </div>
-                  <div v-if="travel.state === 'approved'" style="width: max-content; position: relative">
-                    <TooltipElement :text="t('alerts.noData.stage')">
-                      <button
-                        @click="isReadOnly ? null : toExamination()"
-                        class="btn btn-primary"
-                        :disabled="travel.stages.length < 1 || isReadOnly"
-                        style="min-width: max-content">
+                  <template v-if="travel.state === 'approved'">
+                    <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
+                      <button class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
-                        <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                        <span class="ms-1">{{ t('labels.toExamination') }}</span>
                       </button>
                     </TooltipElement>
-                  </div>
+                    <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="ms-1">{{ t('labels.toExamination') }}</span>
+                    </button>
+                  </template>
                   <template v-else-if="travel.state === 'underExamination'">
                     <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
                       <i class="bi bi-coin"></i>
-                      <span class="ms-1">{{ $t('labels.refund') }}</span>
+                      <span class="ms-1">{{ t('labels.refund') }}</span>
                     </button>
                     <button
                       class="btn btn-secondary"
                       @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
                       :disabled="travel.editor._id !== travel.owner._id">
                       <i class="bi bi-arrow-counterclockwise"></i>
-                      <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                      <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                     </button>
                   </template>
                 </template>
-                <a v-else-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink()" :download="travel.name + '.pdf'">
+                <a v-else-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink" :download="travel.name + '.pdf'">
                   <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
+                  <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
                 </a>
               </div>
             </div>
@@ -531,6 +531,7 @@ import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
 import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
+import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -646,7 +647,10 @@ async function deleteTravel() {
 }
 
 async function toExamination() {
-  const result = await API.setter<Travel>('travel/underExamination', { _id: travel.value._id, comment: travel.value.comment })
+  const result = await API.setter<Travel>(props.endpointPrefix + 'travel/underExamination', {
+    _id: travel.value._id,
+    comment: travel.value.comment
+  })
   if (result.ok) {
     router.push({ path: '/' })
   }
@@ -671,10 +675,6 @@ async function refund() {
   if (result.ok) {
     router.push({ path: '/examine/travel' })
   }
-}
-
-function reportLink(): string {
-  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'travel/report?_id=' + travel.value._id
 }
 
 async function postStage(stage: Stage) {
@@ -906,6 +906,8 @@ try {
 const mails = await getExaminerMails()
 const mailToLinkVal = mailLinkFunc(mails)
 const msTeamsToLinkVal = teamsLinkFunc(mails)
+
+const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'travel/report?_id=' + travel.value._id
 </script>
 
 <style></style>

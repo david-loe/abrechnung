@@ -3,7 +3,7 @@
     <ModalComponent
       ref="modalComp"
       @close="resetForms()"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expense') }) : $t('labels.editX', { X: $t('labels.expense') })">
+      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })">
       <div v-if="healthCareCost._id">
         <ExpenseForm
           ref="expenseForm"
@@ -29,7 +29,7 @@
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
-                <router-link :to="page.link">{{ $t(page.title) }}</router-link>
+                <router-link :to="page.link">{{ t(page.title) }}</router-link>
               </li>
               <li class="breadcrumb-item active" aria-current="page">{{ healthCareCost.name }}</li>
             </ol>
@@ -38,14 +38,14 @@
         <div class="col-auto">
           <div class="dropdown">
             <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ $t('labels.help') }}
+              {{ t('labels.help') }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a class="dropdown-item" :href="mailToLink"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
+                <a class="dropdown-item" :href="mailToLinkVal"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
               </li>
               <li>
-                <a class="dropdown-item" :href="msTeamsToLink" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+                <a class="dropdown-item" :href="msTeamsToLinkVal" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
               </li>
             </ul>
           </div>
@@ -63,14 +63,19 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination'">
+                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state !== 'underExaminationByInsurance'">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost" v-model="isReadOnly" />
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="editHealthCareCost"
+                          v-model="isReadOnlySwitchOn" />
                         <label class="form-check-label text-nowrap" for="editHealthCareCost">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
-                          <span>{{ $t('labels.readOnly') }}</span>
+                          <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
@@ -100,7 +105,7 @@
                         : deleteHealthCareCost()
                     ">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
-                    <span>{{ $t('labels.delete') }}</span>
+                    <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
               </ul>
@@ -126,27 +131,27 @@
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
-                <span class="ms-1 d-none d-md-inline">{{ $t('labels.addX', { X: $t('labels.healthCareCost') }) }}</span>
-                <span class="ms-1 d-md-none">{{ $t('labels.healthCareCost') }}</span>
+                <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.healthCareCost') }) }}</span>
+                <span class="ms-1 d-md-none">{{ t('labels.healthCareCost') }}</span>
               </button>
             </div>
           </div>
           <div v-if="healthCareCost.expenses.length == 0" class="alert alert-light" role="alert">
-            {{ $t('alerts.noData.healthCareCost') }}
+            {{ t('alerts.noData.healthCareCost') }}
           </div>
           <table v-else class="table">
             <thead>
               <tr>
-                <th scope="col">{{ $t('labels.date') }}</th>
-                <th scope="col">{{ $t('labels.description') }}</th>
-                <th scope="col">{{ $t('labels.amount') }}</th>
+                <th scope="col">{{ t('labels.date') }}</th>
+                <th scope="col">{{ t('labels.description') }}</th>
+                <th scope="col">{{ t('labels.amount') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
-                <td>{{ $formatter.simpleDate(expense.cost.date) }}</td>
+                <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ $formatter.money(expense.cost) }}</td>
+                <td>{{ formatter.money(expense.cost) }}</td>
               </tr>
             </tbody>
           </table>
@@ -157,17 +162,17 @@
           ">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ $t('labels.summary') }}</h5>
+              <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
                 <table class="table align-bottom">
                   <tbody>
                     <tr>
-                      <th>{{ $t('labels.balance') }}</th>
-                      <td class="text-end">{{ $formatter.money(healthCareCost.addUp.balance) }}</td>
+                      <th>{{ t('labels.balance') }}</th>
+                      <td class="text-end">{{ formatter.money(healthCareCost.addUp.balance) }}</td>
                     </tr>
                     <tr v-if="healthCareCost.state === 'refunded'">
-                      <th>{{ $t('labels.refundSum') }}</th>
-                      <td class="text-end">{{ $formatter.money(healthCareCost.refundSum) }}</td>
+                      <th>{{ t('labels.refundSum') }}</th>
+                      <td class="text-end">{{ formatter.money(healthCareCost.refundSum) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -180,59 +185,64 @@
                   </small>
                 </div>
                 <div v-if="healthCareCost.state !== 'refunded'" class="mb-3">
-                  <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
+                  <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <textarea
                     class="form-control"
                     id="comment"
                     rows="1"
                     v-model="healthCareCost.comment as string | undefined"
                     :disabled="
-                      (isReadOnly && endpointPrefix === '') ||
-                      (healthCareCost.state === 'underExaminationByInsurance' && endpointPrefix === 'examine/')
+                      isReadOnly &&
+                      !(
+                        (endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination') ||
+                        (endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance')
+                      )
                     "></textarea>
                 </div>
-
-                <button
-                  v-if="healthCareCost.state === 'inWork'"
-                  class="btn btn-primary"
-                  @click="isReadOnly ? null : toExamination()"
-                  :disabled="isReadOnly || healthCareCost.expenses.length < 1">
-                  <i class="bi bi-pencil-square"></i>
-                  <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                </button>
-                <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
-                  <a class="btn btn-primary" :href="reportLink()" :download="healthCareCost.name + '.pdf'">
-                    <i class="bi bi-download"></i>
-                    <span class="ms-1">{{ $t('labels.downloadX', { X: $t('labels.report') }) }}</span>
-                  </a>
-                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2" :href="mailToInsuranceLink(healthCareCost)">
-                    <i class="bi bi-envelope"></i>
-                    <span class="ms-1">{{ $t('labels.mailToInsurance') }}</span>
-                  </a>
+                <template v-if="healthCareCost.state === 'inWork'">
+                  <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
+                    <button class="btn btn-primary" disabled>
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="ms-1">{{ t('labels.toExamination') }}</span>
+                    </button>
+                  </TooltipElement>
+                  <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ t('labels.toExamination') }}</span>
+                  </button>
                 </template>
-                <template v-else>
+                <template v-else-if="healthCareCost.state === 'underExamination'">
                   <a
                     v-if="endpointPrefix === 'examine/'"
                     class="btn btn-primary mb-2"
-                    :href="mailToInsuranceLink(healthCareCost)"
+                    :href="mailToInsuranceLink"
                     @click="toExaminationByInsurance()">
                     <i class="bi bi-pencil-square"></i>
-                    <span class="ms-1">{{ $t('labels.toExaminationByInsurance') }}</span>
+                    <span class="ms-1">{{ t('labels.toExaminationByInsurance') }}</span>
                   </a>
                   <button
                     class="btn btn-secondary"
                     @click="healthCareCost.editor._id !== healthCareCost.owner._id ? null : backToInWork()"
                     :disabled="healthCareCost.editor._id !== healthCareCost.owner._id">
                     <i class="bi bi-arrow-counterclockwise"></i>
-                    <span class="ms-1">{{ $t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                    <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                   </button>
                 </template>
-
+                <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
+                  <a class="btn btn-primary" :href="reportLink" :download="healthCareCost.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+                  </a>
+                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2" :href="mailToInsuranceLink">
+                    <i class="bi bi-envelope"></i>
+                    <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
+                  </a>
+                </template>
                 <form
                   class="mt-3"
                   v-if="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance'"
                   @submit.prevent="refund()">
-                  <label for="refundSum" class="form-label me-2"> {{ $t('labels.refundSum') }}<span class="text-danger">*</span> </label>
+                  <label for="refundSum" class="form-label me-2"> {{ t('labels.refundSum') }}<span class="text-danger">*</span> </label>
                   <div id="refundSum" class="input-group mb-3">
                     <input
                       style="min-width: 100px"
@@ -245,17 +255,17 @@
                     <CurrencySelector v-model="healthCareCost.refundSum!.currency" :required="true"></CurrencySelector>
                   </div>
                   <div class="mb-3">
-                    <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}</label>
+                    <label for="expenseFormFile" class="form-label me-2">{{ t('labels.receipts') }}</label>
                     <FileUpload
                       ref="fileUpload"
                       id="expenseFormFile"
-                      v-model="healthCareCost.refundSum.receipts as DocumentFile[] | undefined"
+                      v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
                       :endpointPrefix="endpointPrefix"
                       :ownerId="healthCareCost.owner._id" />
                   </div>
                   <button type="submit" class="btn btn-success">
                     <i class="bi bi-coin"></i>
-                    <span class="ms-1">{{ $t('labels.confirm') }}</span>
+                    <span class="ms-1">{{ t('labels.confirm') }}</span>
                   </button>
                 </form>
               </div>
@@ -267,217 +277,228 @@
   </div>
 </template>
 
-<script lang="ts">
-import { getById, mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+<script lang="ts" setup>
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
+import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
-import { defineComponent, PropType } from 'vue'
 
 type ModalMode = 'add' | 'edit'
 
-export default defineComponent({
-  name: 'HealthCareCostPage',
-  data() {
-    return {
-      healthCareCost: {} as HealthCareCost,
-      modalExpense: undefined as Expense | undefined,
-      modalMode: 'add' as ModalMode,
-      isReadOnly: false,
-      healthCareCostStates,
-      mailToLink: '',
-      msTeamsToLink: '',
-      organisations: [] as Organisation[]
-    }
-  },
-  components: { StatePipeline, ExpenseForm, CurrencySelector, FileUpload, ModalComponent },
-  props: {
-    _id: { type: String, required: true },
-    parentPages: {
-      type: Array as PropType<{ link: string; title: string }[]>,
-      required: true
-    },
-    endpointPrefix: { type: String, default: '' }
-  },
-  methods: {
-    showModal(mode: ModalMode, expense: Expense | undefined) {
-      this.modalExpense = expense
-      this.modalMode = mode
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
-      }
-    },
-    hideModal() {
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      }
-    },
-    resetForms() {
-      if (this.$refs.expenseForm) {
-        ;(this.$refs.expenseForm as typeof ExpenseForm).clear()
-      }
-      this.modalExpense = undefined
-    },
-    async deleteHealthCareCost() {
-      const result = await API.deleter(this.endpointPrefix + 'healthCareCost', { _id: this._id })
-      if (result) {
-        this.$router.push({ path: this.parentPages[0].link })
-      }
-    },
-    async toExamination() {
-      const result = await API.setter<HealthCareCost>('healthCareCost/underExamination', {
-        _id: this.healthCareCost._id,
-        comment: this.healthCareCost.comment
-      })
-      if (result.ok) {
-        this.$router.push({ path: this.parentPages[0].link })
-      }
-    },
-    async backToInWork() {
-      const result = await API.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/inWork', {
-        _id: this.healthCareCost._id,
-        comment: this.healthCareCost.comment
-      })
-      if (result.ok) {
-        if (this.endpointPrefix === 'examine/') {
-          this.$router.push({ path: '/examine/healthCareCost' })
-        } else {
-          this.setHealthCareCost(result.ok)
-          this.isReadOnly = ['underExamination', 'refunded'].indexOf(this.healthCareCost.state) !== -1
-        }
-      }
-    },
-    async toExaminationByInsurance() {
-      const result = await API.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
-        _id: this.healthCareCost._id,
-        comment: this.healthCareCost.comment
-      })
-      if (result.ok) {
-        this.getHealthCareCost()
-      }
-    },
-    mailToInsuranceLink(healthCareCost: HealthCareCost): string {
-      const orga = getById(healthCareCost.project.organisation, this.organisations)
-      return mailToLink(
-        [healthCareCost.insurance.email],
-        this.$t('mail.underExaminationByInsurance.subject', { companyNumber: orga?.companyNumber }),
-        this.$t('mail.underExaminationByInsurance.body', {
-          insuranceName: healthCareCost.insurance.name,
-          owner: healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName,
-          bankDetails: orga?.bankDetails,
-          organisationName: orga?.name,
-          amount: this.$formatter.money(healthCareCost.addUp.total)
-        })
-      )
-    },
-    async refund() {
-      let headers = {}
-      if (this.healthCareCost.refundSum.receipts && this.healthCareCost.refundSum.receipts.length > 0) {
-        headers = {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-      const result = await API.setter<HealthCareCost>(
-        'confirm/healthCareCost/refunded',
-        {
-          _id: this.healthCareCost._id,
-          comment: this.healthCareCost.comment,
-          refundSum: this.healthCareCost.refundSum
-        },
-        { headers }
-      )
-      if (result.ok) {
-        this.$router.push({ path: this.parentPages[0].link })
-      }
-    },
-    reportLink() {
-      return import.meta.env.VITE_BACKEND_URL + '/' + this.endpointPrefix + 'healthCareCost/report?_id=' + this.healthCareCost._id
-    },
-    async postExpense(expense: Expense) {
-      let headers = {}
-      if (expense.cost.receipts) {
-        headers = {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-      const result = await API.setter<HealthCareCost>(this.endpointPrefix + 'healthCareCost/expense', expense, {
-        headers,
-        params: { parentId: this.healthCareCost._id }
-      })
-      if (result.ok) {
-        this.setHealthCareCost(result.ok)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      } else {
-        ;(this.$refs.expenseForm as typeof ExpenseForm).loading = false
-      }
-    },
-    async deleteExpense(_id: string) {
-      const result = await API.deleter(this.endpointPrefix + 'healthCareCost/expense', { _id, parentId: this._id })
-      if (result) {
-        this.setHealthCareCost(result)
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      }
-    },
-    async getHealthCareCost() {
-      const params: any = {
-        _id: this._id,
-        additionalFields: ['expenses']
-      }
-      const result = (await API.getter<HealthCareCost>(this.endpointPrefix + 'healthCareCost', params)).ok
-      if (result) {
-        this.setHealthCareCost(result.data)
-      }
-    },
-    setHealthCareCost(healthCareCost: HealthCareCost) {
-      this.healthCareCost = healthCareCost
-      logger.info(this.$t('labels.healthCareCost') + ':')
-      logger.info(this.healthCareCost)
-    },
-    async getExaminerMails() {
-      const result = (await API.getter<UserSimple[]>('healthCareCost/examiner')).ok
-      if (result) {
-        return result.data.map((x) => x.email)
-      }
-      return []
-    },
-    getNext(expense: Expense) {
-      const index = this.healthCareCost.expenses.findIndex((e) => e._id === expense._id)
-      if (index === -1 || index + 1 === this.healthCareCost.expenses.length) {
-        return undefined
-      }
-      return this.healthCareCost.expenses[index + 1]
-    },
-    getPrev(expense: Expense) {
-      const index = this.healthCareCost.expenses.findIndex((e) => e._id === expense._id)
-      if (index === -1 || index === 0) {
-        return undefined
-      }
-      return this.healthCareCost.expenses[index - 1]
-    }
-  },
-  async created() {
-    if (this.endpointPrefix === 'examine/') {
-      const result = (await API.getter<Organisation[]>('examine/healthCareCost/organisation')).ok
-      if (result) {
-        this.organisations = result.data
-      }
-    }
-    try {
-      await this.getHealthCareCost()
-    } catch (e) {
-      return this.$router.push({ path: this.parentPages[this.parentPages.length - 1].link })
-    }
-    this.isReadOnly = ['underExamination', 'underExaminationByInsurance', 'refunded'].indexOf(this.healthCareCost.state) !== -1
-    const mails = await this.getExaminerMails()
-    this.mailToLink = mailToLink(mails)
-    this.msTeamsToLink = msTeamsToLink(mails)
-  }
+// --- Props ---
+const props = defineProps({
+  _id: { type: String, required: true },
+  parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
+  endpointPrefix: { type: String, default: '' }
 })
+
+// --- Router, i18n und ggf. Formatter (falls global verfügbar) ---
+const router = useRouter()
+const { t } = useI18n()
+
+// --- Reaktive Daten ---
+const healthCareCost = ref<HealthCareCost>({} as HealthCareCost)
+const modalExpense = ref<Expense | undefined>(undefined)
+const modalMode = ref<ModalMode>('add')
+const isReadOnlySwitchOn = ref(true)
+
+const isReadOnly = computed(() => {
+  return (
+    (healthCareCost.value.state !== 'inWork' || (healthCareCost.value.state === 'inWork' && props.endpointPrefix === 'examine/')) &&
+    isReadOnlySwitchOn.value
+  )
+})
+
+// --- Template-Refs für Komponenten ---
+const modalCompRef = useTemplateRef('modalComp')
+const expenseFormRef = useTemplateRef('expenseForm')
+
+// --- Methoden ---
+function showModal(mode: ModalMode, expense: Expense | undefined) {
+  modalExpense.value = expense
+  modalMode.value = mode
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.modal.show()
+  }
+}
+
+function hideModal() {
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.hideModal()
+  }
+}
+
+function resetForms() {
+  expenseFormRef.value?.clear()
+  modalExpense.value = undefined
+}
+
+async function deleteHealthCareCost() {
+  const result = await API.deleter(props.endpointPrefix + 'healthCareCost', { _id: props._id })
+  if (result) {
+    router.push({ path: props.parentPages[0].link })
+  }
+}
+
+async function toExamination() {
+  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/underExamination', {
+    _id: healthCareCost.value._id,
+    comment: healthCareCost.value.comment
+  })
+  if (result.ok) {
+    router.push({ path: props.parentPages[0].link })
+  }
+}
+
+async function backToInWork() {
+  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/inWork', {
+    _id: healthCareCost.value._id,
+    comment: healthCareCost.value.comment
+  })
+  if (result.ok) {
+    if (props.endpointPrefix === 'examine/') {
+      router.push({ path: '/examine/healthCareCost' })
+    } else {
+      setHealthCareCost(result.ok)
+    }
+  }
+}
+
+async function toExaminationByInsurance() {
+  const result = await API.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
+    _id: healthCareCost.value._id,
+    comment: healthCareCost.value.comment
+  })
+  if (result.ok) {
+    await getHealthCareCost()
+  }
+}
+
+async function refund() {
+  let headers: Record<string, string> = {}
+  if (healthCareCost.value.refundSum.receipts && healthCareCost.value.refundSum.receipts.length > 0) {
+    headers = { 'Content-Type': 'multipart/form-data' }
+  }
+  const result = await API.setter<HealthCareCost>(
+    'confirm/healthCareCost/refunded',
+    {
+      _id: healthCareCost.value._id,
+      comment: healthCareCost.value.comment,
+      refundSum: healthCareCost.value.refundSum
+    },
+    { headers }
+  )
+  if (result.ok) {
+    router.push({ path: props.parentPages[0].link })
+  }
+}
+
+async function postExpense(expense: Expense) {
+  let headers: Record<string, string> = {}
+  if (expense.cost.receipts) {
+    headers = { 'Content-Type': 'multipart/form-data' }
+  }
+  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/expense', expense, {
+    headers,
+    params: { parentId: healthCareCost.value._id }
+  })
+  if (result.ok) {
+    setHealthCareCost(result.ok)
+    modalCompRef.value?.hideModal()
+  } else {
+    if (expenseFormRef.value) expenseFormRef.value.loading = false
+  }
+}
+
+async function deleteExpense(_id: string) {
+  const result = await API.deleter(props.endpointPrefix + 'healthCareCost/expense', { _id, parentId: props._id })
+  if (result) {
+    setHealthCareCost(result)
+    modalCompRef.value?.hideModal()
+  }
+}
+
+async function getHealthCareCost() {
+  const params: any = {
+    _id: props._id,
+    additionalFields: ['expenses']
+  }
+  const result = (await API.getter<HealthCareCost>(props.endpointPrefix + 'healthCareCost', params)).ok
+  if (result) {
+    setHealthCareCost(result.data)
+  }
+}
+
+function setHealthCareCost(newHealthCareCost: HealthCareCost) {
+  healthCareCost.value = newHealthCareCost
+  logger.info(t('labels.healthCareCost') + ':')
+  logger.info(healthCareCost.value)
+}
+
+async function getExaminerMails(): Promise<string[]> {
+  const result = (await API.getter<UserSimple[]>('healthCareCost/examiner')).ok
+  if (result) {
+    return result.data.map((x) => x.email)
+  }
+  return []
+}
+
+function getNext(expense: Expense) {
+  const idx = healthCareCost.value.expenses.findIndex((e) => e._id === expense._id)
+  if (idx === -1 || idx + 1 === healthCareCost.value.expenses.length) {
+    return undefined
+  }
+  return healthCareCost.value.expenses[idx + 1]
+}
+
+function getPrev(expense: Expense) {
+  const idx = healthCareCost.value.expenses.findIndex((e) => e._id === expense._id)
+  if (idx === -1 || idx === 0) {
+    return undefined
+  }
+  return healthCareCost.value.expenses[idx - 1]
+}
+
+try {
+  await getHealthCareCost()
+} catch (e) {
+  router.push({ path: props.parentPages[props.parentPages.length - 1].link })
+}
+
+let mailToInsuranceLink = ''
+if (props.endpointPrefix === 'examine/') {
+  const result = await API.getter<Organisation>('examine/healthCareCost/organisation', { _id: healthCareCost.value.project.organisation })
+  if (result.ok) {
+    const orga = result.ok.data
+    const subject = t('mail.underExaminationByInsurance.subject', { companyNumber: orga.companyNumber })
+    const body = t('mail.underExaminationByInsurance.body', {
+      insuranceName: healthCareCost.value.insurance.name,
+      owner: healthCareCost.value.owner.name.givenName + ' ' + healthCareCost.value.owner.name.familyName,
+      bankDetails: orga.bankDetails,
+      organisationName: orga.name,
+      amount: formatter.money(healthCareCost.value.addUp.total)
+    })
+    mailToInsuranceLink = mailToLink([healthCareCost.value.insurance.email], subject, body)
+  }
+}
+
+const mails = await getExaminerMails()
+const mailToLinkVal = mailToLink(mails)
+const msTeamsToLinkVal = msTeamsToLink(mails)
+
+const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'healthCareCost/report?_id=' + healthCareCost.value._id
 </script>
 
 <style></style>

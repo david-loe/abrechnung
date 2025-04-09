@@ -132,9 +132,9 @@
             </thead>
             <tbody>
               <tr v-for="expense of expenseReport.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
-                <td>{{ $formatter.simpleDate(expense.cost.date) }}</td>
+                <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
-                <td>{{ $formatter.money(expense.cost) }}</td>
+                <td>{{ formatter.money(expense.cost) }}</td>
               </tr>
             </tbody>
           </table>
@@ -152,7 +152,7 @@
                           <small>{{ t('labels.expenses') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ $formatter.money(expenseReport.addUp.expenses) }}</small>
+                          <small>{{ formatter.money(expenseReport.addUp.expenses) }}</small>
                         </td>
                       </tr>
                       <tr>
@@ -160,14 +160,14 @@
                           <small>{{ t('labels.advance') }}</small>
                         </td>
                         <td class="text-end">
-                          <small>{{ $formatter.money(expenseReport.addUp.advance, { func: (x) => 0 - x }) }}</small>
+                          <small>{{ formatter.money(expenseReport.addUp.advance, { func: (x) => 0 - x }) }}</small>
                         </td>
                       </tr>
                     </template>
 
                     <tr>
                       <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ $formatter.money(expenseReport.addUp.balance) }}</td>
+                      <td class="text-end">{{ formatter.money(expenseReport.addUp.balance) }}</td>
                     </tr>
                     <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
                       <td>
@@ -175,7 +175,7 @@
                       </td>
                       <td class="text-end">
                         <small>{{
-                          $formatter.money(expenseReport.project.balance) + ' von ' + $formatter.money(expenseReport.project.budget)
+                          formatter.money(expenseReport.project.balance) + ' von ' + formatter.money(expenseReport.project.budget)
                         }}</small>
                       </td>
                     </tr>
@@ -198,18 +198,18 @@
                     v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></textarea>
                 </div>
-                <div v-if="expenseReport.state === 'inWork'" style="width: max-content; position: relative">
-                  <TooltipElement :text="t('alerts.noData.expense')">
-                    <button
-                      @click="isReadOnly ? null : toExamination()"
-                      class="btn btn-primary"
-                      :disabled="expenseReport.expenses.length < 1 || isReadOnly"
-                      style="min-width: max-content">
+                <template v-if="expenseReport.state === 'inWork'">
+                  <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
+                    <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
                   </TooltipElement>
-                </div>
+                  <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="ms-1">{{ t('labels.toExamination') }}</span>
+                  </button>
+                </template>
                 <template v-else-if="expenseReport.state === 'underExamination'">
                   <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
                     <i class="bi bi-coin"></i>
@@ -248,6 +248,7 @@ import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
+import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
 import { computed, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -342,10 +343,6 @@ async function refund() {
   }
 }
 
-const reportLink = computed(() => {
-  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'expenseReport/report?_id=' + expenseReport.value._id
-})
-
 async function postExpense(expense: Expense) {
   let headers: Record<string, string> = {}
   if (expense.cost.receipts) {
@@ -424,5 +421,7 @@ try {
 const mails = await getExaminerMails()
 const mailToLinkVal = mailToLink(mails)
 const msTeamsToLinkVal = msTeamsToLink(mails)
+
+const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'expenseReport/report?_id=' + expenseReport.value._id
 </script>
 <style></style>
