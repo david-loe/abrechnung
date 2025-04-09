@@ -134,7 +134,12 @@
           </div>
         </div>
       </div>
-      <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
+      <Suspense>
+        <template #default>
+          <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
+        </template>
+        <template #fallback> </template>
+      </Suspense>
     </div>
 
     <footer class="py-3 border-top">
