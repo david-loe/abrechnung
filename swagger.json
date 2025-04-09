@@ -10662,6 +10662,82 @@
 				}
 			}
 		},
+		"/examine/travel/underExamination": {
+			"post": {
+				"operationId": "PostAnyUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/TravelSimple"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReportSimple"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCostSimple"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/examine/travel/report": {
 			"get": {
 				"operationId": "GetAnyReport",
@@ -13014,6 +13090,82 @@
 				}
 			}
 		},
+		"/examine/healthCareCost/underExamination": {
+			"post": {
+				"operationId": "PostOwnUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/TravelSimple"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReportSimple"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCostSimple"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/examine/healthCareCost/report": {
 			"get": {
 				"operationId": "GetunderExaminationByInsuranceReport",
@@ -14444,6 +14596,82 @@
 									"properties": {
 										"result": {
 											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/examine/expenseReport/underExamination": {
+			"post": {
+				"operationId": "PostAnyUnderExamination",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/TravelSimple"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReportSimple"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCostSimple"
+												}
+											]
 										},
 										"message": {
 											"type": "string"
