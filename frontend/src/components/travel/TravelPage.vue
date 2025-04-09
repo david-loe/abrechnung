@@ -169,7 +169,7 @@
         <div class="col-auto">
           <div class="row align-items-center">
             <div class="col-auto pe-2">
-              <label class="form-lable mb-0">{{ t('labels.lastPlaceOfWork') }}</label>
+              <label class="form-label mb-0">{{ t('labels.lastPlaceOfWork') }}</label>
             </div>
             <div class="col-auto p-0">
               <select

@@ -25,7 +25,7 @@
 import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '@/../../common/scripts.js'
 import { defineComponent, PropType } from 'vue'
 export default defineComponent({
-  name: 'PlaceInput',
+  name: 'DateInput',
   data() {
     return {}
   },
