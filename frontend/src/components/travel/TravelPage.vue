@@ -55,7 +55,7 @@
           :travel="(modalObject as TravelSimple)"
           @edit="editTravelDetails"
           ref="travelApplyForm"
-          :minStartDate="endpointPrefix === 'examine/' ? '' : undefined"></TravelApplyForm>
+          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"></TravelApplyForm>
       </div>
     </ModalComponent>
     <div class="container" v-if="travel._id">
@@ -459,14 +459,16 @@
                       :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></textarea>
                   </div>
                   <div v-if="travel.state === 'approved'" style="width: max-content; position: relative">
-                    <button
-                      @click="isReadOnly ? null : toExamination()"
-                      class="btn btn-primary"
-                      :disabled="travel.stages.length < 1 || isReadOnly"
-                      style="min-width: max-content">
-                      <i class="bi bi-pencil-square"></i>
-                      <span class="ms-1">{{ $t('labels.toExamination') }}</span>
-                    </button>
+                    <TooltipElement :text="t('alerts.noData.stage')">
+                      <button
+                        @click="isReadOnly ? null : toExamination()"
+                        class="btn btn-primary"
+                        :disabled="travel.stages.length < 1 || isReadOnly"
+                        style="min-width: max-content">
+                        <i class="bi bi-pencil-square"></i>
+                        <span class="ms-1">{{ $t('labels.toExamination') }}</span>
+                      </button>
+                    </TooltipElement>
                   </div>
                   <template v-else-if="travel.state === 'underExamination'">
                     <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
@@ -525,12 +527,12 @@ import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
 import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { logger } from '@/logger.js'
 
-// --- Typdefinitionen ---
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
 type ModalObject = Record | TravelSimple | Gap | undefined
@@ -552,7 +554,6 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 
-// --- Reaktive Daten und Konstanten ---
 const travel = ref<Travel>({} as Travel)
 const modalObject = ref<ModalObject>(undefined)
 const modalMode = ref<ModalMode>('add')
@@ -564,7 +565,6 @@ const isReadOnlySwitchOn = ref(true)
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
-// --- Template-Refs für Komponenten und DOM-Elemente ---
 const modalCompRef = useTemplateRef('modalComp')
 const stageFormRef = useTemplateRef('stageForm')
 const expenseFormRef = useTemplateRef('expenseForm')
@@ -579,7 +579,6 @@ const isReadOnly = computed(() => {
   )
 })
 
-// --- Methoden ---
 function showModal(mode: ModalMode, object: ModalObject | Gap, type: ModalObjectType) {
   modalObjectType.value = type
   modalObject.value = object
