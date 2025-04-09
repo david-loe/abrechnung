@@ -268,16 +268,16 @@
 </template>
 
 <script lang="ts">
+import { getById, mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '@/../../common/types.js'
 import API from '@/api.js'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import FileUpload from '@/components/elements/FileUpload.vue'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StatePipeline from '@/components/elements/StatePipeline.vue'
+import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import { logger } from '@/logger.js'
 import { defineComponent, PropType } from 'vue'
-import { getById, mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '../../../../common/types.js'
-import CurrencySelector from '../elements/CurrencySelector.vue'
-import FileUpload from '../elements/FileUpload.vue'
-import ModalComponent from '../elements/ModalComponent.vue'
-import StatePipeline from '../elements/StatePipeline.vue'
-import ExpenseForm from './forms/ExpenseForm.vue'
 
 type ModalMode = 'add' | 'edit'
 

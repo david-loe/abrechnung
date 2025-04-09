@@ -57,13 +57,13 @@
 </template>
 
 <script lang="ts">
+import { HealthCareCostSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
+import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
 import { defineComponent } from 'vue'
-import { HealthCareCostSimple } from '../../../../common/types.js'
-import ModalComponent from '../elements/ModalComponent.vue'
-import HealthCareCostList from './HealthCareCostList.vue'
-import HealthCareCostForm from './forms/HealthCareCostForm.vue'
 
 type ModalMode = 'add' | 'edit'
 

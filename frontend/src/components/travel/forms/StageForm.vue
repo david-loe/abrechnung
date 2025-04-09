@@ -234,16 +234,16 @@
 </template>
 
 <script lang="ts">
+import { datetimeToDate, datetimeToDateString, getDayList } from '@/../../common/scripts.js'
+import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import CountrySelector from '@/components/elements/CountrySelector.vue'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
+import FileUpload from '@/components/elements/FileUpload.vue'
+import InfoPoint from '@/components/elements/InfoPoint.vue'
+import PlaceInput from '@/components/elements/PlaceInput.vue'
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDate, datetimeToDateString, getDayList } from '../../../../../common/scripts.js'
-import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '../../../../../common/types.js'
-import CountrySelector from '../../elements/CountrySelector.vue'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
-import DateInput from '../../elements/DateInput.vue'
-import FileUpload from '../../elements/FileUpload.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import PlaceInput from '../../elements/PlaceInput.vue'
 
 export default defineComponent({
   name: 'StageForm',

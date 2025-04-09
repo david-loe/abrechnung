@@ -57,13 +57,13 @@
 </template>
 
 <script lang="ts">
+import { ExpenseReportSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
+import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { defineComponent } from 'vue'
-import { ExpenseReportSimple } from '../../../../common/types.js'
-import ModalComponent from '../elements/ModalComponent.vue'
-import ExpenseReportList from './ExpenseReportList.vue'
-import ExpenseReportForm from './forms/ExpenseReportForm.vue'
 
 type ModalMode = 'add' | 'edit'
 export default defineComponent({

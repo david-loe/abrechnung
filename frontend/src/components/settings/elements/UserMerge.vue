@@ -53,10 +53,10 @@
 </template>
 
 <script lang="ts">
+import { User, UserReplaceReferencesResult, objectIdRegex } from '@/../../common/types.js'
 import API from '@/api.js'
+import UserSelector from '@/components/elements/UserSelector.vue'
 import { defineComponent } from 'vue'
-import { User, UserReplaceReferencesResult, objectIdRegex } from '../../../../../common/types.js'
-import UserSelector from '../../../components/elements/UserSelector.vue'
 
 type MergeResult = {
   mergedUser: User

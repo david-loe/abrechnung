@@ -22,9 +22,9 @@
 </template>
 
 <script lang="ts">
+import { TravelSimple } from '@/../../common/types.js'
+import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import { defineComponent, PropType } from 'vue'
-import TravelApply from '../elements/TravelApplication.vue'
-import { TravelSimple } from '../../../../../common/types.js'
 export default defineComponent({
   name: 'TravelApproveForm',
   data() {

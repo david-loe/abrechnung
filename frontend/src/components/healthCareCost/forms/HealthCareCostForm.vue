@@ -44,12 +44,12 @@
 </template>
 
 <script lang="ts">
+import { HealthCareCostSimple } from '@/../../common/types.js'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
+import InfoPoint from '@/components/elements/InfoPoint.vue'
+import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import UserSelector from '@/components/elements/UserSelector.vue'
 import { defineComponent, PropType } from 'vue'
-import { HealthCareCostSimple } from '../../../../../common/types.js'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import ProjectSelector from '../../elements/ProjectSelector.vue'
-import UserSelector from '../../elements/UserSelector.vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',

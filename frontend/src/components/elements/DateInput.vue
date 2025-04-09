@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
+import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '@/../../common/scripts.js'
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '../../../../common/scripts.js'
 export default defineComponent({
   name: 'PlaceInput',
   data() {

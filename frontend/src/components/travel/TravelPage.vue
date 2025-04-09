@@ -501,10 +501,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
-import { logger } from '@/logger.js'
-import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '../../../../common/scripts.js'
+import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Place,
@@ -519,17 +516,19 @@ import {
   UserSimple,
   meals,
   travelStates
-} from '../../../../common/types.js'
-
-import ErrorBanner from '../elements/ErrorBanner.vue'
-import InfoPoint from '../elements/InfoPoint.vue'
-import ModalComponent from '../elements/ModalComponent.vue'
-import PlaceElement from '../elements/PlaceElement.vue'
-import ProgressCircle from '../elements/ProgressCircle.vue'
-import StatePipeline from '../elements/StatePipeline.vue'
-import ExpenseForm from './forms/ExpenseForm.vue'
-import StageForm from './forms/StageForm.vue'
-import TravelApplyForm from './forms/TravelApplyForm.vue'
+} from '@/../../common/types.js'
+import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
+import ErrorBanner from '@/components/elements/ErrorBanner.vue'
+import InfoPoint from '@/components/elements/InfoPoint.vue'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import PlaceElement from '@/components/elements/PlaceElement.vue'
+import ProgressCircle from '@/components/elements/ProgressCircle.vue'
+import StatePipeline from '@/components/elements/StatePipeline.vue'
+import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
+import StageForm from '@/components/travel/forms/StageForm.vue'
+import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
+import { logger } from '@/logger.js'
 
 // --- Typdefinitionen ---
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }

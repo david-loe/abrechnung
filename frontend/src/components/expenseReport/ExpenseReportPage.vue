@@ -241,17 +241,17 @@
 </template>
 
 <script lang="ts" setup>
+import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '@/../../common/types.js'
 import API from '@/api.js'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
+import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import { logger } from '@/logger.js'
 import { computed, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { mailToLink, msTeamsToLink } from '../../../../common/scripts.js'
-import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '../../../../common/types.js'
-import ModalComponent from '../elements/ModalComponent.vue'
-import StatePipeline from '../elements/StatePipeline.vue'
-import TooltipElement from '../elements/TooltipElement.vue'
-import ExpenseForm from './forms/ExpenseForm.vue'
 
 const props = defineProps({
   _id: { type: String, required: true },

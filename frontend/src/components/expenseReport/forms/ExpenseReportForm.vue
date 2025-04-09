@@ -45,12 +45,12 @@
 </template>
 
 <script lang="ts">
+import { baseCurrency, ExpenseReportSimple } from '@/../../common/types.js'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import InfoPoint from '@/components/elements/InfoPoint.vue'
+import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import UserSelector from '@/components/elements/UserSelector.vue'
 import { defineComponent, PropType } from 'vue'
-import { baseCurrency, ExpenseReportSimple } from '../../../../../common/types.js'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
-import InfoPoint from '../../elements/InfoPoint.vue'
-import ProjectSelector from '../../elements/ProjectSelector.vue'
-import UserSelector from '../../elements/UserSelector.vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',

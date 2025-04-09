@@ -7,8 +7,8 @@
 
 <script lang="ts" setup>
 import APP_LOADER from '@/appData.js'
+import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import { onMounted } from 'vue'
-import ExpenseReportList from './ExpenseReportList.vue'
 
 onMounted(async () => {
   await APP_LOADER.loadData()

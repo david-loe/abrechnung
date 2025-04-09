@@ -105,18 +105,18 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
+import CountryList from '@/components/settings/elements/CountryList.vue'
+import CSVImport from '@/components/settings/elements/CSVImport.vue'
+import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
+import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
+import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
+import OrganisationList from '@/components/settings/elements/OrganisationList.vue'
+import ProjectList from '@/components/settings/elements/ProjectList.vue'
+import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
+import UserList from '@/components/settings/elements/UserList.vue'
+import UserMerge from '@/components/settings/elements/UserMerge.vue'
 import { defineComponent } from 'vue'
-import ConnectionSettingsForm from './elements/ConnectionSettingsForm.vue'
-import CountryList from './elements/CountryList.vue'
-import CSVImport from './elements/CSVImport.vue'
-import CurrencyList from './elements/CurrencyList.vue'
-import DisplaySettingsForm from './elements/DisplaySettingsForm.vue'
-import HealthInsuranceList from './elements/HealthInsuranceList.vue'
-import OrganisationList from './elements/OrganisationList.vue'
-import ProjectList from './elements/ProjectList.vue'
-import SettingsForm from './elements/SettingsForm.vue'
-import UserList from './elements/UserList.vue'
-import UserMerge from './elements/UserMerge.vue'
 
 const entries = [
   'users',

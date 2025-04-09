@@ -61,9 +61,9 @@
 
 <script lang="ts" setup>
 import { getById } from '@/../../common/scripts.js'
-import { Project } from '@/../../common/types'
-import API from '@/api'
-import APP_LOADER from '@/appData'
+import { Project } from '@/../../common/types.js'
+import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import ListElement from '@/components/elements/ListElement.vue'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'

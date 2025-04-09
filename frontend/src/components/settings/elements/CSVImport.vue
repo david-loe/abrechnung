@@ -6,9 +6,9 @@
 </template>
 
 <script lang="ts">
+import { csvToObjects, download } from '@/../../common/scripts.js'
 import API from '@/api.js'
 import { defineComponent, PropType } from 'vue'
-import { csvToObjects, download } from '../../../../../common/scripts'
 
 export default defineComponent({
   name: 'CSVImport',

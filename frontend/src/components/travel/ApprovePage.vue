@@ -70,15 +70,15 @@
 </template>
 
 <script lang="ts">
+import { TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import TravelApply from '@/components/travel/elements/TravelApplication.vue'
+import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
+import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
+import TravelList from '@/components/travel/TravelList.vue'
 import { defineComponent } from 'vue'
-import { TravelSimple } from '../../../../common/types.js'
-import ModalComponent from '../elements/ModalComponent.vue'
-import TravelApply from './elements/TravelApplication.vue'
-import TravelApplyForm from './forms/TravelApplyForm.vue'
-import TravelApproveForm from './forms/TravelApproveForm.vue'
-import TravelList from './TravelList.vue'
 
 export default defineComponent({
   name: 'ApprovePage',

@@ -54,14 +54,14 @@
 </template>
 
 <script lang="ts">
+import { resizeImage } from '@/../../common/scripts.js'
+import { DocumentFile, Token } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
 import { logger } from '@/logger.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
-import { resizeImage } from '../../../../common/scripts.js'
-import { DocumentFile, Token } from '../../../../common/types.js'
-import FileUploadFileElement from './FileUploadFileElement.vue'
 
 let APP_DATA = APP_LOADER.data
 

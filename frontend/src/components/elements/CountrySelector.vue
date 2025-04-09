@@ -32,9 +32,9 @@
 </template>
 
 <script lang="ts">
+import { CountrySimple, Locale } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
-import { CountrySimple, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CountrySelector',

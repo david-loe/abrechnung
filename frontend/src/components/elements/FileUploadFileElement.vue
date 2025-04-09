@@ -25,9 +25,8 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue'
-import { defineComponent } from 'vue'
-import { DocumentFile } from '../../../../common/types.js'
+import { DocumentFile } from '@/../../common/types.js'
+import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
   name: 'FileUploadFileElement',

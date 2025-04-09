@@ -26,8 +26,8 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { defineComponent } from 'vue'
-import HealthCareCostList from './HealthCareCostList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

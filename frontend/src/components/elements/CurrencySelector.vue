@@ -40,9 +40,9 @@
 </template>
 
 <script lang="ts">
+import { Currency, Locale } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
-import { Currency, Locale } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'CurrencySelector',

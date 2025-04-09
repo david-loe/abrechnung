@@ -158,8 +158,9 @@
 </template>
 
 <script lang="ts" setup>
-import { Comment, TravelSimple, TravelState, travelStates } from '@/../../common/types'
-import APP_LOADER from '@/appData'
+import { getById } from '@/../../common/scripts.js'
+import { Comment, TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
+import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
@@ -169,11 +170,10 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { bp } from '@/helper'
+import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import { getById } from '../../../../common/scripts'
 
 const { t } = useI18n()
 

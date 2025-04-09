@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import TravelList from '@/components/travel/TravelList.vue'
 import { defineComponent } from 'vue'
-import TravelList from './TravelList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',

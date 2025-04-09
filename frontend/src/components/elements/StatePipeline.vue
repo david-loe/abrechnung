@@ -26,10 +26,10 @@
 </template>
 
 <script lang="ts">
+import { Settings } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import { defineComponent, PropType } from 'vue'
-import { Settings } from '../../../../common/types.js'
-import StateBadge from './StateBadge.vue'
 
 export default defineComponent({
   data() {

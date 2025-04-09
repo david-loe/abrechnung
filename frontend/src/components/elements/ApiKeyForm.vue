@@ -38,10 +38,10 @@
 </template>
 
 <script lang="ts" setup>
-import API from '@/api'
+import { User } from '@/../../common/types.js'
+import API from '@/api.js'
 import { logger } from '@/logger.js'
 import { ref } from 'vue'
-import { User } from '../../../../common/types'
 
 const props = defineProps<{
   user: User

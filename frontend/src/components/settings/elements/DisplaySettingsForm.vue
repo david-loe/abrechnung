@@ -8,9 +8,9 @@
 </template>
 
 <script lang="ts">
+import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { DisplaySettings } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'DisplaySettingsForm',

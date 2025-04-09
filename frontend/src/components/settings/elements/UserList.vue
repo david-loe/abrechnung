@@ -100,9 +100,9 @@
 </template>
 
 <script lang="ts" setup>
-import { User, accesses } from '@/../../common/types'
-import API from '@/api'
-import APP_LOADER from '@/appData'
+import { User, accesses } from '@/../../common/types.js'
+import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
