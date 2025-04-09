@@ -131,20 +131,20 @@
 </template>
 
 <script lang="ts" setup>
-import { Comment, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types'
-import APP_LOADER from '@/appData'
+import { getById } from '@/../../common/scripts.js'
+import { Comment, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types.js'
+import APP_LOADER from '@/appData.js'
+import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { bp } from '@/helper'
+import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import { getById } from '../../../../common/scripts'
-import HealthInsuranceSelector from '../elements/HealthInsuranceSelector.vue'
 
 const { t } = useI18n()
 

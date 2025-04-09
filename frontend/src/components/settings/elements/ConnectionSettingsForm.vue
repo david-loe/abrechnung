@@ -8,9 +8,9 @@
 </template>
 
 <script lang="ts">
+import { ConnectionSettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import { defineComponent } from 'vue'
-import { ConnectionSettings } from '../../../../../common/types.js'
 
 export default defineComponent({
   name: 'ConnectionSettingsForm',

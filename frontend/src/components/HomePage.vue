@@ -93,18 +93,18 @@
 </template>
 
 <script lang="ts">
+import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
+import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
+import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
+import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
+import TravelList from '@/components/travel/TravelList.vue'
 import { defineComponent } from 'vue'
-import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '../../../common/types.js'
-import ModalComponent from './elements/ModalComponent.vue'
-import ExpenseReportList from './expenseReport/ExpenseReportList.vue'
-import ExpenseReportForm from './expenseReport/forms/ExpenseReportForm.vue'
-import HealthCareCostForm from './healthCareCost/forms/HealthCareCostForm.vue'
-import HealthCareCostList from './healthCareCost/HealthCareCostList.vue'
-import TravelApplication from './travel/elements/TravelApplication.vue'
-import TravelApplyForm from './travel/forms/TravelApplyForm.vue'
-import TravelList from './travel/TravelList.vue'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost'

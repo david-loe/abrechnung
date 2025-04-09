@@ -177,7 +177,7 @@ export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: ExRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ historic: false }, { $or: [{ state: 'inWork' }, { state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }]
     }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
@@ -195,7 +195,7 @@ export class HealthCareCostExamineController extends Controller {
   public async deleteAny(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(HealthCareCost, {
       _id: _id,
-      async checkOldObject(oldObject: IHealthCareCost) {
+      async checkOldObject(oldObject: HealthCareCostDoc) {
         return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
       }
     })
@@ -209,10 +209,10 @@ export class HealthCareCostExamineController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: HealthCareCostDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -231,10 +231,10 @@ export class HealthCareCostExamineController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: HealthCareCostDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           return true
@@ -306,6 +306,26 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
+  @Post('underExamination')
+  public async postOwnUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as HealthCareCostState, editor: request.user?._id })
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      cb: sendNotification,
+      allowNew: false,
+      async checkOldObject(oldObject: HealthCareCostDoc) {
+        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
@@ -400,7 +420,7 @@ export class HealthCareCostConfirmController extends Controller {
   public async deleteAnyConfirm(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(HealthCareCost, {
       _id: _id,
-      async checkOldObject(oldObject: IHealthCareCost) {
+      async checkOldObject(oldObject: HealthCareCostDoc) {
         return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
       }
     })

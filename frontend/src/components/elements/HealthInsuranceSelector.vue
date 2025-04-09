@@ -21,10 +21,10 @@
 </template>
 
 <script lang="ts">
+import { HealthInsurance } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
-import { HealthInsurance } from '../../../../common/types.js'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',

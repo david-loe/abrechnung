@@ -12,8 +12,8 @@
 </template>
 
 <script>
+import FileUpload from '@/components/elements/FileUpload.vue'
 import { defineElement } from '@vueform/vueform'
-import FileUpload from '../FileUpload.vue'
 
 export default defineElement({
   name: 'DocumentfileElement',

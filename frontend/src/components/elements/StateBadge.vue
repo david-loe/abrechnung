@@ -11,9 +11,9 @@
 </template>
 
 <script lang="ts">
+import { Settings } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
-import { Settings } from '../../../../common/types.js'
 
 export default defineComponent({
   data() {

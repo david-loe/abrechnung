@@ -45,11 +45,11 @@
 </template>
 
 <script lang="ts">
+import { getDiffInDays } from '@/../../common/scripts.js'
+import { TravelSimple, travelStates } from '@/../../common/types.js'
+import PlaceElement from '@/components/elements/PlaceElement.vue'
+import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { defineComponent, PropType } from 'vue'
-import { getDiffInDays } from '../../../../../common/scripts.js'
-import { TravelSimple, travelStates } from '../../../../../common/types.js'
-import PlaceElement from '../../elements/PlaceElement.vue'
-import StatePipeline from '../../elements/StatePipeline.vue'
 
 const keys = ['owner', 'reason', 'startDate', 'endDate', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames', 'a1Certificate']
 export default defineComponent({

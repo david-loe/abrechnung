@@ -134,7 +134,17 @@
           </div>
         </div>
       </div>
-      <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
+
+      <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense>
+            <template #default>
+              <component :is="Component"></component>
+            </template>
+            <template #fallback> </template>
+          </Suspense>
+        </template>
+      </router-view>
     </div>
 
     <footer class="py-3 border-top">
@@ -161,18 +171,18 @@
 </template>
 
 <script lang="ts">
+import { getFlagEmoji } from '@/../../common/scripts.js'
+import { accesses, CountrySimple, Currency, Locale, locales } from '@/../../common/types.js'
+import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
+import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
+import Installation from '@/components/elements/Installation.vue'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import OfflineBanner from '@/components/elements/OfflineBanner.vue'
+import { clearingDB, subscribeToPush } from '@/helper.js'
+import { logger } from '@/logger.js'
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { getFlagEmoji } from '../../common/scripts.js'
-import { accesses, CountrySimple, Currency, Locale, locales } from '../../common/types.js'
-import API from './api.js'
-import APP_LOADER from './appData.js'
-import ApiKeyForm from './components/elements/ApiKeyForm.vue'
-import Installation from './components/elements/Installation.vue'
-import ModalComponent from './components/elements/ModalComponent.vue'
-import OfflineBanner from './components/elements/OfflineBanner.vue'
-import { clearingDB, subscribeToPush } from './helper.js'
-import { logger } from './logger.js'
 
 export default defineComponent({
   data() {

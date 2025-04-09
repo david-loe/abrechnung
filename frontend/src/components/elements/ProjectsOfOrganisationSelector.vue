@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts" setup>
+import { getById } from '@/../../common/scripts.js'
+import { OrganisationSimple, ProjectSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { onMounted, ref } from 'vue'
-import { getById } from '../../../../common/scripts.js'
-import { OrganisationSimple, ProjectSimple } from '../../../../common/types.js'
 
 const props = defineProps<{
   modelValue: ProjectSimple[] | string[] | [undefined] | [null]

@@ -42,7 +42,7 @@ export class ExpenseReportController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: ExpenseReportDoc) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           return true
@@ -60,7 +60,7 @@ export class ExpenseReportController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: ExpenseReportDoc) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
           return true
         } else {
@@ -170,10 +170,10 @@ export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
     const filter: Condition<IExpenseReport> = {
-      $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }]
+      historic: false
     }
     if (request.user!.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user!.projects.supervised } })
+      filter.project = { $in: request.user!.projects.supervised }
     }
     return await this.getter(ExpenseReport, {
       query,
@@ -188,7 +188,7 @@ export class ExpenseReportExamineController extends Controller {
   public async delete(@Query() _id: _id, @Request() request: ExRequest) {
     return await this.deleter(ExpenseReport, {
       _id: _id,
-      async checkOldObject(oldObject: IExpenseReport) {
+      async checkOldObject(oldObject: ExpenseReportDoc) {
         return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
       }
     })
@@ -202,10 +202,10 @@ export class ExpenseReportExamineController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject: IExpenseReport) {
+      async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -224,10 +224,10 @@ export class ExpenseReportExamineController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           return true
@@ -288,6 +288,26 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
+  @Post('underExamination')
+  public async postAnyUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user?._id })
+
+    return await this.setter(ExpenseReport, {
+      requestBody: extendedBody,
+      cb: sendNotification,
+      allowNew: false,
+      async checkOldObject(oldObject: ExpenseReportDoc) {
+        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true

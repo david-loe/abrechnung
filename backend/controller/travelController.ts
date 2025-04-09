@@ -60,7 +60,7 @@ export class TravelController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === 'approved' && request.user!._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           return true
@@ -80,7 +80,7 @@ export class TravelController extends Controller {
       parentId,
       arrayElementKey: 'stages',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === 'approved' && request.user!._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           return true
@@ -335,7 +335,9 @@ export class TravelApproveController extends Controller {
 export class TravelExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<ITravel>, @Request() request: ExRequest) {
-    const filter: Condition<ITravel> = { $and: [{ historic: false }, { $or: [{ state: 'underExamination' }, { state: 'refunded' }] }] }
+    const filter: Condition<ITravel> = {
+      $and: [{ historic: false }, { $or: [{ state: 'approved' }, { state: 'underExamination' }, { state: 'refunded' }] }]
+    }
     if (request.user!.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user!.projects.supervised } })
     }
@@ -356,7 +358,9 @@ export class TravelExamineController extends Controller {
       requestBody: extendedBody,
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic && oldObject.state !== 'refunded' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        !oldObject.historic &&
+        (oldObject.state === 'approved' || oldObject.state === 'underExamination') &&
+        checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
     })
   }
 
@@ -382,10 +386,10 @@ export class TravelExamineController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: TravelDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -406,10 +410,10 @@ export class TravelExamineController extends Controller {
       parentId,
       arrayElementKey: 'stages',
       allowNew: true,
-      async checkOldObject(oldObject) {
+      async checkOldObject(oldObject: TravelDoc) {
         if (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -431,7 +435,7 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         return (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         )
       }
@@ -447,7 +451,7 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         return (
           !oldObject.historic &&
-          oldObject.state === 'underExamination' &&
+          (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
         )
       }
@@ -496,6 +500,26 @@ export class TravelExamineController extends Controller {
       cb: (e: ITravel) => sendNotification(e, 'backToApproved'),
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+          await oldObject.saveToHistory()
+          await oldObject.save()
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+  }
+
+  @Post('underExamination')
+  public async postAnyUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user?._id })
+
+    return await this.setter(Travel, {
+      requestBody: extendedBody,
+      cb: sendNotification,
+      allowNew: false,
+      async checkOldObject(oldObject: TravelDoc) {
+        if (oldObject.state === 'approved' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true

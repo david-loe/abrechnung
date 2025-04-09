@@ -22,9 +22,9 @@
 </template>
 
 <script lang="ts">
+import { User } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent, PropType } from 'vue'
-import { User } from '../../../../common/types.js'
 
 interface UserWithName {
   name: User['name']

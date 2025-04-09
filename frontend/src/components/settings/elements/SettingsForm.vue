@@ -8,10 +8,10 @@
 </template>
 
 <script lang="ts">
+import { Settings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
-import { Settings } from '../../../../../common/types.js'
 
 let APP_DATA = APP_LOADER.data
 

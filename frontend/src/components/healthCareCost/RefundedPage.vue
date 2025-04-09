@@ -8,8 +8,8 @@
 
 <script lang="ts" setup>
 import APP_LOADER from '@/appData.js'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { onMounted } from 'vue'
-import HealthCareCostList from './HealthCareCostList.vue'
 
 onMounted(async () => {
   await APP_LOADER.loadData()

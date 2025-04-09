@@ -36,11 +36,11 @@
 </template>
 
 <script lang="ts">
+import { Place } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import CountrySelector from '@/components/elements/CountrySelector.vue'
+import InfoPoint from '@/components/elements/InfoPoint.vue'
 import { defineComponent, PropType } from 'vue'
-import { Place } from '../../../../common/types.js'
-import CountrySelector from './CountrySelector.vue'
-import InfoPoint from './InfoPoint.vue'
 
 const defaultPlace = {
   country: null,

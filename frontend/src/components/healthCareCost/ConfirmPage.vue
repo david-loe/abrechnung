@@ -7,12 +7,12 @@
       stateFilter="underExaminationByInsurance"
       :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date']">
     </HealthCareCostList>
-    <button v-if="!showRefunded" type="button" class="btn btn-light" @click="showRefunded = true">
-      {{ $t('labels.showX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-down"></i>
+    <button v-if="!show" type="button" class="btn btn-light" @click="show = 'refunded'">
+      {{ $t('labels.showX', { X: $t('labels.refundedX', { X: $t('labels.healthCareCosts') }) }) }} <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
-      <button type="button" class="btn btn-light" @click="showRefunded = false">
-        {{ $t('labels.hideX', { X: $t('labels.refundedHealthCareCosts') }) }} <i class="bi bi-chevron-up"></i>
+      <button type="button" class="btn btn-light" @click="show = null">
+        {{ $t('labels.hideX', { X: $t('labels.refundedX', { X: $t('labels.healthCareCosts') }) }) }} <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
       <HealthCareCostList
@@ -26,8 +26,8 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { defineComponent } from 'vue'
-import HealthCareCostList from './HealthCareCostList.vue'
 
 export default defineComponent({
   name: 'ExaminePage',
@@ -35,7 +35,7 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      showRefunded: false
+      show: null as 'refunded' | null
     }
   },
   methods: {},

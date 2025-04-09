@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Base64 } from '@/../../common/scripts'
+import { Base64 } from '@/../../common/scripts.js'
 import API from '@/api.js'
 import { ref, watch } from 'vue'
 import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
