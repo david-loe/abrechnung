@@ -134,12 +134,17 @@
           </div>
         </div>
       </div>
-      <Suspense>
-        <template #default>
-          <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" />
+
+      <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense>
+            <template #default>
+              <component :is="Component"></component>
+            </template>
+            <template #fallback> </template>
+          </Suspense>
         </template>
-        <template #fallback> </template>
-      </Suspense>
+      </router-view>
     </div>
 
     <footer class="py-3 border-top">
