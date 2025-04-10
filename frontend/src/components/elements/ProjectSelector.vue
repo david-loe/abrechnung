@@ -1,6 +1,7 @@
 <template>
   <div :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'input-group' : ''">
     <ProjectsOfOrganisationSelector
+      v-if="APP_DATA && APP_DATA.organisations.length > 1"
       v-model="projects"
       :class="'col-' + orgSelectSplit"
       :updateUserOrg="updateUserOrg"

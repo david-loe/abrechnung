@@ -1,5 +1,14 @@
 <template>
-  <ListElement class="mb-3" ref="list" :endpoint="endpoint" :filter="filter" :headers="headers" :columns-to-hide="props.columnsToHide">
+  <ListElement
+    class="mb-3"
+    ref="list"
+    :endpoint="endpoint"
+    :filter="filter"
+    :headers="headers"
+    :columns-to-hide="props.columnsToHide"
+    :rowsItems="props.rowsItems"
+    :rowsPerPage="props.rowsPerPage"
+    @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
         {{ header.text }}
@@ -71,7 +80,19 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.owner">
-          <UserSelector v-model="filter.owner as any"></UserSelector>
+          <UserSelector v-model="filter.owner as string"></UserSelector>
+        </div>
+      </div>
+    </template>
+    <template #header-updatedAt="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('updatedAt')">
+          <i v-if="showFilter.updatedAt" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.updatedAt">
+          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()"></DateInput>
         </div>
       </div>
     </template>
@@ -110,7 +131,7 @@
     </template>
     <template #item-owner="{ owner }">
       <span :title="owner.name.givenName + ' ' + owner.name.familyName">
-        {{ owner.name.givenName + ' ' + owner.name.familyName.substring(0, 1) + '.' }}
+        {{ owner.name.familyName + ', ' + owner.name.givenName.substring(0, 1) + '.' }}
       </span>
     </template>
     <template #item-state="{ progress, state }">
@@ -118,7 +139,7 @@
       <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
     </template>
     <template #item-organisation="{ project }">
-      <span v-if="APP_LOADER.data.value">{{ getById(project.organisation, APP_LOADER.data.value.organisations)?.name }}</span>
+      <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
     <template #item-addUp.total.amount="{ addUp }">
       <TooltipElement
@@ -149,10 +170,15 @@
       <span v-if="comments.length > 0">
         <TooltipElement
           html
-          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName[0]}</b>: ${comment.text}`).join('<br>')">
+          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}</b>: ${comment.text}`).join('<br>')">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
+    </template>
+    <!-- Standard-Slot weiterleiten -->
+
+    <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+      <slot :name="slot" v-bind="scope"></slot>
     </template>
   </ListElement>
 </template>
@@ -174,6 +200,7 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
+import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 
@@ -182,9 +209,14 @@ const props = defineProps<{
   stateFilter?: TravelState
   columnsToHide?: string[]
   makeNameNoLink?: boolean
+  rowsItems?: number[]
+  rowsPerPage?: number
 }>()
 
-const emits = defineEmits<{ clickedApplied: [travel: TravelSimple] }>()
+const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: [] }>()
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
   //@ts-ignore
@@ -202,10 +234,17 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.balance'), value: 'addUp.balance.amount' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
+    { text: t('labels.updatedAt'), value: 'updatedAt' },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'comments', width: 25 }
   )
+}
+
+if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
+  const index = headers.findIndex((header) => header.value === 'organisation')
+  if (index !== -1) {
+    headers.splice(index, 1)
+  }
 }
 
 const getEmptyFilter = () =>
@@ -214,7 +253,8 @@ const getEmptyFilter = () =>
     owner: undefined,
     state: undefined,
     'destinationPlace.country': undefined,
-    project: { $in: [undefined] }
+    project: { $in: [undefined] },
+    updatedAt: { $gt: undefined }
   } as Filter)
 
 const filter = ref(getEmptyFilter())
@@ -232,7 +272,8 @@ const showFilter = ref({
   state: false,
   'destinationPlace.country': false,
   project: false,
-  'project.organisation': false
+  'project.organisation': false,
+  updatedAt: false
 })
 
 function clickFilter(header: keyof typeof showFilter.value) {
