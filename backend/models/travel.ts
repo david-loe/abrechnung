@@ -2,13 +2,14 @@ import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { TravelCalculator } from '../../common/travel.js'
 import {
+  Comment,
   CountryCode,
   Country as ICountry,
   Currency as ICurrency,
   Money,
   Record,
   Travel,
-  TravelComment,
+  TravelState,
   baseCurrency,
   distanceRefundTypes,
   lumpsumTypes,
@@ -257,7 +258,7 @@ travelSchema.methods.calculateExchangeRates = async function (this: TravelDoc) {
 
 travelSchema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as TravelComment)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<TravelState>)
     delete this.comment
   }
 }

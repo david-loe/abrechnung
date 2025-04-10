@@ -1,8 +1,9 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
+  Comment,
   HealthCareCost,
-  HealthCareCostComment,
+  HealthCareCostState,
   Currency as ICurrency,
   Money,
   baseCurrency,
@@ -138,7 +139,7 @@ healthCareCostSchema.methods.calculateExchangeRates = async function (this: Heal
 
 healthCareCostSchema.methods.addComment = function (this: HealthCareCostDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as HealthCareCostComment)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<HealthCareCostState>)
     delete this.comment
   }
 }
