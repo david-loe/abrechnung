@@ -23,7 +23,7 @@
         </ExpenseForm>
       </div>
     </ModalComponent>
-    <div class="container" v-if="expenseReport._id">
+    <div class="container py-3" v-if="expenseReport._id">
       <div class="row">
         <div class="col">
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">

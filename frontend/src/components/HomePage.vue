@@ -38,7 +38,7 @@
         </HealthCareCostForm>
       </div>
     </ModalComponent>
-    <div v-if="APP_DATA" class="container">
+    <div v-if="APP_DATA" class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('headlines.home') }}</h1>

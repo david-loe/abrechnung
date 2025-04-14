@@ -8,93 +8,88 @@
         @cancel=";($refs.modalComp as any).hideModal()"
         ref="apiKeyForm"></ApiKeyForm>
     </ModalComponent>
-    <header class="mb-3 border-bottom">
-      <div class="container">
-        <div class="d-flex flex-row align-items-center nav">
-          <div class="me-auto">
-            <a href="/" class="nav-link link-body-emphasis d-flex align-items-center">
-              <i class="fs-1 bi bi-receipt"></i>
-              <span class="fs-4 ms-2 d-none d-md-block">{{ $t('headlines.title') }}</span>
-            </a>
-          </div>
+    <nav class="navbar navbar-expand-lg border-bottom">
+      <div class="container d-flex" id="navBarContent">
+        <a href="/" class="navbar-brand link-body-emphasis d-flex align-items-center">
+          <i class="fs-2 bi bi-receipt"></i>
+          <span class="fs-4 ms-2">{{ $t('headlines.title') }}</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <template v-if="APP_DATA">
-            <div v-for="access of accesses" :key="access">
-              <template v-if="access !== 'admin' && access.indexOf(':') === -1 && APP_DATA.user.access[access]">
-                <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
-                  <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-4 bi bi-' + icon"></i>
-                  <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
-                </router-link>
-              </template>
-            </div>
-            <div class="dropdown">
-              <a
-                class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle"
-                data-bs-toggle="dropdown"
-                href="#"
-                role="button">
-                <i class="fs-4 bi bi-person-circle"></i>
-                <span class="ms-1 d-none d-md-block">{{ APP_DATA.user.name.givenName }}</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="updateLanguage()">
-                    <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
-                      {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
-                    </option>
-                  </select>
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <button @click=";($refs.modalComp as any).modal.show()" class="d-flex align-items-center dropdown-item">
-                    <i class="fs-4 bi bi-key"></i>
-                    <span class="ms-1">API Key</span>
-                  </button>
-                </li>
-                <template v-if="APP_DATA?.user.access.admin">
-                  <li>
-                    <hr class="dropdown-divider" />
-                  </li>
-                  <li>
-                    <router-link to="/settings" class="d-flex align-items-center dropdown-item">
-                      <i class="fs-4 bi bi-gear"></i>
-                      <span class="ms-1">{{ $t('headlines.settings') }}</span>
+            <ul class="navbar-nav" style="flex-wrap: wrap">
+              <template v-for="access of accesses" :key="access">
+                <template v-if="access.indexOf(':') === -1 && APP_DATA.user.access[access]">
+                  <li class="nav-item">
+                    <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
+                      <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-4 bi bi-' + icon"></i>
+                      <span class="ms-1">{{ $t('accesses.' + access) }}</span>
                     </router-link>
                   </li>
                 </template>
-                <template v-if="mobile && !alreadyInstalled && !isOffline">
+              </template>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  role="button">
+                  <i class="fs-4 bi bi-person-circle"></i>
+                  <span class="ms-1">{{ APP_DATA.user.name.givenName }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <select class="form-select mx-auto" v-model="$i18n.locale" style="max-width: 68px" @change="updateLanguage()">
+                      <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
+                        {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
+                      </option>
+                    </select>
+                  </li>
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
                   <li>
-                    <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
-                      <i class="fs-4 bi bi-box-arrow-down"></i>
-                      <span class="ms-1">{{ $t('headlines.installApp') }}</span>
+                    <button @click=";($refs.modalComp as any).modal.show()" class="d-flex align-items-center dropdown-item">
+                      <i class="fs-4 bi bi-key"></i>
+                      <span class="ms-1">API Key</span>
                     </button>
                   </li>
-                </template>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
-                    <i class="fs-4 bi bi-box-arrow-left"></i>
-                    <span class="ms-1">{{ $t('headlines.logout') }}</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+                  <template v-if="mobile && !alreadyInstalled && !isOffline">
+                    <li>
+                      <hr class="dropdown-divider" />
+                    </li>
+                    <li>
+                      <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
+                        <i class="fs-4 bi bi-box-arrow-down"></i>
+                        <span class="ms-1">{{ $t('headlines.installApp') }}</span>
+                      </button>
+                    </li>
+                  </template>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
+                      <i class="fs-4 bi bi-box-arrow-left"></i>
+                      <span class="ms-1">{{ $t('headlines.logout') }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </template>
           <div v-else>
             <router-link to="/login" class="nav-link link-body-emphasis d-flex align-items-center">
               <i class="fs-4 bi bi-box-arrow-in-right"></i>
-              <span class="ms-1 d-none d-md-block">{{ $t('headlines.login') }}</span>
+              <span class="ms-1">{{ $t('headlines.login') }}</span>
             </router-link>
           </div>
         </div>
       </div>
-    </header>
+    </nav>
 
     <div v-if="loadState !== 'LOADED'" class="position-absolute top-50 start-50 translate-middle">
       <div class="spinner-grow me-3" role="status">
@@ -289,7 +284,7 @@ html {
 }
 
 body {
-  margin-bottom: 75px !important;
+  margin-bottom: 60px !important;
   /* Margin bottom by footer height */
 }
 

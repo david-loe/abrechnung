@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
         <h1 class="mb-3">{{ $t('accesses.refunded/travel') }}</h1>

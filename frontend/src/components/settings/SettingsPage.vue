@@ -1,21 +1,21 @@
 <template>
-  <div v-if="APP_DATA" class="container">
-    <div class="row">
-      <div class="col-auto">
-        <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px; height: 100%">
-          <ul class="nav nav-pills flex-column">
-            <li v-for="_entry in entries" class="nav-item">
-              <span
-                style="cursor: pointer"
-                :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
-                @click="entry = _entry">
-                {{ $t('labels.' + _entry) }}
-              </span>
-            </li>
-          </ul>
-        </div>
+  <div v-if="APP_DATA" class="d-lg-flex">
+    <div class="sidebar">
+      <div class="offcanvas-body flex-column pt-lg-3 overflow-y-auto">
+        <ul class="nav nav-pills flex-column">
+          <li v-for="_entry in entries" class="nav-item">
+            <span
+              style="cursor: pointer"
+              :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
+              @click="entry = _entry">
+              {{ $t('labels.' + _entry) }}
+            </span>
+          </li>
+        </ul>
       </div>
-      <div class="col">
+    </div>
+    <div class="w-100" id="settingsContent">
+      <div class="container px-lg-4 py-3">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'" />
         <ConnectionSettingsForm v-if="entry === 'connectionSettings'" />
@@ -100,6 +100,7 @@
         </Suspense>
       </div>
     </div>
+    <div class="invisible" :style="{ width: rightMargin }"></div>
   </div>
 </template>
 
@@ -153,6 +154,17 @@ export default defineComponent({
     }
   },
   props: [],
+
+  computed: {
+    rightMargin() {
+      const container = document.getElementById('navBarContent')
+      if (container) {
+        return container.getBoundingClientRect().right - container.getBoundingClientRect().width + 'px'
+      } else {
+        return '0px'
+      }
+    }
+  },
 
   async created() {
     await APP_LOADER.loadData()

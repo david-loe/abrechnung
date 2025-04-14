@@ -24,7 +24,7 @@
           askOwner></TravelApplyForm>
       </div>
     </ModalComponent>
-    <div class="container">
+    <div class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
           <h1>{{ $t('accesses.approve/travel') }}</h1>

@@ -58,7 +58,7 @@
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"></TravelApplyForm>
       </div>
     </ModalComponent>
-    <div class="container" v-if="travel._id">
+    <div class="container py-3" v-if="travel._id">
       <div class="row">
         <div class="col">
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">

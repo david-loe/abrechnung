@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container py-3">
     <h1 class="mb-3">{{ $t('accesses.examine/travel') }}</h1>
     <TravelList
       class="mb-5"

@@ -43,7 +43,7 @@
         </span>
         <br />
         <strong>
-          <a href="/settings"><i class="bi bi-arrow-clockwise me-1"></i>{{ $t('alerts.reloadRequired') }}</a>
+          <a href="/admin"><i class="bi bi-arrow-clockwise me-1"></i>{{ $t('alerts.reloadRequired') }}</a>
         </strong>
       </span>
       <button type="button" class="btn-close ms-auto" @click="result = undefined"></button>
