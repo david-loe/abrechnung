@@ -163,6 +163,17 @@
     }
   },
   "labels": {
+    "pagePadding": "Seitenrand",
+    "cellPadding": "Zellenrand",
+    "fontSizes": "Schriftgrößen",
+    "pageSize": "Seitengröße",
+    "width": "Breite",
+    "height": "Höhe",
+    "bottom": "Unten",
+    "textColor": "Textfarbe",
+    "borderColor": "Rahmenfarbe",
+    "borderThickness": "Rahmenstärke",
+    "printerSettings": "Druckeinstellungen",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",

@@ -18,8 +18,10 @@
       <div class="container px-lg-4 py-3">
         <h1>{{ $t('labels.' + entry) }}</h1>
         <SettingsForm v-if="entry === 'settings'" />
-        <ConnectionSettingsForm v-if="entry === 'connectionSettings'" />
-        <DisplaySettingsForm v-if="entry === 'displaySettings'" />
+        <ConnectionSettingsForm v-else-if="entry === 'connectionSettings'" />
+        <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
+        <TravelSettingsForm v-else-if="entry === 'travelSettings'" />
+        <PrinterSettingsForm v-else-if="entry === 'printerSettings'" />
         <template v-else-if="entry === 'users'">
           <Suspense>
             <template #default>
@@ -113,8 +115,10 @@ import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
 import OrganisationList from '@/components/settings/elements/OrganisationList.vue'
+import PrinterSettingsForm from '@/components/settings/elements/PrinterSettingsForm.vue'
 import ProjectList from '@/components/settings/elements/ProjectList.vue'
 import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
+import TravelSettingsForm from '@/components/settings/elements/TravelSettingsForm.vue'
 import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
 import { defineComponent } from 'vue'
@@ -126,9 +130,11 @@ const entries = [
   'countries',
   'currencies',
   'healthInsurances',
-  'settings',
+  'travelSettings',
   'connectionSettings',
-  'displaySettings'
+  'displaySettings',
+  'printerSettings',
+  'settings'
 ] as const
 
 export default defineComponent({
@@ -144,7 +150,9 @@ export default defineComponent({
     UserMerge,
     CSVImport,
     ConnectionSettingsForm,
-    DisplaySettingsForm
+    DisplaySettingsForm,
+    TravelSettingsForm,
+    PrinterSettingsForm
   },
   data() {
     return {

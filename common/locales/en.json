@@ -162,6 +162,17 @@
     }
   },
   "labels": {
+    "pagePadding": "Page padding",
+    "cellPadding": "Cell padding",
+    "fontSizes": "Font sizes",
+    "pageSize": "Page size",
+    "width": "Width",
+    "height": "Height",
+    "bottom": "Bottom",
+    "textColor": "Text color",
+    "borderColor": "Border color",
+    "borderThickness": "Border Thickness",
+    "printerSettings": "Print Settings",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "E-mail address for A1 certificate notifications",
     "access": "Access",
