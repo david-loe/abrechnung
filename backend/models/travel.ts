@@ -1,10 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { TravelCalculator } from '../../common/travel.js'
 import {
   Comment,
-  CountryCode,
-  Country as ICountry,
   Currency as ICurrency,
   Money,
   Record,
@@ -16,18 +13,12 @@ import {
   transportTypes,
   travelStates
 } from '../../common/types.js'
-import { getSettings } from '../db.js'
-import Country from './country.js'
+import { travelCalculator } from '../factory.js'
 import DocumentFile from './documentFile.js'
 import { convertCurrency } from './exchangeRate.js'
 import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
-
-export const travelCalculator = new TravelCalculator(
-  (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
-  (await getSettings()).travelSettings
-)
 
 function place(required = false, withPlace = true) {
   const obj: any = {

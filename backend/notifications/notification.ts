@@ -9,7 +9,8 @@ import {
   TravelSimple
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
-import i18n, { formatter } from '../i18n.js'
+import { formatter } from '../factory.js'
+import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendMail } from './mail.js'

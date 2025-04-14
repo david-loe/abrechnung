@@ -8,56 +8,6 @@ export async function checkForMigrations() {
   const settings = await Settings.findOne()
   if (settings?.migrateFrom) {
     const migrateFrom = settings?.migrateFrom
-    if (semver.lte(migrateFrom, '1.1.0')) {
-      logger.info('Apply migration from v1.1.0: Rewrite history dates to reflect submission date')
-      async function rewriteSubmissionDate(collection: string, state: string) {
-        const allReports = mongoose.connection.collection(collection).find({ historic: false })
-        for await (const report of allReports) {
-          for (let i = 0; i < report.history.length; i++) {
-            const history = await mongoose.connection.collection(collection).findOne({ _id: report.history[i] })
-            if (history && history.state === state) {
-              let submissionDate = report.updatedAt
-              mongoose.connection.collection(collection).updateOne({ _id: report.history[i] }, { $set: { updatedAt: submissionDate } })
-              break
-            }
-          }
-        }
-      }
-      await rewriteSubmissionDate('travels', 'approved')
-      await rewriteSubmissionDate('expensereports', 'inWork')
-      await rewriteSubmissionDate('healthcarecosts', 'inWork')
-    }
-    if (semver.lte(migrateFrom, '1.2.0')) {
-      logger.info('Apply migration from v1.2.0: New settings structure')
-      const oldSettings = await mongoose.connection.collection('settings').findOne()
-      if (settings && oldSettings) {
-        settings.travelSettings = {
-          maxTravelDayCount: oldSettings.maxTravelDayCount,
-          allowSpouseRefund: oldSettings.allowSpouseRefund,
-          allowTravelApplicationForThePast: oldSettings.allowTravelApplicationForThePast,
-          toleranceStageDatesToApprovedTravelDates: oldSettings.toleranceStageDatesToApprovedTravelDates,
-          distanceRefunds: oldSettings.distanceRefunds,
-          vehicleRegistrationWhenUsingOwnCar: oldSettings.vehicleRegistrationWhenUsingOwnCar,
-          lumpSumCut: {
-            breakfast: oldSettings.breakfastCateringLumpSumCut,
-            lunch: oldSettings.lunchCateringLumpSumCut,
-            dinner: oldSettings.dinnerCateringLumpSumCut
-          },
-          factorCateringLumpSum: oldSettings.factorCateringLumpSum,
-          factorCateringLumpSumExceptions: oldSettings.factorCateringLumpSumExceptions,
-          factorOvernightLumpSum: oldSettings.factorOvernightLumpSum,
-          factorOvernightLumpSumExceptions: oldSettings.factorOvernightLumpSumExceptions,
-          fallBackLumpSumCountry: oldSettings.fallBackLumpSumCountry,
-          secoundNightOnAirplaneLumpSumCountry: oldSettings.secoundNightOnAirplaneLumpSumCountry,
-          secoundNightOnShipOrFerryLumpSumCountry: oldSettings.secoundNightOnShipOrFerryLumpSumCountry,
-          minHoursOfTravel: 8, // fix migration failing
-          minProfessionalShare: 0.5 // fix migration failing
-        } as any
-        await settings.save()
-      } else {
-        throw Error("Couldn't find settings")
-      }
-    }
     if (semver.lte(migrateFrom, '1.2.3')) {
       logger.info('Apply migration from v1.2.3: Move projects from settings.projects to projects.assigned')
       await mongoose.connection.collection('users').updateMany({}, { $rename: { 'settings.projects': 'projects.assigned' } })
@@ -203,6 +153,23 @@ export async function checkForMigrations() {
       await calcAddUp('travels')
       await calcAddUp('expensereports')
       await calcAddUp('healthcarecosts')
+    }
+
+    if (semver.lte(migrateFrom, '1.7.0')) {
+      logger.info('Apply migration from v1.7.0: redesign settings')
+      const { travelSettings, accessIcons, stateColors } = (await mongoose.connection.collection('settings').findOne({})) as any
+
+      for (const key in accessIcons as Record<string, string[]>) {
+        for (let i = 0; i < accessIcons[key].length; i++) {
+          if (accessIcons[key][i].startsWith('bi-')) {
+            accessIcons[key][i] = accessIcons[key][i].slice(3)
+          }
+        }
+      }
+
+      await mongoose.connection.collection('travelsettings').updateOne({}, { $set: travelSettings })
+      await mongoose.connection.collection('displaysettings').updateOne({}, { $set: { accessIcons, stateColors } })
+      await mongoose.connection.collection('settings').updateOne({}, { $unset: { accessIcons: '', stateColors: '', travelSettings: '' } })
     }
 
     if (settings) {

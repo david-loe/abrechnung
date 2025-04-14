@@ -1,20 +1,4 @@
 {
-  "accessIcons": {
-    "admin": ["bi-person-fill"],
-    "appliedFor:travel": ["bi-airplane", "bi-plus"],
-    "approve/travel": ["bi-calendar-check"],
-    "approved:travel": ["bi-airplane", "bi-calendar-check", "bi-plus"],
-    "confirm/healthCareCost": ["bi-check-square", "bi-hospital"],
-    "examine/expenseReport": ["bi-coin", "bi-pencil-square"],
-    "examine/healthCareCost": ["bi-hospital", "bi-pencil-square"],
-    "examine/travel": ["bi-airplane", "bi-pencil-square"],
-    "inWork:expenseReport": ["bi-coin", "bi-plus"],
-    "inWork:healthCareCost": ["bi-hospital", "bi-plus"],
-    "refunded/expenseReport": ["bi-bank", "bi-coin"],
-    "refunded/healthCareCost": ["bi-bank", "bi-hospital"],
-    "refunded/travel": ["bi-airplane", "bi-bank"],
-    "user": ["bi-card-list"]
-  },
   "defaultAccess": {
     "admin": false,
     "appliedFor:travel": true,
@@ -42,63 +26,7 @@
     "deleteRefundedAfterXDays": 0,
     "mailXDaysBeforeDeletion": 7
   },
-  "stateColors": {
-    "appliedFor": {
-      "color": "#cae5ff",
-      "text": "black"
-    },
-    "approved": {
-      "color": "#89bbfe",
-      "text": "black"
-    },
-    "inWork": {
-      "color": "#AAD0FF",
-      "text": "black"
-    },
-    "refunded": {
-      "color": "#615d6c",
-      "text": "white"
-    },
-    "rejected": {
-      "color": "#E8998D",
-      "text": "black"
-    },
-    "underExamination": {
-      "color": "#6f8ab7",
-      "text": "white"
-    },
-    "underExaminationByInsurance": {
-      "color": "#687492",
-      "text": "white"
-    }
-  },
-  "travelSettings": {
-    "allowSpouseRefund": false,
-    "allowTravelApplicationForThePast": false,
-    "distanceRefunds": {
-      "car": 0.3,
-      "halfCar": 0.15,
-      "motorcycle": 0.2
-    },
-    "factorCateringLumpSum": 1,
-    "factorCateringLumpSumExceptions": [],
-    "factorOvernightLumpSum": 1,
-    "factorOvernightLumpSumExceptions": [],
-    "fallBackLumpSumCountry": "LU",
-    "lumpSumCut": {
-      "breakfast": 0.2,
-      "dinner": 0.4,
-      "lunch": 0.4
-    },
-    "maxTravelDayCount": 92,
-    "minHoursOfTravel": 8,
-    "minProfessionalShare": 0.5,
-    "secondNightOnAirplaneLumpSumCountry": "AT",
-    "secondNightOnShipOrFerryLumpSumCountry": "LU",
-    "toleranceStageDatesToApprovedTravelDates": 3,
-    "vehicleRegistrationWhenUsingOwnCar": "optional"
-  },
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
-  "version": "1.7.0"
+  "version": "1.7.1"
 }

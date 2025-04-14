@@ -1,8 +1,8 @@
 import { addUp, sanitizeFilename } from '../../common/scripts.js'
 import { ExpenseReport, HealthCareCost, Locale, Travel, reportIsHealthCareCost, reportIsTravel } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
-import { reportPrinter } from '../factory.js'
-import i18n, { formatter } from '../i18n.js'
+import { formatter, reportPrinter } from '../factory.js'
+import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 import { getClient } from '../notifications/mail.js'
 

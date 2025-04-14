@@ -21,7 +21,7 @@
             <div v-for="access of accesses" :key="access">
               <template v-if="access !== 'admin' && access.indexOf(':') === -1 && APP_DATA.user.access[access]">
                 <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
-                  <i v-for="icon of APP_DATA.settings.accessIcons[access]" :class="'fs-4 bi ' + icon"></i>
+                  <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-4 bi bi-' + icon"></i>
                   <span class="ms-1 d-none d-md-block">{{ $t('accesses.' + access) }}</span>
                 </router-link>
               </template>

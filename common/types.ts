@@ -5,6 +5,11 @@ import { mongo, Types } from 'mongoose'
  */
 export type _id = Types.ObjectId
 
+/**
+ * @pattern /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
+ */
+export type HexColor = string
+
 export interface Settings {
   userCanSeeAllProjects: boolean
   defaultAccess: { [key in Access]: boolean }
@@ -12,10 +17,7 @@ export interface Settings {
   retentionPolicy: {
     [key in RetentionType]: number
   }
-  travelSettings: SettingsTravel
   uploadTokenExpireAfterSeconds: number
-  stateColors: { [key in AnyState]: { color: string; text: string } }
-  accessIcons: { [key in Access]: string[] }
   version: string
   /**
    * @Hidden
@@ -24,7 +26,7 @@ export interface Settings {
   _id: _id
 }
 
-export interface SettingsTravel {
+export interface TravelSettings {
   maxTravelDayCount: number
   allowSpouseRefund: boolean
   allowTravelApplicationForThePast: boolean
@@ -41,6 +43,7 @@ export interface SettingsTravel {
   secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number
   minProfessionalShare: number
+  _id: _id
 }
 
 export interface ldapauthSettings {
@@ -110,7 +113,24 @@ export interface DisplaySettings {
     fallback: Locale
     overwrite: { [key in Locale]: { [key: string]: string } }
   }
+  stateColors: { [key in AnyState]: { color: HexColor; text: string } }
+  accessIcons: { [key in Access]: string[] }
   _id: _id
+}
+
+export interface PrinterSettings extends PrintSettingsBase {
+  fontName: FontName
+  _id: _id
+}
+
+export interface PrintSettingsBase {
+  fontSizes: { S: number; M: number; L: number }
+  textColor: HexColor
+  pagePadding: number
+  borderColor: HexColor
+  borderThickness: number
+  cellPadding: { x: number; bottom: number }
+  pageSize: { width: number; height: number }
 }
 
 /**
@@ -585,6 +605,8 @@ export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
 
 export const objectIdRegex = /^[0-9a-fA-F]{24}$/
+
+export const hexColorRegex = /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
 
 export const baseCurrency: Currency = {
   _id: 'EUR',

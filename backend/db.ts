@@ -6,7 +6,9 @@ import {
   CountryLumpSum,
   ConnectionSettings as IConnectionSettings,
   DisplaySettings as IDisplaySettings,
+  PrinterSettings as IPrinterSettings,
   Settings as ISettings,
+  TravelSettings as ITravelSettings,
   tokenAdminUser
 } from '../common/types.js'
 import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
@@ -15,7 +17,9 @@ import countries from './data/countries.json' with { type: 'json' }
 import currencies from './data/currencies.json' with { type: 'json' }
 import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
+import printerSettings from './data/printerSettings.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
+import travelSettings from './data/travelSettings.json' with { type: 'json' }
 import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'
 import ConnectionSettings from './models/connectionSettings.js'
@@ -26,15 +30,18 @@ import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
 
-export async function connectDB() {
+export function connectDB() {
   const first = mongoose.connection.readyState === 0
   if (first) {
     mongoose.connection.on('connected', () => logger.debug('Connected to Database'))
     mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
-    await mongoose.connect(process.env.MONGO_URL ? process.env.MONGO_URL : 'mongodb://127.0.0.1:27017/abrechnung')
-    await initDB()
+    return (async () => {
+      const mongoDB = await mongoose.connect(process.env.MONGO_URL)
+      await initDB()
+      return mongoDB.connection
+    })()
   } else {
-    await mongoose.connection.asPromise()
+    return mongoose.connection.asPromise()
   }
 }
 
@@ -58,6 +65,16 @@ export async function initDB() {
   } else {
     await mongoose.connection.collection('settings').insertOne(settings)
     logger.info('Created Settings from Default')
+  }
+
+  const DBtravelSettings = (await mongoose.connection.collection('travelsettings').findOne()) as ITravelSettings | null
+  if (!DBtravelSettings) {
+    await mongoose.connection.collection('travelsettings').insertOne(travelSettings)
+  }
+
+  const DBprinterSettings = (await mongoose.connection.collection('printersettings').findOne()) as IPrinterSettings | null
+  if (!DBprinterSettings) {
+    await mongoose.connection.collection('printersettings').insertOne(printerSettings)
   }
 
   if (process.env.NODE_ENV === 'production') {
@@ -152,6 +169,26 @@ export async function getSettings(): Promise<ISettings> {
     return settings
   } else {
     throw Error('Settings not found')
+  }
+}
+
+export async function getTravelSettings(): Promise<ITravelSettings> {
+  await connectDB()
+  const travelSettings = (await mongoose.connection.collection('travelsettings').findOne()) as ITravelSettings | null
+  if (travelSettings) {
+    return travelSettings
+  } else {
+    throw Error('Travel Settings not found')
+  }
+}
+
+export async function getPrinterSettings(): Promise<IPrinterSettings> {
+  await connectDB()
+  const printerSettings = (await mongoose.connection.collection('printersettings').findOne()) as IPrinterSettings | null
+  if (printerSettings) {
+    return printerSettings
+  } else {
+    throw Error('Printer Settings not found')
   }
 }
 

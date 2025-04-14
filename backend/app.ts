@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Request as ExRequest, Response as ExResponse, NextFunction as ExNextFunction } from 'express'
+import express, { NextFunction as ExNextFunction, Request as ExRequest, Response as ExResponse } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import swaggerUi from 'swagger-ui-express'
@@ -57,7 +57,7 @@ const useSecureCookie = process.env.VITE_BACKEND_URL.startsWith('https') && Bool
 app.use(
   session({
     store: sessionStore,
-    secret: process.env.COOKIE_SECRET ? process.env.COOKIE_SECRET : 'secret',
+    secret: process.env.COOKIE_SECRET,
     cookie: {
       maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: useSecureCookie,

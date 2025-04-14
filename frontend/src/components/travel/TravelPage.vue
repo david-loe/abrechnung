@@ -193,7 +193,7 @@
           </label>
           <span
             id="travelProfessionalShare"
-            :class="travel.professionalShare <= APP_DATA!.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
+            :class="travel.professionalShare <= APP_DATA!.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
           <InfoPoint class="ms-1" :text="t('info.professionalShare')" />

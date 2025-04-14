@@ -63,7 +63,7 @@
       <template #item-access="user">
         <template v-for="access of accesses">
           <span v-if="user.access[access]" class="ms-3" :title="$t('accesses.' + access)">
-            <i v-for="icon of APP_DATA!.settings.accessIcons[access]" :class="'bi ' + icon"></i>
+            <i v-for="icon of APP_DATA!.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
           </span>
         </template>
       </template>

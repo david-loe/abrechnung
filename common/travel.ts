@@ -10,22 +10,22 @@ import {
   Place,
   PurposeSimple,
   Refund,
-  SettingsTravel,
   Stage,
   Travel,
   TravelDayFullCountry,
-  TravelExpense
+  TravelExpense,
+  TravelSettings
 } from './types.js'
 
 export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>
   lumpSumCalculator!: LumpSumCalculator
   validator: TravelValidator
-  travelSettings!: SettingsTravel
+  travelSettings!: TravelSettings
   stagesCompareFn = (a: Stage, b: Stage) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
   expensesCompareFn = (a: TravelExpense, b: TravelExpense) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
 
-  constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: SettingsTravel) {
+  constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: TravelSettings) {
     this.getCountryById = getCountryById
     this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallBackLumpSumCountry)
     this.validator = new TravelValidator(travelSettings)
@@ -46,7 +46,7 @@ export class TravelCalculator {
     return conflicts
   }
 
-  updateSettings(travelSettings: SettingsTravel) {
+  updateSettings(travelSettings: TravelSettings) {
     this.travelSettings = travelSettings
     this.validator.updateSettings(travelSettings)
     this.lumpSumCalculator.setFallBackLumpSumCountry(travelSettings.fallBackLumpSumCountry)
@@ -351,13 +351,13 @@ export class TravelCalculator {
 type Invalid = { path: string; err: string | Error; val?: any }
 type Warning = { name: string; val?: any; limit?: any }
 export class TravelValidator {
-  travelSettings!: SettingsTravel
+  travelSettings!: TravelSettings
 
-  constructor(travelSettings: SettingsTravel) {
+  constructor(travelSettings: TravelSettings) {
     this.updateSettings(travelSettings)
   }
 
-  updateSettings(travelSettings: SettingsTravel) {
+  updateSettings(travelSettings: TravelSettings) {
     this.travelSettings = travelSettings
   }
 
