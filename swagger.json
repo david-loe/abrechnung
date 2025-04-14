@@ -2385,7 +2385,7 @@
 				},
 				"type": "object"
 			},
-			"TravelComment": {
+			"Comment_TravelState_": {
 				"properties": {
 					"text": {
 						"type": "string"
@@ -2393,18 +2393,18 @@
 					"author": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
 					"toState": {
 						"$ref": "#/components/schemas/TravelState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
 					"text",
 					"author",
-					"_id",
-					"toState"
+					"toState",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -2727,7 +2727,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/TravelComment"
+							"$ref": "#/components/schemas/Comment_TravelState_"
 						},
 						"type": "array"
 					},
@@ -2943,7 +2943,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/TravelComment"
+							"$ref": "#/components/schemas/Comment_TravelState_"
 						},
 						"type": "array"
 					},
@@ -3664,7 +3664,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/TravelComment"
+							"$ref": "#/components/schemas/Comment_TravelState_"
 						},
 						"type": "array"
 					},
@@ -3835,7 +3835,7 @@
 				},
 				"type": "object"
 			},
-			"ExpenseReportComment": {
+			"Comment_ExpenseReportState_": {
 				"properties": {
 					"text": {
 						"type": "string"
@@ -3843,18 +3843,18 @@
 					"author": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
 					"toState": {
 						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
 					"text",
 					"author",
-					"_id",
-					"toState"
+					"toState",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -3932,7 +3932,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/ExpenseReportComment"
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
 						},
 						"type": "array"
 					},
@@ -4125,7 +4125,7 @@
 				},
 				"type": "object"
 			},
-			"HealthCareCostComment": {
+			"Comment_HealthCareCostState_": {
 				"properties": {
 					"text": {
 						"type": "string"
@@ -4133,18 +4133,18 @@
 					"author": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
 					"toState": {
 						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
 					"text",
 					"author",
-					"_id",
-					"toState"
+					"toState",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4224,7 +4224,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/HealthCareCostComment"
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
 						},
 						"type": "array"
 					},
@@ -6149,7 +6149,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/HealthCareCostComment"
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
 						},
 						"type": "array"
 					},
@@ -6280,7 +6280,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/HealthCareCostComment"
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
 						},
 						"type": "array"
 					},
@@ -6581,7 +6581,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/ExpenseReportComment"
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
 						},
 						"type": "array"
 					},
@@ -6704,7 +6704,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/ExpenseReportComment"
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
 						},
 						"type": "array"
 					},
