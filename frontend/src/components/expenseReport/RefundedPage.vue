@@ -61,8 +61,8 @@ const { handlePrint } = useVueToPrint({
   },
   pageStyle: `
     @page {
-      size: landscape; /* Legt Querformat fest */
-      margin: 0;        /* Entfernt Kopf- und Fußzeilen-Ränder */
+      size: landscape; /* Sets the page to landscape orientation */
+      margin: 0;        /* Removes header and footer margins */
     }`
 })
 

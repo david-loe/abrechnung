@@ -142,6 +142,6 @@ defineExpose({ loadFromServer })
 
 <style>
 tbody.vue3-easy-data-table__body td {
-  max-width: 100px;
+  max-width: 150px;
 }
 </style>

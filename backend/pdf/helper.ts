@@ -28,7 +28,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   const filename = sanitizeFilename(
-    report.owner.name.familyName + ' ' + report.owner.name.givenName[0] + ' - ' + report.name + ' ' + totalSum + '.pdf'
+    report.owner.name.familyName + ' ' + report.owner.name.givenName.substring(0, 1) + ' - ' + report.name + ' ' + totalSum + '.pdf'
   )
   path += subfolder + filename
   return path
