@@ -1,6 +1,14 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { ExpenseReport, ExpenseReportComment, Currency as ICurrency, Money, baseCurrency, expenseReportStates } from '../../common/types.js'
+import {
+  Comment,
+  ExpenseReport,
+  ExpenseReportState,
+  Currency as ICurrency,
+  Money,
+  baseCurrency,
+  expenseReportStates
+} from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
 import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
@@ -128,7 +136,7 @@ expenseReportSchema.methods.calculateExchangeRates = async function (this: Expen
 
 expenseReportSchema.methods.addComment = function (this: ExpenseReportDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as ExpenseReportComment)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<ExpenseReportState>)
     delete this.comment
   }
 }

@@ -81,3 +81,25 @@ export async function clearingDB() {
 }
 
 export const bp = { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 } as const
+
+export function hideExpandColumn(colDeleted: boolean) {
+  queueMicrotask(() => {
+    document.querySelectorAll('tr').forEach((tr) => {
+      const firstCell = tr.querySelector<HTMLElement>('th, td')
+      if (firstCell) {
+        firstCell.style.display = 'none'
+      }
+    })
+    if (!colDeleted) {
+      const firstCol = document.querySelector<HTMLElement>('col')
+      if (firstCol) {
+        firstCol.remove()
+        colDeleted = true
+      }
+    }
+  })
+}
+
+export function expandCollapseComments() {
+  document.querySelectorAll<HTMLElement>('td.can-expand').forEach((td) => td.click())
+}

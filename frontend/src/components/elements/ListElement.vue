@@ -1,7 +1,6 @@
 <template>
-  <EasyDataTable
-    :rows-items="[5, 15, 25]"
-    :rows-per-page="5"
+  <Vue3EasyDataTable
+    :rows-items="rowsItems"
     v-model:server-options="serverOptions"
     :server-items-length="serverItemsLength"
     :loading="loading"
@@ -15,33 +14,46 @@
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope"></slot>
     </template>
-  </EasyDataTable>
+  </Vue3EasyDataTable>
 </template>
 
 <script lang="ts" setup>
 import { Base64 } from '@/../../common/scripts.js'
 import API from '@/api.js'
-import { ref, watch } from 'vue'
+import { PropType, ref, watch } from 'vue'
 import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
+import Vue3EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
+
+import '@/vue3-easy-data-table.css'
 
 export type Filter = {
-  [key: string]: string | undefined | null | { $regex: string | undefined; $options: string } | { $in: Array<any> | [undefined] | [null] }
+  [key: string]:
+    | string
+    | undefined
+    | null
+    | { $regex: string | undefined; $options: string }
+    | { $in: Array<any> | [undefined] | [null] }
+    | { $gt: Date | string | undefined }
+    | { $lt: Date | string | undefined }
 }
-const props = defineProps<{
-  endpoint: string
-  columnsToHide?: string[]
-  headers: Header[]
-  filter: Filter
-  params?: any
-}>()
+const props = defineProps({
+  endpoint: { type: String, required: true },
+  columnsToHide: { type: Array as PropType<string[]>, default: () => [] },
+  headers: { type: Array as PropType<Header[]>, required: true },
+  filter: { type: Object as PropType<Filter>, required: true },
+  params: { type: Object, default: () => ({}) },
+  rowsItems: { type: Array as PropType<number[]>, default: () => [5, 15, 25] },
+  rowsPerPage: { type: Number, default: 5 }
+})
 
-if (props.columnsToHide) {
-  for (const columnToHide of props.columnsToHide) {
-    for (let i = 0; i < props.headers.length; i++) {
-      if (props.headers[i].value === columnToHide) {
-        props.headers.splice(i, 1)
-        break
-      }
+const emits = defineEmits<{ loaded: [] }>()
+
+for (const columnToHide of props.columnsToHide) {
+  for (let i = 0; i < props.headers.length; i++) {
+    if (props.headers[i].value === columnToHide) {
+      props.headers.splice(i, 1)
+      break
     }
   }
 }
@@ -51,14 +63,14 @@ const loading = ref(false)
 const serverItemsLength = ref(0)
 const serverOptions = ref<ServerOptions>({
   page: 1,
-  rowsPerPage: 5
+  rowsPerPage: props.rowsPerPage
 })
 
 let oldFilterValue = ''
 const loadFromServer = async () => {
   loading.value = true
 
-  const params = Object.assign({}, props.params || {}, { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage })
+  const params = Object.assign({}, props.params, { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage })
 
   if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
     const sortObj = {} as any
@@ -79,6 +91,7 @@ const loadFromServer = async () => {
     serverItemsLength.value = 0
   }
   loading.value = false
+  emits('loaded')
 }
 const prepareFilter = (filter: Filter) => {
   const filterCopy: Filter = JSON.parse(JSON.stringify(filter))
@@ -128,7 +141,7 @@ defineExpose({ loadFromServer })
 </script>
 
 <style>
-td {
-  max-width: 100px;
+tbody.vue3-easy-data-table__body td {
+  max-width: 150px;
 }
 </style>

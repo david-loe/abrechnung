@@ -1,6 +1,6 @@
 <template>
   <select
-    v-if="APP_DATA && APP_DATA.organisations.length > 1"
+    v-if="APP_DATA"
     class="form-select"
     id="healthCareCostFormProject"
     v-model="selectedOrg"

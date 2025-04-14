@@ -8,11 +8,6 @@ import 'vue-select/dist/vue-select.css'
 import './vue-select.css'
 import vSelect from './vue-select.js'
 
-// @ts-ignore
-import Vue3EasyDataTable from 'vue3-easy-data-table'
-import 'vue3-easy-data-table/dist/style.css'
-import './vue3-easy-data-table.css'
-
 import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -66,7 +61,6 @@ declare module 'vue' {
 
 const app = createApp(App)
 app.component('vSelect', vSelect)
-app.component('EasyDataTable', Vue3EasyDataTable)
 app.use(i18n)
 app.use(formatter)
 app.use(router)

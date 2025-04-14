@@ -324,28 +324,17 @@ export interface TravelExpense extends Expense {
 export type RecordType = 'stage' | 'expense'
 export type Record = Stage | TravelExpense
 
-export interface Comment {
+export interface Comment<State extends AnyState = AnyState> {
   text: string
   author: UserSimple
+  toState: State
   _id: _id
-}
-
-export interface TravelComment extends Comment {
-  toState: TravelState
-}
-
-export interface ExpenseReportComment extends Comment {
-  toState: ExpenseReportState
-}
-
-export interface HealthCareCostComment extends Comment {
-  toState: HealthCareCostState
 }
 
 export interface TravelSimple extends RequestSimple {
   state: TravelState
   log: Log<TravelState>
-  comments: TravelComment[]
+  comments: Comment<TravelState>[]
   comment?: string | null
   reason: string
   destinationPlace: Place
@@ -427,7 +416,7 @@ export interface ExpenseReportSimple extends RequestSimple {
   state: ExpenseReportState
   log: Log<ExpenseReportState>
   advance: Money
-  comments: ExpenseReportComment[]
+  comments: Comment<ExpenseReportState>[]
   addUp: AddUpResult<ExpenseReport>
   comment?: string | null
 }
@@ -444,7 +433,7 @@ export interface HealthCareCostSimple extends RequestSimple {
   refundSum: MoneyPlus
   state: HealthCareCostState
   log: Log<HealthCareCostState>
-  comments: HealthCareCostComment[]
+  comments: Comment<HealthCareCostState>[]
   addUp: AddUpResult<HealthCareCost>
   comment?: string | null
 }
