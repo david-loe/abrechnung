@@ -1,6 +1,6 @@
 <template>
   <div class="container py-3">
-    <h1 class="mb-3">{{ $t('accesses.confirm/healthCareCost') }}</h1>
+    <h2 class="mb-3">{{ $t('accesses.confirm/healthCareCost') }}</h2>
     <HealthCareCostList
       class="mb-5"
       endpoint="confirm/healthCareCost"

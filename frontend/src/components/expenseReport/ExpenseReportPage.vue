@@ -55,7 +55,7 @@
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
           <div class="col-auto">
-            <h1 class="m-0">{{ expenseReport.name }}</h1>
+            <h2 class="m-0">{{ expenseReport.name }}</h2>
           </div>
           <div class="col-auto">
             <div class="dropdown">

@@ -1,6 +1,6 @@
 <template>
   <div class="container py-3">
-    <h1 class="mb-3">{{ $t('accesses.examine/travel') }}</h1>
+    <h2 class="mb-3">{{ $t('accesses.examine/travel') }}</h2>
     <TravelList
       class="mb-5"
       ref="travelListRef"

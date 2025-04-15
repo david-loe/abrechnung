@@ -8,11 +8,11 @@
         @cancel=";($refs.modalComp as any).hideModal()"
         ref="apiKeyForm"></ApiKeyForm>
     </ModalComponent>
-    <nav class="navbar navbar-expand-lg border-bottom">
+    <nav class="navbar navbar-expand-lg border-bottom py-1">
       <div class="container d-flex" id="navBarContent">
-        <a href="/" class="navbar-brand link-body-emphasis d-flex align-items-center">
-          <i class="fs-2 bi bi-receipt"></i>
-          <span class="fs-4 ms-2">{{ $t('headlines.title') }}</span>
+        <a href="/" class="navbar-brand link-body-emphasis d-flex align-items-center py-0">
+          <i class="fs-3 bi bi-receipt"></i>
+          <span class="fs-4 ms-1">{{ $t('headlines.title') }}</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
           <span class="navbar-toggler-icon"></span>
@@ -23,9 +23,9 @@
             <ul class="navbar-nav" style="flex-wrap: wrap">
               <template v-for="access of accesses" :key="access">
                 <template v-if="access.indexOf(':') === -1 && APP_DATA.user.access[access]">
-                  <li class="nav-item">
+                  <li class="nav-item d-flex align-items-center">
                     <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
-                      <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-4 bi bi-' + icon"></i>
+                      <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
                       <span class="ms-1">{{ $t('accesses.' + access) }}</span>
                     </router-link>
                   </li>
@@ -148,10 +148,10 @@
           <i class="fs-3 bi bi-receipt"></i>
 
           <span class="ps-2 text-muted">
-            © {{ new Date().getFullYear() }} {{ $t('headlines.title') }}
+            © {{ new Date().getFullYear() }} abrechnung
             <small v-if="APP_DATA?.settings.version"
               ><a
-                class="text-decoration-none link-body-emphasis"
+                class="text-decoration-none link-secondary"
                 target="_blank"
                 :href="'https://github.com/david-loe/abrechnung/releases/tag/v' + APP_DATA.settings.version"
                 >v{{ APP_DATA.settings.version }}</a

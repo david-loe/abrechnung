@@ -90,7 +90,7 @@
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
           <div class="col-auto">
-            <h1 class="m-0">{{ travel.name }}</h1>
+            <h2 class="m-0">{{ travel.name }}</h2>
           </div>
           <div class="col">
             <h4 class="text-secondary m-0">

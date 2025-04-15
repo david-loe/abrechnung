@@ -41,7 +41,7 @@
     <div v-if="APP_DATA" class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
-          <h1>{{ $t('headlines.home') }}</h1>
+          <h2>{{ $t('headlines.home') }}</h2>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', {}, 'travel')">

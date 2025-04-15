@@ -16,7 +16,7 @@
     </div>
     <div class="w-100" id="settingsContent">
       <div class="container px-lg-4 py-3">
-        <h1>{{ $t('labels.' + entry) }}</h1>
+        <h2>{{ $t('labels.' + entry) }}</h2>
         <SettingsForm v-if="entry === 'settings'" />
         <ConnectionSettingsForm v-else-if="entry === 'connectionSettings'" />
         <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
@@ -30,7 +30,7 @@
             <template #fallback> Loading.. </template>
           </Suspense>
 
-          <h2>{{ $t('labels.csvImport') }}</h2>
+          <h3>{{ $t('labels.csvImport') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/user/bulk"
@@ -57,7 +57,7 @@
               'settings.organisation'
             ]"
             @imported=";($refs.userList as any).loadFromServer()" />
-          <h2>{{ $t('labels.mergeUsers') }}</h2>
+          <h3>{{ $t('labels.mergeUsers') }}</h3>
           <UserMerge />
         </template>
         <template v-else-if="entry === 'projects'">
@@ -68,7 +68,7 @@
             <template #fallback> Loading.. </template>
           </Suspense>
 
-          <h2>{{ $t('labels.csvImport') }}</h2>
+          <h3>{{ $t('labels.csvImport') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
