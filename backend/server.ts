@@ -1,5 +1,5 @@
 import { CronJob } from 'cron'
-import app from './app.js'
+import APP from './app.js'
 import { fetchAndUpdateLumpSums } from './db.js'
 import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
@@ -36,7 +36,7 @@ declare global {
   }
 }
 
-app.listen(port, () => {
+;(await APP()).listen(port, () => {
   logger.info(`Backend listening at ${url}`)
 })
 
