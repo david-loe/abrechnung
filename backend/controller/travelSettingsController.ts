@@ -26,6 +26,6 @@ export class TravelSettingsAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(travelSettingsSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(travelSettingsSchema().obj, locales) }
   }
 }

@@ -34,6 +34,6 @@ export class HealthInsuranceAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(healthInsuranceSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(healthInsuranceSchema().obj, locales) }
   }
 }

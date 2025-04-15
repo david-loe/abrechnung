@@ -34,6 +34,6 @@ export class CurrencyAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(currencySchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(currencySchema().obj, locales) }
   }
 }

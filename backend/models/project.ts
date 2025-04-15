@@ -8,15 +8,18 @@ interface Methods {
 
 type ProjectModel = Model<Project, {}, Methods>
 
-export const projectSchema = new Schema<Project, ProjectModel, Methods>({
-  identifier: { type: String, trim: true, required: true, unique: true, index: true },
-  organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
-  name: { type: String, trim: true },
-  budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false)),
-  balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, null, 0))
-})
+export const projectSchema = () =>
+  new Schema<Project, ProjectModel, Methods>({
+    identifier: { type: String, trim: true, required: true, unique: true, index: true },
+    organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
+    name: { type: String, trim: true },
+    budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false)),
+    balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, null, 0))
+  })
 
-projectSchema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
+const schema = projectSchema()
+
+schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
   let sum = 0
   const travels = mongoose.connection.collection('travels').find({ project: this._id, state: 'refunded', historic: false })
   const expenseReports = mongoose.connection.collection('expensereports').find({ project: this._id, state: 'refunded', historic: false })
@@ -40,10 +43,10 @@ projectSchema.methods.updateBalance = async function (this: ProjectDoc): Promise
   await this.save()
 }
 
-export type ProjectSchema = InferSchemaType<typeof projectSchema>
+export type ProjectSchema = InferSchemaType<typeof schema>
 export type IProject = ProjectSchema & { _id: _id }
 
-export default model<Project, ProjectModel>('Project', projectSchema)
+export default model<Project, ProjectModel>('Project', schema)
 
 export interface ProjectDoc extends Methods, HydratedDocument<Project> {}
 

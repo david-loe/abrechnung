@@ -19,6 +19,6 @@ export class PrinterSettingsController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(printerSettingsSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(printerSettingsSchema().obj, locales) }
   }
 }

@@ -59,6 +59,6 @@ export class CountryAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(countrySchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(countrySchema().obj, locales) }
   }
 }

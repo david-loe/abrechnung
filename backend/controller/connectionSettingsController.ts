@@ -19,6 +19,6 @@ export class ConnectionSettingsController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(connectionSettingsSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(connectionSettingsSchema().obj, locales) }
   }
 }
