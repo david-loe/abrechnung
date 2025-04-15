@@ -56,7 +56,7 @@ export default async function () {
 
   app.use(
     session({
-      store: sessionStore,
+      store: await sessionStore(),
       secret: process.env.COOKIE_SECRET,
       cookie: {
         maxAge: 2 * 24 * 60 * 60 * 1000,
