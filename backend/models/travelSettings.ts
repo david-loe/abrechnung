@@ -13,10 +13,12 @@ for (const meal of meals) {
 }
 
 export const travelSettingsSchema = new Schema<TravelSettings>({
-  maxTravelDayCount: { type: Number, min: 0, required: true },
-  allowSpouseRefund: { type: Boolean, required: true },
   allowTravelApplicationForThePast: { type: Boolean, required: true },
+  allowSpouseRefund: { type: Boolean, required: true },
+  maxTravelDayCount: { type: Number, min: 0, required: true },
   toleranceStageDatesToApprovedTravelDates: { type: Number, min: 0, required: true },
+  minHoursOfTravel: { type: Number, min: 0, required: true },
+  minProfessionalShare: { type: Number, min: 0, max: 1, required: true },
   distanceRefunds: { type: distanceRefunds, required: true },
   vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
   lumpSumCut: { type: lumpSumCut, required: true },
@@ -26,9 +28,7 @@ export const travelSettingsSchema = new Schema<TravelSettings>({
   factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
   fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
   secondNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
-  secondNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true },
-  minHoursOfTravel: { type: Number, min: 0, required: true },
-  minProfessionalShare: { type: Number, min: 0, max: 1, required: true }
+  secondNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true }
 })
 
 travelSettingsSchema.post('save', function (this: HydratedDocument<TravelSettings>) {

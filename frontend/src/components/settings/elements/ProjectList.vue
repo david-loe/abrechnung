@@ -44,7 +44,7 @@
         </button>
       </template>
     </ListElement>
-    <div v-if="_showForm" class="container" style="max-width: 650px">
+    <div v-if="_showForm" class="container">
       <Vueform
         :schema="schema"
         v-model="projectToEdit"

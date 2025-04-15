@@ -60,6 +60,7 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     required: true
   },
   access: { type: accessObject, default: () => ({}) },
+  loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   projects: {
     type: {
       assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
@@ -85,7 +86,6 @@ export const userSchema = new Schema<User, UserModel, Methods>({
     default: () => ({})
   },
 
-  loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
   settings: {
     type: {
       language: { type: String, default: displaySettings.locale.default, enum: locales },

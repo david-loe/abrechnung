@@ -3,7 +3,16 @@
     <div class="sidebar">
       <div class="offcanvas-body flex-column pt-lg-3 overflow-y-auto">
         <ul class="nav nav-pills flex-column">
-          <li v-for="_entry in entries" class="nav-item">
+          <li v-for="_entry in items" class="nav-item">
+            <span
+              style="cursor: pointer"
+              :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
+              @click="entry = _entry">
+              {{ $t('labels.' + _entry) }}
+            </span>
+          </li>
+          <li class="border-top my-3"></li>
+          <li v-for="_entry in settings" class="nav-item">
             <span
               style="cursor: pointer"
               :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
@@ -14,9 +23,9 @@
         </ul>
       </div>
     </div>
-    <div class="w-100" id="settingsContent">
+    <div class="flex-grow-1" id="settingsContent">
       <div class="container px-lg-4 py-3">
-        <h2>{{ $t('labels.' + entry) }}</h2>
+        <h2 class="mb-3">{{ $t('labels.' + entry) }}</h2>
         <SettingsForm v-if="entry === 'settings'" />
         <ConnectionSettingsForm v-else-if="entry === 'connectionSettings'" />
         <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
@@ -123,19 +132,11 @@ import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
 import { defineComponent } from 'vue'
 
-const entries = [
-  'users',
-  'projects',
-  'organisations',
-  'countries',
-  'currencies',
-  'healthInsurances',
-  'travelSettings',
-  'connectionSettings',
-  'displaySettings',
-  'printerSettings',
-  'settings'
-] as const
+const items = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances'] as const
+
+const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
+
+type Entry = (typeof items)[number] | (typeof settings)[number]
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -156,9 +157,10 @@ export default defineComponent({
   },
   data() {
     return {
-      entries,
+      items,
+      settings,
       APP_DATA: APP_LOADER.data,
-      entry: 'users' as (typeof entries)[number]
+      entry: 'users' as Entry
     }
   },
   props: [],
@@ -167,6 +169,7 @@ export default defineComponent({
     rightMargin() {
       const container = document.getElementById('navBarContent')
       if (container) {
+        console.log(container.getBoundingClientRect())
         return container.getBoundingClientRect().right - container.getBoundingClientRect().width + 'px'
       } else {
         return '0px'
