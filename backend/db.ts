@@ -1,6 +1,5 @@
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import jwt from 'jsonwebtoken'
 import mongoose, { Connection, Model } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
 import {
@@ -21,8 +20,7 @@ import healthInsurances from './data/healthInsurances.json' with { type: 'json' 
 import printerSettings from './data/printerSettings.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
 import travelSettings from './data/travelSettings.json' with { type: 'json' }
-
-// import { genAuthenticatedLink } from './helper.js'
+import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'
 import ConnectionSettings from './models/connectionSettings.js'
 import Country from './models/country.js'
@@ -32,27 +30,7 @@ import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
 
-function genAuthenticatedLink(payload: { destination: string; redirect: string }, jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }) {
-  const secret = process.env.MAGIC_LOGIN_SECRET
-  const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
-  return new Promise<string>((resolve, reject) => {
-    const code = Math.floor(Math.random() * 90000) + 10000 + ''
-    jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(`${callbackUrl}?token=${token}`)
-      }
-    })
-  })
-}
 let connectionPromise: Promise<Connection> | null = null
-
-export async function sessionStore() {
-  if (connectionPromise) {
-    return MongoStore.create({ client: (await connectionPromise).getClient() })
-  }
-}
 
 export function connectDB() {
   if (!connectionPromise) {
@@ -69,6 +47,21 @@ export function connectDB() {
 
 export async function disconnectDB() {
   await mongoose.disconnect()
+}
+
+let sessionStorePromise: Promise<MongoStore> | null = null
+
+export function sessionStore() {
+  if (!sessionStorePromise) {
+    if (connectionPromise) {
+      sessionStorePromise = (async () => {
+        return MongoStore.create({ client: (await connectionPromise).getClient() })
+      })()
+    } else {
+      throw Error('No connection to database started')
+    }
+  }
+  return sessionStorePromise
 }
 
 export async function initDB() {

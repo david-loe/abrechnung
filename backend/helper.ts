@@ -1,25 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 import fs from 'fs/promises'
 import jwt from 'jsonwebtoken'
-import { Model, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import multer from 'multer'
 import path from 'path'
-import {
-  _id,
-  AnyState,
-  DocumentFile as IDocumentFile,
-  ExpenseReport as IExpenseReport,
-  HealthCareCost as IHealthCareCost,
-  Travel as ITravel,
-  User as IUser,
-  reportIsHealthCareCost,
-  reportIsTravel
-} from '../common/types.js'
+import { _id, DocumentFile as IDocumentFile, User as IUser } from '../common/types.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
-import ExpenseReport from './models/expenseReport.js'
-import HealthCareCost from './models/healthCareCost.js'
-import Travel from './models/travel.js'
 
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
   let keys: string[] = []
@@ -153,30 +140,6 @@ export async function writeToDisk(
       }
     }
   }
-}
-
-export async function getSubmissionReportFromHistory(
-  report: ITravel | IExpenseReport | IHealthCareCost,
-  overwriteQueryState?: AnyState
-): Promise<ITravel | IExpenseReport | IHealthCareCost | null> {
-  let model: Model<ITravel | IExpenseReport | IHealthCareCost> = ExpenseReport as any
-  let state: AnyState = 'inWork'
-  if (reportIsTravel(report)) {
-    model = Travel as any
-    state = 'approved'
-  } else if (reportIsHealthCareCost(report)) {
-    model = HealthCareCost as any
-  }
-  if (overwriteQueryState) {
-    state = overwriteQueryState
-  }
-  for (let i = 0; i < report.history.length; i++) {
-    const historyReport = await model.findOne({ _id: report.history[i] }).lean()
-    if (historyReport && historyReport.state === state) {
-      return historyReport
-    }
-  }
-  return null
 }
 
 export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {

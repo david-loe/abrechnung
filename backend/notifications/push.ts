@@ -38,20 +38,21 @@ export async function sendPushNotification(title: string, body: string, users: U
   }
 }
 
-function getAllSessions() {
-  return new Promise<SessionData[]>(async (resolve, reject) => {
-    const store = await sessionStore()
-    if (store) {
-      store.all((err, sessions) => {
-        if (err) {
-          return reject(err)
-        }
-        if (Array.isArray(sessions)) {
-          resolve(sessions)
-        } else {
-          resolve([])
-        }
-      })
-    }
+async function getAllSessions() {
+  const store = await sessionStore()
+  if (!store) {
+    return []
+  }
+  return new Promise<SessionData[]>((resolve, reject) => {
+    store.all((err, sessions) => {
+      if (err) {
+        return reject(err)
+      }
+      if (Array.isArray(sessions)) {
+        resolve(sessions)
+      } else {
+        resolve([])
+      }
+    })
   })
 }
