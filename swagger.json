@@ -1856,6 +1856,241 @@
 				},
 				"type": "object"
 			},
+			"TravelSettings": {
+				"properties": {
+					"maxTravelDayCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"allowTravelApplicationForThePast": {
+						"type": "boolean"
+					},
+					"toleranceStageDatesToApprovedTravelDates": {
+						"type": "number",
+						"format": "double"
+					},
+					"distanceRefunds": {
+						"properties": {
+							"car": {
+								"type": "number",
+								"format": "double"
+							},
+							"motorcycle": {
+								"type": "number",
+								"format": "double"
+							},
+							"halfCar": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"car",
+							"motorcycle",
+							"halfCar"
+						],
+						"type": "object"
+					},
+					"vehicleRegistrationWhenUsingOwnCar": {
+						"type": "string",
+						"enum": [
+							"required",
+							"optional",
+							"none"
+						]
+					},
+					"lumpSumCut": {
+						"properties": {
+							"breakfast": {
+								"type": "number",
+								"format": "double"
+							},
+							"lunch": {
+								"type": "number",
+								"format": "double"
+							},
+							"dinner": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"breakfast",
+							"lunch",
+							"dinner"
+						],
+						"type": "object"
+					},
+					"factorCateringLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"factorOvernightLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorOvernightLumpSumExceptions": {
+						"items": {
+							"$ref": "#/components/schemas/CountryCode"
+						},
+						"type": "array"
+					},
+					"fallBackLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"secondNightOnAirplaneLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"secondNightOnShipOrFerryLumpSumCountry": {
+						"$ref": "#/components/schemas/CountryCode"
+					},
+					"minHoursOfTravel": {
+						"type": "number",
+						"format": "double"
+					},
+					"minProfessionalShare": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"maxTravelDayCount",
+					"allowSpouseRefund",
+					"allowTravelApplicationForThePast",
+					"toleranceStageDatesToApprovedTravelDates",
+					"distanceRefunds",
+					"vehicleRegistrationWhenUsingOwnCar",
+					"lumpSumCut",
+					"factorCateringLumpSum",
+					"factorCateringLumpSumExceptions",
+					"factorOvernightLumpSum",
+					"factorOvernightLumpSumExceptions",
+					"fallBackLumpSumCountry",
+					"secondNightOnAirplaneLumpSumCountry",
+					"secondNightOnShipOrFerryLumpSumCountry",
+					"minHoursOfTravel",
+					"minProfessionalShare",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_ITravelSettings.NoPost_": {
+				"properties": {
+					"minProfessionalShare": {
+						"type": "number",
+						"format": "double"
+					},
+					"minHoursOfTravel": {
+						"type": "number",
+						"format": "double"
+					},
+					"secondNightOnShipOrFerryLumpSumCountry": {
+						"type": "string"
+					},
+					"secondNightOnAirplaneLumpSumCountry": {
+						"type": "string"
+					},
+					"fallBackLumpSumCountry": {
+						"type": "string"
+					},
+					"factorOvernightLumpSumExceptions": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"factorOvernightLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"factorCateringLumpSumExceptions": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"factorCateringLumpSum": {
+						"type": "number",
+						"format": "double"
+					},
+					"lumpSumCut": {
+						"properties": {
+							"dinner": {
+								"type": "number",
+								"format": "double"
+							},
+							"lunch": {
+								"type": "number",
+								"format": "double"
+							},
+							"breakfast": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"vehicleRegistrationWhenUsingOwnCar": {
+						"type": "string",
+						"enum": [
+							"required",
+							"optional",
+							"none"
+						]
+					},
+					"distanceRefunds": {
+						"properties": {
+							"halfCar": {
+								"type": "number",
+								"format": "double"
+							},
+							"motorcycle": {
+								"type": "number",
+								"format": "double"
+							},
+							"car": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"toleranceStageDatesToApprovedTravelDates": {
+						"type": "number",
+						"format": "double"
+					},
+					"allowTravelApplicationForThePast": {
+						"type": "boolean"
+					},
+					"allowSpouseRefund": {
+						"type": "boolean"
+					},
+					"maxTravelDayCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_ITravelSettings_": {
+				"$ref": "#/components/schemas/SetterPartial_ITravelSettings.NoPost_"
+			},
 			"Place": {
 				"properties": {
 					"place": {
@@ -4548,133 +4783,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SettingsTravel": {
-				"properties": {
-					"maxTravelDayCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"allowSpouseRefund": {
-						"type": "boolean"
-					},
-					"allowTravelApplicationForThePast": {
-						"type": "boolean"
-					},
-					"toleranceStageDatesToApprovedTravelDates": {
-						"type": "number",
-						"format": "double"
-					},
-					"distanceRefunds": {
-						"properties": {
-							"car": {
-								"type": "number",
-								"format": "double"
-							},
-							"motorcycle": {
-								"type": "number",
-								"format": "double"
-							},
-							"halfCar": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"car",
-							"motorcycle",
-							"halfCar"
-						],
-						"type": "object"
-					},
-					"vehicleRegistrationWhenUsingOwnCar": {
-						"type": "string",
-						"enum": [
-							"required",
-							"optional",
-							"none"
-						]
-					},
-					"lumpSumCut": {
-						"properties": {
-							"breakfast": {
-								"type": "number",
-								"format": "double"
-							},
-							"lunch": {
-								"type": "number",
-								"format": "double"
-							},
-							"dinner": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"breakfast",
-							"lunch",
-							"dinner"
-						],
-						"type": "object"
-					},
-					"factorCateringLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorCateringLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"factorOvernightLumpSum": {
-						"type": "number",
-						"format": "double"
-					},
-					"factorOvernightLumpSumExceptions": {
-						"items": {
-							"$ref": "#/components/schemas/CountryCode"
-						},
-						"type": "array"
-					},
-					"fallBackLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
-					"secondNightOnAirplaneLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
-					"secondNightOnShipOrFerryLumpSumCountry": {
-						"$ref": "#/components/schemas/CountryCode"
-					},
-					"minHoursOfTravel": {
-						"type": "number",
-						"format": "double"
-					},
-					"minProfessionalShare": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"maxTravelDayCount",
-					"allowSpouseRefund",
-					"allowTravelApplicationForThePast",
-					"toleranceStageDatesToApprovedTravelDates",
-					"distanceRefunds",
-					"vehicleRegistrationWhenUsingOwnCar",
-					"lumpSumCut",
-					"factorCateringLumpSum",
-					"factorCateringLumpSumExceptions",
-					"factorOvernightLumpSum",
-					"factorOvernightLumpSumExceptions",
-					"fallBackLumpSumCountry",
-					"secondNightOnAirplaneLumpSumCountry",
-					"secondNightOnShipOrFerryLumpSumCountry",
-					"minHoursOfTravel",
-					"minProfessionalShare"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Settings": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -4789,236 +4897,9 @@
 						],
 						"type": "object"
 					},
-					"travelSettings": {
-						"$ref": "#/components/schemas/SettingsTravel"
-					},
 					"uploadTokenExpireAfterSeconds": {
 						"type": "number",
 						"format": "double"
-					},
-					"stateColors": {
-						"properties": {
-							"rejected": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"appliedFor": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"approved": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"underExamination": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"refunded": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"inWork": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							},
-							"underExaminationByInsurance": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
-							}
-						},
-						"required": [
-							"rejected",
-							"appliedFor",
-							"approved",
-							"underExamination",
-							"refunded",
-							"inWork",
-							"underExaminationByInsurance"
-						],
-						"type": "object"
-					},
-					"accessIcons": {
-						"properties": {
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"confirm/healthCareCost",
-							"refunded/travel",
-							"refunded/expenseReport",
-							"refunded/healthCareCost",
-							"admin"
-						],
-						"type": "object"
 					},
 					"version": {
 						"type": "string"
@@ -5036,10 +4917,7 @@
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
-					"travelSettings",
 					"uploadTokenExpireAfterSeconds",
-					"stateColors",
-					"accessIcons",
 					"version",
 					"_id"
 				],
@@ -5051,278 +4929,9 @@
 					"migrateFrom": {
 						"type": "string"
 					},
-					"accessIcons": {
-						"properties": {
-							"admin": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"refunded/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"examine/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approve/travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"approved:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"appliedFor:travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"inWork:expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"user": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"type": "object"
-					},
-					"stateColors": {
-						"properties": {
-							"underExaminationByInsurance": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"inWork": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"refunded": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"underExamination": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"approved": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"appliedFor": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							},
-							"rejected": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							}
-						},
-						"type": "object"
-					},
 					"uploadTokenExpireAfterSeconds": {
 						"type": "number",
 						"format": "double"
-					},
-					"travelSettings": {
-						"properties": {
-							"minProfessionalShare": {
-								"type": "number",
-								"format": "double"
-							},
-							"minHoursOfTravel": {
-								"type": "number",
-								"format": "double"
-							},
-							"secondNightOnShipOrFerryLumpSumCountry": {
-								"type": "string"
-							},
-							"secondNightOnAirplaneLumpSumCountry": {
-								"type": "string"
-							},
-							"fallBackLumpSumCountry": {
-								"type": "string"
-							},
-							"factorOvernightLumpSumExceptions": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"factorOvernightLumpSum": {
-								"type": "number",
-								"format": "double"
-							},
-							"factorCateringLumpSumExceptions": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"factorCateringLumpSum": {
-								"type": "number",
-								"format": "double"
-							},
-							"lumpSumCut": {
-								"properties": {
-									"dinner": {
-										"type": "number",
-										"format": "double"
-									},
-									"lunch": {
-										"type": "number",
-										"format": "double"
-									},
-									"breakfast": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"type": "object"
-							},
-							"vehicleRegistrationWhenUsingOwnCar": {
-								"type": "string",
-								"enum": [
-									"required",
-									"optional",
-									"none"
-								]
-							},
-							"toleranceStageDatesToApprovedTravelDates": {
-								"type": "number",
-								"format": "double"
-							},
-							"allowTravelApplicationForThePast": {
-								"type": "boolean"
-							},
-							"allowSpouseRefund": {
-								"type": "boolean"
-							},
-							"maxTravelDayCount": {
-								"type": "number",
-								"format": "double"
-							},
-							"distanceRefunds": {
-								"properties": {
-									"halfCar": {
-										"type": "number",
-										"format": "double"
-									},
-									"motorcycle": {
-										"type": "number",
-										"format": "double"
-									},
-									"car": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"type": "object"
-							}
-						},
-						"type": "object"
 					},
 					"retentionPolicy": {
 						"properties": {
@@ -5669,6 +5278,185 @@
 			},
 			"SetterBody_IProject_": {
 				"$ref": "#/components/schemas/SetterPartial_IProject.NoPost_"
+			},
+			"FontName": {
+				"type": "string",
+				"enum": [
+					"NotoSans"
+				],
+				"nullable": false
+			},
+			"HexColor": {
+				"type": "string",
+				"pattern": "/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
+			},
+			"PrinterSettings": {
+				"properties": {
+					"fontSizes": {
+						"properties": {
+							"L": {
+								"type": "number",
+								"format": "double"
+							},
+							"M": {
+								"type": "number",
+								"format": "double"
+							},
+							"S": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"L",
+							"M",
+							"S"
+						],
+						"type": "object"
+					},
+					"textColor": {
+						"$ref": "#/components/schemas/HexColor"
+					},
+					"pagePadding": {
+						"type": "number",
+						"format": "double"
+					},
+					"borderColor": {
+						"$ref": "#/components/schemas/HexColor"
+					},
+					"borderThickness": {
+						"type": "number",
+						"format": "double"
+					},
+					"cellPadding": {
+						"properties": {
+							"bottom": {
+								"type": "number",
+								"format": "double"
+							},
+							"x": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"bottom",
+							"x"
+						],
+						"type": "object"
+					},
+					"pageSize": {
+						"properties": {
+							"height": {
+								"type": "number",
+								"format": "double"
+							},
+							"width": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"height",
+							"width"
+						],
+						"type": "object"
+					},
+					"fontName": {
+						"$ref": "#/components/schemas/FontName"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"fontSizes",
+					"textColor",
+					"pagePadding",
+					"borderColor",
+					"borderThickness",
+					"cellPadding",
+					"pageSize",
+					"fontName",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_IPrinterSettings.NoPost_": {
+				"properties": {
+					"pageSize": {
+						"properties": {
+							"height": {
+								"type": "number",
+								"format": "double"
+							},
+							"width": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"cellPadding": {
+						"properties": {
+							"bottom": {
+								"type": "number",
+								"format": "double"
+							},
+							"x": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"borderThickness": {
+						"type": "number",
+						"format": "double"
+					},
+					"borderColor": {
+						"type": "string"
+					},
+					"pagePadding": {
+						"type": "number",
+						"format": "double"
+					},
+					"textColor": {
+						"type": "string"
+					},
+					"fontSizes": {
+						"properties": {
+							"L": {
+								"type": "number",
+								"format": "double"
+							},
+							"M": {
+								"type": "number",
+								"format": "double"
+							},
+							"S": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"type": "object"
+					},
+					"fontName": {
+						"type": "string",
+						"enum": [
+							"NotoSans"
+						],
+						"nullable": false
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_IPrinterSettings_": {
+				"$ref": "#/components/schemas/SetterPartial_IPrinterSettings.NoPost_"
 			},
 			"ImageType": {
 				"type": "string",
@@ -6886,6 +6674,230 @@
 						],
 						"type": "object"
 					},
+					"stateColors": {
+						"properties": {
+							"rejected": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"appliedFor": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"approved": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"underExamination": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"refunded": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"inWork": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							},
+							"underExaminationByInsurance": {
+								"properties": {
+									"text": {
+										"type": "string"
+									},
+									"color": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"text",
+									"color"
+								],
+								"type": "object"
+							}
+						},
+						"required": [
+							"rejected",
+							"appliedFor",
+							"approved",
+							"underExamination",
+							"refunded",
+							"inWork",
+							"underExaminationByInsurance"
+						],
+						"type": "object"
+					},
+					"accessIcons": {
+						"properties": {
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"confirm/healthCareCost",
+							"refunded/travel",
+							"refunded/expenseReport",
+							"refunded/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					}
@@ -6894,6 +6906,8 @@
 					"auth",
 					"oidc",
 					"locale",
+					"stateColors",
+					"accessIcons",
 					"_id"
 				],
 				"type": "object",
@@ -6901,6 +6915,177 @@
 			},
 			"SetterPartial_IDisplaySettings.NoPost_": {
 				"properties": {
+					"accessIcons": {
+						"properties": {
+							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"refunded/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"examine/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"inWork:expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"user": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
+					},
+					"stateColors": {
+						"properties": {
+							"underExaminationByInsurance": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"inWork": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"refunded": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"underExamination": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"approved": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"appliedFor": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
+							"rejected": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
 					"locale": {
 						"properties": {
 							"fallback": {
@@ -9032,6 +9217,141 @@
 						}
 					}
 				}
+			}
+		},
+		"/travelSettings": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/TravelSettings"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/travelSettings": {
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/TravelSettings"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_ITravelSettings_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/travelSettings/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/travel": {
@@ -11459,6 +11779,139 @@
 				},
 				"tags": [
 					"Project"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/admin/printerSettings": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/PrinterSettings"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Printer Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/PrinterSettings"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Printer Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IPrinterSettings_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/printerSettings/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Printer Settings"
 				],
 				"security": [
 					{
