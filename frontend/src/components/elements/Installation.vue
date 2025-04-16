@@ -94,7 +94,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-let APP_DATA = APP_LOADER.data
+const APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'Installation',

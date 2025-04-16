@@ -1,5 +1,5 @@
+import { resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
 import { searchForWorkspaceRoot } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 

@@ -49,7 +49,7 @@ import { getDiffInDays } from '@/../../common/scripts.js'
 import { TravelSimple, travelStates } from '@/../../common/types.js'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 const keys = ['owner', 'reason', 'startDate', 'endDate', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames', 'a1Certificate']
 export default defineComponent({
@@ -71,40 +71,38 @@ export default defineComponent({
       switch (key) {
         case 'startDate':
           return this.$formatter.date(this.travel[key])
-        case 'endDate':
+        case 'endDate': {
           const dif = getDiffInDays(this.travel.startDate, this.travel.endDate) + 1
-          return this.$formatter.date(this.travel[key]) + ' (' + dif + ' ' + this.$t('labels.' + (dif == 1 ? 'day' : 'days')) + ')'
+          return `${this.$formatter.date(this.travel[key])} (${dif} ${this.$t(`labels.${dif === 1 ? 'day' : 'days'}`)})`
+        }
         case 'state':
-          return this.$t('states.' + this.travel[key])
+          return this.$t(`states.${this.travel[key]}`)
         case 'editor':
-          if (this.travel.owner._id == this.travel.editor._id) {
+          if (this.travel.owner._id === this.travel.editor._id) {
             return ''
           }
-          return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
+          return `${this.travel[key].name.givenName} ${this.travel[key].name.familyName}`
         case 'owner':
-          return this.travel[key].name.givenName + ' ' + this.travel[key].name.familyName
+          return `${this.travel[key].name.givenName} ${this.travel[key].name.familyName}`
         case 'comments':
           if (this.travel.comments.length > 0) {
             const c = this.travel.comments[this.travel.comments.length - 1]
-            return c.author.name.givenName + ': "' + c.text + '"'
-          } else {
-            return ''
+            return `${c.author.name.givenName}: "${c.text}"`
           }
+          return ''
         case 'a1Certificate':
           if (this.travel.a1Certificate) {
-            return this.travel.a1Certificate.destinationName + ' - ' + this.travel.a1Certificate.exactAddress
-          } else {
-            return ''
+            return `${this.travel.a1Certificate.destinationName} - ${this.travel.a1Certificate.exactAddress}`
           }
+          return ''
         default:
-          if (typeof this.travel[key] == 'boolean') {
+          if (typeof this.travel[key] === 'boolean') {
             return this.travel[key] ? '✅' : ''
           }
           if (this.travel[key]) {
-            return this.travel[key]!.toString()
-          } else {
-            return ''
+            return this.travel[key]?.toString()
           }
+          return ''
       }
     }
   },

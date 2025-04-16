@@ -110,7 +110,7 @@ export default defineComponent({
     async login() {
       try {
         const res = await axios.post(
-          import.meta.env.VITE_BACKEND_URL + '/auth/ldapauth',
+          `${import.meta.env.VITE_BACKEND_URL}/auth/ldapauth`,
           {
             username: this.usernameLDAP,
             password: this.passwordLDAP
@@ -128,7 +128,7 @@ export default defineComponent({
     },
     async requestMagicLogin() {
       try {
-        const res = await axios.post(import.meta.env.VITE_BACKEND_URL + '/auth/magiclogin', {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/magiclogin`, {
           destination: this.magicLoginMail,
           redirect: this.$route.query.redirect
         })
@@ -142,22 +142,18 @@ export default defineComponent({
       }
     },
     microsoftLink() {
-      return (
-        import.meta.env.VITE_BACKEND_URL +
-        '/auth/microsoft' +
-        (this.$route.query.redirect ? '?redirect=' + (this.$route.query.redirect as string) : '')
-      )
+      return `${import.meta.env.VITE_BACKEND_URL}/auth/microsoft${
+        this.$route.query.redirect ? `?redirect=${this.$route.query.redirect as string}` : ''
+      }`
     },
     oidcLink() {
-      return (
-        import.meta.env.VITE_BACKEND_URL +
-        '/auth/oidc' +
-        (this.$route.query.redirect ? '?redirect=' + (this.$route.query.redirect as string) : '')
-      )
+      return `${import.meta.env.VITE_BACKEND_URL}/auth/oidc${
+        this.$route.query.redirect ? `?redirect=${this.$route.query.redirect as string}` : ''
+      }`
     }
   },
-  beforeMount() {
-    APP_LOADER.loadDisplaySettings().then((displaySettings) => (this.displaySettings = displaySettings))
+  async beforeMount() {
+    this.displaySettings = await APP_LOADER.loadDisplaySettings()
   }
 })
 </script>

@@ -162,8 +162,8 @@ async function loadFromServer() {
 }
 defineExpose({ loadFromServer })
 
-let userToEdit: Ref<User | undefined> = ref(undefined)
-let _showForm = ref(false)
+const userToEdit: Ref<User | undefined> = ref(undefined)
+const _showForm = ref(false)
 
 function showForm(user?: User) {
   let formUser: any = user
@@ -172,11 +172,11 @@ function showForm(user?: User) {
     const formUserSettings = Object.assign({}, formUser.settings)
     const formUserProjects = Object.assign({}, formUser.projects)
     formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
-    formUser.settings.lastCurrencies = user!.settings.lastCurrencies.map((c) => c._id)
-    formUser.settings.lastCountries = user!.settings.lastCountries.map((c) => c._id)
-    formUser.projects.assigned = user!.projects.assigned.map((p) => p._id)
-    formUser.settings.organisation = user!.settings.organisation?._id
-    formUser.settings.insurance = user!.settings.insurance?._id
+    formUser.settings.lastCurrencies = user?.settings.lastCurrencies.map((c) => c._id)
+    formUser.settings.lastCountries = user?.settings.lastCountries.map((c) => c._id)
+    formUser.projects.assigned = user?.projects.assigned.map((p) => p._id)
+    formUser.settings.organisation = user?.settings.organisation?._id
+    formUser.settings.insurance = user?.settings.insurance?._id
   }
   userToEdit.value = formUser
   _showForm.value = true

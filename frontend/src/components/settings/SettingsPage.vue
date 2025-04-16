@@ -117,9 +117,9 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import CSVImport from '@/components/settings/elements/CSVImport.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
 import CountryList from '@/components/settings/elements/CountryList.vue'
-import CSVImport from '@/components/settings/elements/CSVImport.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'

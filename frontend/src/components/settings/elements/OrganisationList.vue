@@ -94,8 +94,8 @@ async function loadFromServer() {
 }
 defineExpose({ loadFromServer })
 
-let organisationToEdit: Ref<Organisation | undefined> = ref(undefined)
-let _showForm = ref(false)
+const organisationToEdit: Ref<Organisation | undefined> = ref(undefined)
+const _showForm = ref(false)
 
 function showForm(organisation?: Organisation) {
   organisationToEdit.value = organisation

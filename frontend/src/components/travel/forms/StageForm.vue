@@ -235,7 +235,7 @@
 
 <script lang="ts">
 import { datetimeToDate, datetimeToDateString, getDayList } from '@/../../common/scripts.js'
-import { baseCurrency, distanceRefundTypes, DocumentFile, Place, Stage, transportTypes } from '@/../../common/types.js'
+import { DocumentFile, Place, Stage, baseCurrency, distanceRefundTypes, transportTypes } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
@@ -243,7 +243,7 @@ import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'StageForm',
@@ -306,14 +306,14 @@ export default defineComponent({
         this.formStage.endLocation &&
         this.formStage.startLocation.country &&
         this.formStage.endLocation.country &&
-        this.formStage.startLocation.country._id != this.formStage.endLocation.country._id &&
+        this.formStage.startLocation.country._id !== this.formStage.endLocation.country._id &&
         this.departureAndArrivalOnDifferentDays()
       )
     },
     departureAndArrivalOnDifferentDays() {
       return (
-        !isNaN(new Date(this.formStage.departure).valueOf()) &&
-        !isNaN(new Date(this.formStage.arrival).valueOf()) &&
+        !Number.isNaN(new Date(this.formStage.departure).valueOf()) &&
+        !Number.isNaN(new Date(this.formStage.arrival).valueOf()) &&
         datetimeToDateString(this.formStage.departure) !== datetimeToDateString(this.formStage.arrival)
       )
     },
@@ -327,7 +327,7 @@ export default defineComponent({
         }
         for (const oldMC of this.formStage.midnightCountries) {
           for (const newMC of newMidnightCountries) {
-            if (new Date(oldMC.date).valueOf() - newMC.date.valueOf() == 0) {
+            if (new Date(oldMC.date).valueOf() - newMC.date.valueOf() === 0) {
               Object.assign(newMC, oldMC)
               break
             }
@@ -345,12 +345,9 @@ export default defineComponent({
         this.formStage.endLocation?.place &&
         this.formStage.endLocation?.country
       ) {
-        return (
-          'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=' +
-          encodeURIComponent(this.formStage.startLocation.place + ',' + this.formStage.startLocation.country.name.en) +
-          '&destination=' +
-          encodeURIComponent(this.formStage.endLocation.place + ',' + this.formStage.endLocation.country.name.en)
-        )
+        return `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(
+          `${this.formStage.startLocation.place},${this.formStage.startLocation.country.name.en}`
+        )}&destination=${encodeURIComponent(`${this.formStage.endLocation.place},${this.formStage.endLocation.country.name.en}`)}`
       }
     },
     clear() {
@@ -362,7 +359,7 @@ export default defineComponent({
     },
     output() {
       if (this.vehicleRegistrationChanged) {
-        this.$emit('postVehicleRegistration', this.APP_DATA!.user.vehicleRegistration)
+        this.$emit('postVehicleRegistration', this.APP_DATA?.user.vehicleRegistration)
       }
       this.loading = true
       if (!this.showMidnightCountries()) {
@@ -372,17 +369,18 @@ export default defineComponent({
     },
     input() {
       this.loading = false
+      if (this.APP_DATA) {
+        this.minDate = new Date(
+          new Date(this.travelStartDate).valueOf() -
+            this.APP_DATA.travelSettings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
+        )
 
-      this.minDate = new Date(
-        new Date(this.travelStartDate).valueOf() -
-          this.APP_DATA!.travelSettings.toleranceStageDatesToApprovedTravelDates * 24 * 60 * 60 * 1000
-      )
-
-      this.maxDate = new Date(
-        new Date(this.travelEndDate).valueOf() +
-          (this.APP_DATA!.travelSettings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
-          1
-      )
+        this.maxDate = new Date(
+          new Date(this.travelEndDate).valueOf() +
+            (this.APP_DATA.travelSettings.toleranceStageDatesToApprovedTravelDates + 1) * 24 * 60 * 60 * 1000 -
+            1
+        )
+      }
 
       return Object.assign({}, this.default(), this.stage)
     }
@@ -412,8 +410,8 @@ export default defineComponent({
       // departure is date object when entered manually by the user
       if (
         this.formStage.departure instanceof Date &&
-        !isNaN(new Date(this.formStage.departure).valueOf()) &&
-        isNaN(new Date(this.formStage.arrival).valueOf())
+        !Number.isNaN(new Date(this.formStage.departure).valueOf()) &&
+        Number.isNaN(new Date(this.formStage.arrival).valueOf())
       ) {
         this.formStage.arrival = datetimeToDate(this.formStage.departure)
       }

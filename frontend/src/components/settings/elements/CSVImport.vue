@@ -8,7 +8,7 @@
 <script lang="ts">
 import { csvToObjects, download } from '@/../../common/scripts.js'
 import API from '@/api.js'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'CSVImport',
@@ -32,8 +32,9 @@ export default defineComponent({
   },
   methods: {
     readFile(event: Event) {
-      if (event.target && (event.target as HTMLInputElement).files && (event.target as HTMLInputElement).files!.length > 0) {
-        const file = (event.target as HTMLInputElement).files![0]
+      const target = event.target as HTMLInputElement
+      if (target.files && target.files.length > 0) {
+        const file = target.files[0]
         const reader = new FileReader()
         reader.readAsText(file)
         reader.onload = (e: Event) => {
@@ -42,9 +43,10 @@ export default defineComponent({
       }
     },
     convert(csv: string) {
+      let csvWithoutComment = csv
       //remove first row if it starts with #
-      if (csv.startsWith('#') || csv.startsWith('"#')) {
-        csv = csv.slice(csv.indexOf('\n') + 1)
+      if (csvWithoutComment.startsWith('#') || csvWithoutComment.startsWith('"#')) {
+        csvWithoutComment = csvWithoutComment.slice(csv.indexOf('\n') + 1)
       }
       const transformer = {} as any
       for (const entry of this.transformers) {
@@ -59,13 +61,12 @@ export default defineComponent({
                 }
               }
               throw Error(`No item found with identifier: '${val}''`)
-            } else {
-              return val
             }
+            return val
           }
         }
       }
-      return csvToObjects(csv, transformer, ';')
+      return csvToObjects(csvWithoutComment, transformer, ';')
     },
     async submit(data: any[]) {
       const result = await API.setter<any[]>(this.endpoint, data)
@@ -79,13 +80,10 @@ export default defineComponent({
       download(file)
     },
     genTemplate(seperator = ';', pathSeperator = '.') {
-      let csv =
-        '#' +
-        this.$t('labels.startInLine3') +
-        ' ' +
-        this.templateFields.map((f) => '"' + this.$t('labels.' + f.slice(f.lastIndexOf(pathSeperator) + 1)) + '"').join(seperator) +
-        '\n'
-      csv += this.templateFields.map((f) => '"' + f + '"').join(seperator)
+      let csv = `#${this.$t('labels.startInLine3')} ${this.templateFields
+        .map((f) => `"${this.$t(`labels.${f.slice(f.lastIndexOf(pathSeperator) + 1)}`)}"`)
+        .join(seperator)}\n`
+      csv += this.templateFields.map((f) => `"${f}"`).join(seperator)
       return csv
     }
   },

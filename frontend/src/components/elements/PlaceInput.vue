@@ -40,7 +40,7 @@ import { Place } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 const defaultPlace = {
   country: null,

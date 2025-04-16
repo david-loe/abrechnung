@@ -284,7 +284,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
-import { DocumentFile, Expense, HealthCareCost, healthCareCostStates, Organisation, UserSimple } from '@/../../common/types.js'
+import { DocumentFile, Expense, HealthCareCost, Organisation, UserSimple, healthCareCostStates } from '@/../../common/types.js'
 import API from '@/api.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
@@ -346,14 +346,14 @@ function resetForms() {
 }
 
 async function deleteHealthCareCost() {
-  const result = await API.deleter(props.endpointPrefix + 'healthCareCost', { _id: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}healthCareCost`, { _id: props._id })
   if (result) {
     router.push({ path: props.parentPages[0].link })
   }
 }
 
 async function toExamination() {
-  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/underExamination', {
+  const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/underExamination`, {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment
   })
@@ -363,7 +363,7 @@ async function toExamination() {
 }
 
 async function backToInWork() {
-  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/inWork', {
+  const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/inWork`, {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment
   })
@@ -410,7 +410,7 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  const result = await API.setter<HealthCareCost>(props.endpointPrefix + 'healthCareCost/expense', expense, {
+  const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/expense`, expense, {
     headers,
     params: { parentId: healthCareCost.value._id }
   })
@@ -423,7 +423,7 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  const result = await API.deleter(props.endpointPrefix + 'healthCareCost/expense', { _id, parentId: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
   if (result) {
     setHealthCareCost(result)
     modalCompRef.value?.hideModal()
@@ -435,7 +435,7 @@ async function getHealthCareCost() {
     _id: props._id,
     additionalFields: ['expenses']
   }
-  const result = (await API.getter<HealthCareCost>(props.endpointPrefix + 'healthCareCost', params)).ok
+  const result = (await API.getter<HealthCareCost>(`${props.endpointPrefix}healthCareCost`, params)).ok
   if (result) {
     setHealthCareCost(result.data)
   }
@@ -443,7 +443,7 @@ async function getHealthCareCost() {
 
 function setHealthCareCost(newHealthCareCost: HealthCareCost) {
   healthCareCost.value = newHealthCareCost
-  logger.info(t('labels.healthCareCost') + ':')
+  logger.info(`${t('labels.healthCareCost')}:`)
   logger.info(healthCareCost.value)
 }
 
@@ -485,7 +485,7 @@ if (props.endpointPrefix === 'examine/') {
     const subject = t('mail.underExaminationByInsurance.subject', { companyNumber: orga.companyNumber })
     const body = t('mail.underExaminationByInsurance.body', {
       insuranceName: healthCareCost.value.insurance.name,
-      owner: healthCareCost.value.owner.name.givenName + ' ' + healthCareCost.value.owner.name.familyName,
+      owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,
       organisationName: orga.name,
       amount: formatter.money(healthCareCost.value.addUp.total)
@@ -498,7 +498,7 @@ const mails = await getExaminerMails()
 const mailToLinkVal = mailToLink(mails)
 const msTeamsToLinkVal = msTeamsToLink(mails)
 
-const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'healthCareCost/report?_id=' + healthCareCost.value._id
+const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}healthCareCost/report?_id=${healthCareCost.value._id}`
 </script>
 
 <style></style>

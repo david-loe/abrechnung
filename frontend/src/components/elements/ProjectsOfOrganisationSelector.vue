@@ -30,7 +30,7 @@ const props = defineProps<{
 }>()
 
 // Emits definieren
-const emit = defineEmits<{ (e: 'update:modelValue', projects: ProjectSimple[] | string[]): void }>()
+const emit = defineEmits<(e: 'update:modelValue', projects: ProjectSimple[] | string[]) => void>()
 
 // Reaktive Variablen
 const selectedOrg = ref<OrganisationSimple | null>(null)
@@ -70,9 +70,8 @@ function getProjects(orgaId?: string) {
     return
   }
   // Andernfalls die vollständigen Projektobjekte zurückgeben
-  else {
-    emit('update:modelValue', projects)
-  }
+
+  emit('update:modelValue', projects)
 }
 
 function changeOrganisation(newOrga: OrganisationSimple) {
@@ -96,17 +95,18 @@ onMounted(async () => {
     if (typeof props.modelValue[0] === 'object') {
       project = props.modelValue[0]
     }
-    if (typeof props.modelValue[0] === 'string') {
-      project = getById(props.modelValue[0], APP_DATA.value!.projects!)
+    if (typeof props.modelValue[0] === 'string' && APP_DATA.value?.projects) {
+      project = getById(props.modelValue[0], APP_DATA.value.projects)
     }
-    if (project) {
-      selectedOrg.value = getById(project.organisation, APP_DATA.value!.organisations)
+    if (project && APP_DATA.value) {
+      selectedOrg.value = getById(project.organisation, APP_DATA.value.organisations)
       return
     }
   }
-  if (props.updateUserOrg && APP_DATA.value!.user.settings.organisation) {
-    selectedOrg.value = APP_DATA.value!.user.settings.organisation
+  if (props.updateUserOrg && APP_DATA.value?.user.settings.organisation) {
+    selectedOrg.value = APP_DATA.value.user.settings.organisation
   }
+
   if (props.loadProjectsOnInit) {
     getProjects(selectedOrg.value?._id)
   }

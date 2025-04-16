@@ -99,11 +99,11 @@ import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
-import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
 import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
+import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
+import TravelList from '@/components/travel/TravelList.vue'
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
-import TravelList from '@/components/travel/TravelList.vue'
 import { defineComponent } from 'vue'
 
 type ModalMode = 'view' | 'add' | 'edit'
@@ -165,7 +165,7 @@ export default defineComponent({
       if (result) {
         ;(this.$refs.expenseReportList as typeof ExpenseReportList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-        this.$router.push('/expenseReport/' + result._id)
+        this.$router.push(`/expenseReport/${result._id}`)
       }
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
@@ -173,7 +173,7 @@ export default defineComponent({
       if (result) {
         ;(this.$refs.healthCareCostList as typeof HealthCareCostList).loadFromServer()
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-        this.$router.push('/healthCareCost/' + result._id)
+        this.$router.push(`/healthCareCost/${result._id}`)
       }
     },
     async deleteTravel(_id: string) {

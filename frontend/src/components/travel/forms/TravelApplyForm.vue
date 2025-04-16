@@ -131,7 +131,7 @@
 
 <script lang="ts">
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { baseCurrency, TravelSimple } from '@/../../common/types.js'
+import { TravelSimple, baseCurrency } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -139,7 +139,7 @@ import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
@@ -212,11 +212,10 @@ export default defineComponent({
     },
     getMaxDate() {
       const date = isValidDate(this.formTravel.startDate as string)
-      if (date) {
-        return datetimeToDateString(date.valueOf() + this.APP_DATA!.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
-      } else {
-        return ''
+      if (date && this.APP_DATA) {
+        return datetimeToDateString(date.valueOf() + this.APP_DATA.travelSettings.maxTravelDayCount * 1000 * 60 * 60 * 24)
       }
+      return ''
     }
   },
   async created() {

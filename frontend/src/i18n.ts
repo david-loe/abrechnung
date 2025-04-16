@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n'
 import de from '../../common/locales/de.json' with { type: 'json' }
 import en from '../../common/locales/en.json' with { type: 'json' }
-import { defaultLocale, Locale } from '../../common/types.js'
+import { Locale, defaultLocale } from '../../common/types.js'
 
 const defaultMessages = {
   de,

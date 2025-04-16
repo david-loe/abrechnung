@@ -61,9 +61,9 @@ import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
 import { logger } from '@/logger.js'
 import QRCode from 'qrcode'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
-let APP_DATA = APP_LOADER.data
+const APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'FileUpload',
@@ -71,9 +71,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: [Array, Object] as PropType<Partial<DocumentFile>[] | Partial<DocumentFile> | null>,
-      default: function () {
-        return null
-      }
+      default: () => null
     },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -97,7 +95,7 @@ export default defineComponent({
     async showFile(file: Partial<DocumentFile>): Promise<void> {
       const windowProxy = window.open('', '_blank') as Window
       if (file._id) {
-        const result = (await API.getter<Blob>(this.endpointPrefix + 'documentFile', { _id: file._id }, { responseType: 'blob' })).ok
+        const result = (await API.getter<Blob>(`${this.endpointPrefix}documentFile`, { _id: file._id }, { responseType: 'blob' })).ok
         if (result) {
           const fileURL = URL.createObjectURL(result.data)
           windowProxy.location.assign(fileURL)
@@ -112,7 +110,7 @@ export default defineComponent({
     async deleteFile(file: Partial<DocumentFile>, index?: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (file._id) {
-          const result = await API.deleter(this.endpointPrefix + 'documentFile', { _id: file._id }, false)
+          const result = await API.deleter(`${this.endpointPrefix}documentFile`, { _id: file._id }, false)
           if (!result) {
             return null
           }
@@ -139,9 +137,10 @@ export default defineComponent({
     },
     async fileEventToDocumentFiles(event: Event): Promise<Partial<DocumentFile>[] | null> {
       const files: Partial<DocumentFile>[] = []
-      if (event.target && (event.target as HTMLInputElement).files) {
-        for (const file of (event.target as HTMLInputElement).files!) {
-          if (file.size < parseInt(import.meta.env.VITE_MAX_FILE_SIZE)) {
+      const target = event.target as HTMLInputElement
+      if (target.files) {
+        for (const file of target.files) {
+          if (file.size < Number.parseInt(import.meta.env.VITE_MAX_FILE_SIZE)) {
             if (file.type.indexOf('image') > -1) {
               const resizedImage = await resizeImage(file, 1400)
               files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })
@@ -149,24 +148,24 @@ export default defineComponent({
               files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
             }
           } else {
-            alert('alerts.imageToBig ' + file.name)
+            alert(`alerts.imageToBig ${file.name}`)
           }
         }
-        ;(event.target as HTMLInputElement).value = ''
+        target.value = ''
         return files
       }
       return null
     },
     async generateToken() {
       this.token = (await API.setter<Token>('user/token', {}, undefined, false)).ok
-      if (this.token) {
-        const url = new URL(import.meta.env.VITE_BACKEND_URL + '/upload/new')
-        url.searchParams.append('userId', APP_DATA.value!.user._id)
+      if (this.token && APP_DATA.value) {
+        const url = new URL(`${import.meta.env.VITE_BACKEND_URL}/upload/new`)
+        url.searchParams.append('userId', APP_DATA.value.user._id)
         url.searchParams.append('tokenId', this.token._id)
         if (this.ownerId) {
           url.searchParams.append('ownerId', this.ownerId)
         }
-        logger.info(this.$t('labels.uploadLink') + ':')
+        logger.info(`${this.$t('labels.uploadLink')}:`)
         logger.info(url.href)
         this.qr = await QRCode.toDataURL(url.href, { margin: 0, scale: 3 })
         this.fetchTokenInterval = setInterval(this.getTokenFiles, 3000)
@@ -177,7 +176,7 @@ export default defineComponent({
         this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
       }
       const result = (await API.getter<Token>('user/token')).ok
-      if (result && result.data) {
+      if (result?.data) {
         const token: Token = result.data
         if (token.files.length > 0) {
           if (this.multiple) {
@@ -209,7 +208,9 @@ export default defineComponent({
   },
   async created() {
     await APP_LOADER.loadData()
-    this.secondsLeft = this.expireAfterSeconds = APP_DATA.value!.settings.uploadTokenExpireAfterSeconds
+    if (APP_DATA.value) {
+      this.secondsLeft = this.expireAfterSeconds = APP_DATA.value.settings.uploadTokenExpireAfterSeconds
+    }
   }
 })
 </script>

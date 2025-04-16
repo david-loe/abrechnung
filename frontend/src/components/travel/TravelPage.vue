@@ -584,7 +584,7 @@ function showModal(mode: ModalMode, object: ModalObject | Gap, type: ModalObject
   modalObjectType.value = type
   modalObject.value = object
   modalMode.value = mode
-  if (modalCompRef.value && modalCompRef.value.modal) {
+  if (modalCompRef.value?.modal) {
     modalCompRef.value.modal.show()
   }
 }
@@ -609,7 +609,7 @@ async function postTravelSettings() {
     lastPlaceOfWork: travel.value.lastPlaceOfWork,
     days: travel.value.days
   }
-  const result = await API.setter<Travel>(props.endpointPrefix + 'travel', travelObj)
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
   if (result.ok) {
     setTravel(result.ok)
   } else {
@@ -619,7 +619,7 @@ async function postTravelSettings() {
 
 async function editTravelDetails(updatedTravel: Travel) {
   if (props.endpointPrefix === 'examine/') {
-    const result = await API.setter<Travel>(props.endpointPrefix + 'travel', updatedTravel)
+    const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, updatedTravel)
     if (result.ok) {
       setTravel(result.ok)
       hideModal()
@@ -640,14 +640,14 @@ async function editTravelDetails(updatedTravel: Travel) {
 }
 
 async function deleteTravel() {
-  const result = await API.deleter(props.endpointPrefix + 'travel', { _id: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}travel`, { _id: props._id })
   if (result) {
     router.push({ path: '/' })
   }
 }
 
 async function toExamination() {
-  const result = await API.setter<Travel>(props.endpointPrefix + 'travel/underExamination', {
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/underExamination`, {
     _id: travel.value._id,
     comment: travel.value.comment
   })
@@ -657,7 +657,7 @@ async function toExamination() {
 }
 
 async function backToApproved() {
-  const result = await API.setter<Travel>(props.endpointPrefix + 'travel/approved', {
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/approved`, {
     _id: travel.value._id,
     comment: travel.value.comment
   })
@@ -685,7 +685,7 @@ async function postStage(stage: Stage) {
   if ((stage.cost.amount as unknown) === '') {
     stage.cost.amount = 0
   }
-  const result = await API.setter<Travel>(props.endpointPrefix + 'travel/stage', stage, {
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/stage`, stage, {
     headers,
     params: { parentId: travel.value._id }
   })
@@ -703,7 +703,7 @@ async function postStage(stage: Stage) {
 }
 
 async function deleteStage(_id: string) {
-  const result = await API.deleter(props.endpointPrefix + 'travel/stage', { _id, parentId: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}travel/stage`, { _id, parentId: props._id })
   if (result) {
     setTravel(result)
     hideModal()
@@ -715,7 +715,7 @@ async function postExpense(expense: TravelExpense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  const result = await API.setter<Travel>(props.endpointPrefix + 'travel/expense', expense, {
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/expense`, expense, {
     headers,
     params: { parentId: travel.value._id }
   })
@@ -728,7 +728,7 @@ async function postExpense(expense: TravelExpense) {
 }
 
 async function deleteExpense(_id: string) {
-  const result = await API.deleter(props.endpointPrefix + 'travel/expense', { _id, parentId: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}travel/expense`, { _id, parentId: props._id })
   if (result) {
     setTravel(result)
     hideModal()
@@ -737,12 +737,12 @@ async function deleteExpense(_id: string) {
 
 async function postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
   const result = await API.setter<User>(
-    props.endpointPrefix + 'user/vehicleRegistration',
+    `${props.endpointPrefix}user/vehicleRegistration`,
     { vehicleRegistration },
     { headers: { 'Content-Type': 'multipart/form-data' } }
   )
-  if (result.ok) {
-    APP_DATA.value!.user = result.ok
+  if (result.ok && APP_DATA.value) {
+    APP_DATA.value.user = result.ok
   }
 }
 
@@ -813,7 +813,7 @@ async function getTravel() {
     _id: props._id,
     additionalFields: ['stages', 'expenses', 'days']
   }
-  const res = (await API.getter<Travel>(props.endpointPrefix + 'travel', params)).ok
+  const res = (await API.getter<Travel>(`${props.endpointPrefix}travel`, params)).ok
   if (res) {
     setTravel(res.data)
   }
@@ -833,7 +833,7 @@ function setTravel(newTravel: Travel) {
       }
     }
   }
-  logger.info(t('labels.travel') + ':')
+  logger.info(`${t('labels.travel')}:`)
   logger.info(travel.value)
   renderTable()
 }
@@ -861,7 +861,7 @@ function getLastPaceOfWorkList(travelObj: Travel) {
         country: place.country
       }
       if (place.special) {
-        adding['special'] = place.special
+        adding.special = place.special
       }
       list.push(adding)
     }
@@ -907,7 +907,7 @@ const mails = await getExaminerMails()
 const mailToLinkVal = mailLinkFunc(mails)
 const msTeamsToLinkVal = teamsLinkFunc(mails)
 
-const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'travel/report?_id=' + travel.value._id
+const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}travel/report?_id=${travel.value._id}`
 </script>
 
 <style></style>

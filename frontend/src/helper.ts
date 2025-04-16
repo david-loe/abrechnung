@@ -13,7 +13,7 @@ export async function subscribeToPush() {
   if (!(Notification.permission === 'granted')) {
     return
   }
-  let options = {
+  const options = {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
   }
@@ -25,7 +25,7 @@ export async function subscribeToPush() {
   if (!subscription) {
     return
   }
-  await fetch(import.meta.env.VITE_BACKEND_URL + '/user/subscription', {
+  await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/subscription`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(subscription),
@@ -84,22 +84,23 @@ export const bp = { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 } as const
 
 export function hideExpandColumn(colDeleted: boolean) {
   queueMicrotask(() => {
-    document.querySelectorAll('tr').forEach((tr) => {
+    for (const tr of document.querySelectorAll('tr')) {
       const firstCell = tr.querySelector<HTMLElement>('th, td')
       if (firstCell) {
         firstCell.style.display = 'none'
       }
-    })
+    }
     if (!colDeleted) {
       const firstCol = document.querySelector<HTMLElement>('col')
       if (firstCol) {
         firstCol.remove()
-        colDeleted = true
       }
     }
   })
 }
 
 export function expandCollapseComments() {
-  document.querySelectorAll<HTMLElement>('td.can-expand').forEach((td) => td.click())
+  for (const td of document.querySelectorAll<HTMLElement>('td.can-expand')) {
+    td.click()
+  }
 }

@@ -170,7 +170,7 @@
 
 <script lang="ts" setup>
 import { getById } from '@/../../common/scripts.js'
-import { Comment, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types.js'
+import { Comment, HealthCareCostState, Log, healthCareCostStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
@@ -202,7 +202,7 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const reportLink = (_id: string) => {
-  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpoint + '/report?_id=' + _id
+  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
 }
 
 const headers: Header[] = [
@@ -242,7 +242,7 @@ const getEmptyFilter = () =>
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined },
     'log.underExamination.date': { $gt: undefined }
-  } as Filter)
+  }) as Filter
 
 const filter = ref(getEmptyFilter())
 
@@ -264,10 +264,11 @@ const showFilter = ref({
 function clickFilter(header: keyof typeof showFilter.value) {
   if (showFilter.value[header]) {
     showFilter.value[header] = false
-    if (header === 'project.organisation') {
-      header = 'project'
+    let filterHeader = header
+    if (filterHeader === 'project.organisation') {
+      filterHeader = 'project'
     }
-    filter.value[header] = getEmptyFilter()[header]
+    filter.value[filterHeader] = getEmptyFilter()[header]
   } else {
     showFilter.value[header] = true
   }

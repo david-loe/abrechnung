@@ -25,7 +25,7 @@ class API {
   async getter<T>(endpoint: string, params: any = {}, config: any = {}, showAlert = true): Promise<{ ok?: GETResponse<T>; error?: any }> {
     try {
       const res = await axios.get(
-        import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
+        `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
         Object.assign(
           {
             params: params,
@@ -57,7 +57,7 @@ class API {
   async setter<T>(endpoint: string, data: any, config: AxiosRequestConfig<any> = {}, showAlert = true): Promise<{ ok?: T; error?: any }> {
     try {
       const res = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + '/' + endpoint,
+        `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
         data,
         Object.assign(
           {
@@ -81,9 +81,8 @@ class API {
           })
         }
         return { error: error.response.data }
-      } else {
-        return { error: error }
       }
+      return { error: error }
     }
   }
   async deleter(endpoint: string, params: { [key: string]: any; _id: string }, ask = true, showAlert = true): Promise<boolean | any> {
@@ -93,7 +92,7 @@ class API {
       }
     }
     try {
-      const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/' + endpoint, {
+      const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/${endpoint}`, {
         params: params,
         withCredentials: true
       })
@@ -119,19 +118,16 @@ class API {
     return false
   }
   addAlert(alert: Alert) {
-    alert = Object.assign(alert, { id: Math.random() })
-    this.alerts.push(alert)
-    setTimeout(
-      () => {
-        const index = this.alerts.findIndex((al) => {
-          return al.id === alert.id
-        })
-        if (index !== -1) {
-          this.alerts.splice(index, 1)
-        }
-      },
-      alert.ttl ? alert.ttl : 5000
-    )
+    const alertWithId = Object.assign(alert, { id: Math.random() })
+    this.alerts.push(alertWithId)
+    setTimeout(() => {
+      const index = this.alerts.findIndex((al) => {
+        return al.id === alertWithId.id
+      })
+      if (index !== -1) {
+        this.alerts.splice(index, 1)
+      }
+    }, alertWithId.ttl || 5000)
   }
   redirectToLogin() {
     this.router.push({ path: '/login', query: { redirect: useRoute().path } })

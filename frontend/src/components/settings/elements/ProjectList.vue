@@ -111,8 +111,8 @@ async function loadFromServer() {
 }
 defineExpose({ loadFromServer })
 
-let projectToEdit: Ref<Project | undefined> = ref(undefined)
-let _showForm = ref(false)
+const projectToEdit: Ref<Project | undefined> = ref(undefined)
+const _showForm = ref(false)
 
 function showForm(project?: Project) {
   projectToEdit.value = project

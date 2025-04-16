@@ -58,7 +58,7 @@ export default defineComponent({
       return options.filter((option) => {
         return (
           option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1 ||
-          ((option as Project).name && (option as Project).name!.toLowerCase().indexOf(search.toLowerCase()) > -1)
+          ((option as Project).name && (option as Project).name?.toLowerCase().indexOf(search.toLowerCase()) > -1)
         )
       })
     }

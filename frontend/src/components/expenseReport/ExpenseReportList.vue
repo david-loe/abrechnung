@@ -205,7 +205,7 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
 }
 
 const reportLink = (_id: string) => {
-  return import.meta.env.VITE_BACKEND_URL + '/' + props.endpoint + '/report?_id=' + _id
+  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
 }
 
 const getEmptyFilter = () =>
@@ -215,7 +215,7 @@ const getEmptyFilter = () =>
     state: undefined,
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined }
-  } as Filter)
+  }) as Filter
 
 const filter = ref(getEmptyFilter())
 
@@ -235,10 +235,11 @@ const showFilter = ref({
 function clickFilter(header: keyof typeof showFilter.value) {
   if (showFilter.value[header]) {
     showFilter.value[header] = false
-    if (header === 'project.organisation') {
-      header = 'project'
+    let filterHeader = header
+    if (filterHeader === 'project.organisation') {
+      filterHeader = 'project'
     }
-    filter.value[header] = getEmptyFilter()[header]
+    filter.value[filterHeader] = getEmptyFilter()[header]
   } else {
     showFilter.value[header] = true
   }

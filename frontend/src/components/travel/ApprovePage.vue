@@ -74,10 +74,10 @@ import { TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import TravelList from '@/components/travel/TravelList.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
-import TravelList from '@/components/travel/TravelList.vue'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -116,7 +116,7 @@ export default defineComponent({
     async approveTravel(travel: TravelSimple, decision: 'approved' | 'rejected', comment?: string) {
       if (travel) {
         travel.comment = comment
-        const result = await API.setter<TravelSimple>('approve/travel/' + decision, travel)
+        const result = await API.setter<TravelSimple>(`approve/travel/${decision}`, travel)
         if (result.ok) {
           ;(this.$refs.travelListRef as typeof TravelList).loadFromServer()
           this.hideModal()

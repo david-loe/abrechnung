@@ -167,7 +167,7 @@
 
 <script lang="ts">
 import { getFlagEmoji } from '@/../../common/scripts.js'
-import { accesses, CountrySimple, Currency, Locale, locales } from '@/../../common/types.js'
+import { CountrySimple, Currency, Locale, accesses, locales } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
@@ -196,7 +196,7 @@ export default defineComponent({
   methods: {
     async logout() {
       try {
-        const res = await axios.delete(import.meta.env.VITE_BACKEND_URL + '/auth/logout', {
+        const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
           withCredentials: true
         })
         if (res.status === 204) {

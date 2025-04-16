@@ -51,12 +51,13 @@ export default defineComponent({
   methods: {
     filter(options: CountrySimple[], search: string): CountrySimple[] {
       return options.filter((option) => {
-        const name = option.name[this.$i18n.locale as Locale].toLowerCase().indexOf(search.toLowerCase()) > -1
+        const currentLocale = this.$i18n.locale as Locale
+        const name = option.name[currentLocale].toLowerCase().indexOf(search.toLowerCase()) > -1
         if (name) {
           return name
         }
-        if (option.alias && option.alias[this.$i18n.locale as Locale]) {
-          for (const alias of option.alias[this.$i18n.locale as Locale]!) {
+        if (option.alias?.[currentLocale]) {
+          for (const alias of option.alias[currentLocale]) {
             const result = alias.toLowerCase().indexOf(search.toLowerCase()) > -1
             if (result) {
               return result

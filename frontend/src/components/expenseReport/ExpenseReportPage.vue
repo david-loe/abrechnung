@@ -242,7 +242,7 @@
 
 <script lang="ts" setup>
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
-import { Expense, ExpenseReport, expenseReportStates, UserSimple } from '@/../../common/types.js'
+import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '@/../../common/types.js'
 import API from '@/api.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
@@ -250,7 +250,7 @@ import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
-import { computed, PropType, ref, useTemplateRef } from 'vue'
+import { PropType, computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -303,14 +303,14 @@ function resetForms() {
 }
 
 async function deleteExpenseReport() {
-  const result = await API.deleter(props.endpointPrefix + 'expenseReport', { _id: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}expenseReport`, { _id: props._id })
   if (result) {
     router.push({ path: '/' })
   }
 }
 
 async function toExamination() {
-  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/underExamination', {
+  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment
   })
@@ -320,7 +320,7 @@ async function toExamination() {
 }
 
 async function backToInWork() {
-  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/inWork', {
+  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/inWork`, {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment
   })
@@ -348,7 +348,7 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  const result = await API.setter<ExpenseReport>(props.endpointPrefix + 'expenseReport/expense', expense, {
+  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/expense`, expense, {
     headers,
     params: { parentId: expenseReport.value._id }
   })
@@ -363,7 +363,7 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  const result = await API.deleter(props.endpointPrefix + 'expenseReport/expense', { _id, parentId: props._id })
+  const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
   if (result) {
     setExpenseReport(result)
     modalComp.value?.hideModal()
@@ -375,7 +375,7 @@ async function getExpenseReport() {
     _id: props._id,
     additionalFields: ['expenses']
   }
-  const response = await API.getter<ExpenseReport>(props.endpointPrefix + 'expenseReport', params)
+  const response = await API.getter<ExpenseReport>(`${props.endpointPrefix}expenseReport`, params)
   const result = response.ok
   if (result) {
     setExpenseReport(result.data)
@@ -384,7 +384,7 @@ async function getExpenseReport() {
 
 function setExpenseReport(er: ExpenseReport) {
   expenseReport.value = er
-  logger.info(t('labels.expenseReport') + ':')
+  logger.info(`${t('labels.expenseReport')}:`)
   logger.info(expenseReport.value)
 }
 
@@ -422,6 +422,6 @@ const mails = await getExaminerMails()
 const mailToLinkVal = mailToLink(mails)
 const msTeamsToLinkVal = msTeamsToLink(mails)
 
-const reportLink = import.meta.env.VITE_BACKEND_URL + '/' + props.endpointPrefix + 'expenseReport/report?_id=' + expenseReport.value._id
+const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}expenseReport/report?_id=${expenseReport.value._id}`
 </script>
 <style></style>
