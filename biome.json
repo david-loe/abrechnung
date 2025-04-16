@@ -49,7 +49,7 @@
         "noBannedTypes": "warn"
       },
       "performance": {
-        "noDelete": "warn"
+        "noDelete": "info"
       }
     }
   },

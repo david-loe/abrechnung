@@ -199,8 +199,8 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
           const owner = await User.findOne({ _id: this.owner._id }).lean()
           if (owner?.vehicleRegistration) {
             for (const vr of owner.vehicleRegistration) {
-              const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
-              ;(doc as unknown as any)._id = undefined
+              const doc: any = await DocumentFile.findOne({ _id: vr._id }).lean()
+              doc._id = undefined
               receipts.push(await DocumentFile.create(doc))
             }
           }

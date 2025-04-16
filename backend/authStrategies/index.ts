@@ -38,9 +38,9 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
   if (!user) {
     user = new User(newUser)
   } else {
-    newUser.access = undefined
+    delete newUser.access
     Object.assign(user.fk, newUser.fk)
-    newUser.fk = undefined
+    delete newUser.fk
     Object.assign(user, newUser)
   }
   try {

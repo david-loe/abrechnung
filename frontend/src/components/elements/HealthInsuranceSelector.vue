@@ -44,8 +44,8 @@ export default defineComponent({
       return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
     },
     updateInsurance(insurance: HealthInsurance) {
-      if (this.updateUserInsurance) {
-        this.APP_DATA?.user.settings.insurance = insurance
+      if (this.updateUserInsurance && this.APP_DATA) {
+        this.APP_DATA.user.settings.insurance = insurance
         API.setter('user/settings', this.APP_DATA?.user.settings, {}, false)
       }
       this.$emit('update:modelValue', insurance)

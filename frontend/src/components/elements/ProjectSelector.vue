@@ -1,7 +1,6 @@
 <template>
   <div :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'input-group' : ''">
     <ProjectsOfOrganisationSelector
-      v-if="APP_DATA && APP_DATA.organisations.length > 1"
       v-model="projects"
       :class="'col-' + orgSelectSplit"
       :updateUserOrg="updateUserOrg"
@@ -56,10 +55,12 @@ export default defineComponent({
   methods: {
     filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
       return options.filter((option) => {
-        return (
-          option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1 ||
-          ((option as Project).name && (option as Project).name?.toLowerCase().indexOf(search.toLowerCase()) > -1)
-        )
+        const identifier = option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1
+        if (identifier) {
+          return true
+        }
+        const fullProjectObject = option as Project
+        return fullProjectObject.name && fullProjectObject.name.toLowerCase().indexOf(search.toLowerCase()) > -1
       })
     }
   },

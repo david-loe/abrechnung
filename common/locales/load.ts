@@ -1,22 +1,20 @@
-import { Locale } from '../types.js'
+import { Locale, locales } from '../types.js'
 import de from './de.json' with { type: 'json' }
 import en from './en.json' with { type: 'json' }
 
-export function loadLocales(overwrite: { [key in Locale]?: { [key: string]: string } }) {
-  ;(overwrite as any)._id = undefined
+export function loadLocales(overwrite: { [key in Locale]: { [key: string]: string } }) {
   const messages = { de, en }
-
-  for (const lang in overwrite) {
-    for (const identifier in overwrite[lang as Locale]) {
+  for (const lang of locales) {
+    for (const identifier in overwrite[lang]) {
       let pathExists = false
-      let tmpCheckObj: any = messages[lang as Locale]
+      let tmpCheckObj: any = messages[lang]
       if (tmpCheckObj) {
         const pathToMessage = identifier.split('.')
         pathExists = true
         for (let i = 0; i < pathToMessage.length; i++) {
           if (tmpCheckObj[pathToMessage[i]]) {
             if (i === pathToMessage.length - 1) {
-              tmpCheckObj[pathToMessage[i]] = overwrite[lang as Locale]?.[identifier]
+              tmpCheckObj[pathToMessage[i]] = overwrite[lang]?.[identifier]
             } else {
               tmpCheckObj = tmpCheckObj[pathToMessage[i]]
             }

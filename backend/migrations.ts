@@ -194,6 +194,10 @@ export async function checkForMigrations() {
         }
       }
 
+      delete travelSettings._id
+      delete accessIcons._id
+      delete stateColors._id
+
       await mongoose.connection.collection('travelsettings').updateOne({}, { $set: travelSettings })
       await mongoose.connection.collection('displaysettings').updateOne({}, { $set: { accessIcons, stateColors } })
       await mongoose.connection.collection('settings').updateOne({}, { $unset: { accessIcons: '', stateColors: '', travelSettings: '' } })
