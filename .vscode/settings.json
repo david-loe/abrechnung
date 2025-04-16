@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "backend/node_modules/typescript/lib",
+  "typescript.tsdk": "./backend/node_modules/typescript/lib",
   "cSpell.words": [
     "Auslagenabrechnung",
     "erstattungberechtigt",
@@ -16,5 +16,16 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "biome.searchInPath": false
+  //"biome.lspBin": "./backend/node_modules/@biomejs/biome/bin/biome"
 }
