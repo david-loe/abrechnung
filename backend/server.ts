@@ -35,7 +35,6 @@ declare global {
     }
   }
 }
-
 ;(await APP()).listen(port, () => {
   logger.info(`Backend listening at ${url}`)
 })

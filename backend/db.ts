@@ -189,9 +189,8 @@ export async function getTravelSettings(): Promise<ITravelSettings> {
   const travelSettings = (await mongoose.connection.collection('travelsettings').findOne()) as ITravelSettings | null
   if (travelSettings) {
     return travelSettings
-  } else {
-    throw Error('Travel Settings not found')
   }
+  throw Error('Travel Settings not found')
 }
 
 export async function getPrinterSettings(): Promise<IPrinterSettings> {
@@ -199,9 +198,8 @@ export async function getPrinterSettings(): Promise<IPrinterSettings> {
   const printerSettings = (await mongoose.connection.collection('printersettings').findOne()) as IPrinterSettings | null
   if (printerSettings) {
     return printerSettings
-  } else {
-    throw Error('Printer Settings not found')
   }
+  throw Error('Printer Settings not found')
 }
 
 export async function getConnectionSettings(): Promise<IConnectionSettings> {

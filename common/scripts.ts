@@ -541,23 +541,23 @@ export function escapeRegExp(str: string) {
 
 export function hexToRGB(hex: HexColor): [number, number, number] {
   // Entferne das '#' falls vorhanden
-  hex = hex.replace(/^#/, '')
+  let hexChars = hex.replace(/^#/, '')
 
   // Falls shorthand (#abc), erweitern auf #aabbcc
-  if (hex.length === 3) {
-    hex = hex
+  if (hexChars.length === 3) {
+    hexChars = hexChars
       .split('')
       .map((char) => char + char)
       .join('')
   }
 
-  if (hex.length !== 6) {
+  if (hexChars.length !== 6) {
     throw new Error('Ungültiger Hex-Farbcode')
   }
 
-  const red = parseInt(hex.slice(0, 2), 16)
-  const green = parseInt(hex.slice(2, 4), 16)
-  const blue = parseInt(hex.slice(4, 6), 16)
+  const red = Number.parseInt(hexChars.slice(0, 2), 16)
+  const green = Number.parseInt(hexChars.slice(2, 4), 16)
+  const blue = Number.parseInt(hexChars.slice(4, 6), 16)
 
   return [red, green, blue]
 }

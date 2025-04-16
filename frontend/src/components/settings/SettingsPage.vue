@@ -168,12 +168,12 @@ export default defineComponent({
   computed: {
     rightMargin() {
       const container = document.getElementById('navBarContent')
+      let width = 0
       if (container) {
         console.log(container.getBoundingClientRect())
-        return container.getBoundingClientRect().right - container.getBoundingClientRect().width + 'px'
-      } else {
-        return '0px'
+        width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
       }
+      return `${width}px`
     }
   },
 
