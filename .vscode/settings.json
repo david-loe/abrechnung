@@ -14,7 +14,7 @@
   ],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit"
+    "source.organizeImports.biome": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
