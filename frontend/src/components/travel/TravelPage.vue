@@ -58,7 +58,7 @@
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"></TravelApplyForm>
       </div>
     </ModalComponent>
-    <div class="container" v-if="travel._id">
+    <div class="container py-3" v-if="travel._id">
       <div class="row">
         <div class="col">
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
@@ -90,7 +90,7 @@
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
           <div class="col-auto">
-            <h1 class="m-0">{{ travel.name }}</h1>
+            <h2 class="m-0">{{ travel.name }}</h2>
           </div>
           <div class="col">
             <h4 class="text-secondary m-0">
@@ -193,7 +193,7 @@
           </label>
           <span
             id="travelProfessionalShare"
-            :class="travel.professionalShare <= APP_DATA!.settings.travelSettings.minProfessionalShare ? 'text-danger' : ''">
+            :class="travel.professionalShare <= APP_DATA!.travelSettings.minProfessionalShare ? 'text-danger' : ''">
             {{ Math.round(travel.professionalShare * 100) + '%' }}</span
           >
           <InfoPoint class="ms-1" :text="t('info.professionalShare')" />

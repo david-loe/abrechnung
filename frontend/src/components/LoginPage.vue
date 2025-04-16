@@ -1,7 +1,7 @@
 <template>
   <div v-if="displaySettings?.auth" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
-    <h1 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h1>
+    <h2 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h2>
     <div v-if="strategy === 'ldapauth'">
       <form v-if="displaySettings.auth.ldapauth" class="form-signin" @submit.prevent="login()">
         <div class="form-floating">

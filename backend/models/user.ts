@@ -12,14 +12,6 @@ import {
 } from '../../common/types.js'
 import { getDisplaySettings, getSettings } from '../db.js'
 
-const settings = await getSettings()
-const displaySettings = await getDisplaySettings()
-
-const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
-for (const access of accesses) {
-  accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
-}
-
 interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
@@ -29,78 +21,87 @@ interface Methods {
 
 type UserModel = Model<User, {}, Methods>
 
-export const userSchema = new Schema<User, UserModel, Methods>({
-  fk: {
-    type: {
-      microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
-      oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !displaySettings.auth.oidc },
-      ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
-      magiclogin: {
-        type: String,
-        index: true,
-        unique: true,
-        sparse: true,
-        validate: emailRegex,
-        label: 'Magic Login Email',
-        hide: !displaySettings.auth.magiclogin
-      },
-      httpBearer: {
-        type: String,
-        index: true,
-        unique: true,
-        sparse: true,
-        label: 'API Key Hash'
-      }
-    },
-    required: true
-  },
-  email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
-  name: {
-    type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
-    required: true
-  },
-  access: { type: accessObject, default: () => ({}) },
-  projects: {
-    type: {
-      assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
-      supervised: {
-        type: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
-        required: true,
-        label: 'labels.supervisedProjects',
-        conditions: [
-          [
-            ['access.approve/travel', true],
-            ['access.examine/travel', true],
-            ['access.examine/expenseReport', true],
-            ['access.examine/healthCareCost', true],
-            ['access.confirm/healthCareCost', true],
-            ['access.refunded/travel', true],
-            ['access.refunded/expenseReport', true],
-            ['access.refunded/healthCareCost', true]
-          ]
-        ]
-      }
-    },
-    required: true,
-    default: () => ({})
-  },
+export const userSchema = async () => {
+  const settings = await getSettings()
+  const displaySettings = await getDisplaySettings()
 
-  loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
-  settings: {
-    type: {
-      language: { type: String, default: displaySettings.locale.default, enum: locales },
-      lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
-      lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
-      insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
-      organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
-      showInstallBanner: { type: Boolean, required: true, default: true }
+  const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
+  for (const access of accesses) {
+    accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
+  }
+  return new Schema<User, UserModel, Methods>({
+    fk: {
+      type: {
+        microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
+        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !displaySettings.auth.oidc },
+        ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
+        magiclogin: {
+          type: String,
+          index: true,
+          unique: true,
+          sparse: true,
+          validate: emailRegex,
+          label: 'Magic Login Email',
+          hide: !displaySettings.auth.magiclogin
+        },
+        httpBearer: {
+          type: String,
+          index: true,
+          unique: true,
+          sparse: true,
+          label: 'API Key Hash'
+        }
+      },
+      required: true
     },
-    required: true,
-    default: () => ({})
-  },
-  vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }], hide: true },
-  token: { type: Schema.Types.ObjectId, ref: 'Token' }
-})
+    email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
+    name: {
+      type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
+      required: true
+    },
+    access: { type: accessObject, default: () => ({}) },
+    loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
+    projects: {
+      type: {
+        assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
+        supervised: {
+          type: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
+          required: true,
+          label: 'labels.supervisedProjects',
+          conditions: [
+            [
+              ['access.approve/travel', true],
+              ['access.examine/travel', true],
+              ['access.examine/expenseReport', true],
+              ['access.examine/healthCareCost', true],
+              ['access.confirm/healthCareCost', true],
+              ['access.refunded/travel', true],
+              ['access.refunded/expenseReport', true],
+              ['access.refunded/healthCareCost', true]
+            ]
+          ]
+        }
+      },
+      required: true,
+      default: () => ({})
+    },
+
+    settings: {
+      type: {
+        language: { type: String, default: displaySettings.locale.default, enum: locales },
+        lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
+        lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
+        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
+        organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
+        showInstallBanner: { type: Boolean, required: true, default: true }
+      },
+      required: true,
+      default: () => ({})
+    },
+    vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }], hide: true },
+    token: { type: Schema.Types.ObjectId, ref: 'Token' }
+  })
+}
 
 function populate(doc: Document) {
   return Promise.allSettled([
@@ -114,7 +115,9 @@ function populate(doc: Document) {
   ])
 }
 
-userSchema.pre(/^find((?!Update).)*$/, function () {
+const schema = await userSchema()
+
+schema.pre(/^find((?!Update).)*$/, function () {
   const projection = (this as Query<User, User>).projection()
   const popInProj: boolean = projection && (projection.settings || projection.vehicleRegistration || projection.token)
   if ((this as Query<User, User>).selectedExclusively() && popInProj) {
@@ -126,12 +129,12 @@ userSchema.pre(/^find((?!Update).)*$/, function () {
   populate(this as Document)
 })
 
-userSchema.pre('save', async function (next) {
+schema.pre('save', async function (next) {
   await populate(this)
   next()
 })
 
-userSchema.methods.isActive = async function (this: UserDoc) {
+schema.methods.isActive = async function (this: UserDoc) {
   if (this.access.user) {
     if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= new Date().valueOf())) {
       return true
@@ -145,7 +148,7 @@ userSchema.methods.isActive = async function (this: UserDoc) {
   return false
 }
 
-userSchema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
+schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
     let filter: any = {}
     filter[path] = userIdToOverwrite
@@ -179,7 +182,7 @@ userSchema.methods.replaceReferences = async function (this: UserDoc, userIdToOv
   return result
 }
 
-userSchema.methods.merge = async function (this: UserDoc, userToOverwrite: Partial<User>, mergeFk: boolean) {
+schema.methods.merge = async function (this: UserDoc, userToOverwrite: Partial<User>, mergeFk: boolean) {
   const thisPojo = this.toObject()
   if (mergeFk) {
     Object.assign(this.fk, userToOverwrite.fk, thisPojo.fk)
@@ -213,7 +216,7 @@ userSchema.methods.merge = async function (this: UserDoc, userToOverwrite: Parti
   return this.toObject()
 }
 
-userSchema.methods.addProjects = async function addProjects(projects: { assigned?: _id[]; supervised?: _id[] }) {
+schema.methods.addProjects = async function addProjects(projects: { assigned?: _id[]; supervised?: _id[] }) {
   let changed = false
   if (projects.assigned) {
     for (const newProjectId of projects.assigned) {
@@ -236,6 +239,6 @@ userSchema.methods.addProjects = async function addProjects(projects: { assigned
   }
 }
 
-export default model<User, UserModel>('User', userSchema)
+export default model<User, UserModel>('User', schema)
 
 export interface UserDoc extends Methods, HydratedDocument<User> {}

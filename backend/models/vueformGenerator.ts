@@ -68,6 +68,10 @@ function mapSchemaTypeToVueformElement(
     vueformElement['default'] = schemaType.default
   }
 
+  if (!vueformElement['columns'] && isNotNested(schemaType)) {
+    vueformElement['columns'] = { md: 6 }
+  }
+
   if (schemaType.ref) {
     vueformElement['type'] = schemaType.ref.toString().toLowerCase()
     if (schemaType.ref !== 'DocumentFile') {
@@ -124,10 +128,10 @@ function mapSchemaTypeToVueformElement(
       }
     } else if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
       vueformElement['type'] = 'list'
-      vueformElement['object'] = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language) }
+      vueformElement['object'] = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language, { columns: 12 }) }
     } else {
       vueformElement['type'] = 'list'
-      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr)
+      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr, { columns: 12 })
       delete vueformElement['element'].placeholder
     }
     const index = vueformElement['rules'].indexOf('required')
@@ -138,9 +142,10 @@ function mapSchemaTypeToVueformElement(
   } else if (typeof schemaType.type === 'object') {
     const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
     vueformElement['type'] = 'object'
-    if (keys.length > 1 && isFlatObject(schemaType.type)) {
+    vueformElement['addClasses'] = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
+    if (keys.length > 1 && isNotNestedObject(schemaType.type)) {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language, {
-        columns: { lg: { container: 12 / (keys.length === 2 ? 2 : 3) }, sm: { container: 6 } }
+        columns: { xl: 12 / (keys.length > 3 ? 4 : keys.length), lg: 12 / (keys.length > 2 ? 3 : keys.length), sm: 6 }
       })
     } else {
       vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
@@ -167,8 +172,12 @@ function isCheckboxGroup(mongooseSchema: SchemaDefinition | any) {
   return !Object.keys(mongooseSchema).some((path) => (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Boolean)
 }
 
-function isFlatObject(mongooseSchema: SchemaDefinition | any) {
-  return !Object.keys(mongooseSchema).some((path) => !isFlatType((mongooseSchema[path] as SchemaTypeOptions<any>).type))
+function isNotNestedObject(mongooseSchema: SchemaDefinition | any) {
+  return !Object.keys(mongooseSchema).some((path) => !isNotNested(mongooseSchema[path] as SchemaTypeOptions<any>))
+}
+
+function isNotNested(schemaType: SchemaTypeOptions<any>) {
+  return isFlatType(schemaType.type) || typeof schemaType.type !== 'object' || schemaType.ref
 }
 
 function isFlatType(type: SchemaTypeOptions<any>['type']) {

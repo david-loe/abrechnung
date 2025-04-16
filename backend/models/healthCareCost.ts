@@ -21,52 +21,53 @@ interface Methods {
 
 type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
-const healthCareCostSchema = new Schema<HealthCareCost, HealthCareCostModel, Methods>(
-  {
-    name: { type: String },
-    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    patientName: { type: String, trim: true, required: true },
-    insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    state: {
-      type: String,
-      required: true,
-      enum: healthCareCostStates,
-      default: 'inWork'
-    },
-    log: logObject(healthCareCostStates),
-    refundSum: costObject(true, true, false, baseCurrency._id),
-    addUp: {
-      type: {
-        balance: costObject(false, false, true, null, 0, null),
-        total: costObject(false, false, true, null, 0),
-        expenses: costObject(false, false, true, null, 0)
-      }
-    },
-    editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    comments: [
-      {
-        text: { type: String },
-        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        toState: {
-          type: String,
-          required: true,
-          enum: healthCareCostStates
+const healthCareCostSchema = () =>
+  new Schema<HealthCareCost, HealthCareCostModel, Methods>(
+    {
+      name: { type: String },
+      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      patientName: { type: String, trim: true, required: true },
+      insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
+      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
+      state: {
+        type: String,
+        required: true,
+        enum: healthCareCostStates,
+        default: 'inWork'
+      },
+      log: logObject(healthCareCostStates),
+      refundSum: costObject(true, true, false, baseCurrency._id),
+      addUp: {
+        type: {
+          balance: costObject(false, false, true, null, 0, null),
+          total: costObject(false, false, true, null, 0),
+          expenses: costObject(false, false, true, null, 0)
         }
-      }
-    ],
-    history: [{ type: Schema.Types.ObjectId, ref: 'HealthCareCost' }],
-    historic: { type: Boolean, required: true, default: false },
-    expenses: [
-      {
-        description: { type: String, required: true },
-        cost: costObject(true, true, true),
-        note: { type: String }
-      }
-    ]
-  },
-  { timestamps: true }
-)
+      },
+      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      comments: [
+        {
+          text: { type: String },
+          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          toState: {
+            type: String,
+            required: true,
+            enum: healthCareCostStates
+          }
+        }
+      ],
+      history: [{ type: Schema.Types.ObjectId, ref: 'HealthCareCost' }],
+      historic: { type: Boolean, required: true, default: false },
+      expenses: [
+        {
+          description: { type: String, required: true },
+          cost: costObject(true, true, true),
+          note: { type: String }
+        }
+      ]
+    },
+    { timestamps: true }
+  )
 
 function populate(doc: Document) {
   return Promise.allSettled([
@@ -83,11 +84,13 @@ function populate(doc: Document) {
   ])
 }
 
-healthCareCostSchema.pre(/^find((?!Update).)*$/, function (this: HealthCareCostDoc) {
+const schema = healthCareCostSchema()
+
+schema.pre(/^find((?!Update).)*$/, function (this: HealthCareCostDoc) {
   populate(this)
 })
 
-healthCareCostSchema.pre('deleteOne', { document: true, query: false }, function (this: HealthCareCostDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function (this: HealthCareCostDoc) {
   for (const historyId of this.history) {
     model('HealthCareCost').deleteOne({ _id: historyId }).exec()
   }
@@ -100,7 +103,7 @@ healthCareCostSchema.pre('deleteOne', { document: true, query: false }, function
   }
 })
 
-healthCareCostSchema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
+schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
   const doc: any = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
   doc.updatedAt = new Date()
@@ -122,7 +125,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   return costObject
 }
 
-healthCareCostSchema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc) {
+schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
     promiseList.push(exchange(expense.cost, expense.cost.date))
@@ -137,18 +140,18 @@ healthCareCostSchema.methods.calculateExchangeRates = async function (this: Heal
   }
 }
 
-healthCareCostSchema.methods.addComment = function (this: HealthCareCostDoc) {
+schema.methods.addComment = function (this: HealthCareCostDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<HealthCareCostState>)
     delete this.comment
   }
 }
 
-healthCareCostSchema.pre('validate', function (this: HealthCareCostDoc) {
+schema.pre('validate', function (this: HealthCareCostDoc) {
   this.addComment()
 })
 
-healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) {
+schema.pre('save', async function (this: HealthCareCostDoc, next) {
   await populate(this)
 
   await this.calculateExchangeRates()
@@ -156,12 +159,12 @@ healthCareCostSchema.pre('save', async function (this: HealthCareCostDoc, next) 
   next()
 })
 
-healthCareCostSchema.post('save', async function (this: HealthCareCostDoc) {
+schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
   }
 })
 
-export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', healthCareCostSchema)
+export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', schema)
 
 export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> {}

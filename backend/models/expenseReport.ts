@@ -21,51 +21,52 @@ interface Methods {
 
 type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
-const expenseReportSchema = new Schema<ExpenseReport, ExpenseReportModel, Methods>(
-  {
-    name: { type: String },
-    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    state: {
-      type: String,
-      required: true,
-      enum: expenseReportStates,
-      default: 'inWork'
-    },
-    log: logObject(expenseReportStates),
-    editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    comments: [
-      {
-        text: { type: String },
-        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        toState: {
-          type: String,
-          required: true,
-          enum: expenseReportStates
+const expenseReportSchema = () =>
+  new Schema<ExpenseReport, ExpenseReportModel, Methods>(
+    {
+      name: { type: String },
+      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
+      state: {
+        type: String,
+        required: true,
+        enum: expenseReportStates,
+        default: 'inWork'
+      },
+      log: logObject(expenseReportStates),
+      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      comments: [
+        {
+          text: { type: String },
+          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          toState: {
+            type: String,
+            required: true,
+            enum: expenseReportStates
+          }
         }
-      }
-    ],
-    advance: costObject(true, false, false, baseCurrency._id),
-    addUp: {
-      type: {
-        balance: costObject(false, false, true, null, 0, null),
-        total: costObject(false, false, true, null, 0),
-        expenses: costObject(false, false, true, null, 0),
-        advance: costObject(false, false, true, null, 0)
-      }
+      ],
+      advance: costObject(true, false, false, baseCurrency._id),
+      addUp: {
+        type: {
+          balance: costObject(false, false, true, null, 0, null),
+          total: costObject(false, false, true, null, 0),
+          expenses: costObject(false, false, true, null, 0),
+          advance: costObject(false, false, true, null, 0)
+        }
+      },
+      history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
+      historic: { type: Boolean, required: true, default: false },
+      expenses: [
+        {
+          description: { type: String, required: true },
+          cost: costObject(true, true, true),
+          note: { type: String }
+        }
+      ]
     },
-    history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
-    historic: { type: Boolean, required: true, default: false },
-    expenses: [
-      {
-        description: { type: String, required: true },
-        cost: costObject(true, true, true),
-        note: { type: String }
-      }
-    ]
-  },
-  { timestamps: true }
-)
+    { timestamps: true }
+  )
 
 function populate(doc: Document) {
   return Promise.allSettled([
@@ -80,11 +81,13 @@ function populate(doc: Document) {
   ])
 }
 
-expenseReportSchema.pre(/^find((?!Update).)*$/, function (this: ExpenseReportDoc) {
+const schema = expenseReportSchema()
+
+schema.pre(/^find((?!Update).)*$/, function (this: ExpenseReportDoc) {
   populate(this)
 })
 
-expenseReportSchema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {
   for (const historyId of this.history) {
     model('ExpenseReport').deleteOne({ _id: historyId }).exec()
   }
@@ -97,7 +100,7 @@ expenseReportSchema.pre('deleteOne', { document: true, query: false }, function 
   }
 })
 
-expenseReportSchema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
+schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
   const doc: any = await model<ExpenseReport, ExpenseReportModel>('ExpenseReport').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
   doc.updatedAt = new Date()
@@ -119,7 +122,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   return costObject
 }
 
-expenseReportSchema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
+schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
     promiseList.push(exchange(expense.cost, expense.cost.date))
@@ -134,18 +137,18 @@ expenseReportSchema.methods.calculateExchangeRates = async function (this: Expen
   }
 }
 
-expenseReportSchema.methods.addComment = function (this: ExpenseReportDoc) {
+schema.methods.addComment = function (this: ExpenseReportDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<ExpenseReportState>)
     delete this.comment
   }
 }
 
-expenseReportSchema.pre('validate', function (this: ExpenseReportDoc) {
+schema.pre('validate', function (this: ExpenseReportDoc) {
   this.addComment()
 })
 
-expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
+schema.pre('save', async function (this: ExpenseReportDoc, next) {
   await populate(this)
 
   await this.calculateExchangeRates()
@@ -153,12 +156,12 @@ expenseReportSchema.pre('save', async function (this: ExpenseReportDoc, next) {
   next()
 })
 
-expenseReportSchema.post('save', async function (this: ExpenseReportDoc) {
+schema.post('save', async function (this: ExpenseReportDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
   }
 })
 
-export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', expenseReportSchema)
+export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', schema)
 
 export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> {}

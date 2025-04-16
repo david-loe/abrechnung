@@ -38,9 +38,13 @@ export async function sendPushNotification(title: string, body: string, users: U
   }
 }
 
-function getAllSessions() {
+async function getAllSessions() {
+  const store = await sessionStore()
+  if (!store) {
+    return []
+  }
   return new Promise<SessionData[]>((resolve, reject) => {
-    sessionStore.all((err, sessions) => {
+    store.all((err, sessions) => {
       if (err) {
         return reject(err)
       }

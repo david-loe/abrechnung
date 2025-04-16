@@ -48,6 +48,6 @@ export class OrganisationAdminController extends Controller {
 
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(organisationSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(organisationSchema().obj, locales) }
   }
 }

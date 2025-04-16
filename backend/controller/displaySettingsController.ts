@@ -24,6 +24,6 @@ export class DisplaySettingsAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(displaySettingsSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema(displaySettingsSchema().obj, locales) }
   }
 }

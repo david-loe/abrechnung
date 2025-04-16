@@ -1,24 +1,18 @@
-import pdf_lib from 'pdf-lib'
-import { _id, Locale } from '../common/types.js'
-import { getSettings } from './db.js'
-import i18n, { formatter } from './i18n.js'
+import Formatter from '../common/formatter.js'
+import { TravelCalculator } from '../common/travel.js'
+import { _id, CountryCode, Country as ICountry, Locale } from '../common/types.js'
+import { getDisplaySettings, getPrinterSettings, getTravelSettings } from './db.js'
+import i18n from './i18n.js'
+import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'
 import Organisation from './models/organisation.js'
 import { ReportPrinter } from './pdf/printer.js'
 
-export const reportPrinter = new ReportPrinter(
-  {
-    fontName: 'NotoSans',
-    fontSizes: { S: 9, M: 11, L: 16 },
-    textColor: pdf_lib.rgb(0, 0, 0),
-    pagePadding: 36,
-    borderColor: pdf_lib.rgb(0, 0, 0),
-    borderThickness: 1,
-    cellPadding: { x: 2, bottom: 4 },
-    pageSize: pdf_lib.PageSizes.A4
-  },
+export const formatter = new Formatter((await getDisplaySettings()).locale.default)
 
-  (await getSettings()).travelSettings.distanceRefunds,
+export const reportPrinter = new ReportPrinter(
+  await getPrinterSettings(),
+  (await getTravelSettings()).distanceRefunds,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: any) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
@@ -37,4 +31,9 @@ export const reportPrinter = new ReportPrinter(
     }
     return null
   }
+)
+
+export const travelCalculator = new TravelCalculator(
+  (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
+  await getTravelSettings()
 )

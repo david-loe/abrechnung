@@ -9,6 +9,7 @@ import {
   OrganisationSimple,
   ProjectSimple,
   Settings,
+  TravelSettings,
   User
 } from '../../common/types'
 import API from './api.js'
@@ -22,6 +23,7 @@ export class APP_DATA {
   countries: CountrySimple[]
   user: User
   settings: Settings
+  travelSettings: TravelSettings
   displaySettings: DisplaySettings
   healthInsurances: HealthInsurance[]
   organisations: OrganisationSimple[]
@@ -35,6 +37,7 @@ export class APP_DATA {
     countries: CountrySimple[],
     user: User,
     settings: Settings,
+    travelSettings: TravelSettings,
     displaySettings: DisplaySettings,
     healthInsurances: HealthInsurance[],
     organisations: OrganisationSimple[],
@@ -47,6 +50,7 @@ export class APP_DATA {
     this.countries = countries
     this.user = user
     this.settings = settings
+    this.travelSettings = travelSettings
     this.displaySettings = displaySettings
     this.healthInsurances = healthInsurances
     this.organisations = organisations
@@ -76,6 +80,7 @@ class APP_LOADER {
             this.withProgress(API.getter<Currency[]>('currency')),
             this.withProgress(API.getter<CountrySimple[]>('country')),
             this.withProgress(API.getter<Settings>('settings')),
+            this.withProgress(API.getter<TravelSettings>('travelSettings')),
             this.withProgress(API.getter<HealthInsurance[]>('healthInsurance')),
             this.withProgress(API.getter<OrganisationSimple[]>('organisation')),
             this.withProgress(API.getter<{ [key: string]: string[] }>('specialLumpSums')),
@@ -94,6 +99,7 @@ class APP_LOADER {
               currenciesRes,
               countriesRes,
               settingsRes,
+              travelSettingsRes,
               healthInsurancesRes,
               organisationsRes,
               specialLumpSumsRes,
@@ -111,6 +117,7 @@ class APP_LOADER {
               !currenciesRes.ok ||
               !countriesRes.ok ||
               !settingsRes.ok ||
+              !travelSettingsRes.ok ||
               !healthInsurancesRes.ok ||
               !organisationsRes.ok ||
               !specialLumpSumsRes.ok ||
@@ -123,6 +130,7 @@ class APP_LOADER {
               countriesRes.ok!.data,
               userRes.ok!.data,
               settingsRes.ok!.data,
+              travelSettingsRes.ok!.data,
               displaySettingsRes.ok!.data,
               healthInsurancesRes.ok!.data,
               organisationsRes.ok!.data,

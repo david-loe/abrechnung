@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h1 class="mb-3">{{ $t('accesses.refunded/healthCareCost') }}</h1>
+        <h2 class="mb-3">{{ $t('accesses.refunded/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>

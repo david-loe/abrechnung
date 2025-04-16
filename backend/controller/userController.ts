@@ -221,6 +221,6 @@ export class UserAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(userSchema.obj, locales) }
+    return { data: mongooseSchemaToVueformSchema((await userSchema()).obj, locales) }
   }
 }

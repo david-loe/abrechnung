@@ -1,10 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { TravelCalculator } from '../../common/travel.js'
 import {
   Comment,
-  CountryCode,
-  Country as ICountry,
   Currency as ICurrency,
   Money,
   Record,
@@ -16,18 +13,12 @@ import {
   transportTypes,
   travelStates
 } from '../../common/types.js'
-import { getSettings } from '../db.js'
-import Country from './country.js'
+import { travelCalculator } from '../factory.js'
 import DocumentFile from './documentFile.js'
 import { convertCurrency } from './exchangeRate.js'
 import { costObject, logObject } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
-
-export const travelCalculator = new TravelCalculator(
-  (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
-  (await getSettings()).travelSettings
-)
 
 function place(required = false, withPlace = true) {
   const obj: any = {
@@ -48,101 +39,102 @@ interface Methods {
 
 type TravelModel = Model<Travel, {}, Methods>
 
-const travelSchema = new Schema<Travel, TravelModel, Methods>(
-  {
-    name: { type: String },
-    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    state: {
-      type: String,
-      required: true,
-      enum: travelStates,
-      default: 'appliedFor'
-    },
-    log: logObject(travelStates),
-    editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    comments: [
-      {
-        text: { type: String },
-        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        toState: {
-          type: String,
-          required: true,
-          enum: travelStates
-        }
-      }
-    ],
-    reason: { type: String, required: true },
-    destinationPlace: place(true),
-    isCrossBorder: { type: Boolean },
-    a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
-    advance: costObject(true, false, false, baseCurrency._id),
-    addUp: {
-      type: {
-        balance: costObject(false, false, true, null, 0, null),
-        total: costObject(false, false, true, null, 0),
-        expenses: costObject(false, false, true, null, 0),
-        advance: costObject(false, false, true, null, 0),
-        lumpSums: costObject(false, false, true, null, 0)
-      }
-    },
-    claimSpouseRefund: { type: Boolean },
-    fellowTravelersNames: { type: String },
-    professionalShare: { type: Number, min: 0, max: 1 },
-    claimOvernightLumpSum: { type: Boolean, default: true },
-    lastPlaceOfWork: place(true, false),
-    progress: { type: Number, min: 0, max: 100, default: 0 },
-    history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
-    historic: { type: Boolean, required: true, default: false },
-    stages: [
-      {
-        departure: { type: Date, required: true },
-        arrival: { type: Date, required: true },
-        startLocation: place(true),
-        endLocation: place(true),
-        midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
-        transport: {
-          distance: { type: Number, min: 0 },
-          distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
-          type: { type: String, enum: transportTypes, required: true }
-        },
-        cost: costObject(true, true, false),
-        purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
-        note: { type: String }
-      }
-    ],
-    expenses: [
-      {
-        description: { type: String, required: true },
-        cost: costObject(true, true, true),
-        purpose: { type: String, enum: ['professional', 'mixed'] },
-        note: { type: String }
-      }
-    ],
-    days: [
-      {
-        date: { type: Date, required: true },
-        country: { type: String, ref: 'Country', required: true },
-        special: { type: String },
-        cateringNoRefund: {
-          breakfast: { type: Boolean, default: false },
-          lunch: { type: Boolean, default: false },
-          dinner: { type: Boolean, default: false }
-        },
-        purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
-        refunds: [
-          {
-            type: { type: String, enum: lumpsumTypes, required: true },
-            refund: costObject(false, false, true)
+const travelSchema = () =>
+  new Schema<Travel, TravelModel, Methods>(
+    {
+      name: { type: String },
+      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
+      state: {
+        type: String,
+        required: true,
+        enum: travelStates,
+        default: 'appliedFor'
+      },
+      log: logObject(travelStates),
+      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      comments: [
+        {
+          text: { type: String },
+          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          toState: {
+            type: String,
+            required: true,
+            enum: travelStates
           }
-        ]
-      }
-    ]
-  },
-  { timestamps: true }
-)
+        }
+      ],
+      reason: { type: String, required: true },
+      destinationPlace: place(true),
+      isCrossBorder: { type: Boolean },
+      a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
+      startDate: { type: Date, required: true },
+      endDate: { type: Date, required: true },
+      advance: costObject(true, false, false, baseCurrency._id),
+      addUp: {
+        type: {
+          balance: costObject(false, false, true, null, 0, null),
+          total: costObject(false, false, true, null, 0),
+          expenses: costObject(false, false, true, null, 0),
+          advance: costObject(false, false, true, null, 0),
+          lumpSums: costObject(false, false, true, null, 0)
+        }
+      },
+      claimSpouseRefund: { type: Boolean },
+      fellowTravelersNames: { type: String },
+      professionalShare: { type: Number, min: 0, max: 1 },
+      claimOvernightLumpSum: { type: Boolean, default: true },
+      lastPlaceOfWork: place(true, false),
+      progress: { type: Number, min: 0, max: 100, default: 0 },
+      history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
+      historic: { type: Boolean, required: true, default: false },
+      stages: [
+        {
+          departure: { type: Date, required: true },
+          arrival: { type: Date, required: true },
+          startLocation: place(true),
+          endLocation: place(true),
+          midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
+          transport: {
+            distance: { type: Number, min: 0 },
+            distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
+            type: { type: String, enum: transportTypes, required: true }
+          },
+          cost: costObject(true, true, false),
+          purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
+          note: { type: String }
+        }
+      ],
+      expenses: [
+        {
+          description: { type: String, required: true },
+          cost: costObject(true, true, true),
+          purpose: { type: String, enum: ['professional', 'mixed'] },
+          note: { type: String }
+        }
+      ],
+      days: [
+        {
+          date: { type: Date, required: true },
+          country: { type: String, ref: 'Country', required: true },
+          special: { type: String },
+          cateringNoRefund: {
+            breakfast: { type: Boolean, default: false },
+            lunch: { type: Boolean, default: false },
+            dinner: { type: Boolean, default: false }
+          },
+          purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
+          refunds: [
+            {
+              type: { type: String, enum: lumpsumTypes, required: true },
+              refund: costObject(false, false, true)
+            }
+          ]
+        }
+      ]
+    },
+    { timestamps: true }
+  )
 
 function populate(doc: Document) {
   return Promise.allSettled([
@@ -165,11 +157,13 @@ function populate(doc: Document) {
   ])
 }
 
-travelSchema.pre(/^find((?!Update).)*$/, function (this: TravelDoc) {
+const schema = travelSchema()
+
+schema.pre(/^find((?!Update).)*$/, function (this: TravelDoc) {
   populate(this)
 })
 
-travelSchema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
   for (const historyId of this.history) {
     model('Travel').deleteOne({ _id: historyId }).exec()
   }
@@ -186,7 +180,7 @@ travelSchema.pre('deleteOne', { document: true, query: false }, function (this: 
   deleteReceipts(this.expenses)
 })
 
-travelSchema.methods.saveToHistory = async function (this: TravelDoc) {
+schema.methods.saveToHistory = async function (this: TravelDoc) {
   const doc: any = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
   delete doc._id
   doc.updatedAt = new Date()
@@ -228,7 +222,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   return costObject
 }
 
-travelSchema.methods.calculateExchangeRates = async function (this: TravelDoc) {
+schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   const promiseList = []
   promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
   for (const stage of this.stages) {
@@ -256,14 +250,14 @@ travelSchema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   }
 }
 
-travelSchema.methods.addComment = function (this: TravelDoc) {
+schema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<TravelState>)
     delete this.comment
   }
 }
 
-travelSchema.pre('validate', async function (this: TravelDoc, next) {
+schema.pre('validate', async function (this: TravelDoc, next) {
   this.addComment()
 
   await populate(this)
@@ -281,12 +275,12 @@ travelSchema.pre('validate', async function (this: TravelDoc, next) {
   next()
 })
 
-travelSchema.post('save', async function (this: TravelDoc) {
+schema.post('save', async function (this: TravelDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
   }
 })
 
-export default model<Travel, TravelModel>('Travel', travelSchema)
+export default model<Travel, TravelModel>('Travel', schema)
 
 export interface TravelDoc extends Methods, HydratedDocument<Travel> {}

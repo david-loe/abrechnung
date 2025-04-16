@@ -23,7 +23,7 @@
         </ExpenseForm>
       </div>
     </ModalComponent>
-    <div class="container" v-if="expenseReport._id">
+    <div class="container py-3" v-if="expenseReport._id">
       <div class="row">
         <div class="col">
           <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
@@ -55,7 +55,7 @@
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
           <div class="col-auto">
-            <h1 class="m-0">{{ expenseReport.name }}</h1>
+            <h2 class="m-0">{{ expenseReport.name }}</h2>
           </div>
           <div class="col-auto">
             <div class="dropdown">

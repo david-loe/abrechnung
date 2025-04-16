@@ -30,7 +30,7 @@ const routes = [
     }
   },
   {
-    path: '/settings',
+    path: '/admin',
     component: SettingsPage,
     meta: { requiresAuth: true }
   },

@@ -83,6 +83,6 @@ export class ProjectAdminController extends Controller {
   }
   @Get('form')
   public async getForm() {
-    return { data: mongooseSchemaToVueformSchema(Object.assign(projectSchema.obj, projectUsersSchema.obj), locales) }
+    return { data: mongooseSchemaToVueformSchema(Object.assign(projectSchema().obj, projectUsersSchema.obj), locales) }
   }
 }

@@ -3,6 +3,7 @@ import {
   BaseCurrencyMoney,
   ExpenseReport,
   HealthCareCost,
+  HexColor,
   Locale,
   Money,
   Place,
@@ -529,4 +530,27 @@ export function download(file: File) {
 
 export function escapeRegExp(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+export function hexToRGB(hex: HexColor): [number, number, number] {
+  // Entferne das '#' falls vorhanden
+  hex = hex.replace(/^#/, '')
+
+  // Falls shorthand (#abc), erweitern auf #aabbcc
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map((char) => char + char)
+      .join('')
+  }
+
+  if (hex.length !== 6) {
+    throw new Error('Ungültiger Hex-Farbcode')
+  }
+
+  const red = parseInt(hex.slice(0, 2), 16)
+  const green = parseInt(hex.slice(2, 4), 16)
+  const blue = parseInt(hex.slice(4, 6), 16)
+
+  return [red, green, blue]
 }

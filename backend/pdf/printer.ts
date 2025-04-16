@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
-import { addUp } from '../../common/scripts.js'
+import { addUp, hexToRGB } from '../../common/scripts.js'
 import {
   _id,
   baseCurrency,
@@ -13,43 +13,35 @@ import {
   DocumentFile,
   DocumentFileType,
   ExpenseReport,
-  FontName,
   HealthCareCost,
   Locale,
   Meal,
   Money,
   PageOrientation,
   Place,
+  PrinterSettings,
+  PrintSettingsBase,
   Purpose,
   PurposeSimple,
   Refund,
   reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel,
-  SettingsTravel,
   Transport,
   Travel,
   TravelDay,
-  TravelExpense
+  TravelExpense,
+  TravelSettings
 } from '../../common/types.js'
-
-export interface PrinterSettings extends PrintSettingsBase {
-  fontName: FontName
-}
 
 interface PrintSettings extends PrintSettingsBase {
   language: Locale
   defaultPageOrientation: PageOrientation
 }
 
-interface PrintSettingsBase {
-  fontSizes: { S: number; M: number; L: number }
+interface PrintSettingsWithColorObjects extends Omit<PrintSettings, 'textColor' | 'borderColor'> {
   textColor: pdf_lib.Color
-  pagePadding: number
   borderColor: pdf_lib.Color
-  borderThickness: number
-  cellPadding: { x: number; bottom: number }
-  pageSize: [number, number]
 }
 
 export interface Options {
@@ -95,7 +87,7 @@ function getReceiptMap(costList: { cost: Cost }[], number: number = 1) {
 
 export class ReportPrinter {
   formatter: Formatter
-  distanceRefunds: SettingsTravel['distanceRefunds']
+  distanceRefunds: TravelSettings['distanceRefunds']
   settings: PrinterSettings
   getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById']
   getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
@@ -103,7 +95,7 @@ export class ReportPrinter {
 
   constructor(
     settings: PrinterSettings,
-    distanceRefunds: SettingsTravel['distanceRefunds'],
+    distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
@@ -135,7 +127,7 @@ export class ReportPrinter {
     this.settings = settings
   }
 
-  setDistanceRefunds(distanceRefunds: SettingsTravel['distanceRefunds']) {
+  setDistanceRefunds(distanceRefunds: TravelSettings['distanceRefunds']) {
     this.distanceRefunds = distanceRefunds
   }
 }
@@ -143,13 +135,13 @@ export class ReportPrinter {
 class ReportPrint {
   drawer: PDFDrawer
   report: Travel | ExpenseReport | HealthCareCost
-  distanceRefunds: SettingsTravel['distanceRefunds']
+  distanceRefunds: TravelSettings['distanceRefunds']
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
 
   constructor(
     report: Travel | ExpenseReport | HealthCareCost,
     drawer: PDFDrawer,
-    distanceRefunds: SettingsTravel['distanceRefunds'],
+    distanceRefunds: TravelSettings['distanceRefunds'],
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
   ) {
     this.report = report
@@ -163,7 +155,7 @@ class ReportPrint {
     settings: PrinterSettings,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
-    distanceRefunds: SettingsTravel['distanceRefunds'],
+    distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
     language: Locale
@@ -879,7 +871,7 @@ class PDFDrawer {
   font: pdf_lib.PDFFont
   doc: pdf_lib.PDFDocument
   formatter: Formatter
-  settings: PrintSettings
+  settings: PrintSettingsWithColorObjects
   currentPage!: pdf_lib.PDFPage
   getDocumentFileBufferById: (id: _id) => Promise<{ buffer: Uint8Array<ArrayBufferLike>; type: DocumentFileType } | null>
   getOrganisationLogoIdById: (id: _id) => Promise<{ logoId: _id; website?: string | null } | null>
@@ -895,7 +887,10 @@ class PDFDrawer {
     this.doc = doc
     this.font = font
     this.formatter = formatter
-    this.settings = settings
+    this.settings = Object.assign({}, settings, {
+      textColor: pdf_lib.componentsToColor(hexToRGB(settings.textColor)),
+      borderColor: pdf_lib.componentsToColor(hexToRGB(settings.borderColor))
+    })
     this.getDocumentFileBufferById = getDocumentFileBufferById
     this.getOrganisationLogoIdById = getOrganisationLogoIdById
     this.formatter.setLocale(this.settings.language)
@@ -923,8 +918,12 @@ class PDFDrawer {
   }
 
   newPage(orientation: PageOrientation = this.settings.defaultPageOrientation) {
-    const isPortrait = orientation === 'portrait'
-    const size = [this.settings.pageSize[isPortrait ? 0 : 1], this.settings.pageSize[isPortrait ? 1 : 0]] as [number, number]
+    let size: [number, number]
+    if (orientation === 'portrait') {
+      size = [this.settings.pageSize.width, this.settings.pageSize.height]
+    } else {
+      size = [this.settings.pageSize.height, this.settings.pageSize.width]
+    }
     this.currentPage = this.doc.addPage(size)
   }
 

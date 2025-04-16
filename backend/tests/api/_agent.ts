@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Base64 } from '../../../common/scripts.js'
 import { User } from '../../../common/types.js'
-import app from '../../app.js'
+import APP from '../../app.js'
 
 const users = {
   user: {
@@ -37,7 +37,7 @@ async function createUser(agent: request.Agent, userKey: keyof typeof users) {
 }
 
 export default async function createAgent() {
-  const agent = request.agent(app)
+  const agent = request.agent(await APP())
   // sign in first with 'professor' to make him admin
   await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
   for (const userKey in users) {
