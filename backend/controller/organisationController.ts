@@ -1,4 +1,3 @@
-import { Request as ExRequest } from 'express'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Organisation as IOrganisation, _id, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
@@ -6,6 +5,7 @@ import Organisation, { organisationSchema } from '../models/organisation.js'
 import Project from '../models/project.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Organisation')
 @Route('organisation')
@@ -31,7 +31,7 @@ export class OrganisationAdminController extends Controller {
   @Post()
   @Middlewares(fileHandler.single('logo[data]'))
   @Consumes('multipart/form-data')
-  public async post(@Body() requestBody: SetterBody<IOrganisation>, @Request() request: ExRequest) {
+  public async post(@Body() requestBody: SetterBody<IOrganisation>, @Request() request: AuthenticatedExpressRequest) {
     await documentFileHandler(['logo'], { multiple: false, checkOwner: false })(request)
     return await this.setter(Organisation, { requestBody: requestBody, allowNew: true })
   }

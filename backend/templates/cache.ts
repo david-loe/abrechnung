@@ -1,4 +1,4 @@
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
 
 let mail: string | null = null
 let upload: string | null = null

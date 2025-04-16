@@ -33,7 +33,7 @@ async function getForRetentionPolicy(schema: schemaNames, date: Date, state: Any
 }
 
 function getDateThreshold(days: number) {
-  let dateThreshold = new Date()
+  const dateThreshold = new Date()
   dateThreshold.setHours(0, 0, 0, 0)
   dateThreshold.setDate(dateThreshold.getDate() - days)
   return dateThreshold
@@ -52,11 +52,11 @@ async function getPolicyElements(retentionPolicy: { [key in RetentionType]: numb
 }
 
 async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number }) {
-  let deletions = await getPolicyElements(retentionPolicy)
+  const deletions = await getPolicyElements(retentionPolicy)
   for (let i = 0; i < deletions.length; i++) {
     if (deletions[i].deletionPeriod > 0) {
-      let date = getDateThreshold(deletions[i].deletionPeriod)
-      let result = await getForRetentionPolicy(deletions[i].schema, date, deletions[i].state)
+      const date = getDateThreshold(deletions[i].deletionPeriod)
+      const result = await getForRetentionPolicy(deletions[i].schema, date, deletions[i].state)
       if (result.length > 0) {
         await deleteAny(result, deletions[i].schema)
       }
@@ -68,7 +68,7 @@ async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCo
   let result: any
   for (let i = 0; i < reports.length; i++) {
     result = await model(schema).deleteOne({ _id: reports[i]._id })
-    if (result && result.deletedCount == 1) {
+    if (result && result.deletedCount === 1) {
       logger.info(
         `Deleted ${schema} from owner ${reports[i].owner.name.givenName} ${reports[i].owner.name.familyName} with name ${reports[i].name}.`
       )
@@ -77,18 +77,18 @@ async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCo
 }
 
 async function notificationMailForDeletions(retentionPolicy: { [key in RetentionType]: number }) {
-  let notifications = await getPolicyElements(retentionPolicy)
+  const notifications = await getPolicyElements(retentionPolicy)
   if (retentionPolicy.mailXDaysBeforeDeletion > 0) {
     for (let i = 0; i < notifications.length; i++) {
-      if (notifications[i].deletionPeriod != 0) {
-        let daysUntilDeletionTemp =
+      if (notifications[i].deletionPeriod !== 0) {
+        const daysUntilDeletionTemp =
           retentionPolicy.mailXDaysBeforeDeletion < notifications[i].deletionPeriod
             ? retentionPolicy.mailXDaysBeforeDeletion
             : notifications[i].deletionPeriod
-        let date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
-        let startDate = new Date(date)
+        const date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
+        const startDate = new Date(date)
         startDate.setDate(startDate.getDate() - 1)
-        let result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state, startDate)
+        const result = await getForRetentionPolicy(notifications[i].schema, date, notifications[i].state, startDate)
         if (result.length > 0) {
           for (let p = 0; p < result.length; p++) {
             await sendNotificationMails(result[p], daysUntilDeletionTemp)
@@ -101,10 +101,9 @@ async function notificationMailForDeletions(retentionPolicy: { [key in Retention
 
 async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthCareCost, daysUntilDeletion: number) {
   if (report) {
-    let owner
-    owner = await User.findOne({ _id: report.owner._id }).lean()
+    const owner = await User.findOne({ _id: report.owner._id }).lean()
     if (owner) {
-      let recipients = [owner]
+      const recipients = [owner]
 
       let reportType: ReportType
       if (reportIsTravel(report)) {

@@ -1,4 +1,4 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
+import { HydratedDocument, Schema, model } from 'mongoose'
 import { ConnectionSettings, defaultLocale, emailRegex, locales } from '../../common/types.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 

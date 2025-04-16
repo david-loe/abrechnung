@@ -1,6 +1,5 @@
-import { Request as ExRequest } from 'express'
+import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
-import { Readable } from 'stream'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
@@ -12,7 +11,7 @@ import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { IdDocument, MoneyPost } from './types.js'
+import { AuthenticatedExpressRequest, IdDocument, MoneyPost } from './types.js'
 
 @Tags('Expense Report')
 @Route('expenseReport')
@@ -20,52 +19,54 @@ import { IdDocument, MoneyPost } from './types.js'
 @Security('httpBearer', ['user'])
 export class ExpenseReportController extends Controller {
   @Get()
-  public async getOwn(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+  public async getOwn(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
     return await this.getter(ExpenseReport, {
       query,
-      filter: { owner: request.user!._id, historic: false },
+      filter: { owner: request.user._id, historic: false },
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
   }
   @Delete()
-  public async deleteOwn(@Query() _id: _id, @Request() request: ExRequest) {
-    return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: this.checkOwner(request.user!) })
+  public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+    return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: this.checkOwner(request.user) })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpenseToOwn(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
+  public async postExpenseToOwn(
+    @Query('parentId') parentId: _id,
+    @Body() requestBody: SetterBody<Expense>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           return true
-        } else {
-          return false
         }
+        return false
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
   @Delete('expense')
-  public async deleteExpenseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpenseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user!._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
@@ -73,83 +74,79 @@ export class ExpenseReportController extends Controller {
   @Post('inWork')
   public async postOwnInWork(
     @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined },
-    @Request() request: ExRequest
+    @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
       state: 'inWork' as ExpenseReportState,
-      owner: request.user?._id,
-      editor: request.user?._id
+      owner: request.user._id,
+      editor: request.user._id
     })
 
     if (!extendedBody._id) {
-      if (!request.user!.access['inWork:expenseReport']) {
+      if (!request.user.access['inWork:expenseReport']) {
         throw new AuthorizationError()
-      } else if (!extendedBody.name) {
-        let date = new Date()
-        extendedBody.name =
-          i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
-          ' ' +
-          i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-          ' ' +
-          date.getUTCFullYear()
+      }
+      if (!extendedBody.name) {
+        const date = new Date()
+        extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
-          (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork' && request.user!.access['inWork:expenseReport']) ||
-          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user!._id))
+          (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork' && request.user.access['inWork:expenseReport']) ||
+          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
         ) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
-        } else {
-          return false
         }
+        return false
       },
       allowNew: true
     })
   }
 
   @Post('underExamination')
-  public async postOwnUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user?._id })
+  public async postOwnUnderExamination(
+    @Body() requestBody: { _id: _id; comment?: string },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.owner._id.equals(request.user!._id) && oldObject.state === 'inWork') {
+        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReportForOwn(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getReportForOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const expenseReport = await ExpenseReport.findOne({
       _id: _id,
-      owner: request.user!._id,
+      owner: request.user._id,
       historic: false,
       state: 'refunded'
     }).lean()
-    if (expenseReport) {
-      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
-      this.setHeader('Content-Type', 'application/pdf')
-      this.setHeader('Content-Length', report.length)
-      return Readable.from([report])
-    } else {
+    if (!expenseReport) {
       throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
+    const report = await reportPrinter.print(expenseReport, request.user.settings.language)
+    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
+    this.setHeader('Content-Type', 'application/pdf')
+    this.setHeader('Content-Length', report.length)
+    return Readable.from([report])
   }
 
   @Get('examiner')
@@ -168,12 +165,12 @@ export class ExpenseReportController extends Controller {
 @Security('httpBearer', ['examine/expenseReport'])
 export class ExpenseReportExamineController extends Controller {
   @Get()
-  public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+  public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = {
       historic: false
     }
-    if (request.user!.projects.supervised.length > 0) {
-      filter.project = { $in: request.user!.projects.supervised }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
     }
     return await this.getter(ExpenseReport, {
       query,
@@ -185,18 +182,22 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete()
-  public async delete(@Query() _id: _id, @Request() request: ExRequest) {
+  public async delete(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        return checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+        return checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
       }
     })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
-  public async postExpenseToAny(@Query('parentId') parentId: _id, @Body() requestBody: SetterBody<Expense>, @Request() request: ExRequest) {
+  public async postExpenseToAny(
+    @Query('parentId') parentId: _id,
+    @Body() requestBody: SetterBody<Expense>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody,
       parentId,
@@ -206,20 +207,19 @@ export class ExpenseReportExamineController extends Controller {
         if (
           !oldObject.historic &&
           (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
-          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
           return true
-        } else {
-          return false
         }
+        return false
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
   }
 
   @Delete('expense')
-  public async deleteExpenseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: ExRequest) {
+  public async deleteExpenseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
@@ -228,12 +228,11 @@ export class ExpenseReportExamineController extends Controller {
         if (
           !oldObject.historic &&
           (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
-          checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
@@ -242,37 +241,31 @@ export class ExpenseReportExamineController extends Controller {
   public async postBackInWork(
     @Body()
     requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined; owner?: IdDocument; comment?: string },
-    @Request() request: ExRequest
+    @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork' as ExpenseReportState, editor: request.user?._id })
+    const extendedBody = Object.assign(requestBody, { state: 'inWork' as ExpenseReportState, editor: request.user._id })
     if (!extendedBody._id && !extendedBody.name) {
-      let date = new Date()
-      extendedBody.name =
-        i18n.t('labels.expenses', { lng: request.user!.settings.language }) +
-        ' ' +
-        i18n.t('monthsShort.' + date.getUTCMonth(), { lng: request.user!.settings.language }) +
-        ' ' +
-        date.getUTCFullYear()
+      const date = new Date()
+      extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
 
   @Post('refunded')
-  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user?._id })
+  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+    const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
       sendNotification(expenseReport)
@@ -287,54 +280,54 @@ export class ExpenseReportExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
 
   @Post('underExamination')
-  public async postAnyUnderExamination(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: ExRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user?._id })
+  public async postAnyUnderExamination(
+    @Body() requestBody: { _id: _id; comment?: string },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user!, oldObject.project._id)) {
+        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           await oldObject.save()
           return true
-        } else {
-          return false
         }
+        return false
       }
     })
   }
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
-    if (request.user!.projects.supervised.length > 0) {
-      filter.project = { $in: request.user!.projects.supervised }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
     }
     const expenseReport = await ExpenseReport.findOne(filter).lean()
-    if (expenseReport) {
-      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
-      this.setHeader('Content-Type', 'application/pdf')
-      this.setHeader('Content-Length', report.length)
-      return Readable.from([report])
-    } else {
+    if (!expenseReport) {
       throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
+    const report = await reportPrinter.print(expenseReport, request.user.settings.language)
+    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
+    this.setHeader('Content-Type', 'application/pdf')
+    this.setHeader('Content-Length', report.length)
+    return Readable.from([report])
   }
 }
 
@@ -344,10 +337,10 @@ export class ExpenseReportExamineController extends Controller {
 @Security('httpBearer', ['refunded/expenseReport'])
 export class ExpenseReportRefundedController extends Controller {
   @Get()
-  public async getRefunded(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: ExRequest) {
+  public async getRefunded(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = { historic: false, state: 'refunded' }
-    if (request.user!.projects.supervised.length > 0) {
-      filter.project = { $in: request.user!.projects.supervised }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
     }
     return await this.getter(ExpenseReport, {
       query,
@@ -360,20 +353,19 @@ export class ExpenseReportRefundedController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getRefundedReport(@Query() _id: _id, @Request() request: ExRequest) {
+  public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
-    if (request.user!.projects.supervised.length > 0) {
-      filter.project = { $in: request.user!.projects.supervised }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
     }
     const expenseReport = await ExpenseReport.findOne(filter).lean()
-    if (expenseReport) {
-      const report = await reportPrinter.print(expenseReport, request.user!.settings.language)
-      this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
-      this.setHeader('Content-Type', 'application/pdf')
-      this.setHeader('Content-Length', report.length)
-      return Readable.from([report])
-    } else {
+    if (!expenseReport) {
       throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
     }
+    const report = await reportPrinter.print(expenseReport, request.user.settings.language)
+    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(expenseReport.name)}.pdf`)
+    this.setHeader('Content-Type', 'application/pdf')
+    this.setHeader('Content-Length', report.length)
+    return Readable.from([report])
   }
 }

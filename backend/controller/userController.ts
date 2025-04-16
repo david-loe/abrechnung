@@ -1,9 +1,8 @@
-import { Request as ExRequest } from 'express'
 import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PushSubscription } from 'web-push'
-import { _id, User as IUser, locales, tokenAdminUser } from '../../common/types.js'
+import { DocumentFile, Token as IToken, User as IUser, _id, locales, tokenAdminUser } from '../../common/types.js'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -16,7 +15,7 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { sendMail } from '../notifications/mail.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
-import { File, IdDocument, idDocumentToId } from './types.js'
+import { AuthenticatedExpressRequest, File, IdDocument, idDocumentToId } from './types.js'
 
 @Tags('User')
 @Route('user')
@@ -24,59 +23,62 @@ import { File, IdDocument, idDocumentToId } from './types.js'
 @Security('httpBearer', ['user'])
 export class UserController extends Controller {
   @Get()
-  public getMe(@Request() request: ExRequest) {
-    return { data: request.user! as IUser }
+  public getMe(@Request() request: AuthenticatedExpressRequest) {
+    return { data: request.user as IUser }
   }
 
   @Get('token')
-  public getUploadToken(@Request() request: ExRequest) {
-    return { data: request.user!.token }
+  public getUploadToken(@Request() request: AuthenticatedExpressRequest) {
+    return { data: request.user.token }
   }
 
   @Delete('token')
-  public async deleteUploadToken(@Request() request: ExRequest) {
-    request.user!.token = undefined
-    await request.user!.save()
+  public async deleteUploadToken(@Request() request: AuthenticatedExpressRequest) {
+    request.user.token = undefined
+    await request.user.save()
   }
 
   @Post('token')
-  public async postUploadToken(@Request() request: ExRequest) {
+  public async postUploadToken(@Request() request: AuthenticatedExpressRequest) {
     const token = (await new Token().save()).toObject()
-    request.user!.token = token as unknown as any
-    await request.user!.save()
+    request.user.token = token as unknown as IToken
+    await request.user.save()
     return { message: 'alerts.successSaving', result: token }
   }
 
   @Post('settings')
-  public async postSettings(@Body() requestBody: SetterBody<IUser['settings']>, @Request() request: ExRequest) {
-    Object.assign(request.user!.settings, requestBody)
-    request.user!.markModified('settings')
-    const result = (await request.user!.save()).toObject()
+  public async postSettings(@Body() requestBody: SetterBody<IUser['settings']>, @Request() request: AuthenticatedExpressRequest) {
+    Object.assign(request.user.settings, requestBody)
+    request.user.markModified('settings')
+    const result = (await request.user.save()).toObject()
     return { message: 'alerts.successSaving', result: result.settings }
   }
 
   @Post('vehicleRegistration')
   @Middlewares(fileHandler.any())
   @Consumes('multipart/form-data')
-  public async postVehicleRegistration(@Body() requestBody: { vehicleRegistration: File[] }, @Request() request: ExRequest) {
+  public async postVehicleRegistration(
+    @Body() requestBody: { vehicleRegistration: File[] },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
     await documentFileHandler(['vehicleRegistration'])(request)
-    request.user!.vehicleRegistration = requestBody.vehicleRegistration as unknown as any
-    request.user!.markModified('vehicleRegistration')
-    const result = await request.user!.save()
+    request.user.vehicleRegistration = requestBody.vehicleRegistration as unknown as DocumentFile[]
+    request.user.markModified('vehicleRegistration')
+    const result = await request.user.save()
     return { message: 'alerts.successSaving', result: result }
   }
 
   @Post('subscription')
-  public async postPushNotificationSubscription(@Body() requestBody: PushSubscription, @Request() request: ExRequest) {
+  public async postPushNotificationSubscription(@Body() requestBody: PushSubscription, @Request() request: AuthenticatedExpressRequest) {
     request.session.subscription = requestBody
     return { message: 'alerts.successSaving', result: requestBody }
   }
 
   @Post('httpBearer')
-  public async genOwnApiKey(@Request() request: ExRequest) {
-    const token = generateBearerToken(request.user!._id)
-    request.user!.fk.httpBearer = await hashToken(token)
-    await request.user!.save()
+  public async genOwnApiKey(@Request() request: AuthenticatedExpressRequest) {
+    const token = generateBearerToken(request.user._id)
+    request.user.fk.httpBearer = await hashToken(token)
+    await request.user.save()
     return { message: 'alerts.successSaving', result: token }
   }
 }
@@ -153,21 +155,20 @@ export class UserAdminController extends Controller {
   @Post('httpBearer')
   public async genAnyApiKey(@Body() requestBody: { userId: IdDocument }) {
     const user = await User.findOne({ _id: idDocumentToId(requestBody.userId) })
-    if (user) {
-      const token = generateBearerToken(user._id)
-      user.fk.httpBearer = await hashToken(token)
-      await user.save()
-      return { message: 'alerts.successSaving', result: token }
-    } else {
+    if (!user) {
       throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
     }
+    const token = generateBearerToken(user._id)
+    user.fk.httpBearer = await hashToken(token)
+    await user.save()
+    return { message: 'alerts.successSaving', result: token }
   }
 
   @Post('bulk')
   public async postMany(@Body() requestBody: SetterBodyUser[]) {
     const newMagicloginUsers: number[] = []
     for (let i = 0; i < requestBody.length; i++) {
-      if (!requestBody[i]._id && requestBody[i].fk && requestBody[i].fk!.magiclogin) {
+      if (!requestBody[i]._id && requestBody[i].fk?.magiclogin) {
         newMagicloginUsers.push(i)
       }
     }
@@ -194,30 +195,29 @@ export class UserAdminController extends Controller {
   @Post('merge')
   public async merge(@Body() requestBody: { userId: IdDocument; userIdToOverwrite: IdDocument }, @Query() delOverwritten?: boolean) {
     if (idDocumentToId(requestBody.userId) === idDocumentToId(requestBody.userIdToOverwrite)) {
-      throw new NotAllowedError(`Users are the same.`)
+      throw new NotAllowedError('Users are the same.')
     }
     const user = await User.findOne({ _id: idDocumentToId(requestBody.userId) })
-    if (user) {
-      const userIdToOverwrite = new Types.ObjectId(idDocumentToId(requestBody.userIdToOverwrite))
-      const userToOverwrite = await User.findOne({ _id: userIdToOverwrite }).lean()
-
-      let deleteResult: DeleteResult | null = null
-      if (delOverwritten) {
-        deleteResult = await User.deleteOne({ _id: userIdToOverwrite })
-      }
-
-      const unmergedUser = user.toObject()
-      let mergedUser: IUser | undefined = undefined
-      if (userToOverwrite) {
-        mergedUser = await user.merge(userToOverwrite, Boolean(delOverwritten))
-      }
-
-      const replacedReferences = await user.replaceReferences(userIdToOverwrite)
-
-      return { result: { mergedUser: mergedUser || unmergedUser, replacedReferences, deleteResult }, message: 'alerts.successSaving' }
-    } else {
+    if (!user) {
       throw new NotFoundError(`No user for _id: ${idDocumentToId(requestBody.userId)} found.`)
     }
+    const userIdToOverwrite = new Types.ObjectId(idDocumentToId(requestBody.userIdToOverwrite))
+    const userToOverwrite = await User.findOne({ _id: userIdToOverwrite }).lean()
+
+    let deleteResult: DeleteResult | null = null
+    if (delOverwritten) {
+      deleteResult = await User.deleteOne({ _id: userIdToOverwrite })
+    }
+
+    const unmergedUser = user.toObject()
+    let mergedUser: IUser | undefined = undefined
+    if (userToOverwrite) {
+      mergedUser = await user.merge(userToOverwrite, Boolean(delOverwritten))
+    }
+
+    const replacedReferences = await user.replaceReferences(userIdToOverwrite)
+
+    return { result: { mergedUser: mergedUser || unmergedUser, replacedReferences, deleteResult }, message: 'alerts.successSaving' }
   }
   @Get('form')
   public async getForm() {

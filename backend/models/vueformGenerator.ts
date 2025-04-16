@@ -32,123 +32,125 @@ function mapSchemaTypeToVueformElement(
   const vueformElement = Object.assign({ rules }, assignment) as any
 
   if (schemaType.required && schemaType.type !== Boolean) {
-    let index = vueformElement['rules'].indexOf('nullable')
+    const index = vueformElement.rules.indexOf('nullable')
     if (index !== -1) {
-      vueformElement['rules'].splice(index, 1)
+      vueformElement.rules.splice(index, 1)
     }
-    if (!vueformElement['rules'].some((v: any) => Boolean(v.required))) {
-      vueformElement['rules'].push('required')
+    if (!vueformElement.rules.some((v: any) => Boolean(v.required))) {
+      vueformElement.rules.push('required')
     }
   }
   if (schemaType.min !== undefined) {
-    vueformElement['rules'].push('min:' + schemaType.min)
+    vueformElement.rules.push(`min:${schemaType.min}`)
   }
   if (schemaType.max !== undefined) {
-    vueformElement['rules'].push('max:' + schemaType.max)
+    vueformElement.rules.push(`max:${schemaType.max}`)
   }
 
   if (schemaType.description) {
-    vueformElement['description'] = translate(schemaType.description, language)
+    vueformElement.description = translate(schemaType.description, language)
   }
 
   if (schemaType.conditions) {
-    vueformElement['conditions'] = schemaType.conditions
+    vueformElement.conditions = schemaType.conditions
   }
 
   if (schemaType.label) {
-    vueformElement['label'] = translate(schemaType.label, language)
+    vueformElement.label = translate(schemaType.label, language)
   } else if (labelStr) {
-    vueformElement['label'] = translate('labels.' + labelStr, language)
+    vueformElement.label = translate(`labels.${labelStr}`, language)
   }
 
   if (schemaType.info) {
-    vueformElement['info'] = translate(schemaType.info, language)
+    vueformElement.info = translate(schemaType.info, language)
   }
   if (isFlatType(schemaType.type) && schemaType.default !== undefined && schemaType.default !== null) {
-    vueformElement['default'] = schemaType.default
+    vueformElement.default = schemaType.default
   }
 
-  if (!vueformElement['columns'] && isNotNested(schemaType)) {
-    vueformElement['columns'] = { md: 6 }
+  if (!vueformElement.columns && isNotNested(schemaType)) {
+    vueformElement.columns = { md: 6 }
   }
 
   if (schemaType.ref) {
-    vueformElement['type'] = schemaType.ref.toString().toLowerCase()
+    vueformElement.type = schemaType.ref.toString().toLowerCase()
     if (schemaType.ref !== 'DocumentFile') {
-      vueformElement['placeholder'] = vueformElement['label']
-      delete vueformElement['label']
+      vueformElement.placeholder = vueformElement.label
+      vueformElement.label = undefined
     }
   } else if (schemaType.type === String) {
-    vueformElement['placeholder'] = vueformElement['label']
-    delete vueformElement['label']
+    vueformElement.placeholder = vueformElement.label
+    vueformElement.label = undefined
     if (schemaType.enum && Array.isArray(schemaType.enum)) {
-      vueformElement['type'] = 'select'
+      vueformElement.type = 'select'
       const items: any = {}
       for (const value of schemaType.enum) {
-        items[value!] = translate('labels.' + value, language)
+        if (value) {
+          items[value] = translate(`labels.${value}`, language)
+        }
       }
-      vueformElement['items'] = items
+      vueformElement.items = items
     } else if (schemaType.multiline) {
-      vueformElement['type'] = 'textarea'
+      vueformElement.type = 'textarea'
     } else {
-      vueformElement['type'] = 'text'
+      vueformElement.type = 'text'
       if (schemaType.validate === emailRegex) {
-        vueformElement['rules'].push('email')
+        vueformElement.rules.push('email')
       }
     }
   } else if (schemaType.type === Number) {
-    vueformElement['type'] = 'text'
-    vueformElement['inputType'] = 'number'
-    vueformElement['rules'].push('numeric')
-    vueformElement['attrs'] = { step: 'any' }
-    vueformElement['forceNumbers'] = true
+    vueformElement.type = 'text'
+    vueformElement.inputType = 'number'
+    vueformElement.rules.push('numeric')
+    vueformElement.attrs = { step: 'any' }
+    vueformElement.forceNumbers = true
 
-    vueformElement['placeholder'] = vueformElement['label']
-    delete vueformElement['label']
+    vueformElement.placeholder = vueformElement.label
+    vueformElement.label = undefined
   } else if (schemaType.type === Date) {
-    vueformElement['type'] = 'date'
-    vueformElement['time'] = Boolean(schemaType.time)
-    vueformElement['placeholder'] = vueformElement['label']
-    delete vueformElement['label']
+    vueformElement.type = 'date'
+    vueformElement.time = Boolean(schemaType.time)
+    vueformElement.placeholder = vueformElement.label
+    vueformElement.label = undefined
   } else if (schemaType.type === Boolean) {
-    vueformElement['type'] = 'checkbox'
-    vueformElement['text'] = vueformElement['label']
-    delete vueformElement['label']
+    vueformElement.type = 'checkbox'
+    vueformElement.text = vueformElement.label
+    vueformElement.label = undefined
   } else if (schemaType.type === Schema.Types.Mixed) {
-    vueformElement['type'] = 'mixed'
+    vueformElement.type = 'mixed'
   } else if (Array.isArray(schemaType.type)) {
     if (schemaType.type[0].ref) {
-      vueformElement['type'] = schemaType.type[0].ref.toString().toLowerCase()
+      vueformElement.type = schemaType.type[0].ref.toString().toLowerCase()
       if (schemaType.type[0].ref === 'DocumentFile') {
-        vueformElement['multiple'] = true
+        vueformElement.multiple = true
       } else {
-        vueformElement['extendOptions'] = { mode: 'multiple' }
-        vueformElement['placeholder'] = vueformElement['label']
-        delete vueformElement['label']
+        vueformElement.extendOptions = { mode: 'multiple' }
+        vueformElement.placeholder = vueformElement.label
+        vueformElement.label = undefined
       }
     } else if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
-      vueformElement['type'] = 'list'
-      vueformElement['object'] = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language, { columns: 12 }) }
+      vueformElement.type = 'list'
+      vueformElement.object = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language, { columns: 12 }) }
     } else {
-      vueformElement['type'] = 'list'
-      vueformElement['element'] = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr, { columns: 12 })
-      delete vueformElement['element'].placeholder
+      vueformElement.type = 'list'
+      vueformElement.element = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr, { columns: 12 })
+      vueformElement.element.placeholder = undefined
     }
-    const index = vueformElement['rules'].indexOf('required')
+    const index = vueformElement.rules.indexOf('required')
     if (index !== -1) {
-      vueformElement['rules'].splice(index, 1)
-      vueformElement['rules'].push('min:0')
+      vueformElement.rules.splice(index, 1)
+      vueformElement.rules.push('min:0')
     }
   } else if (typeof schemaType.type === 'object') {
     const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
-    vueformElement['type'] = 'object'
-    vueformElement['addClasses'] = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
+    vueformElement.type = 'object'
+    vueformElement.addClasses = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
     if (keys.length > 1 && isNotNestedObject(schemaType.type)) {
-      vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language, {
+      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language, {
         columns: { xl: 12 / (keys.length > 3 ? 4 : keys.length), lg: 12 / (keys.length > 2 ? 3 : keys.length), sm: 6 }
       })
     } else {
-      vueformElement['schema'] = mongooseSchemaToVueformSchema(schemaType.type, language)
+      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language)
     }
   } else {
     throw new Error(`No Type for conversion found for: ${labelStr} (${schemaType.type})`)
@@ -159,13 +161,12 @@ function mapSchemaTypeToVueformElement(
 function translate(str: string, language: Locale | readonly Locale[]) {
   if (typeof language === 'string') {
     return i18n.t(str, { lng: language })
-  } else {
-    const translation: { [key in Locale]?: string } = {}
-    for (const lng of language) {
-      translation[lng] = i18n.t(str, { lng })
-    }
-    return translation
   }
+  const translation: { [key in Locale]?: string } = {}
+  for (const lng of language) {
+    translation[lng] = i18n.t(str, { lng })
+  }
+  return translation
 }
 
 function isCheckboxGroup(mongooseSchema: SchemaDefinition | any) {

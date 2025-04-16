@@ -1,4 +1,4 @@
-import { mongo, Types } from 'mongoose'
+import { Types, mongo } from 'mongoose'
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$
@@ -199,7 +199,7 @@ export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
   owner: _id
   type: T
   name: string
-  _id?: _id
+  _id: _id
 }
 
 export interface Token {
@@ -341,8 +341,8 @@ export interface TravelExpense extends Expense {
   purpose: 'professional' | 'mixed'
 }
 
-export type RecordType = 'stage' | 'expense'
-export type Record = Stage | TravelExpense
+export type TravelRecordType = 'stage' | 'expense'
+export type TravelRecord = Stage | TravelExpense
 
 export interface Comment<State extends AnyState = AnyState> {
   text: string
@@ -587,22 +587,22 @@ export type AddUpResult<T> = T extends Travel
       lumpSums: BaseCurrencyMoney
     }
   : T extends ExpenseReport
-  ? {
-      balance: BaseCurrencyMoney
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-    }
-  : T extends HealthCareCost
-  ? {
-      balance: BaseCurrencyMoney
-      total: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-    }
-  : never
+    ? {
+        balance: BaseCurrencyMoney
+        total: BaseCurrencyMoney
+        advance: BaseCurrencyMoney
+        expenses: BaseCurrencyMoney
+      }
+    : T extends HealthCareCost
+      ? {
+          balance: BaseCurrencyMoney
+          total: BaseCurrencyMoney
+          expenses: BaseCurrencyMoney
+        }
+      : never
 
 export const emailRegex =
-  /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
+  /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
 
 export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 

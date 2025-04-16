@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
+    "ignoreUnknown": true,
     "ignore": []
   },
   "formatter": {
@@ -64,6 +64,9 @@
       "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
     }
   }
 }

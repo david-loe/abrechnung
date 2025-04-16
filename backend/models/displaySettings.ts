@@ -1,17 +1,17 @@
-import { model, Schema } from 'mongoose'
+import { Schema, model } from 'mongoose'
 import {
   Access,
-  accesses,
-  defaultLocale,
   DisplaySettings,
   ExpenseReportState,
-  expenseReportStates,
   HealthCareCostState,
+  Locale,
+  TravelState,
+  accesses,
+  defaultLocale,
+  expenseReportStates,
   healthCareCostStates,
   hexColorRegex,
-  Locale,
   locales,
-  TravelState,
   travelStates
 } from '../../common/types.js'
 
@@ -19,7 +19,7 @@ function color(state: string) {
   return {
     type: { color: { type: String, required: true, validate: hexColorRegex }, text: { type: String, required: true } },
     required: true,
-    label: 'states.' + state
+    label: `states.${state}`
   }
 }
 
@@ -42,7 +42,7 @@ export const displaySettingsSchema = () => {
 
   const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }
   for (const access of accesses) {
-    accessIcons[access] = { type: [{ type: String, required: true }], required: true, label: 'accesses.' + access }
+    accessIcons[access] = { type: [{ type: String, required: true }], required: true, label: `accesses.${access}` }
   }
 
   return new Schema<DisplaySettings>(

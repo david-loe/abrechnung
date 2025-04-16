@@ -124,7 +124,7 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
   const doc = await model.exists({})
   if (doc === null) {
     const newDocs = await model.insertMany(data, { lean })
-    logger.info('Added ' + newDocs.length + ' ' + name)
+    logger.info(`Added ${newDocs.length} ${name}`)
   }
 }
 
@@ -136,7 +136,7 @@ export async function fetchAndUpdateLumpSums() {
       await addLumpSumsToCountries(res.data)
     }
   } catch (error) {
-    logger.error('Unable to fetch lump sums from: ' + pauschbetrag_api, 'error')
+    logger.error(`Unable to fetch lump sums from: ${pauschbetrag_api}`, 'error')
     logger.error(error, 'error')
   }
 }
@@ -166,11 +166,11 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
           count++
         }
       } else {
-        throw new Error('No Country with id "' + lumpSum.countryCode + '" found')
+        throw new Error(`No Country with id "${lumpSum.countryCode}" found`)
       }
     }
     if (count > 0) {
-      logger.info('Added ' + count + ' lump sums for ' + new Date(lumpSums.validFrom))
+      logger.info(`Added ${count} lump sums for ${new Date(lumpSums.validFrom)}`)
     }
   }
 }
@@ -180,9 +180,8 @@ export async function getSettings(): Promise<ISettings> {
   const settings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (settings) {
     return settings
-  } else {
-    throw Error('Settings not found')
   }
+  throw Error('Settings not found')
 }
 
 export async function getTravelSettings(): Promise<ITravelSettings> {
@@ -210,9 +209,8 @@ export async function getConnectionSettings(): Promise<IConnectionSettings> {
   const connectionSettings = (await mongoose.connection.collection('connectionsettings').findOne()) as IConnectionSettings | null
   if (connectionSettings) {
     return connectionSettings
-  } else {
-    throw Error('Connection Settings not found')
   }
+  throw Error('Connection Settings not found')
 }
 
 export async function getDisplaySettings(): Promise<IDisplaySettings> {
@@ -220,7 +218,6 @@ export async function getDisplaySettings(): Promise<IDisplaySettings> {
   const displaySettings = (await mongoose.connection.collection('displaysettings').findOne()) as IDisplaySettings | null
   if (displaySettings) {
     return displaySettings
-  } else {
-    throw Error('Display Settings not found')
   }
+  throw Error('Display Settings not found')
 }

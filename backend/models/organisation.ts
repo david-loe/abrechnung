@@ -1,5 +1,5 @@
-import { Document, model, Query, Schema } from 'mongoose'
-import { emailRegex, Organisation } from '../../common/types.js'
+import { Document, Query, Schema, model } from 'mongoose'
+import { Organisation, emailRegex } from '../../common/types.js'
 
 export const organisationSchema = () =>
   new Schema<Organisation>({
@@ -21,7 +21,7 @@ const schema = organisationSchema()
 
 schema.pre(/^find((?!Update).)*$/, function () {
   const projection = (this as Query<Organisation, Organisation>).projection()
-  const popInProj: boolean = projection && projection.logo
+  const popInProj: boolean = projection?.logo
   if ((this as Query<Organisation, Organisation>).selectedExclusively() && popInProj) {
     return
   }

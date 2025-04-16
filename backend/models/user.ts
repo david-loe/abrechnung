@@ -15,7 +15,7 @@ import { getDisplaySettings, getSettings } from '../db.js'
 interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
-  merge(userToOverwrite: Partial<User>, mergeFk: boolean): Promise<User>
+  merge(userToOverwrite: User, mergeFk: boolean): Promise<User>
   addProjects(projects: { assigned?: _id[]; supervised?: _id[] }): Promise<void>
 }
 
@@ -27,7 +27,7 @@ export const userSchema = async () => {
 
   const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
   for (const access of accesses) {
-    accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: 'accesses.' + access }
+    accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: `accesses.${access}` }
   }
   return new Schema<User, UserModel, Methods>({
     fk: {
@@ -138,34 +138,33 @@ schema.methods.isActive = async function (this: UserDoc) {
   if (this.access.user) {
     if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= new Date().valueOf())) {
       return true
-    } else {
-      for (const access of accesses) {
-        this.access[access] = false
-      }
-      await this.save()
     }
+    for (const access of accesses) {
+      this.access[access] = false
+    }
+    await this.save()
   }
   return false
 }
 
 schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
-    let filter: any = {}
+    const filter: any = {}
     filter[path] = userIdToOverwrite
     return filter
   }
   const update = (path: string) => {
-    let update = { $set: {} as any }
+    const update = { $set: {} as any }
     update.$set[path] = this._id
     return update
   }
   const arrayFilter = (path: string) => {
     const arrayFilter = { arrayFilters: [] as any[] }
-    let filter: any = {}
+    const filter: any = {}
     if (path === '') {
-      filter['elem'] = userIdToOverwrite
+      filter.elem = userIdToOverwrite
     } else {
-      filter['elem.' + path] = userIdToOverwrite
+      filter[`elem.${path}`] = userIdToOverwrite
     }
     arrayFilter.arrayFilters.push(filter)
     return arrayFilter
@@ -178,38 +177,38 @@ schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwr
       .collection(collection)
       .updateMany(filter('comments.author'), update('comments.$[elem].author'), arrayFilter('author'))
   }
-  result['documentfiles'] = await mongoose.connection.collection('documentfiles').updateMany(filter('owner'), update('owner'))
+  result.documentfiles = await mongoose.connection.collection('documentfiles').updateMany(filter('owner'), update('owner'))
   return result
 }
 
-schema.methods.merge = async function (this: UserDoc, userToOverwrite: Partial<User>, mergeFk: boolean) {
+schema.methods.merge = async function (this: UserDoc, userToOverwrite: User, mergeFk: boolean) {
   const thisPojo = this.toObject()
   if (mergeFk) {
     Object.assign(this.fk, userToOverwrite.fk, thisPojo.fk)
-    delete userToOverwrite.fk
+    ;(userToOverwrite as Partial<User>).fk = undefined
   }
 
-  for (const access in userToOverwrite.access!) {
+  for (const access in userToOverwrite.access) {
     if (userToOverwrite.access[access as Access]) {
       this.access[access as Access] = true
     }
   }
-  delete userToOverwrite.access
+  ;(userToOverwrite as Partial<User>).access = undefined
 
-  for (const p of userToOverwrite.projects!.assigned) {
+  for (const p of userToOverwrite.projects.assigned) {
     if (!this.projects.assigned.some((tp) => tp._id.equals(p._id))) {
       this.projects.assigned.push(p)
     }
   }
 
-  for (const p of userToOverwrite.projects!.supervised) {
+  for (const p of userToOverwrite.projects.supervised) {
     if (!this.projects.supervised.some((tp) => tp._id.equals(p._id))) {
       this.projects.supervised.push(p)
     }
   }
 
   Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
-  delete userToOverwrite.settings
+  ;(userToOverwrite as Partial<User>).settings = undefined
 
   Object.assign(this, userToOverwrite, this.toObject())
   await this.save()

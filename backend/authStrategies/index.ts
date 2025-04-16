@@ -1,5 +1,4 @@
 import { HydratedDocument } from 'mongoose'
-import passport from 'passport'
 import { Contact, User as IUser, tokenAdminUser } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import User from '../models/user.js'
@@ -23,10 +22,10 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
   const searchFilter = {} as any
   // find User with fk, regardless of other fks
   for (const key in filter) {
-    searchFilter['fk.' + key] = filter[key as keyof IUser['fk']]
+    searchFilter[`fk.${key}`] = filter[key as keyof IUser['fk']]
   }
   let user = await User.findOne(searchFilter)
-  let email = userData.email
+  const email = userData.email
   if (!user && email) {
     user = await User.findOne({ email: email })
   }
@@ -39,9 +38,9 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
   if (!user) {
     user = new User(newUser)
   } else {
-    delete newUser.access
+    newUser.access = undefined
     Object.assign(user.fk, newUser.fk)
-    delete newUser.fk
+    newUser.fk = undefined
     Object.assign(user, newUser)
   }
   try {
@@ -53,22 +52,9 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
   }
 }
 
-export abstract class AuthenticationStrategy<Strategy extends passport.Strategy, Options extends any> {
-  strategy: Strategy | undefined
-
-  getStrategy() {
-    if (!this.strategy) {
-      throw new Error(`${this.constructor.name} Strategy is not configured`)
-    }
-    return this.strategy
-  }
-
-  abstract configureStrategy(config: Options): void
-}
-
 export function displayNameSplit(displayName: string) {
   const isComma = displayName.indexOf(', ') !== -1
-  let splitStr = isComma ? ', ' : ' '
+  const splitStr = isComma ? ', ' : ' '
   const split = displayName.split(splitStr)
   const one = split.shift() as string
   const two = split.join(' ') || ' '

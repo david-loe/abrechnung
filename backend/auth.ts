@@ -14,7 +14,7 @@ passport.deserializeUser(async (sessionUser: { _id: Types.ObjectId }, cb) => {
   if (user) {
     cb(null, user)
   } else {
-    cb(new Error('No User found with id: ' + sessionUser._id))
+    cb(new Error(`No User found with id: ${sessionUser._id}`))
   }
 })
 

@@ -1,5 +1,10 @@
+import { Request as ExRequest } from 'express'
 import { Currency, CurrencyCode, DocumentFile, Money, Travel, TravelDay, TravelSimple, _id } from '../../common/types.js'
 import { SetterBody } from './controller.js'
+
+export interface AuthenticatedExpressRequest extends ExRequest {
+  user: Express.User
+}
 
 export type IdDocument<idType = _id> = idType | { _id: idType }
 

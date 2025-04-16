@@ -53,7 +53,7 @@ export async function checkForMigrations() {
         },
         smtp: {
           host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT as string),
+          port: Number.parseInt(process.env.SMTP_PORT as string),
           secure: process.env.SMTP_SECURE?.toLowerCase() === 'true',
           user: process.env.SMTP_USER,
           password: process.env.SMTP_PASS,
@@ -113,11 +113,38 @@ export async function checkForMigrations() {
       // prettier-ignore
       const a1countries = [
         // andere Mitgliedstaaten der Europäischen Union (EU)
-        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
-        "PL", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
-        "PT", "RO", "SK", "SI", "ES", "SE", // "DE" not
+        'AT',
+        'BE',
+        'BG',
+        'HR',
+        'CY',
+        'CZ',
+        'DK',
+        'EE',
+        'FI',
+        'FR',
+        'PL',
+        'GR',
+        'HU',
+        'IE',
+        'IT',
+        'LV',
+        'LT',
+        'LU',
+        'MT',
+        'NL',
+        'PT',
+        'RO',
+        'SK',
+        'SI',
+        'ES',
+        'SE', // "DE" not
         // Weitere europäische Länder
-        "IS", "LI", "NO", "CH", "GB"
+        'IS',
+        'LI',
+        'NO',
+        'CH',
+        'GB'
       ] as const
       await mongoose.connection
         .collection<{ _id: string }>('countries')

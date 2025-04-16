@@ -1,4 +1,4 @@
-import { scrypt as _scrypt, randomBytes, timingSafeEqual } from 'crypto'
+import { scrypt as _scrypt, randomBytes, timingSafeEqual } from 'node:crypto'
 import { Types } from 'mongoose'
 import { Strategy as BearerStrategy } from 'passport-http-bearer'
 import User from '../models/user.js'
@@ -12,7 +12,7 @@ const KEY_LENGTH = 64
  * @param length Anzahl der zufälligen Bytes für den Token (Standard: 48 → 64 Zeichen in Base64)
  * @returns Ein Token im Format `<UserID>:<Base64-Token>`
  */
-export function generateBearerToken(userId: string | Types.ObjectId, length: number = 48) {
+export function generateBearerToken(userId: string | Types.ObjectId, length = 48) {
   const randomToken = randomBytes(length).toString('base64')
   return `${userId}:${randomToken}` // User-ID im Token speichern
 }
@@ -58,15 +58,15 @@ function verifyToken(token: string, storedHash: string): Promise<boolean> {
 }
 
 // Bearer Strategy für Passport.js
-export default new BearerStrategy(async function (token, done) {
+export default new BearerStrategy(async (token, done) => {
   try {
     const [userId, rawToken] = token.split(':') // UserID aus dem Token extrahieren
     if (!userId || !rawToken) return done(null, false)
 
     const user = await User.findOne({ _id: userId, 'fk.httpBearer': { $exists: true } })
-    if (!user) return done(null, false)
+    if (!user?.fk.httpBearer) return done(null, false)
 
-    const isValid = await verifyToken(token, user.fk.httpBearer!)
+    const isValid = await verifyToken(token, user.fk.httpBearer)
     if (isValid) done(null, user)
     else done(null, false)
   } catch (error) {

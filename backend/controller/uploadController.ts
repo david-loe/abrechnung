@@ -13,7 +13,7 @@ import { File } from './types.js'
 
 async function validateToken(req: ExRequest, res: ExResponse, next: NextFunction) {
   const user = await User.findOne({ _id: req.query.userId as string }).lean()
-  if (!(user && user.token && user.token._id.equals(req.query.tokenId as string))) {
+  if (!user?.token?._id.equals(req.query.tokenId as string)) {
     throw new AuthorizationError('Token not valid')
   }
   next()
@@ -34,19 +34,21 @@ export class UploadController extends Controller {
   ): Promise<void> {
     const settings = await getSettings()
     const user = await User.findOne({ _id: userId }).lean()
+    if (!user?.token) {
+      throw new NotFoundError(`No user with token found for userId: ${userId}`)
+    }
     const template = await getUploadTemplate()
-    const url = new URL(process.env.VITE_BACKEND_URL + '/upload/new')
+    const url = new URL(`${process.env.VITE_BACKEND_URL}/upload/new`)
     url.searchParams.append('userId', userId)
     url.searchParams.append('tokenId', tokenId)
     if (ownerId) {
       const owner = await User.findOne({ _id: ownerId }).lean()
-      if (owner) {
-        url.searchParams.append('ownerId', ownerId)
-      } else {
+      if (!owner) {
         throw new NotFoundError(`No user found for ownerId: ${ownerId}`)
       }
+      url.searchParams.append('ownerId', ownerId)
     }
-    const secondsLeft = Math.round((new Date(user!.token!.expireAt).valueOf() - new Date().valueOf()) / 1000)
+    const secondsLeft = Math.round((new Date(user.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
     const text = {
       tapToUpload: i18n.t('labels.tapToUpload', { lng: user?.settings.language }),
       uploading: i18n.t('labels.uploading', { lng: user?.settings.language }),
@@ -59,7 +61,7 @@ export class UploadController extends Controller {
       secondsLeft,
       text,
       language: user?.settings.language,
-      maxFileSize: parseInt(process.env.VITE_MAX_FILE_SIZE)
+      maxFileSize: Number.parseInt(process.env.VITE_MAX_FILE_SIZE)
     })
     this.setHeader('Content-Type', 'text/html; charset=utf-8')
     req.res?.send(renderedHTML)

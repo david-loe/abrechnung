@@ -42,7 +42,7 @@ test('POST /user/token', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.true(res.body.result.hasOwnProperty('_id'))
+  t.true('_id' in res.body.result)
   t.deepEqual(res.body.result.files, [])
 })
 
@@ -75,9 +75,9 @@ const vehicleRegistration = {
 
 test('POST /user/vehicleRegistration', async (t) => {
   t.plan(2)
-  var req = agent.post('/user/vehicleRegistration')
+  let req = agent.post('/user/vehicleRegistration')
   for (const entry of objectToFormFields(vehicleRegistration)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
+    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
       req = req.attach(entry.field, entry.val)
     } else {
       req = req.field(entry.field, entry.val)
@@ -89,7 +89,7 @@ test('POST /user/vehicleRegistration', async (t) => {
   } else {
     console.log(res.body)
   }
-  const res2 = await agent.get('/documentFile').query({ _id: (res.body.result as User).vehicleRegistration![0]._id })
+  const res2 = await agent.get('/documentFile').query({ _id: (res.body.result as User).vehicleRegistration?.[0]._id })
   t.is(res2.status, 200, 'GET /documentFile')
 })
 

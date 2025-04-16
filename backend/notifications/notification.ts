@@ -1,12 +1,14 @@
-import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
+import { RootFilterQuery } from 'mongoose'
+import { PlaceToString, getDiffInDays } from '../../common/scripts.js'
 import {
   ExpenseReportSimple,
   HealthCareCostSimple,
+  User as IUser,
   Locale,
-  reportIsHealthCareCost,
-  reportIsTravel,
   ReportType,
-  TravelSimple
+  TravelSimple,
+  reportIsHealthCareCost,
+  reportIsTravel
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
 import { formatter } from '../factory.js'
@@ -34,7 +36,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   const supervisedProjectsFilter = {
     $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }]
   }
-  const userFilter: any = {}
+  const userFilter: RootFilterQuery<IUser> = {}
   if (report.state === 'appliedFor') {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
@@ -45,7 +47,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
     // 'rejected', 'approved', 'refunded', 'underExaminationByInsurance'
-    userFilter['_id'] = report.owner._id
+    userFilter._id = report.owner._id
     button.link =
       report.state === 'rejected'
         ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
@@ -67,7 +69,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
 
   if (report.comments.length > 0) {
     const comment = report.comments[report.comments.length - 1]
-    if (comment.toState == report.state) {
+    if (comment.toState === report.state) {
       interpolation.comment = comment.text
       interpolation.commentator = comment.author.name.givenName
     }
@@ -93,7 +95,7 @@ export async function sendA1Notification(report: TravelSimple) {
       `${t('labels.traveler')}: ${report.owner.name.givenName} ${report.owner.name.familyName}`,
       `${t('labels.reason')}: ${report.reason}`,
       `${t('labels.startDate')}: ${formatter.date(report.startDate, language)}`,
-      `${t('labels.endDate')}: ${formatter.date(report.endDate)} (${dif} ${t('labels.' + (dif == 1 ? 'day' : 'days'))})`,
+      `${t('labels.endDate')}: ${formatter.date(report.endDate)} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
       `${t('labels.destinationPlace')}: ${PlaceToString(report.destinationPlace, language)}`,
       `${t('labels.approvedBy')}: ${report.editor.name.givenName} ${report.editor.name.familyName}`,
       `${t('labels.destinationName')}: ${report.a1Certificate?.destinationName}`,

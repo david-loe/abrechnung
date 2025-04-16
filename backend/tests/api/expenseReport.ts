@@ -80,7 +80,7 @@ test.serial('POST /expenseReport/expense', async (t) => {
   for (const expense of expenses) {
     let req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
     for (const entry of objectToFormFields(expense)) {
-      if (entry.field.length > 6 && entry.field.slice(-6) == '[data]') {
+      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
         req = req.field(entry.field, entry.val)

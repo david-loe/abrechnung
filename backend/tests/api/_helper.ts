@@ -3,14 +3,13 @@ interface FormField {
   val: string | boolean | number
 }
 
-export function objectToFormFields(object: any, fieldPrefix: string = '', formFields: FormField[] = []): FormField[] {
+export function objectToFormFields(object: any, fieldPrefix = '', formFields: FormField[] = []): FormField[] {
   for (const key in object) {
-    let field = fieldPrefix ? fieldPrefix + '[' + key + ']' : key
+    const field = fieldPrefix ? `${fieldPrefix}[${key}]` : key
     if (object[key] === null || object[key] === undefined) {
-      continue
     } else if (Array.isArray(object[key])) {
       for (let i = 0; i < object[key].length; i++) {
-        objectToFormFields(object[key][i], field + '[' + i + ']', formFields)
+        objectToFormFields(object[key][i], `${field}[${i}]`, formFields)
       }
     } else if (object[key] instanceof Date) {
       formFields.push({ field, val: object[key].toJSON() })

@@ -4,8 +4,8 @@ import {
   Comment,
   Currency as ICurrency,
   Money,
-  Record,
   Travel,
+  TravelRecord,
   TravelState,
   baseCurrency,
   distanceRefundTypes,
@@ -26,7 +26,7 @@ function place(required = false, withPlace = true) {
     special: { type: String }
   }
   if (withPlace) {
-    obj['place'] = { type: String, required: required }
+    obj.place = { type: String, required: required }
   }
   return obj
 }
@@ -167,7 +167,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
   for (const historyId of this.history) {
     model('Travel').deleteOne({ _id: historyId }).exec()
   }
-  function deleteReceipts(records: Record[]) {
+  function deleteReceipts(records: TravelRecord[]) {
     for (const record of records) {
       if (record.cost) {
         for (const receipt of record.cost.receipts) {
@@ -182,7 +182,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 
 schema.methods.saveToHistory = async function (this: TravelDoc) {
   const doc: any = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
-  delete doc._id
+  doc._id = undefined
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('Travel').create([doc], { timestamps: false })
@@ -194,13 +194,13 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
     // move vehicle registration of owner as receipt to 'ownCar' stages
     const receipts = []
     for (const stage of this.stages) {
-      if (stage.transport.type == 'ownCar') {
-        if (receipts.length == 0) {
+      if (stage.transport.type === 'ownCar') {
+        if (receipts.length === 0) {
           const owner = await User.findOne({ _id: this.owner._id }).lean()
           if (owner?.vehicleRegistration) {
             for (const vr of owner.vehicleRegistration) {
               const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
-              delete (doc as unknown as any)._id
+              ;(doc as unknown as any)._id = undefined
               receipts.push(await DocumentFile.create(doc))
             }
           }
@@ -215,7 +215,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   let exchangeRate = null
 
   if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
-    exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
+    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate
 
@@ -253,7 +253,7 @@ schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
 schema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<TravelState>)
-    delete this.comment
+    this.comment = undefined
   }
 }
 
