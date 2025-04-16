@@ -53,9 +53,8 @@ class Formatter {
     const validDate = isValidDate(date)
     if (validDate) {
       return this.#dateFormat.format(validDate)
-    } else {
-      return ''
     }
+    return ''
   }
   /**
    * Day + Month
@@ -65,9 +64,8 @@ class Formatter {
     const validDate = isValidDate(date)
     if (validDate) {
       return this.#simpleDateFormat.format(validDate)
-    } else {
-      return ''
     }
+    return ''
   }
   /**
    * Day + Month + Year + Hour + Minute
@@ -77,9 +75,8 @@ class Formatter {
     const validDate = isValidDate(date)
     if (validDate) {
       return this.#dateTimeFormat.format(validDate)
-    } else {
-      return ''
     }
+    return ''
   }
   /**
    * Day + Month + Hour + Minute
@@ -89,9 +86,8 @@ class Formatter {
     const validDate = isValidDate(date)
     if (validDate) {
       return this.#simpleDateTimeFormat.format(validDate)
-    } else {
-      return ''
     }
+    return ''
   }
   baseCurrency(number: number) {
     return this.#baseCurrencyFormat.format(number)
@@ -99,12 +95,11 @@ class Formatter {
   currency(number: number, currency: string = baseCurrency._id) {
     if (currency === baseCurrency._id) {
       return this.baseCurrency(number)
-    } else {
-      return number.toLocaleString(this.locale, {
-        style: 'currency',
-        currency: currency
-      })
     }
+    return number.toLocaleString(this.locale, {
+      style: 'currency',
+      currency: currency
+    })
   }
   float(number: number) {
     return this.#floatFormat.format(number)
@@ -132,12 +127,12 @@ class Formatter {
   detailedMoney(baseMoney: Money | BaseCurrencyMoney, printZero = false, locale?: Locale): string {
     this.setLocale(locale)
     const money = baseCurrencyMoneyToMoney(baseMoney)
-    if (!money || (money && (typeof money.amount !== 'number' || (!money.amount && !printZero)))) {
+    if (money.amount === null || (!money.amount && !printZero)) {
       return ''
     }
-    let str = this.currency(money.amount!, money.currency._id)
-    if (money.exchangeRate && money.exchangeRate.rate) {
-      str = str + ' / ' + this.float(money.exchangeRate.rate) + ' = ' + this.baseCurrency(money.exchangeRate.amount)
+    let str = this.currency(money.amount, money.currency._id)
+    if (money.exchangeRate?.rate) {
+      str = `${str} / ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
     }
     return str
   }
