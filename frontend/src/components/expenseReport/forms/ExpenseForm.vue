@@ -129,7 +129,6 @@ export default defineComponent({
       if (this.$refs.fileUpload) {
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
-      console.log('CLEAR')
       this.formExpense = this.default()
     },
     output() {

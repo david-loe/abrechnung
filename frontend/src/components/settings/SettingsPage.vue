@@ -170,7 +170,6 @@ export default defineComponent({
       const container = document.getElementById('navBarContent')
       let width = 0
       if (container) {
-        console.log(container.getBoundingClientRect())
         width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
       }
       return `${width}px`

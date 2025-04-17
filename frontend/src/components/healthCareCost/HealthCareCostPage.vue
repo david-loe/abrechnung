@@ -421,7 +421,6 @@ async function postExpense(expense: Expense) {
     params: { parentId: healthCareCost.value._id }
   })
   expenseFormIsLoading.value = false
-
   if (result.ok) {
     setHealthCareCost(result.ok)
     resetAndHide()
@@ -432,7 +431,6 @@ async function deleteExpense(_id: string) {
   expenseFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
   expenseFormIsLoading.value = false
-
   if (result) {
     setHealthCareCost(result)
     resetAndHide()
