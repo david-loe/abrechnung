@@ -15,6 +15,7 @@
       "givenNameAttribute": "givenName"
     }
   },
+
   "smtp": {
     "host": "inbucket",
     "port": 2500,

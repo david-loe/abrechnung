@@ -17,5 +17,6 @@ jobs:
         uses: biomejs/setup-biome@v2
         with:
           working-dir: backend
+          version: 1.9.4
       - name: Run Biome
-        run: biome ci .
+        run: biome ci --changed .

@@ -52,6 +52,15 @@ Click below to launch a ready-to-use Gitpod workspace in your browser.
 
 > ℹ You can change ports and URLs in the `.env` file
 
-## Schema
+## Contributing
 
-![Schema](schema.png)
+Erstelle gerne Issues oder PR's!
+
+### Setup pre-commit lint
+
+> im Projekt root Ornder (abrechnung)
+
+```sh
+ln -sf ../../dev-tools/biome/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
