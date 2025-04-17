@@ -12,7 +12,7 @@ export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
   return (doc as { _id: idType })._id || (doc as idType)
 }
 
-export interface File extends Omit<DocumentFile, 'data' | 'owner'> {
+export interface File extends Omit<DocumentFile, 'data' | 'owner' | '_id'> {
   /**
    * @format binary
    */
