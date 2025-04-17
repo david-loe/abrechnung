@@ -247,7 +247,8 @@
 					"data",
 					"owner",
 					"type",
-					"name"
+					"name",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -676,11 +677,8 @@
 			"SetterBody_IUser-at-settings_": {
 				"$ref": "#/components/schemas/SetterPartial_IUser-at-settings.NoPost_"
 			},
-			"Pick_DocumentFile.Exclude_keyofDocumentFile.data-or-owner__": {
+			"Pick_DocumentFile.Exclude_keyofDocumentFile.data-or-owner-or-_id__": {
 				"properties": {
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
 					"type": {
 						"type": "string",
 						"enum": [
@@ -702,9 +700,6 @@
 			},
 			"File": {
 				"properties": {
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
 					"type": {
 						"type": "string",
 						"enum": [
@@ -1084,36 +1079,46 @@
 			"SetterPartial_IUser.NoPost_": {
 				"properties": {
 					"vehicleRegistration": {
-						"items": {
-							"properties": {
-								"data": {
-									"anyOf": [
-										{
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/Binary"
+												}
+											]
+										},
+										"name": {
 											"type": "string"
 										},
-										{
-											"$ref": "#/components/schemas/Binary"
+										"type": {
+											"type": "string",
+											"enum": [
+												"application/pdf",
+												"image/jpeg",
+												"image/png"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 										}
-									]
+									},
+									"type": "object"
 								},
-								"name": {
-									"type": "string"
-								},
-								"type": {
-									"type": "string",
-									"enum": [
-										"application/pdf",
-										"image/jpeg",
-										"image/png"
-									]
-								},
-								"_id": {
-									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-								}
-							},
-							"type": "object"
-						},
-						"type": "array"
+								"type": "array"
+							}
+						]
 					},
 					"loseAccessAt": {
 						"anyOf": [
@@ -1419,36 +1424,46 @@
 			"SetterBodyUser": {
 				"properties": {
 					"vehicleRegistration": {
-						"items": {
-							"properties": {
-								"data": {
-									"anyOf": [
-										{
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/Binary"
+												}
+											]
+										},
+										"name": {
 											"type": "string"
 										},
-										{
-											"$ref": "#/components/schemas/Binary"
+										"type": {
+											"type": "string",
+											"enum": [
+												"application/pdf",
+												"image/jpeg",
+												"image/png"
+											]
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 										}
-									]
+									},
+									"type": "object"
 								},
-								"name": {
-									"type": "string"
-								},
-								"type": {
-									"type": "string",
-									"enum": [
-										"application/pdf",
-										"image/jpeg",
-										"image/png"
-									]
-								},
-								"_id": {
-									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-								}
-							},
-							"type": "object"
-						},
-						"type": "array"
+								"type": "array"
+							}
+						]
 					},
 					"loseAccessAt": {
 						"type": "string",
@@ -3568,36 +3583,46 @@
 					"cost": {
 						"properties": {
 							"receipts": {
-								"items": {
-									"properties": {
-										"data": {
-											"anyOf": [
-												{
+								"anyOf": [
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"properties": {
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
 													"type": "string"
 												},
-												{
-													"$ref": "#/components/schemas/Binary"
+												"type": {
+													"type": "string",
+													"enum": [
+														"application/pdf",
+														"image/jpeg",
+														"image/png"
+													]
+												},
+												"_id": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
-											]
+											},
+											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
-										"type": {
-											"type": "string",
-											"enum": [
-												"application/pdf",
-												"image/jpeg",
-												"image/png"
-											]
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
+										"type": "array"
+									}
+								]
 							},
 							"amount": {
 								"type": "number",
@@ -3650,36 +3675,46 @@
 					"cost": {
 						"properties": {
 							"receipts": {
-								"items": {
-									"properties": {
-										"data": {
-											"anyOf": [
-												{
+								"anyOf": [
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"properties": {
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
 													"type": "string"
 												},
-												{
-													"$ref": "#/components/schemas/Binary"
+												"type": {
+													"type": "string",
+													"enum": [
+														"application/pdf",
+														"image/jpeg",
+														"image/png"
+													]
+												},
+												"_id": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
-											]
+											},
+											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
-										"type": {
-											"type": "string",
-											"enum": [
-												"application/pdf",
-												"image/jpeg",
-												"image/png"
-											]
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
+										"type": "array"
+									}
+								]
 							},
 							"amount": {
 								"type": "number",
@@ -5487,7 +5522,8 @@
 					"data",
 					"owner",
 					"type",
-					"name"
+					"name",
+					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -5661,35 +5697,49 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"DocumentFile_image_47_jpeg-or-image_47_png_": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Binary"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"image/jpeg",
+							"image/png"
+						]
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SetterPartial_IOrganisation.NoPost_": {
 				"properties": {
 					"logo": {
-						"properties": {
-							"data": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"$ref": "#/components/schemas/Binary"
-									}
-								]
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							},
-							"name": {
-								"type": "string"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"image/jpeg",
-									"image/png"
-								]
-							},
-							"_id": {
-								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							{
+								"$ref": "#/components/schemas/DocumentFile_image_47_jpeg-or-image_47_png_"
 							}
-						},
-						"type": "object"
+						]
 					},
 					"companyNumber": {
 						"type": "string"
@@ -6183,36 +6233,46 @@
 					"cost": {
 						"properties": {
 							"receipts": {
-								"items": {
-									"properties": {
-										"data": {
-											"anyOf": [
-												{
+								"anyOf": [
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"properties": {
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
 													"type": "string"
 												},
-												{
-													"$ref": "#/components/schemas/Binary"
+												"type": {
+													"type": "string",
+													"enum": [
+														"application/pdf",
+														"image/jpeg",
+														"image/png"
+													]
+												},
+												"_id": {
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
-											]
+											},
+											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
-										"type": {
-											"type": "string",
-											"enum": [
-												"application/pdf",
-												"image/jpeg",
-												"image/png"
-											]
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
+										"type": "array"
+									}
+								]
 							},
 							"amount": {
 								"type": "number",
