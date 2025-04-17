@@ -9,6 +9,7 @@ jobs:
 
   production-build:
     name: Production Build
+    needs: [quality]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
