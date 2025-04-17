@@ -222,7 +222,13 @@
             <div class="col-auto">
               <button
                 class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => ((d as Day).showSettings = true))"
+                @click="
+                  table.map((d) => {
+                    if (d.type === 'day') {
+                      d.data.showSettings = true
+                    }
+                  })
+                "
                 :disabled="travel.stages.length == 0">
                 {{ t('labels.expandAll') }}
                 <i class="bi bi-arrows-expand"></i>
@@ -231,7 +237,13 @@
             <div class="col-auto">
               <button
                 class="btn btn-link btn-sm"
-                @click="travel.days.map((d) => ((d as Day).showSettings = false))"
+                @click="
+                  table.map((d) => {
+                    if (d.type === 'day') {
+                      d.data.showSettings = false
+                    }
+                  })
+                "
                 :disabled="travel.stages.length == 0">
                 {{ t('labels.collapseAll') }}
                 <i class="bi bi-arrows-collapse"></i>
