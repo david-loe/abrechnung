@@ -54,7 +54,7 @@ Click below to launch a ready-to-use Gitpod workspace in your browser.
 
 ## Contributing
 
-Erstelle gerne Issues oder PR's!
+Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</a> oder <a href="https://github.com/david-loe/abrechnung/pulls">PR's</a>!
 
 ### Setup pre-commit lint
 
