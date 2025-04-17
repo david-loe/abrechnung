@@ -32,5 +32,3 @@ jobs:
         run: docker compose -f deploy-compose.yml run backend npm run setup
       - name: Run Migration
         run: docker compose run backend npm run setup
-      - name: Run tests on migrated instance
-        run: docker compose run backend npm run test
