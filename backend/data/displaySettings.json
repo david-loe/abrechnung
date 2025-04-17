@@ -1,106 +1,66 @@
 {
-    "auth": {
-        "magiclogin": true,
-        "microsoft": true,
-        "ldapauth": true,
-        "oidc": true
-    },
-    "oidc": {
-        "label": "OIDC",
-        "icon": "key"
-    },
-    "locale": {
-        "default": "de",
-        "fallback": "de",
-        "overwrite": {
-            "de": {},
-            "en": {}
-        }
-    },
-    "accessIcons": {
-        "admin": [
-            "person-fill"
-        ],
-        "appliedFor:travel": [
-            "airplane",
-            "plus"
-        ],
-        "approve/travel": [
-            "calendar-check"
-        ],
-        "approved:travel": [
-            "airplane",
-            "calendar-check",
-            "plus"
-        ],
-        "confirm/healthCareCost": [
-            "check-square",
-            "hospital"
-        ],
-        "examine/expenseReport": [
-            "coin",
-            "pencil-square"
-        ],
-        "examine/healthCareCost": [
-            "hospital",
-            "pencil-square"
-        ],
-        "examine/travel": [
-            "airplane",
-            "pencil-square"
-        ],
-        "inWork:expenseReport": [
-            "coin",
-            "plus"
-        ],
-        "inWork:healthCareCost": [
-            "hospital",
-            "plus"
-        ],
-        "refunded/expenseReport": [
-            "bank",
-            "coin"
-        ],
-        "refunded/healthCareCost": [
-            "bank",
-            "hospital"
-        ],
-        "refunded/travel": [
-            "airplane",
-            "bank"
-        ],
-        "user": [
-            "card-list"
-        ]
-    },
-    "stateColors": {
-        "appliedFor": {
-            "color": "#cae5ff",
-            "text": "black"
-        },
-        "approved": {
-            "color": "#89bbfe",
-            "text": "black"
-        },
-        "inWork": {
-            "color": "#AAD0FF",
-            "text": "black"
-        },
-        "refunded": {
-            "color": "#615d6c",
-            "text": "white"
-        },
-        "rejected": {
-            "color": "#E8998D",
-            "text": "black"
-        },
-        "underExamination": {
-            "color": "#6f8ab7",
-            "text": "white"
-        },
-        "underExaminationByInsurance": {
-            "color": "#687492",
-            "text": "white"
-        }
+  "auth": {
+    "magiclogin": true,
+    "microsoft": true,
+    "ldapauth": true,
+    "oidc": true
+  },
+  "oidc": {
+    "label": "OIDC",
+    "icon": "key"
+  },
+  "locale": {
+    "default": "de",
+    "fallback": "de",
+    "overwrite": {
+      "de": {},
+      "en": {}
     }
+  },
+  "accessIcons": {
+    "admin": ["person-fill"],
+    "appliedFor:travel": ["airplane", "plus"],
+    "approve/travel": ["calendar-check"],
+    "approved:travel": ["airplane", "calendar-check", "plus"],
+    "confirm/healthCareCost": ["check-square", "hospital"],
+    "examine/expenseReport": ["coin", "pencil-square"],
+    "examine/healthCareCost": ["hospital", "pencil-square"],
+    "examine/travel": ["airplane", "pencil-square"],
+    "inWork:expenseReport": ["coin", "plus"],
+    "inWork:healthCareCost": ["hospital", "plus"],
+    "refunded/expenseReport": ["bank", "coin"],
+    "refunded/healthCareCost": ["bank", "hospital"],
+    "refunded/travel": ["airplane", "bank"],
+    "user": ["card-list"]
+  },
+  "stateColors": {
+    "appliedFor": {
+      "color": "#cae5ff",
+      "text": "black"
+    },
+    "approved": {
+      "color": "#89bbfe",
+      "text": "black"
+    },
+    "inWork": {
+      "color": "#AAD0FF",
+      "text": "black"
+    },
+    "refunded": {
+      "color": "#615d6c",
+      "text": "white"
+    },
+    "rejected": {
+      "color": "#E8998D",
+      "text": "black"
+    },
+    "underExamination": {
+      "color": "#6f8ab7",
+      "text": "white"
+    },
+    "underExaminationByInsurance": {
+      "color": "#687492",
+      "text": "white"
+    }
+  }
 }

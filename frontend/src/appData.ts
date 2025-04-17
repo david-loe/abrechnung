@@ -106,45 +106,46 @@ class APP_LOADER {
               displaySettingsRes
             ] = result[0].value
 
-            let projects,
-              users = undefined
+            let projectsRes = undefined
+            let usersRes = undefined
             if (result[1].status === 'fulfilled') {
-              projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
-              users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
+              projectsRes = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
+              usersRes = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
             }
             if (
-              !userRes.ok ||
-              !currenciesRes.ok ||
-              !countriesRes.ok ||
-              !settingsRes.ok ||
-              !travelSettingsRes.ok ||
-              !healthInsurancesRes.ok ||
-              !organisationsRes.ok ||
-              !specialLumpSumsRes.ok ||
-              !displaySettingsRes.ok
+              userRes.ok &&
+              currenciesRes.ok &&
+              countriesRes.ok &&
+              settingsRes.ok &&
+              travelSettingsRes.ok &&
+              healthInsurancesRes.ok &&
+              organisationsRes.ok &&
+              specialLumpSumsRes.ok &&
+              displaySettingsRes.ok
             ) {
+              const data = new APP_DATA(
+                currenciesRes.ok.data,
+                countriesRes.ok.data,
+                userRes.ok.data,
+                settingsRes.ok.data,
+                travelSettingsRes.ok.data,
+                displaySettingsRes.ok.data,
+                healthInsurancesRes.ok.data,
+                organisationsRes.ok.data,
+                specialLumpSumsRes.ok.data,
+                projectsRes?.ok?.data,
+                usersRes?.ok?.data
+              )
+              resolve(data)
+              this.data.value = data
+              this.updateLocales(displaySettingsRes.ok.data)
+              this.setLanguage(data.user.settings.language)
+              this.state.value = 'LOADED'
+              logger.info(`${i18n.global.t('labels.user')}:`)
+              logger.info(userRes.ok.data)
+            } else {
               reject('Error loading essential data')
             }
-            const data = new APP_DATA(
-              currenciesRes.ok!.data,
-              countriesRes.ok!.data,
-              userRes.ok!.data,
-              settingsRes.ok!.data,
-              travelSettingsRes.ok!.data,
-              displaySettingsRes.ok!.data,
-              healthInsurancesRes.ok!.data,
-              organisationsRes.ok!.data,
-              specialLumpSumsRes.ok!.data,
-              projects?.ok?.data,
-              users?.ok?.data
-            )
-            resolve(data)
-            this.data.value = data
-            this.updateLocales(displaySettingsRes.ok!.data)
-            this.setLanguage(data.user.settings.language)
-            this.state.value = 'LOADED'
-            logger.info(i18n.global.t('labels.user') + ':')
-            logger.info(userRes.ok!.data)
           }
         })
       })
@@ -177,7 +178,7 @@ class APP_LOADER {
     }
     ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
     //@ts-ignore
-    document.title = i18n.global.t('headlines.title') + ' ' + i18n.global.t('headlines.emoji')
+    document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
   }
 
   setLanguage(locale: Locale) {

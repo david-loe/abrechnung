@@ -24,7 +24,7 @@
 <script lang="ts">
 import { TravelSimple } from '@/../../common/types.js'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 export default defineComponent({
   name: 'TravelApproveForm',
   data() {

@@ -5,7 +5,7 @@ import { reportPrinter, travelCalculator } from '../factory.js'
 export const travelSettingsSchema = () => {
   const distanceRefunds = {} as { [key in DistanceRefundType]: { type: NumberConstructor; min: 0; required: true; label: string } }
   for (const refund of distanceRefundTypes) {
-    distanceRefunds[refund] = { type: Number, min: 0, required: true, label: 'distanceRefundTypes.' + refund }
+    distanceRefunds[refund] = { type: Number, min: 0, required: true, label: `distanceRefundTypes.${refund}` }
   }
 
   const lumpSumCut = {} as { [key in Meal]: { type: NumberConstructor; required: true } }

@@ -13,7 +13,7 @@ import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 
-let APP_DATA = APP_LOADER.data
+const APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'SettingsForm',
@@ -43,7 +43,7 @@ export default defineComponent({
       _id: { type: 'hidden', meta: true }
     })
 
-    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA.value!.settings))
+    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA.value?.settings))
   }
 })
 </script>

@@ -26,7 +26,6 @@ export class CustomStrategy extends OidcStrategy {
         params.delete('state')
         url.search = params.toString()
       }
-
       ;(OidcStrategy as any).prototype.authorizationCodeGrant.call(this, req, url, options)
     } else {
       ;(OidcStrategy as any).prototype.authorizationRequest.call(this, req, options)
@@ -37,40 +36,39 @@ export class CustomStrategy extends OidcStrategy {
 export async function getOidcStrategy() {
   const connectionSettings = await getConnectionSettings()
 
-  if (connectionSettings.auth.oidc) {
-    const { server, clientId, clientSecret } = connectionSettings.auth.oidc
-
-    const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
-
-    return new CustomStrategy(
-      {
-        callbackURL: `${process.env.VITE_BACKEND_URL}${callbackPath}`,
-        config,
-        scope
-      },
-      async (tokens, verified) => {
-        try {
-          const claims = tokens.claims()
-          if (claims && claims.email && claims.name) {
-            const nameSplit = displayNameSplit(claims.name as string)
-            await findOrCreateUser(
-              { oidc: claims.sub },
-              {
-                email: claims.email as string,
-                name: {
-                  familyName: (claims.family_name as string) || nameSplit.familyName,
-                  givenName: (claims.given_name as string) || nameSplit.givenName
-                }
-              },
-              verified
-            )
-          }
-        } catch (error) {
-          verified(error)
-        }
-      }
-    )
-  } else {
+  if (!connectionSettings.auth.oidc) {
     throw new Error('OIDC not configured in Connection Settings')
   }
+  const { server, clientId, clientSecret } = connectionSettings.auth.oidc
+
+  const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
+
+  return new CustomStrategy(
+    {
+      callbackURL: `${process.env.VITE_BACKEND_URL}${callbackPath}`,
+      config,
+      scope
+    },
+    async (tokens, verified) => {
+      try {
+        const claims = tokens.claims()
+        if (claims?.email && claims.name) {
+          const nameSplit = displayNameSplit(claims.name as string)
+          await findOrCreateUser(
+            { oidc: claims.sub },
+            {
+              email: claims.email as string,
+              name: {
+                familyName: (claims.family_name as string) || nameSplit.familyName,
+                givenName: (claims.given_name as string) || nameSplit.givenName
+              }
+            },
+            verified
+          )
+        }
+      } catch (error) {
+        verified(error)
+      }
+    }
+  )
 }

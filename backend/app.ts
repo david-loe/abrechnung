@@ -4,7 +4,7 @@ import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
-import { errorHandler, RateLimitExceededError } from './controller/error.js'
+import { RateLimitExceededError, errorHandler } from './controller/error.js'
 import { connectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
@@ -20,7 +20,7 @@ export default async function () {
     if (process.env.TRUST_PROXY.toLowerCase() === 'true') {
       app.set('trust proxy', true)
     } else if (process.env.TRUST_PROXY.match(/^\d+$/)) {
-      app.set('trust proxy', parseInt(process.env.TRUST_PROXY))
+      app.set('trust proxy', Number.parseInt(process.env.TRUST_PROXY))
     } else {
       app.set('trust proxy', process.env.TRUST_PROXY)
     }
@@ -41,8 +41,8 @@ export default async function () {
   if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
     app.use(
       rateLimit({
-        windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS),
-        limit: parseInt(process.env.RATE_LIMIT),
+        windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS),
+        limit: Number.parseInt(process.env.RATE_LIMIT),
         standardHeaders: 'draft-7',
         legacyHeaders: false,
         skip: (req, res) => req.method !== 'POST',
@@ -76,7 +76,7 @@ export default async function () {
       '/docs',
       // fix path when behind proxy https://github.com/scottie1984/swagger-ui-express/issues/183
       (req: ExRequest, res: ExResponse, next: ExNextFunction) => {
-        if (req.originalUrl == '/docs') return res.redirect('docs/')
+        if (req.originalUrl === '/docs') return res.redirect('docs/')
         next()
       },
       swaggerUi.serve,

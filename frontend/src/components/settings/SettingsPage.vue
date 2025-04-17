@@ -117,9 +117,9 @@
 
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
+import CSVImport from '@/components/settings/elements/CSVImport.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
 import CountryList from '@/components/settings/elements/CountryList.vue'
-import CSVImport from '@/components/settings/elements/CSVImport.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
@@ -168,12 +168,12 @@ export default defineComponent({
   computed: {
     rightMargin() {
       const container = document.getElementById('navBarContent')
+      let width = 0
       if (container) {
         console.log(container.getBoundingClientRect())
-        return container.getBoundingClientRect().right - container.getBoundingClientRect().width + 'px'
-      } else {
-        return '0px'
+        width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
       }
+      return `${width}px`
     }
   },
 

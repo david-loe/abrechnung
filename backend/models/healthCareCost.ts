@@ -105,7 +105,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Health
 
 schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
   const doc: any = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
-  delete doc._id
+  doc._id = undefined
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('HealthCareCost').create([doc], { timestamps: false })
@@ -118,7 +118,7 @@ async function exchange(costObject: Money, date: string | number | Date) {
   let exchangeRate = null
 
   if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
-    exchangeRate = await convertCurrency(date, costObject.amount!, (costObject.currency as ICurrency)._id)
+    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
   }
   costObject.exchangeRate = exchangeRate
 
@@ -143,7 +143,7 @@ schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc)
 schema.methods.addComment = function (this: HealthCareCostDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<HealthCareCostState>)
-    delete this.comment
+    this.comment = undefined
   }
 }
 

@@ -49,7 +49,7 @@ import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelect
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',

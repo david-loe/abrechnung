@@ -1,10 +1,10 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import { NextFunction, Request, Response } from 'express'
-import fs from 'fs/promises'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
-import path from 'path'
-import { _id, DocumentFile as IDocumentFile, User as IUser } from '../common/types.js'
+import { DocumentFile as IDocumentFile, User as IUser, _id } from '../common/types.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 
@@ -16,21 +16,21 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
       keys = oKeys
     }
   }
-  let str = keys.join(separator) + '\n'
+  let str = `${keys.join(separator)}\n`
   for (const obj of objects) {
     const col: string[] = []
     for (const key of keys) {
       if (!(key in obj)) {
         col.push('')
       } else if (Array.isArray(obj[key])) {
-        col.push('[' + obj[key].join(arraySeparator) + ']')
+        col.push(`[${obj[key].join(arraySeparator)}]`)
       } else if (obj[key] === null) {
         col.push('null')
       } else {
         col.push(obj[key])
       }
     }
-    str += col.join(separator) + '\n'
+    str += `${col.join(separator)}\n`
   }
   return str
 }
@@ -54,13 +54,13 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       }
     }
     if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
-      let reqDocuments = tmpCheckObj
+      const reqDocuments = tmpCheckObj
       function multerFileName(i: number) {
         let str = pathToFiles.length > 0 ? pathToFiles[0] : ''
         for (let j = 1; j < pathToFiles.length; j++) {
-          str += '[' + pathToFiles[j] + ']'
+          str += `[${pathToFiles[j]}]`
         }
-        str += '[' + i + '][data]'
+        str += `[${i}][data]`
         return str
       }
       async function handleFile(reqDoc: any, i: number) {
@@ -68,20 +68,20 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           let buffer = null
           if (opts.multiple) {
             for (const file of req.files as Express.Multer.File[]) {
-              if (file.fieldname == multerFileName(i)) {
+              if (file.fieldname === multerFileName(i)) {
                 buffer = file.buffer
                 break
               }
             }
           } else {
-            buffer = req.file!.buffer
+            buffer = req.file?.buffer
           }
           if (buffer) {
             reqDoc.owner = fileOwner
             reqDoc.data = buffer
             const dbDoc = (await new DocumentFile(reqDoc).save()).toObject() as Partial<IDocumentFile>
-            delete dbDoc.data
-            delete reqDoc.data
+            dbDoc.data = undefined
+            reqDoc.data = undefined
             Object.assign(reqDoc, dbDoc)
           } else {
             return undefined
@@ -119,7 +119,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
 export async function writeToDisk(
   filePath: string,
   data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>,
-  retries: number = 5
+  retries = 5
 ): Promise<void> {
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true })
@@ -149,16 +149,16 @@ export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boo
   return user.projects.supervised.some((p) => p._id.equals(projectId))
 }
 
-export const fileHandler = multer({ limits: { fileSize: parseInt(process.env.VITE_MAX_FILE_SIZE) } })
+export const fileHandler = multer({ limits: { fileSize: Number.parseInt(process.env.VITE_MAX_FILE_SIZE) } })
 
 export function genAuthenticatedLink(
   payload: { destination: string; redirect: string },
   jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }
 ) {
   const secret = process.env.MAGIC_LOGIN_SECRET
-  const callbackUrl = process.env.VITE_BACKEND_URL + '/auth/magiclogin/callback'
+  const callbackUrl = `${process.env.VITE_BACKEND_URL}/auth/magiclogin/callback`
   return new Promise<string>((resolve, reject) => {
-    const code = Math.floor(Math.random() * 90000) + 10000 + ''
+    const code = `${Math.floor(Math.random() * 90000) + 10000}`
     jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
       if (err) {
         reject(err)

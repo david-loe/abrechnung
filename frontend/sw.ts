@@ -1,11 +1,11 @@
 /// <reference lib="webworker" />
 import { logger } from '@/logger.js'
-import { clientsClaim, RouteHandler } from 'workbox-core'
+import { RouteHandler, clientsClaim } from 'workbox-core'
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
-declare var self: ServiceWorkerGlobalScope
+declare let self: ServiceWorkerGlobalScope
 
 precacheAndRoute(self.__WB_MANIFEST)
 
@@ -32,7 +32,7 @@ registerRoute(
 
 //defining a Route Handler for NetworkForst strategy but saving the data in IndexedDB
 const NetworkFirstToDB: RouteHandler = async ({ request }) => {
-  let url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
+  const url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
   try {
     const networkResponse = await fetch(request)
     storeResponse(url, networkResponse.clone())
@@ -60,14 +60,14 @@ const NetworkFirstToDB: RouteHandler = async ({ request }) => {
 //register all Routes using the backend url for NetWorkFirstToDB RouteHandler
 registerRoute(({ request }) => {
   const isBackendURLbutNotAuth =
-    request.url.startsWith(import.meta.env.VITE_BACKEND_URL) && !request.url.startsWith(import.meta.env.VITE_BACKEND_URL + '/auth')
+    request.url.startsWith(import.meta.env.VITE_BACKEND_URL) && !request.url.startsWith(`${import.meta.env.VITE_BACKEND_URL}/auth`)
   return isBackendURLbutNotAuth
 }, NetworkFirstToDB)
 
 //saving data in indexedDB
 async function storeResponse(url: string, response: Response) {
   const contentType = response.headers.get('content-type')
-  if (contentType !== null && contentType.includes('application/json')) {
+  if (contentType?.includes('application/json')) {
     const db = await openDatabase()
     const res = await response.json()
     const transaction = db.transaction('urls', 'readwrite')
@@ -104,16 +104,16 @@ function openDatabase(): Promise<IDBDatabase> {
 
 //reacting to push event and trigger display of notification
 self.addEventListener('push', (event) => {
-  let data
+  let data: any
   try {
     data = event.data?.json()
   } catch (e) {
-    logger.error('Push-Daten konnten nicht geparst werden:\n' + e)
+    logger.error(`Push-Daten konnten nicht geparst werden:\n${e}`)
     return
   }
   // Überprüfe, ob alle nötigen Felder vorhanden sind
   if (!data || !data.title || !data.url) {
-    logger.error('Push-Daten unvollständig:\n' + data)
+    logger.error(`Push-Daten unvollständig:\n${data}`)
     return
   }
   event.waitUntil(

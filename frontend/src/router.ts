@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
+import { RouteLocationNormalized, createRouter, createWebHistory } from 'vue-router'
+import HomePage from './components/HomePage.vue'
+import LoginPage from './components/LoginPage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
@@ -7,8 +9,6 @@ import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.v
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
 import RefundedHealthCareCostPage from './components/healthCareCost/RefundedPage.vue'
-import HomePage from './components/HomePage.vue'
-import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import ApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
@@ -24,9 +24,8 @@ const routes = [
     beforeEnter: async (to: RouteLocationNormalized) => {
       if (await auth()) {
         return { path: '/user' }
-      } else {
-        return true
       }
+      return true
     }
   },
   {
@@ -158,12 +157,12 @@ const router = createRouter({
 })
 
 export async function auth() {
-  var auth = false
+  let auth = false
   if (!navigator.onLine) {
     return true
   }
   try {
-    const res = await axios.get(import.meta.env.VITE_BACKEND_URL + '/auth/authenticated', {
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/authenticated`, {
       withCredentials: true
     })
     auth = res.status === 204

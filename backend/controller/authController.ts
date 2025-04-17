@@ -48,12 +48,11 @@ const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: N
 
 const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.magiclogin) {
-    let user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp('^' + escapeRegExp(req.body.destination) + '$', 'i') } })
-    if (user && (await user.isActive())) {
-      magiclogin.send(req, res)
-    } else {
-      throw new NotAllowedError('No magiclogin user found for e-mail: ' + req.body.destination)
+    const user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp(`^${escapeRegExp(req.body.destination)}$`, 'i') } })
+    if (!user || !(await user.isActive())) {
+      throw new NotAllowedError(`No magiclogin user found for e-mail: ${req.body.destination}`)
     }
+    magiclogin.send(req, res)
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -92,7 +91,7 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
   }
   if ((await getDisplaySettings()).auth.magiclogin || tokenAdmin) {
     passport.authenticate(magiclogin, {
-      failureRedirect: process.env.VITE_FRONTEND_URL + '/login' + (redirect ? '?redirect=' + redirect : '')
+      failureRedirect: `${process.env.VITE_FRONTEND_URL}/login${redirect ? `?redirect=${redirect}` : ''}`
     })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -166,7 +165,7 @@ export class AuthController extends Controller {
 
   private redirectToFrontend(path?: string) {
     let redirect = ''
-    if (path && path.startsWith('/')) {
+    if (path?.startsWith('/')) {
       redirect = path
     }
     this.setHeader('Location', process.env.VITE_FRONTEND_URL + redirect)

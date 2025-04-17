@@ -80,7 +80,7 @@
 <script>
 import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { defineElement, SelectElement } from '@vueform/vueform'
+import { SelectElement, defineElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
 
@@ -104,7 +104,7 @@ export default defineElement({
       if (familyName) {
         return familyName
       }
-      return (option.name.givenName + ' ' + option.name.familyName).toLowerCase().indexOf(search.toLowerCase()) > -1
+      return `${option.name.givenName} ${option.name.familyName}`.toLowerCase().indexOf(search.toLowerCase()) > -1
     }
   },
   setup(props, context) {

@@ -29,7 +29,7 @@
 import { AnyState } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import StateBadge from '@/components/elements/StateBadge.vue'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   data() {

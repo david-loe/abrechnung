@@ -4,9 +4,13 @@ on:
   workflow_call:
 
 jobs:
-  production-build:
-    runs-on: ubuntu-latest
+  quality:
+    uses: ./.github/workflows/code-quality.yml
 
+  production-build:
+    name: Production Build
+    needs: [quality]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: copy .env file

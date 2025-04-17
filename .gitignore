@@ -1,1 +1,9 @@
 .env
+
+# copy from backend/.gitignore
+backend/node_modules
+backend/dist
+
+# copy from frontend/.gitignore
+frontend/node_modules
+frontend/dist

@@ -107,8 +107,8 @@ async function loadFromServer() {
 }
 defineExpose({ loadFromServer })
 
-let healthInsuranceToEdit: Ref<HealthInsurance | undefined> = ref(undefined)
-let _showForm = ref(false)
+const healthInsuranceToEdit: Ref<HealthInsurance | undefined> = ref(undefined)
+const _showForm = ref(false)
 
 function showForm(healthInsurance?: HealthInsurance) {
   healthInsuranceToEdit.value = healthInsurance

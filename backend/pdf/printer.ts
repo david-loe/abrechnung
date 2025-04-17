@@ -1,11 +1,9 @@
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { addUp, hexToRGB } from '../../common/scripts.js'
 import {
-  _id,
-  baseCurrency,
   Comment,
   Cost,
   CountryCode,
@@ -19,19 +17,21 @@ import {
   Money,
   PageOrientation,
   Place,
-  PrinterSettings,
   PrintSettingsBase,
+  PrinterSettings,
   Purpose,
   PurposeSimple,
   Refund,
-  reportIsExpenseReport,
-  reportIsHealthCareCost,
-  reportIsTravel,
   Transport,
   Travel,
   TravelDay,
   TravelExpense,
-  TravelSettings
+  TravelSettings,
+  _id,
+  baseCurrency,
+  reportIsExpenseReport,
+  reportIsHealthCareCost,
+  reportIsTravel
 } from '../../common/types.js'
 
 interface PrintSettings extends PrintSettingsBase {
@@ -73,12 +73,13 @@ export interface ReceiptMap {
   [key: string]: ReceiptMapEntry
 }
 
-function getReceiptMap(costList: { cost: Cost }[], number: number = 1) {
+function getReceiptMap(costList: { cost: Cost }[], number = 1) {
+  let counter = number
   const map: ReceiptMap = {}
   for (const cost of costList) {
-    if (cost.cost && cost.cost.receipts) {
+    if (cost.cost?.receipts) {
       for (const receipt of cost.cost.receipts) {
-        map[receipt._id!.toString()] = Object.assign({ number: number++, date: cost.cost.date as Date }, receipt)
+        map[receipt._id.toString()] = Object.assign({ number: counter++, date: cost.cost.date as Date }, receipt)
       }
     }
   }
@@ -205,7 +206,7 @@ class ReportPrint {
     const optionalMapHealth: ReceiptMap = {}
     if (reportIsHealthCareCost(this.report) && this.report.refundSum.receipts && this.report.refundSum.receipts.length > 0) {
       for (const receipt of this.report.refundSum.receipts) {
-        optionalMapHealth[receipt._id!.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
+        optionalMapHealth[receipt._id?.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
       }
     }
     const receiptMap = Object.assign(
@@ -265,7 +266,7 @@ class ReportPrint {
     let y = options.yStart
     y = this.drawer.drawMultilineText(this.report.name, { xStart: options.xStart, yStart: y, fontSize: options.fontSize * 1.5 })
     y = this.drawer.drawMultilineText(
-      this.t('labels.project') + ': ' + this.report.project.identifier + (this.report.project.name ? ' - ' + this.report.project.name : ''),
+      `${this.t('labels.project')}: ${this.report.project.identifier}${this.report.project.name ? ` - ${this.report.project.name}` : ''}`,
       {
         xStart: options.xStart,
         yStart: y,
@@ -280,12 +281,7 @@ class ReportPrint {
     if (reportIsTravel(this.report)) {
       // Traveler
       y = this.drawer.drawMultilineText(
-        this.t('labels.traveler') +
-          ': ' +
-          this.report.owner.name.givenName +
-          ' ' +
-          this.report.owner.name.familyName +
-          (this.report.claimSpouseRefund ? ' & ' + this.report.fellowTravelersNames : ''),
+        `${this.t('labels.traveler')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}${this.report.claimSpouseRefund ? ` & ${this.report.fellowTravelersNames}` : ''}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -295,7 +291,7 @@ class ReportPrint {
 
       // Reason + Place
       y = await this.drawer.drawMultilineTextWithPlace(
-        this.t('labels.reason') + ': ' + this.report.reason + '    ' + this.t('labels.destinationPlace') + ': ',
+        `${this.t('labels.reason')}: ${this.report.reason}    ${this.t('labels.destinationPlace')}: `,
         this.report.destinationPlace,
         {
           xStart: options.xStart,
@@ -306,21 +302,14 @@ class ReportPrint {
       let text = ''
       // Dates + professionalShare + lastPlaceOfWork
       const sc = this.report.stages.length
-      text =
-        this.t('labels.from') +
-        ': ' +
-        (sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[0].departure) : this.drawer.formatter.date(this.report.startDate)) +
-        '    ' +
-        this.t('labels.to') +
-        ': ' +
-        (sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[sc - 1].arrival) : this.drawer.formatter.date(this.report.endDate))
+      text = `${this.t('labels.from')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[0].departure) : this.drawer.formatter.date(this.report.startDate)}    ${this.t('labels.to')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[sc - 1].arrival) : this.drawer.formatter.date(this.report.endDate)}`
 
       if (this.report.professionalShare !== null && this.report.professionalShare !== 1) {
-        text = text + '    ' + this.t('labels.professionalShare') + ': ' + Math.round(this.report.professionalShare * 100) + '%'
+        text = `${text}    ${this.t('labels.professionalShare')}: ${Math.round(this.report.professionalShare * 100)}%`
       }
       if (this.report.lastPlaceOfWork) {
         const lastPlace = { country: this.report.lastPlaceOfWork.country, place: this.report.lastPlaceOfWork.special }
-        y = await this.drawer.drawMultilineTextWithPlace(text + '    ' + this.t('labels.lastPlaceOfWork') + ': ', lastPlace, {
+        y = await this.drawer.drawMultilineTextWithPlace(`${text}    ${this.t('labels.lastPlaceOfWork')}: `, lastPlace, {
           xStart: options.xStart,
           yStart: y,
           fontSize: options.fontSize
@@ -336,7 +325,7 @@ class ReportPrint {
     let y = options.yStart
     if (reportIsExpenseReport(this.report)) {
       y = this.drawer.drawMultilineText(
-        this.t('labels.expensePayer') + ': ' + this.report.owner.name.givenName + ' ' + this.report.owner.name.familyName,
+        `${this.t('labels.expensePayer')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -344,14 +333,7 @@ class ReportPrint {
         }
       )
       // Dates
-      let text =
-        this.t('labels.from') +
-        ': ' +
-        this.drawer.formatter.date(this.report.expenses[0].cost.date) +
-        '    ' +
-        this.t('labels.to') +
-        ': ' +
-        this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)
+      const text = `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
       y = this.drawer.drawMultilineText(text, {
         xStart: options.xStart,
         yStart: y,
@@ -366,19 +348,7 @@ class ReportPrint {
     if (reportIsHealthCareCost(this.report)) {
       // Isurance + patientName
       y = this.drawer.drawMultilineText(
-        this.t('labels.insurance') +
-          ': ' +
-          this.report.insurance.name +
-          '      ' +
-          this.t('labels.applicant') +
-          ': ' +
-          this.report.owner.name.givenName +
-          ' ' +
-          this.report.owner.name.familyName +
-          '      ' +
-          this.t('labels.patientName') +
-          ': ' +
-          this.report.patientName,
+        `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -396,7 +366,7 @@ class ReportPrint {
         this.t('report.advance.approvedXonYbyZ', {
           X: this.drawer.formatter.detailedMoney(this.report.advance, true),
           Y: this.drawer.formatter.date(this.report.updatedAt),
-          Z: this.report.editor.name.givenName + ' ' + this.report.editor.name.familyName
+          Z: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
         }),
         {
           xStart: options.xStart,
@@ -490,7 +460,7 @@ class ReportPrint {
     summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log.underExamination?.date })
     summary.push({
       reference: this.t('labels.examinedBy'),
-      value: this.report.editor.name.givenName + ' ' + this.report.editor.name.familyName
+      value: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
     })
     const tabelOptions: TableOptions = options
     tabelOptions.firstRow = false
@@ -508,7 +478,7 @@ class ReportPrint {
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,
       title: 'author',
-      fn: (a: Comment['author']) => a.name.givenName + ' ' + a.name.familyName
+      fn: (a: Comment['author']) => `${a.name.givenName} ${a.name.familyName}`
     })
     columns.push({
       key: 'text',
@@ -535,6 +505,7 @@ class ReportPrint {
     if (!reportIsTravel(this.report) || this.report.stages.length === 0) {
       return options.yStart
     }
+    const travel = this.report
     const columns: Column[] = []
     columns.push({
       key: 'departure',
@@ -555,7 +526,7 @@ class ReportPrint {
       width: 145,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.startLocation'),
-      fn: (p: Place) => p.place + ', ' + p.country.name[this.drawer.settings.language],
+      fn: (p: Place) => `${p.place}, ${p.country.name[this.drawer.settings.language]}`,
       countryCodeForFlag: (p: Place) => p.country._id
     })
     columns.push({
@@ -563,7 +534,7 @@ class ReportPrint {
       width: 145,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.endLocation'),
-      fn: (p: Place) => p.place + ', ' + p.country.name[this.drawer.settings.language],
+      fn: (p: Place) => `${p.place}, ${p.country.name[this.drawer.settings.language]}`,
       countryCodeForFlag: (p: Place) => p.country._id
     })
     columns.push({
@@ -573,13 +544,8 @@ class ReportPrint {
       title: this.t('labels.transport'),
       fn: (t: Transport) =>
         t.type === 'ownCar'
-          ? this.t('distanceRefundTypes.' + t.distanceRefundType) +
-            ' (' +
-            this.distanceRefunds[t.distanceRefundType] +
-            ' ' +
-            baseCurrency.symbol +
-            '/km)'
-          : this.t('labels.' + t.type)
+          ? `${this.t(`distanceRefundTypes.${t.distanceRefundType}`)} (${this.distanceRefunds[t.distanceRefundType]} ${baseCurrency.symbol}/km)`
+          : this.t(`labels.${t.type}`)
     })
     columns.push({
       key: 'transport',
@@ -594,7 +560,7 @@ class ReportPrint {
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.purpose'),
       fn: (p: Purpose) =>
-        this.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round((this.report as Travel).professionalShare! * 100) + '%)' : '')
+        this.t(`labels.${p}`) + (p === 'mixed' && travel.professionalShare ? ` (${Math.round(travel.professionalShare * 100)}%)` : '')
     })
     columns.push({
       key: 'cost',
@@ -614,7 +580,7 @@ class ReportPrint {
       width: 45,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id!.toString()].number).join(', ')
+      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id?.toString()].number).join(', ')
     })
 
     const fontSize = options.fontSize + 2
@@ -640,13 +606,14 @@ class ReportPrint {
       title: this.t('labels.description')
     })
     if (reportIsTravel(this.report)) {
+      const travel = this.report
       columns.push({
         key: 'purpose',
         width: 50,
         alignment: pdf_lib.TextAlignment.Left,
         title: this.t('labels.purpose'),
         fn: (p: TravelExpense['purpose']) =>
-          this.t('labels.' + p) + (p === 'mixed' ? ' (' + Math.round((this.report as Travel).professionalShare! * 100) + '%)' : '')
+          this.t(`labels.${p}`) + (p === 'mixed' && travel.professionalShare ? ` (${Math.round(travel.professionalShare * 100)}%)` : '')
       })
     }
     columns.push({
@@ -674,7 +641,7 @@ class ReportPrint {
       width: 45,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id!.toString()].number).join(', ')
+      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id?.toString()].number).join(', ')
     })
 
     const fontSize = options.fontSize + 2
@@ -720,14 +687,14 @@ class ReportPrint {
       width: 50,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.purpose'),
-      fn: (p: PurposeSimple) => this.t('labels.' + p)
+      fn: (p: PurposeSimple) => this.t(`labels.${p}`)
     })
     columns.push({
       key: 'cateringNoRefund',
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.cateringNoRefund'),
-      fn: (c: TravelDay['cateringNoRefund']) => (Object.keys(c) as Meal[]).map((k) => (c[k] ? this.t('labels.' + k) : '')).join(' ')
+      fn: (c: TravelDay['cateringNoRefund']) => (Object.keys(c) as Meal[]).map((k) => (c[k] ? this.t(`labels.${k}`) : '')).join(' ')
     })
     columns.push({
       key: 'refunds',
@@ -751,14 +718,11 @@ class ReportPrint {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(
-      this.t('labels.lumpSums') + (this.report.claimSpouseRefund ? ' (' + this.t('labels.claimSpouseRefund') + ')' : ''),
-      {
-        xStart: options.xStart,
-        yStart: options.yStart - fontSize,
-        fontSize: fontSize
-      }
-    )
+    this.drawer.drawText(this.t('labels.lumpSums') + (this.report.claimSpouseRefund ? ` (${this.t('labels.claimSpouseRefund')})` : ''), {
+      xStart: options.xStart,
+      yStart: options.yStart - fontSize,
+      fontSize: fontSize
+    })
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(this.report.days, columns, options)
@@ -769,6 +733,7 @@ class ReportPrint {
 }
 
 // From https://github.com/Hopding/pdf-lib
+// biome-ignore lint/suspicious/noControlCharactersInRegex: <explanation>
 const lineSplit = (text: string) => text.split(/[\n\f\r\u000B]/)
 const cleanText = (text: string) => text.replace(/\t|\u0085|\u2028|\u2029/g, '    ').replace(/[\b\v]/g, '')
 const lastIndexOfWhitespace = (line: string) => {
@@ -829,12 +794,14 @@ const layoutMultilineText = (
       const { line, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize)
 
       // prettier-ignore
-      const x = (
-          alignment === pdf_lib.TextAlignment.Left   ? bounds.x
-        : alignment === pdf_lib.TextAlignment.Center ? bounds.x + (bounds.width / 2) - (width / 2)
-        : alignment === pdf_lib.TextAlignment.Right  ? bounds.x + bounds.width - width
-        : bounds.x
-      );
+      const x =
+        alignment === pdf_lib.TextAlignment.Left
+          ? bounds.x
+          : alignment === pdf_lib.TextAlignment.Center
+            ? bounds.x + bounds.width / 2 - width / 2
+            : alignment === pdf_lib.TextAlignment.Right
+              ? bounds.x + bounds.width - width
+              : bounds.x
 
       y -= lineHeight
 
@@ -953,6 +920,7 @@ class PDFDrawer {
     place: { country: CountrySimple; place?: string },
     options: Options & { alignment?: pdf_lib.TextAlignment; width?: number }
   ) {
+    let textWithPlace = text
     const opts = Object.assign(options, {
       alignment: pdf_lib.TextAlignment.Left,
       width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
@@ -960,10 +928,10 @@ class PDFDrawer {
     const flagPseudoSuffixWidth =
       this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
     if (place.place) {
-      text += place.place + ', '
+      textWithPlace += `${place.place}, `
     }
-    text += place.country.name[this.settings.language]
-    text += FLAG_PSEUDO_SUFFIX
+    textWithPlace += place.country.name[this.settings.language]
+    textWithPlace += FLAG_PSEUDO_SUFFIX
 
     const multiLineText = layoutMultilineText(text, {
       alignment: opts.alignment,
@@ -1003,7 +971,7 @@ class PDFDrawer {
     if (receipt.noNumberPrint) {
       return
     }
-    const text = '#' + receipt.number + (receipt.date ? ' - ' + this.formatter.date(receipt.date) : '')
+    const text = `#${receipt.number}${receipt.date ? ` - ${this.formatter.date(receipt.date)}` : ''}`
     const width = this.font.widthOfTextAtSize(text, this.settings.fontSizes.L)
     this.currentPage.drawRectangle({
       x: 2,
@@ -1023,9 +991,9 @@ class PDFDrawer {
   async attachReceipts(receiptMap: ReceiptMap) {
     for (const receiptId in receiptMap) {
       const receipt = receiptMap[receiptId]
-      const doc = await this.getDocumentFileBufferById(receipt._id!)
+      const doc = await this.getDocumentFileBufferById(receipt._id)
       if (!doc) {
-        console.error('No DocumentFile found for id: ' + receipt._id)
+        console.error(`No DocumentFile found for id: ${receipt._id}`)
         continue
       }
       if (receipt.type === 'application/pdf') {
@@ -1073,12 +1041,12 @@ class PDFDrawer {
     let filename = countryCode
     if (opts.fontSize > 42 * 0.75) {
       // 0.75 px <=> 1 pt
-      filename = filename + '@3x'
+      filename = `${filename}@3x`
     } else if (opts.fontSize > 21 * 0.75) {
       // 0.75 px <=> 1 pt
-      filename = filename + '@2x'
+      filename = `${filename}@2x`
     }
-    const flagBytes = await fs.readFile('./pdf/flags/' + filename + '.png')
+    const flagBytes = await fs.readFile(`./pdf/flags/${filename}.png`)
     const flag = await this.doc.embedPng(flagBytes)
 
     this.currentPage.drawImage(flag, {
@@ -1095,13 +1063,13 @@ class PDFDrawer {
   async drawLogo(title: string, options: Options) {
     let filename = 'receipt'
     if (options.fontSize > 24) {
-      filename = filename + '36'
+      filename = `${filename}36`
     } else if (options.fontSize > 12) {
-      filename = filename + '24'
+      filename = `${filename}24`
     } else {
-      filename = filename + '12'
+      filename = `${filename}12`
     }
-    const logoBytes = await fs.readFile('./pdf/receipt/' + filename + '.png')
+    const logoBytes = await fs.readFile(`./pdf/receipt/${filename}.png`)
     const logo = await this.doc.embedPng(logoBytes)
     const logoSize = this.font.heightAtSize(options.fontSize)
     const y = options.yStart - logoSize * 0.8
@@ -1127,7 +1095,7 @@ class PDFDrawer {
     }
     const doc = await this.getDocumentFileBufferById(orga.logoId)
     if (!doc) {
-      console.error('No DocumentFile found for id: ' + orga.logoId)
+      console.error(`No DocumentFile found for id: ${orga.logoId}`)
       return
     }
 
@@ -1194,13 +1162,6 @@ class PDFDrawer {
       },
       options
     )
-
-    if (!columns) {
-      columns = []
-      for (const key in data[0]) {
-        columns.push({ key: key, width: opts.defaultCellWidth, alignment: pdf_lib.TextAlignment.Left, title: key })
-      }
-    }
 
     opts.yStart = opts.yStart - opts.cellHeight
     opts.newPageYStart = opts.newPageYStart - opts.cellHeight

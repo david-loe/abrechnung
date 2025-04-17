@@ -25,6 +25,7 @@
     "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
+    "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
     "loginFailed": "Failed to login!",

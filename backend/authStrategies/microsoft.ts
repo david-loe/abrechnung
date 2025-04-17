@@ -28,32 +28,31 @@ interface msProfile {
 
 export async function getMicrosoftStrategy() {
   const connectionSettings = await getConnectionSettings()
-  if (connectionSettings.auth.microsoft) {
-    const config: microsoftSettings = connectionSettings.auth.microsoft
-    return new MicrosoftStrategy(
-      {
-        clientID: config.clientId,
-        clientSecret: config.clientSecret,
-        callbackURL: process.env.VITE_BACKEND_URL + '/auth/microsoft/callback',
-        tenant: config.tenant,
-        scope: ['user.read']
-      },
-      async function (accessToken: string, refreshToken: string, profile: msProfile, verified: (error: any, user?: Express.User) => void) {
-        let nameSplit = displayNameSplit(profile._json.displayName)
-        await findOrCreateUser(
-          { microsoft: profile._json.id },
-          {
-            email: profile._json.mail,
-            name: {
-              familyName: profile._json.surname || nameSplit.familyName,
-              givenName: profile._json.givenName || nameSplit.givenName
-            }
-          },
-          verified
-        )
-      }
-    )
-  } else {
+  if (!connectionSettings.auth.microsoft) {
     throw new Error('Microsoft not configured in Connection Settings')
   }
+  const config: microsoftSettings = connectionSettings.auth.microsoft
+  return new MicrosoftStrategy(
+    {
+      clientID: config.clientId,
+      clientSecret: config.clientSecret,
+      callbackURL: `${process.env.VITE_BACKEND_URL}/auth/microsoft/callback`,
+      tenant: config.tenant,
+      scope: ['user.read']
+    },
+    async (accessToken: string, refreshToken: string, profile: msProfile, verified: (error: any, user?: Express.User) => void) => {
+      const nameSplit = displayNameSplit(profile._json.displayName)
+      await findOrCreateUser(
+        { microsoft: profile._json.id },
+        {
+          email: profile._json.mail,
+          name: {
+            familyName: profile._json.surname || nameSplit.familyName,
+            givenName: profile._json.givenName || nameSplit.givenName
+          }
+        },
+        verified
+      )
+    }
+  )
 }

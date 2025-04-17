@@ -21,22 +21,23 @@ const schema = projectSchema()
 
 schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
   let sum = 0
-  const travels = mongoose.connection.collection('travels').find({ project: this._id, state: 'refunded', historic: false })
-  const expenseReports = mongoose.connection.collection('expensereports').find({ project: this._id, state: 'refunded', historic: false })
-  const healthCareCosts = mongoose.connection.collection('healthcarecosts').find({ project: this._id, state: 'refunded', historic: false })
+  const filter: mongoose.mongo.Filter<any> = { project: this._id, state: 'refunded', historic: false }
+  const travels = mongoose.connection.collection<Travel>('travels').find(filter)
+  const expenseReports = mongoose.connection.collection<ExpenseReport>('expensereports').find(filter)
+  const healthCareCosts = mongoose.connection.collection<HealthCareCost>('healthcarecosts').find(filter)
   for await (const travel of travels) {
-    if ((travel as Travel).addUp.total.amount) {
-      sum += (travel as Travel).addUp.total.amount!
+    if (travel.addUp.total.amount) {
+      sum += travel.addUp.total.amount
     }
   }
   for await (const expenseReport of expenseReports) {
-    if ((expenseReport as ExpenseReport).addUp.total.amount) {
-      sum += (expenseReport as ExpenseReport).addUp.total.amount!
+    if (expenseReport.addUp.total.amount) {
+      sum += expenseReport.addUp.total.amount
     }
   }
   for await (const healthCareCost of healthCareCosts) {
-    if ((healthCareCost as HealthCareCost).addUp.total.amount) {
-      sum += (healthCareCost as HealthCareCost).addUp.total.amount!
+    if (healthCareCost.addUp.total.amount) {
+      sum += healthCareCost.addUp.total.amount
     }
   }
   this.balance = { amount: sum }

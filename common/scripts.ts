@@ -14,9 +14,7 @@ import {
 } from './types.js'
 
 export function PlaceToString(place: Place, language?: Locale) {
-  return (
-    `${place.place}, ${language ? place.country.name[language] : place.country._id}` + (place.country.flag ? ' ' + place.country.flag : '')
-  )
+  return `${place.place}, ${language ? place.country.name[language] : place.country._id}${place.country.flag ? ` ${place.country.flag}` : ''}`
 }
 
 export function getById<T extends { _id: string }>(id: string, array: T[]): T | null {
@@ -33,9 +31,9 @@ export function mailToLink(recipients: string[], subject?: string, body?: string
   function addParam(param: string, value: string) {
     if (value.length > 0) {
       if (paramString.length > 0) {
-        paramString += '&' + param + '=' + value
+        paramString += `&${param}=${value}`
       } else {
-        paramString += '?' + param + '=' + value
+        paramString += `?${param}=${value}`
       }
     }
   }
@@ -43,7 +41,7 @@ export function mailToLink(recipients: string[], subject?: string, body?: string
   if (bcc) addParam('bcc', bcc.join(';'))
   if (subject) addParam('subject', encodeURIComponent(subject))
   if (body) addParam('body', encodeURIComponent(body))
-  return 'mailto:' + recipients.join(';') + paramString
+  return `mailto:${recipients.join(';')}${paramString}`
 }
 
 export function msTeamsToLink(recipients: string[], message?: string, topicName?: string): string {
@@ -51,16 +49,16 @@ export function msTeamsToLink(recipients: string[], message?: string, topicName?
   function addParam(param: string, value: string) {
     if (value.length > 0) {
       if (paramString.length > 0) {
-        paramString += '&' + param + '=' + value
+        paramString += `&${param}=${value}`
       } else {
-        paramString += '?' + param + '=' + value
+        paramString += `?${param}=${value}`
       }
     }
   }
   addParam('users', recipients.join(','))
   if (topicName) addParam('topicName', encodeURIComponent(topicName))
   if (message) addParam('message', encodeURIComponent(message))
-  return 'https://teams.microsoft.com/l/chat/0/0' + paramString
+  return `https://teams.microsoft.com/l/chat/0/0${paramString}`
 }
 
 export function getFlagEmoji(countryCode: string): string | null {
@@ -81,38 +79,34 @@ export function isValidDate(date: Date | string | number): Date | null {
     return null
   }
   const d = new Date(date)
-  if (isNaN(d.valueOf())) {
+  if (Number.isNaN(d.valueOf())) {
     return null
-  } else {
-    return d
   }
+  return d
 }
 
 export function datetimeToDateString(datetime: Date | string | number): string {
   const date = isValidDate(datetime)
   if (date) {
     return date.toISOString().slice(0, -14)
-  } else {
-    return ''
   }
+  return ''
 }
 
 export function datetimeToDatetimeString(datetime: Date | string | number): string {
   const date = isValidDate(datetime)
   if (date) {
     return date.toISOString().slice(0, -8)
-  } else {
-    return ''
   }
+  return ''
 }
 
 export function htmlInputStringToDateTime(dateTimeStr: string): Date | null {
   const date = isValidDate(dateTimeStr)
   if (date) {
     return new Date(date.valueOf() - date.getTimezoneOffset() * 60 * 1000)
-  } else {
-    return null
   }
+  return null
 }
 
 export function datetimeToDate(datetime: Date | string | number): Date {
@@ -152,10 +146,10 @@ function getLumpSumsSum(travel: Travel) {
 function getBaseCurrencyAmount(a: Money): number {
   let amount = 0
   if (a.amount !== null) {
-    let currency = typeof a.currency === 'string' ? a.currency : a.currency._id
+    const currency = typeof a.currency === 'string' ? a.currency : a.currency._id
     if (currency === baseCurrency._id) {
       amount = a.amount
-    } else if (a.exchangeRate && typeof a.exchangeRate.amount == 'number') {
+    } else if (a.exchangeRate && typeof a.exchangeRate.amount === 'number') {
       amount = a.exchangeRate.amount
     }
   }
@@ -167,8 +161,8 @@ function getTravelExpensesSum(travel: Travel) {
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount !== null) {
       let add = getBaseCurrencyAmount(stage.cost)
-      if (stage.purpose === 'mixed') {
-        add = add * travel.professionalShare!
+      if (stage.purpose === 'mixed' && travel.professionalShare) {
+        add = add * travel.professionalShare
       }
       sum += add
     }
@@ -176,8 +170,8 @@ function getTravelExpensesSum(travel: Travel) {
   for (const expense of travel.expenses) {
     if (expense.cost && expense.cost.amount !== null) {
       let add = getBaseCurrencyAmount(expense.cost)
-      if (expense.purpose === 'mixed') {
-        add = add * travel.professionalShare!
+      if (expense.purpose === 'mixed' && travel.professionalShare) {
+        add = add * travel.professionalShare
       }
       sum += add
     }
@@ -202,8 +196,8 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   if ((report as Travel | ExpenseReport).advance) {
     advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
   }
-  let total = expenses + lumpSums
-  let balance = total - advance
+  const total = expenses + lumpSums
+  const balance = total - advance
 
   if (reportIsTravel(report)) {
     return {
@@ -213,20 +207,20 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
       expenses: { amount: expenses },
       lumpSums: { amount: lumpSums }
     } as AddUpResult<T>
-  } else if (reportIsHealthCareCost(report)) {
+  }
+  if (reportIsHealthCareCost(report)) {
     return {
       balance: { amount: balance },
       total: { amount: total },
-      expenses: { amount: expenses }
-    } as AddUpResult<T>
-  } else {
-    return {
-      balance: { amount: balance },
-      total: { amount: total },
-      advance: { amount: advance },
       expenses: { amount: expenses }
     } as AddUpResult<T>
   }
+  return {
+    balance: { amount: balance },
+    total: { amount: total },
+    advance: { amount: advance },
+    expenses: { amount: expenses }
+  } as AddUpResult<T>
 }
 
 export function sanitizeFilename(filename: string) {
@@ -247,15 +241,15 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
     reader.readAsDataURL(file)
     reader.onload = function (this: FileReader) {
       // We create an image to receive the Data URI
-      let img = document.createElement('img')
+      const img = document.createElement('img')
       // When the img "onload" is triggered we can resize the image.
       img.onload = function (this: GlobalEventHandlers) {
         // We create a canvas and get its context.
-        let canvas = document.createElement('canvas')
-        let ctx = canvas.getContext('2d')
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
         // We set the dimensions to the wanted size.
-        let max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
-        let min: 'width' | 'height' = max == 'width' ? 'height' : 'width'
+        const max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
+        const min: 'width' | 'height' = max === 'width' ? 'height' : 'width'
         if (img[max] > longestSide) {
           canvas[max] = longestSide
           canvas[min] = img[min] * (longestSide / img[max])
@@ -272,33 +266,41 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
   })
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: This class is intentionally static-only to provide utility methods without requiring instantiation
 export class Base64 {
   static #keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 
   static encode(input: string): string {
     let output = ''
-    let chr1, chr2, chr3, enc1, enc2, enc3, enc4
+    let chr1: number
+    let chr2: number
+    let chr3: number
+    let enc1: number
+    let enc2: number
+    let enc3: number
+    let enc4: number
     let i = 0
 
-    input = this.#utf8_encode(input)
+    const inputUTF8Save = Base64.#utf8_encode(input)
 
-    while (i < input.length) {
-      chr1 = input.charCodeAt(i++)
-      chr2 = input.charCodeAt(i++)
-      chr3 = input.charCodeAt(i++)
+    while (i < inputUTF8Save.length) {
+      chr1 = inputUTF8Save.charCodeAt(i++)
+      chr2 = inputUTF8Save.charCodeAt(i++)
+      chr3 = inputUTF8Save.charCodeAt(i++)
 
       enc1 = chr1 >> 2
       enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
       enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
       enc4 = chr3 & 63
 
-      if (isNaN(chr2)) {
+      if (Number.isNaN(chr2)) {
         enc3 = enc4 = 64
-      } else if (isNaN(chr3)) {
+      } else if (Number.isNaN(chr3)) {
         enc4 = 64
       }
 
-      output = output + this.#keyStr.charAt(enc1) + this.#keyStr.charAt(enc2) + this.#keyStr.charAt(enc3) + this.#keyStr.charAt(enc4)
+      output =
+        output + Base64.#keyStr.charAt(enc1) + Base64.#keyStr.charAt(enc2) + Base64.#keyStr.charAt(enc3) + Base64.#keyStr.charAt(enc4)
     }
 
     return output
@@ -306,17 +308,22 @@ export class Base64 {
 
   static decode(input: string): string {
     let output = ''
-    let chr1, chr2, chr3
-    let enc1, enc2, enc3, enc4
+    let chr1: number
+    let chr2: number
+    let chr3: number
+    let enc1: number
+    let enc2: number
+    let enc3: number
+    let enc4: number
     let i = 0
 
-    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '')
+    const validBase64Input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '')
 
-    while (i < input.length) {
-      enc1 = this.#keyStr.indexOf(input.charAt(i++))
-      enc2 = this.#keyStr.indexOf(input.charAt(i++))
-      enc3 = this.#keyStr.indexOf(input.charAt(i++))
-      enc4 = this.#keyStr.indexOf(input.charAt(i++))
+    while (i < validBase64Input.length) {
+      enc1 = Base64.#keyStr.indexOf(validBase64Input.charAt(i++))
+      enc2 = Base64.#keyStr.indexOf(validBase64Input.charAt(i++))
+      enc3 = Base64.#keyStr.indexOf(validBase64Input.charAt(i++))
+      enc4 = Base64.#keyStr.indexOf(validBase64Input.charAt(i++))
 
       chr1 = (enc1 << 2) | (enc2 >> 4)
       chr2 = ((enc2 & 15) << 4) | (enc3 >> 2)
@@ -324,25 +331,25 @@ export class Base64 {
 
       output = output + String.fromCharCode(chr1)
 
-      if (enc3 != 64) {
+      if (enc3 !== 64) {
         output = output + String.fromCharCode(chr2)
       }
-      if (enc4 != 64) {
+      if (enc4 !== 64) {
         output = output + String.fromCharCode(chr3)
       }
     }
 
-    output = this.#utf8_decode(output)
+    output = Base64.#utf8_decode(output)
 
     return output
   }
 
   static #utf8_encode(string: string): string {
-    string = string.replace(/\r\n/g, '\n')
+    const stringLineBreakCleaned = string.replace(/\r\n/g, '\n')
     let utftext = ''
 
-    for (let n = 0; n < string.length; n++) {
-      let c = string.charCodeAt(n)
+    for (let n = 0; n < stringLineBreakCleaned.length; n++) {
+      const c = stringLineBreakCleaned.charCodeAt(n)
 
       if (c < 128) {
         utftext += String.fromCharCode(c)
@@ -362,9 +369,9 @@ export class Base64 {
   static #utf8_decode(utftext: string): string {
     let string = ''
     let i = 0
-    let c,
-      c2,
-      c3 = 0
+    let c: number
+    let c2: number
+    let c3 = 0
 
     while (i < utftext.length) {
       c = utftext.charCodeAt(i)
@@ -420,22 +427,22 @@ export function mergeDeep(target: any, ...sources: any) {
   return mergeDeep(target, ...sources)
 }
 
-function csvToArray(text: string, separator = ',', escape = '"') {
-  let p = '',
-    row = [''],
-    ret = [row],
-    i = 0,
-    r = 0,
-    s = !0,
-    l
-  for (l of text) {
-    if (escape === l) {
+function csvToArray(text: string, separator = ',', escapeChar = '"') {
+  let p = ''
+  let row = ['']
+  const ret = [row]
+  let i = 0
+  let r = 0
+  let s = !0
+  for (let l of text) {
+    if (escapeChar === l) {
       if (s && l === p) row[i] += l
       s = !s
     } else if (separator === l && s) l = row[++i] = ''
     else if ('\n' === l && s) {
       if ('\r' === p) row[i] = row[i].slice(0, -1)
-      row = ret[++r] = [(l = '')]
+      l = ''
+      row = ret[++r] = [l]
       i = 0
     } else row[i] += l
     p = l
@@ -455,15 +462,15 @@ export function csvToObjects(
   separator = ',',
   arraySeparator = ',',
   pathSeparator = '.',
-  escape = '"'
+  escapeChar = '"'
 ) {
-  const lines = csvToArray(csv, separator, escape)
-  let result: any[] = []
+  const lines = csvToArray(csv, separator, escapeChar)
+  const result: any[] = []
   if (lines.length > 1) {
     const headers = lines[0]
     for (let i = 1; i < lines.length; i++) {
-      let obj: any = {}
-      let currentline = lines[i]
+      const obj: any = {}
+      const currentline = lines[i]
       for (let j = 0; j < headers.length; j++) {
         let object = obj
         let val: string | string[] | undefined = currentline[j] !== '' ? currentline[j] : undefined
@@ -474,7 +481,7 @@ export function csvToObjects(
           }
           object = object[pathParts[k]]
         }
-        let key = pathParts[pathParts.length - 1]
+        const key = pathParts[pathParts.length - 1]
         // search for [] to identify arrays
         const match = currentline[j].match(/^\[(.*)\]$/)
         if (match === null) {
@@ -503,12 +510,12 @@ export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = 
       return Object.values(it)
         .map((item) => {
           if (Array.isArray(item)) {
-            return '[' + item.join(arraySeparator) + ']'
-          } else if (item === null) {
-            return 'null'
-          } else {
-            return item
+            return `[${item.join(arraySeparator)}]`
           }
+          if (item === null) {
+            return 'null'
+          }
+          return item
         })
         .join(separator)
     })
@@ -534,23 +541,35 @@ export function escapeRegExp(str: string) {
 
 export function hexToRGB(hex: HexColor): [number, number, number] {
   // Entferne das '#' falls vorhanden
-  hex = hex.replace(/^#/, '')
+  let hexChars = hex.replace(/^#/, '')
 
   // Falls shorthand (#abc), erweitern auf #aabbcc
-  if (hex.length === 3) {
-    hex = hex
+  if (hexChars.length === 3) {
+    hexChars = hexChars
       .split('')
       .map((char) => char + char)
       .join('')
   }
 
-  if (hex.length !== 6) {
+  if (hexChars.length !== 6) {
     throw new Error('Ungültiger Hex-Farbcode')
   }
 
-  const red = parseInt(hex.slice(0, 2), 16)
-  const green = parseInt(hex.slice(2, 4), 16)
-  const blue = parseInt(hex.slice(4, 6), 16)
+  const red = Number.parseInt(hexChars.slice(0, 2), 16)
+  const green = Number.parseInt(hexChars.slice(2, 4), 16)
+  const blue = Number.parseInt(hexChars.slice(4, 6), 16)
 
   return [red, green, blue]
+}
+
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) {
+    const mb = bytes / (1024 * 1024)
+    return `${mb.toFixed(2)} MB`
+  }
+  if (bytes >= 1024) {
+    const kb = bytes / 1024
+    return `${kb.toFixed(2)} KB`
+  }
+  return `${bytes} B`
 }

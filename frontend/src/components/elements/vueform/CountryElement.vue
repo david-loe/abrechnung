@@ -87,7 +87,7 @@
 <script>
 import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { defineElement, SelectElement } from '@vueform/vueform'
+import { SelectElement, defineElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
 
@@ -107,7 +107,7 @@ export default defineElement({
       if (name) {
         return name
       }
-      if (option.alias && option.alias[this.$i18n.locale]) {
+      if (option.alias?.[this.$i18n.locale]) {
         for (const alias of option.alias[this.$i18n.locale]) {
           const result = alias.toLowerCase().indexOf(search.toLowerCase()) > -1
           if (result) {

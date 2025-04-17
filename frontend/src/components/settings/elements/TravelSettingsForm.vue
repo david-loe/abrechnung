@@ -13,7 +13,7 @@ import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 
-let APP_DATA = APP_LOADER.data
+const APP_DATA = APP_LOADER.data
 
 export default defineComponent({
   name: 'TravelSettingsForm',
@@ -42,8 +42,11 @@ export default defineComponent({
       },
       _id: { type: 'hidden', meta: true }
     })
-
-    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA.value!.travelSettings))
+    queueMicrotask(() => {
+      if (APP_DATA.value) {
+        ;(this.$refs.form$ as any).load(APP_DATA.value.travelSettings)
+      }
+    })
   }
 })
 </script>

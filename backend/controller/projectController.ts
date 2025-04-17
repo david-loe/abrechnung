@@ -1,4 +1,3 @@
-import { Request as ExRequest } from 'express'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
 import { getSettings } from '../db.js'
@@ -11,6 +10,7 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { isUserAllowedToAccess } from './authentication.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError } from './error.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Project')
 @Route('project')
@@ -18,11 +18,11 @@ import { AuthorizationError } from './error.js'
 @Security('httpBearer', ['user'])
 export class ProjectController extends Controller {
   @Get()
-  public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: ExRequest) {
+  public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: AuthenticatedExpressRequest) {
     const settings = await getSettings()
     if (
-      settings.userCanSeeAllProjects ||
-      (await isUserAllowedToAccess(request.user!, [
+      !settings.userCanSeeAllProjects &&
+      !(await isUserAllowedToAccess(request.user, [
         'admin',
         'approve/travel',
         'examine/travel',
@@ -34,10 +34,9 @@ export class ProjectController extends Controller {
         'refunded/healthCareCost'
       ]))
     ) {
-      return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 }, sort: { identifier: 1 } })
-    } else {
       throw new AuthorizationError()
     }
+    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 }, sort: { identifier: 1 } })
   }
 }
 

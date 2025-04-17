@@ -24,7 +24,7 @@
 import { HealthInsurance } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',
@@ -44,9 +44,9 @@ export default defineComponent({
       return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
     },
     updateInsurance(insurance: HealthInsurance) {
-      if (this.updateUserInsurance) {
-        this.APP_DATA!.user.settings.insurance = insurance
-        API.setter('user/settings', this.APP_DATA!.user.settings, {}, false)
+      if (this.updateUserInsurance && this.APP_DATA) {
+        this.APP_DATA.user.settings.insurance = insurance
+        API.setter('user/settings', this.APP_DATA?.user.settings, {}, false)
       }
       this.$emit('update:modelValue', insurance)
     }

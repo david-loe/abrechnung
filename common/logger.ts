@@ -1,19 +1,20 @@
 export enum LogLevel {
   DEBUG = 0,
-  INFO,
-  WARN,
-  ERROR
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3
 }
 
 export class Logger {
   logLevel: LogLevel = LogLevel.INFO
 
   constructor(logLevel?: LogLevel | string) {
-    if (typeof logLevel === 'string') {
-      logLevel = Logger.getLogLevelFromString(logLevel)
-    }
     if (logLevel) {
-      this.logLevel = logLevel
+      if (typeof logLevel === 'string') {
+        this.logLevel = Logger.getLogLevelFromString(logLevel)
+      } else {
+        this.logLevel = logLevel
+      }
     }
   }
   error(message?: any, ...optionalParams: any[]) {

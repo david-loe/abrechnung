@@ -4,7 +4,7 @@ import { Access, ReportType, RetentionType, Settings, accesses, reportTypes, ret
 export const settingsSchema = () => {
   const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
   for (const access of accesses) {
-    defaultAccess[access] = { type: Boolean, required: true, label: 'accesses.' + access }
+    defaultAccess[access] = { type: Boolean, required: true, label: `accesses.${access}` }
   }
 
   const disableReportType = {} as { [key in ReportType]: { type: BooleanConstructor; required: true } }
@@ -30,7 +30,7 @@ export const settingsSchema = () => {
         validator: Number.isInteger,
         message: 'Must be Integer'
       },
-      description: 'description.' + policy
+      description: `description.${policy}`
     }
   }
   return new Schema<Settings>({

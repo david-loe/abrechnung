@@ -23,7 +23,7 @@ test('GET /country?additionalFields=lumpSums&additionalFields=lumpSumsFrom', asy
   } else {
     console.log(res.body)
   }
-  t.true((res.body.data[0] as Country).hasOwnProperty('lumpSums'))
+  t.true('lumpSums' in (res.body.data[0] as Country))
 })
 
 test('GET /specialLumpSums', async (t) => {

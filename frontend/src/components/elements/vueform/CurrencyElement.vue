@@ -96,7 +96,7 @@
 <script>
 import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { defineElement, SelectElement } from '@vueform/vueform'
+import { SelectElement, defineElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
 

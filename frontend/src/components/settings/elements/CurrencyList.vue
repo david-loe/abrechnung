@@ -81,7 +81,7 @@ const headers: Header[] = [
 
 const APP_DATA = APP_LOADER.data
 
-const nameFilterKey = 'name.' + APP_DATA.value!.user.settings.language
+const nameFilterKey = `name.${APP_DATA.value?.user.settings.language}`
 
 const getEmptyFilter = () => {
   const emptyFilter: Filter = { _id: { $regex: undefined, $options: 'i' } }
@@ -119,8 +119,8 @@ async function loadFromServer() {
 }
 defineExpose({ loadFromServer })
 
-let currencyToEdit: Ref<Currency | undefined> = ref(undefined)
-let _showForm = ref(false)
+const currencyToEdit: Ref<Currency | undefined> = ref(undefined)
+const _showForm = ref(false)
 
 function showForm(currency?: Currency) {
   currencyToEdit.value = currency

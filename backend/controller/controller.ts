@@ -1,8 +1,8 @@
 import { DeleteResult } from 'mongodb'
-import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder, Types } from 'mongoose'
+import { FilterQuery, HydratedDocument, Model, ProjectionType, SortOrder, Types, mongo } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
-import { _id, GETResponse, Meta, User } from '../../common/types.js'
+import { GETResponse, Meta, User, _id } from '../../common/types.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
@@ -188,7 +188,7 @@ export class Controller extends TsoaController {
           //@ts-ignore
           if (options.projection[additionalField] === 0) {
             //@ts-ignore
-            delete options.projection[additionalField]!
+            delete options.projection[additionalField]
           } else {
             //@ts-ignore
             options.projection[additionalField] = 1
@@ -198,55 +198,54 @@ export class Controller extends TsoaController {
     }
     // find by ID
     if (options.query._id) {
-      let conditions: any = Object.assign({ _id: options.query._id }, options.filter)
+      const conditions: any = Object.assign({ _id: options.query._id }, options.filter)
       const result = (await model.findOne(conditions, options.projection).lean()) as ModelType
-      if (result !== null) {
-        if (options.cb) {
-          options.cb(result)
-        }
-        return { data: result, meta }
-      } else {
+      if (result === null) {
         throw new NotFoundError(`No ${model.modelName} for _id: '${options.query._id}' found.`)
       }
-      // find all
-    } else {
-      // conditions
-      let conditions: any = {}
-      if (options.query.filterJSON) {
-        conditions = JSON.parse(Base64.decode(options.query.filterJSON))
-      }
-      if (Object.keys(options.filter).length > 0) {
-        if (!('$and' in conditions)) {
-          conditions.$and = []
-        }
-        conditions.$and.push(options.filter)
-      }
-
-      //sorting
-      let sort = options.sort
-      if (options.query.sortJSON) {
-        const sortFromQuery = JSON.parse(Base64.decode(options.query.sortJSON))
-        if (sortFromQuery) {
-          sort = sortFromQuery
-        }
-      }
-
-      let query = model.find(conditions, options.projection)
-      meta.count = await model.countDocuments(conditions)
-      if (meta.limit > 0) {
-        query = query.limit(meta.limit).skip(meta.limit * (meta.page - 1))
-        meta.countPages = Math.ceil(meta.count / meta.limit)
-      }
-      if (sort) {
-        query = query.sort(sort)
-      }
-      let data = (await query.lean()) as ModelType[]
-
       if (options.cb) {
-        options.cb(data)
+        options.cb(result)
       }
-      return { data, meta }
+      return { data: result, meta }
     }
+
+    // find all
+    // conditions
+    let conditions: any = {}
+    if (options.query.filterJSON) {
+      conditions = JSON.parse(Base64.decode(options.query.filterJSON))
+    }
+    if (Object.keys(options.filter).length > 0) {
+      if (!('$and' in conditions)) {
+        conditions.$and = []
+      }
+      conditions.$and.push(options.filter)
+    }
+
+    //sorting
+    let sort = options.sort
+    if (options.query.sortJSON) {
+      const sortFromQuery = JSON.parse(Base64.decode(options.query.sortJSON))
+      if (sortFromQuery) {
+        sort = sortFromQuery
+      }
+    }
+
+    let query = model.find(conditions, options.projection)
+    meta.count = await model.countDocuments(conditions)
+    if (meta.limit > 0) {
+      query = query.limit(meta.limit).skip(meta.limit * (meta.page - 1))
+      meta.countPages = Math.ceil(meta.count / meta.limit)
+    }
+    if (sort) {
+      query = query.sort(sort)
+    }
+    const data = (await query.lean()) as ModelType[]
+
+    if (options.cb) {
+      options.cb(data)
+    }
+    return { data, meta }
   }
 
   async setter<ModelType extends { _id?: Types.ObjectId | string }>(model: Model<ModelType>, options: SetterOptions<ModelType>) {
@@ -287,10 +286,13 @@ export class Controller extends TsoaController {
     if (options.checkOldObject && !(await options.checkOldObject(parentObject))) {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
+    const arr = parentObject[options.arrayElementKey] as Array<ArrayElementType>
+
     if (options.requestBody._id && options.requestBody._id !== '') {
       let found = false
-      for (const arrayElement of parentObject[options.arrayElementKey] as Array<ArrayElementType>) {
-        if ((arrayElement._id! as Types.ObjectId).equals(options.requestBody._id as string)) {
+
+      for (const arrayElement of arr) {
+        if ((arrayElement._id as Types.ObjectId).equals(options.requestBody._id as string)) {
           found = true
           Object.assign(arrayElement, options.requestBody)
           break
@@ -300,12 +302,12 @@ export class Controller extends TsoaController {
         throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
       }
     } else if (options.allowNew) {
-      ;(parentObject[options.arrayElementKey] as Array<any>).push(options.requestBody)
+      ;(arr as Array<any>).push(options.requestBody)
     } else {
       throw new NotAllowedError(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     if (options.sortFn) {
-      ;(parentObject[options.arrayElementKey] as Array<ArrayElementType>).sort(options.sortFn)
+      arr.sort(options.sortFn)
     }
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()
@@ -353,13 +355,14 @@ export class Controller extends TsoaController {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     let found = false
-    for (let i = 0; i < (parentObject[options.arrayElementKey] as Array<{ _id: _id }>).length; i++) {
-      if ((parentObject[options.arrayElementKey] as Array<{ _id: _id }>)[i]._id.equals(options._id)) {
+    const arr = parentObject[options.arrayElementKey] as Array<{ _id: _id }>
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i]._id.equals(options._id)) {
         found = true
         if (options.beforeDelete) {
-          await options.beforeDelete((parentObject[options.arrayElementKey] as Array<any>)[i])
+          await options.beforeDelete(arr[i])
         }
-        ;(parentObject[options.arrayElementKey] as Array<any>).splice(i, 1)
+        arr.splice(i, 1)
         break
       }
     }
@@ -375,13 +378,7 @@ export class Controller extends TsoaController {
   }
 
   checkOwner(requestUser: User) {
-    return async function (oldObject: { owner: { _id: Types.ObjectId | string } }) {
-      if (requestUser._id.equals(oldObject.owner._id)) {
-        return true
-      } else {
-        return false
-      }
-    }
+    return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
   }
 
   async insertMany<ModelType extends { _id?: Types.ObjectId | string }>(

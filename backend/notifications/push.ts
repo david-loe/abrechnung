@@ -18,12 +18,12 @@ export async function sendPushNotification(title: string, body: string, users: U
     const userSessions = allSessions.filter((session) => session.subscription && user._id.equals(session.passport.user._id))
     if (userSessions.length > 0) {
       const latestSession = userSessions.reduce(
-        (max, session) => (new Date(session.cookie.expires!).valueOf() > new Date(max.cookie.expires!).valueOf() ? session : max),
+        (max, session) => (new Date(session.cookie.expires || 0).valueOf() > new Date(max.cookie.expires || 0).valueOf() ? session : max),
         userSessions[0]
       )
-      if (latestSession) {
+      if (latestSession?.subscription) {
         try {
-          webpush.sendNotification(latestSession.subscription!, JSON.stringify(payload), {
+          webpush.sendNotification(latestSession.subscription, JSON.stringify(payload), {
             vapidDetails: {
               subject: process.env.VITE_FRONTEND_URL,
               publicKey: process.env.VITE_PUBLIC_VAPID_KEY,

@@ -82,7 +82,7 @@ const loadFromServer = async () => {
     params.filterJSON = Base64.encode(JSON.stringify(filter))
   }
 
-  let result = (await API.getter<any[]>(props.endpoint, params)).ok
+  const result = (await API.getter<any[]>(props.endpoint, params)).ok
   if (result) {
     items.value = result.data
     serverItemsLength.value = result.meta.count

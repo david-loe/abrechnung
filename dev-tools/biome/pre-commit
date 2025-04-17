@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+# Check for unstaged changes in staged files
+if git status --short | grep --quiet '^MM'; then
+  printf '%s\n' "ERROR: Some staged files have unstaged changes" >&2
+  exit 1
+fi
+
+# Get absolute path to the repo root
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Normalize path for Docker on Windows (Git Bash / MSYS2)
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    REPO_ROOT=$(cd "$REPO_ROOT" && pwd -W | sed 's|\\|/|g')
+    ;;
+esac
+
+BIOME_VERSION="1.9.4"
+IMAGE_NAME="biome-with-git:${BIOME_VERSION}"
+
+if docker image inspect "$IMAGE_NAME" > /dev/null 2>&1; then
+  echo "Image '$IMAGE_NAME' existiert bereits."
+else
+  echo "Image nicht gefunden. Baue es jetzt..."
+  docker build -t "$IMAGE_NAME" "$REPO_ROOT/dev-tools/biome"
+fi
+
+# Run Docker
+docker run --rm -v "$REPO_ROOT":/code $IMAGE_NAME check --write --staged --no-errors-on-unmatched /code
+
+# Refresh Git index
+git update-index --again

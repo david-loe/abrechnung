@@ -24,7 +24,7 @@
 <script lang="ts">
 import { User } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import { defineComponent, PropType } from 'vue'
+import { PropType, defineComponent } from 'vue'
 
 interface UserWithName {
   name: User['name']
@@ -54,7 +54,7 @@ export default defineComponent({
         if (familyName) {
           return familyName
         }
-        return (option.name.givenName + ' ' + option.name.familyName).toLowerCase().indexOf(search.toLowerCase()) > -1
+        return `${option.name.givenName} ${option.name.familyName}`.toLowerCase().indexOf(search.toLowerCase()) > -1
       })
     }
   },

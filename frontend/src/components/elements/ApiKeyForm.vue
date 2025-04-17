@@ -49,9 +49,9 @@ const props = defineProps<{
   includeUserIdInRequest?: boolean
 }>()
 
-let loading = ref(false)
+const loading = ref(false)
 const copied = ref(false)
-let token = ref('')
+const token = ref('')
 
 const emits = defineEmits<{ cancel: []; newKey: [] }>()
 
@@ -70,9 +70,11 @@ const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(token.value)
     copied.value = true
-    setTimeout(() => (copied.value = false), 2000) // Meldung nach 2 Sek. ausblenden
+    setTimeout(() => {
+      copied.value = false
+    }, 2000) // Meldung nach 2 Sek. ausblenden
   } catch (err) {
-    logger.error('Fehler beim Kopieren:\n' + err)
+    logger.error(`Fehler beim Kopieren:\n${err}`)
   }
 }
 
