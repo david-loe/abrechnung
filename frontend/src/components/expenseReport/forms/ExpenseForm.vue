@@ -44,18 +44,19 @@
         rows="1"></textarea>
     </div>
 
-    <div class="mb-1 d-flex">
+    <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expense') }) : $t('labels.save') }}
       </button>
       <button
         type="button"
         class="btn btn-danger me-2"
+        :disabled="loading"
         v-if="mode === 'edit' && !disabled"
         @click="disabled ? null : $emit('deleted', formExpense._id)">
         {{ $t('labels.delete') }}
       </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -103,12 +104,12 @@ export default defineComponent({
     endpointPrefix: { type: String, default: '' },
     ownerId: { type: String },
     showPrevButton: { type: Boolean, default: false },
-    showNextButton: { type: Boolean, default: false }
+    showNextButton: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   data() {
     return {
-      formExpense: this.default(),
-      loading: false
+      formExpense: this.default()
     }
   },
   methods: {
@@ -128,15 +129,12 @@ export default defineComponent({
       if (this.$refs.fileUpload) {
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
-      this.loading = false
       this.formExpense = this.default()
     },
     output() {
-      this.loading = true
       return this.formExpense
     },
     input() {
-      this.loading = false
       return Object.assign({}, this.default(), this.expense)
     }
   },

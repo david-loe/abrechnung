@@ -2,22 +2,22 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @close="resetForms()"
       :header="
         modalMode === 'add'
           ? t('labels.newX', { X: t('labels.' + modalObjectType) })
           : t('labels.editX', { X: t('labels.' + modalObjectType) })
-      ">
+      "
+      @beforeClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="travel._id">
         <ErrorBanner :error="error"></ErrorBanner>
         <StageForm
           v-if="modalObjectType === 'stage'"
-          ref="stageForm"
           :mode="modalMode"
           :stage="(modalObject as Partial<Stage> | Gap | undefined)"
           :travelStartDate="travel.startDate"
           :travelEndDate="travel.endDate"
           :disabled="isReadOnly"
+          :loading="modalFormIsLoading"
           :showVehicleRegistration="travel.state === 'approved'"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
@@ -26,16 +26,16 @@
           @add="postStage"
           @edit="postStage"
           @deleted="deleteStage"
-          @cancel="hideModal"
+          @cancel="resetAndHide"
           @postVehicleRegistration="postVehicleRegistration"
-          @next="() => {const next = getNext((modalObject as Stage), 'stage'); if(next){showModal('edit', next.data, next.type)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev((modalObject as Stage), 'stage'); if(prev){showModal('edit', prev.data, prev.type)}else{hideModal()}}">
+          @next="() => {const next = getNext((modalObject as Stage), 'stage'); if(next){showModal('edit', next.type, next.data)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev((modalObject as Stage), 'stage'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}">
         </StageForm>
         <ExpenseForm
           v-else-if="modalObjectType === 'expense'"
-          ref="expenseForm"
           :expense="(modalObject as Partial<TravelExpense> | undefined)"
           :disabled="isReadOnly"
+          :loading="modalFormIsLoading"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
@@ -44,18 +44,19 @@
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
-          @cancel="hideModal"
-          @next="() => {const next = getNext((modalObject as TravelExpense), 'expense'); if(next){showModal('edit', next.data, next.type)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev((modalObject as TravelExpense), 'expense'); if(prev){showModal('edit', prev.data, prev.type)}else{hideModal()}}">
+          @cancel="resetAndHide"
+          @next="() => {const next = getNext((modalObject as TravelExpense), 'expense'); if(next){showModal('edit', next.type, next.data)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev((modalObject as TravelExpense), 'expense'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}">
         </ExpenseForm>
         <TravelApplyForm
           v-else-if="modalObjectType === 'travel'"
           :mode="modalMode"
-          @cancel="hideModal"
           :travel="(modalObject as TravelSimple)"
-          @edit="editTravelDetails"
-          ref="travelApplyForm"
-          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"></TravelApplyForm>
+          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
+          :loading="modalFormIsLoading"
+          @cancel="resetAndHide"
+          @edit="editTravelDetails">
+        </TravelApplyForm>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="travel._id">
@@ -120,7 +121,7 @@
                   </li>
                 </template>
                 <li>
-                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', travel, 'travel')">
+                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', 'travel', travel)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.travelDetails') }) }}</span>
                   </a>
@@ -204,14 +205,14 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-2">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'stage')" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'stage', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.stage') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.stage') }}</span>
               </button>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined, 'expense')" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
@@ -344,7 +345,7 @@
               v-else-if="row.type === 'stage'"
               class="row align-items-center ps-lg-4 mb-1"
               style="cursor: pointer"
-              @click="showModal('edit', row.data as Stage, 'stage')">
+              @click="showModal('edit', 'stage', row.data as Stage)">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i :class="getStageIcon(row.data as Stage)"></i>
               </div>
@@ -367,7 +368,7 @@
               v-else-if="row.type === 'expense'"
               class="row align-items-center ps-lg-4 mb-1"
               style="cursor: pointer"
-              @click="showModal('edit', row.data as TravelExpense, 'expense')">
+              @click="showModal('edit', 'expense', row.data as TravelExpense)">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i class="bi bi-coin"></i>
               </div>
@@ -384,7 +385,7 @@
             <!-- gap -->
             <div v-else-if="row.type === 'gap'" class="row ps-5">
               <div class="col-auto">
-                <button class="btn btn-sm btn-light" @click="showModal('add', row.data as Gap, 'stage')" style="border-radius: 50%">
+                <button class="btn btn-sm btn-light" @click="showModal('add', 'stage', row.data as Gap)" style="border-radius: 50%">
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
@@ -536,7 +537,7 @@ import { logger } from '@/logger.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
-type ModalObject = TravelRecord | TravelSimple | Gap | undefined
+type ModalObject = Partial<TravelRecord> | Partial<TravelSimple> | Gap
 type ModalObjectType = TravelRecordType | 'travel'
 type Day = TravelDay & { showSettings?: boolean }
 type Table = (
@@ -556,20 +557,18 @@ const router = useRouter()
 const { t } = useI18n()
 
 const travel = ref<Travel>({} as Travel)
-const modalObject = ref<ModalObject>(undefined)
+const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('stage')
 const table = ref<Table>([])
 const error = ref<any>(undefined)
 const isReadOnlySwitchOn = ref(true)
+const modalFormIsLoading = ref(false)
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const modalCompRef = useTemplateRef('modalComp')
-const stageFormRef = useTemplateRef('stageForm')
-const expenseFormRef = useTemplateRef('expenseForm')
-const travelApplyFormRef = useTemplateRef('travelApplyForm')
 
 const isReadOnly = computed(() => {
   return (
@@ -580,9 +579,13 @@ const isReadOnly = computed(() => {
   )
 })
 
-function showModal(mode: ModalMode, object: ModalObject | Gap, type: ModalObjectType) {
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject | Gap) {
+  if (object) {
+    modalObject.value = object
+  } else if (modalObjectType.value !== type) {
+    modalObject.value = {}
+  }
   modalObjectType.value = type
-  modalObject.value = object
   modalMode.value = mode
   if (modalCompRef.value?.modal) {
     modalCompRef.value.modal.show()
@@ -593,13 +596,13 @@ function hideModal() {
   modalCompRef.value?.hideModal()
 }
 
-function resetForms() {
-  stageFormRef.value?.clear()
-  expenseFormRef.value?.clear()
-  travelApplyFormRef.value?.clear()
+function resetModal() {
   modalMode.value = 'add'
-  modalObject.value = undefined
-  error.value = undefined
+  modalObject.value = {}
+}
+function resetAndHide() {
+  resetModal()
+  hideModal()
 }
 
 async function postTravelSettings() {
@@ -619,18 +622,22 @@ async function postTravelSettings() {
 
 async function editTravelDetails(updatedTravel: Travel) {
   if (props.endpointPrefix === 'examine/') {
+    modalFormIsLoading.value = true
     const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, updatedTravel)
+    modalFormIsLoading.value = false
     if (result.ok) {
       setTravel(result.ok)
-      hideModal()
+      resetAndHide()
     } else {
       await getTravel()
     }
   } else {
     if (confirm(t('alerts.warningReapply'))) {
+      modalFormIsLoading.value = true
       const result = await API.setter<Travel>('travel/appliedFor', updatedTravel)
+      modalFormIsLoading.value = false
       if (result.ok) {
-        hideModal()
+        resetAndHide()
         router.push({ path: '/' })
       } else {
         await getTravel()
@@ -640,17 +647,21 @@ async function editTravelDetails(updatedTravel: Travel) {
 }
 
 async function deleteTravel() {
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}travel`, { _id: props._id })
+  modalFormIsLoading.value = false
   if (result) {
     router.push({ path: '/' })
   }
 }
 
 async function toExamination() {
+  modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel/underExamination`, {
     _id: travel.value._id,
     comment: travel.value.comment
   })
+  modalFormIsLoading.value = false
   if (result.ok) {
     router.push({ path: '/' })
   }
@@ -685,16 +696,17 @@ async function postStage(stage: Stage) {
   if ((stage.cost.amount as unknown) === '') {
     stage.cost.amount = 0
   }
+  modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel/stage`, stage, {
     headers,
     params: { parentId: travel.value._id }
   })
+  modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
-    hideModal()
+    resetAndHide()
   } else if (result.error) {
     error.value = result.error
-    if (stageFormRef.value) stageFormRef.value.loading = false
     const modalEl = document.getElementById('modal')
     if (modalEl) {
       modalEl.scrollTo({ top: 0, behavior: 'smooth' })
@@ -703,10 +715,13 @@ async function postStage(stage: Stage) {
 }
 
 async function deleteStage(_id: string) {
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}travel/stage`, { _id, parentId: props._id })
+  modalFormIsLoading.value = false
+
   if (result) {
     setTravel(result)
-    hideModal()
+    resetAndHide()
   }
 }
 
@@ -715,23 +730,25 @@ async function postExpense(expense: TravelExpense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
+  modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel/expense`, expense, {
     headers,
     params: { parentId: travel.value._id }
   })
+  modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
-    hideModal()
-  } else {
-    if (expenseFormRef.value) expenseFormRef.value.loading = false
+    resetAndHide()
   }
 }
 
 async function deleteExpense(_id: string) {
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}travel/expense`, { _id, parentId: props._id })
+  modalFormIsLoading.value = false
   if (result) {
     setTravel(result)
-    hideModal()
+    resetAndHide()
   }
 }
 

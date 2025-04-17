@@ -1,27 +1,30 @@
 <template>
   <div>
     <ModalComponent
-      :header="modalTravel && modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
+      :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @close="resetForms()">
+      @beforeClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
-          ref="travelApproveForm"
-          :travel="modalTravel"
-          @cancel="hideModal()"
-          @decision="(d, c) => approveTravel(modalTravel!, d, c)"></TravelApproveForm>
-        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="modalTravel" :showButtons="false"></TravelApply>
+          :travel="(modalTravel as TravelSimple)"
+          :loading="modalFormIsLoading"
+          @cancel="resetAndHide()"
+          @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
+        <TravelApply
+          v-else-if="modalTravel.state === 'approved'"
+          :travel="(modalTravel as TravelSimple)"
+          :showButtons="false"></TravelApply>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
-          @cancel="hideModal()"
-          :travel="modalTravel as Partial<TravelSimple>"
-          @add="(t) => approveTravel(t, 'approved')"
-          @edit="(t) => approveTravel(t, 'approved')"
-          ref="travelApplyForm"
+          @cancel="resetAndHide()"
+          :travel="modalTravel"
           minStartDate=""
-          askOwner></TravelApplyForm>
+          askOwner
+          :loading="modalFormIsLoading"
+          @add="(t) => approveTravel(t, 'approved')">
+        </TravelApplyForm>
       </div>
     </ModalComponent>
     <div class="container py-3">
@@ -30,7 +33,7 @@
           <h2>{{ $t('accesses.approve/travel') }}</h2>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal({} as TravelSimple, 'add')">
+          <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.createX', { X: $t('labels.travel') }) }}</span>
           </button>
@@ -86,14 +89,17 @@ export default defineComponent({
   props: { _id: { type: String } },
   data() {
     return {
-      modalTravel: undefined as TravelSimple | undefined,
-      modalMode: 'view' as 'view' | 'add' | 'edit',
-      show: null as 'approved' | null
+      modalTravel: {} as Partial<TravelSimple>,
+      modalMode: 'view' as 'view' | 'add',
+      show: null as 'approved' | null,
+      modalFormIsLoading: false
     }
   },
   methods: {
-    showModal(travel: TravelSimple, mode: 'view' | 'add' | 'edit' = 'view') {
-      this.modalTravel = travel
+    showModal(mode: 'view' | 'add', travel?: Partial<TravelSimple>) {
+      if (travel) {
+        this.modalTravel = travel
+      }
       this.modalMode = mode
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
@@ -103,32 +109,30 @@ export default defineComponent({
       ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       this.$router.push('/approve/travel')
     },
-    resetForms() {
+    resetModal() {
+      this.modalTravel = {}
+      this.modalMode = 'view'
+    },
+    resetAndHide() {
+      this.resetModal()
       this.hideModal()
-      if (this.$refs.travelApproveForm) {
-        ;(this.$refs.travelApproveForm as typeof TravelApproveForm).clear()
-      }
-      if (this.$refs.travelApplyForm) {
-        ;(this.$refs.travelApplyForm as typeof TravelApplyForm).clear()
-      }
-      this.modalTravel = undefined
     },
     async approveTravel(travel: TravelSimple, decision: 'approved' | 'rejected', comment?: string) {
       if (travel) {
         travel.comment = comment
+        this.modalFormIsLoading = true
         const result = await API.setter<TravelSimple>(`approve/travel/${decision}`, travel)
+        this.modalFormIsLoading = false
         if (result.ok) {
           ;(this.$refs.travelListRef as typeof TravelList).loadFromServer()
-          this.hideModal()
-        } else {
-          ;(this.$refs.travelApplyForm as typeof TravelApplyForm).loading = false
+          this.resetAndHide()
         }
       }
     },
     async showTravel(_id: string) {
       const result = await API.getter<TravelSimple>('approve/travel', { _id })
       if (result.ok) {
-        this.showModal(result.ok.data)
+        this.showModal('view', result.ok.data)
       }
     }
   },

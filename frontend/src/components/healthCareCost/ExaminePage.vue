@@ -2,16 +2,15 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @close="resetForms()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.healthCareCost') }) : $t('labels.editX', { X: $t('labels.healthCareCost') })
       ">
       <div v-if="modalHealthCareCost">
         <HealthCareCostForm
-          ref="healthCareCostForm"
           :mode="modalMode"
           :healthCareCost="modalHealthCareCost"
-          @cancel="hideModal()"
+          :loading="modalFormIsLoading"
+          @cancel="resetAndHide()"
           @add="addHealthCareCost"
           askOwner>
         </HealthCareCostForm>
@@ -23,7 +22,7 @@
           <h2>{{ $t('accesses.examine/healthCareCost') }}</h2>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {} as HealthCareCostSimple)">
+          <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.createX', { X: $t('labels.healthCareCost') }) }}</span>
           </button>
@@ -73,14 +72,17 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      modalHealthCareCost: undefined as HealthCareCostSimple | undefined,
+      modalHealthCareCost: {} as Partial<HealthCareCostSimple>,
       modalMode: 'add' as ModalMode,
-      show: null as 'inWork' | 'underExaminationByInsurance' | null
+      show: null as 'inWork' | 'underExaminationByInsurance' | null,
+      modalFormIsLoading: false
     }
   },
   methods: {
-    showModal(mode: ModalMode, healthCareCost: HealthCareCostSimple | undefined) {
-      this.modalHealthCareCost = healthCareCost
+    showModal(mode: ModalMode, healthCareCost?: Partial<HealthCareCostSimple>) {
+      if (healthCareCost) {
+        this.modalHealthCareCost = healthCareCost
+      }
       this.modalMode = mode
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
@@ -91,18 +93,20 @@ export default defineComponent({
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
-    resetForms() {
-      if (this.$refs.healthCareCostForm) {
-        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).clear()
-      }
-      this.modalHealthCareCost = undefined
+    resetModal() {
+      this.modalMode = 'add'
+      this.modalHealthCareCost = {}
+    },
+    resetAndHide() {
+      this.resetModal()
+      this.hideModal()
     },
     async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
+      this.modalFormIsLoading = true
       const result = await API.setter<HealthCareCostSimple>('examine/healthCareCost/inWork', healthCareCost)
+      this.modalFormIsLoading = false
       if (result.ok) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      } else {
-        ;(this.$refs.healthCareCostForm as typeof HealthCareCostForm).loading = false
+        this.resetAndHide()
       }
     }
   },

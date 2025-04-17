@@ -111,9 +111,8 @@
       <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="!askOwner" required> </ProjectSelector>
     </div>
 
-    <div class="mb-2">
+    <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{
           mode === 'add' && !askOwner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
@@ -122,6 +121,7 @@
             : $t('labels.save')
         }}
       </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -146,27 +146,16 @@ export default defineComponent({
   components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    travel: {
-      type: Object as PropType<Partial<TravelSimple>>
-    },
-    mode: {
-      type: String as PropType<'add' | 'edit'>,
-      required: true
-    },
-    askOwner: {
-      type: Boolean,
-      default: false
-    },
-    minStartDate: {
-      type: [Date, String] as PropType<Date | string>,
-      default: new Date()
-    }
+    travel: { type: Object as PropType<Partial<TravelSimple>> },
+    mode: { type: String as PropType<'add' | 'edit'>, required: true },
+    minStartDate: { type: [Date, String] as PropType<Date | string>, default: new Date() },
+    askOwner: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   data() {
     return {
       APP_DATA: APP_LOADER.data,
-      formTravel: this.default(),
-      loading: false
+      formTravel: this.default()
     }
   },
   methods: {
@@ -191,11 +180,9 @@ export default defineComponent({
       }
     },
     clear() {
-      this.loading = false
       this.formTravel = this.default()
     },
     output() {
-      this.loading = true
       if (this.formTravel.advance.amount === null) {
         this.formTravel.advance = undefined
       } else if (this.formTravel.advance.amount === '') {
@@ -207,7 +194,6 @@ export default defineComponent({
       return this.formTravel
     },
     input() {
-      this.loading = false
       return Object.assign({}, this.default(), this.travel)
     },
     getMaxDate() {
