@@ -223,7 +223,7 @@
               <button
                 class="btn btn-link btn-sm"
                 @click="
-                  table.map((d) => {
+                  table.forEach((d) => {
                     if (d.type === 'day') {
                       d.data.showSettings = true
                     }
@@ -238,7 +238,7 @@
               <button
                 class="btn btn-link btn-sm"
                 @click="
-                  table.map((d) => {
+                  table.forEach((d) => {
                     if (d.type === 'day') {
                       d.data.showSettings = false
                     }
