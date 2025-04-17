@@ -2,20 +2,17 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @close="resetForms()"
       :header="
         modalMode === 'add' ? $t('labels.newX', { X: $t('labels.expenseReport') }) : $t('labels.editX', { X: $t('labels.expenseReport') })
       ">
-      <div v-if="modalExpenseReport">
-        <ExpenseReportForm
-          ref="expenseReportForm"
-          :mode="modalMode"
-          :expenseReport="modalExpenseReport"
-          @cancel="hideModal()"
-          @add="addExpenseReport"
-          askOwner>
-        </ExpenseReportForm>
-      </div>
+      <ExpenseReportForm
+        :mode="modalMode"
+        :expenseReport="modalExpenseReport"
+        :loading="modalFormIsLoading"
+        @cancel="resetAndHide()"
+        @add="addExpenseReport"
+        askOwner>
+      </ExpenseReportForm>
     </ModalComponent>
     <div class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
@@ -23,7 +20,7 @@
           <h2>{{ $t('accesses.examine/expenseReport') }}</h2>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', {} as ExpenseReportSimple)">
+          <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ $t('labels.createX', { X: $t('labels.expenseReport') }) }}</span>
           </button>
@@ -73,13 +70,16 @@ export default defineComponent({
   data() {
     return {
       show: null as 'inWork' | 'refunded' | null,
-      modalExpenseReport: undefined as ExpenseReportSimple | undefined,
-      modalMode: 'add' as ModalMode
+      modalExpenseReport: {} as Partial<ExpenseReportSimple>,
+      modalMode: 'add' as ModalMode,
+      modalFormIsLoading: false
     }
   },
   methods: {
-    showModal(mode: ModalMode, expenseReport: ExpenseReportSimple | undefined) {
-      this.modalExpenseReport = expenseReport
+    showModal(mode: ModalMode, expenseReport?: Partial<ExpenseReportSimple>) {
+      if (expenseReport) {
+        this.modalExpenseReport = expenseReport
+      }
       this.modalMode = mode
       if ((this.$refs.modalComp as typeof ModalComponent).modal) {
         ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
@@ -90,18 +90,20 @@ export default defineComponent({
         ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
       }
     },
-    resetForms() {
-      if (this.$refs.expenseReportForm) {
-        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).clear()
-      }
-      this.modalExpenseReport = undefined
+    resetModal() {
+      this.modalMode = 'add'
+      this.modalExpenseReport = {}
+    },
+    resetAndHide() {
+      this.resetModal()
+      this.hideModal()
     },
     async addExpenseReport(expenseReport: ExpenseReportSimple) {
+      this.modalFormIsLoading = true
       const result = await API.setter<ExpenseReportSimple>('examine/expenseReport/inWork', expenseReport)
+      this.modalFormIsLoading = false
       if (result.ok) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      } else {
-        ;(this.$refs.expenseReportForm as typeof ExpenseReportForm).loading = false
+        this.resetAndHide()
       }
     }
   },

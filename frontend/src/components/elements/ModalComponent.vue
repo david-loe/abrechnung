@@ -8,9 +8,10 @@
             type="button"
             class="btn-close"
             @click="
-              //prettier-ignore
-              hideModal();
-              $emit('close')
+              () => {
+                $emit('beforeClose')
+                hideModal()
+              }
             "></button>
         </div>
         <div class="modal-body">
@@ -26,7 +27,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ModalComponent',
-  emits: ['close'],
+  emits: ['beforeClose'],
   data() {
     return {
       modal: undefined as Modal | undefined
@@ -44,6 +45,7 @@ export default defineComponent({
     const modalEl = this.$refs.modal as HTMLElement
     if (modalEl) {
       this.modal = new Modal(modalEl, {})
+      modalEl.addEventListener('hide.bs.modal', () => this.$emit('beforeClose'))
     }
   },
   beforeUnmount() {

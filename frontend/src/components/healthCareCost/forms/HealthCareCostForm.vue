@@ -31,11 +31,12 @@
       <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" :update-user-org="!askOwner" required>
       </ProjectSelector>
     </div>
-    <div class="mb-2">
+
+    <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.healthCareCost') }) : $t('labels.save') }}
       </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -56,22 +57,14 @@ export default defineComponent({
   components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    healthCareCost: {
-      type: Object as PropType<Partial<HealthCareCostSimple>>
-    },
-    mode: {
-      type: String as PropType<'add' | 'edit'>,
-      required: true
-    },
-    askOwner: {
-      type: Boolean,
-      default: false
-    }
+    healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>> },
+    mode: { type: String as PropType<'add' | 'edit'>, required: true },
+    askOwner: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   data() {
     return {
-      formHealthCareCost: this.default(),
-      loading: false
+      formHealthCareCost: this.default()
     }
   },
   methods: {
@@ -83,15 +76,12 @@ export default defineComponent({
       }
     },
     clear() {
-      this.loading = false
       this.formHealthCareCost = this.default()
     },
     output() {
-      this.loading = true
       return this.formHealthCareCost
     },
     input() {
-      this.loading = false
       return Object.assign({}, this.default(), this.healthCareCost)
     }
   },

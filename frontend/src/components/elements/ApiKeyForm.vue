@@ -18,11 +18,11 @@
   </template>
 
   <form class="container" @submit.prevent="postApiKey(props.endpoint)">
-    <div class="mb-2">
+    <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ $t('labels.addX', { X: 'API Key' }) }}
       </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button
         type="button"
         class="btn btn-light"
@@ -41,13 +41,13 @@
 import { User } from '@/../../common/types.js'
 import API from '@/api.js'
 import { logger } from '@/logger.js'
-import { ref } from 'vue'
+import { PropType, ref } from 'vue'
 
-const props = defineProps<{
-  user: User
-  endpoint: string
-  includeUserIdInRequest?: boolean
-}>()
+const props = defineProps({
+  user: { type: Object as PropType<User>, required: true },
+  endpoint: { type: String, required: true },
+  includeUserIdInRequest: { type: Boolean, default: false }
+})
 
 const loading = ref(false)
 const copied = ref(false)
@@ -57,7 +57,7 @@ const emits = defineEmits<{ cancel: []; newKey: [] }>()
 
 const postApiKey = async (endpoint: string) => {
   loading.value = true
-  const result = await API.setter<string>(props.endpoint, props.includeUserIdInRequest ? { userId: props.user._id } : undefined)
+  const result = await API.setter<string>(endpoint, props.includeUserIdInRequest ? { userId: props.user._id } : undefined)
   if (result.ok) {
     token.value = result.ok
     emits('newKey')

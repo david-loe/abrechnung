@@ -3,7 +3,7 @@
     <template v-if="userToEdit">
       <ModalComponent
         :header="`API Key (${userToEdit.name.givenName} ${userToEdit.name.familyName})`"
-        @close=";($refs.apiKeyForm as any).resetForm()"
+        @beforeClose=";($refs.apiKeyForm as any).resetForm()"
         ref="modal">
         <ApiKeyForm
           :user="userToEdit"
@@ -11,11 +11,13 @@
           endpoint="admin/user/httpBearer"
           @cancel=";($refs.modal as any).hideModal()"
           @new-key="
-            //prettier-ignore
-            loadFromServer();
-            _showForm = false
+            () => {
+              loadFromServer()
+              _showForm = false
+            }
           "
-          include-user-id-in-request></ApiKeyForm>
+          include-user-id-in-request>
+        </ApiKeyForm>
       </ModalComponent>
     </template>
     <ListElement class="mb-3" ref="list" endpoint="admin/user" :filter="filter" :headers="headers">

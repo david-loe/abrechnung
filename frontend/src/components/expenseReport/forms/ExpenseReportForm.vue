@@ -32,11 +32,12 @@
       <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="!askOwner" required>
       </ProjectSelector>
     </div>
-    <div class="mb-2">
+
+    <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expenseReport') }) : $t('labels.save') }}
       </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -67,12 +68,12 @@ export default defineComponent({
     askOwner: {
       type: Boolean,
       default: false
-    }
+    },
+    loading: { type: Boolean, default: false }
   },
   data() {
     return {
-      formExpenseReport: this.default(),
-      loading: false
+      formExpenseReport: this.default()
     }
   },
   methods: {
@@ -87,15 +88,12 @@ export default defineComponent({
       }
     },
     clear() {
-      this.loading = false
       this.formExpenseReport = this.default()
     },
     output() {
-      this.loading = true
       return this.formExpenseReport
     },
     input() {
-      this.loading = false
       return Object.assign({}, this.default(), this.expenseReport)
     }
   },

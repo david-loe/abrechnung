@@ -1,12 +1,9 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @close=";($refs.apiKeyForm as any).resetForm()">
-      <ApiKeyForm
-        :user="APP_DATA.user"
-        endpoint="user/httpBearer"
-        @cancel=";($refs.modalComp as any).hideModal()"
-        ref="apiKeyForm"></ApiKeyForm>
+    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @beforeClose=";($refs.apiKeyForm as any).resetForm()">
+      <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm">
+      </ApiKeyForm>
     </ModalComponent>
     <nav class="navbar navbar-expand-lg border-bottom py-1">
       <div class="container d-flex" id="navBarContent">

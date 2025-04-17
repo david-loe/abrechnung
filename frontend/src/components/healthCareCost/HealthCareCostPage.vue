@@ -2,13 +2,13 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      @close="resetForms()"
-      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })">
+      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
+      @beforeClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="healthCareCost._id">
         <ExpenseForm
-          ref="expenseForm"
-          :expense="modalExpense as Partial<Expense> | undefined"
+          :expense="modalExpense"
           :disabled="isReadOnly"
+          :loading="expenseFormIsLoading"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
@@ -17,7 +17,7 @@
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
-          @cancel="hideModal"
+          @cancel="resetAndHide"
           @next="() => {const next = getNext(modalExpense as Expense); if(next){showModal('edit', next)}else{hideModal()}}"
           @prev="() => {const prev = getPrev(modalExpense as Expense); if(prev){showModal('edit', prev)}else{hideModal()}}">
         </ExpenseForm>
@@ -310,9 +310,10 @@ const { t } = useI18n()
 
 // --- Reaktive Daten ---
 const healthCareCost = ref<HealthCareCost>({} as HealthCareCost)
-const modalExpense = ref<Expense | undefined>(undefined)
+const modalExpense = ref<Partial<Expense>>({})
 const modalMode = ref<ModalMode>('add')
 const isReadOnlySwitchOn = ref(true)
+const expenseFormIsLoading = ref(true)
 
 const isReadOnly = computed(() => {
   return (
@@ -323,11 +324,12 @@ const isReadOnly = computed(() => {
 
 // --- Template-Refs für Komponenten ---
 const modalCompRef = useTemplateRef('modalComp')
-const expenseFormRef = useTemplateRef('expenseForm')
 
 // --- Methoden ---
-function showModal(mode: ModalMode, expense: Expense | undefined) {
-  modalExpense.value = expense
+function showModal(mode: ModalMode, expense?: Partial<Expense>) {
+  if (expense) {
+    modalExpense.value = expense
+  }
   modalMode.value = mode
   if (modalCompRef.value?.modal) {
     modalCompRef.value.modal.show()
@@ -339,10 +341,13 @@ function hideModal() {
     modalCompRef.value.hideModal()
   }
 }
-
-function resetForms() {
-  expenseFormRef.value?.clear()
-  modalExpense.value = undefined
+function resetModal() {
+  modalMode.value = 'add'
+  modalExpense.value = {}
+}
+function resetAndHide() {
+  resetModal()
+  hideModal()
 }
 
 async function deleteHealthCareCost() {
@@ -410,23 +415,27 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
+  expenseFormIsLoading.value = true
   const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/expense`, expense, {
     headers,
     params: { parentId: healthCareCost.value._id }
   })
+  expenseFormIsLoading.value = false
+
   if (result.ok) {
     setHealthCareCost(result.ok)
-    modalCompRef.value?.hideModal()
-  } else {
-    if (expenseFormRef.value) expenseFormRef.value.loading = false
+    resetAndHide()
   }
 }
 
 async function deleteExpense(_id: string) {
+  expenseFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
+  expenseFormIsLoading.value = false
+
   if (result) {
     setHealthCareCost(result)
-    modalCompRef.value?.hideModal()
+    resetAndHide()
   }
 }
 
