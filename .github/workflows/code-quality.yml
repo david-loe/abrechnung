@@ -19,4 +19,4 @@ jobs:
           working-dir: backend
           version: 1.9.4
       - name: Run Biome
-        run: biome ci --changed .
+        run: biome ci --changed --no-errors-on-unmatched .

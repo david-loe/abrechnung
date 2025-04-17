@@ -28,7 +28,7 @@ else
 fi
 
 # Run Docker
-docker run --rm -v "$REPO_ROOT":/code $IMAGE_NAME check --write --staged /code
+docker run --rm -v "$REPO_ROOT":/code $IMAGE_NAME check --write --staged --no-errors-on-unmatched /code
 
 # Refresh Git index
 git update-index --again
