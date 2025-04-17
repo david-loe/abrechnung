@@ -266,7 +266,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
   })
 }
 
-// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
+// biome-ignore lint/complexity/noStaticOnlyClass: This class is intentionally static-only to provide utility methods without requiring instantiation
 export class Base64 {
   static #keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 
@@ -560,4 +560,16 @@ export function hexToRGB(hex: HexColor): [number, number, number] {
   const blue = Number.parseInt(hexChars.slice(4, 6), 16)
 
   return [red, green, blue]
+}
+
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) {
+    const mb = bytes / (1024 * 1024)
+    return `${mb.toFixed(2)} MB`
+  }
+  if (bytes >= 1024) {
+    const kb = bytes / 1024
+    return `${kb.toFixed(2)} KB`
+  }
+  return `${bytes} B`
 }

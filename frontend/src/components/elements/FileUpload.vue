@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { resizeImage } from '@/../../common/scripts.js'
+import { formatBytes, resizeImage } from '@/../../common/scripts.js'
 import { DocumentFile, Token } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
@@ -140,7 +140,8 @@ export default defineComponent({
       const target = event.target as HTMLInputElement
       if (target.files) {
         for (const file of target.files) {
-          if (file.size < Number.parseInt(import.meta.env.VITE_MAX_FILE_SIZE)) {
+          const maxSize = Number.parseInt(import.meta.env.VITE_MAX_FILE_SIZE)
+          if (file.size < maxSize) {
             if (file.type.indexOf('image') > -1) {
               const resizedImage = await resizeImage(file, 1400)
               files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })
@@ -148,7 +149,7 @@ export default defineComponent({
               files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
             }
           } else {
-            alert(`alerts.imageToBig ${file.name}`)
+            alert(this.$t('alerts.fileXToLargeMaxIsY', { X: file.name, Y: formatBytes(maxSize) }))
           }
         }
         target.value = ''

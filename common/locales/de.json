@@ -25,6 +25,7 @@
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
+    "fileXToLargeMaxIsY": "Die Datei '{X}' ist zu groß. Maximalgröße ist {Y}.",
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "loginFailed": "Anmeldung fehlgeschlagen!",

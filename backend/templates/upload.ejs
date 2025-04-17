@@ -55,14 +55,14 @@
         const files = []
         if (event.target && event.target.files) {
           for (const file of event.target.files) {
-            if (file.size < <%= maxFileSize %>) {
+            if (file.size < <%- maxFileSize %>) {
               if (file.type.indexOf('image') > -1) {
                 files.push({ data: await resizeImage(file, 1400), type: file.type, name: file.name })
               } else {
                 files.push({ data: file, type: file.type, name: file.name })
               }
             } else {
-              alert('alerts.imageToBig ' + file.name)
+              alert("<%- text.alert %>".replace("''", `'${file.name}'`))
             }
           }
           event.target.value = ''
@@ -106,7 +106,7 @@
 
       fileInput.addEventListener('change', async function (event) {
         const files = await fileEventToDocumentFiles(event)
-        if (files) {
+        if (files && files.length > 0) {
           document.getElementById('progress').remove()
           document.getElementById('button').remove()
           document.getElementById('text').innerHTML = '<%= text.uploading %>'
