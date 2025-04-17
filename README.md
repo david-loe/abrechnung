@@ -58,7 +58,7 @@ Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</
 
 ### Setup pre-commit lint
 
-> im Projekt root Ornder (abrechnung)
+> im Projekt-Root-Ordner (abrechnung)
 
 ```sh
 ln -sf ../../dev-tools/biome/pre-commit .git/hooks/pre-commit
