@@ -54,7 +54,6 @@ import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
-await APP_LOADER.loadData()
 
 const headers: Header[] = [
   { text: t('labels.name'), value: 'name' },
@@ -63,6 +62,19 @@ const headers: Header[] = [
   { text: '', value: 'buttons', width: 80 }
 ]
 
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
+    if (rootOrganisations && APP_DATA.value) {
+      APP_DATA.value.organisations = rootOrganisations
+    }
+  }
+}
+defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
@@ -81,18 +93,6 @@ function clickFilter(header: keyof typeof showFilter.value) {
     showFilter.value[header] = true
   }
 }
-
-const list = useTemplateRef('list')
-async function loadFromServer() {
-  if (list.value) {
-    list.value.loadFromServer()
-    const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
-    if (rootOrganisations && APP_DATA.value) {
-      APP_DATA.value.organisations = rootOrganisations
-    }
-  }
-}
-defineExpose({ loadFromServer })
 
 const organisationToEdit: Ref<Organisation | undefined> = ref(undefined)
 const _showForm = ref(false)

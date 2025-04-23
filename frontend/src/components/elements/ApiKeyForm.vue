@@ -55,6 +55,11 @@ const token = ref('')
 
 const emits = defineEmits<{ cancel: []; newKey: [] }>()
 
+const resetForm = () => {
+  token.value = ''
+}
+defineExpose({ resetForm })
+
 const postApiKey = async (endpoint: string) => {
   loading.value = true
   const result = await API.setter<string>(endpoint, props.includeUserIdInRequest ? { userId: props.user._id } : undefined)
@@ -77,12 +82,6 @@ const copyToClipboard = async () => {
     logger.error(`Fehler beim Kopieren:\n${err}`)
   }
 }
-
-const resetForm = () => {
-  token.value = ''
-}
-
-defineExpose({ resetForm })
 </script>
 
 <style></style>

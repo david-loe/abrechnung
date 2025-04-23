@@ -198,6 +198,14 @@ const props = defineProps<{
 
 const emits = defineEmits<{ loaded: [] }>()
 
+const list = useTemplateRef('list')
+function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+  }
+}
+defineExpose({ loadFromServer })
+
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
@@ -273,14 +281,6 @@ function clickFilter(header: keyof typeof showFilter.value) {
     showFilter.value[header] = true
   }
 }
-
-const list = useTemplateRef('list')
-function loadFromServer() {
-  if (list.value) {
-    list.value.loadFromServer()
-  }
-}
-defineExpose({ loadFromServer })
 </script>
 
 <style></style>

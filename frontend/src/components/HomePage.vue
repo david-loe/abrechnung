@@ -20,8 +20,8 @@
             @cancel="resetAndHide()"
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
-            @add="applyForTravel"
-            @edit="applyForTravel"
+            @add="handleSubmit"
+            @edit="handleSubmit"
             ref="travelApplyForm"></TravelApplyForm>
         </template>
         <ExpenseReportForm
@@ -30,7 +30,7 @@
           :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
-          @add="addExpenseReport">
+          @add="handleSubmit">
         </ExpenseReportForm>
         <HealthCareCostForm
           v-else
@@ -38,7 +38,7 @@
           :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
-          @add="addHealthCareCost">
+          @add="handleSubmit">
         </HealthCareCostForm>
       </div>
     </ModalComponent>
@@ -96,8 +96,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
+<script setup lang="ts">
+import type { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
@@ -108,105 +108,90 @@ import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCost
 import TravelList from '@/components/travel/TravelList.vue'
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
-import { defineComponent } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost'
 type ModalObject = Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partial<HealthCareCostSimple>
 
-export default defineComponent({
-  name: 'HomePage',
-  components: {
-    TravelList,
-    TravelApplyForm,
-    TravelApplication,
-    ExpenseReportList,
-    ExpenseReportForm,
-    HealthCareCostList,
-    HealthCareCostForm,
-    ModalComponent
-  },
-  props: [],
-  data() {
-    return {
-      modalMode: 'add' as ModalMode,
-      modalObject: {} as ModalObject,
-      modalObjectType: 'travel' as ModalObjectType,
-      APP_DATA: APP_LOADER.data,
-      modalFormIsLoading: false
-    }
-  },
-  methods: {
-    showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
-      if (object) {
-        this.modalObject = object
-      } else if (this.modalObjectType !== type) {
-        this.modalObject = {}
-      }
-      this.modalObjectType = type
-      this.modalMode = mode
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).modal.show()
-      }
-    },
-    hideModal() {
-      if ((this.$refs.modalComp as typeof ModalComponent).modal) {
-        ;(this.$refs.modalComp as typeof ModalComponent).hideModal()
-      }
-    },
-    resetModal() {
-      this.modalObject = {}
-      this.modalMode = 'add'
-    },
-    resetAndHide() {
-      this.resetModal()
-      this.hideModal()
-    },
-    async applyForTravel(travel: TravelSimple) {
-      this.modalFormIsLoading = true
-      const result = (
-        await API.setter<TravelSimple>(this.APP_DATA?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor', travel)
-      ).ok
-      this.modalFormIsLoading = false
-      if (result) {
-        ;(this.$refs.travelList as typeof TravelList).loadFromServer()
-        this.resetAndHide()
-      }
-    },
-    async addExpenseReport(expenseReport: ExpenseReportSimple) {
-      this.modalFormIsLoading = true
-      const result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', expenseReport)).ok
-      this.modalFormIsLoading = false
-      if (result) {
-        ;(this.$refs.expenseReportList as typeof ExpenseReportList).loadFromServer()
-        this.resetAndHide()
-        this.$router.push(`/expenseReport/${result._id}`)
-      }
-    },
-    async addHealthCareCost(healthCareCost: HealthCareCostSimple) {
-      this.modalFormIsLoading = true
-      const result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', healthCareCost)).ok
-      this.modalFormIsLoading = false
-      if (result) {
-        ;(this.$refs.healthCareCostList as typeof HealthCareCostList).loadFromServer()
-        this.resetAndHide()
-        this.$router.push(`/healthCareCost/${result._id}`)
-      }
-    },
-    async deleteTravel(_id: string) {
-      this.modalFormIsLoading = true
-      const result = await API.deleter('travel', { _id })
-      this.modalFormIsLoading = false
-      if (result) {
-        ;(this.$refs.travelList as typeof TravelList).loadFromServer()
-        this.resetAndHide()
-      }
-    }
-  },
-  async created() {
-    await APP_LOADER.loadData()
+const modalMode = ref<ModalMode>('add')
+const modalObjectType = ref<ModalObjectType>('travel')
+const modalObject = ref<ModalObject>({})
+const modalFormIsLoading = ref(false)
+
+const travelList = useTemplateRef('travelList')
+const expenseReportList = useTemplateRef('expenseReportList')
+const healthCareCostList = useTemplateRef('healthCareCostList')
+const modalComp = useTemplateRef('modalComp')
+
+const router = useRouter()
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
+
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
+  if (object) {
+    modalObject.value = object
+  } else if (modalObjectType.value !== type) {
+    modalObject.value = {}
   }
-})
+  modalObjectType.value = type
+  modalMode.value = mode
+  modalComp.value?.modal?.show()
+}
+
+function hideModal() {
+  modalComp.value?.hideModal()
+}
+
+function resetModal() {
+  modalObject.value = {}
+  modalMode.value = 'add'
+}
+
+function resetAndHide() {
+  resetModal()
+  hideModal()
+}
+
+async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple) {
+  modalFormIsLoading.value = true
+  let result: any
+
+  if (modalObjectType.value === 'travel') {
+    const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'
+    result = (await API.setter<TravelSimple>(path, payload as TravelSimple)).ok
+  } else if (modalObjectType.value === 'expenseReport') {
+    result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', payload as ExpenseReportSimple)).ok
+  } else {
+    result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', payload as HealthCareCostSimple)).ok
+  }
+
+  modalFormIsLoading.value = false
+  if (result) {
+    if (modalObjectType.value === 'travel') {
+      travelList.value?.loadFromServer()
+    } else if (modalObjectType.value === 'expenseReport') {
+      expenseReportList.value?.loadFromServer()
+      router.push(`/expenseReport/${result._id}`)
+    } else {
+      healthCareCostList.value?.loadFromServer()
+      router.push(`/healthCareCost/${result._id}`)
+    }
+    resetAndHide()
+  }
+}
+
+async function deleteTravel(_id: string) {
+  modalFormIsLoading.value = true
+  const result = await API.deleter('travel', { _id })
+  modalFormIsLoading.value = false
+  if (result) {
+    travelList.value?.loadFromServer()
+    resetAndHide()
+  }
+}
 </script>
 
 <style></style>

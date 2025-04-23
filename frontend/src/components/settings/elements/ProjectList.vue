@@ -70,7 +70,6 @@ import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
-await APP_LOADER.loadData()
 
 const headers: Header[] = [
   { text: t('labels.identifier'), value: 'identifier' },
@@ -79,6 +78,19 @@ const headers: Header[] = [
   { text: '', value: 'buttons', width: 80 }
 ]
 
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootProjects = (await API.getter<Project[]>('project')).ok?.data
+    if (rootProjects && APP_DATA.value) {
+      APP_DATA.value.projects = rootProjects
+    }
+  }
+}
+defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' }, identifier: { $regex: undefined, $options: 'i' } })
@@ -98,18 +110,6 @@ function clickFilter(header: keyof typeof showFilter.value) {
     showFilter.value[header] = true
   }
 }
-
-const list = useTemplateRef('list')
-async function loadFromServer() {
-  if (list.value) {
-    list.value.loadFromServer()
-    const rootProjects = (await API.getter<Project[]>('project')).ok?.data
-    if (rootProjects && APP_DATA.value) {
-      APP_DATA.value.projects = rootProjects
-    }
-  }
-}
-defineExpose({ loadFromServer })
 
 const projectToEdit: Ref<Project | undefined> = ref(undefined)
 const _showForm = ref(false)

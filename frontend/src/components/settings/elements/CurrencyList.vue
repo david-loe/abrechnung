@@ -70,7 +70,6 @@ import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
-await APP_LOADER.loadData()
 
 const headers: Header[] = [
   { text: t('labels.name'), value: 'name' },
@@ -79,6 +78,19 @@ const headers: Header[] = [
   { text: '', value: 'buttons', width: 80 }
 ]
 
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootCurrencies = (await API.getter<Currency[]>('currency')).ok?.data
+    if (rootCurrencies && APP_DATA.value) {
+      APP_DATA.value.currencies = rootCurrencies
+    }
+  }
+}
+defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const nameFilterKey = `name.${APP_DATA.value?.user.settings.language}`
@@ -106,18 +118,6 @@ function clickFilter(header: keyof typeof showFilter.value) {
     showFilter.value[header] = true
   }
 }
-
-const list = useTemplateRef('list')
-async function loadFromServer() {
-  if (list.value) {
-    list.value.loadFromServer()
-    const rootCurrencies = (await API.getter<Currency[]>('currency')).ok?.data
-    if (rootCurrencies && APP_DATA.value) {
-      APP_DATA.value.currencies = rootCurrencies
-    }
-  }
-}
-defineExpose({ loadFromServer })
 
 const currencyToEdit: Ref<Currency | undefined> = ref(undefined)
 const _showForm = ref(false)

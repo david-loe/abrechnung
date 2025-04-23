@@ -1,5 +1,5 @@
 <template>
-  <form v-if="APP_DATA" class="container" @submit.prevent="mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form v-if="APP_DATA" class="container" @submit.prevent="$emit(mode, output())">
     <div v-if="askOwner" class="mb-2">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formTravel.owner" required></UserSelector>
@@ -210,7 +210,6 @@ export default defineComponent({
   },
   watch: {
     travel: function () {
-      this.clear()
       this.formTravel = this.input()
     }
   }

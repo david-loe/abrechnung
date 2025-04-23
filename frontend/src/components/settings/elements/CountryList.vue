@@ -76,7 +76,6 @@ import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
-await APP_LOADER.loadData()
 
 const headers: Header[] = [
   { text: t('labels.name'), value: 'name' },
@@ -86,6 +85,19 @@ const headers: Header[] = [
   { text: '', value: 'buttons', width: 80 }
 ]
 
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+    const rootCountries = (await API.getter<Country[]>('country')).ok?.data
+    if (rootCountries && APP_DATA.value) {
+      APP_DATA.value.countries = rootCountries
+    }
+  }
+}
+defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const nameFilterKey = `name.${APP_DATA.value?.user.settings.language}`
@@ -113,18 +125,6 @@ function clickFilter(header: string) {
     showFilter.value[header] = true
   }
 }
-
-const list = useTemplateRef('list')
-async function loadFromServer() {
-  if (list.value) {
-    list.value.loadFromServer()
-    const rootCountries = (await API.getter<Country[]>('country')).ok?.data
-    if (rootCountries && APP_DATA.value) {
-      APP_DATA.value.countries = rootCountries
-    }
-  }
-}
-defineExpose({ loadFromServer })
 
 const countryToEdit: Ref<Country | undefined> = ref(undefined)
 const _showForm = ref(false)
