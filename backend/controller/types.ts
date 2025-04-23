@@ -36,7 +36,6 @@ export interface TravelApplication
 }
 
 export interface TravelPost extends Omit<TravelSimple, 'state' | 'comments' | 'comment' | 'progress' | 'log' | 'addUp'> {
-  claimOvernightLumpSum: Travel['claimOvernightLumpSum']
   lastPlaceOfWork: Travel['lastPlaceOfWork']
   days: TravelDayPost[]
 }

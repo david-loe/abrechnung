@@ -397,6 +397,7 @@ export interface TravelDay {
   cateringNoRefund: {
     [key in Meal]: boolean
   }
+  noOvernightRefund: boolean
   purpose: PurposeSimple
   refunds: Refund[]
   _id: _id
@@ -422,7 +423,6 @@ export interface RequestSimple {
 }
 
 export interface Travel extends TravelSimple {
-  claimOvernightLumpSum: boolean
   lastPlaceOfWork: Place
   professionalShare: number | null
   history: _id[]

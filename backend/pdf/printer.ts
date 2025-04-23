@@ -690,6 +690,13 @@ class ReportPrint {
       fn: (p: PurposeSimple) => this.t(`labels.${p}`)
     })
     columns.push({
+      key: 'noOvernightRefund',
+      width: 50,
+      alignment: pdf_lib.TextAlignment.Left,
+      title: this.t('labels.noOvernightRefund'),
+      fn: (nor: boolean) => (nor ? 'X' : '')
+    })
+    columns.push({
       key: 'cateringNoRefund',
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,

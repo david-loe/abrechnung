@@ -74,16 +74,21 @@ export class TravelCalculator {
   getDays(travel: Travel) {
     if (travel.stages.length > 0) {
       const days = getDayList(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival)
-      const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[] = days.map(
-        (d) => {
-          return { date: d, refunds: [] }
-        }
-      )
+      const newDays: {
+        date: Date
+        cateringNoRefund?: { [key in Meal]: boolean }
+        purpose?: PurposeSimple
+        refunds: Refund[]
+        noOvernightRefund?: boolean
+      }[] = days.map((d) => {
+        return { date: d, refunds: [] }
+      })
       for (const oldDay of travel.days) {
         for (const newDay of newDays) {
           if (new Date(oldDay.date).valueOf() - new Date(newDay.date).valueOf() === 0) {
             newDay.cateringNoRefund = oldDay.cateringNoRefund
             newDay.purpose = oldDay.purpose
+            newDay.noOvernightRefund = oldDay.noOvernightRefund
             break
           }
         }
@@ -272,40 +277,38 @@ export class TravelCalculator {
   }
 
   async addOvernightRefunds(travel: Travel) {
-    if (travel.claimOvernightLumpSum) {
-      let stageIndex = 0
-      for (let i = 0; i < travel.days.length; i++) {
-        const day = travel.days[i] as TravelDayFullCountry
-        if (day.purpose === 'professional') {
-          if (i === travel.days.length - 1) {
-            break
-          }
-          const midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
-          while (stageIndex < travel.stages.length - 1 && midnight - new Date(travel.stages[stageIndex].arrival).valueOf() > 0) {
-            stageIndex++
-          }
-          if (
-            midnight - new Date(travel.stages[stageIndex].departure).valueOf() > 0 &&
-            new Date(travel.stages[stageIndex].arrival).valueOf() - midnight > 0
-          ) {
-            continue
-          }
-          const result = { type: 'overnight', refund: { amount: null } } as Refund
-          const amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type]
-          result.refund.amount =
-            Math.round(
-              amount *
-                (this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
-                  ? this.travelSettings.factorOvernightLumpSum
-                  : 1) *
-                100
-            ) / 100
-
-          if (this.travelSettings.allowSpouseRefund && travel.claimSpouseRefund) {
-            result.refund.amount *= 2
-          }
-          day.refunds.push(result)
+    let stageIndex = 0
+    for (let i = 0; i < travel.days.length; i++) {
+      const day = travel.days[i] as TravelDayFullCountry
+      if (!day.noOvernightRefund && day.purpose === 'professional') {
+        if (i === travel.days.length - 1) {
+          break
         }
+        const midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
+        while (stageIndex < travel.stages.length - 1 && midnight - new Date(travel.stages[stageIndex].arrival).valueOf() > 0) {
+          stageIndex++
+        }
+        if (
+          midnight - new Date(travel.stages[stageIndex].departure).valueOf() > 0 &&
+          new Date(travel.stages[stageIndex].arrival).valueOf() - midnight > 0
+        ) {
+          continue
+        }
+        const result = { type: 'overnight', refund: { amount: null } } as Refund
+        const amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type]
+        result.refund.amount =
+          Math.round(
+            amount *
+              (this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
+                ? this.travelSettings.factorOvernightLumpSum
+                : 1) *
+              100
+          ) / 100
+
+        if (this.travelSettings.allowSpouseRefund && travel.claimSpouseRefund) {
+          result.refund.amount *= 2
+        }
+        day.refunds.push(result)
       }
     }
   }

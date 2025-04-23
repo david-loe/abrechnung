@@ -83,7 +83,6 @@ const travelSchema = () =>
       claimSpouseRefund: { type: Boolean },
       fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
-      claimOvernightLumpSum: { type: Boolean, default: true },
       lastPlaceOfWork: place(true, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
       history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
@@ -123,6 +122,7 @@ const travelSchema = () =>
             lunch: { type: Boolean, default: false },
             dinner: { type: Boolean, default: false }
           },
+          noOvernightRefund: { type: Boolean, default: false },
           purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
           refunds: [
             {
