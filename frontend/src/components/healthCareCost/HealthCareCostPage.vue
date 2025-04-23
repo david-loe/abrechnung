@@ -286,6 +286,7 @@ import { useRouter } from 'vue-router'
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { DocumentFile, Expense, HealthCareCost, Organisation, UserSimple, healthCareCostStates } from '@/../../common/types.js'
 import API from '@/api.js'
+import APP_LOADER from '@/appData'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
@@ -297,23 +298,20 @@ import { logger } from '@/logger.js'
 
 type ModalMode = 'add' | 'edit'
 
-// --- Props ---
 const props = defineProps({
   _id: { type: String, required: true },
   parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
   endpointPrefix: { type: String, default: '' }
 })
 
-// --- Router, i18n und ggf. Formatter (falls global verfügbar) ---
 const router = useRouter()
 const { t } = useI18n()
 
-// --- Reaktive Daten ---
 const healthCareCost = ref<HealthCareCost>({} as HealthCareCost)
 const modalExpense = ref<Partial<Expense>>({})
 const modalMode = ref<ModalMode>('add')
 const isReadOnlySwitchOn = ref(true)
-const expenseFormIsLoading = ref(true)
+const expenseFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
@@ -322,10 +320,8 @@ const isReadOnly = computed(() => {
   )
 })
 
-// --- Template-Refs für Komponenten ---
 const modalCompRef = useTemplateRef('modalComp')
 
-// --- Methoden ---
 function showModal(mode: ModalMode, expense?: Partial<Expense>) {
   if (expense) {
     modalExpense.value = expense
@@ -477,6 +473,8 @@ function getPrev(expense: Expense) {
   }
   return healthCareCost.value.expenses[idx - 1]
 }
+
+await APP_LOADER.loadData()
 
 try {
   await getHealthCareCost()

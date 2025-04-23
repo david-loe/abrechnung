@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form @submit.prevent="disabled ? null : $emit(mode, output())">
     <div class="mb-2">
       <label for="travelFormDescription" class="form-label">
         {{ $t('labels.preciseServiceDescription') }}<span class="text-danger">*</span>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="mb-1 d-flex align-items-center">
-      <button type="submit" class="btn btn-primary me-2" v-if="!disabled">
+      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expense') }) : $t('labels.save') }}
       </button>
       <button

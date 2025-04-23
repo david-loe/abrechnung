@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form @submit.prevent="disabled ? null : $emit(mode, output())">
     <div class="mb-2">
       <label for="travelFormDescription" class="form-label"> {{ $t('labels.description') }}<span class="text-danger">*</span> </label>
       <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required />

@@ -1,5 +1,5 @@
 <template>
-  <form v-if="APP_DATA" @submit.prevent="disabled ? null : mode === 'add' ? $emit('add', output()) : $emit('edit', output())">
+  <form v-if="APP_DATA" @submit.prevent="disabled ? null : $emit(mode, output())">
     <div class="mb-3">
       <div class="row">
         <div class="col">
