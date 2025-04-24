@@ -62,6 +62,7 @@
           :days="travel.days"
           :lastPlaceOfWorkList="getLastPaceOfWorkList(travel)"
           :lastPlaceOfWork="travel.lastPlaceOfWork"
+          :loading="modalFormIsLoading"
           :disabled="isReadOnly"
           @save="postTravelSettings"
           @cancel="
@@ -515,9 +516,12 @@ async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place
     lastPlaceOfWork,
     days
   }
+  modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
+  modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
+    resetAndHide()
   } else {
     await getTravel()
   }
