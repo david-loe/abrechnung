@@ -693,28 +693,22 @@ class ReportPrint {
       key: 'cateringRefund',
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.cateringRefund'),
+      title: this.t('labels.cateringNoRefund'),
       fn: (c: TravelDay['cateringRefund']) => (Object.keys(c) as Meal[]).map((k) => (c[k] ? '' : this.t(`labels.${k}`))).join(' ')
     })
     columns.push({
-      key: 'refunds',
+      key: 'lumpSums',
       width: 80,
       alignment: pdf_lib.TextAlignment.Right,
       title: this.t('lumpSums.catering24\n'),
-      fn: (r: Refund[]) =>
-        r.filter((r) => r.type.indexOf('catering') === 0).length > 0
-          ? this.drawer.formatter.detailedMoney(r.filter((r) => r.type.indexOf('catering') === 0)[0].refund)
-          : ''
+      fn: (lumpSums: TravelDay['lumpSums']) => this.drawer.formatter.detailedMoney(lumpSums.catering.refund)
     })
     columns.push({
-      key: 'refunds',
+      key: 'lumpSums',
       width: 80,
       alignment: pdf_lib.TextAlignment.Right,
       title: this.t('lumpSums.overnight\n'),
-      fn: (r: Refund[]) =>
-        r.filter((r) => r.type === 'overnight').length > 0
-          ? this.drawer.formatter.detailedMoney(r.filter((r) => r.type === 'overnight')[0].refund)
-          : ''
+      fn: (lumpSums: TravelDay['lumpSums']) => this.drawer.formatter.detailedMoney(lumpSums.overnight.refund)
     })
 
     const fontSize = options.fontSize + 2
