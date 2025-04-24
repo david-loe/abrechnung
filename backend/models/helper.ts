@@ -10,7 +10,7 @@ export function costObject(
   min: number | null = 0
 ) {
   const type: any = {
-    amount: { type: Number, min, required: required, default: defaultAmount }
+    amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount }
   }
   if (exchangeRate) {
     type.exchangeRate = {

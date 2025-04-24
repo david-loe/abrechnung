@@ -50,9 +50,9 @@ const expenseReportSchema = () =>
       addUp: {
         type: {
           balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true, null, 0),
-          expenses: costObject(false, false, true, null, 0),
-          advance: costObject(false, false, true, null, 0)
+          total: costObject(false, false, true),
+          expenses: costObject(false, false, true),
+          advance: costObject(false, false, true)
         }
       },
       history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
