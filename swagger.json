@@ -2383,33 +2383,12 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"LumpsumType": {
+			"CateringType": {
 				"type": "string",
 				"enum": [
-					"overnight",
 					"catering8",
 					"catering24"
 				]
-			},
-			"Refund": {
-				"properties": {
-					"type": {
-						"$ref": "#/components/schemas/LumpsumType"
-					},
-					"refund": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"type",
-					"refund",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"TravelDay": {
 				"properties": {
@@ -2430,7 +2409,7 @@
 					"special": {
 						"type": "string"
 					},
-					"cateringNoRefund": {
+					"cateringRefund": {
 						"properties": {
 							"breakfast": {
 								"type": "boolean"
@@ -2449,14 +2428,46 @@
 						],
 						"type": "object"
 					},
+					"overnightRefund": {
+						"type": "boolean"
+					},
 					"purpose": {
 						"$ref": "#/components/schemas/PurposeSimple"
 					},
-					"refunds": {
-						"items": {
-							"$ref": "#/components/schemas/Refund"
+					"lumpSums": {
+						"properties": {
+							"catering": {
+								"properties": {
+									"type": {
+										"$ref": "#/components/schemas/CateringType"
+									},
+									"refund": {
+										"$ref": "#/components/schemas/BaseCurrencyMoney"
+									}
+								},
+								"required": [
+									"type",
+									"refund"
+								],
+								"type": "object"
+							},
+							"overnight": {
+								"properties": {
+									"refund": {
+										"$ref": "#/components/schemas/BaseCurrencyMoney"
+									}
+								},
+								"required": [
+									"refund"
+								],
+								"type": "object"
+							}
 						},
-						"type": "array"
+						"required": [
+							"catering",
+							"overnight"
+						],
+						"type": "object"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -2465,9 +2476,10 @@
 				"required": [
 					"date",
 					"country",
-					"cateringNoRefund",
+					"cateringRefund",
+					"overnightRefund",
 					"purpose",
-					"refunds",
+					"lumpSums",
 					"_id"
 				],
 				"type": "object",
@@ -3051,9 +3063,6 @@
 						"type": "string",
 						"nullable": true
 					},
-					"claimOvernightLumpSum": {
-						"type": "boolean"
-					},
 					"lastPlaceOfWork": {
 						"$ref": "#/components/schemas/Place"
 					},
@@ -3108,7 +3117,6 @@
 					"advance",
 					"progress",
 					"addUp",
-					"claimOvernightLumpSum",
 					"lastPlaceOfWork",
 					"professionalShare",
 					"history",
@@ -3267,9 +3275,6 @@
 						"type": "string",
 						"nullable": true
 					},
-					"claimOvernightLumpSum": {
-						"type": "boolean"
-					},
 					"lastPlaceOfWork": {
 						"$ref": "#/components/schemas/Place"
 					},
@@ -3324,7 +3329,6 @@
 					"advance",
 					"progress",
 					"addUp",
-					"claimOvernightLumpSum",
 					"lastPlaceOfWork",
 					"professionalShare",
 					"history",
@@ -3381,7 +3385,6 @@
 								"a1Certificate",
 								"claimSpouseRefund",
 								"fellowTravelersNames",
-								"claimOvernightLumpSum",
 								"lastPlaceOfWork",
 								"professionalShare",
 								"history",
@@ -3506,7 +3509,10 @@
 					"days": {
 						"items": {
 							"properties": {
-								"cateringNoRefund": {
+								"overnightRefund": {
+									"type": "boolean"
+								},
+								"cateringRefund": {
 									"properties": {
 										"dinner": {
 											"type": "boolean"
@@ -3552,9 +3558,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"claimOvernightLumpSum": {
-						"type": "boolean"
 					},
 					"name": {
 						"type": "string"
@@ -9508,7 +9511,6 @@
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"claimOvernightLumpSum",
 									"lastPlaceOfWork",
 									"professionalShare",
 									"history",
@@ -10247,7 +10249,6 @@
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"claimOvernightLumpSum",
 									"lastPlaceOfWork",
 									"professionalShare",
 									"history",
@@ -10537,7 +10538,6 @@
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"claimOvernightLumpSum",
 									"lastPlaceOfWork",
 									"professionalShare",
 									"history",
@@ -11255,7 +11255,6 @@
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"claimOvernightLumpSum",
 									"lastPlaceOfWork",
 									"professionalShare",
 									"history",
