@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : $emit('save', days, localLastPlaceOfWork)">
+  <form @submit.prevent="disabled ? null : $emit('save', localDays, localLastPlaceOfWork)">
     <table class="table table-sm table-hover align-middle text-center">
       <thead>
         <tr>
@@ -56,7 +56,7 @@
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        <tr v-for="day of days">
+        <tr v-for="day of localDays">
           <th scope="row" class="text-nowrap">
             {{ formatter.simpleDate(day.date) }} <span class="ms-1">{{ day.country.flag || '' }}</span>
           </th>
@@ -113,6 +113,7 @@ import PlaceElement from '@/components/elements/PlaceElement.vue'
 import { formatter } from '@/formatter.js'
 import { PropType, Ref, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { mergeDeep } from '../../../../../common/scripts'
 
 const emojis = {
   breakfast: '🥐',
@@ -133,6 +134,11 @@ const props = defineProps({
 const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>]; cancel: [] }>()
 
 const localLastPlaceOfWork = ref(props.lastPlaceOfWork)
+const localDays: Ref<TravelDay[]> = ref([])
+
+for (const day of props.days) {
+  localDays.value.push(mergeDeep({}, day))
+}
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data as Ref<IAPP_DATA>
@@ -140,15 +146,15 @@ const APP_DATA = APP_LOADER.data as Ref<IAPP_DATA>
 const lumpSums = [...meals, 'overnight'] as const
 type LumpSums = (typeof lumpSums)[number]
 
-const professionalShare = computed(() => APP_DATA.value.travelCalculator.getProfessionalShare(props.days))
+const professionalShare = computed(() => APP_DATA.value.travelCalculator.getProfessionalShare(localDays.value))
 
 function setAll(type: LumpSums, value: boolean) {
   if (type === 'overnight') {
-    for (const day of props.days) {
+    for (const day of localDays.value) {
       day.overnightRefund = value
     }
   } else {
-    for (const day of props.days) {
+    for (const day of localDays.value) {
       day.cateringRefund[type] = value
     }
   }

@@ -65,12 +65,7 @@
           :loading="modalFormIsLoading"
           :disabled="isReadOnly"
           @save="postTravelSettings"
-          @cancel="
-            () => {
-              getTravel()
-              hideModal()
-            }
-          "></LumpSumEditor>
+          @cancel="resetAndHide"></LumpSumEditor>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="travel._id">
@@ -410,6 +405,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { DatabaseSync } from 'node:sqlite'
 import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
@@ -511,6 +507,7 @@ function resetAndHide() {
 }
 
 async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
+  console.log(days)
   const travelObj = {
     _id: travel.value._id,
     lastPlaceOfWork,
