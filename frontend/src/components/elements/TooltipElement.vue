@@ -18,7 +18,7 @@ export default defineComponent({
   components: {},
   props: { text: { type: String, required: true }, html: { type: Boolean, default: false } },
   mounted() {
-    this.tooltip = new Tooltip(this.$refs.tooltip as Element)
+    this.tooltip = new Tooltip(this.$refs.tooltip as Element, { trigger: 'click hover focus' })
   },
   watch: {
     text: function () {

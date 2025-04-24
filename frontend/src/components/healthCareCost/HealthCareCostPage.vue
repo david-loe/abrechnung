@@ -18,8 +18,8 @@
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => {const next = getNext(modalExpense as Expense); if(next){showModal('edit', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalExpense as Expense); if(prev){showModal('edit', prev)}else{hideModal()}}">
+          @next="() => { const next = getNext(modalExpense as Expense); if (next) { showModal('edit', next) } else { hideModal() } }"
+          @prev="() => { const prev = getPrev(modalExpense as Expense); if (prev) { showModal('edit', prev) } else { hideModal() } }">
         </ExpenseForm>
       </div>
     </ModalComponent>

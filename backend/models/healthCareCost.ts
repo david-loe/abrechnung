@@ -40,8 +40,8 @@ const healthCareCostSchema = () =>
       addUp: {
         type: {
           balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true, null, 0),
-          expenses: costObject(false, false, true, null, 0)
+          total: costObject(false, false, true),
+          expenses: costObject(false, false, true)
         }
       },
       editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },

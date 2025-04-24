@@ -1,5 +1,7 @@
 import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
 import {
+  BaseCurrencyMoney,
+  CateringType,
   Country,
   CountryCode,
   CountrySimple,
@@ -11,6 +13,7 @@ import {
   Refund,
   Stage,
   Travel,
+  TravelDay,
   TravelDayFullCountry,
   TravelExpense,
   TravelSettings,
@@ -36,9 +39,9 @@ export class TravelCalculator {
     this.sort(travel)
     const conflicts = this.validator.validate(travel)
     if (conflicts.length === 0) {
-      this.calculateProgress(travel)
+      travel.progress = this.getProgress(travel)
       await this.calculateDays(travel)
-      this.calculateProfessionalShare(travel)
+      travel.professionalShare = this.getProfessionalShare(travel.days)
       this.calculateRefundforOwnCar(travel)
       await this.addCateringRefunds(travel)
       await this.addOvernightRefunds(travel)
@@ -57,33 +60,31 @@ export class TravelCalculator {
     travel.expenses.sort(this.expensesCompareFn)
   }
 
-  calculateProgress(travel: Travel) {
+  getProgress(travel: Travel) {
     if (travel.stages.length > 0) {
       const approvedLength = getDiffInDays(travel.startDate, travel.endDate) + 1
       const stageLength = getDiffInDays(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival) + 1
       if (stageLength >= approvedLength) {
-        travel.progress = 100
-      } else {
-        travel.progress = Math.round((stageLength / approvedLength) * 100)
+        return 100
       }
-    } else {
-      travel.progress = 0
+      return Math.round((stageLength / approvedLength) * 100)
     }
+    return 0
   }
 
   getDays(travel: Travel) {
     if (travel.stages.length > 0) {
       const days = getDayList(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival)
-      const newDays: { date: Date; cateringNoRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; refunds: Refund[] }[] = days.map(
-        (d) => {
-          return { date: d, refunds: [] }
-        }
-      )
+      const newDays: { date: Date; cateringRefund?: { [key in Meal]: boolean }; purpose?: PurposeSimple; overnightRefund?: boolean }[] =
+        days.map((d) => {
+          return { date: d }
+        })
       for (const oldDay of travel.days) {
         for (const newDay of newDays) {
           if (new Date(oldDay.date).valueOf() - new Date(newDay.date).valueOf() === 0) {
-            newDay.cateringNoRefund = oldDay.cateringNoRefund
+            newDay.cateringRefund = oldDay.cateringRefund
             newDay.purpose = oldDay.purpose
+            newDay.overnightRefund = oldDay.overnightRefund
             break
           }
         }
@@ -182,13 +183,13 @@ export class TravelCalculator {
     travel.days = days as TravelDayFullCountry[]
   }
 
-  async calcCateringRefund(day: TravelDayFullCountry, type: LumpsumType, claimSpouseRefund: boolean | null | undefined) {
-    const result = { type, refund: { amount: null } } as Refund
+  async getCateringRefund(day: TravelDayFullCountry, type: CateringType, claimSpouseRefund: boolean | null | undefined) {
+    const result: TravelDay['lumpSums']['catering'] = { type, refund: { amount: null } }
     const amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type]
     let leftover = 1
-    if (day.cateringNoRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
-    if (day.cateringNoRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
-    if (day.cateringNoRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
+    if (!day.cateringRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
+    if (!day.cateringRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
+    if (!day.cateringRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
 
     result.refund.amount =
       Math.round(
@@ -228,7 +229,7 @@ export class TravelCalculator {
             refundType = 'catering8'
           }
           if (refundType) {
-            day.refunds.push(await this.calcCateringRefund(day, refundType, travel.claimSpouseRefund))
+            day.lumpSums.catering = await this.getCateringRefund(day, refundType, travel.claimSpouseRefund)
           }
         }
       }
@@ -238,83 +239,109 @@ export class TravelCalculator {
         const day1Length = (travel.days[1].date as Date).valueOf() - new Date(travel.stages[0].departure).valueOf()
         const day2Length = new Date(travel.stages[travel.stages.length - 1].arrival).valueOf() - (travel.days[1].date as Date).valueOf()
         if (day1Length > 8 * h && day2Length > 8 * h) {
-          travel.days[0].refunds.push(
-            await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-          )
-          travel.days[1].refunds.push(
-            await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-          )
+          if (travel.days[0].purpose === 'professional') {
+            travel.days[0].lumpSums.catering = await this.getCateringRefund(
+              travel.days[0] as TravelDayFullCountry,
+              'catering8',
+              travel.claimSpouseRefund
+            )
+          }
+          if (travel.days[1].purpose === 'professional') {
+            travel.days[1].lumpSums.catering = await this.getCateringRefund(
+              travel.days[1] as TravelDayFullCountry,
+              'catering8',
+              travel.claimSpouseRefund
+            )
+          }
         } else if (day1Length > 8 * h) {
-          travel.days[0].refunds.push(
-            await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-          )
+          if (travel.days[0].purpose === 'professional') {
+            travel.days[0].lumpSums.catering = await this.getCateringRefund(
+              travel.days[0] as TravelDayFullCountry,
+              'catering8',
+              travel.claimSpouseRefund
+            )
+          }
         } else if (day2Length > 8 * h) {
-          travel.days[1].refunds.push(
-            await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-          )
+          if (travel.days[1].purpose === 'professional') {
+            travel.days[1].lumpSums.catering = await this.getCateringRefund(
+              travel.days[1] as TravelDayFullCountry,
+              'catering8',
+              travel.claimSpouseRefund
+            )
+          }
         } else {
           if (day1Length >= day2Length) {
-            travel.days[0].refunds.push(
-              await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-            )
+            if (travel.days[0].purpose === 'professional') {
+              travel.days[0].lumpSums.catering = await this.getCateringRefund(
+                travel.days[0] as TravelDayFullCountry,
+                'catering8',
+                travel.claimSpouseRefund
+              )
+            }
           } else {
-            travel.days[1].refunds.push(
-              await this.calcCateringRefund(travel.days[1] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-            )
+            if (travel.days[1].purpose === 'professional') {
+              travel.days[1].lumpSums.catering = await this.getCateringRefund(
+                travel.days[1] as TravelDayFullCountry,
+                'catering8',
+                travel.claimSpouseRefund
+              )
+            }
           }
         }
       } else if (travel.days.length === 1) {
-        travel.days[0].refunds.push(
-          await this.calcCateringRefund(travel.days[0] as TravelDayFullCountry, 'catering8', travel.claimSpouseRefund)
-        )
+        if (travel.days[0].purpose === 'professional') {
+          travel.days[0].lumpSums.catering = await this.getCateringRefund(
+            travel.days[0] as TravelDayFullCountry,
+            'catering8',
+            travel.claimSpouseRefund
+          )
+        }
       }
     }
   }
 
   async addOvernightRefunds(travel: Travel) {
-    if (travel.claimOvernightLumpSum) {
-      let stageIndex = 0
-      for (let i = 0; i < travel.days.length; i++) {
-        const day = travel.days[i] as TravelDayFullCountry
-        if (day.purpose === 'professional') {
-          if (i === travel.days.length - 1) {
-            break
-          }
-          const midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
-          while (stageIndex < travel.stages.length - 1 && midnight - new Date(travel.stages[stageIndex].arrival).valueOf() > 0) {
-            stageIndex++
-          }
-          if (
-            midnight - new Date(travel.stages[stageIndex].departure).valueOf() > 0 &&
-            new Date(travel.stages[stageIndex].arrival).valueOf() - midnight > 0
-          ) {
-            continue
-          }
-          const result = { type: 'overnight', refund: { amount: null } } as Refund
-          const amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special))[result.type]
-          result.refund.amount =
-            Math.round(
-              amount *
-                (this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
-                  ? this.travelSettings.factorOvernightLumpSum
-                  : 1) *
-                100
-            ) / 100
-
-          if (this.travelSettings.allowSpouseRefund && travel.claimSpouseRefund) {
-            result.refund.amount *= 2
-          }
-          day.refunds.push(result)
+    let stageIndex = 0
+    for (let i = 0; i < travel.days.length; i++) {
+      const day = travel.days[i] as TravelDayFullCountry
+      if (day.overnightRefund && day.purpose === 'professional') {
+        if (i === travel.days.length - 1) {
+          break
         }
+        const midnight = (day.date as Date).valueOf() + 1000 * 24 * 60 * 60 - 1
+        while (stageIndex < travel.stages.length - 1 && midnight - new Date(travel.stages[stageIndex].arrival).valueOf() > 0) {
+          stageIndex++
+        }
+        if (
+          midnight - new Date(travel.stages[stageIndex].departure).valueOf() > 0 &&
+          new Date(travel.stages[stageIndex].arrival).valueOf() - midnight > 0
+        ) {
+          continue
+        }
+        const refund: BaseCurrencyMoney = { amount: null }
+        const amount = (await this.lumpSumCalculator.getLumpSum(day.country, day.date as Date, day.special)).overnight
+        refund.amount =
+          Math.round(
+            amount *
+              (this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
+                ? this.travelSettings.factorOvernightLumpSum
+                : 1) *
+              100
+          ) / 100
+
+        if (this.travelSettings.allowSpouseRefund && travel.claimSpouseRefund) {
+          refund.amount *= 2
+        }
+        day.lumpSums.overnight = { refund }
       }
     }
   }
 
-  calculateProfessionalShare(travel: Travel) {
-    if (travel.days.length > 0) {
+  getProfessionalShare(days: TravelDay[]) {
+    if (days.length > 0) {
       let professionalDays = 0
       let calc = false
-      for (const day of travel.days) {
+      for (const day of days) {
         if (day.purpose === 'professional') {
           professionalDays += 1
         } else {
@@ -322,13 +349,11 @@ export class TravelCalculator {
         }
       }
       if (calc) {
-        travel.professionalShare = professionalDays / travel.days.length
-      } else {
-        travel.professionalShare = 1
+        return professionalDays / days.length
       }
-    } else {
-      travel.professionalShare = null
+      return 1
     }
+    return null
   }
 
   calculateRefundforOwnCar(travel: Travel) {

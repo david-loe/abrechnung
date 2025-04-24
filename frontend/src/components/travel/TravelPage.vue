@@ -57,6 +57,15 @@
           @cancel="resetAndHide"
           @edit="editTravelDetails">
         </TravelApplyForm>
+        <LumpSumEditor
+          v-else-if="modalObjectType === 'lumpSums'"
+          :days="travel.days"
+          :lastPlaceOfWorkList="getLastPaceOfWorkList(travel)"
+          :lastPlaceOfWork="travel.lastPlaceOfWork"
+          :loading="modalFormIsLoading"
+          :disabled="isReadOnly"
+          @save="postTravelSettings"
+          @cancel="resetAndHide"></LumpSumEditor>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="travel._id">
@@ -152,58 +161,9 @@
 
       <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
 
-      <div class="row gx-5 justify-content-center align-items-center mb-5">
-        <div class="col-auto">
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="travelClaimOvernightLumpSum"
-              v-model="travel.claimOvernightLumpSum"
-              @change="postTravelSettings"
-              :disabled="isReadOnly" />
-            <label class="form-check-label" for="travelClaimOvernightLumpSum">{{ t('labels.claimOvernightLumpSum') }}</label>
-            <InfoPoint class="ms-1" :text="t('info.claimOvernightLumpSum')" />
-          </div>
-        </div>
-        <div class="col-auto">
-          <div class="row align-items-center">
-            <div class="col-auto pe-2">
-              <label class="form-label mb-0">{{ t('labels.lastPlaceOfWork') }}</label>
-            </div>
-            <div class="col-auto p-0">
-              <select
-                class="form-select form-select-sm"
-                @change="postTravelSettings"
-                v-model="travel.lastPlaceOfWork"
-                :disabled="isReadOnly">
-                <option v-for="place of getLastPaceOfWorkList(travel)" :value="place" :key="place.country._id + place.special">
-                  <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
-                </option>
-              </select>
-            </div>
-            <div class="col-auto ps-2">
-              <InfoPoint :text="t('info.lastPlaceOfWork')" />
-            </div>
-          </div>
-        </div>
-        <div v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1" class="col-auto">
-          <label class="form-check-label me-2" for="travelProfessionalShare">
-            {{ t('labels.professionalShare') + ':' }}
-          </label>
-          <span
-            id="travelProfessionalShare"
-            :class="travel.professionalShare <= APP_DATA!.travelSettings.minProfessionalShare ? 'text-danger' : ''">
-            {{ Math.round(travel.professionalShare * 100) + '%' }}</span
-          >
-          <InfoPoint class="ms-1" :text="t('info.professionalShare')" />
-        </div>
-      </div>
-
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
-          <div class="row g-1 mb-2">
+          <div class="row g-1 mb-4">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'stage', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
@@ -218,138 +178,66 @@
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
               </button>
             </div>
-          </div>
-          <div class="row mb-2">
             <div class="col-auto">
               <button
-                class="btn btn-link btn-sm"
-                @click="
-                  table.forEach((d) => {
-                    if (d.type === 'day') {
-                      d.data.showSettings = true
-                    }
-                  })
-                "
-                :disabled="travel.stages.length == 0">
-                {{ t('labels.expandAll') }}
-                <i class="bi bi-arrows-expand"></i>
-              </button>
-            </div>
-            <div class="col-auto">
-              <button
-                class="btn btn-link btn-sm"
-                @click="
-                  table.forEach((d) => {
-                    if (d.type === 'day') {
-                      d.data.showSettings = false
-                    }
-                  })
-                "
-                :disabled="travel.stages.length == 0">
-                {{ t('labels.collapseAll') }}
-                <i class="bi bi-arrows-collapse"></i>
+                class="btn btn-outline-secondary"
+                @click="travel.days.length < 1 ? null : showModal('edit', 'lumpSums', undefined)"
+                :disabled="travel.days.length < 1">
+                <span class="ms-1 d-none d-md-inline">{{ t('labels.editX', { X: t('labels.lumpSums') }) }}</span>
+                <span class="ms-1 d-md-none">{{ t('labels.lumpSums') }}</span>
               </button>
             </div>
           </div>
+
           <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">
             {{ t('alerts.noData.stage') }}
           </div>
-
           <div
             v-for="row of table"
             class="mb-2"
-            :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as TravelRecord | Day)._id">
+            :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as TravelRecord | TravelDay)._id">
             <!-- day -->
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
                 <h5 class="m-0">
                   <small
-                    v-if="(row.data as Day).purpose === 'private'"
+                    v-if="(row.data as TravelDay).purpose === 'private'"
                     :title="t('labels.private')"
                     style="margin-left: -1.25rem; margin-right: 0.156rem">
                     <i class="bi bi-file-person"></i> </small
-                  >{{ formatter.simpleDate((row.data as Day).date) }}
+                  >{{ formatter.simpleDate((row.data as TravelDay).date) }}
                 </h5>
               </div>
               <div class="col">
                 <div class="row align-items-center">
-                  <!-- refunds -->
-                  <template v-if="!(row.data as Day).showSettings">
-                    <template v-for="refund of (row.data as Day).refunds" :key="refund._id">
-                      <!-- catering -->
-                      <div
-                        v-if="refund.type.indexOf('catering') == 0"
-                        class="col-auto text-secondary"
-                        :title="
+                  <!-- lump sums -->
+                  <!-- catering -->
+                  <div
+                    class="col-auto text-secondary"
+                    :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          t('lumpSums.' + refund.type) +
+                          t('lumpSums.' + row.data.lumpSums.catering.type) +
                           ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                          (row.data as TravelDay).country.flag +
+                          ((row.data as TravelDay).special ? ' (' + (row.data as TravelDay).special + ')' : '')
                         ">
-                        <i class="bi bi-sun"></i>
-                        {{ formatter.money(refund.refund) }}
-                      </div>
-                      <!-- overnight -->
-                      <div
-                        v-else
-                        class="col-auto text-secondary"
-                        :title="
+                    <i class="bi bi-sun"></i>
+                    {{ formatter.money(row.data.lumpSums.catering.refund) }}
+                  </div>
+                  <!-- overnight -->
+                  <div
+                    class="col-auto text-secondary"
+                    :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          t('lumpSums.' + refund.type) +
+                          t('lumpSums.overnight') +
                           ' ' +
-                          (row.data as Day).country.flag +
-                          ((row.data as Day).special ? ' (' + (row.data as Day).special + ')' : '')
+                          (row.data as TravelDay).country.flag +
+                          ((row.data as TravelDay).special ? ' (' + (row.data as TravelDay).special + ')' : '')
                         ">
-                        <i class="bi bi-moon"></i>
-                        {{ formatter.money(refund.refund) }}
-                      </div>
-                    </template>
-                  </template>
-                  <template v-else>
-                    <div class="col-auto pe-1">
-                      <InfoPoint :text="t('info.cateringNoRefund')" />
-                    </div>
-                    <div v-for="key of meals" class="form-check col-auto" :key="key">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        role="switch"
-                        :id="'configCateringRefund' + key + (row.data as Day).date"
-                        v-model="((row.data as Day).cateringNoRefund as any)[key]"
-                        @change="isReadOnly ? null : postTravelSettings()"
-                        :disabled="isReadOnly" />
-                      <label class="form-check-label" :for="'configCateringRefund' + key + (row.data as Day).date">
-                        {{ t('labels.' + key) }}
-                      </label>
-                    </div>
-                    <div class="col-auto">
-                      <div class="row align-items-center">
-                        <div class="col-auto pe-1">
-                          <InfoPoint :text="t('info.purpose')" />
-                        </div>
-                        <div class="col-auto ps-0">
-                          <select
-                            class="form-select form-select-sm"
-                            v-model="(row.data as Day).purpose"
-                            @change="isReadOnly ? null : postTravelSettings()"
-                            :disabled="isReadOnly"
-                            required>
-                            <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
-                              {{ t('labels.' + purpose) }}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
+                    <i class="bi bi-moon"></i>
+                    {{ formatter.money(row.data.lumpSums.overnight.refund) }}
+                  </div>
                 </div>
-              </div>
-              <div class="col-auto ms-auto">
-                <i
-                  :class="(row.data as Day).showSettings ? 'bi bi-x-lg' : 'bi bi-sliders'"
-                  style="cursor: pointer"
-                  @click=";(row.data as Day).showSettings = !(row.data as Day).showSettings"></i>
               </div>
             </div>
             <!-- Stage -->
@@ -404,6 +292,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-lg-3 col">
           <div class="card">
             <div class="card-body">
@@ -516,6 +405,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { DatabaseSync } from 'node:sqlite'
 import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
@@ -535,12 +425,12 @@ import {
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ErrorBanner from '@/components/elements/ErrorBanner.vue'
-import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
+import LumpSumEditor from '@/components/travel//elements/LumpSumEditor.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
 import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
@@ -550,12 +440,11 @@ import { logger } from '@/logger.js'
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
 type ModalObject = Partial<TravelRecord> | Partial<TravelSimple> | Gap
-type ModalObjectType = TravelRecordType | 'travel'
-type Day = TravelDay & { showSettings?: boolean }
+type ModalObjectType = TravelRecordType | 'travel' | 'lumpSums'
 type Table = (
   | { type: 'stage'; data: Stage }
   | { type: 'expense'; data: TravelExpense }
-  | { type: 'day'; data: Day }
+  | { type: 'day'; data: TravelDay }
   | { type: 'gap'; data: Gap }
 )[]
 
@@ -617,16 +506,19 @@ function resetAndHide() {
   hideModal()
 }
 
-async function postTravelSettings() {
+async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
+  console.log(days)
   const travelObj = {
     _id: travel.value._id,
-    claimOvernightLumpSum: travel.value.claimOvernightLumpSum,
-    lastPlaceOfWork: travel.value.lastPlaceOfWork,
-    days: travel.value.days
+    lastPlaceOfWork,
+    days
   }
+  modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
+  modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
+    resetAndHide()
   } else {
     await getTravel()
   }
@@ -812,7 +704,7 @@ function renderTable() {
     if (i === travel.value.days.length - 1) {
       stagesEnd = travel.value.stages.length
     }
-    table.value.push({ type: 'day', data: { ...travel.value.days[i] } as Day })
+    table.value.push({ type: 'day', data: { ...travel.value.days[i] } as TravelDay })
     for (const expense of travel.value.expenses) {
       if (expense.cost.date === travel.value.days[i].date) {
         table.value.push({ type: 'expense', data: expense })
@@ -849,19 +741,7 @@ async function getTravel() {
 }
 
 function setTravel(newTravel: Travel) {
-  const oldTravel = travel.value
   travel.value = newTravel
-  if (oldTravel.days && newTravel.days) {
-    for (const oldDay of oldTravel.days) {
-      if ((oldDay as Day).showSettings) {
-        for (const newDay of newTravel.days) {
-          if (new Date(newDay.date).valueOf() === new Date(oldDay.date).valueOf()) {
-            ;(newDay as Day).showSettings = true
-          }
-        }
-      }
-    }
-  }
   logger.info(`${t('labels.travel')}:`)
   logger.info(travel.value)
   renderTable()

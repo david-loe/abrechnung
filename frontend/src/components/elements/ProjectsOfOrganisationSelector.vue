@@ -30,7 +30,7 @@ const props = defineProps<{
 }>()
 
 // Emits definieren
-const emit = defineEmits<(e: 'update:modelValue', projects: ProjectSimple[] | string[]) => void>()
+const emit = defineEmits<{ 'update:modelValue': [projects: ProjectSimple[] | string[]] }>()
 
 // Reaktive Variablen
 const selectedOrg = ref<OrganisationSimple | null>(null)

@@ -8,8 +8,8 @@ import {
   TravelRecord,
   TravelState,
   baseCurrency,
+  cateringTypes,
   distanceRefundTypes,
-  lumpsumTypes,
   transportTypes,
   travelStates
 } from '../../common/types.js'
@@ -74,16 +74,15 @@ const travelSchema = () =>
       addUp: {
         type: {
           balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true, null, 0),
-          expenses: costObject(false, false, true, null, 0),
-          advance: costObject(false, false, true, null, 0),
-          lumpSums: costObject(false, false, true, null, 0)
+          total: costObject(false, false, true),
+          expenses: costObject(false, false, true),
+          advance: costObject(false, false, true),
+          lumpSums: costObject(false, false, true)
         }
       },
       claimSpouseRefund: { type: Boolean },
       fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
-      claimOvernightLumpSum: { type: Boolean, default: true },
       lastPlaceOfWork: place(true, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
       history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
@@ -118,18 +117,20 @@ const travelSchema = () =>
           date: { type: Date, required: true },
           country: { type: String, ref: 'Country', required: true },
           special: { type: String },
-          cateringNoRefund: {
-            breakfast: { type: Boolean, default: false },
-            lunch: { type: Boolean, default: false },
-            dinner: { type: Boolean, default: false }
+          cateringRefund: {
+            breakfast: { type: Boolean, default: true },
+            lunch: { type: Boolean, default: true },
+            dinner: { type: Boolean, default: true }
           },
+          overnightRefund: { type: Boolean, default: true },
           purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
-          refunds: [
-            {
-              type: { type: String, enum: lumpsumTypes, required: true },
-              refund: costObject(false, false, true)
+          lumpSums: {
+            overnight: { refund: costObject(false, false, true) },
+            catering: {
+              refund: costObject(false, false, true),
+              type: { type: String, enum: cateringTypes, required: true, default: 'catering8' }
             }
-          ]
+          }
         }
       ]
     },

@@ -12,9 +12,7 @@ export class CountryController extends Controller {
   @Get('country')
   public async get(@Queries() query: GetterQuery<ICountry>) {
     return await this.getter(Country, {
-      query,
-      projection: { lumpSums: 0, lumpSumsFrom: 0 },
-      allowedAdditionalFields: ['lumpSums', 'lumpSumsFrom']
+      query
     })
   }
   @Get('specialLumpSums')

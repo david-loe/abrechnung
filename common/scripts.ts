@@ -134,11 +134,8 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
 function getLumpSumsSum(travel: Travel) {
   let sum = 0
   for (const day of travel.days) {
-    for (const refund of day.refunds) {
-      if (refund.refund.amount != null) {
-        sum += refund.refund.amount
-      }
-    }
+    sum += day.lumpSums.overnight.refund.amount || 0
+    sum += day.lumpSums.catering.refund.amount || 0
   }
   return { amount: sum }
 }

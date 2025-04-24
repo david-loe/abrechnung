@@ -1,12 +1,6 @@
 <template>
   <div>
-    <ListElement
-      class="mb-3"
-      ref="list"
-      endpoint="country"
-      :filter="filter"
-      :headers="headers"
-      :params="{ additionalFields: ['lumpSums', 'lumpSumsFrom'] }">
+    <ListElement class="mb-3" ref="list" endpoint="country" :filter="filter" :headers="headers">
       <template #header-name="header">
         <div class="filter-column">
           {{ header.text }}

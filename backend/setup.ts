@@ -1,6 +1,9 @@
-import { connectDB, disconnectDB } from './db.js'
-import { checkForMigrations } from './migrations.js'
+import APP from './app.js'
+import { disconnectDB } from './db.js'
 
-await connectDB()
-await checkForMigrations()
+await APP()
+
+// sleep 5 seconds
+await new Promise((resolve) => setTimeout(resolve, 5000))
+
 await disconnectDB()

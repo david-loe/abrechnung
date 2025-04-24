@@ -394,11 +394,15 @@ export interface TravelDay {
   date: Date | string
   country: CountrySimple
   special?: string
-  cateringNoRefund: {
+  cateringRefund: {
     [key in Meal]: boolean
   }
+  overnightRefund: boolean
   purpose: PurposeSimple
-  refunds: Refund[]
+  lumpSums: {
+    overnight: { refund: BaseCurrencyMoney }
+    catering: { refund: BaseCurrencyMoney; type: CateringType }
+  }
   _id: _id
 }
 
@@ -422,7 +426,6 @@ export interface RequestSimple {
 }
 
 export interface Travel extends TravelSimple {
-  claimOvernightLumpSum: boolean
   lastPlaceOfWork: Place
   professionalShare: number | null
   history: _id[]
@@ -530,7 +533,10 @@ export type FontName = (typeof fontNames)[number]
 
 export type PageOrientation = 'portrait' | 'landscape'
 
-export const lumpsumTypes = ['overnight', 'catering8', 'catering24'] as const
+export const cateringTypes = ['catering8', 'catering24'] as const
+export type CateringType = (typeof cateringTypes)[number]
+
+export const lumpsumTypes = ['overnight', ...cateringTypes] as const
 export type LumpsumType = (typeof lumpsumTypes)[number]
 export type LumpSum = { [key in LumpsumType]: number }
 
