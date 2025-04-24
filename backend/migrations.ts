@@ -110,41 +110,14 @@ export async function checkForMigrations() {
 
     if (semver.lte(migrateFrom, '1.5.4')) {
       logger.info('Apply migration from v1.5.4: Add needsA1Certificate to countries')
-      // prettier-ignore
+      // biome-ignore format: the array should not be formatted
       const a1countries = [
         // andere Mitgliedstaaten der Europäischen Union (EU)
-        'AT',
-        'BE',
-        'BG',
-        'HR',
-        'CY',
-        'CZ',
-        'DK',
-        'EE',
-        'FI',
-        'FR',
-        'PL',
-        'GR',
-        'HU',
-        'IE',
-        'IT',
-        'LV',
-        'LT',
-        'LU',
-        'MT',
-        'NL',
-        'PT',
-        'RO',
-        'SK',
-        'SI',
-        'ES',
-        'SE', // "DE" not
+        'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI',
+        'FR', 'PL', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU',
+        'MT', 'NL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', // "DE" not
         // Weitere europäische Länder
-        'IS',
-        'LI',
-        'NO',
-        'CH',
-        'GB'
+        'IS', 'LI', 'NO', 'CH', 'GB'
       ] as const
       await mongoose.connection
         .collection<{ _id: string }>('countries')
@@ -201,6 +174,28 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('travelsettings').updateOne({}, { $set: travelSettings })
       await mongoose.connection.collection('displaysettings').updateOne({}, { $set: { accessIcons, stateColors } })
       await mongoose.connection.collection('settings').updateOne({}, { $unset: { accessIcons: '', stateColors: '', travelSettings: '' } })
+    }
+
+    if (semver.lte(migrateFrom, '1.7.1')) {
+      logger.info('Apply migration from v1.7.1: migrate travel.days.refunds to lumpSums')
+
+      const travels = await mongoose.model('Travel').find({})
+      for (const travel of travels) {
+        if (travel.days > 1) {
+          for (const day of travel.days) {
+            day.cateringRefund = {
+              breakfast: !day.cateringNoRefund?.breakfast,
+              lunch: !day.cateringNoRefund?.lunch,
+              dinner: !day.cateringNoRefund?.dinner
+            }
+            day.overnightRefund = travel.claimOvernightLumpSum
+          }
+          await travel.save({ timestamps: false })
+        }
+      }
+      await mongoose.connection
+        .collection('travels')
+        .updateMany({}, { $unset: { 'days.$[].cateringNoRefund': '', claimOvernightLumpSum: '' } })
     }
 
     if (settings) {

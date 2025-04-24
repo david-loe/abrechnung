@@ -60,6 +60,8 @@
         <LumpSumEditor
           v-else-if="modalObjectType === 'lumpSums'"
           :days="travel.days"
+          :lastPlaceOfWorkList="getLastPaceOfWorkList(travel)"
+          :lastPlaceOfWork="travel.lastPlaceOfWork"
           :disabled="isReadOnly"
           @save="postTravelSettings"
           @cancel="
@@ -163,22 +165,6 @@
 
       <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
 
-      <div
-        v-if="travel.stages.length > 0 && travel.professionalShare !== null && travel.professionalShare !== 1"
-        class="row gx-5 justify-content-center align-items-center mb-3">
-        <div class="col-auto">
-          <label class="form-check-label me-2" for="travelProfessionalShare">
-            {{ t('labels.professionalShare') + ':' }}
-          </label>
-          <span
-            id="travelProfessionalShare"
-            :class="travel.professionalShare <= APP_DATA!.travelSettings.minProfessionalShare ? 'text-danger' : ''">
-            {{ Math.round(travel.professionalShare * 100) + '%' }}</span
-          >
-          <InfoPoint class="ms-1" :text="t('info.professionalShare')" />
-        </div>
-      </div>
-
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-4">
@@ -228,37 +214,33 @@
               </div>
               <div class="col">
                 <div class="row align-items-center">
-                  <!-- refunds -->
-                  <template v-for="refund of (row.data as TravelDay).refunds" :key="refund._id">
-                    <!-- catering -->
-                    <div
-                      v-if="refund.type.indexOf('catering') == 0"
-                      class="col-auto text-secondary"
-                      :title="
+                  <!-- lump sums -->
+                  <!-- catering -->
+                  <div
+                    class="col-auto text-secondary"
+                    :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          t('lumpSums.' + refund.type) +
+                          t('lumpSums.' + row.data.lumpSums.catering.type) +
                           ' ' +
                           (row.data as TravelDay).country.flag +
                           ((row.data as TravelDay).special ? ' (' + (row.data as TravelDay).special + ')' : '')
                         ">
-                      <i class="bi bi-sun"></i>
-                      {{ formatter.money(refund.refund) }}
-                    </div>
-                    <!-- overnight -->
-                    <div
-                      v-else
-                      class="col-auto text-secondary"
-                      :title="
+                    <i class="bi bi-sun"></i>
+                    {{ formatter.money(row.data.lumpSums.catering.refund) }}
+                  </div>
+                  <!-- overnight -->
+                  <div
+                    class="col-auto text-secondary"
+                    :title="
                           (travel.claimSpouseRefund ? '2x ' : '') +
-                          t('lumpSums.' + refund.type) +
+                          t('lumpSums.overnight') +
                           ' ' +
                           (row.data as TravelDay).country.flag +
                           ((row.data as TravelDay).special ? ' (' + (row.data as TravelDay).special + ')' : '')
                         ">
-                      <i class="bi bi-moon"></i>
-                      {{ formatter.money(refund.refund) }}
-                    </div>
-                  </template>
+                    <i class="bi bi-moon"></i>
+                    {{ formatter.money(row.data.lumpSums.overnight.refund) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -311,26 +293,6 @@
                   <i class="bi bi-plus-lg"></i>
                 </button>
               </div>
-            </div>
-          </div>
-
-          <div class="row align-items-center mt-4">
-            <div class="col-auto pe-2">
-              <label class="form-label mb-0">{{ t('labels.lastPlaceOfWork') }}</label>
-            </div>
-            <div class="col-auto p-0">
-              <select
-                class="form-select form-select-sm"
-                @change="postTravelSettings"
-                v-model="travel.lastPlaceOfWork"
-                :disabled="isReadOnly">
-                <option v-for="place of getLastPaceOfWorkList(travel)" :value="place" :key="place.country._id + place.special">
-                  <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
-                </option>
-              </select>
-            </div>
-            <div class="col-auto ps-2">
-              <InfoPoint :text="t('info.lastPlaceOfWork')" />
             </div>
           </div>
         </div>
@@ -466,7 +428,6 @@ import {
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ErrorBanner from '@/components/elements/ErrorBanner.vue'
-import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
@@ -548,11 +509,11 @@ function resetAndHide() {
   hideModal()
 }
 
-async function postTravelSettings() {
+async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
   const travelObj = {
     _id: travel.value._id,
-    lastPlaceOfWork: travel.value.lastPlaceOfWork,
-    days: travel.value.days
+    lastPlaceOfWork,
+    days
   }
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
   if (result.ok) {

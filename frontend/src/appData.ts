@@ -1,7 +1,10 @@
 import { Ref, ref } from 'vue'
 import { loadLocales } from '../../common/locales/load'
+import { getById } from '../../common/scripts'
+import { TravelCalculator } from '../../common/travel'
 import {
-  CountrySimple,
+  Country,
+  CountryCode,
   Currency,
   DisplaySettings,
   HealthInsurance,
@@ -20,7 +23,7 @@ import { vueform } from './main'
 
 export class APP_DATA {
   currencies: Currency[]
-  countries: CountrySimple[]
+  countries: Country[]
   user: User
   settings: Settings
   travelSettings: TravelSettings
@@ -32,9 +35,11 @@ export class APP_DATA {
   projects?: ProjectSimple[]
   users?: { name: User['name']; _id: string }[]
 
+  travelCalculator: TravelCalculator
+
   constructor(
     currencies: Currency[],
-    countries: CountrySimple[],
+    countries: Country[],
     user: User,
     settings: Settings,
     travelSettings: TravelSettings,
@@ -58,6 +63,14 @@ export class APP_DATA {
 
     this.projects = projects
     this.users = users
+
+    this.travelCalculator = new TravelCalculator(async (code: CountryCode) => {
+      const country = getById(code, this.countries)
+      if (!country) {
+        throw new Error(`No Country found for code ${code}`)
+      }
+      return country
+    }, this.travelSettings)
   }
 }
 
@@ -78,7 +91,7 @@ class APP_LOADER {
           Promise.all([
             this.withProgress(API.getter<User>('user')),
             this.withProgress(API.getter<Currency[]>('currency')),
-            this.withProgress(API.getter<CountrySimple[]>('country')),
+            this.withProgress(API.getter<Country[]>('country')),
             this.withProgress(API.getter<Settings>('settings')),
             this.withProgress(API.getter<TravelSettings>('travelSettings')),
             this.withProgress(API.getter<HealthInsurance[]>('healthInsurance')),

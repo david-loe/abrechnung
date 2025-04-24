@@ -690,18 +690,11 @@ class ReportPrint {
       fn: (p: PurposeSimple) => this.t(`labels.${p}`)
     })
     columns.push({
-      key: 'noOvernightRefund',
-      width: 50,
-      alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.noOvernightRefund'),
-      fn: (nor: boolean) => (nor ? 'X' : '')
-    })
-    columns.push({
-      key: 'cateringNoRefund',
+      key: 'cateringRefund',
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.cateringNoRefund'),
-      fn: (c: TravelDay['cateringNoRefund']) => (Object.keys(c) as Meal[]).map((k) => (c[k] ? this.t(`labels.${k}`) : '')).join(' ')
+      title: this.t('labels.cateringRefund'),
+      fn: (c: TravelDay['cateringRefund']) => (Object.keys(c) as Meal[]).map((k) => (c[k] ? '' : this.t(`labels.${k}`))).join(' ')
     })
     columns.push({
       key: 'refunds',

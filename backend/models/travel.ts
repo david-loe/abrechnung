@@ -8,8 +8,8 @@ import {
   TravelRecord,
   TravelState,
   baseCurrency,
+  cateringTypes,
   distanceRefundTypes,
-  lumpsumTypes,
   transportTypes,
   travelStates
 } from '../../common/types.js'
@@ -117,19 +117,20 @@ const travelSchema = () =>
           date: { type: Date, required: true },
           country: { type: String, ref: 'Country', required: true },
           special: { type: String },
-          cateringNoRefund: {
-            breakfast: { type: Boolean, default: false },
-            lunch: { type: Boolean, default: false },
-            dinner: { type: Boolean, default: false }
+          cateringRefund: {
+            breakfast: { type: Boolean, default: true },
+            lunch: { type: Boolean, default: true },
+            dinner: { type: Boolean, default: true }
           },
-          noOvernightRefund: { type: Boolean, default: false },
+          overnightRefund: { type: Boolean, default: true },
           purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
-          refunds: [
-            {
-              type: { type: String, enum: lumpsumTypes, required: true },
-              refund: costObject(false, false, true)
+          lumpSums: {
+            overnight: { refund: costObject(false, false, true) },
+            catering: {
+              refund: costObject(false, false, true),
+              type: { type: String, enum: cateringTypes, required: true, default: 'catering8' }
             }
-          ]
+          }
         }
       ]
     },
