@@ -46,3 +46,27 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
   }
   return log
 }
+
+export function requestBaseSchema<S extends AnyState = AnyState>(stages: readonly S[], defaultState: S, modelName: string) {
+  return {
+    name: { type: String },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
+    state: { type: String, required: true, enum: stages, default: defaultState },
+    log: logObject(stages),
+    editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    comments: [
+      {
+        text: { type: String },
+        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        toState: {
+          type: String,
+          required: true,
+          enum: stages
+        }
+      }
+    ],
+    history: [{ type: Schema.Types.ObjectId, ref: modelName }],
+    historic: { type: Boolean, required: true, default: false }
+  }
+}

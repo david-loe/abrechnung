@@ -16,7 +16,7 @@ import {
 import { travelCalculator } from '../factory.js'
 import DocumentFile from './documentFile.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { costObject, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -41,29 +41,7 @@ type TravelModel = Model<Travel, {}, Methods>
 
 const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: travelStates,
-        default: 'appliedFor'
-      },
-      log: logObject(travelStates),
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: travelStates
-          }
-        }
-      ],
+    Object.assign(requestBaseSchema(travelStates, 'appliedFor', 'Travel'), {
       reason: { type: String, required: true },
       destinationPlace: place(true),
       isCrossBorder: { type: Boolean },
@@ -85,8 +63,6 @@ const travelSchema = () =>
       professionalShare: { type: Number, min: 0, max: 1 },
       lastPlaceOfWork: place(true, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
-      history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
-      historic: { type: Boolean, required: true, default: false },
       stages: [
         {
           departure: { type: Date, required: true },
@@ -133,7 +109,7 @@ const travelSchema = () =>
           }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 

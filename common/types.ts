@@ -355,7 +355,7 @@ export interface TravelSimple extends RequestSimple {
   state: TravelState
   log: Log<TravelState>
   comments: Comment<TravelState>[]
-  comment?: string | null
+
   reason: string
   destinationPlace: Place
   startDate: Date | string
@@ -416,13 +416,23 @@ export type Log<StateType extends AnyState = AnyState> = {
 export interface RequestSimple {
   name: string
   owner: UserSimple
+  editor: UserSimple
+  project: Project
+  comment?: string | null
+  comments: Comment<AnyState>[]
   state: AnyState
   log: Log<AnyState>
-  project: Project
-  editor: UserSimple
   createdAt: Date | string
   updatedAt: Date | string
   _id: _id
+}
+
+export interface Advance extends RequestSimple {
+  advance: Money
+  reason: string
+  state: AdvanceState
+  log: Log<AdvanceState>
+  comments: Comment<AdvanceState>[]
 }
 
 export interface Travel extends TravelSimple {
@@ -441,7 +451,6 @@ export interface ExpenseReportSimple extends RequestSimple {
   advance: Money
   comments: Comment<ExpenseReportState>[]
   addUp: AddUpResult<ExpenseReport>
-  comment?: string | null
 }
 
 export interface ExpenseReport extends ExpenseReportSimple {
@@ -458,7 +467,6 @@ export interface HealthCareCostSimple extends RequestSimple {
   log: Log<HealthCareCostState>
   comments: Comment<HealthCareCostState>[]
   addUp: AddUpResult<HealthCareCost>
-  comment?: string | null
 }
 
 export interface HealthCareCost extends HealthCareCostSimple {
@@ -479,7 +487,10 @@ export type ExpenseReportState = (typeof expenseReportStates)[number]
 export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
 export type HealthCareCostState = (typeof healthCareCostStates)[number]
 
-export type AnyState = TravelState | HealthCareCostState | ExpenseReportState
+export const advanceStates = ['rejected', 'appliedFor', 'approved', 'completed'] as const
+export type AdvanceState = (typeof advanceStates)[number]
+
+export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
 
 const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const
 export const transportTypes = ['ownCar', ...transportTypesButOwnCar] as const

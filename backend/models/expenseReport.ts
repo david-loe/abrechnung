@@ -10,7 +10,7 @@ import {
   expenseReportStates
 } from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { costObject, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -23,29 +23,7 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
 const expenseReportSchema = () =>
   new Schema<ExpenseReport, ExpenseReportModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: expenseReportStates,
-        default: 'inWork'
-      },
-      log: logObject(expenseReportStates),
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: expenseReportStates
-          }
-        }
-      ],
+    Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport'), {
       advance: costObject(true, false, false, baseCurrency._id),
       addUp: {
         type: {
@@ -55,8 +33,6 @@ const expenseReportSchema = () =>
           advance: costObject(false, false, true)
         }
       },
-      history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
-      historic: { type: Boolean, required: true, default: false },
       expenses: [
         {
           description: { type: String, required: true },
@@ -64,7 +40,7 @@ const expenseReportSchema = () =>
           note: { type: String }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 

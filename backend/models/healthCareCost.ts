@@ -10,7 +10,7 @@ import {
   healthCareCostStates
 } from '../../common/types.js'
 import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { costObject, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -23,19 +23,9 @@ type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
 const healthCareCostSchema = () =>
   new Schema<HealthCareCost, HealthCareCostModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    Object.assign(requestBaseSchema(healthCareCostStates, 'inWork', 'HealthCareCost'), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: healthCareCostStates,
-        default: 'inWork'
-      },
-      log: logObject(healthCareCostStates),
       refundSum: costObject(true, true, false, baseCurrency._id),
       addUp: {
         type: {
@@ -44,20 +34,6 @@ const healthCareCostSchema = () =>
           expenses: costObject(false, false, true)
         }
       },
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: healthCareCostStates
-          }
-        }
-      ],
-      history: [{ type: Schema.Types.ObjectId, ref: 'HealthCareCost' }],
-      historic: { type: Boolean, required: true, default: false },
       expenses: [
         {
           description: { type: String, required: true },
@@ -65,7 +41,7 @@ const healthCareCostSchema = () =>
           note: { type: String }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 
