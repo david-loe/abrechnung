@@ -3,6 +3,7 @@
   "start_url": "./user",
   "scope": "./",
   "display": "standalone",
+  "description": "Reisekostenabrechnung inkl. automatischer Pauschalen Berechnung auch für internationale Reisen ",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
@@ -19,6 +20,19 @@
     {
       "src": "/appicons/receipt512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1242x620",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "640x360",
       "type": "image/png"
     }
   ]

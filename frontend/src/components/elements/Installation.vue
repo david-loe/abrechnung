@@ -148,11 +148,11 @@ export default defineComponent({
     }
   },
   async created() {
-    await APP_LOADER.loadData()
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault()
       this.promptInstallEvent = event as BeforeInstallPromptEvent
     })
+    await APP_LOADER.loadData()
   },
   beforeMount() {
     this.browser = this.detectBrowser()

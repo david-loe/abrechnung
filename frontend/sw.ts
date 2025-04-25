@@ -1,143 +1,169 @@
 /// <reference lib="webworker" />
 import { logger } from '@/logger.js'
-import { RouteHandler, clientsClaim } from 'workbox-core'
-import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
+import { DBSchema, StoreNames, openDB } from 'idb'
+import { clientsClaim } from 'workbox-core'
+import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { escapeRegExp } from '../common/scripts'
+import { GETResponse } from '../common/types'
 
 declare let self: ServiceWorkerGlobalScope
 
+// -----------------------------------------------------------------------------
+// Constants
+// -----------------------------------------------------------------------------
+const CACHE_PREFIX = 'abrechnung' as const
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL
+const INDEX_DB_NAME = `${CACHE_PREFIX}-db`
+const INDEX_DB_VERSION = 1
+
+// Routes denylist for SPA navigation
+const denylist = [] // [/\/report(?:\?|$)/]
+if (BACKEND_URL.startsWith(FRONTEND_URL)) {
+  const backendPath = escapeRegExp(BACKEND_URL.replace(FRONTEND_URL, ''))
+  denylist.push(new RegExp(`^${backendPath}/auth`), new RegExp(`^${backendPath}/ip`), new RegExp(`^${backendPath}/docs`))
+}
+
+// -----------------------------------------------------------------------------
+// Install & Activate
+// -----------------------------------------------------------------------------
 precacheAndRoute(self.__WB_MANIFEST)
+cleanupOutdatedCaches()
 
 self.skipWaiting()
 clientsClaim()
 
-//default caching strategy - no caching only using network
+// -----------------------------------------------------------------------------
+// Default handler
+// -----------------------------------------------------------------------------
 setDefaultHandler(new NetworkOnly())
-// to allow work offline - setting default entry point for app
-const denylist = [/\/report(?:\?|$)/]
-if (import.meta.env.VITE_BACKEND_URL.startsWith(import.meta.env.VITE_FRONTEND_URL)) {
-  const backendPath = import.meta.env.VITE_BACKEND_URL.replace(import.meta.env.VITE_FRONTEND_URL, '')
-  denylist.push(new RegExp(`^${backendPath}/auth`), new RegExp(`^${backendPath}/ip`), new RegExp(`^${backendPath}/docs`))
-}
+
+// -----------------------------------------------------------------------------
+// Route registrations
+// -----------------------------------------------------------------------------
+// 1️⃣ HTML Navigation (Vue SPA)
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
 
-//caching all fonts with StaleWhileRevalidat strategy
+// 2️⃣ Static Assets
 registerRoute(
   ({ request }) => request.destination === 'font',
   new StaleWhileRevalidate({
     cacheName: 'font-cache'
   })
 )
+// 3️⃣ API Calls
+registerRoute(
+  ({ request }) => request.url.startsWith(BACKEND_URL) && !request.url.startsWith(`${BACKEND_URL}/auth`),
+  networkFirstWithDBFallback,
+  'GET'
+)
 
-//defining a Route Handler for NetworkForst strategy but saving the data in IndexedDB
-const NetworkFirstToDB: RouteHandler = async ({ request }) => {
+// -----------------------------------------------------------------------------
+// Handlers & Utilities
+// -----------------------------------------------------------------------------
+/**
+ * NetworkFirst strategy with IndexedDB fallback for GET requests.
+ */
+async function networkFirstWithDBFallback({ request }: { request: Request }) {
   const url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
   try {
-    const networkResponse = await fetch(request)
-    storeResponse(url, networkResponse.clone())
-    return networkResponse
-  } catch (error) {
-    const db = await openDatabase()
-    const transaction = db.transaction('urls', 'readonly')
-    const store = transaction.objectStore('urls')
-    const getRequest = store.get(url)
-    return new Promise<Response>((resolve, reject) => {
-      getRequest.onsuccess = () => {
-        const cachedData = getRequest.result
-        if (!cachedData) {
-          reject(error)
-        }
-        const cachedResponse = new Response(JSON.stringify(cachedData.res), {
-          headers: { 'Content-Type': 'application/json' }
-        })
-        resolve(cachedResponse)
+    const response = await fetch(request)
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      await storeToDB('urls', await response.clone().json(), url)
+    }
+    return response
+  } catch {
+    const dbEntry = await readFromDB('urls', url)
+    if (dbEntry) {
+      return new Response(JSON.stringify(dbEntry), { headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(
+      JSON.stringify({
+        error: 'offline',
+        message: 'No data'
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
       }
-      getRequest.onerror = () => reject(getRequest.error)
-    })
+    )
   }
 }
-//register all Routes using the backend url for NetWorkFirstToDB RouteHandler
-registerRoute(({ request }) => {
-  const isBackendURLbutNotAuth =
-    request.url.startsWith(import.meta.env.VITE_BACKEND_URL) && !request.url.startsWith(`${import.meta.env.VITE_BACKEND_URL}/auth`)
-  return isBackendURLbutNotAuth
-}, NetworkFirstToDB)
 
-//saving data in indexedDB
-async function storeResponse(url: string, response: Response) {
-  const contentType = response.headers.get('content-type')
-  if (contentType?.includes('application/json')) {
-    const db = await openDatabase()
-    const res = await response.json()
-    const transaction = db.transaction('urls', 'readwrite')
-    const store = transaction.objectStore('urls')
-    store.put({ id: url, res })
-    await new Promise<void>((resolve, reject) => {
-      transaction.oncomplete = () => {
-        resolve()
-      }
-      transaction.onerror = () => {
-        reject('Problem')
-      }
-    })
+/**
+ * Open IndexedDB and create `urls` store if needed.
+ */
+interface MyDB extends DBSchema {
+  urls: {
+    key: string
+    value: {
+      data: GETResponse<any>
+      timestamp: number
+    }
   }
 }
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('myDatabase', 1) // umbennenen und zentral speichern?
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      db.createObjectStore('urls', { keyPath: 'id' })
+const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
+  upgrade(db) {
+    if (!db.objectStoreNames.contains('urls')) {
+      db.createObjectStore('urls')
     }
-
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBOpenDBRequest).result)
-    }
-
-    request.onerror = (event) => {
-      reject((event.target as IDBOpenDBRequest).error)
-    }
-  })
-}
-
-//reacting to push event and trigger display of notification
-self.addEventListener('push', (event) => {
-  let data: any
-  try {
-    data = event.data?.json()
-  } catch (e) {
-    logger.error(`Push-Daten konnten nicht geparst werden:\n${e}`)
-    return
   }
-  // Überprüfe, ob alle nötigen Felder vorhanden sind
-  if (!data || !data.title || !data.url) {
-    logger.error(`Push-Daten unvollständig:\n${data}`)
-    return
-  }
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body || '',
-      data: { url: data.url }
-      // Hier können weitere Optionen wie Icons oder Aktionen ergänzt werden
-    })
-  )
 })
 
-//reacting to notificationclick event and open the notification url
+async function storeToDB(storeName: StoreNames<MyDB>, value: GETResponse<any>, key: string) {
+  const entry = {
+    data: value,
+    timestamp: Date.now()
+  }
+  await (await dbPromise).put(storeName, entry, key)
+}
+
+async function readFromDB(
+  storeName: StoreNames<MyDB>,
+  key: string,
+  ttlMillis = 86400000 // 1 day
+) {
+  const entry = await (await dbPromise).get(storeName, key)
+  if (!entry) return null
+  const age = Date.now() - entry.timestamp
+  if (age > ttlMillis) {
+    await (await dbPromise).delete(storeName, key)
+    return null
+  }
+  return entry.data
+}
+
+// -----------------------------------------------------------------------------
+// Push & Notification Events
+// -----------------------------------------------------------------------------
+self.addEventListener('push', (event) => {
+  const data = parsePushData(event)
+  if (!data) return
+  event.waitUntil(self.registration.showNotification(data.title, { body: data.body || '', data: { url: data.url } }))
+})
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const urlToOpen = event.notification.data.url
+  const url = event.notification.data.url
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      const client = clientList.find((c) => c.url === urlToOpen && 'focus' in c)
-      if (client) {
-        return client.focus()
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(urlToOpen)
-      }
-    })
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => clients.find((c) => c.url === url)?.focus() || self.clients.openWindow(url))
   )
 })
+
+/**
+ * Safely parse push event data or log error.
+ */
+function parsePushData(event: PushEvent) {
+  try {
+    const data = event.data?.json()
+    if (data?.title && data?.url) return data
+    throw new Error('Missing title or url')
+  } catch (err) {
+    logger.error('Invalid push data:', err)
+    return null
+  }
+}
