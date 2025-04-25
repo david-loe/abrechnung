@@ -17,7 +17,7 @@ import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, IdDocument, MoneyPlusPost } from './types.js'
 
@@ -38,7 +38,7 @@ export class HealthCareCostController extends Controller {
   }
   @Delete()
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(HealthCareCost, { _id: _id, checkOldObject: this.checkOwner(request.user) })
+    return await this.deleter(HealthCareCost, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 
   @Post('expense')
@@ -85,7 +85,7 @@ export class HealthCareCostController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'inWork' as HealthCareCostState,
+      state: 'inWork',
       owner: request.user._id,
       editor: request.user._id
     })
@@ -121,7 +121,7 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as HealthCareCostState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -248,7 +248,7 @@ export class HealthCareCostExamineController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'underExaminationByInsurance' as HealthCareCostState,
+      state: 'underExaminationByInsurance',
       editor: request.user._id
     })
 
@@ -289,7 +289,7 @@ export class HealthCareCostExamineController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
     if (!extendedBody._id && !extendedBody.name) {
       const date = new Date()
       extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -314,7 +314,7 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as HealthCareCostState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -384,7 +384,7 @@ export class HealthCareCostConfirmController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'refunded' as HealthCareCostState,
+      state: 'refunded',
       editor: request.user._id
     })
 

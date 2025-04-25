@@ -118,7 +118,7 @@ export class TravelController extends Controller {
   @Post('appliedFor')
   public async postOwnInWork(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'appliedFor' as TravelState,
+      state: 'appliedFor',
       owner: request.user._id,
       editor: request.user._id,
       lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
@@ -163,13 +163,13 @@ export class TravelController extends Controller {
         }
       }
       Object.assign(extendedBody, {
-        state: 'approved' as TravelState,
+        state: 'approved',
         editor: request.user._id,
         owner: request.user._id,
         lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
       })
     } else {
-      extendedBody = Object.assign({ _id: extendedBody._id }, { state: 'approved' as TravelState, editor: request.user._id })
+      extendedBody = Object.assign({ _id: extendedBody._id }, { state: 'approved', editor: request.user._id })
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -195,7 +195,7 @@ export class TravelController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -265,7 +265,7 @@ export class TravelApproveController extends Controller {
     @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
     if (!extendedBody._id) {
       const travelApplication = extendedBody as TravelApplication
       ;(travelApplication as any).lastPlaceOfWork = { country: travelApplication.destinationPlace?.country, place: '' }
@@ -304,7 +304,7 @@ export class TravelApproveController extends Controller {
 
   @Post('rejected')
   public async postAnyRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'rejected' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'rejected', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -450,7 +450,7 @@ export class TravelExamineController extends Controller {
 
   @Post('refunded')
   public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'refunded', editor: request.user._id })
 
     const cb = async (travel: ITravel) => {
       sendNotification(travel)
@@ -481,7 +481,7 @@ export class TravelExamineController extends Controller {
 
   @Post('approved')
   public async postAnyApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -503,7 +503,7 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,

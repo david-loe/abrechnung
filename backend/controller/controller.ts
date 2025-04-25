@@ -377,10 +377,6 @@ export class Controller extends TsoaController {
     return { message: 'alerts.successDeleting', result: result }
   }
 
-  checkOwner(requestUser: User) {
-    return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
-  }
-
   async insertMany<ModelType extends { _id?: Types.ObjectId | string }>(
     model: Model<ModelType>,
     options: { requestBody: SetterBody<ModelType>[]; cb?: (data: ModelType[]) => any }
@@ -391,4 +387,7 @@ export class Controller extends TsoaController {
     }
     return { message: 'alerts.successSaving', result }
   }
+}
+export function checkOwner(requestUser: User) {
+  return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
 }
