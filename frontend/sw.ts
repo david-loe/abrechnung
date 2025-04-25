@@ -5,6 +5,7 @@ import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { escapeRegExp } from '../common/scripts'
 import { GETResponse } from '../common/types'
 
 declare let self: ServiceWorkerGlobalScope
@@ -21,7 +22,7 @@ const INDEX_DB_VERSION = 1
 // Routes denylist for SPA navigation
 const denylist = [] // [/\/report(?:\?|$)/]
 if (BACKEND_URL.startsWith(FRONTEND_URL)) {
-  const backendPath = BACKEND_URL.replace(FRONTEND_URL, '')
+  const backendPath = escapeRegExp(BACKEND_URL.replace(FRONTEND_URL, ''))
   denylist.push(new RegExp(`^${backendPath}/auth`), new RegExp(`^${backendPath}/ip`), new RegExp(`^${backendPath}/docs`))
 }
 
@@ -69,7 +70,7 @@ async function networkFirstWithDBFallback({ request }: { request: Request }) {
   const url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
   try {
     const response = await fetch(request)
-    if (response.headers.get('content-type')?.includes('application/json')) {
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
       await storeToDB('urls', await response.clone().json(), url)
     }
     return response
@@ -105,7 +106,9 @@ interface MyDB extends DBSchema {
 }
 const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
   upgrade(db) {
-    db.createObjectStore('urls')
+    if (!db.objectStoreNames.contains('urls')) {
+      db.createObjectStore('urls')
+    }
   }
 })
 
