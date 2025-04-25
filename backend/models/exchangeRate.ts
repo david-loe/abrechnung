@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Schema, model } from 'mongoose'
-import { ExchangeRate as IExchangeRate, baseCurrency } from '../../common/types.js'
+import { Currency, ExchangeRate as IExchangeRate, Money, baseCurrency } from '../../common/types.js'
 
 const exchangeRateSchema = () =>
   new Schema<IExchangeRate>({
@@ -56,4 +56,14 @@ export async function convertCurrency(
   const rate = data.value
   const resultAmount = Math.round((amount / rate) * 100) / 100
   return { date: conversionDate, rate, amount: resultAmount }
+}
+
+export async function addExchangeRate(costObject: Money, date: string | number | Date) {
+  let exchangeRate = null
+
+  if (costObject.amount !== null && costObject.amount > 0) {
+    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as Currency)._id)
+  }
+  costObject.exchangeRate = exchangeRate
+  return costObject
 }

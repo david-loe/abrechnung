@@ -1,15 +1,7 @@
 import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import {
-  Comment,
-  ExpenseReport,
-  ExpenseReportState,
-  Currency as ICurrency,
-  Money,
-  baseCurrency,
-  expenseReportStates
-} from '../../common/types.js'
-import { convertCurrency } from './exchangeRate.js'
+import { Comment, ExpenseReport, ExpenseReportState, baseCurrency, expenseReportStates } from '../../common/types.js'
+import { addExchangeRate } from './exchangeRate.js'
 import { costObject, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
@@ -87,30 +79,12 @@ schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
   this.log[this.state] = { date: new Date(), editor: this.editor }
 }
 
-async function exchange(costObject: Money, date: string | number | Date) {
-  let exchangeRate = null
-
-  if (costObject.amount !== null && costObject.amount > 0) {
-    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
-  }
-  costObject.exchangeRate = exchangeRate
-
-  return costObject
-}
-
 schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
-    promiseList.push(exchange(expense.cost, expense.cost.date))
+    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
   }
-  const results = await Promise.allSettled(promiseList)
-  let i = 0
-  for (const expense of this.expenses) {
-    if (results[i].status === 'fulfilled') {
-      Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)
-    }
-    i++
-  }
+  await Promise.allSettled(promiseList)
 }
 
 schema.methods.addComment = function (this: ExpenseReportDoc) {
