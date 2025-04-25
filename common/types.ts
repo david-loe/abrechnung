@@ -355,12 +355,10 @@ export interface TravelSimple extends RequestSimple {
   state: TravelState
   log: Log<TravelState>
   comments: Comment<TravelState>[]
-
   reason: string
   destinationPlace: Place
   startDate: Date | string
   endDate: Date | string
-  advance: Money
   progress: number
   addUp: AddUpResult<Travel>
   isCrossBorder?: boolean | null
@@ -433,6 +431,8 @@ export interface Advance extends RequestSimple {
   state: AdvanceState
   log: Log<AdvanceState>
   comments: Comment<AdvanceState>[]
+  history: _id[]
+  historic: boolean
 }
 
 export interface Travel extends TravelSimple {
@@ -448,7 +448,6 @@ export interface Travel extends TravelSimple {
 export interface ExpenseReportSimple extends RequestSimple {
   state: ExpenseReportState
   log: Log<ExpenseReportState>
-  advance: Money
   comments: Comment<ExpenseReportState>[]
   addUp: AddUpResult<ExpenseReport>
 }
@@ -505,7 +504,7 @@ export type ImageType = (typeof imageTypes)[number]
 export const documentFileTypes = ['application/pdf', ...imageTypes] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
-export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
+export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
 
 export const retention = [
@@ -522,8 +521,10 @@ export const accesses = [
   'user',
   'inWork:expenseReport',
   'inWork:healthCareCost',
+  'appliedFor:advance',
   'appliedFor:travel',
   'approved:travel',
+  'approve/advance',
   'approve/travel',
   'examine/travel',
   'examine/expenseReport',
@@ -577,22 +578,32 @@ export type UserReplaceReferencesResult = {
   [key in (typeof userReplaceCollections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number }
 }
 
-export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel
-export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is TravelSimple
-export function reportIsTravel(report: any): report is { reason: string } {
-  return typeof report.reason === 'string'
+export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Travel
+export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is TravelSimple
+export function reportIsTravel(report: any): report is { startDate: Date | string } {
+  return typeof report.startDate === 'string' || report.startDate instanceof Date
 }
 
-export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost
-export function reportIsHealthCareCost(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is HealthCareCost
+export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost | Advance): report is HealthCareCost
+export function reportIsHealthCareCost(
+  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
+): report is HealthCareCostSimple
 export function reportIsHealthCareCost(report: any): report is { patientName: string } {
   return typeof report.patientName === 'string'
 }
 
-export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport
-export function reportIsExpenseReport(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is ExpenseReport
+export function reportIsAdvance(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Advance
+export function reportIsAdvance(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is Advance
+export function reportIsAdvance(report: any): report is { startDate: Date | string } {
+  return !reportIsTravel(report) && typeof report.reason === 'string'
+}
+
+export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost | Advance): report is ExpenseReport
+export function reportIsExpenseReport(
+  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
+): report is ExpenseReportSimple
 export function reportIsExpenseReport(report: any): report is any {
-  return !reportIsTravel(report) && !reportIsHealthCareCost(report)
+  return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
 
 export type AddUpResult<T> = T extends Travel
@@ -614,6 +625,7 @@ export type AddUpResult<T> = T extends Travel
       ? {
           balance: BaseCurrencyMoney
           total: BaseCurrencyMoney
+          advance: BaseCurrencyMoney
           expenses: BaseCurrencyMoney
         }
       : never

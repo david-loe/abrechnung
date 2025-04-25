@@ -1,12 +1,14 @@
 import { RootFilterQuery } from 'mongoose'
 import { PlaceToString, getDiffInDays } from '../../common/scripts.js'
 import {
+  Advance,
   ExpenseReportSimple,
   HealthCareCostSimple,
   User as IUser,
   Locale,
   ReportType,
   TravelSimple,
+  reportIsAdvance,
   reportIsHealthCareCost,
   reportIsTravel
 } from '../../common/types.js'
@@ -18,11 +20,13 @@ import User from '../models/user.js'
 import { sendMail } from './mail.js'
 import { sendPushNotification } from './push.js'
 
-export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple, textState?: string) {
+export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, textState?: string) {
   let recipients = []
   let reportType: ReportType
   if (reportIsTravel(report)) {
     reportType = 'travel'
+  } else if (reportIsAdvance(report)) {
+    reportType = 'advance'
   } else if (reportIsHealthCareCost(report)) {
     reportType = 'healthCareCost'
   } else {
