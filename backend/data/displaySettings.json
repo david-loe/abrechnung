@@ -50,6 +50,10 @@
       "color": "#615d6c",
       "text": "white"
     },
+    "completed": {
+      "color": "#615d6c",
+      "text": "white"
+    },
     "rejected": {
       "color": "#E8998D",
       "text": "black"

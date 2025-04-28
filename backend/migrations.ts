@@ -206,6 +206,14 @@ export async function checkForMigrations() {
         .updateMany({}, { $unset: { 'days.$[].cateringNoRefund': '', claimOvernightLumpSum: '' } })
     }
 
+    if (semver.lte(migrateFrom, '1.7.4')) {
+      logger.info('Apply migration from v1.7.4: rewrite advances')
+
+      await mongoose.connection
+        .collection('displaysettings')
+        .updateOne({}, { $set: { 'stateColors.completed': { color: '#615d6c', text: 'white' } } })
+    }
+
     if (settings) {
       settings.migrateFrom = undefined
       await settings.save()
