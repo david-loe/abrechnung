@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -46,14 +46,8 @@
       "node": true,
       "es2022": true
     },
-    "extends": [
-      "plugin:vue/vue3-essential"
-    ],
+    "extends": ["plugin:vue/vue3-essential"],
     "rules": {}
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "browserslist": ["> 1%", "last 2 versions", "not dead"]
 }

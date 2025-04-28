@@ -176,21 +176,29 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('settings').updateOne({}, { $unset: { accessIcons: '', stateColors: '', travelSettings: '' } })
     }
 
-    if (semver.lte(migrateFrom, '1.7.1')) {
+    if (semver.lte(migrateFrom, '1.7.2')) {
       logger.info('Apply migration from v1.7.1: migrate travel.days.refunds to lumpSums')
 
       const travels = await mongoose.model('Travel').find({})
       for (const travel of travels) {
-        if (travel.days > 1) {
+        if (travel.days.length > 0) {
           for (const day of travel.days) {
-            day.cateringRefund = {
-              breakfast: !day.cateringNoRefund?.breakfast,
-              lunch: !day.cateringNoRefund?.lunch,
-              dinner: !day.cateringNoRefund?.dinner
+            if (!day.cateringRefund) {
+              day.cateringRefund = {
+                breakfast: !day.cateringNoRefund?.breakfast,
+                lunch: !day.cateringNoRefund?.lunch,
+                dinner: !day.cateringNoRefund?.dinner
+              }
+              day.overnightRefund = Boolean(travel.claimOvernightLumpSum)
             }
-            day.overnightRefund = travel.claimOvernightLumpSum
           }
-          await travel.save({ timestamps: false })
+          try {
+            await travel.save({ timestamps: false })
+          } catch (e) {
+            if (!travel.historic) {
+              logger.warn(`Travel (${travel._id.toString()}) not save: ${e}`)
+            }
+          }
         }
       }
       await mongoose.connection
