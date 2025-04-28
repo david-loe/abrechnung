@@ -117,6 +117,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'stages.cost.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'project' }),
+    doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
     doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }),
     doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
     doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
@@ -188,7 +189,6 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
 
 schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   const promiseList = []
-  promiseList.push(addExchangeRate(this.advance, this.createdAt ? this.createdAt : new Date()))
   for (const stage of this.stages) {
     promiseList.push(addExchangeRate(stage.cost, stage.cost.date))
   }

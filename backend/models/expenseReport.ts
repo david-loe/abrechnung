@@ -41,6 +41,7 @@ function populate(doc: Document) {
     doc.populate({ path: 'advance.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'project' }),
+    doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
     doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),

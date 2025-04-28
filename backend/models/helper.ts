@@ -47,8 +47,13 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
   return log
 }
 
-export function requestBaseSchema<S extends AnyState = AnyState>(stages: readonly S[], defaultState: S, modelName: string) {
-  return {
+export function requestBaseSchema<S extends AnyState = AnyState>(
+  stages: readonly S[],
+  defaultState: S,
+  modelName: string,
+  advances = true
+) {
+  const schema = {
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
@@ -69,4 +74,8 @@ export function requestBaseSchema<S extends AnyState = AnyState>(stages: readonl
     history: [{ type: Schema.Types.ObjectId, ref: modelName }],
     historic: { type: Boolean, required: true, default: false }
   }
+
+  const schemaWithAdvances = Object.assign(schema, advances ? { advances: [{ type: Schema.Types.ObjectId, ref: 'Advance' }] } : {})
+
+  return schemaWithAdvances
 }

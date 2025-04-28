@@ -351,25 +351,6 @@ export interface Comment<State extends AnyState = AnyState> {
   _id: _id
 }
 
-export interface TravelSimple extends RequestSimple {
-  state: TravelState
-  log: Log<TravelState>
-  comments: Comment<TravelState>[]
-  reason: string
-  destinationPlace: Place
-  startDate: Date | string
-  endDate: Date | string
-  progress: number
-  addUp: AddUpResult<Travel>
-  isCrossBorder?: boolean | null
-  a1Certificate?: {
-    exactAddress: string
-    destinationName: string
-  } | null
-  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
-  fellowTravelersNames?: string | null //settings.allowSpouseRefund
-}
-
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | {
@@ -404,74 +385,86 @@ export interface TravelDay {
   _id: _id
 }
 
-export type Log<StateType extends AnyState = AnyState> = {
-  [key in StateType]?: {
+export type Log<S extends AnyState = AnyState> = {
+  [key in S]?: {
     date: Date | string
     editor: UserSimple
   }
 }
 
-export interface RequestSimple {
+export interface ReportSimple<S extends AnyState = AnyState> {
   name: string
   owner: UserSimple
   editor: UserSimple
   project: Project
   comment?: string | null
-  comments: Comment<AnyState>[]
-  state: AnyState
-  log: Log<AnyState>
+  comments: Comment<S>[]
+  state: S
+  log: Log<S>
   createdAt: Date | string
   updatedAt: Date | string
   _id: _id
 }
 
-export interface Advance extends RequestSimple {
-  advance: Money
-  reason: string
-  state: AdvanceState
-  log: Log<AdvanceState>
-  comments: Comment<AdvanceState>[]
+export interface Report<S extends AnyState = AnyState> extends ReportSimple<S> {
   history: _id[]
   historic: boolean
 }
 
-export interface Travel extends TravelSimple {
+export interface AdvanceBase {
+  name: string
+  budget: Money
+  balance: BaseCurrencyMoney
+  runningBalance: BaseCurrencyMoney
+  _id: _id
+}
+
+export interface Advance extends Report<AdvanceState>, AdvanceBase {
+  reason: string
+}
+
+export interface TravelSimple extends ReportSimple<TravelState> {
+  reason: string
+  destinationPlace: Place
+  startDate: Date | string
+  endDate: Date | string
+  progress: number
+  addUp: AddUpResult<Travel>
+  isCrossBorder?: boolean | null
+  a1Certificate?: {
+    exactAddress: string
+    destinationName: string
+  } | null
+  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
+  fellowTravelersNames?: string | null //settings.allowSpouseRefund
+}
+
+export interface Travel extends TravelSimple, Report<TravelState> {
   lastPlaceOfWork: Place
   professionalShare: number | null
-  history: _id[]
-  historic: boolean
   stages: Stage[]
   expenses: TravelExpense[]
   days: TravelDay[]
+  advances: AdvanceBase[]
 }
 
-export interface ExpenseReportSimple extends RequestSimple {
-  state: ExpenseReportState
-  log: Log<ExpenseReportState>
-  comments: Comment<ExpenseReportState>[]
+export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
   addUp: AddUpResult<ExpenseReport>
 }
-
-export interface ExpenseReport extends ExpenseReportSimple {
-  history: _id[]
-  historic: boolean
+export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
   expenses: Expense[]
+  advances: AdvanceBase[]
 }
 
-export interface HealthCareCostSimple extends RequestSimple {
+export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> {
   patientName: string
   insurance: HealthInsurance
   refundSum: MoneyPlus
-  state: HealthCareCostState
-  log: Log<HealthCareCostState>
-  comments: Comment<HealthCareCostState>[]
   addUp: AddUpResult<HealthCareCost>
 }
-
-export interface HealthCareCost extends HealthCareCostSimple {
-  history: _id[]
-  historic: boolean
+export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
   expenses: Expense[]
+  advances: AdvanceBase[]
 }
 
 export const locales = ['de', 'en'] as const
@@ -606,7 +599,7 @@ export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
 
-export type AddUpResult<T> = T extends Travel
+export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost> = T extends Travel
   ? {
       balance: BaseCurrencyMoney
       total: BaseCurrencyMoney
@@ -614,21 +607,12 @@ export type AddUpResult<T> = T extends Travel
       expenses: BaseCurrencyMoney
       lumpSums: BaseCurrencyMoney
     }
-  : T extends ExpenseReport
-    ? {
-        balance: BaseCurrencyMoney
-        total: BaseCurrencyMoney
-        advance: BaseCurrencyMoney
-        expenses: BaseCurrencyMoney
-      }
-    : T extends HealthCareCost
-      ? {
-          balance: BaseCurrencyMoney
-          total: BaseCurrencyMoney
-          advance: BaseCurrencyMoney
-          expenses: BaseCurrencyMoney
-        }
-      : never
+  : {
+      balance: BaseCurrencyMoney
+      total: BaseCurrencyMoney
+      advance: BaseCurrencyMoney
+      expenses: BaseCurrencyMoney
+    }
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

@@ -186,14 +186,13 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
     expenses = getTravelExpensesSum(report).amount
   } else {
     for (const expense of report.expenses) {
-      if (expense.cost) {
-        expenses += getBaseCurrencyAmount(expense.cost)
-      }
+      expenses += getBaseCurrencyAmount(expense.cost)
     }
   }
-  if ((report as Travel | ExpenseReport).advance) {
-    advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
+  for (const approvedAdvance of report.advances) {
+    advance += approvedAdvance.balance.amount || 0
   }
+
   const total = expenses + lumpSums
   const balance = total - advance
 
@@ -204,13 +203,6 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
       advance: { amount: advance },
       expenses: { amount: expenses },
       lumpSums: { amount: lumpSums }
-    } as AddUpResult<T>
-  }
-  if (reportIsHealthCareCost(report)) {
-    return {
-      balance: { amount: balance },
-      total: { amount: total },
-      expenses: { amount: expenses }
     } as AddUpResult<T>
   }
   return {

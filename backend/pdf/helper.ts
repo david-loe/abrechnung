@@ -52,22 +52,18 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
       const mailClient = await getClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
       let subject = '🧾 '
-      let pdf: Uint8Array
+      const pdf = await reportPrinter.print(report, lng)
       let totalSum = ''
       if (reportIsAdvance(report)) {
         subject = subject + i18n.t('labels.advance', { lng })
-        pdf = await reportPrinter.print(report, lng)
       } else {
         totalSum = formatter.money(addUp(report).balance)
         if (reportIsTravel(report)) {
           subject = subject + i18n.t('labels.travel', { lng })
-          pdf = await reportPrinter.print(report, lng)
         } else if (reportIsHealthCareCost(report)) {
           subject = subject + i18n.t('labels.healthCareCost', { lng })
-          pdf = await reportPrinter.print(report, lng)
         } else {
           subject = subject + i18n.t('labels.expenseReport', { lng })
-          pdf = await reportPrinter.print(report, lng)
         }
       }
 

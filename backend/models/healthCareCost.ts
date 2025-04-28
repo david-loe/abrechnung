@@ -49,6 +49,7 @@ function populate(doc: Document) {
   return Promise.allSettled([
     doc.populate({ path: 'insurance' }),
     doc.populate({ path: 'project' }),
+    doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
     doc.populate({ path: 'refundSum.currency' }),
     doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
     doc.populate({ path: 'expenses.cost.currency' }),

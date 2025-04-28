@@ -13,15 +13,17 @@ type AdvanceModel = Model<Advance, {}, Methods>
 
 const advanceSchema = () =>
   new Schema<Advance, AdvanceModel, Methods>(
-    Object.assign(requestBaseSchema(advanceStates, 'appliedFor', 'Advance'), {
-      advance: costObject(true, false, false, baseCurrency._id)
+    Object.assign(requestBaseSchema(advanceStates, 'appliedFor', 'Advance', false), {
+      budget: costObject(true, false, true, baseCurrency._id),
+      balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
+      runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true))
     }),
     { timestamps: true }
   )
 
 function populate(doc: Document) {
   return Promise.allSettled([
-    doc.populate({ path: 'advance.currency' }),
+    doc.populate({ path: 'budget.currency' }),
     doc.populate({ path: 'project' }),
     doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
     doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
@@ -54,7 +56,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc) {
 }
 
 schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
-  await addExchangeRate(this.advance, this.createdAt ? this.createdAt : new Date())
+  await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
 schema.methods.addComment = function (this: AdvanceDoc) {

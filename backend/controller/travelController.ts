@@ -279,12 +279,6 @@ export class TravelApproveController extends Controller {
       if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
         sendA1Notification(travel)
       }
-      if (travel.advance.amount !== null && travel.advance.amount > 0) {
-        sendViaMail(travel)
-        if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-          await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
-        }
-      }
     }
 
     return await this.setter(Travel, {
