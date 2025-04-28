@@ -181,6 +181,7 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   let expenses = 0
   let advance = 0
   let lumpSums = 0
+  let advanceOverflow = false
   if (reportIsTravel(report)) {
     lumpSums = getLumpSumsSum(report.days).amount
     expenses = getTravelExpensesSum(report).amount
@@ -194,7 +195,12 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   }
 
   const total = expenses + lumpSums
-  const balance = total - advance
+  let balance = total - advance
+
+  if (balance < 0) {
+    advanceOverflow = true
+    balance = 0
+  }
 
   if (reportIsTravel(report)) {
     return {
@@ -202,14 +208,16 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
       total: { amount: total },
       advance: { amount: advance },
       expenses: { amount: expenses },
-      lumpSums: { amount: lumpSums }
+      lumpSums: { amount: lumpSums },
+      advanceOverflow
     } as AddUpResult<T>
   }
   return {
     balance: { amount: balance },
     total: { amount: total },
     advance: { amount: advance },
-    expenses: { amount: expenses }
+    expenses: { amount: expenses },
+    advanceOverflow
   } as AddUpResult<T>
 }
 

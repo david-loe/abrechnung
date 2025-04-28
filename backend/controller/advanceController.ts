@@ -1,15 +1,15 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { AdvanceState, Expense, Advance as IAdvance, Locale, _id } from '../../common/types.js'
+import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Advance as IAdvance, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
+import { Controller, GetterQuery, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, IdDocument, MoneyPost } from './types.js'
 
@@ -17,7 +17,7 @@ interface AdvanceApplication {
   project?: IdDocument
   _id?: _id
   name?: string
-  advance: MoneyPost | undefined
+  budget: MoneyPost | undefined
   reason: string
 }
 

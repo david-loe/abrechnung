@@ -416,12 +416,13 @@ export interface AdvanceBase {
   budget: Money
   balance: BaseCurrencyMoney
   runningBalance: BaseCurrencyMoney
+  reason: string
   _id: _id
 }
 
-export interface Advance extends Report<AdvanceState>, AdvanceBase {
-  reason: string
-}
+export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {}
+
+export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
 
 export interface TravelSimple extends ReportSimple<TravelState> {
   reason: string
@@ -606,12 +607,14 @@ export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost> = T e
       advance: BaseCurrencyMoney
       expenses: BaseCurrencyMoney
       lumpSums: BaseCurrencyMoney
+      advanceOverflow: boolean
     }
   : {
       balance: BaseCurrencyMoney
       total: BaseCurrencyMoney
       advance: BaseCurrencyMoney
       expenses: BaseCurrencyMoney
+      advanceOverflow: boolean
     }
 
 export const emailRegex =

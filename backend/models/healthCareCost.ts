@@ -9,6 +9,7 @@ import {
   baseCurrency,
   healthCareCostStates
 } from '../../common/types.js'
+import { AdvanceDoc } from './advance.js'
 import { addExchangeRate, convertCurrency } from './exchangeRate.js'
 import { costObject, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
@@ -29,9 +30,10 @@ const healthCareCostSchema = () =>
       refundSum: costObject(true, true, false, baseCurrency._id),
       addUp: {
         type: {
-          balance: costObject(false, false, true, null, 0, null),
+          balance: costObject(false, false, true),
           total: costObject(false, false, true),
-          expenses: costObject(false, false, true)
+          expenses: costObject(false, false, true),
+          advanceOverflow: { type: Boolean, required: true, default: false }
         }
       },
       expenses: [
@@ -121,6 +123,9 @@ schema.pre('save', async function (this: HealthCareCostDoc, next) {
 schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
+    for (const advance of this.advances) {
+      await (advance as AdvanceDoc).offset(this.addUp.total.amount || 0)
+    }
   }
 })
 

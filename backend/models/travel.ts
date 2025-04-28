@@ -12,6 +12,7 @@ import {
   travelStates
 } from '../../common/types.js'
 import { travelCalculator } from '../factory.js'
+import { AdvanceDoc } from './advance.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, requestBaseSchema } from './helper.js'
@@ -49,11 +50,12 @@ const travelSchema = () =>
       advance: costObject(true, false, false, baseCurrency._id),
       addUp: {
         type: {
-          balance: costObject(false, false, true, null, 0, null),
+          balance: costObject(false, false, true),
           total: costObject(false, false, true),
           expenses: costObject(false, false, true),
           advance: costObject(false, false, true),
-          lumpSums: costObject(false, false, true)
+          lumpSums: costObject(false, false, true),
+          advanceOverflow: { type: Boolean, required: true, default: false }
         }
       },
       claimSpouseRefund: { type: Boolean },
@@ -226,6 +228,9 @@ schema.pre('validate', async function (this: TravelDoc, next) {
 schema.post('save', async function (this: TravelDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
+    for (const advance of this.advances) {
+      await (advance as AdvanceDoc).offset(this.addUp.total.amount || 0)
+    }
   }
 })
 

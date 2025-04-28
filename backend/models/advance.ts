@@ -7,6 +7,7 @@ interface Methods {
   saveToHistory(): Promise<void>
   calculateExchangeRates(): Promise<void>
   addComment(): void
+  offset(reportTotal: number): Promise<number>
 }
 
 type AdvanceModel = Model<Advance, {}, Methods>
@@ -14,6 +15,7 @@ type AdvanceModel = Model<Advance, {}, Methods>
 const advanceSchema = () =>
   new Schema<Advance, AdvanceModel, Methods>(
     Object.assign(requestBaseSchema(advanceStates, 'appliedFor', 'Advance', false), {
+      reason: { type: String, required: true },
       budget: costObject(true, false, true, baseCurrency._id),
       balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
       runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true))
@@ -59,6 +61,25 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
   await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
+schema.methods.offset = async function (this: AdvanceDoc, reportTotal: number) {
+  if (this.state !== 'approved' || reportTotal <= 0) {
+    return reportTotal
+  }
+  let difference = reportTotal - (this.balance.amount || 0)
+  if (difference >= 0) {
+    await this.saveToHistory()
+    this.balance.amount = 0
+    this.runningBalance.amount = 0
+    this.state = 'completed'
+  } else {
+    this.balance.amount = -difference
+    this.runningBalance.amount = -difference
+    difference = 0
+  }
+  await this.save()
+  return difference
+}
+
 schema.methods.addComment = function (this: AdvanceDoc) {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<AdvanceState>)
@@ -73,6 +94,10 @@ schema.pre('validate', function (this: AdvanceDoc) {
 schema.pre('save', async function (this: AdvanceDoc, next) {
   await populate(this)
   await this.calculateExchangeRates()
+  if (this.isNew) {
+    this.balance.amount = this.budget.amount
+    this.runningBalance.amount = this.budget.amount
+  }
   next()
 })
 
