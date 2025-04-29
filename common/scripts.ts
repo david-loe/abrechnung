@@ -8,6 +8,7 @@ import {
   Money,
   Place,
   Travel,
+  TravelDay,
   baseCurrency,
   reportIsHealthCareCost,
   reportIsTravel
@@ -131,9 +132,9 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
 }
 
-function getLumpSumsSum(travel: Travel) {
+export function getLumpSumsSum(days: TravelDay[]) {
   let sum = 0
-  for (const day of travel.days) {
+  for (const day of days) {
     sum += day.lumpSums.overnight.refund.amount || 0
     sum += day.lumpSums.catering.refund.amount || 0
   }
@@ -181,7 +182,7 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   let advance = 0
   let lumpSums = 0
   if (reportIsTravel(report)) {
-    lumpSums = getLumpSumsSum(report).amount
+    lumpSums = getLumpSumsSum(report.days).amount
     expenses = getTravelExpensesSum(report).amount
   } else {
     for (const expense of report.expenses) {
@@ -404,7 +405,7 @@ function isObject(item: any) {
 /**
  * Deep merge two objects.
  */
-export function mergeDeep(target: any, ...sources: any) {
+export function mergeDeep(target: any, ...sources: any[]) {
   if (!sources.length) return target
   const source = sources.shift()
 
