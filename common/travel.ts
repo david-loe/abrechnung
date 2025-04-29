@@ -8,9 +8,7 @@ import {
   LumpSum,
   LumpsumType,
   Meal,
-  Place,
   PurposeSimple,
-  Refund,
   Stage,
   Travel,
   TravelDay,
@@ -133,20 +131,30 @@ export class TravelCalculator {
 
   getDateOfLastPlaceOfWork(travel: Travel) {
     let date: Date | null = null
-    function sameCountryAndSpecial(placeA: Place, placeB: Place): boolean {
-      return placeA.country._id === placeB.country._id && placeA.special === placeB.special
-    }
+    let sameCountryDate: Date | null = null
+    const lpow = travel.lastPlaceOfWork
     for (let i = travel.stages.length - 1; i >= 0; i--) {
-      if (sameCountryAndSpecial(travel.stages[i].endLocation, travel.lastPlaceOfWork)) {
-        date = datetimeToDate(travel.stages[i].arrival)
-        break
+      const stage = travel.stages[i]
+      if (stage.endLocation.country._id === lpow.country._id) {
+        if (!sameCountryDate) {
+          sameCountryDate = datetimeToDate(stage.arrival)
+        }
+        if (stage.endLocation.special === lpow.special) {
+          date = datetimeToDate(stage.arrival)
+          break
+        }
       }
-      if (sameCountryAndSpecial(travel.stages[i].startLocation, travel.lastPlaceOfWork)) {
-        date = datetimeToDate(travel.stages[i].departure)
-        break
+      if (stage.startLocation.country._id === lpow.country._id) {
+        if (!sameCountryDate) {
+          sameCountryDate = datetimeToDate(stage.departure)
+        }
+        if (stage.startLocation.special === lpow.special) {
+          date = datetimeToDate(stage.departure)
+          break
+        }
       }
     }
-    return date
+    return date ?? sameCountryDate
   }
 
   async calculateDays(travel: Travel) {
