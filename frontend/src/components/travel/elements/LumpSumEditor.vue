@@ -82,23 +82,31 @@
       </tbody>
     </table>
 
-    <div class="mb-3">
-      <label class="form-label me-2">{{ t('labels.lastPlaceOfWork') }}</label>
-      <div class="d-inline-flex flex-shrink-1 me-2">
-        <select class="form-select form-select-sm" v-model="localLastPlaceOfWork" :disabled="disabled">
-          <option v-for="place of lastPlaceOfWorkList" :value="place" :key="place.country._id + place.special">
-            <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
-          </option>
-        </select>
+    <div class="mb-3 row">
+      <div class="col">
+        <label class="form-label me-2">{{ t('labels.lastPlaceOfWork') }}</label>
+        <div class="d-inline-flex flex-shrink-1 me-2">
+          <select class="form-select form-select-sm" v-model="localLastPlaceOfWork" :disabled="disabled">
+            <option v-for="place of lastPlaceOfWorkList" :value="place" :key="place.country._id + place.special">
+              <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
+            </option>
+          </select>
+        </div>
+        <InfoPoint :text="t('info.lastPlaceOfWork')" />
       </div>
-      <InfoPoint :text="t('info.lastPlaceOfWork')" />
+      <div class="col-auto">
+        <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+        <span v-else class="text-secondary">
+          {{ $formatter.money(lumpSumsSum) }}
+        </span>
+      </div>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         {{ t('labels.save') }}
       </button>
-      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+      <span v-if="isCalculatingLumpSumsSum" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
@@ -106,14 +114,14 @@
   </form>
 </template>
 <script lang="ts" setup>
-import { Place, TravelDay, meals } from '@/../../common/types.js'
+import { getLumpSumsSum, mergeDeep } from '@/../../common/scripts'
+import { BaseCurrencyMoney, Place, Travel, TravelDay, meals } from '@/../../common/types.js'
 import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import { formatter } from '@/formatter.js'
-import { PropType, Ref, computed, ref } from 'vue'
+import { PropType, Ref, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { mergeDeep } from '../../../../../common/scripts'
 
 const emojis = {
   breakfast: '🥐',
@@ -125,19 +133,58 @@ const emojis = {
 const { t } = useI18n()
 
 const props = defineProps({
-  days: { type: Array as PropType<TravelDay[]>, required: true },
-  lastPlaceOfWork: { type: Object as PropType<Omit<Place, 'place'>>, required: true },
-  lastPlaceOfWorkList: { type: Array as PropType<Omit<Place, 'place'>[]>, required: true },
+  travel: { type: Object as PropType<Travel>, required: true },
   disabled: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
 const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>]; cancel: [] }>()
 
-const localLastPlaceOfWork = ref(props.lastPlaceOfWork)
-const localDays: Ref<TravelDay[]> = ref([])
+const lastPlaceOfWorkList = ref<Omit<Place, 'place'>[]>([])
+const localLastPlaceOfWork = ref<Place>(props.travel.lastPlaceOfWork)
+const lumpSumsSum = ref<BaseCurrencyMoney>(getLumpSumsSum(props.travel.days))
+const isCalculatingLumpSumsSum = ref(false)
+const localDays = ref<TravelDay[]>([])
 
-for (const day of props.days) {
-  localDays.value.push(mergeDeep({}, day))
+setup(props.travel)
+
+function setup(travel: Travel) {
+  setLocalDays(travel.days)
+  lastPlaceOfWorkList.value = getLastPaceOfWorkList(travel)
+  localLastPlaceOfWork.value = props.travel.lastPlaceOfWork
+}
+function setLocalDays(days: TravelDay[]) {
+  const newDays: TravelDay[] = []
+  for (const day of days) {
+    newDays.push(mergeDeep({}, day))
+  }
+  localDays.value = newDays
+}
+function getLastPaceOfWorkList(travelObj: Travel) {
+  const list: Omit<Place, 'place'>[] = []
+  function add(place: Place, list: Omit<Place, 'place'>[]) {
+    let found = false
+    for (const entry of list) {
+      if (entry.country._id === place.country._id && entry.special === place.special) {
+        found = true
+        break
+      }
+    }
+    if (!found) {
+      const adding: Omit<Place, 'place'> = {
+        country: place.country
+      }
+      if (place.special) {
+        adding.special = place.special
+      }
+      list.push(adding)
+    }
+  }
+  add(travelObj.destinationPlace, list)
+  for (const stage of travelObj.stages) {
+    add(stage.startLocation, list)
+    add(stage.endLocation, list)
+  }
+  return list
 }
 
 await APP_LOADER.loadData()
@@ -159,6 +206,42 @@ function setAll(type: LumpSums, value: boolean) {
     }
   }
 }
+watch(
+  () => props.travel,
+  () => setup(props.travel)
+)
+
+watch(localLastPlaceOfWork, async (newLastPlace) => {
+  setLocalDays(await APP_DATA.value.travelCalculator.calculateDays(props.travel.stages, newLastPlace, localDays.value))
+})
+
+watch(
+  localDays,
+  async (newLocalDays) => {
+    isCalculatingLumpSumsSum.value = true
+    try {
+      const newCalculatedDays = await APP_DATA.value.travelCalculator.calculateDays(
+        props.travel.stages,
+        localLastPlaceOfWork.value,
+        newLocalDays
+      )
+      await APP_DATA.value.travelCalculator.addCateringRefunds(
+        newCalculatedDays,
+        props.travel.stages,
+        Boolean(props.travel.claimSpouseRefund)
+      )
+      await APP_DATA.value.travelCalculator.addOvernightRefunds(
+        newCalculatedDays,
+        props.travel.stages,
+        Boolean(props.travel.claimSpouseRefund)
+      )
+      lumpSumsSum.value = getLumpSumsSum(newCalculatedDays)
+    } finally {
+      isCalculatingLumpSumsSum.value = false
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>

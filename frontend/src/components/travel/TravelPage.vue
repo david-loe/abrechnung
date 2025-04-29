@@ -59,9 +59,7 @@
         </TravelApplyForm>
         <LumpSumEditor
           v-else-if="modalObjectType === 'lumpSums'"
-          :days="travel.days"
-          :lastPlaceOfWorkList="getLastPaceOfWorkList(travel)"
-          :lastPlaceOfWork="travel.lastPlaceOfWork"
+          :travel="travel"
           :loading="modalFormIsLoading"
           :disabled="isReadOnly"
           @save="postTravelSettings"
@@ -507,7 +505,6 @@ function resetAndHide() {
 }
 
 async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
-  console.log(days)
   const travelObj = {
     _id: travel.value._id,
     lastPlaceOfWork,
@@ -753,34 +750,6 @@ async function getExaminerMails(): Promise<string[]> {
     return result.data.map((x) => x.email)
   }
   return []
-}
-
-function getLastPaceOfWorkList(travelObj: Travel) {
-  const list: Omit<Place, 'place'>[] = []
-  function add(place: Place, list: Omit<Place, 'place'>[]) {
-    let found = false
-    for (const entry of list) {
-      if (entry.country._id === place.country._id && entry.special === place.special) {
-        found = true
-        break
-      }
-    }
-    if (!found) {
-      const adding: Omit<Place, 'place'> = {
-        country: place.country
-      }
-      if (place.special) {
-        adding.special = place.special
-      }
-      list.push(adding)
-    }
-  }
-  add(travelObj.destinationPlace, list)
-  for (const stage of travelObj.stages) {
-    add(stage.startLocation, list)
-    add(stage.endLocation, list)
-  }
-  return list
 }
 
 function getNext(record: TravelRecord, type: TravelRecordType) {
