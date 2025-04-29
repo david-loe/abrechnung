@@ -95,7 +95,7 @@
         <InfoPoint :text="t('info.lastPlaceOfWork')" />
       </div>
       <div class="col-auto">
-        <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+        <span v-if="isCalculatingLumpSumsSum" class="spinner-border spinner-border-sm ms-1 me-3"></span>
         <span v-else class="text-secondary">
           {{ $formatter.money(lumpSumsSum) }}
         </span>
@@ -106,7 +106,7 @@
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         {{ t('labels.save') }}
       </button>
-      <span v-if="isCalculatingLumpSumsSum" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" @click="$emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
