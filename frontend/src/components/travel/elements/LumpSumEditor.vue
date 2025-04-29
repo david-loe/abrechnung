@@ -218,9 +218,6 @@ watch(localLastPlaceOfWork, async (newLastPlace) => {
 watch(
   localDays,
   async (newLocalDays) => {
-    if (isCalculatingLumpSumsSum.value) {
-      return
-    }
     isCalculatingLumpSumsSum.value = true
     try {
       const newCalculatedDays = await APP_DATA.value.travelCalculator.calculateDays(

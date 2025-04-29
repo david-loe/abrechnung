@@ -23,7 +23,7 @@ const routes = [
     meta: { requiresAuth: false },
     beforeEnter: async (to: RouteLocationNormalized) => {
       if (await auth()) {
-        return { path: (typeof to.query.redirect === 'string' ? to.query.redirect : null) || '/user' }
+        return { path: typeof to.query.redirect === 'string' ? to.query.redirect : '/user' }
       }
       return true
     }
