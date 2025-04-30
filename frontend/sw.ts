@@ -25,7 +25,7 @@ if (BACKEND_URL.startsWith(FRONTEND_URL)) {
   const backendPath = escapeRegExp(BACKEND_URL.replace(FRONTEND_URL, ''))
   denylist.push(
     new RegExp(`^${backendPath}/auth`),
-    new RegExp(`^${backendPath}.*/report(?:\?|$)`),
+    new RegExp(`^${backendPath}.*/report(?:\\?|$)`),
     new RegExp(`^${backendPath}/ip`),
     new RegExp(`^${backendPath}/docs`)
   )

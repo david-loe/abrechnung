@@ -6,7 +6,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register(swUrl, {
       type: swType,
-      updateViaCache: 'none'
+      updateViaCache: 'imports'
     })
     .then(async (registration) => {
       // Gleich nach der Registration eine Update-Prüfung anstoßen
