@@ -20,10 +20,15 @@ const INDEX_DB_NAME = `${CACHE_PREFIX}-db`
 const INDEX_DB_VERSION = 1
 
 // Routes denylist for SPA navigation
-const denylist = [] // [/\/report(?:\?|$)/]
+const denylist = []
 if (BACKEND_URL.startsWith(FRONTEND_URL)) {
   const backendPath = escapeRegExp(BACKEND_URL.replace(FRONTEND_URL, ''))
-  denylist.push(new RegExp(`^${backendPath}/auth`), new RegExp(`^${backendPath}/ip`), new RegExp(`^${backendPath}/docs`))
+  denylist.push(
+    new RegExp(`^${backendPath}/auth`),
+    new RegExp(`^${backendPath}.*/report(?:\?|$)`),
+    new RegExp(`^${backendPath}/ip`),
+    new RegExp(`^${backendPath}/docs`)
+  )
 }
 
 // -----------------------------------------------------------------------------
