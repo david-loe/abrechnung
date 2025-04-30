@@ -351,12 +351,10 @@
                 <template v-if="travel.state !== 'refunded'">
                   <div class="mb-3">
                     <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                    <textarea
-                      class="form-control"
+                    <TextArea
                       id="comment"
-                      rows="1"
                       v-model="travel.comment"
-                      :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></textarea>
+                      :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
                   </div>
                   <template v-if="travel.state === 'approved'">
                     <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
@@ -398,12 +396,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-
-import { DatabaseSync } from 'node:sqlite'
 import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
@@ -427,6 +419,7 @@ import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import LumpSumEditor from '@/components/travel//elements/LumpSumEditor.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
@@ -434,6 +427,10 @@ import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'

@@ -189,13 +189,7 @@
 
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
-      <textarea
-        type="text"
-        class="form-control form-control-sm"
-        id="travelFormDescription"
-        v-model="formStage.note"
-        :disabled="disabled"
-        rows="1"></textarea>
+      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formStage.note" :disabled="disabled"></TextArea>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -244,11 +238,12 @@ import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'StageForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput },
+  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput, TextArea },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev', 'postVehicleRegistration'],
   props: {
     stage: {

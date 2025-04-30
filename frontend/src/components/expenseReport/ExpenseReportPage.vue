@@ -191,12 +191,10 @@
                 </div>
                 <div v-if="expenseReport.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
+                  <TextArea
                     id="comment"
-                    rows="1"
                     v-model="expenseReport.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></textarea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
                 </div>
                 <template v-if="expenseReport.state === 'inWork'">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -246,6 +244,7 @@ import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '@/../..
 import API from '@/api.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import { formatter } from '@/formatter.js'

@@ -35,13 +35,7 @@
 
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
-      <textarea
-        type="text"
-        class="form-control form-control-sm"
-        id="travelFormDescription"
-        v-model="formExpense.note"
-        :disabled="disabled"
-        rows="1"></textarea>
+      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled"></TextArea>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -86,11 +80,13 @@ import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
+import TextArea from '@/components/elements/TextArea.vue'
+
 import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
+  components: { InfoPoint, CurrencySelector, FileUpload, DateInput, TextArea },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev'],
   props: {
     expense: {

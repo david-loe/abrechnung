@@ -186,10 +186,8 @@
                 </div>
                 <div v-if="healthCareCost.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
+                  <TextArea
                     id="comment"
-                    rows="1"
                     v-model="healthCareCost.comment as string | undefined"
                     :disabled="
                       isReadOnly &&
@@ -197,7 +195,7 @@
                         (endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination') ||
                         (endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance')
                       )
-                    "></textarea>
+                    "></TextArea>
                 </div>
                 <template v-if="healthCareCost.state === 'inWork'">
                   <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -278,11 +276,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { DocumentFile, Expense, HealthCareCost, Organisation, UserSimple, healthCareCostStates } from '@/../../common/types.js'
 import API from '@/api.js'
@@ -291,10 +284,15 @@ import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 type ModalMode = 'add' | 'edit'
 
