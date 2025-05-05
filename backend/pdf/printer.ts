@@ -990,41 +990,45 @@ class PDFDrawer {
         console.error(`No DocumentFile found for id: ${receipt._id}`)
         continue
       }
-      if (receipt.type === 'application/pdf') {
-        const insertPDF = await pdf_lib.PDFDocument.load(doc.buffer)
-        const pages = await this.doc.copyPages(insertPDF, insertPDF.getPageIndices())
-        for (const p of pages) {
-          this.currentPage = this.doc.addPage(p)
+      try {
+        if (receipt.type === 'application/pdf') {
+          const insertPDF = await pdf_lib.PDFDocument.load(doc.buffer)
+          const pages = await this.doc.copyPages(insertPDF, insertPDF.getPageIndices())
+          for (const p of pages) {
+            this.currentPage = this.doc.addPage(p)
+            this.drawReceiptNumber(receipt)
+          }
+        } else {
+          let image: pdf_lib.PDFImage
+          if (receipt.type === 'image/jpeg') {
+            const zeroOffsetData = new Uint8Array(doc.buffer, 0)
+            image = await this.doc.embedJpg(zeroOffsetData)
+          } else {
+            // receipt.type === 'image/png'
+            image = await this.doc.embedPng(doc.buffer)
+          }
+          if (image.width > image.height) {
+            this.newPage('landscape')
+          } else {
+            this.newPage('portrait')
+          }
+          let size = image.scaleToFit(
+            this.currentPage.getSize().width - this.settings.pagePadding, // only half padding
+            this.currentPage.getSize().height - this.settings.pagePadding
+          )
+          if (size.width > image.width) {
+            size = image.size()
+          }
+          this.currentPage.drawImage(image, {
+            x: (this.currentPage.getSize().width - size.width) / 2,
+            y: (this.currentPage.getSize().height - size.height) / 2,
+            width: size.width,
+            height: size.height
+          })
           this.drawReceiptNumber(receipt)
         }
-      } else {
-        let image: pdf_lib.PDFImage
-        if (receipt.type === 'image/jpeg') {
-          const zeroOffsetData = new Uint8Array(doc.buffer, 0)
-          image = await this.doc.embedJpg(zeroOffsetData)
-        } else {
-          // receipt.type === 'image/png'
-          image = await this.doc.embedPng(doc.buffer)
-        }
-        if (image.width > image.height) {
-          this.newPage('landscape')
-        } else {
-          this.newPage('portrait')
-        }
-        let size = image.scaleToFit(
-          this.currentPage.getSize().width - this.settings.pagePadding, // only half padding
-          this.currentPage.getSize().height - this.settings.pagePadding
-        )
-        if (size.width > image.width) {
-          size = image.size()
-        }
-        this.currentPage.drawImage(image, {
-          x: (this.currentPage.getSize().width - size.width) / 2,
-          y: (this.currentPage.getSize().height - size.height) / 2,
-          width: size.width,
-          height: size.height
-        })
-        this.drawReceiptNumber(receipt)
+      } catch (error) {
+        console.error(`Error while trying to add Document (${receipt._id})[${doc.type}] to PDF: ${error}`)
       }
     }
   }
