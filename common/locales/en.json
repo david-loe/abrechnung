@@ -1,7 +1,9 @@
 {
   "accesses": {
     "admin": "Administrator",
-    "appliedFor:travel": "Apply For Travels",
+    "appliedFor:advance": "Apply for Advance",
+    "appliedFor:travel": "Apply for Travels",
+    "approve/advance": "Approve Advance",
     "approve/travel": "Approve Travels",
     "approved:travel": "Initiate Own Travel Expenses Without Approval",
     "confirm/healthCareCost": "Confirm Health Care Costs",
@@ -10,9 +12,9 @@
     "examine/travel": "Examine Travels",
     "inWork:expenseReport": "Initiate Own Expenses",
     "inWork:healthCareCost": "Initiate Own Health Care Costs",
-    "refunded/expenseReport": "Show refunded Expenses",
-    "refunded/healthCareCost": "Show refunded Health Care Costs",
-    "refunded/travel": "Show refunded Travels",
+    "refunded/expenseReport": "Show Refunded Expenses",
+    "refunded/healthCareCost": "Show Refunded Health Care Costs",
+    "refunded/travel": "Show Refunded Travels",
     "user": "Home"
   },
   "alerts": {
@@ -173,6 +175,7 @@
     "addX": "Add {X}",
     "advance": "Advance",
     "advanceFromEmployer": "Advance From Employer",
+    "advances": "Advances",
     "airplane": "Airplane ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Allow accounting for spouses when traveling",
@@ -610,6 +613,7 @@
   "states": {
     "appliedFor": "Applied for",
     "approved": "Approved",
+    "completed": "Completed",
     "inWork": "In work",
     "refunded": "Refunded",
     "rejected": "Rejected",

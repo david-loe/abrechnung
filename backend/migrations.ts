@@ -212,6 +212,16 @@ export async function checkForMigrations() {
       await mongoose.connection
         .collection('displaysettings')
         .updateOne({}, { $set: { 'stateColors.completed': { color: '#615d6c', text: 'white' } } })
+      await mongoose.connection.collection('displaysettings').updateOne(
+        {},
+        {
+          $set: {
+            'accessIcons.appliedFor:advance': ['briefcase', 'cash-coin', 'plus'],
+            'accessIcons.approve/travel': ['airplane', 'clipboard-check'],
+            'accessIcons.approve/advance': ['briefcase', 'cash-coin', 'clipboard-check']
+          }
+        }
+      )
     }
 
     if (settings) {

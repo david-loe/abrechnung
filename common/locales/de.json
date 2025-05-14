@@ -1,7 +1,9 @@
 {
   "accesses": {
     "admin": "Administrator",
+    "appliedFor:advance": "Vorschuss beantragen",
     "appliedFor:travel": "Reisekostenabrechnung beantragen",
+    "approve/advance": "Vorschuss genehmigen",
     "approve/travel": "Reisen genehmigen",
     "approved:travel": "Eigene Reisekostenabrechnung ohne Genehmigung initiieren",
     "confirm/healthCareCost": "Krankenkosten bestätigen",
@@ -174,6 +176,7 @@
     "addX": "{X} hinzufügen",
     "advance": "Vorschuss",
     "advanceFromEmployer": "Vorschuss vom Arbeitgeber",
+    "advances": "Vorschüsse",
     "airplane": "Flugzeug ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Abrechnung für Ehepartner bei Reisen erlauben",
@@ -611,6 +614,7 @@
   "states": {
     "appliedFor": "Beantragt",
     "approved": "Genehmigt",
+    "completed": "Abgeschlossen",
     "inWork": "in Arbeit",
     "refunded": "Erstattet",
     "rejected": "Abgelehnt",
