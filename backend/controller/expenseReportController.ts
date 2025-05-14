@@ -73,7 +73,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined },
+    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
@@ -240,7 +240,7 @@ export class ExpenseReportExamineController extends Controller {
   @Post('inWork')
   public async postBackInWork(
     @Body()
-    requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined; owner?: IdDocument; comment?: string },
+    requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; owner?: IdDocument; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })

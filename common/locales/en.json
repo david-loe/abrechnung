@@ -33,8 +33,10 @@
     "loginFailed": "Failed to login!",
     "mailSend": "E-mail was send.",
     "noData": {
+      "advance": "No approved advance for selected project and owner. Apply for one!",
       "expense": "There are no expenses jet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
+      "searchX": "Nothing found for '{X}'.",
       "stage": "There are no stages jet. Add one!"
     },
     "notAllowed": "Not allowed!",
@@ -71,7 +73,7 @@
     "title": "abrechnung"
   },
   "info": {
-    "advance": "If you need an advance (e.g. for the plane tickets), specify here how much you need.",
+    "advance": "Select the advances you want to offset against your expenses here.",
     "cateringRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "claimSpouseRefund": "If you are traveling with your spouse and he is also eligible for reimbursement, you can bill him as well.",
     "cost": "Enter the cost here.",

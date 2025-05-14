@@ -4,9 +4,9 @@
     <table class="table">
       <tbody>
         <tr v-for="key of keys" :key="key">
-          <template v-if="displayKey(key as keyof TravelSimple)">
+          <template v-if="displayKey(key)">
             <th>{{ $t('labels.' + key) }}</th>
-            <td>{{ displayKey(key as keyof TravelSimple) }}</td>
+            <td>{{ displayKey(key) }}</td>
           </template>
         </tr>
         <tr>
@@ -27,7 +27,19 @@ import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { PropType, defineComponent } from 'vue'
 
-const keys = ['owner', 'reason', 'startDate', 'endDate', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames', 'a1Certificate']
+const keys: (keyof TravelSimple)[] = [
+  'owner',
+  'project',
+  'reason',
+  'startDate',
+  'endDate',
+  'editor',
+  'comments',
+  'advances',
+  'claimSpouseRefund',
+  'fellowTravelersNames',
+  'a1Certificate'
+]
 export default defineComponent({
   name: 'TravelApply',
   data() {
@@ -69,6 +81,21 @@ export default defineComponent({
             return `${this.travel.a1Certificate.destinationName} - ${this.travel.a1Certificate.exactAddress}`
           }
           return ''
+        case 'advances':
+          if (this.travel.advances.length > 0) {
+            return this.travel.advances
+              .map(
+                (a) =>
+                  `${a.name} - ${this.$formatter.money(a.runningBalance)} ${
+                    a.budget.amount !== a.runningBalance.amount ? `(${this.$formatter.money(a.budget)})` : ''
+                  }`
+              )
+              .join('\n')
+          }
+          return ''
+        case 'project':
+          return `${this.travel.project.identifier} - ${this.travel.project.name || ''}`
+
         default:
           if (typeof this.travel[key] === 'boolean') {
             return this.travel[key] ? '✅' : ''

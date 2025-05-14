@@ -33,8 +33,10 @@
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "mailSend": "E-mail wurde versandt.",
     "noData": {
+      "advance": "Kein genehmigter Vorschuss für das ausgewählte Projekt und den Besitzer. Beantrage einen!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
+      "searchX": "Kein Eintrag für '{X}' gefunden.",
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu."
     },
     "notAllowed": "Nicht erlaubt!",
@@ -72,7 +74,7 @@
     "title": "abrechnung"
   },
   "info": {
-    "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wie viel du benötigst.",
+    "advance": "Wähle hier die Vorschüsse aus die du mit deiner abrechnung🧾 verrechnen willst.",
     "cateringRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "claimSpouseRefund": "Wenn du gemeinsam mit deinem Ehepartner verreist und er auch erstattungberechtigt ist, kannst du ihn mitabrechnen.",
     "cost": "Trage hier die Kosten ein.",

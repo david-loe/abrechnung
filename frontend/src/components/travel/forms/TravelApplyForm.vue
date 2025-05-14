@@ -94,21 +94,23 @@
           :required="formTravel.claimSpouseRefund" />
       </div>
     </template>
-    <div class="mb-2">
-      <label for="travelFormAdvance" class="form-label me-2">
-        {{ $t('labels.advanceFromEmployer') }}
-      </label>
-      <InfoPoint :text="$t('info.advance')" />
-      <div class="input-group" id="travelFormAdvance">
-        <input type="number" class="form-control" step="0.01" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
-        <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
-      </div>
-    </div>
 
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
       <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="!askOwner" required> </ProjectSelector>
+    </div>
+
+    <div class="mb-3">
+      <label for="travelFormAdvance" class="form-label me-2">
+        {{ $t('labels.advanceFromEmployer') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <AdvanceSelector
+        v-model="formTravel.advances"
+        :owner-id="askOwner ? formTravel.owner : APP_DATA.user._id"
+        :project-id="formTravel.project?._id"
+        multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -131,8 +133,9 @@
 
 <script lang="ts">
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { TravelSimple, baseCurrency } from '@/../../common/types.js'
+import { TravelSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
@@ -143,7 +146,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector },
+  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: { type: Object as PropType<Partial<TravelSimple>> },
@@ -172,10 +175,7 @@ export default defineComponent({
           destinationName: ''
         },
         isCrossBorder: undefined,
-        advance: {
-          amount: null,
-          currency: baseCurrency
-        },
+        advances: [],
         owner: null
       }
     },
@@ -183,11 +183,6 @@ export default defineComponent({
       this.formTravel = this.default()
     },
     output() {
-      if (this.formTravel.advance.amount === null) {
-        this.formTravel.advance = undefined
-      } else if (this.formTravel.advance.amount === '') {
-        this.formTravel.advance.amount = 0
-      }
       if (!this.formTravel.isCrossBorder) {
         this.formTravel.a1Certificate = undefined
       }

@@ -431,6 +431,7 @@ export interface TravelSimple extends ReportSimple<TravelState> {
   endDate: Date | string
   progress: number
   addUp: AddUpResult<Travel>
+  advances: AdvanceBase[]
   isCrossBorder?: boolean | null
   a1Certificate?: {
     exactAddress: string
@@ -446,15 +447,14 @@ export interface Travel extends TravelSimple, Report<TravelState> {
   stages: Stage[]
   expenses: TravelExpense[]
   days: TravelDay[]
-  advances: AdvanceBase[]
 }
 
 export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
   addUp: AddUpResult<ExpenseReport>
+  advances: AdvanceBase[]
 }
 export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
   expenses: Expense[]
-  advances: AdvanceBase[]
 }
 
 export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> {
@@ -462,10 +462,10 @@ export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> 
   insurance: HealthInsurance
   refundSum: MoneyPlus
   addUp: AddUpResult<HealthCareCost>
+  advances: AdvanceBase[]
 }
 export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
   expenses: Expense[]
-  advances: AdvanceBase[]
 }
 
 export const locales = ['de', 'en'] as const

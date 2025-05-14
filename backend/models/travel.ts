@@ -47,7 +47,6 @@ const travelSchema = () =>
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
       startDate: { type: Date, required: true },
       endDate: { type: Date, required: true },
-      advance: costObject(true, false, false, baseCurrency._id),
       addUp: {
         type: {
           balance: costObject(false, false, true),
@@ -115,7 +114,6 @@ const travelSchema = () =>
 
 function populate(doc: Document) {
   return Promise.allSettled([
-    doc.populate({ path: 'advance.currency' }),
     doc.populate({ path: 'stages.cost.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'project' }),

@@ -1,4 +1,4 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { Document, HydratedDocument, Model, PopulateOptions, Query, Schema, model } from 'mongoose'
 import { Advance, AdvanceState, Comment, advanceStates, baseCurrency } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, requestBaseSchema } from './helper.js'
@@ -23,7 +23,7 @@ const advanceSchema = () =>
     { timestamps: true }
   )
 
-function populate(doc: Document) {
+function populate(doc: { populate: (opts: PopulateOptions) => Promise<unknown> }) {
   return Promise.allSettled([
     doc.populate({ path: 'budget.currency' }),
     doc.populate({ path: 'project' }),
@@ -36,7 +36,15 @@ function populate(doc: Document) {
 
 const schema = advanceSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: AdvanceDoc) {
+schema.pre(/^find((?!Update).)*$/, function (this: Query<Advance, Advance>) {
+  const projection = this.projection()
+  const popInProj: boolean = projection && (projection.settings || projection.vehicleRegistration || projection.token)
+  if (this.selectedExclusively() && popInProj) {
+    return
+  }
+  if (this.selectedInclusively() && !popInProj) {
+    return
+  }
   populate(this)
 })
 

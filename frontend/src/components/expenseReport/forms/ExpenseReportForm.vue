@@ -12,25 +12,22 @@
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
     <div class="mb-3">
-      <label for="expenseReportFormAdvance" class="form-label me-2">
-        {{ $t('labels.advanceFromEmployer') }}
-      </label>
-      <div class="input-group" id="expenseReportFormAdvance">
-        <input
-          type="number"
-          class="form-control"
-          step="0.01"
-          id="expenseReportFormAdvanceAmount"
-          v-model="formExpenseReport.advance.amount" />
-        <CurrencySelector v-model="formExpenseReport.advance.currency" required></CurrencySelector>
-      </div>
-    </div>
-
-    <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
       <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="!askOwner" required>
       </ProjectSelector>
+    </div>
+    <div class="mb-3">
+      <label for="expenseReportFormAdvance" class="form-label me-2">
+        {{ $t('labels.advanceFromEmployer') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <AdvanceSelector
+        id="expenseReportFormAdvance"
+        v-model="formExpenseReport.advances"
+        :owner-id="askOwner ? formExpenseReport.owner : APP_DATA?.user._id"
+        :project-id="formExpenseReport.project?._id"
+        multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -47,6 +44,8 @@
 
 <script lang="ts">
 import { ExpenseReportSimple, baseCurrency } from '@/../../common/types.js'
+import APP_LOADER from '@/appData.js'
+import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -55,7 +54,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint, ProjectSelector, CurrencySelector, UserSelector },
+  components: { InfoPoint, ProjectSelector, CurrencySelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: {
@@ -73,6 +72,7 @@ export default defineComponent({
   },
   data() {
     return {
+      APP_DATA: APP_LOADER.data,
       formExpenseReport: this.default()
     }
   },
@@ -97,7 +97,8 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.expenseReport)
     }
   },
-  created() {
+  async created() {
+    await APP_LOADER.loadData()
     this.formExpenseReport = this.input()
   },
   watch: {

@@ -17,7 +17,6 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 const expenseReportSchema = () =>
   new Schema<ExpenseReport, ExpenseReportModel, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport'), {
-      advance: costObject(true, false, false, baseCurrency._id),
       addUp: {
         type: {
           balance: costObject(false, false, true),
@@ -40,7 +39,6 @@ const expenseReportSchema = () =>
 
 function populate(doc: Document) {
   return Promise.allSettled([
-    doc.populate({ path: 'advance.currency' }),
     doc.populate({ path: 'expenses.cost.currency' }),
     doc.populate({ path: 'project' }),
     doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
