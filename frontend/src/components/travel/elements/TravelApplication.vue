@@ -15,32 +15,8 @@
             <PlaceElement :place="travel.destinationPlace"></PlaceElement>
           </td>
         </tr>
-        <tr v-if="travel.advance.amount != null">
-          <th>{{ $t('labels.advance') }}</th>
-          <td>
-            <span>
-              {{ $formatter.money(travel.advance) }}
-            </span>
-            <span v-if="travel.advance.exchangeRate" class="text-secondary">
-              &nbsp;-&nbsp;
-              {{ $formatter.money(travel.advance, { useExchangeRate: false }) }}
-            </span>
-          </td>
-        </tr>
       </tbody>
     </table>
-
-    <div v-if="showButtons" class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')">
-        {{ $t('labels.edit') }}
-      </button>
-      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted', travel._id)">
-        {{ $t('labels.delete') }}
-      </button>
-      <button type="button" class="btn btn-light" @click="$emit('cancel')">
-        {{ $t('labels.cancel') }}
-      </button>
-    </div>
   </div>
 </template>
 
@@ -61,10 +37,8 @@ export default defineComponent({
     }
   },
   components: { StatePipeline, PlaceElement },
-  emits: ['cancel', 'edit', 'deleted'],
   props: {
-    travel: { type: Object as PropType<TravelSimple>, required: true },
-    showButtons: { type: Boolean, default: true }
+    travel: { type: Object as PropType<TravelSimple>, required: true }
   },
   methods: {
     displayKey(key: keyof TravelSimple): string {

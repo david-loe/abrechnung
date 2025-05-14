@@ -326,7 +326,7 @@
                         <small>{{ formatter.money(travel.addUp.expenses) }}</small>
                       </td>
                     </tr>
-                    <tr v-if="travel.advance.amount">
+                    <tr v-if="travel.addUp.advance.amount">
                       <td class="text-secondary">
                         <small>{{ t('labels.advance') }}</small>
                       </td>

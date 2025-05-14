@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TravelApply :travel="travel" :showButtons="false"></TravelApply>
+    <TravelApply :travel="travel"></TravelApply>
     <div class="mb-3">
       <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
       <TextArea id="comment" v-model="comment"></TextArea>

@@ -11,10 +11,7 @@
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
           @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
-        <TravelApply
-          v-else-if="modalTravel.state === 'approved'"
-          :travel="(modalTravel as TravelSimple)"
-          :showButtons="false"></TravelApply>
+        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="(modalTravel as TravelSimple)"></TravelApply>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"

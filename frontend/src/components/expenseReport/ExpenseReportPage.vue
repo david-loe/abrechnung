@@ -146,7 +146,7 @@
               <div>
                 <table class="table align-bottom">
                   <tbody>
-                    <template v-if="expenseReport.advance.amount">
+                    <template v-if="expenseReport.addUp.advance.amount">
                       <tr>
                         <td>
                           <small>{{ t('labels.expenses') }}</small>
