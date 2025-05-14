@@ -55,6 +55,10 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc) {
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
+  if (this.state === 'appliedFor') {
+    this.balance.amount = this.budget.amount
+    this.runningBalance.amount = this.budget.amount
+  }
 }
 
 schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
@@ -94,10 +98,6 @@ schema.pre('validate', function (this: AdvanceDoc) {
 schema.pre('save', async function (this: AdvanceDoc, next) {
   await populate(this)
   await this.calculateExchangeRates()
-  if (this.isNew) {
-    this.balance.amount = this.budget.amount
-    this.runningBalance.amount = this.budget.amount
-  }
   next()
 })
 

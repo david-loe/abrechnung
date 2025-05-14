@@ -19,6 +19,7 @@ interface AdvanceApplication {
   name?: string
   budget: MoneyPost | undefined
   reason: string
+  comment?: string
 }
 
 @Tags('Expense Report')
@@ -37,7 +38,10 @@ export class AdvanceController extends Controller {
   }
   @Delete()
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(Advance, { _id: _id, checkOldObject: checkOwner(request.user) })
+    return await this.deleter(Advance, {
+      _id: _id,
+      checkOldObject: async (oldObject: AdvanceDoc) => request.user._id.equals(oldObject.owner._id) && oldObject.state === 'appliedFor'
+    })
   }
 
   @Post('appliedFor')
@@ -105,14 +109,16 @@ export class AdvanceController extends Controller {
 export class AdvanceApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }] }] }
+    const filter: Condition<IAdvance> = {
+      $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }, { state: 'completed' }] }]
+    }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
     return await this.getter(Advance, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      projection: { history: 0, historic: 0 },
       sort: { updatedAt: -1 }
     })
   }

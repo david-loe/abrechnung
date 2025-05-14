@@ -60,6 +60,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     state: { type: String, required: true, enum: stages, default: defaultState },
     log: logObject(stages),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    comment: { type: String },
     comments: [
       {
         text: { type: String },
