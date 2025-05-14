@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @beforeClose="modalMode === 'view' ? resetModal() : null">
+      @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"

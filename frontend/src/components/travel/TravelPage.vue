@@ -7,7 +7,7 @@
           ? t('labels.newX', { X: t('labels.' + modalObjectType) })
           : t('labels.editX', { X: t('labels.' + modalObjectType) })
       "
-      @beforeClose="modalMode === 'edit' ? resetModal() : null">
+      @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="travel._id">
         <ErrorBanner :error="error"></ErrorBanner>
         <StageForm

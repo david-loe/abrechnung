@@ -3,7 +3,7 @@
     <ModalComponent
       ref="modalComp"
       :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
-      @beforeClose="modalMode === 'edit' ? resetModal() : null">
+      @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="expenseReport._id">
         <ExpenseForm
           :expense="modalExpense"

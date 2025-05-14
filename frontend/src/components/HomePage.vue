@@ -3,7 +3,7 @@
     <ModalComponent
       ref="modalComp"
       :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
-      @beforeClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
+      @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>

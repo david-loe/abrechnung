@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalAdvance.state ? modalAdvance.name : $t('labels.newX', { X: $t('labels.advance') })"
       ref="modalComp"
-      @beforeClose="modalMode === 'view' ? resetModal() : null">
+      @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalAdvance">
         <AdvanceApproveForm
           v-if="modalAdvance.state === 'appliedFor'"

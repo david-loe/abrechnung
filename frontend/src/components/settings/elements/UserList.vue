@@ -3,7 +3,7 @@
     <template v-if="userToEdit">
       <ModalComponent
         :header="`API Key (${userToEdit.name.givenName} ${userToEdit.name.familyName})`"
-        @beforeClose=";($refs.apiKeyForm as any).resetForm()"
+        @afterClose=";($refs.apiKeyForm as any).resetForm()"
         ref="modal">
         <ApiKeyForm
           :user="userToEdit"
