@@ -182,7 +182,6 @@ export class TravelController extends Controller {
           oldObject.editor._id.equals(request.user._id)
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -204,7 +203,6 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'approved') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -288,7 +286,6 @@ export class TravelApproveController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -465,7 +462,6 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -484,7 +480,6 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -506,7 +501,6 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'approved' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

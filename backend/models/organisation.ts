@@ -1,5 +1,6 @@
-import { Document, Query, Schema, model } from 'mongoose'
+import { Query, Schema, model } from 'mongoose'
 import { Organisation, emailRegex } from '../../common/types.js'
+import { populateSelected } from './helper.js'
 
 export const organisationSchema = () =>
   new Schema<Organisation>({
@@ -13,22 +14,14 @@ export const organisationSchema = () =>
     subfolderPath: { type: String, trim: true, default: '' }
   })
 
-function populate(doc: Document) {
-  return Promise.allSettled([doc.populate({ path: 'logo', select: { name: 1, type: 1 } })])
-}
-
 const schema = organisationSchema()
 
-schema.pre(/^find((?!Update).)*$/, function () {
-  const projection = (this as Query<Organisation, Organisation>).projection()
-  const popInProj: boolean = projection?.logo
-  if ((this as Query<Organisation, Organisation>).selectedExclusively() && popInProj) {
-    return
-  }
-  if ((this as Query<Organisation, Organisation>).selectedInclusively() && !popInProj) {
-    return
-  }
-  populate(this as Document)
+const populates = {
+  logo: [{ path: 'logo', select: { name: 1, type: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, function (this: Query<Organisation, Organisation>) {
+  return populateSelected(this, populates)
 })
 
 export default model<Organisation>('Organisation', schema)

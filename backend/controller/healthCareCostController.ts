@@ -114,7 +114,6 @@ export class HealthCareCostController extends Controller {
           (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -137,7 +136,6 @@ export class HealthCareCostController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -274,7 +272,6 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -309,7 +306,6 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -331,7 +327,6 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -412,7 +407,6 @@ export class HealthCareCostConfirmController extends Controller {
         if (oldObject.state === 'underExaminationByInsurance' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await documentFileHandler(['refundSum', 'receipts'], { owner: oldObject.owner._id })(request)
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

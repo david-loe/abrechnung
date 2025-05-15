@@ -151,7 +151,6 @@ export class AdvanceApproveController extends Controller {
       async checkOldObject(oldObject: AdvanceDoc) {
         if (oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

@@ -1,17 +1,9 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import {
-  Comment,
-  HealthCareCost,
-  HealthCareCostState,
-  Currency as ICurrency,
-  Money,
-  baseCurrency,
-  healthCareCostStates
-} from '../../common/types.js'
+import { Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
-import { addExchangeRate, convertCurrency } from './exchangeRate.js'
-import { costObject, requestBaseSchema } from './helper.js'
+import { addExchangeRate } from './exchangeRate.js'
+import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -47,26 +39,22 @@ const healthCareCostSchema = () =>
     { timestamps: true }
   )
 
-function populate(doc: Document) {
-  return Promise.allSettled([
-    doc.populate({ path: 'insurance' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
-    doc.populate({ path: 'refundSum.currency' }),
-    doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...healthCareCostStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = healthCareCostSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: HealthCareCostDoc) {
-  populate(this)
+const populates = {
+  refundSum: [{ path: 'refundSum.receipts', select: { name: 1, type: 1 } }, { path: 'refundSum.currency' }],
+  insurance: [{ path: 'insurance' }],
+  expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1, state: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: healthCareCostStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, function (this: Query<HealthCareCost, HealthCareCost>) {
+  return populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: HealthCareCostDoc) {
@@ -91,6 +79,7 @@ schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
+  await this.save()
 }
 
 schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc) {
@@ -113,7 +102,7 @@ schema.pre('validate', function (this: HealthCareCostDoc) {
 })
 
 schema.pre('save', async function (this: HealthCareCostDoc, next) {
-  await populate(this)
+  await populateAll(this, populates)
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)

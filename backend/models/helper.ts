@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose'
+import { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
 import { AnyState } from '../../common/types.js'
 
 export function costObject(
@@ -61,22 +61,58 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     log: logObject(stages),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comment: { type: String },
-    comments: [
-      {
-        text: { type: String },
-        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        toState: {
-          type: String,
-          required: true,
-          enum: stages
+    comments: {
+      type: [
+        {
+          text: { type: String },
+          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          toState: {
+            type: String,
+            required: true,
+            enum: stages
+          }
         }
-      }
-    ],
-    history: [{ type: Schema.Types.ObjectId, ref: modelName }],
+      ]
+    },
+    history: { type: [{ type: Schema.Types.ObjectId, ref: modelName }] },
     historic: { type: Boolean, required: true, default: false }
   }
 
   const schemaWithAdvances = Object.assign(schema, advances ? { advances: [{ type: Schema.Types.ObjectId, ref: 'Advance' }] } : {})
 
   return schemaWithAdvances
+}
+
+export function populateSelected<DocType extends Record<string, any>>(
+  query: Query<DocType, DocType>,
+  projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
+) {
+  const projection = query.projection()
+  const runAll = !query.selected()
+  const isExclusiv = query.selectedExclusively()
+  const isInclusiv = query.selectedInclusively()
+  const populates = []
+  for (const [key, value] of Object.entries(projectionPopulateMap)) {
+    if (!value) continue
+    if (runAll || (isExclusiv && projection[key] !== 0) || (isInclusiv && projection[key] === 1)) {
+      for (const populate of value) {
+        populates.push(query.populate(populate))
+      }
+    }
+  }
+  return Promise.allSettled(populates)
+}
+
+export function populateAll<DocType extends Record<string, any>>(
+  doc: HydratedDocument<DocType>,
+  projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
+) {
+  const populates: Promise<any>[] = []
+  for (const value of Object.values(projectionPopulateMap)) {
+    if (!value) continue
+    for (const populate of value) {
+      populates.push(doc.populate(populate))
+    }
+  }
+  return Promise.allSettled(populates)
 }

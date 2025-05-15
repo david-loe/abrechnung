@@ -1,11 +1,10 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
   Comment,
   Travel,
   TravelRecord,
   TravelState,
-  baseCurrency,
   cateringTypes,
   distanceRefundTypes,
   transportTypes,
@@ -15,7 +14,7 @@ import { travelCalculator } from '../factory.js'
 import { AdvanceDoc } from './advance.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, requestBaseSchema } from './helper.js'
+import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -112,31 +111,30 @@ const travelSchema = () =>
     { timestamps: true }
   )
 
-function populate(doc: Document) {
-  return Promise.allSettled([
-    doc.populate({ path: 'stages.cost.currency' }),
-    doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1 } }),
-    doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }),
-    doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...travelStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = travelSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: TravelDoc) {
-  populate(this)
+const populates = {
+  lastPlaceOfWork: [{ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }],
+  destinationPlace: [{ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }],
+  days: [{ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }],
+  stages: [
+    { path: 'stages.cost.currency' },
+    { path: 'stages.cost.receipts', select: { name: 1, type: 1 } },
+    { path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } },
+    { path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } },
+    { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }
+  ],
+  expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, runningBalance: 1, state: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: travelStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, function (this: Query<Travel, Travel>) {
+  return populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
@@ -185,6 +183,7 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
       }
     }
   }
+  await this.save()
 }
 
 schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
@@ -208,7 +207,7 @@ schema.methods.addComment = function (this: TravelDoc) {
 schema.pre('validate', async function (this: TravelDoc, next) {
   this.addComment()
 
-  await populate(this)
+  await populateAll(this, populates)
 
   const conflicts = await travelCalculator.calc(this)
 
@@ -218,7 +217,7 @@ schema.pre('validate', async function (this: TravelDoc, next) {
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
-  await populate(this)
+  await populateAll(this, populates)
 
   next()
 })

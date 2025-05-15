@@ -99,7 +99,6 @@ export class ExpenseReportController extends Controller {
           (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -122,7 +121,6 @@ export class ExpenseReportController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -255,7 +253,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -282,7 +279,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -304,7 +300,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
