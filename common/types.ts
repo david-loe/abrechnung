@@ -483,6 +483,7 @@ export type HealthCareCostState = (typeof healthCareCostStates)[number]
 export const advanceStates = ['rejected', 'appliedFor', 'approved', 'completed'] as const
 export type AdvanceState = (typeof advanceStates)[number]
 
+export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
 export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
 
 const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const

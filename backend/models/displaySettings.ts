@@ -1,18 +1,14 @@
 import { Schema, model } from 'mongoose'
 import {
   Access,
+  AnyState,
   DisplaySettings,
-  ExpenseReportState,
-  HealthCareCostState,
   Locale,
-  TravelState,
   accesses,
+  anyStates,
   defaultLocale,
-  expenseReportStates,
-  healthCareCostStates,
   hexColorRegex,
-  locales,
-  travelStates
+  locales
 } from '../../common/types.js'
 
 function color(state: string) {
@@ -29,14 +25,8 @@ export const displaySettingsSchema = () => {
     overwrites[locale] = { type: Schema.Types.Mixed, required: true, default: () => ({}) }
   }
 
-  const stateColors = {} as { [key in TravelState | HealthCareCostState | ExpenseReportState]: ReturnType<typeof color> }
-  for (const state of travelStates) {
-    stateColors[state] = color(state)
-  }
-  for (const state of healthCareCostStates) {
-    stateColors[state] = color(state)
-  }
-  for (const state of expenseReportStates) {
+  const stateColors = {} as { [key in AnyState]: ReturnType<typeof color> }
+  for (const state of anyStates) {
     stateColors[state] = color(state)
   }
 
