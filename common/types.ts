@@ -423,7 +423,7 @@ export interface AdvanceBase {
 export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 
 export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
-  reports: { type: ReportModelName; report: { _id: _id; name: string }; amount: number }[]
+  reports: { type: ReportModelName; report: { _id: _id; name: string } | null | undefined; amount: number }[]
 }
 
 export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
@@ -605,7 +605,7 @@ export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
 
-export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost> = T extends Travel
+export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost = Travel | ExpenseReport | HealthCareCost> = T extends Travel
   ? {
       balance: BaseCurrencyMoney
       total: BaseCurrencyMoney

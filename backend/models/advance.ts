@@ -1,6 +1,18 @@
-import { HydratedDocument, Model, PopulateOptions, Query, Schema, model } from 'mongoose'
+import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { getBaseCurrencyAmount } from '../../common/scripts.js'
-import { Advance, AdvanceBase, AdvanceState, Comment, ReportModelName, _id, advanceStates, baseCurrency } from '../../common/types.js'
+import {
+  Advance,
+  AdvanceBase,
+  AdvanceState,
+  Comment,
+  ExpenseReport,
+  HealthCareCost,
+  ReportModelName,
+  Travel,
+  _id,
+  advanceStates,
+  baseCurrency
+} from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 
@@ -24,7 +36,7 @@ const advanceSchema = () =>
         type: [
           {
             type: { type: String, enum: ['Travel', 'ExpenseReport', 'HealthCareCost'], required: true },
-            report: { type: Schema.Types.ObjectId, refPath: 'reports.type', required: true },
+            report: { type: Schema.Types.ObjectId, refPath: 'reports.type' },
             amount: { type: Number, min: 0, required: true }
           }
         ]
@@ -77,6 +89,22 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
   await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
+async function recalcAllAssociatedReports(advanceId: _id) {
+  const reports: Document[] = []
+  reports.push(...(await model<Travel>('Travel').find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })))
+  reports.push(...(await model<ExpenseReport>('ExpenseReport').find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })))
+  reports.push(
+    ...(await model<HealthCareCost>('HealthCareCost').find({
+      advances: advanceId,
+      historic: false,
+      state: { $nin: ['refunded', 'underExaminationByInsurance'] }
+    }))
+  )
+  for (const report of reports) {
+    await report.save()
+  }
+}
+
 // When calling this method from populated paths, only the populated field are in die document
 interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
@@ -92,10 +120,10 @@ schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: numbe
   let amount = reportTotal
   if (difference >= 0) {
     await doc.saveToHistory(false)
+    amount = doc.balance.amount || 0
     doc.balance.amount = 0
     doc.runningBalance.amount = 0
     doc.state = 'completed'
-    amount = doc.balance.amount || 0
   } else {
     doc.balance.amount = -difference
     doc.runningBalance.amount = -difference
@@ -104,6 +132,7 @@ schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: numbe
   doc.reports.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['reports'][number])
   doc.markModified('reports')
   await doc.save()
+  recalcAllAssociatedReports(doc._id)
   return difference
 }
 

@@ -25,10 +25,11 @@
       <tr v-if="advance.reports.length > 0">
         <th scope="row"></th>
         <td>
-          <div class="mb-1" v-for="report in advance.reports" :key="report.report._id">
+          <div class="mb-1" v-for="report in advance.reports">
             <small>
               <span class="me-2">{{ $formatter.money(report) }}</span>
-              <span>{{ report.report.name }}</span>
+              <span v-if="report.report">{{ report.report.name }}</span>
+              <i class="text-secondary" v-else>{{ t('labels.deleted') }}</i>
             </small>
           </div>
         </td>
