@@ -102,7 +102,11 @@ function showForm(organisation?: Organisation) {
   _showForm.value = true
 }
 async function postOrganisation(organisation: Organisation) {
-  const result = await API.setter<Organisation>('admin/organisation', organisation)
+  let headers: Record<string, string> = {}
+  if (organisation.logo) {
+    headers = { 'Content-Type': 'multipart/form-data' }
+  }
+  const result = await API.setter<Organisation>('admin/organisation', organisation, { headers })
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
