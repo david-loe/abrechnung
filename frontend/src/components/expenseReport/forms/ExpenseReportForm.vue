@@ -11,12 +11,14 @@
       </label>
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
     </div>
+
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
       <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="!askOwner" required>
       </ProjectSelector>
     </div>
+
     <div class="mb-3">
       <label for="expenseReportFormAdvance" class="form-label me-2">
         {{ $t('labels.advanceFromEmployer') }}

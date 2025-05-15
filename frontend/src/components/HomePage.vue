@@ -9,7 +9,7 @@
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
           <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
           <div class="mb-1">
-            <template v-if="modalObject.state === 'appliedFor'">
+            <template v-if="modalObject.state === 'appliedFor' || modalObject.state === 'rejected'">
               <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
                 {{ $t('labels.edit') }}
               </button>

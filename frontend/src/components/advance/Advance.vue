@@ -11,7 +11,7 @@
         <td>{{ advance.reason }}</td>
       </tr>
       <tr>
-        <th scope="row">{{ t('labels.amount') }}</th>
+        <th scope="row">{{ t('labels.budget') }}</th>
         <td>
           <span>
             {{ $formatter.money(advance.budget) }}
@@ -22,7 +22,18 @@
           </span>
         </td>
       </tr>
-      <tr v-if="advance.state === 'approved'">
+      <tr v-if="advance.reports.length > 0">
+        <th scope="row"></th>
+        <td>
+          <div class="mb-1" v-for="report in advance.reports" :key="report.report._id">
+            <small>
+              <span class="me-2">{{ $formatter.money(report) }}</span>
+              <span>{{ report.report.name }}</span>
+            </small>
+          </div>
+        </td>
+      </tr>
+      <tr v-if="advance.state === 'approved' || advance.state === 'completed'">
         <th scope="row">{{ t('labels.balance') }}</th>
         <td>
           <span>
@@ -37,7 +48,7 @@
       <tr v-if="advance.comments.length > 0">
         <th scope="row">{{ t('labels.comments') }}</th>
         <td>
-          <div class="m-1" v-for="comment in advance.comments" :key="comment._id">
+          <div class="mb-1" v-for="comment in advance.comments" :key="comment._id">
             <small>
               <b>{{ `${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}: ` }}</b>
               <span>{{ comment.text }}</span>
