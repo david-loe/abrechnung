@@ -1,13 +1,14 @@
-import { Document, HydratedDocument, Model, PopulateOptions, Query, Schema, model } from 'mongoose'
-import { Advance, AdvanceState, Comment, advanceStates, baseCurrency } from '../../common/types.js'
+import { HydratedDocument, Model, PopulateOptions, Query, Schema, model } from 'mongoose'
+import { getBaseCurrencyAmount } from '../../common/scripts.js'
+import { Advance, AdvanceBase, AdvanceState, Comment, ReportModelName, _id, advanceStates, baseCurrency } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, requestBaseSchema } from './helper.js'
+import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 
 interface Methods {
-  saveToHistory(): Promise<void>
+  saveToHistory(save?: boolean): Promise<void>
   calculateExchangeRates(): Promise<void>
   addComment(): void
-  offset(reportTotal: number): Promise<number>
+  offset(reportTotal: number, reportModelName: ReportModelName, reportId: _id): Promise<number>
 }
 
 type AdvanceModel = Model<Advance, {}, Methods>
@@ -18,34 +19,33 @@ const advanceSchema = () =>
       reason: { type: String, required: true },
       budget: costObject(true, false, true, baseCurrency._id),
       balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
-      runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true))
+      runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
+      reports: {
+        type: [
+          {
+            type: { type: String, enum: ['Travel', 'ExpenseReport', 'HealthCareCost'], required: true },
+            report: { type: Schema.Types.ObjectId, refPath: 'reports.type', required: true },
+            amount: { type: Number, min: 0, required: true }
+          }
+        ]
+      }
     }),
     { timestamps: true }
   )
 
-function populate(doc: { populate: (opts: PopulateOptions) => Promise<unknown> }) {
-  return Promise.allSettled([
-    doc.populate({ path: 'budget.currency' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...advanceStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = advanceSchema()
 
+const populates = {
+  budget: [{ path: 'budget.currency' }],
+  reports: [{ path: 'reports.report', select: { name: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: advanceStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
 schema.pre(/^find((?!Update).)*$/, function (this: Query<Advance, Advance>) {
-  const projection = this.projection()
-  const popInProj: boolean = projection && (projection.settings || projection.vehicleRegistration || projection.token)
-  if (this.selectedExclusively() && popInProj) {
-    return
-  }
-  if (this.selectedInclusively() && !popInProj) {
-    return
-  }
-  populate(this)
+  return populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: AdvanceDoc) {
@@ -54,7 +54,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
   }
 })
 
-schema.methods.saveToHistory = async function (this: AdvanceDoc) {
+schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true) {
   const doc: any = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).lean()
   doc._id = undefined
   doc.updatedAt = new Date()
@@ -64,8 +64,12 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc) {
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
   if (this.state === 'appliedFor') {
-    this.balance.amount = this.budget.amount
-    this.runningBalance.amount = this.budget.amount
+    const budgetAmount = getBaseCurrencyAmount(this.budget)
+    this.balance.amount = budgetAmount
+    this.runningBalance.amount = budgetAmount
+  }
+  if (save) {
+    await this.save()
   }
 }
 
@@ -73,22 +77,33 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
   await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
-schema.methods.offset = async function (this: AdvanceDoc, reportTotal: number) {
+// When calling this method from populated paths, only the populated field are in die document
+interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
+
+schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: number, reportModelName: ReportModelName, reportId: _id) {
   if (this.state !== 'approved' || reportTotal <= 0) {
     return reportTotal
   }
-  let difference = reportTotal - (this.balance.amount || 0)
+  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id })
+  if (!doc) {
+    return reportTotal
+  }
+  let difference = reportTotal - (doc.balance.amount || 0)
+  let amount = reportTotal
   if (difference >= 0) {
-    await this.saveToHistory()
-    this.balance.amount = 0
-    this.runningBalance.amount = 0
-    this.state = 'completed'
+    await doc.saveToHistory(false)
+    doc.balance.amount = 0
+    doc.runningBalance.amount = 0
+    doc.state = 'completed'
+    amount = doc.balance.amount || 0
   } else {
-    this.balance.amount = -difference
-    this.runningBalance.amount = -difference
+    doc.balance.amount = -difference
+    doc.runningBalance.amount = -difference
     difference = 0
   }
-  await this.save()
+  doc.reports.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['reports'][number])
+  doc.markModified('reports')
+  await doc.save()
   return difference
 }
 
@@ -104,7 +119,7 @@ schema.pre('validate', function (this: AdvanceDoc) {
 })
 
 schema.pre('save', async function (this: AdvanceDoc, next) {
-  await populate(this)
+  await populateAll(this, populates)
   await this.calculateExchangeRates()
   next()
 })

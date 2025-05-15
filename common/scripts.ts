@@ -141,7 +141,7 @@ export function getLumpSumsSum(days: TravelDay[]) {
   return { amount: sum }
 }
 
-function getBaseCurrencyAmount(a: Money): number {
+export function getBaseCurrencyAmount(a: Money): number {
   let amount = 0
   if (a.amount !== null) {
     const currency = typeof a.currency === 'string' ? a.currency : a.currency._id

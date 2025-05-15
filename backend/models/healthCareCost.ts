@@ -112,8 +112,10 @@ schema.pre('save', async function (this: HealthCareCostDoc, next) {
 schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
+    let total = this.addUp.total.amount || 0
+    this.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
     for (const advance of this.advances) {
-      await (advance as AdvanceDoc).offset(this.addUp.total.amount || 0)
+      total = await (advance as AdvanceDoc).offset(total, 'HealthCareCost', this._id)
     }
   }
 })

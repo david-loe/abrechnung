@@ -417,10 +417,14 @@ export interface AdvanceBase {
   balance: BaseCurrencyMoney
   runningBalance: BaseCurrencyMoney
   reason: string
+  state: AdvanceState
   _id: _id
 }
+export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 
-export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {}
+export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
+  reports: { type: ReportModelName; report: { _id: _id; name: string }; amount: number }[]
+}
 
 export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
 
