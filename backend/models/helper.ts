@@ -51,7 +51,8 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
   stages: readonly S[],
   defaultState: S,
   modelName: string,
-  advances = true
+  advancesAndAddUp = true,
+  addUpLumpSums = true
 ) {
   const schema = {
     name: { type: String },
@@ -78,7 +79,31 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     historic: { type: Boolean, required: true, default: false }
   }
 
-  const schemaWithAdvances = Object.assign(schema, advances ? { advances: [{ type: Schema.Types.ObjectId, ref: 'Advance' }] } : {})
+  const addUp = Object.assign(
+    {
+      balance: costObject(false, false, true),
+      total: costObject(false, false, true),
+      expenses: costObject(false, false, true),
+      advance: costObject(false, false, true),
+      advanceOverflow: { type: Boolean, required: true, default: false }
+    },
+    addUpLumpSums
+      ? {
+          lumpSums: costObject(false, false, true)
+        }
+      : {}
+  )
+  const schemaWithAdvances = Object.assign(
+    schema,
+    advancesAndAddUp
+      ? {
+          advances: [{ type: Schema.Types.ObjectId, ref: 'Advance' }],
+          addUp: {
+            type: addUp
+          }
+        }
+      : {}
+  )
 
   return schemaWithAdvances
 }

@@ -16,16 +16,7 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
 const expenseReportSchema = () =>
   new Schema<ExpenseReport, ExpenseReportModel, Methods>(
-    Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport'), {
-      addUp: {
-        type: {
-          balance: costObject(false, false, true),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true),
-          advance: costObject(false, false, true),
-          advanceOverflow: { type: Boolean, required: true, default: false }
-        }
-      },
+    Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport', true, false), {
       expenses: [
         {
           description: { type: String, required: true },

@@ -46,16 +46,6 @@ const travelSchema = () =>
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
       startDate: { type: Date, required: true },
       endDate: { type: Date, required: true },
-      addUp: {
-        type: {
-          balance: costObject(false, false, true),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true),
-          advance: costObject(false, false, true),
-          lumpSums: costObject(false, false, true),
-          advanceOverflow: { type: Boolean, required: true, default: false }
-        }
-      },
       claimSpouseRefund: { type: Boolean },
       fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },

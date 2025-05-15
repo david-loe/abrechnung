@@ -16,18 +16,10 @@ type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
 const healthCareCostSchema = () =>
   new Schema<HealthCareCost, HealthCareCostModel, Methods>(
-    Object.assign(requestBaseSchema(healthCareCostStates, 'inWork', 'HealthCareCost'), {
+    Object.assign(requestBaseSchema(healthCareCostStates, 'inWork', 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
       refundSum: costObject(true, true, false, baseCurrency._id),
-      addUp: {
-        type: {
-          balance: costObject(false, false, true),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true),
-          advanceOverflow: { type: Boolean, required: true, default: false }
-        }
-      },
       expenses: [
         {
           description: { type: String, required: true },
