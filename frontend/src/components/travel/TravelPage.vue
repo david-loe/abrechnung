@@ -296,50 +296,12 @@
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
-                <table class="table align-bottom">
-                  <tbody>
-                    <tr>
-                      <th>{{ t('labels.progress') }}</th>
-                      <td class="text-end">
-                        <ProgressCircle :progress="travel.progress"></ProgressCircle>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <small>
-                          {{ t('labels.lumpSums') }}
-                          <small v-if="travel.claimSpouseRefund">
-                            <br />
-                            {{ t('labels.includingSpouseRefund') }}
-                          </small>
-                        </small>
-                      </td>
-                      <td class="text-end align-top">
-                        <small>{{ formatter.money(travel.addUp.lumpSums) }}</small>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <small>{{ t('labels.expenses') }}</small>
-                      </td>
-                      <td class="text-end">
-                        <small>{{ formatter.money(travel.addUp.expenses) }}</small>
-                      </td>
-                    </tr>
-                    <tr v-if="travel.addUp.advance.amount">
-                      <td class="text-secondary">
-                        <small>{{ t('labels.advance') }}</small>
-                      </td>
-                      <td class="text-end text-secondary">
-                        <small>{{ formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(travel.addUp.balance) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <AddUpTable
+                  :add-up="travel.addUp"
+                  :claim-spouse-refund="travel.claimSpouseRefund"
+                  :progress="travel.progress"
+                  :project="travel.project"
+                  :showAdvanceOverflow="travel.state !== 'refunded'"></AddUpTable>
                 <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
@@ -409,15 +371,14 @@ import {
   TravelSimple,
   User,
   UserSimple,
-  meals,
   travelStates
 } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ErrorBanner from '@/components/elements/ErrorBanner.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
-import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'

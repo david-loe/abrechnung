@@ -144,43 +144,10 @@
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
-                <table class="table align-bottom">
-                  <tbody>
-                    <template v-if="expenseReport.addUp.advance.amount">
-                      <tr>
-                        <td>
-                          <small>{{ t('labels.expenses') }}</small>
-                        </td>
-                        <td class="text-end">
-                          <small>{{ formatter.money(expenseReport.addUp.expenses) }}</small>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <small>{{ t('labels.advance') }}</small>
-                        </td>
-                        <td class="text-end">
-                          <small>{{ formatter.money(expenseReport.addUp.advance, { func: (x) => 0 - x }) }}</small>
-                        </td>
-                      </tr>
-                    </template>
-
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(expenseReport.addUp.balance) }}</td>
-                    </tr>
-                    <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
-                      <td>
-                        <small>{{ t('labels.project') }}</small>
-                      </td>
-                      <td class="text-end">
-                        <small>{{
-                          formatter.money(expenseReport.project.balance) + ' von ' + formatter.money(expenseReport.project.budget)
-                        }}</small>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <AddUpTable
+                  :add-up="expenseReport.addUp"
+                  :project="expenseReport.project"
+                  :showAdvanceOverflow="expenseReport.state !== 'refunded'"></AddUpTable>
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
@@ -242,6 +209,7 @@
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '@/../../common/types.js'
 import API from '@/api.js'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TextArea from '@/components/elements/TextArea.vue'

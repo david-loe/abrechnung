@@ -165,16 +165,13 @@
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
                 <table class="table align-bottom">
-                  <tbody>
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(healthCareCost.addUp.balance) }}</td>
-                    </tr>
-                    <tr v-if="healthCareCost.state === 'refunded'">
-                      <th>{{ t('labels.refundSum') }}</th>
-                      <td class="text-end">{{ formatter.money(healthCareCost.refundSum) }}</td>
-                    </tr>
-                  </tbody>
+                  <AddUpTable
+                    :add-up="healthCareCost.addUp"
+                    :project="healthCareCost.project"
+                    :refundSum="healthCareCost.state === 'refunded' ? healthCareCost.refundSum : undefined"
+                    :showAdvanceOverflow="
+                      healthCareCost.state !== 'refunded' && healthCareCost.state !== 'underExaminationByInsurance'
+                    "></AddUpTable>
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
@@ -280,6 +277,7 @@ import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { DocumentFile, Expense, HealthCareCost, Organisation, UserSimple, healthCareCostStates } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
