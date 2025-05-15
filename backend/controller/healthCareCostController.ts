@@ -81,7 +81,14 @@ export class HealthCareCostController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; insurance?: IdDocument; patientName?: string; _id?: _id; name?: string },
+    @Body() requestBody: {
+      project?: IdDocument
+      insurance?: IdDocument
+      patientName?: string
+      _id?: _id
+      name?: string
+      advances?: IdDocument[]
+    },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
@@ -286,6 +293,7 @@ export class HealthCareCostExamineController extends Controller {
       name?: string
       owner?: IdDocument
       comment?: string
+      advances?: IdDocument[]
     },
     @Request() request: AuthenticatedExpressRequest
   ) {

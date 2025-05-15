@@ -32,6 +32,19 @@
       </ProjectSelector>
     </div>
 
+    <div class="mb-3">
+      <label for="healthCareCostFormAdvance" class="form-label me-2">
+        {{ $t('labels.advanceFromEmployer') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <AdvanceSelector
+        id="healthCareCostFormAdvance"
+        v-model="formHealthCareCost.advances"
+        :owner-id="askOwner ? formHealthCareCost.owner : APP_DATA?.user._id"
+        :project-id="formHealthCareCost.project?._id"
+        multiple></AdvanceSelector>
+    </div>
+
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.healthCareCost') }) : $t('labels.save') }}
@@ -46,6 +59,8 @@
 
 <script lang="ts">
 import { HealthCareCostSimple } from '@/../../common/types.js'
+import APP_LOADER from '@/appData.js'
+import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -54,7 +69,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>> },
@@ -64,6 +79,7 @@ export default defineComponent({
   },
   data() {
     return {
+      APP_DATA: APP_LOADER.data,
       formHealthCareCost: this.default()
     }
   },
@@ -85,7 +101,8 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.healthCareCost)
     }
   },
-  created() {
+  async created() {
+    await APP_LOADER.loadData()
     this.formHealthCareCost = this.input()
   },
   watch: {
