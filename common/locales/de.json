@@ -245,7 +245,7 @@
     "destinationName": "Name des Reiseziels",
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
-    "disableReportType": "Antragsarten deaktivieren",
+    "disableReportType": "Abrechnungsarten deaktivieren",
     "displaySettings": "Anzeigeeinstellungen",
     "distance": "Entfernung [km]",
     "distanceRefunds": "Entfernungspauschalen",
@@ -338,6 +338,7 @@
     "none": "gar nicht",
     "note": "Bemerkung",
     "object": "Objekt",
+    "offsetAgainst": "Verrechnet mit",
     "on": "am",
     "optional": "optional",
     "organisation": "Organisation",
@@ -375,6 +376,7 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "reportEmail": "Email Adresse für Berichte",
+    "reportTypeIcons": "Icons für Abrechnungstypen",
     "required": "erforderlich",
     "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
@@ -419,12 +421,12 @@
     "toX": "Zu {X}",
     "transport": "Verkehrsmittel",
     "travel": "Reise",
-    "XDetails": "{X}details",
     "traveler": "Reisender",
     "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "travelName": "Name der Reise",
     "travels": "Reisen",
     "travelSettings": "Reisekostenabrechnungseinstellungen",
+    "type": "Art",
     "typeToSearch": "Tippe um zu Suchen...",
     "underExaminationByInsuranceHealthCareCosts": "Krankenkosten in Prüfung bei Krankenkassen",
     "updatedAt": "Aktualisiert am",
@@ -443,7 +445,8 @@
     "version": "Version",
     "viewX": "{X} ansehen",
     "website": "Website",
-    "width": "Breite"
+    "width": "Breite",
+    "XDetails": "{X}details"
   },
   "login": {
     "signIn": "Bitte Anmelden"
@@ -608,11 +611,6 @@
     "9": "Okt",
     "10": "Nov",
     "11": "Dez"
-  },
-  "report": {
-    "advance": {
-      "approvedXonYbyZ": "Vorschuss in Höhe von {X} am {Y} durch {Z} genehmigt."
-    }
   },
   "settings": {},
   "states": {

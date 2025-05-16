@@ -337,6 +337,7 @@
     "none": "not at all",
     "note": "Note",
     "object": "Object",
+    "offsetAgainst": "Offset against",
     "on": "on",
     "optional": "optional",
     "organisation": "Organisation",
@@ -374,6 +375,7 @@
     "reject": "Reject",
     "report": "Report",
     "reportEmail": "Email Address for Reports",
+    "reportTypeIcons": "Icons for report types",
     "required": "required",
     "retentionPolicy": "Retention policy",
     "route": "Route",
@@ -418,12 +420,12 @@
     "toX": "To {X}",
     "transport": "Transport",
     "travel": "Travel",
-    "XDetails": "{X} details",
     "traveler": "Traveler",
     "travelInsideOfEU": "Travel inside of the EU",
     "travelName": "Travel name",
     "travels": "Travels",
     "travelSettings": "Travel Settings",
+    "type": "Type",
     "typeToSearch": "Type to search...",
     "underExaminationByInsuranceHealthCareCosts": "Health care costs under examination by health insurances",
     "updatedAt": "Updated at",
@@ -442,7 +444,8 @@
     "version": "Version",
     "viewX": "View {X}",
     "website": "Website",
-    "width": "Width"
+    "width": "Width",
+    "XDetails": "{X} details"
   },
   "login": {
     "signIn": "Please sign in"
@@ -607,11 +610,6 @@
     "9": "Oct",
     "10": "Nov",
     "11": "Dec"
-  },
-  "report": {
-    "advance": {
-      "approvedXonYbyZ": "Advance in the amount of {X} approved by {Z} on {Y}."
-    }
   },
   "settings": {},
   "states": {

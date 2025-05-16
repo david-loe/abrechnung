@@ -32,11 +32,11 @@ const advanceSchema = () =>
       budget: costObject(true, false, true, baseCurrency._id),
       balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
       runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
-      reports: {
+      offsetAgainst: {
         type: [
           {
             type: { type: String, enum: ['Travel', 'ExpenseReport', 'HealthCareCost'], required: true },
-            report: { type: Schema.Types.ObjectId, refPath: 'reports.type' },
+            report: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
             amount: { type: Number, min: 0, required: true }
           }
         ]
@@ -49,7 +49,7 @@ const schema = advanceSchema()
 
 const populates = {
   budget: [{ path: 'budget.currency' }],
-  reports: [{ path: 'reports.report', select: { name: 1 } }],
+  offsetAgainst: [{ path: 'offsetAgainst.report', select: { name: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -129,8 +129,8 @@ schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: numbe
     doc.runningBalance.amount = -difference
     difference = 0
   }
-  doc.reports.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['reports'][number])
-  doc.markModified('reports')
+  doc.offsetAgainst.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['offsetAgainst'][number])
+  doc.markModified('offsetAgainst')
   await doc.save()
   recalcAllAssociatedReports(doc._id)
   return difference

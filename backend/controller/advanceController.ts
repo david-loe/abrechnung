@@ -80,7 +80,7 @@ export class AdvanceController extends Controller {
       _id: _id,
       owner: request.user._id,
       historic: false,
-      state: 'completed'
+      state: { $in: ['completed', 'approved'] }
     }).lean()
     if (!advance) {
       throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
@@ -169,5 +169,23 @@ export class AdvanceApproveController extends Controller {
       checkOldObject: async (oldObject: AdvanceDoc) =>
         oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
+  }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getReportForAny(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IAdvance> = { _id, historic: false, state: { $in: ['completed', 'approved'] } }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
+    }
+    const advance = await Advance.findOne(filter).lean()
+    if (!advance) {
+      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
+    }
+    const report = await reportPrinter.print(advance, request.user.settings.language)
+    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
+    this.setHeader('Content-Type', 'application/pdf')
+    this.setHeader('Content-Length', report.length)
+    return Readable.from([report])
   }
 }

@@ -22,12 +22,15 @@
           </span>
         </td>
       </tr>
-      <tr v-if="advance.reports.length > 0">
-        <th scope="row"></th>
+      <tr v-if="advance.offsetAgainst.length > 0">
+        <th scope="row">{{ t('labels.offsetAgainst') }}</th>
         <td>
-          <div class="mb-1" v-for="report in advance.reports">
+          <div class="mb-1" v-for="report in advance.offsetAgainst">
             <small>
               <span class="me-2">{{ $formatter.money(report) }}</span>
+              <i
+                v-if="APP_DATA"
+                :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
               <span v-if="report.report">{{ report.report.name }}</span>
               <i class="text-secondary" v-else>{{ t('labels.deleted') }}</i>
             </small>
@@ -59,9 +62,18 @@
       </tr>
     </tbody>
   </table>
+  <a
+    v-if="advance.state === 'completed' || advance.state === 'approved'"
+    class="btn btn-primary"
+    :href="advanceReportLink(advance._id)"
+    :download="advance.name + '.pdf'">
+    <i class="bi bi-download"></i>
+    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+  </a>
 </template>
 <script setup lang="ts">
-import { AdvanceSimple, advanceStates } from '@/../../common/types'
+import { AdvanceSimple, advanceStates, getReportTypeFromModelName } from '@/../../common/types'
+import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -74,4 +86,9 @@ const props = defineProps({
     required: true
   }
 })
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
+
+const advanceReportLink = (id: string) => `${import.meta.env.VITE_BACKEND_URL}/advance/report?_id=${id}`
 </script>

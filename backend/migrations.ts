@@ -209,16 +209,20 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '1.7.4')) {
       logger.info('Apply migration from v1.7.4: rewrite advances')
 
-      await mongoose.connection
-        .collection('displaysettings')
-        .updateOne({}, { $set: { 'stateColors.completed': { color: '#615d6c', text: 'white' } } })
       await mongoose.connection.collection('displaysettings').updateOne(
         {},
         {
           $set: {
+            'stateColors.completed': { color: '#615d6c', text: 'white' },
             'accessIcons.appliedFor:advance': ['briefcase', 'cash-coin', 'plus'],
             'accessIcons.approve/travel': ['airplane', 'clipboard-check'],
-            'accessIcons.approve/advance': ['briefcase', 'cash-coin', 'clipboard-check']
+            'accessIcons.approve/advance': ['briefcase', 'cash-coin', 'clipboard-check'],
+            reportTypeIcons: {
+              travel: ['airplane'],
+              expenseReport: ['coin'],
+              advance: ['briefcase', 'cash-coin'],
+              healthCareCost: ['hospital']
+            }
           }
         }
       )

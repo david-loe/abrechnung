@@ -5,15 +5,19 @@
       ref="modalComp"
       @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalAdvance">
-        <AdvanceApproveForm
-          v-if="modalAdvance.state === 'appliedFor'"
-          :advance="(modalAdvance as AdvanceSimple)"
-          :loading="modalFormIsLoading"
-          @cancel="resetAndHide()"
-          @decision="(d, c) => approveAdvance((modalAdvance as AdvanceSimple), d, c)"></AdvanceApproveForm>
-        <Advance v-else-if="modalAdvance.state === 'approved'" :advance="(modalAdvance as AdvanceSimple)"></Advance>
+        <template v-if="modalMode === 'view'">
+          <template v-if="modalAdvance._id">
+            <AdvanceApproveForm
+              v-if="modalAdvance.state === 'appliedFor'"
+              :advance="(modalAdvance as AdvanceSimple)"
+              :loading="modalFormIsLoading"
+              @cancel="resetAndHide()"
+              @decision="(d, c) => approveAdvance((modalAdvance as AdvanceSimple), d, c)"></AdvanceApproveForm>
+            <Advance v-else :advance="(modalAdvance as AdvanceSimple)"></Advance>
+          </template>
+        </template>
         <AdvanceForm
-          v-else-if="modalMode !== 'view'"
+          v-else
           :mode="modalMode"
           @cancel="resetAndHide()"
           :advance="modalAdvance"

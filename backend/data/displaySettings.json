@@ -35,6 +35,12 @@
     "refunded/travel": ["airplane", "bank"],
     "user": ["card-list"]
   },
+  "reportTypeIcons": {
+    "travel": ["airplane"],
+    "expenseReport": ["coin"],
+    "advance": ["briefcase", "cash-coin"],
+    "healthCareCost": ["hospital"]
+  },
   "stateColors": {
     "appliedFor": {
       "color": "#cae5ff",

@@ -115,6 +115,7 @@ export interface DisplaySettings {
   }
   stateColors: { [key in AnyState]: { color: HexColor; text: string } }
   accessIcons: { [key in Access]: string[] }
+  reportTypeIcons: { [key in ReportType]: string[] }
   _id: _id
 }
 
@@ -420,10 +421,9 @@ export interface AdvanceBase {
   state: AdvanceState
   _id: _id
 }
-export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 
 export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
-  reports: { type: ReportModelName; report: { _id: _id; name: string } | null | undefined; amount: number }[]
+  offsetAgainst: { type: ReportModelName; report: { _id: _id; name: string } | null | undefined; amount: number }[]
 }
 
 export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
@@ -503,8 +503,21 @@ export type ImageType = (typeof imageTypes)[number]
 export const documentFileTypes = ['application/pdf', ...imageTypes] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
+export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
+
+export function getReportTypeFromModelName(modelName: ReportModelName) {
+  switch (modelName) {
+    case 'Travel':
+      return 'travel'
+    case 'ExpenseReport':
+      return 'expenseReport'
+    case 'HealthCareCost':
+      return 'healthCareCost'
+  }
+}
 
 export const retention = [
   'deleteRefundedAfterXDays',

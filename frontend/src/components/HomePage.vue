@@ -2,26 +2,24 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
+      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
       @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
           <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
-          <div class="mb-1">
-            <template v-if="modalObject.state === 'appliedFor' || modalObject.state === 'rejected'">
-              <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
-                {{ $t('labels.edit') }}
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger me-2"
-                @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
-                {{ $t('labels.delete') }}
-              </button>
-            </template>
+          <div v-if="modalObject.state === 'appliedFor' || modalObject.state === 'rejected'" class="mb-1">
+            <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
+              {{ t('labels.edit') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger me-2"
+              @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
+              {{ t('labels.delete') }}
+            </button>
             <button type="button" class="btn btn-light" @click="resetAndHide()">
-              {{ $t('labels.cancel') }}
+              {{ t('labels.cancel') }}
             </button>
           </div>
         </template>
@@ -66,37 +64,37 @@
     <div v-if="APP_DATA" class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
-          <h2>{{ $t('headlines.home') }}</h2>
+          <h2>{{ t('headlines.home') }}</h2>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'travel', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">
-              {{ $t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') }) }}
+              {{ t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: t('labels.travel') }) }}
             </span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.expenseReport && APP_DATA.user.access['inWork:expenseReport']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'expenseReport', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
+            <span class="ms-1">{{ t('labels.addX', { X: t('labels.expenseReport') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.healthCareCost && APP_DATA.user.access['inWork:healthCareCost']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'healthCareCost', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.submitX', { X: $t('labels.healthCareCost') }) }}</span>
+            <span class="ms-1">{{ t('labels.submitX', { X: t('labels.healthCareCost') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.advance && APP_DATA.user.access['appliedFor:advance']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'advance', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.applyForX', { X: $t('labels.advance') }) }}</span>
+            <span class="ms-1">{{ t('labels.applyForX', { X: t('labels.advance') }) }}</span>
           </button>
         </div>
       </div>
       <template v-if="!APP_DATA.settings.disableReportType.travel">
-        <h3>{{ $t('labels.travel') }}</h3>
+        <h3>{{ t('labels.travel') }}</h3>
         <TravelList
           class="mb-4"
           ref="travelList"
@@ -105,7 +103,7 @@
           @clicked-applied="(t) => showModal('view', 'travel', t)"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
-        <h3>{{ $t('labels.expenses') }}</h3>
+        <h3>{{ t('labels.expenses') }}</h3>
         <ExpenseReportList
           class="mb-4"
           ref="expenseReportList"
@@ -113,14 +111,14 @@
           :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
-        <h3>{{ $t('labels.healthCareCost') }}</h3>
+        <h3>{{ t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
           :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments', 'log.underExamination.date']"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
-        <h3>{{ $t('labels.advance') }}</h3>
+        <h3>{{ t('labels.advance') }}</h3>
         <AdvanceList
           ref="advanceList"
           endpoint="advance"
@@ -147,6 +145,7 @@ import TravelList from '@/components/travel/TravelList.vue'
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 type ModalMode = 'view' | 'add' | 'edit'
@@ -165,6 +164,7 @@ const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
 
 const router = useRouter()
+const { t } = useI18n()
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
