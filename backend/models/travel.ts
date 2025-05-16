@@ -14,7 +14,7 @@ import { travelCalculator } from '../factory.js'
 import { AdvanceDoc } from './advance.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -194,7 +194,7 @@ schema.methods.addComment = function (this: TravelDoc) {
   }
 }
 
-schema.pre('validate', async function (this: TravelDoc, next) {
+schema.pre('validate', async function (this: TravelDoc) {
   this.addComment()
 
   await populateAll(this, populates)
@@ -208,18 +208,12 @@ schema.pre('validate', async function (this: TravelDoc, next) {
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
   await populateAll(this, populates)
-
-  next()
 })
 
 schema.post('save', async function (this: TravelDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
-    let total = this.addUp.total.amount || 0
-    this.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
-    for (const advance of this.advances) {
-      total = await (advance as AdvanceDoc).offset(total, 'Travel', this._id)
-    }
+    await offsetAdvance(this, 'Travel')
   }
 })
 

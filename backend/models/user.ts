@@ -120,9 +120,8 @@ schema.pre(/^find((?!Update).)*$/, function (this: Query<User, User>) {
   return populateSelected(this, populates)
 })
 
-schema.pre('save', async function (next) {
+schema.pre('save', async function () {
   await populateAll(this, populates)
-  next()
 })
 
 schema.methods.isActive = async function (this: UserDoc) {

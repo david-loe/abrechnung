@@ -1,9 +1,9 @@
-import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
+import mongoose, { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from '../../common/types.js'
+import { AddUpResult, AdvanceBase, Comment, ExpenseReport, ExpenseReportState, _id, expenseReportStates } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -88,22 +88,17 @@ schema.pre('validate', function (this: ExpenseReportDoc) {
   this.addComment()
 })
 
-schema.pre('save', async function (this: ExpenseReportDoc, next) {
+schema.pre('save', async function (this: ExpenseReportDoc) {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
-  next()
 })
 
 schema.post('save', async function (this: ExpenseReportDoc) {
   if (this.state === 'refunded') {
-    ;(this.project as ProjectDoc).updateBalance()
-    let total = this.addUp.total.amount || 0
-    this.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
-    for (const advance of this.advances) {
-      total = await (advance as AdvanceDoc).offset(total, 'ExpenseReport', this._id)
-    }
+    await (this.project as ProjectDoc).updateBalance()
+    await offsetAdvance(this, 'ExpenseReport')
   }
 })
 

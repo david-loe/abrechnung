@@ -1,5 +1,6 @@
-import { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
-import { AnyState } from '../../common/types.js'
+import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
+import { AddUpResult, AdvanceBase, AnyState, ReportModelName, _id } from '../../common/types.js'
+import { AdvanceDoc } from './advance.js'
 
 export function costObject(
   exchangeRate = true,
@@ -146,4 +147,25 @@ export function populateAll<DocType extends Record<string, any>>(
     }
   }
   return Promise.allSettled(populates)
+}
+
+export async function offsetAdvance(report: { addUp: AddUpResult; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
+  const session = await mongoose.startSession()
+  // session.startTransaction() // needs Replica Set
+  try {
+    let total = report.addUp.total.amount || 0
+    report.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
+
+    for (const advance of report.advances) {
+      total = await (advance as AdvanceDoc).offset(total, modelName, report._id, session)
+    }
+
+    // await session.commitTransaction() // needs Replica Set
+  } catch (error) {
+    // await session.abortTransaction() // needs Replica Set
+    // biome-ignore lint/complexity/noUselessCatch: <explanation>
+    throw error
+  } finally {
+    await session.endSession()
+  }
 }

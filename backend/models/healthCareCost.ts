@@ -3,7 +3,7 @@ import { addUp } from '../../common/scripts.js'
 import { Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -93,22 +93,17 @@ schema.pre('validate', function (this: HealthCareCostDoc) {
   this.addComment()
 })
 
-schema.pre('save', async function (this: HealthCareCostDoc, next) {
+schema.pre('save', async function (this: HealthCareCostDoc) {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
-  next()
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
-    let total = this.addUp.total.amount || 0
-    this.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
-    for (const advance of this.advances) {
-      total = await (advance as AdvanceDoc).offset(total, 'HealthCareCost', this._id)
-    }
+    await offsetAdvance(this, 'HealthCareCost')
   }
 })
 

@@ -1,4 +1,4 @@
-import { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
+import mongoose, { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { getBaseCurrencyAmount } from '../../common/scripts.js'
 import {
   Advance,
@@ -17,10 +17,10 @@ import { addExchangeRate } from './exchangeRate.js'
 import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 
 interface Methods {
-  saveToHistory(save?: boolean): Promise<void>
+  saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
   calculateExchangeRates(): Promise<void>
   addComment(): void
-  offset(reportTotal: number, reportModelName: ReportModelName, reportId: _id): Promise<number>
+  offset(reportTotal: number, reportModelName: ReportModelName, reportId: _id, session?: mongoose.ClientSession | null): Promise<number>
 }
 
 type AdvanceModel = Model<Advance, {}, Methods>
@@ -65,7 +65,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
   }
 })
 
-schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true) {
+schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
   const doc: any = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).lean()
   doc._id = undefined
   doc.updatedAt = new Date()
@@ -87,37 +87,53 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
   await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
-async function recalcAllAssociatedReports(advanceId: _id) {
+async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.ClientSession | null = null) {
   const reports: Document[] = []
-  reports.push(...(await model<Travel>('Travel').find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })))
-  reports.push(...(await model<ExpenseReport>('ExpenseReport').find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })))
   reports.push(
-    ...(await model<HealthCareCost>('HealthCareCost').find({
-      advances: advanceId,
-      historic: false,
-      state: { $nin: ['refunded', 'underExaminationByInsurance'] }
-    }))
+    ...(await model<Travel>('Travel')
+      .find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })
+      .session(session))
+  )
+  reports.push(
+    ...(await model<ExpenseReport>('ExpenseReport')
+      .find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })
+      .session(session))
+  )
+  reports.push(
+    ...(await model<HealthCareCost>('HealthCareCost')
+      .find({
+        advances: advanceId,
+        historic: false,
+        state: { $nin: ['refunded', 'underExaminationByInsurance'] }
+      })
+      .session(session))
   )
   for (const report of reports) {
-    await report.save()
+    await report.save({ session })
   }
 }
 
 // When calling this method from populated paths, only the populated field are in die document
 interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
-schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: number, reportModelName: ReportModelName, reportId: _id) {
+schema.methods.offset = async function (
+  this: AdvanceBaseDoc,
+  reportTotal: number,
+  reportModelName: ReportModelName,
+  reportId: _id,
+  session: mongoose.ClientSession | null = null
+) {
   if (this.state !== 'approved' || reportTotal <= 0) {
     return reportTotal
   }
-  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id })
+  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
   if (!doc) {
     return reportTotal
   }
   let difference = reportTotal - (doc.balance.amount || 0)
   let amount = reportTotal
   if (difference >= 0) {
-    await doc.saveToHistory(false)
+    await doc.saveToHistory(false, session)
     amount = doc.balance.amount || 0
     doc.balance.amount = 0
     doc.state = 'completed'
@@ -127,8 +143,8 @@ schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: numbe
   }
   doc.offsetAgainst.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['offsetAgainst'][number])
   doc.markModified('offsetAgainst')
-  await doc.save()
-  recalcAllAssociatedReports(doc._id)
+  await doc.save({ session })
+  await recalcAllAssociatedReports(doc._id, session)
   return difference
 }
 
@@ -143,10 +159,9 @@ schema.pre('validate', function (this: AdvanceDoc) {
   this.addComment()
 })
 
-schema.pre('save', async function (this: AdvanceDoc, next) {
+schema.pre('save', async function (this: AdvanceDoc) {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
-  next()
 })
 
 export default model<Advance, AdvanceModel>('Advance', schema)
