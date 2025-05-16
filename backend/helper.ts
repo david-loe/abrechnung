@@ -130,6 +130,7 @@ export async function writeToDisk(
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await fs.writeFile(filePath, data)
+      logger.debug(`Wrote to file ${filePath}`)
       return
     } catch (err: any) {
       if (err.code === 'EAGAIN' && attempt < retries) {

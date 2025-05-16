@@ -74,7 +74,7 @@ export default async function () {
 
   // Request-Logging
   app.use((req, res, next) => {
-    logger.debug(`${req.method} ${req.url}`)
+    logger.debug(`${req.user?.email || 'Guest'} -> ${req.method} ${req.url}`)
     if (req.body && Object.keys(req.body).length > 0) {
       logger.debug('Body:', req.body)
     }
