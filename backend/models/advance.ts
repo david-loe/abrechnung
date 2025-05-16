@@ -55,8 +55,8 @@ const populates = {
   log: advanceStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
-schema.pre(/^find((?!Update).)*$/, function (this: Query<Advance, Advance>) {
-  return populateSelected(this, populates)
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance, Advance>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: AdvanceDoc) {
@@ -141,7 +141,7 @@ schema.methods.offset = async function (
     doc.balance.amount = -difference
     difference = 0
   }
-  doc.offsetAgainst.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['offsetAgainst'][number])
+  doc.offsetAgainst.push({ type: reportModelName, report: reportId as unknown as { _id: _id; name: string }, amount })
   doc.markModified('offsetAgainst')
   await doc.save({ session })
   await recalcAllAssociatedReports(doc._id, session)

@@ -20,8 +20,8 @@ const populates = {
   logo: [{ path: 'logo', select: { name: 1, type: 1 } }]
 }
 
-schema.pre(/^find((?!Update).)*$/, function (this: Query<Organisation, Organisation>) {
-  return populateSelected(this, populates)
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<Organisation, Organisation>) {
+  await populateSelected(this, populates)
 })
 
 export default model<Organisation>('Organisation', schema)

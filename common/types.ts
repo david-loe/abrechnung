@@ -623,22 +623,16 @@ export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
 
-export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost = Travel | ExpenseReport | HealthCareCost> = T extends Travel
-  ? {
-      balance: BaseCurrencyMoney
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-      lumpSums: BaseCurrencyMoney
-      advanceOverflow: boolean
-    }
-  : {
-      balance: BaseCurrencyMoney
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-      advanceOverflow: boolean
-    }
+type AddUpBase = {
+  balance: BaseCurrencyMoney
+  total: BaseCurrencyMoney
+  advance: BaseCurrencyMoney
+  expenses: BaseCurrencyMoney
+  advanceOverflow: boolean
+}
+export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
+  ? AddUpBase & { lumpSums: BaseCurrencyMoney }
+  : AddUpBase
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

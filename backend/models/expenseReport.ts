@@ -40,8 +40,8 @@ const populates = {
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 
-schema.pre(/^find((?!Update).)*$/, function (this: Query<ExpenseReport, ExpenseReport>) {
-  return populateSelected(this, populates)
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<ExpenseReport, ExpenseReport>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {

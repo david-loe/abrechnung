@@ -116,8 +116,8 @@ const populates = {
   vehicleRegistration: [{ path: 'vehicleRegistration', select: { name: 1, type: 1 } }],
   token: [{ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } }]
 }
-schema.pre(/^find((?!Update).)*$/, function (this: Query<User, User>) {
-  return populateSelected(this, populates)
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<User, User>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('save', async function () {

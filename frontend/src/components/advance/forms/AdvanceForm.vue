@@ -112,7 +112,6 @@ function input() {
 }
 
 function output() {
-  console.log(formAdvance.value)
   return formAdvance.value as Partial<AdvanceSimple>
 }
 
