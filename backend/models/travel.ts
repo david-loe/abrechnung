@@ -1,22 +1,20 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
   Comment,
-  Currency as ICurrency,
-  Money,
   Travel,
   TravelRecord,
   TravelState,
-  baseCurrency,
   cateringTypes,
   distanceRefundTypes,
   transportTypes,
   travelStates
 } from '../../common/types.js'
 import { travelCalculator } from '../factory.js'
+import { AdvanceDoc } from './advance.js'
 import DocumentFile from './documentFile.js'
-import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { addExchangeRate } from './exchangeRate.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 import User from './user.js'
 
@@ -41,52 +39,18 @@ type TravelModel = Model<Travel, {}, Methods>
 
 const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: travelStates,
-        default: 'appliedFor'
-      },
-      log: logObject(travelStates),
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: travelStates
-          }
-        }
-      ],
+    Object.assign(requestBaseSchema(travelStates, 'appliedFor', 'Travel'), {
       reason: { type: String, required: true },
       destinationPlace: place(true),
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
       startDate: { type: Date, required: true },
       endDate: { type: Date, required: true },
-      advance: costObject(true, false, false, baseCurrency._id),
-      addUp: {
-        type: {
-          balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true),
-          advance: costObject(false, false, true),
-          lumpSums: costObject(false, false, true)
-        }
-      },
       claimSpouseRefund: { type: Boolean },
       fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
       lastPlaceOfWork: place(true, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
-      history: [{ type: Schema.Types.ObjectId, ref: 'Travel' }],
-      historic: { type: Boolean, required: true, default: false },
       stages: [
         {
           departure: { type: Date, required: true },
@@ -133,35 +97,34 @@ const travelSchema = () =>
           }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 
-function populate(doc: Document) {
-  return Promise.allSettled([
-    doc.populate({ path: 'advance.currency' }),
-    doc.populate({ path: 'stages.cost.currency' }),
-    doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }),
-    doc.populate({ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }),
-    doc.populate({ path: 'stages.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...travelStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = travelSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: TravelDoc) {
-  populate(this)
+const populates = {
+  lastPlaceOfWork: [{ path: 'lastPlaceOfWork.country', select: { name: 1, flag: 1, currency: 1 } }],
+  destinationPlace: [{ path: 'destinationPlace.country', select: { name: 1, flag: 1, currency: 1, needsA1Certificate: 1 } }],
+  days: [{ path: 'days.country', select: { name: 1, flag: 1, currency: 1 } }],
+  stages: [
+    { path: 'stages.cost.currency' },
+    { path: 'stages.cost.receipts', select: { name: 1, type: 1 } },
+    { path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } },
+    { path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } },
+    { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }
+  ],
+  expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: travelStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<Travel, Travel>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
@@ -210,45 +173,18 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
       }
     }
   }
-}
-
-async function exchange(costObject: Money, date: string | number | Date) {
-  let exchangeRate = null
-
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
-    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
-  }
-  costObject.exchangeRate = exchangeRate
-
-  return costObject
+  await this.save()
 }
 
 schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   const promiseList = []
-  promiseList.push(exchange(this.advance, this.createdAt ? this.createdAt : new Date()))
   for (const stage of this.stages) {
-    promiseList.push(exchange(stage.cost, stage.cost.date))
+    promiseList.push(addExchangeRate(stage.cost, stage.cost.date))
   }
   for (const expense of this.expenses) {
-    promiseList.push(exchange(expense.cost, expense.cost.date))
+    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
   }
-  const results = await Promise.allSettled(promiseList)
-  if (results[0].status === 'fulfilled') {
-    this.advance = results[0].value
-  }
-  let i = 1
-  for (const stage of this.stages) {
-    if (results[i].status === 'fulfilled') {
-      Object.assign(stage.cost, (results[i] as PromiseFulfilledResult<Money>).value)
-    }
-    i++
-  }
-  for (const expense of this.expenses) {
-    if (results[i].status === 'fulfilled') {
-      Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)
-    }
-    i++
-  }
+  await Promise.allSettled(promiseList)
 }
 
 schema.methods.addComment = function (this: TravelDoc) {
@@ -258,10 +194,10 @@ schema.methods.addComment = function (this: TravelDoc) {
   }
 }
 
-schema.pre('validate', async function (this: TravelDoc, next) {
+schema.pre('validate', async function (this: TravelDoc) {
   this.addComment()
 
-  await populate(this)
+  await populateAll(this, populates)
 
   const conflicts = await travelCalculator.calc(this)
 
@@ -271,14 +207,13 @@ schema.pre('validate', async function (this: TravelDoc, next) {
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
-  await populate(this)
-
-  next()
+  await populateAll(this, populates)
 })
 
 schema.post('save', async function (this: TravelDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
+    await offsetAdvance(this, 'Travel')
   }
 })
 

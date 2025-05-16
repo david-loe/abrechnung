@@ -7,7 +7,7 @@
           ? t('labels.newX', { X: t('labels.' + modalObjectType) })
           : t('labels.editX', { X: t('labels.' + modalObjectType) })
       "
-      @beforeClose="modalMode === 'edit' ? resetModal() : null">
+      @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="travel._id">
         <ErrorBanner :error="error"></ErrorBanner>
         <StageForm
@@ -54,6 +54,9 @@
           :travel="(modalObject as TravelSimple)"
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
           :loading="modalFormIsLoading"
+          :owner="travel.owner._id"
+          :update-user-org="endpointPrefix !== 'examine/'"
+          :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"
           @edit="editTravelDetails">
         </TravelApplyForm>
@@ -130,7 +133,7 @@
                 <li>
                   <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', 'travel', travel)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
-                    <span>{{ t('labels.editX', { X: t('labels.travelDetails') }) }}</span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
                   </a>
                 </li>
                 <li>
@@ -296,50 +299,12 @@
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
-                <table class="table align-bottom">
-                  <tbody>
-                    <tr>
-                      <th>{{ t('labels.progress') }}</th>
-                      <td class="text-end">
-                        <ProgressCircle :progress="travel.progress"></ProgressCircle>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <small>
-                          {{ t('labels.lumpSums') }}
-                          <small v-if="travel.claimSpouseRefund">
-                            <br />
-                            {{ t('labels.includingSpouseRefund') }}
-                          </small>
-                        </small>
-                      </td>
-                      <td class="text-end align-top">
-                        <small>{{ formatter.money(travel.addUp.lumpSums) }}</small>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <small>{{ t('labels.expenses') }}</small>
-                      </td>
-                      <td class="text-end">
-                        <small>{{ formatter.money(travel.addUp.expenses) }}</small>
-                      </td>
-                    </tr>
-                    <tr v-if="travel.advance.amount">
-                      <td class="text-secondary">
-                        <small>{{ t('labels.advance') }}</small>
-                      </td>
-                      <td class="text-end text-secondary">
-                        <small>{{ formatter.money(travel.addUp.advance, { func: (x) => 0 - x }) }}</small>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(travel.addUp.balance) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <AddUpTable
+                  :add-up="travel.addUp"
+                  :claim-spouse-refund="travel.claimSpouseRefund"
+                  :progress="travel.progress"
+                  :project="travel.project"
+                  :showAdvanceOverflow="travel.state !== 'refunded'"></AddUpTable>
                 <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
@@ -351,12 +316,10 @@
                 <template v-if="travel.state !== 'refunded'">
                   <div class="mb-3">
                     <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                    <textarea
-                      class="form-control"
+                    <TextArea
                       id="comment"
-                      rows="1"
                       v-model="travel.comment"
-                      :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></textarea>
+                      :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
                   </div>
                   <template v-if="travel.state === 'approved'">
                     <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
@@ -398,12 +361,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-
-import { DatabaseSync } from 'node:sqlite'
 import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
@@ -417,16 +374,16 @@ import {
   TravelSimple,
   User,
   UserSimple,
-  meals,
   travelStates
 } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ErrorBanner from '@/components/elements/ErrorBanner.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
-import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import LumpSumEditor from '@/components/travel//elements/LumpSumEditor.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
@@ -434,6 +391,10 @@ import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -478,7 +439,7 @@ const isReadOnly = computed(() => {
   )
 })
 
-function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject | Gap) {
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
   if (object) {
     modalObject.value = object
   } else if (modalObjectType.value !== type) {

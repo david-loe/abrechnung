@@ -1,6 +1,6 @@
 <template>
   <form class="container" @submit.prevent="$emit(mode, output())">
-    <div v-if="askOwner" class="mb-3">
+    <div v-if="!owner" class="mb-3">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formHealthCareCost.owner" required></UserSelector>
     </div>
@@ -23,13 +23,27 @@
         {{ $t('labels.insurance') }}<span class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.insurance')" />
-      <HealthInsuranceSelector v-model="formHealthCareCost.insurance" :update-user-insurance="!askOwner"></HealthInsuranceSelector>
+      <HealthInsuranceSelector v-model="formHealthCareCost.insurance" :update-user-insurance="updateUserOrg"></HealthInsuranceSelector>
     </div>
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" :update-user-org="!askOwner" required>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" :update-user-org="updateUserOrg" required>
       </ProjectSelector>
+    </div>
+
+    <div class="mb-3">
+      <label for="healthCareCostFormAdvance" class="form-label me-2">
+        {{ $t('labels.advanceFromEmployer') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <AdvanceSelector
+        id="healthCareCostFormAdvance"
+        v-model="formHealthCareCost.advances"
+        :owner-id="formHealthCareCost.owner"
+        :project-id="formHealthCareCost.project?._id"
+        :endpoint-prefix="endpointPrefix"
+        multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -46,6 +60,8 @@
 
 <script lang="ts">
 import { HealthCareCostSimple } from '@/../../common/types.js'
+import APP_LOADER from '@/appData.js'
+import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -54,16 +70,19 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
-  components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>> },
+    healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
-    askOwner: { type: Boolean, default: false },
+    owner: { type: String },
+    updateUserOrg: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
   },
   data() {
     return {
+      APP_DATA: APP_LOADER.data,
       formHealthCareCost: this.default()
     }
   },
@@ -72,7 +91,8 @@ export default defineComponent({
       return {
         name: '',
         patientName: '',
-        owner: null
+        advances: [],
+        owner: this.owner
       }
     },
     clear() {
@@ -85,7 +105,8 @@ export default defineComponent({
       return Object.assign({}, this.default(), this.healthCareCost)
     }
   },
-  created() {
+  async created() {
+    await APP_LOADER.loadData()
     this.formHealthCareCost = this.input()
   },
   watch: {

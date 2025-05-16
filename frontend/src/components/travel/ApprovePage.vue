@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @beforeClose="modalMode === 'view' ? resetModal() : null">
+      @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
@@ -11,18 +11,15 @@
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
           @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
-        <TravelApply
-          v-else-if="modalTravel.state === 'approved'"
-          :travel="(modalTravel as TravelSimple)"
-          :showButtons="false"></TravelApply>
+        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="(modalTravel as TravelSimple)"></TravelApply>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
-          @cancel="resetAndHide()"
           :travel="modalTravel"
           minStartDate=""
-          askOwner
           :loading="modalFormIsLoading"
+          endpoint-prefix="examine/"
+          @cancel="resetAndHide()"
           @add="(t) => approveTravel(t, 'approved')">
         </TravelApplyForm>
       </div>

@@ -23,13 +23,16 @@ export default defineComponent({
   methods: {
     async postConnectionSettings(connectionSettings: ConnectionSettings) {
       if (!connectionSettings.smtp?.host) {
-        connectionSettings.smtp = undefined
+        connectionSettings.smtp = null
       }
       if (!connectionSettings.auth.ldapauth?.url) {
-        connectionSettings.auth.ldapauth = undefined
+        connectionSettings.auth.ldapauth = null
       }
       if (!connectionSettings.auth.microsoft?.clientId) {
-        connectionSettings.auth.microsoft = undefined
+        connectionSettings.auth.microsoft = null
+      }
+      if (!connectionSettings.auth.oidc?.clientId) {
+        connectionSettings.auth.oidc = null
       }
       const result = await API.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
       if (result.ok) {
@@ -50,6 +53,20 @@ export default defineComponent({
       _id: { type: 'hidden', meta: true }
     })
     this.connectionSettings = (await API.getter<ConnectionSettings>('admin/connectionSettings')).ok?.data
+    if (this.connectionSettings) {
+      if (this.connectionSettings.smtp === null) {
+        this.connectionSettings.smtp = undefined
+      }
+      if (this.connectionSettings.auth.ldapauth === null) {
+        this.connectionSettings.auth.ldapauth = undefined
+      }
+      if (this.connectionSettings.auth.microsoft === null) {
+        this.connectionSettings.auth.microsoft = undefined
+      }
+      if (this.connectionSettings.auth.oidc === null) {
+        this.connectionSettings.auth.oidc = undefined
+      }
+    }
     queueMicrotask(() => (this.$refs.form$ as any).load(this.connectionSettings))
   }
 })

@@ -1,7 +1,7 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @beforeClose=";($refs.apiKeyForm as any).resetForm()">
+    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @afterClose=";($refs.apiKeyForm as any).resetForm()">
       <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm">
       </ApiKeyForm>
     </ModalComponent>

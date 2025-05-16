@@ -2,8 +2,9 @@ import fs from 'node:fs/promises'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
-import { addUp, hexToRGB } from '../../common/scripts.js'
+import { hexToRGB } from '../../common/scripts.js'
 import {
+  Advance,
   Comment,
   Cost,
   CountryCode,
@@ -22,6 +23,7 @@ import {
   Purpose,
   PurposeSimple,
   Refund,
+  ReportModelName,
   Transport,
   Travel,
   TravelDay,
@@ -29,6 +31,8 @@ import {
   TravelSettings,
   _id,
   baseCurrency,
+  getReportTypeFromModelName,
+  reportIsAdvance,
   reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel
@@ -110,7 +114,7 @@ export class ReportPrinter {
     this.translateFunc = translateFunc
   }
 
-  async print(report: Travel | ExpenseReport | HealthCareCost, language: Locale) {
+  async print(report: Travel | ExpenseReport | HealthCareCost | Advance, language: Locale) {
     const print = await ReportPrint.create(
       report,
       this.settings,
@@ -135,12 +139,12 @@ export class ReportPrinter {
 
 class ReportPrint {
   drawer: PDFDrawer
-  report: Travel | ExpenseReport | HealthCareCost
+  report: Travel | ExpenseReport | HealthCareCost | Advance
   distanceRefunds: TravelSettings['distanceRefunds']
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
 
   constructor(
-    report: Travel | ExpenseReport | HealthCareCost,
+    report: Travel | ExpenseReport | HealthCareCost | Advance,
     drawer: PDFDrawer,
     distanceRefunds: TravelSettings['distanceRefunds'],
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
@@ -152,7 +156,7 @@ class ReportPrint {
   }
 
   static async create(
-    report: Travel | ExpenseReport | HealthCareCost,
+    report: Travel | ExpenseReport | HealthCareCost | Advance,
     settings: PrinterSettings,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
@@ -201,40 +205,32 @@ class ReportPrint {
       yStart: y,
       fontSize: this.drawer.settings.fontSizes.M
     })
+    y = this.drawAdvanceInformation({
+      xStart: this.drawer.settings.pagePadding,
+      yStart: y,
+      fontSize: this.drawer.settings.fontSizes.M
+    })
 
-    const optionalMapTravel = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 1 }
-    const optionalMapHealth: ReceiptMap = {}
-    if (reportIsHealthCareCost(this.report) && this.report.refundSum.receipts && this.report.refundSum.receipts.length > 0) {
-      for (const receipt of this.report.refundSum.receipts) {
-        optionalMapHealth[receipt._id?.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
+    const receiptMap = {}
+    if (!reportIsAdvance(this.report)) {
+      const optionalMapTravel = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 1 }
+      const optionalMapHealth: ReceiptMap = {}
+      if (reportIsHealthCareCost(this.report) && this.report.refundSum.receipts && this.report.refundSum.receipts.length > 0) {
+        for (const receipt of this.report.refundSum.receipts) {
+          optionalMapHealth[receipt._id?.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
+        }
       }
+      Object.assign(receiptMap, optionalMapTravel.map, optionalMapHealth, getReceiptMap(this.report.expenses, optionalMapTravel.number).map)
     }
-    const receiptMap = Object.assign(
-      optionalMapTravel.map,
-      optionalMapHealth,
-      getReceiptMap(this.report.expenses, optionalMapTravel.number).map
-    )
+    let yDates = y
+    y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
 
-    // y = y - 16
-
-    if (reportIsTravel(this.report) && this.report.state === 'approved') {
-      //Advance
-      y = this.drawAdvanceApprovedText({
-        xStart: this.drawer.settings.pagePadding,
-        yStart: y,
-        fontSize: this.drawer.settings.fontSizes.M
-      })
-    } else {
-      let yDates = y
-      y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
-
-      yDates = await this.drawDates({
-        xStart: this.drawer.currentPage.getSize().width - this.drawer.settings.pagePadding - 175, // 175: width of dates table
-        yStart: yDates,
-        fontSize: this.drawer.settings.fontSizes.S
-      })
-      y = y < yDates ? y : yDates
-    }
+    yDates = await this.drawDates({
+      xStart: this.drawer.currentPage.getSize().width - this.drawer.settings.pagePadding - 175, // 175: width of dates table
+      yStart: yDates,
+      fontSize: this.drawer.settings.fontSizes.S
+    })
+    y = y < yDates ? y : yDates
 
     y = await this.drawStages(receiptMap, {
       xStart: this.drawer.settings.pagePadding,
@@ -247,6 +243,11 @@ class ReportPrint {
       fontSize: this.drawer.settings.fontSizes.S
     })
     y = await this.drawDays({
+      xStart: this.drawer.settings.pagePadding,
+      yStart: y - 16,
+      fontSize: this.drawer.settings.fontSizes.S
+    })
+    y = await this.drawReports({
       xStart: this.drawer.settings.pagePadding,
       yStart: y - 16,
       fontSize: this.drawer.settings.fontSizes.S
@@ -346,7 +347,7 @@ class ReportPrint {
   drawHealthCareCostInformation(options: Options) {
     let y = options.yStart
     if (reportIsHealthCareCost(this.report)) {
-      // Isurance + patientName
+      // Insurance + patientName
       y = this.drawer.drawMultilineText(
         `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
         {
@@ -359,15 +360,11 @@ class ReportPrint {
     return y
   }
 
-  drawAdvanceApprovedText(options: Options) {
+  drawAdvanceInformation(options: Options) {
     let y = options.yStart
-    if (reportIsTravel(this.report)) {
+    if (reportIsAdvance(this.report)) {
       y = this.drawer.drawMultilineText(
-        this.t('report.advance.approvedXonYbyZ', {
-          X: this.drawer.formatter.detailedMoney(this.report.advance, true),
-          Y: this.drawer.formatter.date(this.report.updatedAt),
-          Z: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
-        }),
+        `${this.t('labels.applicant')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}      ${this.t('labels.reason')}: ${this.report.reason}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -390,32 +387,27 @@ class ReportPrint {
     })
 
     const summary = []
-
-    if (reportIsTravel(this.report)) {
-      const addedUp = addUp(this.report)
-      summary.push({ reference: this.t('labels.lumpSums'), sum: addedUp.lumpSums })
-      summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
-      if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
-        addedUp.advance.amount = -1 * addedUp.advance.amount
-        summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
+    if (reportIsAdvance(this.report)) {
+      summary.push({ reference: this.t('labels.advance'), sum: this.report.budget })
+      summary.push({ reference: this.t('labels.balance'), sum: this.report.balance })
+    } else {
+      if (reportIsTravel(this.report)) {
+        summary.push({ reference: this.t('labels.lumpSums'), sum: this.report.addUp.lumpSums })
       }
-      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
-    } else if (reportIsHealthCareCost(this.report)) {
-      const addedUp = addUp(this.report)
-      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
-      if (this.report.state === 'refunded') {
+      summary.push({ reference: this.t('labels.expenses'), sum: this.report.addUp.expenses })
+      if (this.report.addUp.advance.amount) {
+        summary.push({
+          reference: this.t('labels.advance'),
+          sum: {
+            amount: -1 * ((this.report.addUp.advanceOverflow ? this.report.addUp.total.amount : this.report.addUp.advance.amount) || 0)
+          }
+        })
+      }
+      summary.push({ reference: this.t('labels.balance'), sum: this.report.addUp.balance })
+      if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {
         summary.push({ reference: this.t('labels.refundSum'), sum: this.report.refundSum })
       }
-    } else {
-      const addedUp = addUp(this.report)
-      if (addedUp.advance.amount !== null && addedUp.advance.amount > 0) {
-        addedUp.advance.amount = -1 * addedUp.advance.amount
-        summary.push({ reference: this.t('labels.expenses'), sum: addedUp.expenses })
-        summary.push({ reference: this.t('labels.advance'), sum: addedUp.advance })
-      }
-      summary.push({ reference: this.t('labels.balance'), sum: addedUp.balance })
     }
-
     const fontSize = options.fontSize + 2
     this.drawer.drawText(this.t('labels.summary'), {
       xStart: options.xStart,
@@ -441,15 +433,15 @@ class ReportPrint {
     })
 
     const summary = []
-    if (reportIsTravel(this.report)) {
+    if (reportIsTravel(this.report) || reportIsAdvance(this.report)) {
       summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.createdAt })
       summary.push({
         reference: this.t('labels.approvedOn'),
         value: this.report.log.appliedFor?.date
       })
       summary.push({
-        reference: this.t('labels.submittedOn'),
-        value: this.report.log.approved?.date
+        reference: this.t('labels.approvedBy'),
+        value: `${this.report.log.appliedFor?.editor.name.givenName} ${this.report.log.appliedFor?.editor.name.familyName}`
       })
     } else {
       summary.push({
@@ -457,11 +449,20 @@ class ReportPrint {
         value: this.report.log.inWork?.date
       })
     }
-    summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log.underExamination?.date })
-    summary.push({
-      reference: this.t('labels.examinedBy'),
-      value: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
-    })
+    if (reportIsTravel(this.report)) {
+      summary.push({
+        reference: this.t('labels.submittedOn'),
+        value: this.report.log.approved?.date
+      })
+    }
+    if (!reportIsAdvance(this.report)) {
+      summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log.underExamination?.date })
+      summary.push({
+        reference: this.t('labels.examinedBy'),
+        value: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
+      })
+    }
+
     const tabelOptions: TableOptions = options
     tabelOptions.firstRow = false
 
@@ -595,7 +596,7 @@ class ReportPrint {
   }
 
   async drawExpenses(receiptMap: ReceiptMap, options: Options) {
-    if (this.report.expenses.length === 0) {
+    if (reportIsAdvance(this.report) || this.report.expenses.length === 0) {
       return options.yStart
     }
     const columns: Column[] = []
@@ -720,6 +721,44 @@ class ReportPrint {
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(this.report.days, columns, options)
+  }
+
+  async drawReports(options: Options) {
+    if (!reportIsAdvance(this.report) || this.report.offsetAgainst.length === 0) {
+      return options.yStart
+    }
+    const columns: Column[] = []
+    columns.push({
+      key: 'report',
+      width: 280,
+      alignment: pdf_lib.TextAlignment.Left,
+      title: this.t('labels.name'),
+      fn: (r: { name: string } | null) => r?.name ?? this.t('labels.deleted')
+    })
+    columns.push({
+      key: 'type',
+      width: 105,
+      alignment: pdf_lib.TextAlignment.Left,
+      title: this.t('labels.type'),
+      fn: (t: ReportModelName) => this.t(`labels.${getReportTypeFromModelName(t)}`)
+    })
+    columns.push({
+      key: 'amount',
+      width: 100,
+      alignment: pdf_lib.TextAlignment.Right,
+      title: this.t('labels.amount'),
+      fn: (a: number) => this.drawer.formatter.money({ amount: a })
+    })
+
+    const fontSize = options.fontSize + 2
+    this.drawer.drawText(this.t('labels.offsetAgainst'), {
+      xStart: options.xStart,
+      yStart: options.yStart - fontSize,
+      fontSize: fontSize
+    })
+    options.yStart -= fontSize * 1.25
+
+    return await this.drawer.drawTable(this.report.offsetAgainst, columns, options)
   }
   t(textIdentifier: string, interpolation: any = {}) {
     return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation) as string

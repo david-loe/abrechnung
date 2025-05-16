@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
-import { Controller } from './controller.js'
+import { Controller, checkOwner } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
@@ -29,7 +29,7 @@ export class DocumentFileController extends Controller {
 
   @Delete()
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(DocumentFile, { _id: _id, checkOldObject: this.checkOwner(request.user) })
+    return await this.deleter(DocumentFile, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 }
 

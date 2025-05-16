@@ -1,9 +1,9 @@
 <template>
   <div>
-    <TravelApply :travel="travel" :showButtons="false"></TravelApply>
+    <TravelApply :travel="travel"></TravelApply>
     <div class="mb-3">
       <label for="comment" class="form-label">{{ $t('labels.comment') }}</label>
-      <textarea class="form-control" id="comment" rows="3" v-model="comment"></textarea>
+      <TextArea id="comment" v-model="comment"></TextArea>
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-success me-2" @click="output('approved')" :disabled="loading.approved || loading.rejected">
@@ -23,6 +23,7 @@
 
 <script lang="ts">
 import { TravelSimple } from '@/../../common/types.js'
+import TextArea from '@/components/elements/TextArea.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import { PropType, defineComponent } from 'vue'
 export default defineComponent({
@@ -36,7 +37,7 @@ export default defineComponent({
       }
     }
   },
-  components: { TravelApply },
+  components: { TravelApply, TextArea },
   props: { travel: { type: Object as PropType<TravelSimple>, required: true } },
   emits: ['decision', 'cancel'],
   methods: {

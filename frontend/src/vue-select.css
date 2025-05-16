@@ -17,10 +17,10 @@
   --vs-dropdown-max-height: 250px;
   --vs-dropdown-box-shadow: var(--bs-box-shadow);
 
-  --vs-selected-bg: var(--vs-colors--lightest);
+  --vs-selected-bg: var(--bs-tertiary-bg);
   --vs-selected-color: var(--vs-colors--dark);
   --vs-selected-border-color: var(--vs-border-color);
-  --vs-selected-border-style: var(--vs-border-style);
+  --vs-selected-border-style: none;
   --vs-selected-border-width: var(--vs-border-width);
 }
 

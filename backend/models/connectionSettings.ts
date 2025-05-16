@@ -138,14 +138,13 @@ export const connectionSettingsSchema = () =>
 
 const schema = connectionSettingsSchema()
 
-schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings>, next) {
+schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings>) {
   if (this.auth.ldapauth?.url) {
     await verifyLdapauthConfig(this.auth.ldapauth)
   }
   if (this.smtp?.host) {
     await verifySmtpConfig(this.smtp)
   }
-  next()
 })
 
 export default model<ConnectionSettings>('ConnectionSettings', schema)

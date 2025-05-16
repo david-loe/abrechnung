@@ -10,6 +10,7 @@ import {
   Travel,
   TravelDay,
   baseCurrency,
+  idDocumentToId,
   reportIsHealthCareCost,
   reportIsTravel
 } from './types.js'
@@ -141,10 +142,10 @@ export function getLumpSumsSum(days: TravelDay[]) {
   return { amount: sum }
 }
 
-function getBaseCurrencyAmount(a: Money): number {
+export function getBaseCurrencyAmount(a: Money): number {
   let amount = 0
   if (a.amount !== null) {
-    const currency = typeof a.currency === 'string' ? a.currency : a.currency._id
+    const currency = idDocumentToId(a.currency)
     if (currency === baseCurrency._id) {
       amount = a.amount
     } else if (a.exchangeRate && typeof a.exchangeRate.amount === 'number') {
@@ -181,21 +182,26 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
   let expenses = 0
   let advance = 0
   let lumpSums = 0
+  let advanceOverflow = false
   if (reportIsTravel(report)) {
     lumpSums = getLumpSumsSum(report.days).amount
     expenses = getTravelExpensesSum(report).amount
   } else {
     for (const expense of report.expenses) {
-      if (expense.cost) {
-        expenses += getBaseCurrencyAmount(expense.cost)
-      }
+      expenses += getBaseCurrencyAmount(expense.cost)
     }
   }
-  if ((report as Travel | ExpenseReport).advance) {
-    advance = getBaseCurrencyAmount((report as Travel | ExpenseReport).advance)
+  for (const approvedAdvance of report.advances) {
+    advance += approvedAdvance.balance.amount || 0
   }
+
   const total = expenses + lumpSums
-  const balance = total - advance
+  let balance = total - advance
+
+  if (balance < 0) {
+    advanceOverflow = true
+    balance = 0
+  }
 
   if (reportIsTravel(report)) {
     return {
@@ -203,21 +209,16 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
       total: { amount: total },
       advance: { amount: advance },
       expenses: { amount: expenses },
-      lumpSums: { amount: lumpSums }
-    } as AddUpResult<T>
-  }
-  if (reportIsHealthCareCost(report)) {
-    return {
-      balance: { amount: balance },
-      total: { amount: total },
-      expenses: { amount: expenses }
+      lumpSums: { amount: lumpSums },
+      advanceOverflow
     } as AddUpResult<T>
   }
   return {
     balance: { amount: balance },
     total: { amount: total },
     advance: { amount: advance },
-    expenses: { amount: expenses }
+    expenses: { amount: expenses },
+    advanceOverflow
   } as AddUpResult<T>
 }
 

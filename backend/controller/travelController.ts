@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
+import { Travel as ITravel, IdDocument, Locale, Stage, TravelExpense, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -11,7 +11,7 @@ import { sendA1Notification, sendNotification } from '../notifications/notificat
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, TravelApplication, TravelPost } from './types.js'
+import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
 
 @Tags('Travel')
 @Route('travel')
@@ -118,8 +118,7 @@ export class TravelController extends Controller {
   @Post('appliedFor')
   public async postOwnInWork(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'appliedFor' as TravelState,
-      owner: request.user._id,
+      state: 'appliedFor',
       editor: request.user._id,
       lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
     })
@@ -128,6 +127,7 @@ export class TravelController extends Controller {
       if (!request.user.access['appliedFor:travel']) {
         throw new AuthorizationError()
       }
+      Object.assign(extendedBody, { owner: request.user._id })
       if (!extendedBody.name && extendedBody.startDate) {
         const date = new Date(extendedBody.startDate)
         extendedBody.name = `${extendedBody.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -163,13 +163,13 @@ export class TravelController extends Controller {
         }
       }
       Object.assign(extendedBody, {
-        state: 'approved' as TravelState,
+        state: 'approved',
         editor: request.user._id,
         owner: request.user._id,
         lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
       })
     } else {
-      extendedBody = Object.assign({ _id: extendedBody._id }, { state: 'approved' as TravelState, editor: request.user._id })
+      extendedBody = Object.assign({ _id: extendedBody._id }, { state: 'approved', editor: request.user._id })
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -182,7 +182,6 @@ export class TravelController extends Controller {
           oldObject.editor._id.equals(request.user._id)
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -195,7 +194,7 @@ export class TravelController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -204,7 +203,6 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'approved') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -265,7 +263,7 @@ export class TravelApproveController extends Controller {
     @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
     if (!extendedBody._id) {
       const travelApplication = extendedBody as TravelApplication
       ;(travelApplication as any).lastPlaceOfWork = { country: travelApplication.destinationPlace?.country, place: '' }
@@ -279,12 +277,6 @@ export class TravelApproveController extends Controller {
       if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
         sendA1Notification(travel)
       }
-      if (travel.advance.amount !== null && travel.advance.amount > 0) {
-        sendViaMail(travel)
-        if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-          await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
-        }
-      }
     }
 
     return await this.setter(Travel, {
@@ -294,7 +286,6 @@ export class TravelApproveController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -304,7 +295,7 @@ export class TravelApproveController extends Controller {
 
   @Post('rejected')
   public async postAnyRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'rejected' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'rejected', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -450,7 +441,7 @@ export class TravelExamineController extends Controller {
 
   @Post('refunded')
   public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'refunded' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'refunded', editor: request.user._id })
 
     const cb = async (travel: ITravel) => {
       sendNotification(travel)
@@ -471,7 +462,6 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -481,7 +471,7 @@ export class TravelExamineController extends Controller {
 
   @Post('approved')
   public async postAnyApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -490,7 +480,6 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -503,7 +492,7 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as TravelState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -512,7 +501,6 @@ export class TravelExamineController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === 'approved' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

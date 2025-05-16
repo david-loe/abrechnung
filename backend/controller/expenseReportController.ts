@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
+import { Expense, ExpenseReport as IExpenseReport, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -9,9 +9,9 @@ import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, MoneyPost } from './types.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Expense Report')
 @Route('expenseReport')
@@ -30,7 +30,7 @@ export class ExpenseReportController extends Controller {
   }
   @Delete()
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: this.checkOwner(request.user) })
+    return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 
   @Post('expense')
@@ -73,12 +73,11 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined },
+    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'inWork' as ExpenseReportState,
-      owner: request.user._id,
+      state: 'inWork',
       editor: request.user._id
     })
 
@@ -86,6 +85,7 @@ export class ExpenseReportController extends Controller {
       if (!request.user.access['inWork:expenseReport']) {
         throw new AuthorizationError()
       }
+      Object.assign(extendedBody, { owner: request.user._id })
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -99,7 +99,6 @@ export class ExpenseReportController extends Controller {
           (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
         ) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -113,7 +112,7 @@ export class ExpenseReportController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
@@ -122,7 +121,6 @@ export class ExpenseReportController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -237,13 +235,30 @@ export class ExpenseReportExamineController extends Controller {
     })
   }
 
+  @Post()
+  public async postAny(
+    @Body() requestBody: { project?: IdDocument; _id: _id; name?: string; advances?: IdDocument[] },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { editor: request.user._id })
+
+    return await this.setter(ExpenseReport, {
+      requestBody: extendedBody,
+      allowNew: false,
+      checkOldObject: async (oldObject: ExpenseReportDoc) =>
+        !oldObject.historic &&
+        (oldObject.state === 'inWork' || oldObject.state === 'underExamination') &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+    })
+  }
+
   @Post('inWork')
   public async postBackInWork(
     @Body()
-    requestBody: { project?: IdDocument; _id?: _id; name?: string; advance: MoneyPost | undefined; owner?: IdDocument; comment?: string },
+    requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; owner?: IdDocument; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork' as ExpenseReportState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
     if (!extendedBody._id && !extendedBody.name) {
       const date = new Date()
       extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -255,7 +270,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -265,7 +279,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('refunded')
   public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'refunded' as ExpenseReportState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'refunded', editor: request.user._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
       sendNotification(expenseReport)
@@ -282,7 +296,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -295,7 +308,7 @@ export class ExpenseReportExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as ExpenseReportState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
@@ -304,7 +317,6 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

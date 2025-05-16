@@ -2,11 +2,10 @@ import { DeleteResult } from 'mongodb'
 import { FilterQuery, HydratedDocument, Model, ProjectionType, SortOrder, Types, mongo } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
-import { GETResponse, Meta, User, _id } from '../../common/types.js'
+import { GETResponse, IdDocument, Meta, User, _id } from '../../common/types.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
-import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -377,10 +376,6 @@ export class Controller extends TsoaController {
     return { message: 'alerts.successDeleting', result: result }
   }
 
-  checkOwner(requestUser: User) {
-    return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
-  }
-
   async insertMany<ModelType extends { _id?: Types.ObjectId | string }>(
     model: Model<ModelType>,
     options: { requestBody: SetterBody<ModelType>[]; cb?: (data: ModelType[]) => any }
@@ -391,4 +386,7 @@ export class Controller extends TsoaController {
     }
     return { message: 'alerts.successSaving', result }
   }
+}
+export function checkOwner(requestUser: User) {
+  return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
 }

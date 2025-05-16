@@ -1,6 +1,6 @@
 <template>
   <form v-if="APP_DATA" class="container" @submit.prevent="$emit(mode, output())">
-    <div v-if="askOwner" class="mb-2">
+    <div v-if="!owner" class="mb-2">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formTravel.owner" required></UserSelector>
     </div>
@@ -94,29 +94,33 @@
           :required="formTravel.claimSpouseRefund" />
       </div>
     </template>
-    <div class="mb-2">
-      <label for="travelFormAdvance" class="form-label me-2">
-        {{ $t('labels.advanceFromEmployer') }}
-      </label>
-      <InfoPoint :text="$t('info.advance')" />
-      <div class="input-group" id="travelFormAdvance">
-        <input type="number" class="form-control" step="0.01" id="travelFormAdvanceAmount" v-model="formTravel.advance.amount" />
-        <CurrencySelector v-model="formTravel.advance.currency" :required="true"></CurrencySelector>
-      </div>
-    </div>
 
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="!askOwner" required> </ProjectSelector>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="updateUserOrg" required>
+      </ProjectSelector>
+    </div>
+
+    <div class="mb-3">
+      <label for="travelFormAdvance" class="form-label me-2">
+        {{ $t('labels.advanceFromEmployer') }}
+      </label>
+      <InfoPoint :text="$t('info.advance')" />
+      <AdvanceSelector
+        v-model="formTravel.advances"
+        :owner-id="formTravel.owner"
+        :project-id="formTravel.project?._id"
+        :endpoint-prefix="endpointPrefix"
+        multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         {{
-          mode === 'add' && !askOwner
+          mode === 'add' && owner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
-            : travel && (travel.state === 'rejected' || travel.state === 'approved')
+            : travel.state === 'rejected' || travel.state === 'approved'
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
@@ -131,9 +135,9 @@
 
 <script lang="ts">
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { TravelSimple, baseCurrency } from '@/../../common/types.js'
+import { TravelSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
@@ -143,13 +147,15 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector },
+  components: { InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    travel: { type: Object as PropType<Partial<TravelSimple>> },
+    travel: { type: Object as PropType<Partial<TravelSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
     minStartDate: { type: [Date, String] as PropType<Date | string>, default: new Date() },
-    askOwner: { type: Boolean, default: false },
+    owner: { type: String },
+    updateUserOrg: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
   },
   data() {
@@ -172,22 +178,14 @@ export default defineComponent({
           destinationName: ''
         },
         isCrossBorder: undefined,
-        advance: {
-          amount: null,
-          currency: baseCurrency
-        },
-        owner: null
+        advances: [],
+        owner: this.owner
       }
     },
     clear() {
       this.formTravel = this.default()
     },
     output() {
-      if (this.formTravel.advance.amount === null) {
-        this.formTravel.advance = undefined
-      } else if (this.formTravel.advance.amount === '') {
-        this.formTravel.advance.amount = 0
-      }
       if (!this.formTravel.isCrossBorder) {
         this.formTravel.a1Certificate = undefined
       }

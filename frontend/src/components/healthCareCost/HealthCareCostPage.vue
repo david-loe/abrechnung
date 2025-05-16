@@ -2,25 +2,41 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
-      @beforeClose="modalMode === 'edit' ? resetModal() : null">
+      :header="
+        modalMode === 'add'
+          ? t('labels.newX', { X: t('labels.' + modalObjectType) })
+          : t('labels.editX', { X: t('labels.' + modalObjectType) })
+      "
+      @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="healthCareCost._id">
         <ExpenseForm
-          :expense="modalExpense"
+          v-if="modalObjectType === 'expense'"
+          :expense="modalObject"
           :disabled="isReadOnly"
-          :loading="expenseFormIsLoading"
+          :loading="modalFormIsLoading"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalExpense as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalExpense as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => { const next = getNext(modalExpense as Expense); if (next) { showModal('edit', next) } else { hideModal() } }"
-          @prev="() => { const prev = getPrev(modalExpense as Expense); if (prev) { showModal('edit', prev) } else { hideModal() } }">
+          @next="() => { const next = getNext(modalObject as Expense); if (next) { showModal('edit', 'expense', next) } else { hideModal() } }"
+          @prev="() => { const prev = getPrev(modalObject as Expense); if (prev) { showModal('edit', 'expense', prev) } else { hideModal() } }">
         </ExpenseForm>
+        <HealthCareCostForm
+          v-else
+          :mode="(modalMode as 'add' | 'edit')"
+          :healthCareCost="modalObject"
+          :loading="modalFormIsLoading"
+          :owner="healthCareCost.owner._id"
+          :update-user-org="endpointPrefix !== 'examine/'"
+          :endpoint-prefix="endpointPrefix"
+          @cancel="resetAndHide()"
+          @add="editHealthCareCostDetails">
+        </HealthCareCostForm>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="healthCareCost._id">
@@ -86,6 +102,15 @@
                 </template>
                 <li>
                   <a
+                    :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
+                    href="#"
+                    @click="showModal('edit', 'healthCareCost', healthCareCost)">
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.healthCareCost') }) }) }}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
                     :class="
                       'dropdown-item' +
                       (isReadOnly &&
@@ -129,7 +154,7 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.healthCareCost') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.healthCareCost') }}</span>
@@ -148,7 +173,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="expense of healthCareCost.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
+              <tr
+                v-for="expense of healthCareCost.expenses"
+                :key="expense._id"
+                style="cursor: pointer"
+                @click="showModal('edit', 'expense', expense)">
                 <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
                 <td>{{ formatter.money(expense.cost) }}</td>
@@ -165,16 +194,13 @@
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
                 <table class="table align-bottom">
-                  <tbody>
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(healthCareCost.addUp.balance) }}</td>
-                    </tr>
-                    <tr v-if="healthCareCost.state === 'refunded'">
-                      <th>{{ t('labels.refundSum') }}</th>
-                      <td class="text-end">{{ formatter.money(healthCareCost.refundSum) }}</td>
-                    </tr>
-                  </tbody>
+                  <AddUpTable
+                    :add-up="healthCareCost.addUp"
+                    :project="healthCareCost.project"
+                    :refundSum="healthCareCost.state === 'refunded' ? healthCareCost.refundSum : undefined"
+                    :showAdvanceOverflow="
+                      healthCareCost.state !== 'refunded' && healthCareCost.state !== 'underExaminationByInsurance'
+                    "></AddUpTable>
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
@@ -186,10 +212,8 @@
                 </div>
                 <div v-if="healthCareCost.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
+                  <TextArea
                     id="comment"
-                    rows="1"
                     v-model="healthCareCost.comment as string | undefined"
                     :disabled="
                       isReadOnly &&
@@ -197,7 +221,7 @@
                         (endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination') ||
                         (endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance')
                       )
-                    "></textarea>
+                    "></TextArea>
                 </div>
                 <template v-if="healthCareCost.state === 'inWork'">
                   <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -278,24 +302,36 @@
 </template>
 
 <script lang="ts" setup>
+import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import {
+  DocumentFile,
+  Expense,
+  HealthCareCost,
+  HealthCareCostSimple,
+  Organisation,
+  UserSimple,
+  healthCareCostStates
+} from '@/../../common/types.js'
+import API from '@/api.js'
+import APP_LOADER from '@/appData'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import FileUpload from '@/components/elements/FileUpload.vue'
+import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
+import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
+import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
+import { formatter } from '@/formatter.js'
+import { logger } from '@/logger.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
-import { DocumentFile, Expense, HealthCareCost, Organisation, UserSimple, healthCareCostStates } from '@/../../common/types.js'
-import API from '@/api.js'
-import APP_LOADER from '@/appData'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
-import FileUpload from '@/components/elements/FileUpload.vue'
-import ModalComponent from '@/components/elements/ModalComponent.vue'
-import StatePipeline from '@/components/elements/StatePipeline.vue'
-import TooltipElement from '@/components/elements/TooltipElement.vue'
-import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
-import { formatter } from '@/formatter.js'
-import { logger } from '@/logger.js'
-
+type ModalObject = Partial<Expense> | HealthCareCostSimple
+type ModalObjectType = 'expense' | 'healthCareCost'
 type ModalMode = 'add' | 'edit'
 
 const props = defineProps({
@@ -308,10 +344,11 @@ const router = useRouter()
 const { t } = useI18n()
 
 const healthCareCost = ref<HealthCareCost>({} as HealthCareCost)
-const modalExpense = ref<Partial<Expense>>({})
+const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
+const modalObjectType = ref<ModalObjectType>('expense')
 const isReadOnlySwitchOn = ref(true)
-const expenseFormIsLoading = ref(false)
+const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
@@ -322,10 +359,13 @@ const isReadOnly = computed(() => {
 
 const modalCompRef = useTemplateRef('modalComp')
 
-function showModal(mode: ModalMode, expense?: Partial<Expense>) {
-  if (expense) {
-    modalExpense.value = expense
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
+  if (object) {
+    modalObject.value = object
+  } else if (modalObjectType.value !== type) {
+    modalObject.value = {}
   }
+  modalObjectType.value = type
   modalMode.value = mode
   if (modalCompRef.value?.modal) {
     modalCompRef.value.modal.show()
@@ -339,7 +379,7 @@ function hideModal() {
 }
 function resetModal() {
   modalMode.value = 'add'
-  modalExpense.value = {}
+  modalObject.value = {}
 }
 function resetAndHide() {
   resetModal()
@@ -411,12 +451,12 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/expense`, expense, {
     headers,
     params: { parentId: healthCareCost.value._id }
   })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result.ok) {
     setHealthCareCost(result.ok)
     resetAndHide()
@@ -424,12 +464,27 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result) {
     setHealthCareCost(result)
     resetAndHide()
+  }
+}
+
+async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) {
+  modalFormIsLoading.value = true
+  const result = await API.setter<HealthCareCost>(
+    `${props.endpointPrefix}healthCareCost${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
+    updatedHealthCareCost
+  )
+  modalFormIsLoading.value = false
+  if (result.ok) {
+    setHealthCareCost(result.ok)
+    resetAndHide()
+  } else {
+    await getHealthCareCost()
   }
 }
 

@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
-import { addUp } from '../common/scripts.js'
+import { addUp, getBaseCurrencyAmount } from '../common/scripts.js'
 import { logger } from './logger.js'
+import { addExchangeRate } from './models/exchangeRate.js'
 import Settings from './models/settings.js'
 
 export async function checkForMigrations() {
@@ -204,6 +205,73 @@ export async function checkForMigrations() {
       await mongoose.connection
         .collection('travels')
         .updateMany({}, { $unset: { 'days.$[].cateringNoRefund': '', claimOvernightLumpSum: '' } })
+    }
+
+    if (semver.lte(migrateFrom, '1.7.4')) {
+      logger.info('Apply migration from v1.7.4: rewrite advances')
+
+      await mongoose.connection.collection('displaysettings').updateOne(
+        {},
+        {
+          $set: {
+            'stateColors.completed': { color: '#615d6c', text: 'white' },
+            'accessIcons.appliedFor:advance': ['briefcase', 'cash-coin', 'plus'],
+            'accessIcons.approve/travel': ['airplane', 'clipboard-check'],
+            'accessIcons.approve/advance': ['briefcase', 'cash-coin', 'clipboard-check'],
+            reportTypeIcons: {
+              travel: ['airplane'],
+              expenseReport: ['coin'],
+              advance: ['briefcase', 'cash-coin'],
+              healthCareCost: ['hospital']
+            }
+          }
+        }
+      )
+
+      async function rewriteAdvance(collection: string) {
+        const allReports = mongoose.connection.collection(collection).find({ historic: false })
+        for await (const report of allReports) {
+          try {
+            if (!report.advance.amount) {
+              await mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { advances: [] } })
+            } else {
+              if (report.advance.currency !== 'EUR' && !report.advance.exchangeRate) {
+                await addExchangeRate(report.advance, report.createdAt)
+              }
+              const amount = getBaseCurrencyAmount(report.advance)
+              if (report.state === 'refunded') {
+                report.advances = [{ balance: { amount: amount } }]
+                await mongoose.connection
+                  .collection(collection)
+                  .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [] } })
+              } else if (report.state === 'inWork' || report.state === 'approved' || report.state === 'appliedFor') {
+                const advance = new (mongoose.connection.model('Advance'))({
+                  name: report.name,
+                  reason: report.name,
+                  budget: report.advance,
+                  balance: { amount: amount },
+                  owner: report.owner,
+                  project: report.project,
+                  log: report.state !== 'inWork' ? report.log : {},
+                  state: report.state === 'appliedFor' ? 'appliedFor' : 'approved',
+                  editor: report.editor
+                })
+                await advance.save()
+                report.advances = [advance]
+                await mongoose.connection
+                  .collection(collection)
+                  .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [advance._id] } })
+              }
+            }
+          } catch (e) {
+            logger.warn(`${collection}: ${report._id.toString()} not save: ${e}`)
+          }
+        }
+      }
+
+      await rewriteAdvance('travels')
+      await rewriteAdvance('expensereports')
+      await mongoose.connection.collection('healthcarecosts').updateMany({}, { $set: { advances: [], 'addUp.advance': { amount: 0 } } })
     }
 
     if (settings) {

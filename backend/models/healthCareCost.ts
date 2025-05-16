@@ -1,16 +1,9 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import {
-  Comment,
-  HealthCareCost,
-  HealthCareCostState,
-  Currency as ICurrency,
-  Money,
-  baseCurrency,
-  healthCareCostStates
-} from '../../common/types.js'
-import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
+import { AdvanceDoc } from './advance.js'
+import { addExchangeRate } from './exchangeRate.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -23,41 +16,10 @@ type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
 const healthCareCostSchema = () =>
   new Schema<HealthCareCost, HealthCareCostModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    Object.assign(requestBaseSchema(healthCareCostStates, 'inWork', 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: healthCareCostStates,
-        default: 'inWork'
-      },
-      log: logObject(healthCareCostStates),
       refundSum: costObject(true, true, false, baseCurrency._id),
-      addUp: {
-        type: {
-          balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true)
-        }
-      },
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: healthCareCostStates
-          }
-        }
-      ],
-      history: [{ type: Schema.Types.ObjectId, ref: 'HealthCareCost' }],
-      historic: { type: Boolean, required: true, default: false },
       expenses: [
         {
           description: { type: String, required: true },
@@ -65,29 +27,26 @@ const healthCareCostSchema = () =>
           note: { type: String }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 
-function populate(doc: Document) {
-  return Promise.allSettled([
-    doc.populate({ path: 'insurance' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'refundSum.currency' }),
-    doc.populate({ path: 'refundSum.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...healthCareCostStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = healthCareCostSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: HealthCareCostDoc) {
-  populate(this)
+const populates = {
+  refundSum: [{ path: 'refundSum.receipts', select: { name: 1, type: 1 } }, { path: 'refundSum.currency' }],
+  insurance: [{ path: 'insurance' }],
+  expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: healthCareCostStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<HealthCareCost, HealthCareCost>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: HealthCareCostDoc) {
@@ -112,32 +71,15 @@ schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
-}
-
-async function exchange(costObject: Money, date: string | number | Date) {
-  let exchangeRate = null
-
-  if (costObject.amount !== null && costObject.amount > 0 && (costObject.currency as ICurrency)._id !== baseCurrency._id) {
-    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
-  }
-  costObject.exchangeRate = exchangeRate
-
-  return costObject
+  await this.save()
 }
 
 schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
-    promiseList.push(exchange(expense.cost, expense.cost.date))
+    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
   }
-  const results = await Promise.allSettled(promiseList)
-  let i = 0
-  for (const expense of this.expenses) {
-    if (results[i].status === 'fulfilled') {
-      Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)
-    }
-    i++
-  }
+  await Promise.allSettled(promiseList)
 }
 
 schema.methods.addComment = function (this: HealthCareCostDoc) {
@@ -151,17 +93,17 @@ schema.pre('validate', function (this: HealthCareCostDoc) {
   this.addComment()
 })
 
-schema.pre('save', async function (this: HealthCareCostDoc, next) {
-  await populate(this)
+schema.pre('save', async function (this: HealthCareCostDoc) {
+  await populateAll(this, populates)
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this)
-  next()
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === 'refunded') {
     ;(this.project as ProjectDoc).updateBalance()
+    await offsetAdvance(this, 'HealthCareCost')
   }
 })
 
