@@ -460,6 +460,23 @@
     "overnight\n": "Übernachtungs\npauschale"
   },
   "mail": {
+    "advance": {
+      "appliedFor": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Ein neuer Vorschussantrag von {owner} kam grade rein.",
+        "subject": "🆕 Neue Vorschussantrag"
+      },
+      "approved": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Dein Vorschussantrag wurde genehmigt.",
+        "subject": "✅ Vorschuss genehmigt"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Dein Vorschussantrag wurde abgelehnt.",
+        "subject": "❌ Vorschuss abgelehnt"
+      }
+    },
     "expenseReport": {
       "backToInWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

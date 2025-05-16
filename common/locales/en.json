@@ -459,6 +459,23 @@
     "overnight\n": "Overnight lump sum"
   },
   "mail": {
+    "advance": {
+      "appliedFor": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "A new advance request from {owner} just came in.",
+        "subject": "🆕 New advance request"
+      },
+      "approved": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "Your advance request has been approved.",
+        "subject": "✅ Advance approved"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "Your advance request was rejected.",
+        "subject": "❌ Advance rejected"
+      }
+    },
     "expenseReport": {
       "backToInWork": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
