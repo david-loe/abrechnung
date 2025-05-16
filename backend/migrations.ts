@@ -233,7 +233,7 @@ export async function checkForMigrations() {
         for await (const report of allReports) {
           try {
             if (!report.advance.amount) {
-              mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { advances: [] } })
+              await mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { advances: [] } })
             } else {
               if (report.advance.currency !== 'EUR' && !report.advance.exchangeRate) {
                 await addExchangeRate(report.advance, report.createdAt)
@@ -241,7 +241,7 @@ export async function checkForMigrations() {
               const amount = getBaseCurrencyAmount(report.advance)
               if (report.state === 'refunded') {
                 report.advances = [{ balance: { amount: amount } }]
-                mongoose.connection
+                await mongoose.connection
                   .collection(collection)
                   .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [] } })
               } else if (report.state === 'inWork' || report.state === 'approved' || report.state === 'appliedFor') {
@@ -258,7 +258,7 @@ export async function checkForMigrations() {
                 })
                 await advance.save()
                 report.advances = [advance]
-                mongoose.connection
+                await mongoose.connection
                   .collection(collection)
                   .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [advance._id] } })
               }

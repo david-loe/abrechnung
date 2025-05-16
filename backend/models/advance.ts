@@ -66,11 +66,11 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
 })
 
 schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
-  const doc: any = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).lean()
+  const doc: any = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).session(session).lean()
   doc._id = undefined
   doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('Advance').create([doc], { timestamps: false })
+  const old = await model('Advance').create([doc], { timestamps: false, session })
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
@@ -79,7 +79,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
     this.balance.amount = budgetAmount
   }
   if (save) {
-    await this.save()
+    await this.save({ session })
   }
 }
 

@@ -2,7 +2,11 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
+      :header="
+        modalMode === 'add'
+          ? t('labels.newX', { X: t('labels.' + modalObjectType) })
+          : t('labels.editX', { X: t('labels.' + modalObjectType) })
+      "
       @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="healthCareCost._id">
         <ExpenseForm

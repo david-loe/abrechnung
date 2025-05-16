@@ -138,7 +138,6 @@ import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
 import { TravelSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
@@ -148,7 +147,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
-  components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector, AdvanceSelector },
+  components: { InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     travel: { type: Object as PropType<Partial<TravelSimple>>, required: true },

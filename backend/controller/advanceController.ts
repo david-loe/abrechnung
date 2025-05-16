@@ -21,7 +21,7 @@ interface AdvanceApplication {
   comment?: string
 }
 
-@Tags('Expense Report')
+@Tags('Advance')
 @Route('advance')
 @Security('cookieAuth', ['user'])
 @Security('httpBearer', ['user'])

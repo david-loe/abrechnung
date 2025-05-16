@@ -119,7 +119,7 @@ export function populateSelected<DocType extends Record<string, any>>(
   query: Query<DocType, DocType>,
   projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
 ) {
-  const projection = query.projection()
+  const projection = query.projection() || {}
   const runAll = !query.selected()
   const isExclusiv = query.selectedExclusively()
   const isInclusiv = query.selectedInclusively()

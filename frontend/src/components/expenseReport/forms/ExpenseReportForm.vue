@@ -49,7 +49,6 @@
 import { ExpenseReportSimple, baseCurrency } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -57,7 +56,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint, ProjectSelector, CurrencySelector, UserSelector, AdvanceSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: { type: Object as PropType<Partial<ExpenseReportSimple>>, required: true },
