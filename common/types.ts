@@ -416,7 +416,6 @@ export interface AdvanceBase {
   name: string
   budget: Money
   balance: BaseCurrencyMoney
-  runningBalance: BaseCurrencyMoney
   reason: string
   state: AdvanceState
   _id: _id

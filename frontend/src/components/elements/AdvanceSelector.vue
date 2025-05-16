@@ -9,26 +9,26 @@
     :disabled="disabled"
     :multiple="multiple"
     style="min-width: 160px">
-    <template #option="{ name, budget, runningBalance }">
+    <template #option="{ name, budget, balance }">
       <div class="row align-items-center">
         <div class="col text-truncate">
           {{ name }}
         </div>
         <div class="col-auto px-1">
-          <span>{{ $formatter.money(runningBalance) }}</span>
+          <span>{{ $formatter.money(balance) }}</span>
         </div>
-        <div v-if="runningBalance.amount !== budget.amount" class="col-auto px-1 opacity-75">
+        <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75">
           <span>{{ $formatter.money(budget) }}</span>
         </div>
       </div>
     </template>
-    <template #selected-option="{ name, runningBalance }">
+    <template #selected-option="{ name, balance }">
       <div class="row align-items-center">
         <div class="col-auto text-truncate" style="max-width: 220px">
           {{ name }}
         </div>
         <div class="col-auto opacity-75">
-          <span>{{ $formatter.money(runningBalance) }}</span>
+          <span>{{ $formatter.money(balance) }}</span>
         </div>
       </div>
     </template>

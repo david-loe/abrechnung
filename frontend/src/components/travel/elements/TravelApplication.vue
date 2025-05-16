@@ -86,8 +86,8 @@ export default defineComponent({
             return this.travel.advances
               .map(
                 (a) =>
-                  `${a.name} - ${this.$formatter.money(a.runningBalance)} ${
-                    a.budget.amount !== a.runningBalance.amount ? `(${this.$formatter.money(a.budget)})` : ''
+                  `${a.name} - ${this.$formatter.money(a.balance)} ${
+                    a.budget.amount !== a.balance.amount ? `(${this.$formatter.money(a.budget)})` : ''
                   }`
               )
               .join('\n')

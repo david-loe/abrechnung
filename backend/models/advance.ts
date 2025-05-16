@@ -31,7 +31,6 @@ const advanceSchema = () =>
       reason: { type: String, required: true },
       budget: costObject(true, false, true, baseCurrency._id),
       balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
-      runningBalance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
       offsetAgainst: {
         type: [
           {
@@ -78,7 +77,6 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true) {
   if (this.state === 'appliedFor') {
     const budgetAmount = getBaseCurrencyAmount(this.budget)
     this.balance.amount = budgetAmount
-    this.runningBalance.amount = budgetAmount
   }
   if (save) {
     await this.save()
@@ -122,11 +120,9 @@ schema.methods.offset = async function (this: AdvanceBaseDoc, reportTotal: numbe
     await doc.saveToHistory(false)
     amount = doc.balance.amount || 0
     doc.balance.amount = 0
-    doc.runningBalance.amount = 0
     doc.state = 'completed'
   } else {
     doc.balance.amount = -difference
-    doc.runningBalance.amount = -difference
     difference = 0
   }
   doc.offsetAgainst.push({ type: reportModelName, report: { _id: reportId }, amount } as Advance['offsetAgainst'][number])
