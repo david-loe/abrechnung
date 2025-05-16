@@ -9,6 +9,7 @@ import { connectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import i18n from './i18n.js'
+import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
 
 export default async function () {
@@ -70,6 +71,15 @@ export default async function () {
   )
 
   app.use(auth)
+
+  // Request-Logging
+  app.use((req, res, next) => {
+    logger.debug(`${req.method} ${req.url}`)
+    if (req.body && Object.keys(req.body).length > 0) {
+      logger.debug('Body:', req.body)
+    }
+    next()
+  })
 
   if (process.env.NODE_ENV === 'development') {
     app.use(
