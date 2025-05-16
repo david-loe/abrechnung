@@ -419,7 +419,7 @@
     "toX": "Zu {X}",
     "transport": "Verkehrsmittel",
     "travel": "Reise",
-    "travelDetails": "Reisedetails",
+    "XDetails": "{X}details",
     "traveler": "Reisender",
     "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "travelName": "Name der Reise",

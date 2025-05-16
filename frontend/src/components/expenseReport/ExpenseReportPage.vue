@@ -2,25 +2,38 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
+      :header="
+        modalMode === 'add'
+          ? t('labels.newX', { X: t('labels.' + modalObjectType) })
+          : t('labels.editX', { X: t('labels.' + modalObjectType) })
+      "
       @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="expenseReport._id">
         <ExpenseForm
-          :expense="modalExpense"
+          v-if="modalObjectType === 'expense'"
+          :expense="modalObject"
           :disabled="isReadOnly"
-          :loading="expenseFormIsLoading"
+          :loading="modalFormIsLoading"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalExpense as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalExpense as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => {const next = getNext(modalExpense as Expense); if(next){showModal('edit', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalExpense as Expense); if(prev){showModal('edit', prev)}else{hideModal()}}">
+          @next="() => {const next = getNext(modalObject as Expense); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev(modalObject as Expense); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
         </ExpenseForm>
+        <ExpenseReportForm
+          v-else
+          :mode="modalMode"
+          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+          :loading="modalFormIsLoading"
+          @cancel="resetAndHide()"
+          @edit="editExpenseReportDetails">
+        </ExpenseReportForm>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="expenseReport._id">
@@ -81,6 +94,15 @@
                 </template>
                 <li>
                   <a
+                    :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
+                    href="#"
+                    @click="showModal('edit', 'expenseReport', expenseReport)">
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
                     :class="
                       'dropdown-item' +
                       (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state !== 'refunded' ? ' disabled' : '')
@@ -112,7 +134,7 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
@@ -131,7 +153,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="expense of expenseReport.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
+              <tr
+                v-for="expense of expenseReport.expenses"
+                :key="expense._id"
+                style="cursor: pointer"
+                @click="showModal('edit', 'expense', expense)">
                 <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
                 <td>{{ formatter.money(expense.cost) }}</td>
@@ -207,7 +233,7 @@
 
 <script lang="ts" setup>
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
-import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '@/../../common/types.js'
+import { Expense, ExpenseReport, ExpenseReportSimple, UserSimple, expenseReportStates } from '@/../../common/types.js'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
@@ -215,11 +241,16 @@ import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
+import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
 import { PropType, computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+type ModalObject = Partial<Expense> | ExpenseReportSimple
+type ModalObjectType = 'expense' | 'expenseReport'
+type ModalMode = 'add' | 'edit'
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -231,10 +262,12 @@ const router = useRouter()
 const { t } = useI18n()
 
 const expenseReport = ref<ExpenseReport>({} as ExpenseReport)
-const modalExpense = ref<Partial<Expense>>({})
-const modalMode = ref<'add' | 'edit'>('add')
+const modalObject = ref<ModalObject>({})
+const modalMode = ref<ModalMode>('add')
+const modalObjectType = ref<ModalObjectType>('expense')
+
 const isReadOnlySwitchOn = ref(true)
-const expenseFormIsLoading = ref(false)
+const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
@@ -245,26 +278,29 @@ const isReadOnly = computed(() => {
   )
 })
 
-const modalComp = useTemplateRef('modalComp')
+const modalCompRef = useTemplateRef('modalComp')
 
-function showModal(mode: 'add' | 'edit', expense?: Partial<Expense>) {
-  if (expense) {
-    modalExpense.value = expense
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
+  if (object) {
+    modalObject.value = object
+  } else if (modalObjectType.value !== type) {
+    modalObject.value = {}
   }
+  modalObjectType.value = type
   modalMode.value = mode
-  if (modalComp.value?.modal) {
-    modalComp.value.modal.show()
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.modal.show()
   }
 }
 
 function hideModal() {
-  if (modalComp.value?.modal) {
-    modalComp.value.hideModal()
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.hideModal()
   }
 }
 function resetModal() {
   modalMode.value = 'add'
-  modalExpense.value = {}
+  modalObject.value = {}
 }
 function resetAndHide() {
   resetModal()
@@ -317,12 +353,12 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/expense`, expense, {
     headers,
     params: { parentId: expenseReport.value._id }
   })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result.ok) {
     setExpenseReport(result.ok)
     resetAndHide()
@@ -331,12 +367,27 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result) {
     setExpenseReport(result)
     resetAndHide()
+  }
+}
+
+async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
+  modalFormIsLoading.value = true
+  const result = await API.setter<ExpenseReport>(
+    `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
+    updatedExpenseReport
+  )
+  modalFormIsLoading.value = false
+  if (result.ok) {
+    setExpenseReport(result.ok)
+    resetAndHide()
+  } else {
+    await getExpenseReport()
   }
 }
 

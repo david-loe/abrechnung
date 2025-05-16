@@ -119,7 +119,6 @@ export class TravelController extends Controller {
   public async postOwnInWork(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, {
       state: 'appliedFor',
-      owner: request.user._id,
       editor: request.user._id,
       lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
     })
@@ -128,6 +127,7 @@ export class TravelController extends Controller {
       if (!request.user.access['appliedFor:travel']) {
         throw new AuthorizationError()
       }
+      Object.assign(extendedBody, { owner: request.user._id })
       if (!extendedBody.name && extendedBody.startDate) {
         const date = new Date(extendedBody.startDate)
         extendedBody.name = `${extendedBody.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`

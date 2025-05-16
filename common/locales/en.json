@@ -418,7 +418,7 @@
     "toX": "To {X}",
     "transport": "Transport",
     "travel": "Travel",
-    "travelDetails": "Travel details",
+    "XDetails": "{X} details",
     "traveler": "Traveler",
     "travelInsideOfEU": "Travel inside of the EU",
     "travelName": "Travel name",

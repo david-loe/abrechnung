@@ -93,7 +93,6 @@ export class HealthCareCostController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, {
       state: 'inWork',
-      owner: request.user._id,
       editor: request.user._id
     })
 
@@ -101,6 +100,7 @@ export class HealthCareCostController extends Controller {
       if (!request.user.access['inWork:healthCareCost']) {
         throw new AuthorizationError()
       }
+      Object.assign(extendedBody, { owner: request.user._id })
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -276,6 +276,30 @@ export class HealthCareCostExamineController extends Controller {
         }
         return false
       }
+    })
+  }
+
+  @Post()
+  public async postAny(
+    @Body() requestBody: {
+      project?: IdDocument
+      insurance?: IdDocument
+      patientName?: string
+      _id: _id
+      name?: string
+      advances?: IdDocument[]
+    },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { editor: request.user._id })
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      allowNew: false,
+      checkOldObject: async (oldObject: HealthCareCostDoc) =>
+        !oldObject.historic &&
+        (oldObject.state === 'inWork' || oldObject.state === 'underExamination') &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
 

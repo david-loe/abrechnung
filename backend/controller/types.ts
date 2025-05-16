@@ -31,7 +31,7 @@ export interface MoneyPlusPost extends MoneyPost {
 }
 
 export interface TravelApplication
-  extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log' | 'addUp'>> {
+  extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log' | 'addUp' | 'editor' | 'owner'>> {
   advance: MoneyPost | undefined
 }
 

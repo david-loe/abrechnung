@@ -130,7 +130,7 @@
                 <li>
                   <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', 'travel', travel)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
-                    <span>{{ t('labels.editX', { X: t('labels.travelDetails') }) }}</span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
                   </a>
                 </li>
                 <li>
@@ -436,7 +436,7 @@ const isReadOnly = computed(() => {
   )
 })
 
-function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject | Gap) {
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
   if (object) {
     modalObject.value = object
   } else if (modalObjectType.value !== type) {
