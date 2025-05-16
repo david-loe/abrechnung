@@ -27,9 +27,11 @@
           <TravelApplyForm
             v-if="modalObjectType === 'travel'"
             :mode="modalMode"
-            @cancel="resetAndHide()"
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user._id"
+            update-user-org
+            @cancel="resetAndHide()"
             @add="handleSubmit"
             @edit="handleSubmit"
             ref="travelApplyForm"></TravelApplyForm>
@@ -38,6 +40,8 @@
             :mode="(modalMode as 'add' | 'edit')"
             :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
             :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user._id"
+            update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">
           </ExpenseReportForm>
@@ -46,6 +50,8 @@
             :mode="(modalMode as 'add' | 'edit')"
             :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
             :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user._id"
+            update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">
           </HealthCareCostForm>

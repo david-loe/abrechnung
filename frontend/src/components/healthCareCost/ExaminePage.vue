@@ -10,9 +10,9 @@
           :mode="modalMode"
           :healthCareCost="modalHealthCareCost"
           :loading="modalFormIsLoading"
+          endpointPrefix="examine/"
           @cancel="resetAndHide()"
-          @add="addHealthCareCost"
-          askOwner>
+          @add="addHealthCareCost">
         </HealthCareCostForm>
       </div>
     </ModalComponent>

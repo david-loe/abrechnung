@@ -97,7 +97,13 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     schema,
     advancesAndAddUp
       ? {
-          advances: [{ type: Schema.Types.ObjectId, ref: 'Advance' }],
+          advances: {
+            type: [{ type: Schema.Types.ObjectId, ref: 'Advance' }],
+            validate: {
+              validator: (value: unknown) => Array.isArray(value) && new Set(value).size === value.length,
+              message: 'Array values must be unique.'
+            }
+          },
           addUp: {
             type: addUp
           }

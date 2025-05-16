@@ -1,6 +1,6 @@
 <template>
   <form class="container" @submit.prevent="$emit(mode, output())">
-    <div v-if="askOwner" class="mb-3">
+    <div v-if="!owner" class="mb-3">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formHealthCareCost.owner" required></UserSelector>
     </div>
@@ -23,12 +23,12 @@
         {{ $t('labels.insurance') }}<span class="text-danger">*</span>
       </label>
       <InfoPoint :text="$t('info.insurance')" />
-      <HealthInsuranceSelector v-model="formHealthCareCost.insurance" :update-user-insurance="!askOwner"></HealthInsuranceSelector>
+      <HealthInsuranceSelector v-model="formHealthCareCost.insurance" :update-user-insurance="updateUserOrg"></HealthInsuranceSelector>
     </div>
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" :update-user-org="!askOwner" required>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formHealthCareCost.project" :update-user-org="updateUserOrg" required>
       </ProjectSelector>
     </div>
 
@@ -40,8 +40,9 @@
       <AdvanceSelector
         id="healthCareCostFormAdvance"
         v-model="formHealthCareCost.advances"
-        :owner-id="askOwner ? formHealthCareCost.owner : APP_DATA?.user._id"
+        :owner-id="formHealthCareCost.owner"
         :project-id="formHealthCareCost.project?._id"
+        :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
 
@@ -72,9 +73,11 @@ export default defineComponent({
   components: { InfoPoint, ProjectSelector, UserSelector, HealthInsuranceSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>> },
+    healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
-    askOwner: { type: Boolean, default: false },
+    owner: { type: String },
+    updateUserOrg: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
   },
   data() {
@@ -88,7 +91,7 @@ export default defineComponent({
       return {
         name: '',
         patientName: '',
-        owner: null
+        owner: this.owner
       }
     },
     clear() {

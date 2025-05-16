@@ -84,11 +84,12 @@ const props = defineProps({
   advance: {
     type: Object as PropType<AdvanceSimple>,
     required: true
-  }
+  },
+  endpointPrefix: { type: String, default: '' }
 })
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
-const advanceReportLink = (id: string) => `${import.meta.env.VITE_BACKEND_URL}/advance/report?_id=${id}`
+const advanceReportLink = (id: string) => `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}advance/report?_id=${id}`
 </script>

@@ -27,6 +27,9 @@
           :mode="(modalMode as 'add' | 'edit')"
           :healthCareCost="modalObject"
           :loading="modalFormIsLoading"
+          :owner="healthCareCost.owner._id"
+          :update-user-org="endpointPrefix !== '/examine'"
+          :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
           @add="editHealthCareCostDetails">
         </HealthCareCostForm>

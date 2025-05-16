@@ -13,7 +13,7 @@
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
               @decision="(d, c) => approveAdvance((modalAdvance as AdvanceSimple), d, c)"></AdvanceApproveForm>
-            <Advance v-else :advance="(modalAdvance as AdvanceSimple)"></Advance>
+            <Advance v-else :advance="(modalAdvance as AdvanceSimple)" endpointPrefix="approve/"></Advance>
           </template>
         </template>
         <AdvanceForm

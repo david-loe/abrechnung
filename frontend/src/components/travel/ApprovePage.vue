@@ -15,11 +15,11 @@
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
-          @cancel="resetAndHide()"
           :travel="modalTravel"
           minStartDate=""
-          askOwner
           :loading="modalFormIsLoading"
+          endpoint-prefix="examine/"
+          @cancel="resetAndHide()"
           @add="(t) => approveTravel(t, 'approved')">
         </TravelApplyForm>
       </div>

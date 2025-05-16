@@ -57,7 +57,8 @@ const props = defineProps({
   placeholder: { type: String, default: '' },
   multiple: { type: Boolean, default: false },
   ownerId: { type: String },
-  projectId: { type: String }
+  projectId: { type: String },
+  endpointPrefix: { type: String, default: '' }
 })
 
 // Emits
@@ -77,7 +78,9 @@ async function getAdvances(ownerId: string | undefined, projectId: string | unde
   const filter: Partial<Record<keyof AdvanceSimple, string>> = { state: 'approved' }
   if (ownerId) filter.owner = ownerId
   if (projectId) filter.project = projectId
-  const response = await API.getter<AdvanceSimple[]>('advance', { filterJSON: Base64.encode(JSON.stringify(filter)) })
+  const response = await API.getter<AdvanceSimple[]>(`${props.endpointPrefix}advance`, {
+    filterJSON: Base64.encode(JSON.stringify(filter))
+  })
   const result = response.ok
   if (result) {
     return result.data

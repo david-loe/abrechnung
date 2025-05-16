@@ -1,6 +1,6 @@
 <template>
   <form class="container" @submit.prevent="$emit(mode, output())">
-    <div v-if="askOwner" class="mb-3">
+    <div v-if="!owner" class="mb-3">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formExpenseReport.owner" required></UserSelector>
     </div>
@@ -15,7 +15,7 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="!askOwner" required>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="updateUserOrg" required>
       </ProjectSelector>
     </div>
 
@@ -27,8 +27,9 @@
       <AdvanceSelector
         id="expenseReportFormAdvance"
         v-model="formExpenseReport.advances"
-        :owner-id="askOwner ? formExpenseReport.owner : APP_DATA?.user._id"
+        :owner-id="formExpenseReport.owner"
         :project-id="formExpenseReport.project?._id"
+        :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
 
@@ -59,17 +60,11 @@ export default defineComponent({
   components: { InfoPoint, ProjectSelector, CurrencySelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    expenseReport: {
-      type: Object as PropType<Partial<ExpenseReportSimple>>
-    },
-    mode: {
-      type: String as PropType<'add' | 'edit'>,
-      required: true
-    },
-    askOwner: {
-      type: Boolean,
-      default: false
-    },
+    expenseReport: { type: Object as PropType<Partial<ExpenseReportSimple>>, required: true },
+    mode: { type: String as PropType<'add' | 'edit'>, required: true },
+    owner: { type: String },
+    updateUserOrg: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
   },
   data() {
@@ -86,7 +81,7 @@ export default defineComponent({
           amount: null,
           currency: baseCurrency
         },
-        owner: null
+        owner: this.owner
       }
     },
     clear() {

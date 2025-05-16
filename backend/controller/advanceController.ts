@@ -83,7 +83,7 @@ export class AdvanceController extends Controller {
       state: { $in: ['completed', 'approved'] }
     }).lean()
     if (!advance) {
-      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
     const report = await reportPrinter.print(advance, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
@@ -91,13 +91,32 @@ export class AdvanceController extends Controller {
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
   }
+}
 
-  @Get('examiner')
-  public async getExaminer() {
-    return await this.getter(User, {
-      query: { limit: 5 },
-      filter: { 'access.examine/advance': true },
-      projection: { name: 1, email: 1 }
+@Tags('Advance')
+@Route('examine/advance')
+@Security('cookieAuth', ['user', 'approve/travel'])
+@Security('httpBearer', ['user', 'approve/travel'])
+@Security('cookieAuth', ['user', 'examine/travel'])
+@Security('httpBearer', ['user', 'examine/travel'])
+@Security('cookieAuth', ['user', 'examine/expenseReport'])
+@Security('httpBearer', ['user', 'examine/expenseReport'])
+@Security('cookieAuth', ['user', 'examine/healthCareCost'])
+@Security('httpBearer', ['user', 'examine/healthCareCost'])
+export class AdvanceExamineController extends Controller {
+  @Get()
+  public async getForExamineReport(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IAdvance> = {
+      $and: [{ historic: false }, { state: 'approved' }]
+    }
+    if (request.user.projects.supervised.length > 0) {
+      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+    }
+    return await this.getter(Advance, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0 },
+      sort: { updatedAt: -1 }
     })
   }
 }
@@ -180,7 +199,7 @@ export class AdvanceApproveController extends Controller {
     }
     const advance = await Advance.findOne(filter).lean()
     if (!advance) {
-      throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
+      throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
     const report = await reportPrinter.print(advance, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)

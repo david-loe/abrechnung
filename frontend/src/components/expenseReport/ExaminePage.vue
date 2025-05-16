@@ -9,9 +9,9 @@
         :mode="modalMode"
         :expenseReport="modalExpenseReport"
         :loading="modalFormIsLoading"
+        endpointPrefix="examine/"
         @cancel="resetAndHide()"
-        @add="addExpenseReport"
-        askOwner>
+        @add="addExpenseReport">
       </ExpenseReportForm>
     </ModalComponent>
     <div class="container py-3">

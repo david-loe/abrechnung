@@ -1,6 +1,6 @@
 <template>
   <form v-if="APP_DATA" class="container" @submit.prevent="$emit(mode, output())">
-    <div v-if="askOwner" class="mb-2">
+    <div v-if="!owner" class="mb-2">
       <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formTravel.owner" required></UserSelector>
     </div>
@@ -98,7 +98,8 @@
     <div class="mb-3">
       <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="$t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="!askOwner" required> </ProjectSelector>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formTravel.project" :update-user-org="updateUserOrg" required>
+      </ProjectSelector>
     </div>
 
     <div class="mb-3">
@@ -108,17 +109,18 @@
       <InfoPoint :text="$t('info.advance')" />
       <AdvanceSelector
         v-model="formTravel.advances"
-        :owner-id="askOwner ? formTravel.owner : APP_DATA.user._id"
+        :owner-id="formTravel.owner"
         :project-id="formTravel.project?._id"
+        :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         {{
-          mode === 'add' && !askOwner
+          mode === 'add' && owner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
-            : travel && (travel.state === 'rejected' || travel.state === 'approved')
+            : travel.state === 'rejected' || travel.state === 'approved'
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
@@ -149,10 +151,12 @@ export default defineComponent({
   components: { CurrencySelector, InfoPoint, PlaceInput, DateInput, ProjectSelector, UserSelector, AdvanceSelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
-    travel: { type: Object as PropType<Partial<TravelSimple>> },
+    travel: { type: Object as PropType<Partial<TravelSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
     minStartDate: { type: [Date, String] as PropType<Date | string>, default: new Date() },
-    askOwner: { type: Boolean, default: false },
+    owner: { type: String },
+    updateUserOrg: { type: Boolean, default: false },
+    endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
   },
   data() {
@@ -176,7 +180,7 @@ export default defineComponent({
         },
         isCrossBorder: undefined,
         advances: [],
-        owner: null
+        owner: this.owner
       }
     },
     clear() {
