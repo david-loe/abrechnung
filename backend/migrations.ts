@@ -236,9 +236,7 @@ export async function checkForMigrations() {
               mongoose.connection.collection(collection).updateOne({ _id: report._id }, { $set: { advances: [] } })
             } else {
               if (report.advance.currency !== 'EUR' && !report.advance.exchangeRate) {
-                report.advance.currency = { _id: report.advance.currency }
                 await addExchangeRate(report.advance, report.createdAt)
-                report.advance.currency = report.advance.currency._id
               }
               const amount = getBaseCurrencyAmount(report.advance)
               if (report.state === 'refunded') {

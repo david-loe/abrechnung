@@ -1,14 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import {
-  Expense,
-  HealthCareCostState,
-  HealthCareCost as IHealthCareCost,
-  Organisation as IOrganisation,
-  Locale,
-  _id
-} from '../../common/types.js'
+import { Expense, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -19,7 +12,7 @@ import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, MoneyPlusPost } from './types.js'
+import { AuthenticatedExpressRequest, MoneyPlusPost } from './types.js'
 
 @Tags('Health Care Cost')
 @Route('healthCareCost')

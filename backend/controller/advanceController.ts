@@ -1,17 +1,16 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Advance as IAdvance, Locale, _id } from '../../common/types.js'
+import { Advance as IAdvance, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
-import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, checkOwner } from './controller.js'
+import { Controller, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, MoneyPost } from './types.js'
+import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
 interface AdvanceApplication {
   project?: IdDocument

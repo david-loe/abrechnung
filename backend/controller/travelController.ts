@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Travel as ITravel, Locale, Stage, TravelExpense, TravelState, _id } from '../../common/types.js'
+import { Travel as ITravel, IdDocument, Locale, Stage, TravelExpense, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -11,7 +11,7 @@ import { sendA1Notification, sendNotification } from '../notifications/notificat
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, TravelApplication, TravelPost } from './types.js'
+import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
 
 @Tags('Travel')
 @Route('travel')

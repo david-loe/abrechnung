@@ -2,11 +2,10 @@ import { DeleteResult } from 'mongodb'
 import { FilterQuery, HydratedDocument, Model, ProjectionType, SortOrder, Types, mongo } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
-import { GETResponse, Meta, User, _id } from '../../common/types.js'
+import { GETResponse, IdDocument, Meta, User, _id } from '../../common/types.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
-import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**

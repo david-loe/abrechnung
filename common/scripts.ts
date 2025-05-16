@@ -10,6 +10,7 @@ import {
   Travel,
   TravelDay,
   baseCurrency,
+  idDocumentToId,
   reportIsHealthCareCost,
   reportIsTravel
 } from './types.js'
@@ -144,7 +145,7 @@ export function getLumpSumsSum(days: TravelDay[]) {
 export function getBaseCurrencyAmount(a: Money): number {
   let amount = 0
   if (a.amount !== null) {
-    const currency = typeof a.currency === 'string' ? a.currency : a.currency._id
+    const currency = idDocumentToId(a.currency)
     if (currency === baseCurrency._id) {
       amount = a.amount
     } else if (a.exchangeRate && typeof a.exchangeRate.amount === 'number') {

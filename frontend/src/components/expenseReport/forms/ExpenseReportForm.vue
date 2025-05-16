@@ -77,10 +77,7 @@ export default defineComponent({
     default() {
       return {
         name: '',
-        advance: {
-          amount: null,
-          currency: baseCurrency
-        },
+        advances: [],
         owner: this.owner
       }
     },

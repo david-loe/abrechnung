@@ -5,6 +5,12 @@ import { Types, mongo } from 'mongoose'
  */
 export type _id = Types.ObjectId
 
+export type IdDocument<idType = _id> = idType | { _id: idType }
+
+export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
+  return (doc as { _id: idType })._id || (doc as idType)
+}
+
 /**
  * @pattern /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
  */
@@ -605,7 +611,7 @@ export function reportIsHealthCareCost(report: any): report is { patientName: st
 
 export function reportIsAdvance(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Advance
 export function reportIsAdvance(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is Advance
-export function reportIsAdvance(report: any): report is { startDate: Date | string } {
+export function reportIsAdvance(report: any): report is { startDate: Exclude<unknown, Date | string>; reason: string } {
   return !reportIsTravel(report) && typeof report.reason === 'string'
 }
 

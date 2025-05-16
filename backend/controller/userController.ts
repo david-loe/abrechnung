@@ -2,7 +2,16 @@ import { DeleteResult } from 'mongodb'
 import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PushSubscription } from 'web-push'
-import { DocumentFile, Token as IToken, User as IUser, _id, locales, tokenAdminUser } from '../../common/types.js'
+import {
+  DocumentFile,
+  Token as IToken,
+  User as IUser,
+  IdDocument,
+  _id,
+  idDocumentToId,
+  locales,
+  tokenAdminUser
+} from '../../common/types.js'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -15,7 +24,7 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { sendMail } from '../notifications/mail.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, File, IdDocument, idDocumentToId } from './types.js'
+import { AuthenticatedExpressRequest, File } from './types.js'
 
 @Tags('User')
 @Route('user')

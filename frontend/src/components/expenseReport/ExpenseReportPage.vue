@@ -32,7 +32,7 @@
           :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
           :loading="modalFormIsLoading"
           :owner="expenseReport.owner._id"
-          :update-user-org="endpointPrefix !== '/examine'"
+          :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
           @edit="editExpenseReportDetails">

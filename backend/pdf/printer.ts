@@ -396,9 +396,12 @@ class ReportPrint {
       }
       summary.push({ reference: this.t('labels.expenses'), sum: this.report.addUp.expenses })
       if (this.report.addUp.advance.amount) {
-        const advance = this.report.addUp.advanceOverflow ? this.report.addUp.total : this.report.addUp.advance
-        advance.amount = -1 * (advance.amount || 0)
-        summary.push({ reference: this.t('labels.advance'), sum: advance })
+        summary.push({
+          reference: this.t('labels.advance'),
+          sum: {
+            amount: -1 * ((this.report.addUp.advanceOverflow ? this.report.addUp.total.amount : this.report.addUp.advance.amount) || 0)
+          }
+        })
       }
       summary.push({ reference: this.t('labels.balance'), sum: this.report.addUp.balance })
       if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {

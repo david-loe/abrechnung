@@ -55,7 +55,7 @@
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
           :loading="modalFormIsLoading"
           :owner="travel.owner._id"
-          :update-user-org="endpointPrefix !== '/examine'"
+          :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"
           @edit="editTravelDetails">

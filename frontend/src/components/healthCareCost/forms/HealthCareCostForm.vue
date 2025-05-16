@@ -91,6 +91,7 @@ export default defineComponent({
       return {
         name: '',
         patientName: '',
+        advances: [],
         owner: this.owner
       }
     },

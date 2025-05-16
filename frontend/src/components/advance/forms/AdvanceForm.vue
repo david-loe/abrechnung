@@ -24,14 +24,9 @@
     </div>
 
     <div class="mb-3">
-      <label for="healthCareCostFormProject" class="form-label me-2"> {{ t('labels.project') }}<span class="text-danger">*</span> </label>
+      <label for="advanceFormProject" class="form-label me-2"> {{ t('labels.project') }}<span class="text-danger">*</span> </label>
       <InfoPoint :text="t('info.project')" />
-      <ProjectSelector
-        id="healthCareCostFormProject"
-        v-model="formAdvance.project"
-        :update-user-org="!askOwner"
-        :disabled="disabled"
-        required>
+      <ProjectSelector id="advanceFormProject" v-model="formAdvance.project" :update-user-org="!askOwner" :disabled="disabled" required>
       </ProjectSelector>
     </div>
 

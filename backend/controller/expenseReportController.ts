@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, ExpenseReportState, ExpenseReport as IExpenseReport, Locale, _id } from '../../common/types.js'
+import { Expense, ExpenseReport as IExpenseReport, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -11,7 +11,7 @@ import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, MoneyPost } from './types.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Expense Report')
 @Route('expenseReport')
