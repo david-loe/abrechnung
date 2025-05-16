@@ -14,7 +14,7 @@ export class ConnectionSettingsController extends Controller {
     return { data: (await ConnectionSettings.findOne({}, { __v: 0 }).lean()) as IConnectionSettings }
   }
   @Post()
-  public async post(@Body() requestBody: SetterBody<IConnectionSettings>) {
+  public async post(@Body() requestBody: IConnectionSettings) {
     return await this.setter(ConnectionSettings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')
