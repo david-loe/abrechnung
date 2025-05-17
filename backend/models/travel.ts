@@ -116,6 +116,7 @@ const populates = {
     { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }
   ],
   expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  addUp: [{ path: 'addUp.project', select: { _id: 1, identifier: 1, organisation: 1 } }],
   advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],

@@ -37,6 +37,7 @@ const populates = {
   refundSum: [{ path: 'refundSum.receipts', select: { name: 1, type: 1 } }, { path: 'refundSum.currency' }],
   insurance: [{ path: 'insurance' }],
   expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
+  addUp: [{ path: 'addUp.project', select: { _id: 1, identifier: 1, organisation: 1 } }],
   advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
@@ -98,6 +99,7 @@ schema.pre('save', async function (this: HealthCareCostDoc) {
 
   await this.calculateExchangeRates()
   this.addUp = addUp(this) as AddUp<HealthCareCost>[]
+  await populateAll(this, populates)
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {
