@@ -168,7 +168,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-lg-3 col">
+        <div class="col-lg-4 col">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>

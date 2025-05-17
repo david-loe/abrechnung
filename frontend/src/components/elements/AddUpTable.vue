@@ -8,7 +8,13 @@
         </td>
       </tr>
       <tr v-for="row of addUpTableData">
-        <th>{{ t(row[0]) }}</th>
+        <th>
+          {{ t(row[0]) }}
+          <small class="fw-normal" v-if="row[0] === 'labels.lumpSums' && claimSpouseRefund">
+            <br />
+            {{ t('labels.includingSpouseRefund') }}
+          </small>
+        </th>
         <template v-for="(col, index) of row">
           <td v-if="index !== 0" class="text-end">
             {{ col }}
@@ -19,10 +25,6 @@
           </td>
         </template>
       </tr>
-      <small v-if="claimSpouseRefund">
-        <br />
-        {{ t('labels.includingSpouseRefund') }}
-      </small>
       <tr v-if="addUp.length > 1">
         <th>{{ t('labels.totalBalance') }}</th>
         <td class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
