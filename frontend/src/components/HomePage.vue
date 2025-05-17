@@ -29,7 +29,7 @@
             :mode="modalMode"
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit"
@@ -40,7 +40,7 @@
             :mode="(modalMode as 'add' | 'edit')"
             :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">
@@ -50,7 +50,7 @@
             :mode="(modalMode as 'add' | 'edit')"
             :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">

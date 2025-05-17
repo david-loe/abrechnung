@@ -33,7 +33,7 @@
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "mailSend": "E-mail wurde versandt.",
     "noData": {
-      "advance": "Kein genehmigter Vorschuss für das ausgewählte Projekt und den Besitzer. Beantrage einen!",
+      "advanceForUserX": "Kein genehmigter Vorschuss für '{X}'. Beantrage einen!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
       "searchX": "Kein Eintrag für '{X}' gefunden.",

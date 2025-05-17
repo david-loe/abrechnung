@@ -40,8 +40,7 @@
       <AdvanceSelector
         id="healthCareCostFormAdvance"
         v-model="formHealthCareCost.advances"
-        :owner-id="idDocumentToId(formHealthCareCost.owner)"
-        :project-id="formHealthCareCost.project?._id"
+        :owner="formHealthCareCost.owner"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
@@ -59,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { HealthCareCostSimple, idDocumentToId } from '@/../../common/types.js'
+import { HealthCareCostSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
@@ -75,7 +74,7 @@ export default defineComponent({
   props: {
     healthCareCost: { type: Object as PropType<Partial<HealthCareCostSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
-    owner: { type: String },
+    owner: { type: Object as PropType<UserWithName> },
     updateUserOrg: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }

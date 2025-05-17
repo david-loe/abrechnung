@@ -31,7 +31,7 @@
           :mode="(modalMode as 'add' | 'edit')"
           :healthCareCost="modalObject as HealthCareCostSimple"
           :loading="modalFormIsLoading"
-          :owner="healthCareCost.owner._id"
+          :owner="healthCareCost.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"

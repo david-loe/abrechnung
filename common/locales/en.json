@@ -33,7 +33,7 @@
     "loginFailed": "Failed to login!",
     "mailSend": "E-mail was send.",
     "noData": {
-      "advance": "No approved advance for selected project and owner. Apply for one!",
+      "advanceForUserX": "No approved advance for '{X}'. Apply for one!",
       "expense": "There are no expenses jet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
       "searchX": "Nothing found for '{X}'.",

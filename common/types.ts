@@ -295,9 +295,12 @@ export interface User extends UserSimple {
   token?: Token | null
 }
 
-export interface UserWithNameAndProject {
+export interface UserWithName {
   _id: _id
   name: User['name']
+}
+
+export interface UserWithNameAndProject extends UserWithName {
   projects: User['projects']
 }
 

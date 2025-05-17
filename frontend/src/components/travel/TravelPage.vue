@@ -54,7 +54,7 @@
           :travel="(modalObject as TravelSimple)"
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
           :loading="modalFormIsLoading"
-          :owner="travel.owner._id"
+          :owner="travel.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"

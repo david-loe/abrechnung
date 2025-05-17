@@ -9,10 +9,10 @@
     :disabled="disabled"
     :multiple="multiple"
     style="min-width: 160px">
-    <template #option="{ name, budget, balance }">
+    <template #option="{ name, budget, balance, project }">
       <div class="row align-items-center">
         <div class="col text-truncate">
-          {{ name }}
+          {{ `${name} [${project.identifier}]` }}
         </div>
         <div class="col-auto px-1">
           <span>{{ $formatter.money(balance) }}</span>
@@ -22,10 +22,10 @@
         </div>
       </div>
     </template>
-    <template #selected-option="{ name, balance }">
+    <template #selected-option="{ name, balance, project }">
       <div class="row align-items-center">
         <div class="col-auto text-truncate" style="max-width: 220px">
-          {{ name }}
+          {{ `${name} [${project.identifier}]` }}
         </div>
         <div class="col-auto opacity-75">
           <span>{{ $formatter.money(balance) }}</span>
@@ -37,13 +37,13 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
-      <span v-else>{{ t('alerts.noData.advance', { X: projectId, Y: ownerId }) }}</span>
+      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: `${owner?.name?.givenName} ${owner?.name?.familyName}` }) }}</span>
     </template>
   </v-select>
 </template>
 
 <script setup lang="ts">
-import { AdvanceSimple } from '@/../../common/types.js'
+import { AdvanceSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import API from '@/api'
 import { PropType, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -56,8 +56,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   multiple: { type: Boolean, default: false },
-  ownerId: { type: String },
-  projectId: { type: String },
+  owner: { type: Object as PropType<UserWithName> },
   endpointPrefix: { type: String, default: '' }
 })
 
@@ -74,10 +73,9 @@ function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
   return options.filter((option) => option.name.toLowerCase().includes(term) || option.budget.amount.toString().includes(term))
 }
 
-async function getAdvances(ownerId: string | undefined, projectId: string | undefined) {
+async function getAdvances(ownerId: string | undefined) {
   const filter: Partial<Record<keyof AdvanceSimple, string>> = { state: 'approved' }
   if (ownerId) filter.owner = ownerId
-  if (projectId) filter.project = projectId
   const response = await API.getter<AdvanceSimple[]>(`${props.endpointPrefix}advance`, {
     filterJSON: Base64.encode(JSON.stringify(filter))
   })
@@ -89,19 +87,13 @@ async function getAdvances(ownerId: string | undefined, projectId: string | unde
 }
 
 onMounted(async () => {
-  advances.value = await getAdvances(props.ownerId, props.projectId)
+  advances.value = await getAdvances(idDocumentToId(props.owner))
 })
 
 watch(
-  () => props.ownerId,
+  () => props.owner,
   async () => {
-    advances.value = await getAdvances(props.ownerId, props.projectId)
-  }
-)
-watch(
-  () => props.projectId,
-  async () => {
-    advances.value = await getAdvances(props.ownerId, props.projectId)
+    advances.value = await getAdvances(idDocumentToId(props.owner))
   }
 )
 </script>

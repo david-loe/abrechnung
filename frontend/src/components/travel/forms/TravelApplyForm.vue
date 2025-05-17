@@ -107,12 +107,7 @@
         {{ $t('labels.advanceFromEmployer') }}
       </label>
       <InfoPoint :text="$t('info.advance')" />
-      <AdvanceSelector
-        v-model="formTravel.advances"
-        :owner-id="idDocumentToId(formTravel.owner)"
-        :project-id="formTravel.project?._id"
-        :endpoint-prefix="endpointPrefix"
-        multiple></AdvanceSelector>
+      <AdvanceSelector v-model="formTravel.advances" :owner="formTravel.owner" :endpoint-prefix="endpointPrefix" multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -135,7 +130,7 @@
 
 <script lang="ts">
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { TravelSimple, idDocumentToId } from '@/../../common/types.js'
+import { TravelSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -153,7 +148,7 @@ export default defineComponent({
     travel: { type: Object as PropType<Partial<TravelSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
     minStartDate: { type: [Date, String] as PropType<Date | string>, default: new Date() },
-    owner: { type: String },
+    owner: { type: Object as PropType<UserWithName> },
     updateUserOrg: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
