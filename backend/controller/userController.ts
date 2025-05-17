@@ -94,6 +94,8 @@ export class UserController extends Controller {
 
 @Tags('User')
 @Route('users')
+@Security('cookieAuth', ['user', 'approve/advance'])
+@Security('httpBearer', ['user', 'approve/advance'])
 @Security('cookieAuth', ['user', 'approve/travel'])
 @Security('httpBearer', ['user', 'approve/travel'])
 @Security('cookieAuth', ['user', 'examine/travel'])
@@ -114,10 +116,10 @@ export class UserController extends Controller {
 @Security('httpBearer', ['user', 'admin'])
 export class UsersController extends Controller {
   @Get()
-  public async getOnlyNames(@Queries() query: GetterQuery<IUser>) {
+  public async getNamesAndProjects(@Queries() query: GetterQuery<IUser>) {
     return await this.getter(User, {
       query,
-      projection: { name: 1 },
+      projection: { name: 1, projects: 1 },
       filter: { 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }
     })
   }

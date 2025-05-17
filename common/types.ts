@@ -241,8 +241,11 @@ export interface ProjectSimple {
   _id: _id
 }
 
-export interface Project extends ProjectSimple {
+export interface ProjectSimpleWithName extends ProjectSimple {
   name?: string
+}
+
+export interface Project extends ProjectSimpleWithName {
   balance: BaseCurrencyMoneyNotNull
   budget?: BaseCurrencyMoney
 }
@@ -290,6 +293,12 @@ export interface User extends UserSimple {
   }
   vehicleRegistration?: DocumentFile[] | null
   token?: Token | null
+}
+
+export interface UserWithNameAndProject {
+  _id: _id
+  name: User['name']
+  projects: User['projects']
 }
 
 export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {

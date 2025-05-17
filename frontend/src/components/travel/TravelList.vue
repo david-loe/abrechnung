@@ -80,7 +80,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.owner">
-          <UserSelector v-model="filter.owner as string"></UserSelector>
+          <UserSelector v-model="filter.owner as any"></UserSelector>
         </div>
       </div>
     </template>

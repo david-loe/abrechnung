@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, Project, baseCurrency } from '@/../../common/types.js'
+import { AdvanceSimple, Project, UserWithNameAndProject, baseCurrency } from '@/../../common/types.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -100,7 +100,7 @@ function defaultAdvance() {
       amount: null as number | null,
       currency: baseCurrency
     },
-    owner: undefined as string | undefined,
+    owner: undefined as UserWithNameAndProject | undefined,
     project: undefined as Project | undefined,
     comment: undefined as string | undefined
   }

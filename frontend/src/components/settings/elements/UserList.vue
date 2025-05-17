@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-import { User, accesses } from '@/../../common/types.js'
+import { User, UserWithNameAndProject, accesses } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
@@ -126,7 +126,7 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootUsers = (await API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false)).ok?.data
+    const rootUsers = (await API.getter<UserWithNameAndProject[]>('users', {}, {}, false)).ok?.data
     if (rootUsers && APP_DATA.value) {
       APP_DATA.value.users = rootUsers
     }
