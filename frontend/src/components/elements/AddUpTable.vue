@@ -27,10 +27,10 @@
       </tr>
       <tr v-if="addUp.length > 1">
         <th>{{ t('labels.totalBalance') }}</th>
-        <td class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
+        <td :colspan="addUp.length" class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
       <tr v-if="refundSum">
-        <th>{{ t('labels.refundSum') }}</th>
+        <th :colspan="addUp.length">{{ t('labels.refundSum') }}</th>
         <td class="text-end">{{ $formatter.money(refundSum) }}</td>
       </tr>
       <tr v-if="project.budget && project.budget.amount">
@@ -65,7 +65,7 @@ const props = defineProps({
 })
 
 const addUpTableData = ref(getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
-console.log(addUpTableData.value)
+
 watch(
   () => props.addUp,
   () => {

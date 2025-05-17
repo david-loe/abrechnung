@@ -183,7 +183,11 @@ export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLum
       summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<Travel>).lumpSums.amount))
     }
     if (hasAdvance) {
-      summary[j++].push(formatter.baseCurrency(-1 * (addUps[i].advanceOverflow ? addUps[i].total.amount : addUps[i].advance.amount)))
+      summary[j++].push(
+        addUps[i].advance.amount > 0
+          ? formatter.baseCurrency(-1 * (addUps[i].advanceOverflow ? addUps[i].total.amount : addUps[i].advance.amount))
+          : ''
+      )
     }
     summary[j++].push(formatter.baseCurrency(addUps[i].balance.amount))
   }
