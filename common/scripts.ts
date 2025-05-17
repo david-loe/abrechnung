@@ -155,26 +155,37 @@ export function getTotalTotal(addUps: FlatAddUp[]) {
 }
 
 export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLumpSums = false) {
+  const hasAdvance = addUps.some((addUp) => addUp.advance.amount > 0)
+  const showExpenses = withLumpSums || hasAdvance
   const summary: string[][] = []
   if (addUps.length > 1) {
     summary.push(['labels.project'])
   }
-  summary.push(['labels.expenses'])
+  if (showExpenses) {
+    summary.push(['labels.expenses'])
+  }
   if (withLumpSums) {
     summary.push(['labels.lumpSums'])
   }
-  summary.push(['labels.advance'])
+  if (hasAdvance) {
+    summary.push(['labels.advance'])
+  }
   summary.push(['labels.balance'])
   for (let i = 0; i < addUps.length; i++) {
     let j = 0
     if (addUps.length > 1) {
       summary[j++].push(addUps[i].project.identifier)
     }
-    summary[j++].push(formatter.baseCurrency(addUps[i].expenses.amount))
+    if (showExpenses) {
+      summary[j++].push(formatter.baseCurrency(addUps[i].expenses.amount))
+    }
     if (withLumpSums) {
       summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<Travel>).lumpSums.amount))
     }
-    summary[j++].push(formatter.baseCurrency(-1 * (addUps[i].advanceOverflow ? addUps[i].total.amount : addUps[i].advance.amount)))
+    if (hasAdvance) {
+      summary[j++].push(formatter.baseCurrency(-1 * (addUps[i].advanceOverflow ? addUps[i].total.amount : addUps[i].advance.amount)))
+    }
+    summary[j++].push(formatter.baseCurrency(addUps[i].balance.amount))
   }
   return summary
 }
@@ -216,7 +227,7 @@ function addToAddUps(
 ): void {
   if (project) {
     const projectId = idDocumentToId(project)
-    const addUp = addUps.find((addUp) => addUp.project === projectId)
+    const addUp = addUps.find((addUp) => idDocumentToId(addUp.project).toString() === projectId.toString())
     if (addUp) {
       if (key in addUp) {
         ;(addUp as FlatAddUp<Travel>)[key].amount += add
@@ -264,11 +275,11 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
     addTravelExpensesSum(report, addUps as FlatAddUp<Travel>[])
   } else {
     for (const expense of report.expenses) {
-      addToAddUps(addUps, getBaseCurrencyAmount(expense.cost), 'expenses', expense.project)
+      addToAddUps(addUps, getBaseCurrencyAmount(expense.cost), 'expenses', expense.project, isTravel)
     }
   }
   for (const approvedAdvance of report.advances) {
-    addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project)
+    addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project, isTravel)
   }
   for (const addUp of addUps) {
     addUp.total.amount = addUp.expenses.amount + ((addUp as FlatAddUp<Travel>).lumpSums?.amount || 0)

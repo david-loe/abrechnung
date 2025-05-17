@@ -109,7 +109,7 @@
       <InfoPoint :text="$t('info.advance')" />
       <AdvanceSelector
         v-model="formTravel.advances"
-        :owner-id="formTravel.owner"
+        :owner-id="idDocumentToId(formTravel.owner)"
         :project-id="formTravel.project?._id"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
@@ -135,7 +135,7 @@
 
 <script lang="ts">
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { TravelSimple } from '@/../../common/types.js'
+import { TravelSimple, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -165,6 +165,7 @@ export default defineComponent({
     }
   },
   methods: {
+    idDocumentToId,
     default() {
       return {
         name: '',

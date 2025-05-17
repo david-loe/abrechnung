@@ -375,8 +375,8 @@ class ReportPrint {
 
   async drawSummary(options: Options) {
     const columns: Column[] = []
-    columns.push({ key: '0', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
-    const moneyColumn = (key: string) => ({ key, width: 75, alignment: pdf_lib.TextAlignment.Right, title: 'sum' })
+    columns.push({ key: '0', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'title', fn: (l: string) => this.t(l) })
+    const moneyColumn = (key: string) => ({ key, width: 75, alignment: pdf_lib.TextAlignment.Right, title: 'title' })
     let summary = []
     if (reportIsAdvance(this.report)) {
       columns.push(moneyColumn('1'))
@@ -384,10 +384,10 @@ class ReportPrint {
       summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.baseCurrency(this.report.balance.amount) })
     } else {
       for (let i = 0; i < this.report.addUp.length; i++) {
-        columns.push(moneyColumn(i.toString(10)))
+        columns.push(moneyColumn((i + 1).toString(10)))
       }
       const tableData = getAddUpTableData(this.drawer.formatter, this.report.addUp, reportIsTravel(this.report))
-      summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(), value])))
+      summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(10), value])))
     }
     const fontSize = options.fontSize + 2
     this.drawer.drawText(this.t('labels.summary'), {

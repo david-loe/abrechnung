@@ -27,7 +27,7 @@
       <AdvanceSelector
         id="expenseReportFormAdvance"
         v-model="formExpenseReport.advances"
-        :owner-id="formExpenseReport.owner"
+        :owner-id="idDocumentToId(formExpenseReport.owner)"
         :project-id="formExpenseReport.project?._id"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { ExpenseReportSimple, baseCurrency } from '@/../../common/types.js'
+import { ExpenseReportSimple, baseCurrency, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
@@ -73,6 +73,7 @@ export default defineComponent({
     }
   },
   methods: {
+    idDocumentToId,
     default() {
       return {
         name: '',

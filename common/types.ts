@@ -8,7 +8,7 @@ export type _id = Types.ObjectId
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
 export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
-  return (doc as { _id: idType })._id || (doc as idType)
+  return doc ? (doc as { _id: idType })._id || (doc as idType) : doc
 }
 
 /**

@@ -63,7 +63,7 @@ const props = defineProps({
 })
 
 const addUpTableData = ref(getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
-
+console.log(addUpTableData.value)
 watch(
   () => props.addUp,
   () => {

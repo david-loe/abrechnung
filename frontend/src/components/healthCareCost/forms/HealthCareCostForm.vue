@@ -40,7 +40,7 @@
       <AdvanceSelector
         id="healthCareCostFormAdvance"
         v-model="formHealthCareCost.advances"
-        :owner-id="formHealthCareCost.owner"
+        :owner-id="idDocumentToId(formHealthCareCost.owner)"
         :project-id="formHealthCareCost.project?._id"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { HealthCareCostSimple } from '@/../../common/types.js'
+import { HealthCareCostSimple, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
@@ -87,6 +87,7 @@ export default defineComponent({
     }
   },
   methods: {
+    idDocumentToId,
     default() {
       return {
         name: '',
