@@ -32,7 +32,7 @@
       </ProjectSelector>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" v-if="APP_DATA?.settings.disableReportType.advance === false">
       <label for="healthCareCostFormAdvance" class="form-label me-2">
         {{ $t('labels.advanceFromEmployer') }}
       </label>
