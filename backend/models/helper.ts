@@ -82,7 +82,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 
   const addUp = Object.assign(
     {
-      project: { type: Schema.Types.ObjectId, ref: 'Project' },
+      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
       balance: costObject(false, false, true),
       total: costObject(false, false, true),
       expenses: costObject(false, false, true),

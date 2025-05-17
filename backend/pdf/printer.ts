@@ -5,7 +5,6 @@ import Formatter from '../../common/formatter.js'
 import { getAddUpTableData, getTotalBalance, hexToRGB } from '../../common/scripts.js'
 import {
   Advance,
-  BaseCurrencyMoney,
   Comment,
   Cost,
   CountryCode,
@@ -16,7 +15,6 @@ import {
   HealthCareCost,
   Locale,
   Meal,
-  Money,
   PageOrientation,
   Place,
   PrintSettingsBase,
@@ -378,15 +376,15 @@ class ReportPrint {
   async drawSummary(options: Options) {
     const columns: Column[] = []
     columns.push({ key: '0', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
-    const moneyClolumn = (key: string) => ({ key, width: 75, alignment: pdf_lib.TextAlignment.Right, title: 'sum' })
+    const moneyColumn = (key: string) => ({ key, width: 75, alignment: pdf_lib.TextAlignment.Right, title: 'sum' })
     let summary = []
     if (reportIsAdvance(this.report)) {
-      columns.push(moneyClolumn('1'))
+      columns.push(moneyColumn('1'))
       summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.baseCurrency(this.report.budget.amount) })
       summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.baseCurrency(this.report.balance.amount) })
     } else {
       for (let i = 0; i < this.report.addUp.length; i++) {
-        columns.push(moneyClolumn(i.toString(10)))
+        columns.push(moneyColumn(i.toString(10)))
       }
       const tableData = getAddUpTableData(this.drawer.formatter, this.report.addUp, reportIsTravel(this.report))
       summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(), value])))
@@ -397,10 +395,10 @@ class ReportPrint {
       yStart: options.yStart - fontSize,
       fontSize: fontSize
     })
-    const tabelOptions: TableOptions = options
-    tabelOptions.yStart -= fontSize * 1.25
-    tabelOptions.firstRow = false
-    let y = await this.drawer.drawTable(summary, columns, tabelOptions)
+    const tableOptions: TableOptions = options
+    tableOptions.yStart -= fontSize * 1.25
+    tableOptions.firstRow = false
+    let y = await this.drawer.drawTable(summary, columns, tableOptions)
     if (!reportIsAdvance(this.report) && this.report.addUp.length > 1) {
       options.yStart = y
       y = this.drawer.drawMultilineText(

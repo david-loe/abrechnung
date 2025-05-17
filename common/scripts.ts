@@ -147,19 +147,11 @@ export function getLumpSumsSum(days: TravelDay[]) {
 }
 
 export function getTotalBalance(addUps: FlatAddUp[]) {
-  let totalBalance = 0
-  for (const addUp of addUps) {
-    totalBalance += addUp.balance.amount
-  }
-  return totalBalance
+  return addUps.reduce((sum, a) => sum + a.balance.amount, 0)
 }
 
 export function getTotalTotal(addUps: FlatAddUp[]) {
-  let totalTotal = 0
-  for (const addUp of addUps) {
-    totalTotal += addUp.total.amount
-  }
-  return totalTotal
+  return addUps.reduce((sum, a) => sum + a.total.amount, 0)
 }
 
 export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLumpSums = false) {
@@ -226,22 +218,20 @@ function addToAddUps(
     const projectId = idDocumentToId(project)
     const addUp = addUps.find((addUp) => addUp.project === projectId)
     if (addUp) {
-      if (key in addUp && 'amount' in (addUp as FlatAddUp<Travel>)[key] && typeof (addUp as FlatAddUp<Travel>)[key].amount === 'number') {
+      if (key in addUp) {
         ;(addUp as FlatAddUp<Travel>)[key].amount += add
       }
     } else {
       const newAddUp = defaultAddUp(projectId, isTravel)
-      if (
-        key in newAddUp &&
-        'amount' in (newAddUp as FlatAddUp<Travel>)[key] &&
-        typeof (newAddUp as FlatAddUp<Travel>)[key].amount === 'number'
-      ) {
+      if (key in newAddUp) {
         ;(newAddUp as FlatAddUp<Travel>)[key].amount += add
       }
       addUps.push(newAddUp)
     }
   } else {
-    addUps[0].expenses.amount += add
+    if (key in addUps[0]) {
+      ;(addUps[0] as FlatAddUp<Travel>)[key].amount += add
+    }
   }
 }
 
