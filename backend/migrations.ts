@@ -81,17 +81,12 @@ export async function checkForMigrations() {
           }
         }
       )
-
+      const travelApprover = await mongoose.connection.collection('users').findOne({ 'access.approve/travel': true })
       async function rewriteAdvance(collection: string) {
         const allReports = mongoose.connection.collection(collection).find({ historic: false })
         for await (const report of allReports) {
           try {
-            if (!report.advance?.amount) {
-              report.advances = []
-              await mongoose.connection
-                .collection(collection)
-                .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [] } })
-            } else {
+            if (report.advance?.amount) {
               if (report.advance.currency !== 'EUR' && !report.advance.exchangeRate) {
                 await addExchangeRate(report.advance, report.createdAt)
               }
@@ -101,7 +96,9 @@ export async function checkForMigrations() {
                 await mongoose.connection
                   .collection(collection)
                   .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [] } })
-              } else if (report.state === 'inWork' || report.state === 'approved' || report.state === 'appliedFor') {
+                continue
+              }
+              if (report.state !== 'rejected') {
                 const advance = new (mongoose.connection.model('Advance'))({
                   name: report.name,
                   reason: report.name,
@@ -109,7 +106,10 @@ export async function checkForMigrations() {
                   balance: { amount: amount },
                   owner: report.owner,
                   project: report.project,
-                  log: report.state !== 'inWork' ? report.log : {},
+                  log:
+                    report.state === 'appliedFor'
+                      ? {}
+                      : { appliedFor: report.log.appliedFor ?? { date: report.createdAt, editor: travelApprover?._id } },
                   state: report.state === 'appliedFor' ? 'appliedFor' : 'approved',
                   editor: report.editor
                 })
@@ -118,8 +118,13 @@ export async function checkForMigrations() {
                 await mongoose.connection
                   .collection(collection)
                   .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [advance._id] } })
+                continue
               }
             }
+            report.advances = []
+            await mongoose.connection
+              .collection(collection)
+              .updateOne({ _id: report._id }, { $set: { addUp: addUp(report as any), advances: [] } })
           } catch (e) {
             logger.warn(`${collection}: ${report._id.toString()} not save: ${e}`)
           }
