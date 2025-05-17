@@ -11,7 +11,7 @@
       <div v-if="healthCareCost._id">
         <ExpenseForm
           v-if="modalObjectType === 'expense'"
-          :expense="modalObject"
+          :expense="modalObject as Partial<Expense>"
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
@@ -29,7 +29,7 @@
         <HealthCareCostForm
           v-else
           :mode="(modalMode as 'add' | 'edit')"
-          :healthCareCost="modalObject"
+          :healthCareCost="modalObject as HealthCareCostSimple"
           :loading="modalFormIsLoading"
           :owner="healthCareCost.owner._id"
           :update-user-org="endpointPrefix !== 'examine/'"
@@ -302,7 +302,7 @@
 </template>
 
 <script lang="ts" setup>
-import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import { getTotalTotal, mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Expense,
@@ -548,7 +548,7 @@ if (props.endpointPrefix === 'examine/') {
       owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,
       organisationName: orga.name,
-      amount: formatter.money(healthCareCost.value.addUp.total)
+      amount: formatter.baseCurrency(getTotalTotal(healthCareCost.value.addUp))
     })
     mailToInsuranceLink = mailToLink([healthCareCost.value.insurance.email], subject, body)
   }

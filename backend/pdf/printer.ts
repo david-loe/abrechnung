@@ -2,9 +2,10 @@ import fs from 'node:fs/promises'
 import pdf_fontkit from 'pdf-fontkit'
 import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
-import { hexToRGB } from '../../common/scripts.js'
+import { getAddUpTableData, getTotalBalance, hexToRGB } from '../../common/scripts.js'
 import {
   Advance,
+  BaseCurrencyMoney,
   Comment,
   Cost,
   CountryCode,
@@ -22,7 +23,6 @@ import {
   PrinterSettings,
   Purpose,
   PurposeSimple,
-  Refund,
   ReportModelName,
   Transport,
   Travel,
@@ -377,36 +377,19 @@ class ReportPrint {
 
   async drawSummary(options: Options) {
     const columns: Column[] = []
-    columns.push({ key: 'reference', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
-    columns.push({
-      key: 'sum',
-      width: 85,
-      alignment: pdf_lib.TextAlignment.Right,
-      title: 'sum',
-      fn: (m: Money) => this.drawer.formatter.detailedMoney(m, true)
-    })
-
-    const summary = []
+    columns.push({ key: '0', width: 100, alignment: pdf_lib.TextAlignment.Left, title: 'reference' })
+    const moneyClolumn = (key: string) => ({ key, width: 75, alignment: pdf_lib.TextAlignment.Right, title: 'sum' })
+    let summary = []
     if (reportIsAdvance(this.report)) {
-      summary.push({ reference: this.t('labels.advance'), sum: this.report.budget })
-      summary.push({ reference: this.t('labels.balance'), sum: this.report.balance })
+      columns.push(moneyClolumn('1'))
+      summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.baseCurrency(this.report.budget.amount) })
+      summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.baseCurrency(this.report.balance.amount) })
     } else {
-      if (reportIsTravel(this.report)) {
-        summary.push({ reference: this.t('labels.lumpSums'), sum: this.report.addUp.lumpSums })
+      for (let i = 0; i < this.report.addUp.length; i++) {
+        columns.push(moneyClolumn(i.toString(10)))
       }
-      summary.push({ reference: this.t('labels.expenses'), sum: this.report.addUp.expenses })
-      if (this.report.addUp.advance.amount) {
-        summary.push({
-          reference: this.t('labels.advance'),
-          sum: {
-            amount: -1 * ((this.report.addUp.advanceOverflow ? this.report.addUp.total.amount : this.report.addUp.advance.amount) || 0)
-          }
-        })
-      }
-      summary.push({ reference: this.t('labels.balance'), sum: this.report.addUp.balance })
-      if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {
-        summary.push({ reference: this.t('labels.refundSum'), sum: this.report.refundSum })
-      }
+      const tableData = getAddUpTableData(this.drawer.formatter, this.report.addUp, reportIsTravel(this.report))
+      summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(), value])))
     }
     const fontSize = options.fontSize + 2
     this.drawer.drawText(this.t('labels.summary'), {
@@ -417,8 +400,22 @@ class ReportPrint {
     const tabelOptions: TableOptions = options
     tabelOptions.yStart -= fontSize * 1.25
     tabelOptions.firstRow = false
-
-    return await this.drawer.drawTable(summary, columns, tabelOptions)
+    let y = await this.drawer.drawTable(summary, columns, tabelOptions)
+    if (!reportIsAdvance(this.report) && this.report.addUp.length > 1) {
+      options.yStart = y
+      y = this.drawer.drawMultilineText(
+        `${this.t('labels.totalBalance')}: ${this.drawer.formatter.baseCurrency(getTotalBalance(this.report.addUp))}`,
+        options
+      )
+    }
+    if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {
+      options.yStart = y
+      y = this.drawer.drawMultilineText(
+        `${this.t('labels.refundSum')}: ${this.drawer.formatter.detailedMoney(this.report.refundSum)}`,
+        options
+      )
+    }
+    return y
   }
 
   async drawDates(options: Options) {

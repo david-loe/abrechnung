@@ -1,5 +1,5 @@
 import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
-import { AddUpResult, AdvanceBase, AnyState, ReportModelName, _id } from '../../common/types.js'
+import { AddUp, AdvanceBase, AnyState, FlatAddUp, ReportModelName, _id, idDocumentToId } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 
 export function costObject(
@@ -82,6 +82,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 
   const addUp = Object.assign(
     {
+      project: { type: Schema.Types.ObjectId, ref: 'Project' },
       balance: costObject(false, false, true),
       total: costObject(false, false, true),
       expenses: costObject(false, false, true),
@@ -106,7 +107,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
             }
           },
           addUp: {
-            type: addUp
+            type: [addUp]
           }
         }
       : {}
@@ -149,15 +150,18 @@ export function populateAll<DocType extends Record<string, any>>(
   return Promise.allSettled(populates)
 }
 
-export async function offsetAdvance(report: { addUp: AddUpResult; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
+export async function offsetAdvance(report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {
-    let total = report.addUp.total.amount || 0
-    report.advances.sort((a, b) => (a.balance.amount || 0) - (b.balance.amount || 0))
-
-    for (const advance of report.advances) {
-      total = await (advance as AdvanceDoc).offset(total, modelName, report._id, session)
+    report.advances.sort((a, b) => a.balance.amount - b.balance.amount)
+    for (const addUp of report.addUp) {
+      let total = addUp.total.amount || 0
+      for (const advance of report.advances) {
+        if (advance.project._id.equals(idDocumentToId(addUp.project))) {
+          total = await (advance as AdvanceDoc).offset(total, modelName, report._id, session)
+        }
+      }
     }
 
     // await session.commitTransaction() // needs Replica Set

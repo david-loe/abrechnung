@@ -1,6 +1,7 @@
 import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
+  AddUp,
   Comment,
   Travel,
   TravelRecord,
@@ -115,7 +116,7 @@ const populates = {
     { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }
   ],
   expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
-  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -206,7 +207,7 @@ schema.pre('validate', async function (this: TravelDoc) {
   }
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this)
+  this.addUp = addUp(this) as AddUp<Travel>[]
   await populateAll(this, populates)
 })
 

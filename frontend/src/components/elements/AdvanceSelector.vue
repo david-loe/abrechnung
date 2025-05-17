@@ -71,7 +71,7 @@ const advances = ref([] as AdvanceSimple[])
 // Filter method
 function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
   const term = search.toLowerCase()
-  return options.filter((option) => option.name.toLowerCase().includes(term) || option.budget.amount?.toString().includes(term))
+  return options.filter((option) => option.name.toLowerCase().includes(term) || option.budget.amount.toString().includes(term))
 }
 
 async function getAdvances(ownerId: string | undefined, projectId: string | undefined) {

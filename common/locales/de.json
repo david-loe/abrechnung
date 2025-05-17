@@ -67,7 +67,6 @@
   "headlines": {
     "emoji": "🧾",
     "home": "Home",
-    "installApp": "App installieren",
     "login": "Login",
     "logout": "Logout",
     "settings": "Einstellungen",
@@ -168,6 +167,7 @@
     }
   },
   "labels": {
+    "installApp": "App installieren",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",
@@ -418,6 +418,7 @@
     "toExaminationByInsurance": "Zum Prüfen durch Krankenkasse",
     "toleranceStageDatesToApprovedTravelDates": "Abweichungstoleranz der Etappen von den beantragten Daten [Tage]",
     "total": "Gesamt",
+    "totalBalance": "Gesamtsaldo",
     "toX": "Zu {X}",
     "transport": "Verkehrsmittel",
     "travel": "Reise",

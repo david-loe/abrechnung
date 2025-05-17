@@ -61,7 +61,7 @@
                     <li>
                       <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
                         <i class="fs-4 bi bi-box-arrow-down"></i>
-                        <span class="ms-1">{{ $t('headlines.installApp') }}</span>
+                        <span class="ms-1">{{ $t('labels.installApp') }}</span>
                       </button>
                     </li>
                   </template>

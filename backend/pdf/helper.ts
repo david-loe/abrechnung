@@ -1,4 +1,4 @@
-import { addUp, sanitizeFilename } from '../../common/scripts.js'
+import { addUp, getTotalBalance, sanitizeFilename } from '../../common/scripts.js'
 import {
   Advance,
   ExpenseReport,
@@ -21,7 +21,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   if (reportIsAdvance(report)) {
     path += 'advance/'
   } else {
-    totalSum = formatter.money(addUp(report).balance)
+    totalSum = formatter.baseCurrency(getTotalBalance(report.addUp))
     if (reportIsTravel(report)) {
       path += 'travel/'
     } else if (reportIsHealthCareCost(report)) {
@@ -51,13 +51,14 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
     if (org?.reportEmail) {
       const mailClient = await getClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
+      formatter.setLocale(lng)
       let subject = '🧾 '
       const pdf = await reportPrinter.print(report, lng)
       let totalSum = ''
       if (reportIsAdvance(report)) {
         subject = subject + i18n.t('labels.advance', { lng })
       } else {
-        totalSum = formatter.money(addUp(report).balance)
+        totalSum = formatter.baseCurrency(getTotalBalance(report.addUp))
         if (reportIsTravel(report)) {
           subject = subject + i18n.t('labels.travel', { lng })
         } else if (reportIsHealthCareCost(report)) {
@@ -68,7 +69,6 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
       }
 
       const appName = `${i18n.t('headlines.title', { lng })} ${i18n.t('headlines.emoji', { lng })}`
-      formatter.setLocale(lng)
 
       const text =
         `${i18n.t('labels.project', { lng })}: ${report.project.identifier}\n` +

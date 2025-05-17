@@ -7,43 +7,25 @@
           <ProgressCircle :progress="progress"></ProgressCircle>
         </td>
       </tr>
-      <tr v-if="(addUp as AddUpResult<Travel>).lumpSums">
-        <td>
-          <small>
-            {{ t('labels.lumpSums') }}
-            <small v-if="claimSpouseRefund">
+      <tr v-for="row of addUpTableData">
+        <th>{{ t(row[0]) }}</th>
+        <template v-for="(col, index) of row">
+          <td v-if="index !== 0" class="text-end">
+            {{ col }}
+            <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
               <br />
-              {{ t('labels.includingSpouseRefund') }}
+              {{ `(${$formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
             </small>
-          </small>
-        </td>
-        <td class="text-end align-top">
-          <small>{{ $formatter.money((addUp as AddUpResult<Travel>).lumpSums) }}</small>
-        </td>
+          </td>
+        </template>
       </tr>
-      <tr>
-        <td>
-          <small>{{ t('labels.expenses') }}</small>
-        </td>
-        <td class="text-end">
-          <small>{{ $formatter.money(addUp.expenses) }}</small>
-        </td>
-      </tr>
-      <tr v-if="addUp.advance.amount">
-        <td class="text-secondary">
-          <small>{{ t('labels.advance') }}</small>
-        </td>
-        <td class="text-end text-secondary">
-          <small v-if="addUp.advanceOverflow">{{ $formatter.money(addUp.total , { func: (x) => 0 - x }) }}
-          <small v-if="showAdvanceOverflow"><br/>  {{ `(${$formatter.money({amount: addUp.advance.amount - (addUp.total.amount || 0)})} ${t('labels.left')})` }}
-          </small></small>
-          <small v-else>{{ $formatter.money(addUp.advance, { func: (x) => 0 - x }) }}
-        </small>
-        </td>
-      </tr>
-      <tr>
-        <th>{{ t('labels.balance') }}</th>
-        <td class="text-end">{{ $formatter.money(addUp.balance) }}</td>
+      <small v-if="claimSpouseRefund">
+        <br />
+        {{ t('labels.includingSpouseRefund') }}
+      </small>
+      <tr v-if="addUp.length > 1">
+        <th>{{ t('labels.totalBalance') }}</th>
+        <td class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
       <tr v-if="refundSum">
         <th>{{ t('labels.refundSum') }}</th>
@@ -62,19 +44,30 @@
 </template>
 
 <script setup lang="ts">
-import { AddUpResult, Money, Project, Travel } from '@/../../common/types.js'
+import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
+import { AddUp, Money, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
-import { PropType } from 'vue'
+import { formatter } from '@/formatter'
+import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps({
-  addUp: { type: Object as PropType<AddUpResult>, required: true },
+  addUp: { type: Object as PropType<AddUp[]>, required: true },
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },
   refundSum: { type: Object as PropType<Money> },
   showAdvanceOverflow: { type: Boolean, default: true }
 })
+
+const addUpTableData = ref(getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
+
+watch(
+  () => props.addUp,
+  () => {
+    addUpTableData.value = getAddUpTableData(formatter, props.addUp, props.progress !== undefined)
+  }
+)
 </script>

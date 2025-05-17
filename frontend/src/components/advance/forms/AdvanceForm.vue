@@ -100,7 +100,6 @@ function defaultAdvance() {
       amount: null as number | null,
       currency: baseCurrency
     },
-    balance: { amount: null as number | null },
     owner: undefined as string | undefined,
     project: undefined as Project | undefined,
     comment: undefined as string | undefined

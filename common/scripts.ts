@@ -1,14 +1,18 @@
+import Formatter from './formatter.js'
 import {
-  AddUpResult,
+  AddUp,
   BaseCurrencyMoney,
   ExpenseReport,
+  FlatAddUp,
   HealthCareCost,
   HexColor,
   Locale,
   Money,
   Place,
+  ProjectSimple,
   Travel,
   TravelDay,
+  _id,
   baseCurrency,
   idDocumentToId,
   reportIsHealthCareCost,
@@ -136,10 +140,51 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
 export function getLumpSumsSum(days: TravelDay[]) {
   let sum = 0
   for (const day of days) {
-    sum += day.lumpSums.overnight.refund.amount || 0
-    sum += day.lumpSums.catering.refund.amount || 0
+    sum += day.lumpSums.overnight.refund.amount
+    sum += day.lumpSums.catering.refund.amount
   }
   return { amount: sum }
+}
+
+export function getTotalBalance(addUps: FlatAddUp[]) {
+  let totalBalance = 0
+  for (const addUp of addUps) {
+    totalBalance += addUp.balance.amount
+  }
+  return totalBalance
+}
+
+export function getTotalTotal(addUps: FlatAddUp[]) {
+  let totalTotal = 0
+  for (const addUp of addUps) {
+    totalTotal += addUp.total.amount
+  }
+  return totalTotal
+}
+
+export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLumpSums = false) {
+  const summary: string[][] = []
+  if (addUps.length > 1) {
+    summary.push(['labels.project'])
+  }
+  summary.push(['labels.expenses'])
+  if (withLumpSums) {
+    summary.push(['labels.lumpSums'])
+  }
+  summary.push(['labels.advance'])
+  summary.push(['labels.balance'])
+  for (let i = 0; i < addUps.length; i++) {
+    let j = 0
+    if (addUps.length > 1) {
+      summary[j++].push(addUps[i].project.identifier)
+    }
+    summary[j++].push(formatter.baseCurrency(addUps[i].expenses.amount))
+    if (withLumpSums) {
+      summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<Travel>).lumpSums.amount))
+    }
+    summary[j++].push(formatter.baseCurrency(-1 * (addUps[i].advanceOverflow ? addUps[i].total.amount : addUps[i].advance.amount)))
+  }
+  return summary
 }
 
 export function getBaseCurrencyAmount(a: Money): number {
@@ -155,15 +200,59 @@ export function getBaseCurrencyAmount(a: Money): number {
   return amount
 }
 
-function getTravelExpensesSum(travel: Travel) {
-  let sum = 0
+function defaultAddUp(projectId: _id, withLumpSums: true): FlatAddUp<Travel>
+function defaultAddUp(projectId: _id, withLumpSums: false): FlatAddUp<ExpenseReport | HealthCareCost>
+function defaultAddUp(projectId: _id, withLumpSums: boolean): FlatAddUp
+function defaultAddUp(projectId: _id, withLumpSums = false): FlatAddUp {
+  return {
+    project: projectId,
+    balance: { amount: 0 },
+    total: { amount: 0 },
+    advance: { amount: 0 },
+    expenses: { amount: 0 },
+    ...(withLumpSums && { lumpSums: { amount: 0 } }),
+    advanceOverflow: false
+  }
+}
+
+function addToAddUps(
+  addUps: FlatAddUp[],
+  add: number,
+  key: 'balance' | 'total' | 'advance' | 'expenses' | 'lumpSums',
+  project: ProjectSimple | undefined,
+  isTravel = false
+): void {
+  if (project) {
+    const projectId = idDocumentToId(project)
+    const addUp = addUps.find((addUp) => addUp.project === projectId)
+    if (addUp) {
+      if (key in addUp && 'amount' in (addUp as FlatAddUp<Travel>)[key] && typeof (addUp as FlatAddUp<Travel>)[key].amount === 'number') {
+        ;(addUp as FlatAddUp<Travel>)[key].amount += add
+      }
+    } else {
+      const newAddUp = defaultAddUp(projectId, isTravel)
+      if (
+        key in newAddUp &&
+        'amount' in (newAddUp as FlatAddUp<Travel>)[key] &&
+        typeof (newAddUp as FlatAddUp<Travel>)[key].amount === 'number'
+      ) {
+        ;(newAddUp as FlatAddUp<Travel>)[key].amount += add
+      }
+      addUps.push(newAddUp)
+    }
+  } else {
+    addUps[0].expenses.amount += add
+  }
+}
+
+function addTravelExpensesSum(travel: Travel, addUps: FlatAddUp<Travel>[]) {
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount !== null) {
       let add = getBaseCurrencyAmount(stage.cost)
       if (stage.purpose === 'mixed' && travel.professionalShare) {
         add = add * travel.professionalShare
       }
-      sum += add
+      addToAddUps(addUps, add, 'expenses', stage.project, true)
     }
   }
   for (const expense of travel.expenses) {
@@ -172,54 +261,36 @@ function getTravelExpensesSum(travel: Travel) {
       if (expense.purpose === 'mixed' && travel.professionalShare) {
         add = add * travel.professionalShare
       }
-      sum += add
+      addToAddUps(addUps, add, 'expenses', expense.project, true)
     }
   }
-  return { amount: sum }
 }
 
-export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report: T): AddUpResult<T> {
-  let expenses = 0
-  let advance = 0
-  let lumpSums = 0
-  let advanceOverflow = false
+export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report: T): FlatAddUp<T>[] {
+  const isTravel = reportIsTravel(report)
+  const addUps = [defaultAddUp(idDocumentToId(report.project), isTravel) as FlatAddUp<T>]
   if (reportIsTravel(report)) {
-    lumpSums = getLumpSumsSum(report.days).amount
-    expenses = getTravelExpensesSum(report).amount
+    ;(addUps[0] as FlatAddUp<Travel>).lumpSums = getLumpSumsSum(report.days)
+    addTravelExpensesSum(report, addUps as FlatAddUp<Travel>[])
   } else {
     for (const expense of report.expenses) {
-      expenses += getBaseCurrencyAmount(expense.cost)
+      addToAddUps(addUps, getBaseCurrencyAmount(expense.cost), 'expenses', expense.project)
     }
   }
   for (const approvedAdvance of report.advances) {
-    advance += approvedAdvance.balance.amount || 0
+    addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project)
+  }
+  for (const addUp of addUps) {
+    addUp.total.amount = addUp.expenses.amount + ((addUp as FlatAddUp<Travel>).lumpSums?.amount || 0)
+    let balanceAmount = addUp.total.amount - addUp.advance.amount
+    if (balanceAmount < 0) {
+      addUp.advanceOverflow = true
+      balanceAmount = 0
+    }
+    addUp.balance.amount = balanceAmount
   }
 
-  const total = expenses + lumpSums
-  let balance = total - advance
-
-  if (balance < 0) {
-    advanceOverflow = true
-    balance = 0
-  }
-
-  if (reportIsTravel(report)) {
-    return {
-      balance: { amount: balance },
-      total: { amount: total },
-      advance: { amount: advance },
-      expenses: { amount: expenses },
-      lumpSums: { amount: lumpSums },
-      advanceOverflow
-    } as AddUpResult<T>
-  }
-  return {
-    balance: { amount: balance },
-    total: { amount: total },
-    advance: { amount: advance },
-    expenses: { amount: expenses },
-    advanceOverflow
-  } as AddUpResult<T>
+  return addUps
 }
 
 export function sanitizeFilename(filename: string) {

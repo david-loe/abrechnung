@@ -1,6 +1,6 @@
 import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
+import { AddUp, Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
@@ -37,7 +37,7 @@ const populates = {
   refundSum: [{ path: 'refundSum.receipts', select: { name: 1, type: 1 } }, { path: 'refundSum.currency' }],
   insurance: [{ path: 'insurance' }],
   expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
-  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -97,7 +97,7 @@ schema.pre('save', async function (this: HealthCareCostDoc) {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this)
+  this.addUp = addUp(this) as AddUp<HealthCareCost>[]
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {

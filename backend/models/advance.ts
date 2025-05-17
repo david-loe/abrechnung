@@ -130,11 +130,11 @@ schema.methods.offset = async function (
   if (!doc) {
     return reportTotal
   }
-  let difference = reportTotal - (doc.balance.amount || 0)
   let amount = reportTotal
+  let difference = reportTotal - doc.balance.amount
   if (difference >= 0) {
     await doc.saveToHistory(false, session)
-    amount = doc.balance.amount || 0
+    amount = doc.balance.amount
     doc.balance.amount = 0
     doc.state = 'completed'
   } else {
