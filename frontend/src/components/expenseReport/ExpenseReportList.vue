@@ -111,16 +111,11 @@
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.total.amount="{ addUp }">
-      {{ $formatter.money(addUp.total) }}
+    <template #item-addUp.totalTotal="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalTotal(addUp)) }}
     </template>
-    <template #item-addUp.balance.amount="{ addUp }">
-      <TooltipElement
-        html
-        :text="`${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
-        ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
-        {{ $formatter.money(addUp.balance) }}
-      </TooltipElement>
+    <template #item-addUp.totalBalance="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalBalance(addUp)) }}
     </template>
     <template #item-report="{ _id, name }">
       <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
@@ -148,7 +143,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getById } from '@/../../common/scripts.js'
+import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { Comment, ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
@@ -195,8 +190,8 @@ if (window.innerWidth > bp.md) {
   headers.push(
     { text: t('labels.project'), value: 'project.identifier' },
     { text: t('labels.organisation'), value: 'organisation' },
-    { text: t('labels.total'), value: 'addUp.total.amount' },
-    { text: t('labels.balance'), value: 'addUp.balance.amount' },
+    { text: t('labels.total'), value: 'addUp.totalTotal' },
+    { text: t('labels.balance'), value: 'addUp.totalBalance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt' },
