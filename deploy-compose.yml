@@ -1,6 +1,6 @@
 services:
   backend:
-    image: davidloe/abrechnung-backend:2
+    image: davidloe/abrechnung-backend
     restart: always
     depends_on:
       - db
@@ -10,7 +10,7 @@ services:
       - .env
 
   frontend:
-    image: davidloe/abrechnung-frontend:2
+    image: davidloe/abrechnung-frontend
     restart: always
     depends_on:
       - backend
