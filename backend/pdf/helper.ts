@@ -58,6 +58,7 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
       let totalSum = ''
       if (reportIsAdvance(report)) {
         subject = subject + i18n.t('labels.advance', { lng })
+        totalSum = formatter.baseCurrency(report.budget.amount)
       } else {
         totalSum = formatter.baseCurrency(getTotalBalance(report.addUp))
         if (reportIsTravel(report)) {
