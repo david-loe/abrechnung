@@ -7,6 +7,19 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"BaseCurrencyMoneyNotNull": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"BaseCurrencyMoney": {
 				"properties": {
 					"amount": {
@@ -43,7 +56,7 @@
 						"type": "string"
 					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 					},
 					"budget": {
 						"$ref": "#/components/schemas/BaseCurrencyMoney"
@@ -343,10 +356,16 @@
 							"inWork:healthCareCost": {
 								"type": "boolean"
 							},
+							"appliedFor:advance": {
+								"type": "boolean"
+							},
 							"appliedFor:travel": {
 								"type": "boolean"
 							},
 							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/advance": {
 								"type": "boolean"
 							},
 							"approve/travel": {
@@ -362,6 +381,9 @@
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"approved/advance": {
 								"type": "boolean"
 							},
 							"refunded/travel": {
@@ -381,13 +403,16 @@
 							"user",
 							"inWork:expenseReport",
 							"inWork:healthCareCost",
+							"appliedFor:advance",
 							"appliedFor:travel",
 							"approved:travel",
+							"approve/advance",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"approved/advance",
 							"refunded/travel",
 							"refunded/expenseReport",
 							"refunded/healthCareCost",
@@ -870,10 +895,16 @@
 							"inWork:healthCareCost": {
 								"type": "boolean"
 							},
+							"appliedFor:advance": {
+								"type": "boolean"
+							},
 							"appliedFor:travel": {
 								"type": "boolean"
 							},
 							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/advance": {
 								"type": "boolean"
 							},
 							"approve/travel": {
@@ -889,6 +920,9 @@
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"approved/advance": {
 								"type": "boolean"
 							},
 							"refunded/travel": {
@@ -908,13 +942,16 @@
 							"user",
 							"inWork:expenseReport",
 							"inWork:healthCareCost",
+							"appliedFor:advance",
 							"appliedFor:travel",
 							"approved:travel",
+							"approve/advance",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"approved/advance",
 							"refunded/travel",
 							"refunded/expenseReport",
 							"refunded/healthCareCost",
@@ -1204,6 +1241,9 @@
 							"refunded/travel": {
 								"type": "boolean"
 							},
+							"approved/advance": {
+								"type": "boolean"
+							},
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
@@ -1219,10 +1259,16 @@
 							"approve/travel": {
 								"type": "boolean"
 							},
+							"approve/advance": {
+								"type": "boolean"
+							},
 							"approved:travel": {
 								"type": "boolean"
 							},
 							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:advance": {
 								"type": "boolean"
 							},
 							"inWork:healthCareCost": {
@@ -1543,6 +1589,9 @@
 							"refunded/travel": {
 								"type": "boolean"
 							},
+							"approved/advance": {
+								"type": "boolean"
+							},
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
@@ -1558,10 +1607,16 @@
 							"approve/travel": {
 								"type": "boolean"
 							},
+							"approve/advance": {
+								"type": "boolean"
+							},
 							"approved:travel": {
 								"type": "boolean"
 							},
 							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:advance": {
 								"type": "boolean"
 							},
 							"inWork:healthCareCost": {
@@ -2264,6 +2319,26 @@
 					}
 				]
 			},
+			"ProjectSimple": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Stage": {
 				"properties": {
 					"departure": {
@@ -2330,6 +2405,14 @@
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							}
+						],
+						"nullable": true
+					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -2358,6 +2441,14 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							}
+						],
+						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -2442,7 +2533,7 @@
 										"$ref": "#/components/schemas/CateringType"
 									},
 									"refund": {
-										"$ref": "#/components/schemas/BaseCurrencyMoney"
+										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 									}
 								},
 								"required": [
@@ -2454,7 +2545,7 @@
 							"overnight": {
 								"properties": {
 									"refund": {
-										"$ref": "#/components/schemas/BaseCurrencyMoney"
+										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 									}
 								},
 								"required": [
@@ -2485,198 +2576,60 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"TravelState": {
-				"type": "string",
-				"enum": [
-					"rejected",
-					"appliedFor",
-					"approved",
-					"underExamination",
-					"refunded"
-				]
-			},
-			"UserSimple": {
+			"AddUpBase": {
 				"properties": {
-					"email": {
-						"type": "string"
+					"advanceOverflow": {
+						"type": "boolean"
 					},
-					"name": {
-						"properties": {
-							"familyName": {
-								"type": "string"
-							},
-							"givenName": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"familyName",
-							"givenName"
-						],
-						"type": "object"
+					"expenses": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
+					"advance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"total": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple"
 					}
 				},
 				"required": [
-					"email",
-					"name",
-					"_id"
+					"advanceOverflow",
+					"expenses",
+					"advance",
+					"total",
+					"balance",
+					"project"
 				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_TravelState_": {
-				"properties": {
-					"rejected": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"appliedFor": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"approved": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"underExamination": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"refunded": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					}
-				},
 				"type": "object"
 			},
-			"Comment_TravelState_": {
-				"properties": {
-					"text": {
-						"type": "string"
+			"AddUp_Travel_": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AddUpBase"
 					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/TravelState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
+					{
+						"properties": {
+							"lumpSums": {
+								"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+							}
+						},
+						"required": [
+							"lumpSums"
+						],
+						"type": "object"
 					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
+				]
 			},
-			"Money": {
+			"MoneyNotNull": {
 				"properties": {
 					"amount": {
 						"type": "number",
-						"format": "double",
-						"nullable": true
+						"format": "double"
 					},
 					"currency": {
 						"$ref": "#/components/schemas/Currency"
@@ -2719,227 +2672,119 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AddUpResult_Travel_": {
+			"AdvanceState": {
+				"type": "string",
+				"enum": [
+					"rejected",
+					"appliedFor",
+					"approved",
+					"completed"
+				]
+			},
+			"AdvanceBase": {
 				"properties": {
-					"lumpSums": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					"name": {
+						"type": "string"
 					},
-					"expenses": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
-					"advance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"total": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					"project": {
+						"$ref": "#/components/schemas/Project"
 					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					}
 				},
 				"required": [
-					"lumpSums",
-					"expenses",
-					"advance",
-					"total",
-					"balance"
+					"name",
+					"budget",
+					"project",
+					"balance",
+					"reason",
+					"state",
+					"_id"
 				],
-				"type": "object"
+				"type": "object",
+				"additionalProperties": false
 			},
-			"HealthCareCostState": {
-				"type": "string",
-				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork",
-					"underExaminationByInsurance"
-				]
-			},
-			"ExpenseReportState": {
-				"type": "string",
-				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork"
-				]
-			},
-			"AnyState": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/TravelState"
-					},
-					{
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					{
-						"$ref": "#/components/schemas/ExpenseReportState"
-					}
-				]
-			},
-			"Log_AnyState_": {
+			"UserSimple": {
 				"properties": {
-					"rejected": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
 						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
+							"familyName": {
+								"type": "string"
 							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
+							"givenName": {
+								"type": "string"
 							}
 						},
 						"required": [
-							"editor",
-							"date"
+							"familyName",
+							"givenName"
 						],
 						"type": "object"
 					},
-					"appliedFor": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"approved": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"underExamination": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"refunded": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"inWork": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"underExaminationByInsurance": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
+					"_id": {
+						"$ref": "#/components/schemas/_id"
 					}
 				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelState": {
+				"type": "string",
+				"enum": [
+					"rejected",
+					"appliedFor",
+					"approved",
+					"underExamination",
+					"refunded"
+				]
+			},
+			"Comment_TravelState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_TravelState_": {
+				"properties": {},
 				"type": "object"
 			},
 			"Travel": {
@@ -2950,17 +2795,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_TravelState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_TravelState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -2986,16 +2845,6 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_TravelState_"
-						},
-						"type": "array"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
 					},
 					"reason": {
 						"type": "string"
@@ -3025,15 +2874,21 @@
 							}
 						]
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
 					},
 					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_Travel_"
+						"items": {
+							"$ref": "#/components/schemas/AddUp_Travel_"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
 					"isCrossBorder": {
 						"type": "boolean",
@@ -3063,14 +2918,6 @@
 						"type": "string",
 						"nullable": true
 					},
-					"lastPlaceOfWork": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"professionalShare": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -3079,6 +2926,14 @@
 					},
 					"historic": {
 						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
 					},
 					"stages": {
 						"items": {
@@ -3102,25 +2957,25 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"comments",
 					"reason",
 					"destinationPlace",
 					"startDate",
 					"endDate",
-					"advance",
 					"progress",
 					"addUp",
-					"lastPlaceOfWork",
-					"professionalShare",
+					"advances",
 					"history",
 					"historic",
+					"lastPlaceOfWork",
+					"professionalShare",
 					"stages",
 					"expenses",
 					"days"
@@ -3162,17 +3017,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_TravelState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_TravelState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -3198,16 +3067,6 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_TravelState_"
-						},
-						"type": "array"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
 					},
 					"reason": {
 						"type": "string"
@@ -3237,15 +3096,21 @@
 							}
 						]
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
 					},
 					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_Travel_"
+						"items": {
+							"$ref": "#/components/schemas/AddUp_Travel_"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
 					"isCrossBorder": {
 						"type": "boolean",
@@ -3275,14 +3140,6 @@
 						"type": "string",
 						"nullable": true
 					},
-					"lastPlaceOfWork": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"professionalShare": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -3291,6 +3148,14 @@
 					},
 					"historic": {
 						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
 					},
 					"stages": {
 						"items": {
@@ -3314,25 +3179,25 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"comments",
 					"reason",
 					"destinationPlace",
 					"startDate",
 					"endDate",
-					"advance",
 					"progress",
 					"addUp",
-					"lastPlaceOfWork",
-					"professionalShare",
+					"advances",
 					"history",
 					"historic",
+					"lastPlaceOfWork",
+					"professionalShare",
 					"stages",
 					"expenses",
 					"days"
@@ -3363,32 +3228,43 @@
 							"enum": [
 								"name",
 								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
 								"state",
 								"log",
-								"project",
-								"editor",
 								"createdAt",
 								"updatedAt",
 								"_id",
-								"state",
-								"log",
-								"comments",
-								"comment",
 								"reason",
 								"destinationPlace",
 								"startDate",
 								"endDate",
-								"advance",
 								"progress",
 								"addUp",
+								"advances",
 								"isCrossBorder",
 								"a1Certificate",
 								"claimSpouseRefund",
 								"fellowTravelersNames",
-								"lastPlaceOfWork",
-								"professionalShare",
+								"name",
+								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
+								"state",
+								"log",
+								"createdAt",
+								"updatedAt",
+								"_id",
 								"history",
 								"historic",
+								"lastPlaceOfWork",
+								"professionalShare",
 								"stages",
 								"expenses",
 								"days"
@@ -3411,6 +3287,9 @@
 			},
 			"SetterPartial_TravelPost.NoPost_": {
 				"properties": {
+					"bookingRemark": {
+						"type": "string"
+					},
 					"project": {
 						"anyOf": [
 							{
@@ -3441,24 +3320,70 @@
 					"isCrossBorder": {
 						"type": "boolean"
 					},
-					"advance": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
+					"advances": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
 							},
-							"currency": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/Currency"
+							{
+								"items": {
+									"properties": {
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Project"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"reason": {
+											"type": "string"
+										},
+										"budget": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"balance": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
+										},
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
 									},
-									{
-										"$ref": "#/components/schemas/IdDocument_string_"
-									}
-								]
+									"type": "object"
+								},
+								"type": "array"
 							}
-						},
-						"type": "object"
+						]
 					},
 					"endDate": {
 						"anyOf": [
@@ -3484,9 +3409,6 @@
 					},
 					"destinationPlace": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -3499,6 +3421,9 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -3540,9 +3465,6 @@
 					},
 					"lastPlaceOfWork": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -3555,6 +3477,9 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -3654,6 +3579,16 @@
 							}
 						},
 						"type": "object"
+					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
 					},
 					"description": {
 						"type": "string"
@@ -3819,9 +3754,6 @@
 					},
 					"endLocation": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -3834,15 +3766,15 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
 					},
 					"startLocation": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -3855,6 +3787,9 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -3881,6 +3816,16 @@
 							}
 						]
 					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
@@ -3898,17 +3843,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_TravelState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_TravelState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -3934,16 +3893,6 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_TravelState_"
-						},
-						"type": "array"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
 					},
 					"reason": {
 						"type": "string"
@@ -3973,15 +3922,21 @@
 							}
 						]
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
 					},
 					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_Travel_"
+						"items": {
+							"$ref": "#/components/schemas/AddUp_Travel_"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
 					"isCrossBorder": {
 						"type": "boolean",
@@ -4015,98 +3970,86 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"comments",
 					"reason",
 					"destinationPlace",
 					"startDate",
 					"endDate",
-					"advance",
 					"progress",
-					"addUp"
+					"addUp",
+					"advances"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Log_ExpenseReportState_": {
+			"AddUp_ExpenseReport_": {
+				"$ref": "#/components/schemas/AddUpBase"
+			},
+			"HexColor": {
+				"type": "string",
+				"pattern": "/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
+			},
+			"TextColor": {
+				"type": "string",
+				"enum": [
+					"black",
+					"white"
+				]
+			},
+			"BadgeStyle": {
 				"properties": {
-					"underExamination": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
+					"color": {
+						"$ref": "#/components/schemas/HexColor"
 					},
-					"refunded": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"inWork": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
+					"text": {
+						"$ref": "#/components/schemas/TextColor"
 					}
 				},
-				"type": "object"
+				"required": [
+					"color",
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Category": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"isDefault",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseReportState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork"
+				]
 			},
 			"Comment_ExpenseReportState_": {
 				"properties": {
@@ -4132,27 +4075,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AddUpResult_ExpenseReport_": {
-				"properties": {
-					"expenses": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"advance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"total": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"expenses",
-					"advance",
-					"total",
-					"balance"
-				],
+			"Log_ExpenseReportState_": {
+				"properties": {},
 				"type": "object"
 			},
 			"ExpenseReportSimple": {
@@ -4163,17 +4087,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_ExpenseReportState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -4200,36 +4138,36 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+							"$ref": "#/components/schemas/AddUp_ExpenseReport_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"category": {
+						"$ref": "#/components/schemas/Category"
 					}
 				},
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"advance",
-					"comments",
-					"addUp"
+					"addUp",
+					"advances",
+					"category"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4301,102 +4239,17 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Log_HealthCareCostState_": {
-				"properties": {
-					"underExamination": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"refunded": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"inWork": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					},
-					"underExaminationByInsurance": {
-						"properties": {
-							"editor": {
-								"$ref": "#/components/schemas/UserSimple"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "string",
-										"format": "date-time"
-									}
-								]
-							}
-						},
-						"required": [
-							"editor",
-							"date"
-						],
-						"type": "object"
-					}
-				},
-				"type": "object"
+			"AddUp_HealthCareCost_": {
+				"$ref": "#/components/schemas/AddUpBase"
+			},
+			"HealthCareCostState": {
+				"type": "string",
+				"enum": [
+					"underExamination",
+					"refunded",
+					"inWork",
+					"underExaminationByInsurance"
+				]
 			},
 			"Comment_HealthCareCostState_": {
 				"properties": {
@@ -4422,23 +4275,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AddUpResult_HealthCareCost_": {
-				"properties": {
-					"expenses": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"total": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"expenses",
-					"total",
-					"balance"
-				],
+			"Log_HealthCareCostState_": {
+				"properties": {},
 				"type": "object"
 			},
 			"HealthCareCostSimple": {
@@ -4449,17 +4287,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_HealthCareCostState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -4495,35 +4347,205 @@
 					"refundSum": {
 						"$ref": "#/components/schemas/MoneyPlus"
 					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
 					"patientName",
 					"insurance",
 					"refundSum",
+					"addUp",
+					"advances"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment_AdvanceState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_AdvanceState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"ReportModelName": {
+				"type": "string",
+				"enum": [
+					"Travel",
+					"ExpenseReport",
+					"HealthCareCost"
+				]
+			},
+			"Advance": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_AdvanceState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_AdvanceState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"offsetAgainst": {
+						"items": {
+							"properties": {
+								"amount": {
+									"type": "number",
+									"format": "double"
+								},
+								"report": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/_id"
+										}
+									},
+									"required": [
+										"name",
+										"_id"
+									],
+									"type": "object",
+									"nullable": true
+								},
+								"type": {
+									"$ref": "#/components/schemas/ReportModelName"
+								}
+							},
+							"required": [
+								"amount",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"editor",
+					"project",
 					"comments",
-					"addUp"
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"history",
+					"historic",
+					"budget",
+					"balance",
+					"reason",
+					"offsetAgainst"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4643,8 +4665,11 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance-or-log-or-addUp_.NoPost_": {
+			"SetterPartial_Omit_TravelSimple.comments-or-comment-or-progress-or-advance-or-log-or-addUp-or-editor-or-owner_.NoPost_": {
 				"properties": {
+					"bookingRemark": {
+						"type": "string"
+					},
 					"project": {
 						"anyOf": [
 							{
@@ -4675,6 +4700,71 @@
 					"isCrossBorder": {
 						"type": "boolean"
 					},
+					"advances": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"properties": {
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Project"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"reason": {
+											"type": "string"
+										},
+										"budget": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"balance": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
+										},
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							}
+						]
+					},
 					"endDate": {
 						"anyOf": [
 							{
@@ -4699,9 +4789,6 @@
 					},
 					"destinationPlace": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -4714,6 +4801,9 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -4732,6 +4822,9 @@
 			},
 			"TravelApplication": {
 				"properties": {
+					"bookingRemark": {
+						"type": "string"
+					},
 					"project": {
 						"anyOf": [
 							{
@@ -4762,6 +4855,71 @@
 					"isCrossBorder": {
 						"type": "boolean"
 					},
+					"advances": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"properties": {
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Project"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"reason": {
+											"type": "string"
+										},
+										"budget": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"balance": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
+										},
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							}
+						]
+					},
 					"endDate": {
 						"anyOf": [
 							{
@@ -4786,9 +4944,6 @@
 					},
 					"destinationPlace": {
 						"properties": {
-							"place": {
-								"type": "string"
-							},
 							"special": {
 								"type": "string"
 							},
@@ -4801,6 +4956,9 @@
 										"$ref": "#/components/schemas/IdDocument_string_"
 									}
 								]
+							},
+							"place": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -4837,10 +4995,16 @@
 							"inWork:healthCareCost": {
 								"type": "boolean"
 							},
+							"appliedFor:advance": {
+								"type": "boolean"
+							},
 							"appliedFor:travel": {
 								"type": "boolean"
 							},
 							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/advance": {
 								"type": "boolean"
 							},
 							"approve/travel": {
@@ -4856,6 +5020,9 @@
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
+								"type": "boolean"
+							},
+							"approved/advance": {
 								"type": "boolean"
 							},
 							"refunded/travel": {
@@ -4875,13 +5042,16 @@
 							"user",
 							"inWork:expenseReport",
 							"inWork:healthCareCost",
+							"appliedFor:advance",
 							"appliedFor:travel",
 							"approved:travel",
+							"approve/advance",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"approved/advance",
 							"refunded/travel",
 							"refunded/expenseReport",
 							"refunded/healthCareCost",
@@ -4891,6 +5061,9 @@
 					},
 					"disableReportType": {
 						"properties": {
+							"advance": {
+								"type": "boolean"
+							},
 							"travel": {
 								"type": "boolean"
 							},
@@ -4902,6 +5075,7 @@
 							}
 						},
 						"required": [
+							"advance",
 							"travel",
 							"expenseReport",
 							"healthCareCost"
@@ -5002,6 +5176,9 @@
 							},
 							"travel": {
 								"type": "boolean"
+							},
+							"advance": {
+								"type": "boolean"
 							}
 						},
 						"type": "object"
@@ -5020,6 +5197,9 @@
 							"refunded/travel": {
 								"type": "boolean"
 							},
+							"approved/advance": {
+								"type": "boolean"
+							},
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
@@ -5035,10 +5215,16 @@
 							"approve/travel": {
 								"type": "boolean"
 							},
+							"approve/advance": {
+								"type": "boolean"
+							},
 							"approved:travel": {
 								"type": "boolean"
 							},
 							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"appliedFor:advance": {
 								"type": "boolean"
 							},
 							"inWork:healthCareCost": {
@@ -5090,26 +5276,6 @@
 				"required": [
 					"data",
 					"meta"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ProjectSimple": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -5170,7 +5336,7 @@
 						"type": "string"
 					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 					},
 					"budget": {
 						"$ref": "#/components/schemas/BaseCurrencyMoney"
@@ -5323,10 +5489,6 @@
 					"NotoSans"
 				],
 				"nullable": false
-			},
-			"HexColor": {
-				"type": "string",
-				"pattern": "/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
 			},
 			"PrinterSettings": {
 				"properties": {
@@ -5700,49 +5862,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"DocumentFile_image_47_jpeg-or-image_47_png_": {
-				"properties": {
-					"data": {
-						"$ref": "#/components/schemas/Binary"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"type": {
-						"type": "string",
-						"enum": [
-							"image/jpeg",
-							"image/png"
-						]
-					},
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"data",
-					"owner",
-					"type",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SetterPartial_IOrganisation.NoPost_": {
+			"SetterPartial_PostOrganisation.NoPost_": {
 				"properties": {
 					"logo": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+						"properties": {
+							"data": {
+								"type": "string"
 							},
-							{
-								"$ref": "#/components/schemas/DocumentFile_image_47_jpeg-or-image_47_png_"
+							"name": {
+								"type": "string"
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"application/pdf",
+									"image/jpeg",
+									"image/png"
+								]
 							}
-						]
+						},
+						"type": "object"
 					},
 					"companyNumber": {
 						"type": "string"
@@ -5771,8 +5910,8 @@
 				},
 				"type": "object"
 			},
-			"SetterBody_IOrganisation_": {
-				"$ref": "#/components/schemas/SetterPartial_IOrganisation.NoPost_"
+			"SetterBody_PostOrganisation_": {
+				"$ref": "#/components/schemas/SetterPartial_PostOrganisation.NoPost_"
 			},
 			"SetterPartial_Omit_IOrganisation.logo_.NoPost_": {
 				"properties": {
@@ -5918,6 +6057,14 @@
 					"cost": {
 						"$ref": "#/components/schemas/Cost"
 					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							}
+						],
+						"nullable": true
+					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -5942,17 +6089,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_HealthCareCostState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -5988,18 +6149,17 @@
 					"refundSum": {
 						"$ref": "#/components/schemas/MoneyPlus"
 					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -6020,18 +6180,19 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
 					"patientName",
 					"insurance",
 					"refundSum",
-					"comments",
 					"addUp",
+					"advances",
 					"history",
 					"historic",
 					"expenses"
@@ -6073,17 +6234,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/HealthCareCostState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_HealthCareCostState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -6119,18 +6294,17 @@
 					"refundSum": {
 						"$ref": "#/components/schemas/MoneyPlus"
 					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_HealthCareCostState_"
+							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_HealthCareCost_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -6151,18 +6325,19 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
 					"patientName",
 					"insurance",
 					"refundSum",
-					"comments",
 					"addUp",
+					"advances",
 					"history",
 					"historic",
 					"expenses"
@@ -6193,21 +6368,33 @@
 							"enum": [
 								"name",
 								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
 								"state",
 								"log",
-								"project",
-								"editor",
 								"createdAt",
 								"updatedAt",
 								"_id",
 								"patientName",
 								"insurance",
 								"refundSum",
+								"addUp",
+								"advances",
+								"name",
+								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
 								"state",
 								"log",
-								"comments",
-								"addUp",
-								"comment",
+								"createdAt",
+								"updatedAt",
+								"_id",
 								"history",
 								"historic",
 								"expenses"
@@ -6305,6 +6492,16 @@
 						},
 						"type": "object"
 					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"description": {
 						"type": "string"
 					},
@@ -6390,17 +6587,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_ExpenseReportState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -6427,21 +6638,20 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+							"$ref": "#/components/schemas/AddUp_ExpenseReport_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"category": {
+						"$ref": "#/components/schemas/Category"
 					},
 					"history": {
 						"items": {
@@ -6462,16 +6672,17 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"advance",
-					"comments",
 					"addUp",
+					"advances",
+					"category",
 					"history",
 					"historic",
 					"expenses"
@@ -6513,17 +6724,31 @@
 					"owner": {
 						"$ref": "#/components/schemas/UserSimple"
 					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+						},
+						"type": "array"
+					},
 					"state": {
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"log": {
 						"$ref": "#/components/schemas/Log_ExpenseReportState_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -6550,21 +6775,20 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"advance": {
-						"$ref": "#/components/schemas/Money"
-					},
-					"comments": {
+					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_ExpenseReportState_"
+							"$ref": "#/components/schemas/AddUp_ExpenseReport_"
 						},
 						"type": "array"
 					},
-					"addUp": {
-						"$ref": "#/components/schemas/AddUpResult_ExpenseReport_"
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase"
+						},
+						"type": "array"
 					},
-					"comment": {
-						"type": "string",
-						"nullable": true
+					"category": {
+						"$ref": "#/components/schemas/Category"
 					},
 					"history": {
 						"items": {
@@ -6585,16 +6809,17 @@
 				"required": [
 					"name",
 					"owner",
+					"editor",
+					"project",
+					"comments",
 					"state",
 					"log",
-					"project",
-					"editor",
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"advance",
-					"comments",
 					"addUp",
+					"advances",
+					"category",
 					"history",
 					"historic",
 					"expenses"
@@ -6625,19 +6850,31 @@
 							"enum": [
 								"name",
 								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
 								"state",
 								"log",
-								"project",
-								"editor",
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"addUp",
+								"advances",
+								"category",
+								"name",
+								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
 								"state",
 								"log",
-								"advance",
-								"comments",
-								"addUp",
-								"comment",
+								"createdAt",
+								"updatedAt",
+								"_id",
 								"history",
 								"historic",
 								"expenses"
@@ -6740,109 +6977,28 @@
 					"stateColors": {
 						"properties": {
 							"rejected": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"appliedFor": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"approved": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"underExamination": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"refunded": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"inWork": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
 							},
 							"underExaminationByInsurance": {
-								"properties": {
-									"text": {
-										"type": "string"
-									},
-									"color": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"text",
-									"color"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/BadgeStyle"
+							},
+							"completed": {
+								"$ref": "#/components/schemas/BadgeStyle"
 							}
 						},
 						"required": [
@@ -6852,7 +7008,8 @@
 							"underExamination",
 							"refunded",
 							"inWork",
-							"underExaminationByInsurance"
+							"underExaminationByInsurance",
+							"completed"
 						],
 						"type": "object"
 					},
@@ -6876,6 +7033,12 @@
 								},
 								"type": "array"
 							},
+							"appliedFor:advance": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"appliedFor:travel": {
 								"items": {
 									"type": "string"
@@ -6883,6 +7046,12 @@
 								"type": "array"
 							},
 							"approved:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approve/advance": {
 								"items": {
 									"type": "string"
 								},
@@ -6913,6 +7082,12 @@
 								"type": "array"
 							},
 							"confirm/healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved/advance": {
 								"items": {
 									"type": "string"
 								},
@@ -6947,17 +7122,55 @@
 							"user",
 							"inWork:expenseReport",
 							"inWork:healthCareCost",
+							"appliedFor:advance",
 							"appliedFor:travel",
 							"approved:travel",
+							"approve/advance",
 							"approve/travel",
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
+							"approved/advance",
 							"refunded/travel",
 							"refunded/expenseReport",
 							"refunded/healthCareCost",
 							"admin"
+						],
+						"type": "object"
+					},
+					"reportTypeIcons": {
+						"properties": {
+							"advance": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"advance",
+							"travel",
+							"expenseReport",
+							"healthCareCost"
 						],
 						"type": "object"
 					},
@@ -6971,6 +7184,7 @@
 					"locale",
 					"stateColors",
 					"accessIcons",
+					"reportTypeIcons",
 					"_id"
 				],
 				"type": "object",
@@ -6978,6 +7192,35 @@
 			},
 			"SetterPartial_IDisplaySettings.NoPost_": {
 				"properties": {
+					"reportTypeIcons": {
+						"properties": {
+							"healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"advance": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
+					},
 					"accessIcons": {
 						"properties": {
 							"admin": {
@@ -6999,6 +7242,12 @@
 								"type": "array"
 							},
 							"refunded/travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"approved/advance": {
 								"items": {
 									"type": "string"
 								},
@@ -7034,6 +7283,12 @@
 								},
 								"type": "array"
 							},
+							"approve/advance": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"approved:travel": {
 								"items": {
 									"type": "string"
@@ -7041,6 +7296,12 @@
 								"type": "array"
 							},
 							"appliedFor:travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"appliedFor:advance": {
 								"items": {
 									"type": "string"
 								},
@@ -7069,13 +7330,32 @@
 					},
 					"stateColors": {
 						"properties": {
+							"completed": {
+								"properties": {
+									"color": {
+										"type": "string"
+									},
+									"text": {
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
+									}
+								},
+								"type": "object"
+							},
 							"underExaminationByInsurance": {
 								"properties": {
 									"color": {
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7086,7 +7366,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7097,7 +7381,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7108,7 +7396,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7119,7 +7411,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7130,7 +7426,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7141,7 +7441,11 @@
 										"type": "string"
 									},
 									"text": {
-										"type": "string"
+										"type": "string",
+										"enum": [
+											"black",
+											"white"
+										]
 									}
 								},
 								"type": "object"
@@ -7366,37 +7670,37 @@
 			},
 			"LumpSum": {
 				"properties": {
-					"overnight": {
-						"type": "number",
-						"format": "double"
-					},
 					"catering8": {
 						"type": "number",
 						"format": "double"
 					},
 					"catering24": {
+						"type": "number",
+						"format": "double"
+					},
+					"overnight": {
 						"type": "number",
 						"format": "double"
 					}
 				},
 				"required": [
-					"overnight",
 					"catering8",
-					"catering24"
+					"catering24",
+					"overnight"
 				],
 				"type": "object"
 			},
 			"CountryLumpSum": {
 				"properties": {
-					"overnight": {
-						"type": "number",
-						"format": "double"
-					},
 					"catering8": {
 						"type": "number",
 						"format": "double"
 					},
 					"catering24": {
+						"type": "number",
+						"format": "double"
+					},
+					"overnight": {
 						"type": "number",
 						"format": "double"
 					},
@@ -7434,9 +7738,9 @@
 					}
 				},
 				"required": [
-					"overnight",
 					"catering8",
 					"catering24",
+					"overnight",
 					"validFrom"
 				],
 				"type": "object",
@@ -7678,15 +7982,15 @@
 											"city": {
 												"type": "string"
 											},
+											"overnight": {
+												"type": "number",
+												"format": "double"
+											},
 											"catering24": {
 												"type": "number",
 												"format": "double"
 											},
 											"catering8": {
-												"type": "number",
-												"format": "double"
-											},
-											"overnight": {
 												"type": "number",
 												"format": "double"
 											}
@@ -7706,15 +8010,15 @@
 										}
 									]
 								},
+								"overnight": {
+									"type": "number",
+									"format": "double"
+								},
 								"catering24": {
 									"type": "number",
 									"format": "double"
 								},
 								"catering8": {
-									"type": "number",
-									"format": "double"
-								},
-								"overnight": {
 									"type": "number",
 									"format": "double"
 								}
@@ -7964,122 +8268,186 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_IConnectionSettings.NoPost_": {
+			"IConnectionSettings": {
 				"properties": {
-					"smtp": {
-						"properties": {
-							"senderAddress": {
-								"type": "string"
-							},
-							"password": {
-								"type": "string"
-							},
-							"secure": {
-								"type": "boolean"
-							},
-							"port": {
-								"type": "number",
-								"format": "double"
-							},
-							"host": {
-								"type": "string"
-							},
-							"user": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
 					"PDFReportsViaEmail": {
 						"properties": {
+							"locale": {
+								"$ref": "#/components/schemas/Locale"
+							},
 							"sendPDFReportsToOrganisationEmail": {
 								"type": "boolean"
-							},
-							"locale": {
-								"type": "string",
-								"enum": [
-									"de",
-									"en"
-								]
 							}
 						},
+						"required": [
+							"locale",
+							"sendPDFReportsToOrganisationEmail"
+						],
 						"type": "object"
 					},
 					"auth": {
 						"properties": {
 							"oidc": {
-								"properties": {
-									"server": {
-										"type": "string"
-									},
-									"clientSecret": {
-										"type": "string"
-									},
-									"clientId": {
-										"type": "string"
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/oidcSettings"
 									}
-								},
-								"type": "object"
+								],
+								"nullable": true
 							},
 							"ldapauth": {
-								"properties": {
-									"givenNameAttribute": {
-										"type": "string"
-									},
-									"familyNameAttribute": {
-										"type": "string"
-									},
-									"uidAttribute": {
-										"type": "string"
-									},
-									"mailAttribute": {
-										"type": "string"
-									},
-									"tlsOptions": {
-										"properties": {
-											"rejectUnauthorized": {
-												"type": "boolean"
-											}
-										},
-										"required": [
-											"rejectUnauthorized"
-										],
-										"type": "object"
-									},
-									"searchFilter": {
-										"type": "string"
-									},
-									"searchBase": {
-										"type": "string"
-									},
-									"bindCredentials": {
-										"type": "string"
-									},
-									"bindDN": {
-										"type": "string"
-									},
-									"url": {
-										"type": "string"
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ldapauthSettings"
 									}
-								},
-								"type": "object"
+								],
+								"nullable": true
 							},
 							"microsoft": {
-								"properties": {
-									"tenant": {
-										"type": "string"
-									},
-									"clientSecret": {
-										"type": "string"
-									},
-									"clientId": {
-										"type": "string"
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/microsoftSettings"
 									}
-								},
-								"type": "object"
+								],
+								"nullable": true
 							}
 						},
 						"type": "object"
+					},
+					"smtp": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/smtpSettings"
+							}
+						],
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"PDFReportsViaEmail",
+					"auth",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_Category-or-Category-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Category"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Category"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ICategory": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"isDefault",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_ICategory_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"minimum": 0
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1,
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"name",
+								"style",
+								"isDefault",
+								"_id"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_ICategory.NoPost_": {
+				"properties": {
+					"isDefault": {
+						"type": "boolean"
+					},
+					"style": {
+						"properties": {
+							"color": {
+								"type": "string"
+							},
+							"text": {
+								"type": "string",
+								"enum": [
+									"black",
+									"white"
+								]
+							}
+						},
+						"type": "object"
+					},
+					"name": {
+						"type": "string"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -8087,8 +8455,267 @@
 				},
 				"type": "object"
 			},
-			"SetterBody_IConnectionSettings_": {
-				"$ref": "#/components/schemas/SetterPartial_IConnectionSettings.NoPost_"
+			"SetterBody_ICategory_": {
+				"$ref": "#/components/schemas/SetterPartial_ICategory.NoPost_"
+			},
+			"GETResponse_Advance-or-Advance-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Advance"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Advance"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IAdvance": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_AdvanceState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_AdvanceState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"offsetAgainst": {
+						"items": {
+							"properties": {
+								"amount": {
+									"type": "number",
+									"format": "double"
+								},
+								"report": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/_id"
+										}
+									},
+									"required": [
+										"name",
+										"_id"
+									],
+									"type": "object",
+									"nullable": true
+								},
+								"type": {
+									"$ref": "#/components/schemas/ReportModelName"
+								}
+							},
+							"required": [
+								"amount",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"history",
+					"historic",
+					"budget",
+					"balance",
+					"reason",
+					"offsetAgainst"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IAdvance_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"minimum": 0
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1,
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"name",
+								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
+								"state",
+								"log",
+								"createdAt",
+								"updatedAt",
+								"_id",
+								"history",
+								"historic",
+								"name",
+								"owner",
+								"editor",
+								"project",
+								"comment",
+								"bookingRemark",
+								"comments",
+								"state",
+								"log",
+								"createdAt",
+								"updatedAt",
+								"_id",
+								"name",
+								"budget",
+								"project",
+								"balance",
+								"reason",
+								"state",
+								"_id",
+								"offsetAgainst"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AdvanceApplication": {
+				"properties": {
+					"project": {
+						"$ref": "#/components/schemas/IdDocument"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyPost"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"comment": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"reason"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -8105,7 +8732,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "1.7.4",
+		"version": "2.0.0",
 		"contact": {}
 	},
 	"paths": {
@@ -8531,7 +9158,7 @@
 		},
 		"/users": {
 			"get": {
-				"operationId": "GetOnlyNames",
+				"operationId": "GetNamesAndProjects",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -8551,6 +9178,18 @@
 					{
 						"cookieAuth": [
 							"user",
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"approve/advance"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
 							"approve/travel"
 						]
 					},
@@ -8606,6 +9245,18 @@
 						"httpBearer": [
 							"user",
 							"confirm/healthCareCost"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"approved/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"approved/advance"
 						]
 					},
 					{
@@ -9489,32 +10140,43 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"state",
-									"log",
-									"comments",
-									"comment",
 									"reason",
 									"destinationPlace",
 									"startDate",
 									"endDate",
-									"advance",
 									"progress",
 									"addUp",
+									"advances",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"lastPlaceOfWork",
-									"professionalShare",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
+									"lastPlaceOfWork",
+									"professionalShare",
 									"stages",
 									"expenses",
 									"days"
@@ -9903,6 +10565,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -10023,6 +10688,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -10227,32 +10895,43 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"state",
-									"log",
-									"comments",
-									"comment",
 									"reason",
 									"destinationPlace",
 									"startDate",
 									"endDate",
-									"advance",
 									"progress",
 									"addUp",
+									"advances",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"lastPlaceOfWork",
-									"professionalShare",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
+									"lastPlaceOfWork",
+									"professionalShare",
 									"stages",
 									"expenses",
 									"days"
@@ -10388,6 +11067,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -10516,32 +11198,43 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"state",
-									"log",
-									"comments",
-									"comment",
 									"reason",
 									"destinationPlace",
 									"startDate",
 									"endDate",
-									"advance",
 									"progress",
 									"addUp",
+									"advances",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"lastPlaceOfWork",
-									"professionalShare",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
+									"lastPlaceOfWork",
+									"professionalShare",
 									"stages",
 									"expenses",
 									"days"
@@ -10959,6 +11652,10 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"bookingRemark": {
+										"type": "string",
+										"nullable": true
+									},
 									"comment": {
 										"type": "string"
 									},
@@ -11062,6 +11759,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -11233,32 +11933,43 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"state",
-									"log",
-									"comments",
-									"comment",
 									"reason",
 									"destinationPlace",
 									"startDate",
 									"endDate",
-									"advance",
 									"progress",
 									"addUp",
+									"advances",
 									"isCrossBorder",
 									"a1Certificate",
 									"claimSpouseRefund",
 									"fellowTravelersNames",
-									"lastPlaceOfWork",
-									"professionalShare",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
+									"lastPlaceOfWork",
+									"professionalShare",
 									"stages",
 									"expenses",
 									"days"
@@ -12239,7 +12950,7 @@
 					"content": {
 						"multipart/form-data": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IOrganisation_"
+								"$ref": "#/components/schemas/SetterBody_PostOrganisation_"
 							}
 						}
 					}
@@ -12750,21 +13461,33 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"patientName",
 									"insurance",
 									"refundSum",
+									"addUp",
+									"advances",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -13005,6 +13728,12 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
+									},
 									"name": {
 										"type": "string"
 									},
@@ -13048,6 +13777,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -13252,21 +13984,33 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"patientName",
 									"insurance",
 									"refundSum",
+									"addUp",
+									"advances",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -13332,6 +14076,85 @@
 						}
 					}
 				]
+			},
+			"post": {
+				"operationId": "PostAny",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									},
+									"patientName": {
+										"type": "string"
+									},
+									"insurance": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"project": {
+										"$ref": "#/components/schemas/IdDocument"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/examine/healthCareCost/expense": {
@@ -13507,6 +14330,10 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"bookingRemark": {
+										"type": "string",
+										"nullable": true
+									},
 									"comment": {
 										"type": "string"
 									},
@@ -13573,6 +14400,12 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
+									},
 									"comment": {
 										"type": "string"
 									},
@@ -13622,6 +14455,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -13896,21 +14732,33 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"patientName",
 									"insurance",
 									"refundSum",
+									"addUp",
+									"advances",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -14163,21 +15011,33 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
 									"patientName",
 									"insurance",
 									"refundSum",
+									"addUp",
+									"advances",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -14320,19 +15180,31 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"addUp",
+									"advances",
+									"category",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"advance",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -14573,8 +15445,14 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"advance": {
-										"$ref": "#/components/schemas/MoneyPost"
+									"category": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
 									},
 									"name": {
 										"type": "string"
@@ -14613,6 +15491,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -14817,19 +15698,31 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"addUp",
+									"advances",
+									"category",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"advance",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -14895,6 +15788,82 @@
 						}
 					}
 				]
+			},
+			"post": {
+				"operationId": "PostAny",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/ExpenseReport"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"category": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
+									},
+									"name": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									},
+									"project": {
+										"$ref": "#/components/schemas/IdDocument"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/examine/expenseReport/expense": {
@@ -15076,8 +16045,14 @@
 									"owner": {
 										"$ref": "#/components/schemas/IdDocument"
 									},
-									"advance": {
-										"$ref": "#/components/schemas/MoneyPost"
+									"category": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"advances": {
+										"items": {
+											"$ref": "#/components/schemas/IdDocument"
+										},
+										"type": "array"
 									},
 									"name": {
 										"type": "string"
@@ -15145,6 +16120,10 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"bookingRemark": {
+										"type": "string",
+										"nullable": true
+									},
 									"comment": {
 										"type": "string"
 									},
@@ -15182,6 +16161,9 @@
 												},
 												{
 													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
 												}
 											]
 										},
@@ -15353,19 +16335,31 @@
 								"enum": [
 									"name",
 									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"project",
-									"editor",
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"addUp",
+									"advances",
+									"category",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
 									"state",
 									"log",
-									"advance",
-									"comments",
-									"addUp",
-									"comment",
+									"createdAt",
+									"updatedAt",
+									"_id",
 									"history",
 									"historic",
 									"expenses"
@@ -16498,7 +17492,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IConnectionSettings_"
+								"$ref": "#/components/schemas/IConnectionSettings"
 							}
 						}
 					}
@@ -16528,6 +17522,299 @@
 				},
 				"tags": [
 					"Connection Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/category": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Category-or-Category-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"style",
+									"isDefault",
+									"_id"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/category": {
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Category"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_ICategory_"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/admin/category/bulk": {
+			"post": {
+				"operationId": "PostMany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Category"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_ICategory_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/category/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Category"
 				],
 				"security": [
 					{
@@ -16797,6 +18084,968 @@
 					}
 				],
 				"parameters": []
+			}
+		},
+		"/advance": {
+			"get": {
+				"operationId": "GetOwn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Advance-or-Advance-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"history",
+									"historic",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"name",
+									"budget",
+									"project",
+									"balance",
+									"reason",
+									"state",
+									"_id",
+									"offsetAgainst"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteOwn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/advance/appliedFor": {
+			"post": {
+				"operationId": "PostOwnInWork",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/TravelSimple"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReportSimple"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AdvanceApplication"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/advance/report": {
+			"get": {
+				"operationId": "GetReportForOwn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/examine/advance": {
+			"get": {
+				"operationId": "GetForExamineReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Advance-or-Advance-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user",
+							"approve/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"approve/travel"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"examine/travel"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"examine/expenseReport"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"examine/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"history",
+									"historic",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"name",
+									"budget",
+									"project",
+									"balance",
+									"reason",
+									"state",
+									"_id",
+									"offsetAgainst"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/approve/advance": {
+			"get": {
+				"operationId": "GetToApprove",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Advance-or-Advance-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"history",
+									"historic",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"name",
+									"budget",
+									"project",
+									"balance",
+									"reason",
+									"state",
+									"_id",
+									"offsetAgainst"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/approve/advance/approved": {
+			"post": {
+				"operationId": "PostAnyBackApproved",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Advance"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"anyOf": [
+									{
+										"allOf": [
+											{
+												"$ref": "#/components/schemas/AdvanceApplication"
+											},
+											{
+												"properties": {
+													"bookingRemark": {
+														"type": "string",
+														"nullable": true
+													},
+													"owner": {
+														"$ref": "#/components/schemas/IdDocument"
+													}
+												},
+												"required": [
+													"owner"
+												],
+												"type": "object"
+											}
+										]
+									},
+									{
+										"properties": {
+											"bookingRemark": {
+												"type": "string",
+												"nullable": true
+											},
+											"comment": {
+												"type": "string"
+											},
+											"_id": {
+												"$ref": "#/components/schemas/_id"
+											}
+										},
+										"required": [
+											"_id"
+										],
+										"type": "object"
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/approve/advance/rejected": {
+			"post": {
+				"operationId": "PostAnyRejected",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/TravelSimple"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReportSimple"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCostSimple"
+												},
+												{
+													"$ref": "#/components/schemas/Advance"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/approve/advance/report": {
+			"get": {
+				"operationId": "GetReportForAny",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
+			}
+		},
+		"/approved/advance": {
+			"get": {
+				"operationId": "GetRefunded",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Advance-or-Advance-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approved/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approved/advance"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"history",
+									"historic",
+									"name",
+									"owner",
+									"editor",
+									"project",
+									"comment",
+									"bookingRemark",
+									"comments",
+									"state",
+									"log",
+									"createdAt",
+									"updatedAt",
+									"_id",
+									"name",
+									"budget",
+									"project",
+									"balance",
+									"reason",
+									"state",
+									"_id",
+									"offsetAgainst"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/approved/advance/report": {
+			"get": {
+				"operationId": "GetRefundedReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approved/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approved/advance"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					}
+				]
 			}
 		}
 	},
