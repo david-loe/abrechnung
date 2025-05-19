@@ -220,7 +220,14 @@
                       )
                     "></TextArea>
                 </div>
-                <template v-if="healthCareCost.state === 'inWork'">
+                <div v-if="endpointPrefix === 'examine/'" class="mb-3">
+                  <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
+                  <TextArea
+                    id="bookingRemark"
+                    v-model="healthCareCost.bookingRemark"
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination')"></TextArea>
+                </div>
+                <div v-if="healthCareCost.state === 'inWork'">
                   <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
@@ -231,33 +238,37 @@
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
-                </template>
+                </div>
                 <template v-else-if="healthCareCost.state === 'underExamination'">
-                  <a
-                    v-if="endpointPrefix === 'examine/'"
-                    class="btn btn-primary mb-2"
-                    :href="mailToInsuranceLink"
-                    @click="toExaminationByInsurance()">
-                    <i class="bi bi-pencil-square"></i>
-                    <span class="ms-1">{{ t('labels.toExaminationByInsurance') }}</span>
-                  </a>
-                  <button
-                    class="btn btn-secondary"
-                    @click="healthCareCost.editor._id !== healthCareCost.owner._id ? null : backToInWork()"
-                    :disabled="healthCareCost.editor._id !== healthCareCost.owner._id">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                    <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
-                  </button>
+                  <div v-if="endpointPrefix === 'examine/'" class="mb-2">
+                    <a class="btn btn-primary" :href="mailToInsuranceLink" @click="toExaminationByInsurance()">
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="ms-1">{{ t('labels.toExaminationByInsurance') }}</span>
+                    </a>
+                  </div>
+                  <div>
+                    <button
+                      class="btn btn-secondary"
+                      @click="healthCareCost.editor._id !== healthCareCost.owner._id ? null : backToInWork()"
+                      :disabled="healthCareCost.editor._id !== healthCareCost.owner._id">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                    </button>
+                  </div>
                 </template>
                 <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
-                  <a class="btn btn-primary" :href="reportLink" :download="healthCareCost.name + '.pdf'">
-                    <i class="bi bi-download"></i>
-                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                  </a>
-                  <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary mt-2" :href="mailToInsuranceLink">
-                    <i class="bi bi-envelope"></i>
-                    <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
-                  </a>
+                  <div>
+                    <a class="btn btn-primary" :href="reportLink" :download="healthCareCost.name + '.pdf'">
+                      <i class="bi bi-download"></i>
+                      <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+                    </a>
+                  </div>
+                  <div class="mt-2">
+                    <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
+                      <i class="bi bi-envelope"></i>
+                      <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
+                    </a>
+                  </div>
                 </template>
                 <form
                   class="mt-3"
@@ -417,7 +428,8 @@ async function backToInWork() {
 async function toExaminationByInsurance() {
   const result = await API.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
     _id: healthCareCost.value._id,
-    comment: healthCareCost.value.comment
+    comment: healthCareCost.value.comment,
+    bookingRemark: healthCareCost.value.bookingRemark
   })
   if (result.ok) {
     await getHealthCareCost()

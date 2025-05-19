@@ -431,6 +431,7 @@ export interface ReportSimple<S extends AnyState = AnyState> {
   editor: UserSimple
   project: Project
   comment?: string | null
+  bookingRemark?: string | null
   comments: Comment<S>[]
   state: S
   log: Log<S>

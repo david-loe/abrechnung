@@ -23,7 +23,7 @@ export class ExpenseReportController extends Controller {
     return await this.getter(ExpenseReport, {
       query,
       filter: { owner: request.user._id, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
@@ -279,9 +279,12 @@ export class ExpenseReportExamineController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
-    if (!extendedBody._id && !extendedBody.name) {
-      const date = new Date()
-      extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+    if (!extendedBody._id) {
+      ;(extendedBody as any).log = { inWork: { date: new Date(), editor: request.user._id } }
+      if (!extendedBody.name) {
+        const date = new Date()
+        extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
@@ -298,7 +301,10 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Post('refunded')
-  public async postRefunded(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+  public async postRefunded(
+    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
     const extendedBody = Object.assign(requestBody, { state: 'refunded', editor: request.user._id })
 
     const cb = async (expenseReport: IExpenseReport) => {

@@ -122,14 +122,12 @@
         <i class="bi bi-download"></i>
       </a>
     </template>
-    <template #item-updatedAt="{ updatedAt }">
-      {{ $formatter.dateTime(updatedAt) }}
+    <template #item-log.approved.date="{ log }">
+      {{ $formatter.dateTime(log.appliedFor?.date) }}
     </template>
-    <template #item-comments="{ comments }">
-      <span v-if="comments.length > 0">
-        <TooltipElement
-          html
-          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}</b>: ${comment.text}`).join('<br>')">
+    <template #item-bookingRemark="{ bookingRemark }">
+      <span v-if="bookingRemark">
+        <TooltipElement html :text="bookingRemark.replace(/\n/g, '<br>')">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
@@ -144,7 +142,7 @@
 
 <script lang="ts" setup>
 import { getById } from '@/../../common/scripts.js'
-import { AdvanceSimple, AdvanceState, Comment, advanceStates } from '@/../../common/types.js'
+import { AdvanceSimple, AdvanceState, advanceStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
@@ -194,9 +192,9 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.balance'), value: 'balance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.updatedAt'), value: 'updatedAt' },
+    { text: t('labels.approvedOn'), value: 'log.approved.date' },
     { text: '', value: 'report', width: 40 },
-    { text: '', value: 'comments', width: 25 }
+    { text: '', value: 'bookingRemark', width: 25 }
   )
 }
 

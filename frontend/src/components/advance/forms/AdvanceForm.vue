@@ -35,6 +35,11 @@
       <TextArea v-model="formAdvance.comment"></TextArea>
     </div>
 
+    <div v-if="askBookingRemark" class="mb-3">
+      <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
+      <TextArea id="comment" v-model="formAdvance.bookingRemark" :disabled="disabled"></TextArea>
+    </div>
+
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
         {{ mode === 'add' ? t('labels.addX', { X: t('labels.advance') }) : t('labels.save') }}
@@ -78,6 +83,7 @@ const props = defineProps({
   },
   disabled: { type: Boolean, default: false },
   askOwner: { type: Boolean, default: false },
+  askBookingRemark: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
 
@@ -102,7 +108,8 @@ function defaultAdvance() {
     },
     owner: undefined as UserWithNameAndProject | undefined,
     project: undefined as Project | undefined,
-    comment: undefined as string | undefined
+    comment: undefined as string | undefined,
+    bookingRemark: undefined as string | undefined
   }
 }
 

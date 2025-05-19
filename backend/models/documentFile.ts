@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose'
-
 import { DocumentFile, documentFileTypes } from '../../common/types.js'
 
 const fileSchema = () =>

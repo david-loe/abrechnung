@@ -12,7 +12,7 @@
               :advance="(modalAdvance as AdvanceSimple)"
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
-              @decision="(d, c) => approveAdvance((modalAdvance as AdvanceSimple), d, c)"></AdvanceApproveForm>
+              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple), d, c, br)"></AdvanceApproveForm>
             <Advance v-else :advance="(modalAdvance as AdvanceSimple)" endpointPrefix="approve/"></Advance>
           </template>
         </template>
@@ -23,6 +23,7 @@
           :advance="modalAdvance"
           minStartDate=""
           askOwner
+          askBookingRemark
           :loading="modalFormIsLoading"
           @add="(t) => approveAdvance(t as AdvanceSimple, 'approved')">
         </AdvanceForm>
@@ -46,7 +47,7 @@
         endpoint="approve/advance"
         stateFilter="appliedFor"
         @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
-        :columns-to-hide="['balance', 'state', 'editor', 'updatedAt', 'report', 'organisation', 'comments']"></AdvanceList>
+        :columns-to-hide="['balance', 'state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']"></AdvanceList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
         {{ $t('labels.showX', { X: $t('labels.approvedX', { X: $t('labels.advances') }) }) }} <i class="bi bi-chevron-down"></i>
       </button>
@@ -58,7 +59,7 @@
         <AdvanceList
           endpoint="approve/advance"
           :stateFilter="{ $in: ['approved', 'completed'] }"
-          :columns-to-hide="['updatedAt', 'report', 'organisation', 'comments']"
+          :columns-to-hide="['updatedAt', 'report', 'organisation']"
           @clicked="(a) => router.push(`/approve/advance/${a._id}`)">
         </AdvanceList>
       </template>
@@ -111,9 +112,19 @@ function resetAndHide() {
   hideModal()
 }
 
-async function approveAdvance(advance: AdvanceSimple, decision: 'approved' | 'rejected', comment?: string) {
+async function approveAdvance(
+  advance: AdvanceSimple,
+  decision: 'approved' | 'rejected',
+  comment?: string | null,
+  bookingRemark?: string | null
+) {
   if (advance) {
-    advance.comment = comment
+    if (comment) {
+      advance.comment = comment
+    }
+    if (decision === 'approved' && bookingRemark) {
+      advance.bookingRemark = bookingRemark
+    }
     modalFormIsLoading.value = true
     const result = await API.setter<AdvanceSimple>(`approve/advance/${decision}`, advance)
     modalFormIsLoading.value = false

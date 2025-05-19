@@ -3,7 +3,7 @@ import { Condition } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { Advance as IAdvance, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, setAdvanceBalance, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import { sendNotification } from '../notifications/notification.js'
@@ -31,7 +31,7 @@ export class AdvanceController extends Controller {
     return await this.getter(Advance, {
       query,
       filter: { owner: request.user._id, historic: false },
-      projection: { history: 0, historic: 0 },
+      projection: { history: 0, historic: 0, bookingRemark: 0 },
       sort: { createdAt: -1 }
     })
   }
@@ -143,11 +143,15 @@ export class AdvanceApproveController extends Controller {
 
   @Post('approved')
   public async postAnyBackApproved(
-    @Body() requestBody: (AdvanceApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
+    @Body() requestBody:
+      | (AdvanceApplication & { owner: IdDocument; bookingRemark?: string | null })
+      | { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
     if (!extendedBody._id) {
+      ;(extendedBody as any).log = { appliedFor: { date: new Date(), editor: request.user._id } }
+      setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
         ;(extendedBody as AdvanceApplication).name =
