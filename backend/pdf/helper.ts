@@ -20,6 +20,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   let totalSum = ''
   if (reportIsAdvance(report)) {
     path += 'advance/'
+    totalSum = formatter.baseCurrency(report.budget.amount)
   } else {
     totalSum = formatter.baseCurrency(getTotalBalance(report.addUp))
     if (reportIsTravel(report)) {
