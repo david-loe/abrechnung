@@ -4,6 +4,7 @@
     "appliedFor:advance": true,
     "appliedFor:travel": true,
     "approve/advance": false,
+    "approved/advance": false,
     "approve/travel": false,
     "approved:travel": false,
     "confirm/healthCareCost": false,
