@@ -7,7 +7,13 @@ const users = {
   user: {
     username: 'fry',
     password: 'fry',
-    access: { user: true, 'inWork:expenseReport': true, 'inWork:healthCareCost': true, 'appliedFor:travel': true }
+    access: {
+      user: true,
+      'inWork:expenseReport': true,
+      'inWork:healthCareCost': true,
+      'appliedFor:travel': true,
+      'appliedFor:advance': true
+    }
   },
   admin: { username: 'professor', password: 'professor', access: { user: true, admin: true } },
   travel: { username: 'zoidberg', password: 'zoidberg', access: { user: true, 'examine/travel': true, 'approve/travel': true } },
@@ -15,7 +21,12 @@ const users = {
   healthCareCost: {
     username: 'bender',
     password: 'bender',
-    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true }
+    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true, 'approve/advance': true }
+  },
+  advance: {
+    username: 'bender',
+    password: 'bender',
+    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true, 'approve/advance': true }
   }
 }
 

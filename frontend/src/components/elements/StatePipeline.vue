@@ -9,7 +9,7 @@
           <div class="col-auto p-0" :key="value">
             <StateBadge :state="value" :class="state === value ? 'fs-6' : 'fw-normal'"></StateBadge>
           </div>
-          <div v-if="value !== 'refunded'" class="col p-0" :key="value">
+          <div v-if="value !== 'refunded' && value !== 'completed'" class="col p-0" :key="value">
             <hr
               :style="
                 'background: linear-gradient(to right, ' +

@@ -2,6 +2,8 @@ import axios from 'axios'
 import { RouteLocationNormalized, createRouter, createWebHistory } from 'vue-router'
 import HomePage from './components/HomePage.vue'
 import LoginPage from './components/LoginPage.vue'
+import AdvanceApprovePage from './components/advance/ApprovePage.vue'
+import ApprovedAdvancePage from './components/advance/ApprovedPage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
@@ -10,7 +12,7 @@ import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.v
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
 import RefundedHealthCareCostPage from './components/healthCareCost/RefundedPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
-import ApprovePage from './components/travel/ApprovePage.vue'
+import TravelApprovePage from './components/travel/ApprovePage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import RefundedTravelPage from './components/travel/RefundedPage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
@@ -34,8 +36,19 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
+    component: AdvanceApprovePage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
+  {
+    path: '/approved/advance',
+    component: ApprovedAdvancePage,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
-    component: ApprovePage,
+    component: TravelApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },

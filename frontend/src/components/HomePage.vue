@@ -2,104 +2,154 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? $t('labels.newX', { X: $t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
-      @beforeClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
+      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
+      @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
       <div v-if="modalObject">
-        <template v-if="modalObjectType === 'travel'">
-          <TravelApplication
-            v-if="modalMode === 'view'"
-            :travel="(modalObject as TravelSimple)"
-            :loading="modalFormIsLoading"
-            @cancel="resetAndHide()"
-            @edit="showModal('edit', 'travel', modalObject)"
-            @deleted="deleteTravel">
-          </TravelApplication>
+        <template v-if="modalMode === 'view'">
+          <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
+          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
+          <div v-if="modalObject.state === 'appliedFor' || modalObject.state === 'rejected'" class="mb-1">
+            <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
+              {{ t('labels.edit') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger me-2"
+              @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
+              {{ t('labels.delete') }}
+            </button>
+            <button type="button" class="btn btn-light" @click="resetAndHide()">
+              {{ t('labels.cancel') }}
+            </button>
+          </div>
+        </template>
+        <template v-else>
           <TravelApplyForm
-            v-else
+            v-if="modalObjectType === 'travel'"
             :mode="modalMode"
-            @cancel="resetAndHide()"
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user"
+            update-user-org
+            @cancel="resetAndHide()"
             @add="handleSubmit"
             @edit="handleSubmit"
             ref="travelApplyForm"></TravelApplyForm>
+          <ExpenseReportForm
+            v-else-if="modalObjectType === 'expenseReport'"
+            :mode="(modalMode as 'add' | 'edit')"
+            :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+            :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user"
+            update-user-org
+            @cancel="resetAndHide()"
+            @add="handleSubmit">
+          </ExpenseReportForm>
+          <HealthCareCostForm
+            v-else-if="modalObjectType === 'healthCareCost'"
+            :mode="(modalMode as 'add' | 'edit')"
+            :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
+            :loading="modalFormIsLoading"
+            :owner="APP_DATA?.user"
+            update-user-org
+            @cancel="resetAndHide()"
+            @add="handleSubmit">
+          </HealthCareCostForm>
+          <AdvanceForm
+            v-else
+            :mode="(modalMode as 'add' | 'edit')"
+            :advance="(modalObject as Partial<AdvanceSimple>)"
+            :loading="modalFormIsLoading"
+            @cancel="resetAndHide()"
+            @add="handleSubmit"
+            @edit="handleSubmit">
+          </AdvanceForm>
         </template>
-        <ExpenseReportForm
-          v-else-if="modalObjectType === 'expenseReport'"
-          :mode="(modalMode as 'add' | 'edit')"
-          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
-          :loading="modalFormIsLoading"
-          @cancel="resetAndHide()"
-          @add="handleSubmit">
-        </ExpenseReportForm>
-        <HealthCareCostForm
-          v-else
-          :mode="(modalMode as 'add' | 'edit')"
-          :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
-          :loading="modalFormIsLoading"
-          @cancel="resetAndHide()"
-          @add="handleSubmit">
-        </HealthCareCostForm>
       </div>
     </ModalComponent>
     <div v-if="APP_DATA" class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
         <div class="col-auto me-auto">
-          <h2>{{ $t('headlines.home') }}</h2>
+          <h2>{{ t('headlines.home') }}</h2>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'travel', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{
-              $t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: $t('labels.travel') })
-            }}</span>
+            <span class="ms-1">
+              {{ t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: t('labels.travel') }) }}
+            </span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.expenseReport && APP_DATA.user.access['inWork:expenseReport']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'expenseReport', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.addX', { X: $t('labels.expenseReport') }) }}</span>
+            <span class="ms-1">{{ t('labels.addX', { X: t('labels.expenseReport') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.healthCareCost && APP_DATA.user.access['inWork:healthCareCost']" class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', 'healthCareCost', undefined)">
             <i class="bi bi-plus-lg"></i>
-            <span class="ms-1">{{ $t('labels.submitX', { X: $t('labels.healthCareCost') }) }}</span>
+            <span class="ms-1">{{ t('labels.submitX', { X: t('labels.healthCareCost') }) }}</span>
+          </button>
+        </div>
+        <div v-if="!APP_DATA.settings.disableReportType.advance && APP_DATA.user.access['appliedFor:advance']" class="col-auto">
+          <button class="btn btn-secondary" @click="showModal('add', 'advance', undefined)">
+            <i class="bi bi-plus-lg"></i>
+            <span class="ms-1">{{ t('labels.applyForX', { X: t('labels.advance') }) }}</span>
           </button>
         </div>
       </div>
       <template v-if="!APP_DATA.settings.disableReportType.travel">
-        <h3>{{ $t('labels.travel') }}</h3>
+        <h3>{{ t('labels.travel') }}</h3>
         <TravelList
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
           @clicked-applied="(t) => showModal('view', 'travel', t)"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
-        <h3>{{ $t('labels.expenses') }}</h3>
+        <h3>{{ t('labels.expenses') }}</h3>
         <ExpenseReportList
           class="mb-4"
           ref="expenseReportList"
           endpoint="expenseReport"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"></ExpenseReportList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
-        <h3>{{ $t('labels.healthCareCost') }}</h3>
+        <h3>{{ t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments', 'log.underExamination.date']"></HealthCareCostList>
+          :columns-to-hide="[
+            'owner',
+            'updatedAt',
+            'report',
+            'addUp.totalTotal',
+            'organisation',
+            'bookingRemark',
+            'log.underExamination.date'
+          ]"></HealthCareCostList>
+      </template>
+      <template v-if="!APP_DATA.settings.disableReportType.advance">
+        <h3>{{ t('labels.advance') }}</h3>
+        <AdvanceList
+          ref="advanceList"
+          endpoint="advance"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.appliedFor.date']"
+          @clicked="(t) => showModal('view', 'advance', t)"></AdvanceList>
       </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
+import type { AdvanceSimple, ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import Advance from '@/components/advance/Advance.vue'
+import AdvanceList from '@/components/advance/AdvanceList.vue'
+import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
@@ -109,11 +159,12 @@ import TravelList from '@/components/travel/TravelList.vue'
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 type ModalMode = 'view' | 'add' | 'edit'
-type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost'
-type ModalObject = Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partial<HealthCareCostSimple>
+type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost' | 'advance'
+type ModalObject = Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partial<HealthCareCostSimple> | Partial<AdvanceSimple>
 
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('travel')
@@ -123,9 +174,11 @@ const modalFormIsLoading = ref(false)
 const travelList = useTemplateRef('travelList')
 const expenseReportList = useTemplateRef('expenseReportList')
 const healthCareCostList = useTemplateRef('healthCareCostList')
+const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
 
 const router = useRouter()
+const { t } = useI18n()
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -155,17 +208,19 @@ function resetAndHide() {
   hideModal()
 }
 
-async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple) {
+async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Partial<AdvanceSimple>) {
   modalFormIsLoading.value = true
   let result: any
 
   if (modalObjectType.value === 'travel') {
     const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'
-    result = (await API.setter<TravelSimple>(path, payload as TravelSimple)).ok
+    result = (await API.setter<TravelSimple>(path, payload)).ok
   } else if (modalObjectType.value === 'expenseReport') {
-    result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', payload as ExpenseReportSimple)).ok
+    result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', payload)).ok
+  } else if (modalObjectType.value === 'healthCareCost') {
+    result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', payload)).ok
   } else {
-    result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', payload as HealthCareCostSimple)).ok
+    result = (await API.setter<AdvanceSimple>('advance/appliedFor', payload)).ok
   }
 
   modalFormIsLoading.value = false
@@ -175,20 +230,26 @@ async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | Health
     } else if (modalObjectType.value === 'expenseReport') {
       expenseReportList.value?.loadFromServer()
       router.push(`/expenseReport/${result._id}`)
-    } else {
+    } else if (modalObjectType.value === 'healthCareCost') {
       healthCareCostList.value?.loadFromServer()
       router.push(`/healthCareCost/${result._id}`)
+    } else {
+      advanceList.value?.loadFromServer()
     }
     resetAndHide()
   }
 }
 
-async function deleteTravel(_id: string) {
+async function deleteReport(endpoint: 'travel' | 'advance', _id: string) {
   modalFormIsLoading.value = true
-  const result = await API.deleter('travel', { _id })
+  const result = await API.deleter(endpoint, { _id })
   modalFormIsLoading.value = false
   if (result) {
-    travelList.value?.loadFromServer()
+    if (endpoint === 'travel') {
+      travelList.value?.loadFromServer()
+    } else {
+      advanceList.value?.loadFromServer()
+    }
     resetAndHide()
   }
 }

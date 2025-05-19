@@ -2,25 +2,41 @@
   <div>
     <ModalComponent
       ref="modalComp"
-      :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.expense') }) : t('labels.editX', { X: t('labels.expense') })"
-      @beforeClose="modalMode === 'edit' ? resetModal() : null">
+      :header="
+        modalMode === 'add'
+          ? t('labels.newX', { X: t('labels.' + modalObjectType) })
+          : t('labels.editX', { X: t('labels.' + modalObjectType) })
+      "
+      @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="expenseReport._id">
         <ExpenseForm
-          :expense="modalExpense"
+          v-if="modalObjectType === 'expense'"
+          :expense="modalObject"
           :disabled="isReadOnly"
-          :loading="expenseFormIsLoading"
+          :loading="modalFormIsLoading"
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalExpense as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalExpense as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => {const next = getNext(modalExpense as Expense); if(next){showModal('edit', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalExpense as Expense); if(prev){showModal('edit', prev)}else{hideModal()}}">
+          @next="() => {const next = getNext(modalObject as Expense); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev(modalObject as Expense); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
         </ExpenseForm>
+        <ExpenseReportForm
+          v-else
+          :mode="modalMode"
+          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+          :loading="modalFormIsLoading"
+          :owner="expenseReport.owner"
+          :update-user-org="endpointPrefix !== 'examine/'"
+          :endpoint-prefix="endpointPrefix"
+          @cancel="resetAndHide()"
+          @edit="editExpenseReportDetails">
+        </ExpenseReportForm>
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="expenseReport._id">
@@ -54,8 +70,15 @@
 
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
-          <div class="col-auto">
+          <div class="col-auto d-flex align-items-center">
             <h2 class="m-0">{{ expenseReport.name }}</h2>
+            <div>
+              <Badge
+                v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1"
+                class="ms-2 fs-6"
+                :text="expenseReport.category.name"
+                :style="expenseReport.category.style"></Badge>
+            </div>
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -79,6 +102,15 @@
                     <hr class="dropdown-divider" />
                   </li>
                 </template>
+                <li>
+                  <a
+                    :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
+                    href="#"
+                    @click="showModal('edit', 'expenseReport', expenseReport)">
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     :class="
@@ -112,7 +144,7 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', undefined)" :disabled="isReadOnly">
+              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
@@ -131,7 +163,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="expense of expenseReport.expenses" :key="expense._id" style="cursor: pointer" @click="showModal('edit', expense)">
+              <tr
+                v-for="expense of expenseReport.expenses"
+                :key="expense._id"
+                style="cursor: pointer"
+                @click="showModal('edit', 'expense', expense)">
                 <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
                 <td>{{ expense.description }}</td>
                 <td>{{ formatter.money(expense.cost) }}</td>
@@ -139,48 +175,15 @@
             </tbody>
           </table>
         </div>
-        <div class="col-lg-3 col">
+        <div class="col-lg-4 col">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
               <div>
-                <table class="table align-bottom">
-                  <tbody>
-                    <template v-if="expenseReport.advance.amount">
-                      <tr>
-                        <td>
-                          <small>{{ t('labels.expenses') }}</small>
-                        </td>
-                        <td class="text-end">
-                          <small>{{ formatter.money(expenseReport.addUp.expenses) }}</small>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <small>{{ t('labels.advance') }}</small>
-                        </td>
-                        <td class="text-end">
-                          <small>{{ formatter.money(expenseReport.addUp.advance, { func: (x) => 0 - x }) }}</small>
-                        </td>
-                      </tr>
-                    </template>
-
-                    <tr>
-                      <th>{{ t('labels.balance') }}</th>
-                      <td class="text-end">{{ formatter.money(expenseReport.addUp.balance) }}</td>
-                    </tr>
-                    <tr v-if="expenseReport.project.budget && expenseReport.project.budget.amount">
-                      <td>
-                        <small>{{ t('labels.project') }}</small>
-                      </td>
-                      <td class="text-end">
-                        <small>{{
-                          formatter.money(expenseReport.project.balance) + ' von ' + formatter.money(expenseReport.project.budget)
-                        }}</small>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <AddUpTable
+                  :add-up="expenseReport.addUp"
+                  :project="expenseReport.project"
+                  :showAdvanceOverflow="expenseReport.state !== 'refunded'"></AddUpTable>
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
@@ -191,14 +194,19 @@
                 </div>
                 <div v-if="expenseReport.state !== 'refunded'" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <textarea
-                    class="form-control"
+                  <TextArea
                     id="comment"
-                    rows="1"
                     v-model="expenseReport.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></textarea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
                 </div>
-                <template v-if="expenseReport.state === 'inWork'">
+                <div v-if="endpointPrefix === 'examine/'" class="mb-3">
+                  <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
+                  <TextArea
+                    id="bookingRemark"
+                    v-model="expenseReport.bookingRemark"
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
+                </div>
+                <div v-if="expenseReport.state === 'inWork'">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
@@ -209,28 +217,30 @@
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
-                </template>
+                </div>
                 <template v-else-if="expenseReport.state === 'underExamination'">
-                  <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
-                    <i class="bi bi-coin"></i>
-                    <span class="ms-1">{{ t('labels.refund') }}</span>
-                  </button>
-                  <button
-                    class="btn btn-secondary"
-                    @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
-                    :disabled="expenseReport.editor._id !== expenseReport.owner._id">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                    <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
-                  </button>
+                  <div class="mb-2" v-if="endpointPrefix === 'examine/'">
+                    <button class="btn btn-success" @click="refund()">
+                      <i class="bi bi-coin"></i>
+                      <span class="ms-1">{{ t('labels.refund') }}</span>
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      class="btn btn-secondary"
+                      @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
+                      :disabled="expenseReport.editor._id !== expenseReport.owner._id">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                    </button>
+                  </div>
                 </template>
-                <a
-                  v-else-if="expenseReport.state === 'refunded'"
-                  class="btn btn-primary"
-                  :href="reportLink"
-                  :download="expenseReport.name + '.pdf'">
-                  <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                </a>
+                <div v-else-if="expenseReport.state === 'refunded'">
+                  <a class="btn btn-primary" :href="reportLink" :download="expenseReport.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -242,17 +252,26 @@
 
 <script lang="ts" setup>
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
-import { Expense, ExpenseReport, UserSimple, expenseReportStates } from '@/../../common/types.js'
+import { Expense, ExpenseReport, ExpenseReportSimple, UserSimple, expenseReportStates } from '@/../../common/types.js'
 import API from '@/api.js'
+import APP_LOADER from '@/appData'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
+import Badge from '@/components/elements/Badge.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
+import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
 import { PropType, computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+type ModalObject = Partial<Expense> | ExpenseReportSimple
+type ModalObjectType = 'expense' | 'expenseReport'
+type ModalMode = 'add' | 'edit'
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -264,10 +283,12 @@ const router = useRouter()
 const { t } = useI18n()
 
 const expenseReport = ref<ExpenseReport>({} as ExpenseReport)
-const modalExpense = ref<Partial<Expense>>({})
-const modalMode = ref<'add' | 'edit'>('add')
+const modalObject = ref<ModalObject>({})
+const modalMode = ref<ModalMode>('add')
+const modalObjectType = ref<ModalObjectType>('expense')
+
 const isReadOnlySwitchOn = ref(true)
-const expenseFormIsLoading = ref(false)
+const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
@@ -278,26 +299,32 @@ const isReadOnly = computed(() => {
   )
 })
 
-const modalComp = useTemplateRef('modalComp')
+const modalCompRef = useTemplateRef('modalComp')
 
-function showModal(mode: 'add' | 'edit', expense?: Partial<Expense>) {
-  if (expense) {
-    modalExpense.value = expense
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
+
+function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
+  if (object) {
+    modalObject.value = object
+  } else if (modalObjectType.value !== type) {
+    modalObject.value = {}
   }
+  modalObjectType.value = type
   modalMode.value = mode
-  if (modalComp.value?.modal) {
-    modalComp.value.modal.show()
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.modal.show()
   }
 }
 
 function hideModal() {
-  if (modalComp.value?.modal) {
-    modalComp.value.hideModal()
+  if (modalCompRef.value?.modal) {
+    modalCompRef.value.hideModal()
   }
 }
 function resetModal() {
   modalMode.value = 'add'
-  modalExpense.value = {}
+  modalObject.value = {}
 }
 function resetAndHide() {
   resetModal()
@@ -338,7 +365,8 @@ async function backToInWork() {
 async function refund() {
   const result = await API.setter<ExpenseReport>('examine/expenseReport/refunded', {
     _id: expenseReport.value._id,
-    comment: expenseReport.value.comment
+    comment: expenseReport.value.comment,
+    bookingRemark: expenseReport.value.bookingRemark
   })
   if (result.ok) {
     router.push({ path: '/examine/expenseReport' })
@@ -350,12 +378,12 @@ async function postExpense(expense: Expense) {
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/expense`, expense, {
     headers,
     params: { parentId: expenseReport.value._id }
   })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result.ok) {
     setExpenseReport(result.ok)
     resetAndHide()
@@ -364,12 +392,27 @@ async function postExpense(expense: Expense) {
 }
 
 async function deleteExpense(_id: string) {
-  expenseFormIsLoading.value = true
+  modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
-  expenseFormIsLoading.value = false
+  modalFormIsLoading.value = false
   if (result) {
     setExpenseReport(result)
     resetAndHide()
+  }
+}
+
+async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
+  modalFormIsLoading.value = true
+  const result = await API.setter<ExpenseReport>(
+    `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
+    updatedExpenseReport
+  )
+  modalFormIsLoading.value = false
+  if (result.ok) {
+    setExpenseReport(result.ok)
+    resetAndHide()
+  } else {
+    await getExpenseReport()
   }
 }
 

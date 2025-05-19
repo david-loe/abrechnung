@@ -80,7 +80,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.owner">
-          <UserSelector v-model="filter.owner as string"></UserSelector>
+          <UserSelector v-model="filter.owner as any"></UserSelector>
         </div>
       </div>
     </template>
@@ -141,22 +141,11 @@
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.total.amount="{ addUp }">
-      <TooltipElement
-        html
-        :text="`${t('labels.lumpSums')}: ${$formatter.money(addUp.lumpSums)}<br>
-        ${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}`">
-        {{ $formatter.money(addUp.total) }}
-      </TooltipElement>
+    <template #item-addUp.totalTotal="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalTotal(addUp)) }}
     </template>
-    <template #item-addUp.balance.amount="{ addUp }">
-      <TooltipElement
-        html
-        :text="`${t('labels.lumpSums')}: ${$formatter.money(addUp.lumpSums)}<br>
-        ${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
-        ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
-        {{ $formatter.money(addUp.balance) }}
-      </TooltipElement>
+    <template #item-addUp.totalBalance="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalBalance(addUp)) }}
     </template>
     <template #item-report="{ _id, name }">
       <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
@@ -166,11 +155,9 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-comments="{ comments }">
-      <span v-if="comments.length > 0">
-        <TooltipElement
-          html
-          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}</b>: ${comment.text}`).join('<br>')">
+    <template #item-bookingRemark="{ bookingRemark }">
+      <span v-if="bookingRemark">
+        <TooltipElement :text="bookingRemark">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
@@ -184,10 +171,11 @@
 </template>
 
 <script lang="ts" setup>
-import { getById } from '@/../../common/scripts.js'
-import { Comment, TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
+import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
+import { TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
@@ -200,7 +188,6 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 
@@ -238,13 +225,13 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.startDate'), value: 'startDate', sortable: true },
     { text: t('labels.project'), value: 'project.identifier' },
     { text: t('labels.organisation'), value: 'organisation' },
-    { text: t('labels.total'), value: 'addUp.total.amount' },
-    { text: t('labels.balance'), value: 'addUp.balance.amount' },
+    { text: t('labels.total'), value: 'addUp.totalTotal' },
+    { text: t('labels.balance'), value: 'addUp.totalBalance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt' },
     { text: '', value: 'report', width: 40 },
-    { text: '', value: 'comments', width: 25 }
+    { text: '', value: 'bookingRemark', width: 25 }
   )
 }
 
@@ -298,4 +285,8 @@ function clickFilter(header: keyof typeof showFilter.value) {
 }
 </script>
 
-<style></style>
+<style scoped>
+.tooltip-inner {
+  white-space: pre-wrap;
+}
+</style>

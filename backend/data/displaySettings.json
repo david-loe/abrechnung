@@ -20,7 +20,9 @@
   "accessIcons": {
     "admin": ["person-fill"],
     "appliedFor:travel": ["airplane", "plus"],
-    "approve/travel": ["calendar-check"],
+    "appliedFor:advance": ["briefcase", "cash-coin", "plus"],
+    "approve/travel": ["airplane", "clipboard-check"],
+    "approve/advance": ["briefcase", "cash-coin", "clipboard-check"],
     "approved:travel": ["airplane", "calendar-check", "plus"],
     "confirm/healthCareCost": ["check-square", "hospital"],
     "examine/expenseReport": ["coin", "pencil-square"],
@@ -28,10 +30,17 @@
     "examine/travel": ["airplane", "pencil-square"],
     "inWork:expenseReport": ["coin", "plus"],
     "inWork:healthCareCost": ["hospital", "plus"],
-    "refunded/expenseReport": ["bank", "coin"],
-    "refunded/healthCareCost": ["bank", "hospital"],
+    "approved/advance": ["briefcase", "cash-coin", "bank"],
+    "refunded/expenseReport": ["coin", "bank"],
+    "refunded/healthCareCost": ["hospital", "bank"],
     "refunded/travel": ["airplane", "bank"],
     "user": ["card-list"]
+  },
+  "reportTypeIcons": {
+    "travel": ["airplane"],
+    "expenseReport": ["coin"],
+    "advance": ["briefcase", "cash-coin"],
+    "healthCareCost": ["hospital"]
   },
   "stateColors": {
     "appliedFor": {
@@ -47,6 +56,10 @@
       "text": "black"
     },
     "refunded": {
+      "color": "#615d6c",
+      "text": "white"
+    },
+    "completed": {
       "color": "#615d6c",
       "text": "white"
     },

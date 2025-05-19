@@ -36,6 +36,18 @@
         </div>
       </div>
     </template>
+    <template #header-category="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('category')">
+          <i v-if="showFilter.category" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.category">
+          <CategorySelector v-model="filter.category as any"></CategorySelector>
+        </div>
+      </div>
+    </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ header.text }}
@@ -68,7 +80,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.owner">
-          <UserSelector v-model="(filter.owner as string)"></UserSelector>
+          <UserSelector v-model="(filter.owner as any)"></UserSelector>
         </div>
       </div>
     </template>
@@ -108,19 +120,17 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
+    <template #item-category="{ category }">
+      <Badge :text="category.name" :style="category.style"></Badge>
+    </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.total.amount="{ addUp }">
-      {{ $formatter.money(addUp.total) }}
+    <template #item-addUp.totalTotal="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalTotal(addUp)) }}
     </template>
-    <template #item-addUp.balance.amount="{ addUp }">
-      <TooltipElement
-        html
-        :text="`${t('labels.expenses')}: ${$formatter.money(addUp.expenses)}<br>
-        ${t('labels.advance')}: ${$formatter.money(addUp.advance, { func: (x) => x * -1 })}`">
-        {{ $formatter.money(addUp.balance) }}
-      </TooltipElement>
+    <template #item-addUp.totalBalance="{ addUp }">
+      {{ $formatter.baseCurrency(getTotalBalance(addUp)) }}
     </template>
     <template #item-report="{ _id, name }">
       <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
@@ -130,11 +140,9 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-comments="{ comments }">
-      <span v-if="comments.length > 0">
-        <TooltipElement
-          html
-          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}</b>: ${comment.text}`).join('<br>')">
+    <template #item-bookingRemark="{ bookingRemark }">
+      <span v-if="bookingRemark">
+        <TooltipElement :text="bookingRemark">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
@@ -148,9 +156,12 @@
 </template>
 
 <script lang="ts" setup>
-import { getById } from '@/../../common/scripts.js'
-import { Comment, ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
+import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
+import { ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import Badge from '@/components/elements/Badge.vue'
+import CategorySelector from '@/components/elements/CategorySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
@@ -161,7 +172,6 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 
@@ -191,17 +201,20 @@ const headers: Header[] = [
   { text: t('labels.name'), value: 'name' },
   { text: t('labels.state'), value: 'state' }
 ]
+if (APP_DATA.value && APP_DATA.value.categories.length > 1) {
+  headers.push({ text: t('labels.category'), value: 'category' })
+}
 if (window.innerWidth > bp.md) {
   headers.push(
     { text: t('labels.project'), value: 'project.identifier' },
     { text: t('labels.organisation'), value: 'organisation' },
-    { text: t('labels.total'), value: 'addUp.total.amount' },
-    { text: t('labels.balance'), value: 'addUp.balance.amount' },
+    { text: t('labels.total'), value: 'addUp.totalTotal' },
+    { text: t('labels.balance'), value: 'addUp.totalBalance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt' },
     { text: '', value: 'report', width: 40 },
-    { text: '', value: 'comments', width: 25 }
+    { text: '', value: 'bookingRemark', width: 25 }
   )
 }
 
@@ -221,6 +234,7 @@ const getEmptyFilter = () =>
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
+    category: undefined,
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined }
   }) as Filter
@@ -235,6 +249,7 @@ const showFilter = ref({
   name: false,
   owner: false,
   state: false,
+  category: false,
   project: false,
   'project.organisation': false,
   updatedAt: false
@@ -254,4 +269,8 @@ function clickFilter(header: keyof typeof showFilter.value) {
 }
 </script>
 
-<style></style>
+<style scoped>
+.tooltip-inner {
+  white-space: pre-wrap;
+}
+</style>

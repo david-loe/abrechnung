@@ -1,15 +1,9 @@
 import { Request as ExRequest } from 'express'
-import { Currency, CurrencyCode, DocumentFile, Money, Travel, TravelDay, TravelSimple, _id } from '../../common/types.js'
+import { Currency, CurrencyCode, DocumentFile, IdDocument, Money, Travel, TravelDay, TravelSimple, _id } from '../../common/types.js'
 import { SetterBody } from './controller.js'
 
 export interface AuthenticatedExpressRequest extends ExRequest {
   user: Express.User
-}
-
-export type IdDocument<idType = _id> = idType | { _id: idType }
-
-export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
-  return (doc as { _id: idType })._id || (doc as idType)
 }
 
 export interface File extends Omit<DocumentFile, 'data' | 'owner' | '_id'> {
@@ -31,7 +25,7 @@ export interface MoneyPlusPost extends MoneyPost {
 }
 
 export interface TravelApplication
-  extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log' | 'addUp'>> {
+  extends SetterBody<Omit<TravelSimple, 'comments' | 'comment' | 'progress' | 'advance' | 'log' | 'addUp' | 'editor' | 'owner'>> {
   advance: MoneyPost | undefined
 }
 

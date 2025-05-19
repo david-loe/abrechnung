@@ -4,7 +4,8 @@ import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
-import { DocumentFile as IDocumentFile, User as IUser, _id } from '../common/types.js'
+import { getBaseCurrencyAmount } from '../common/scripts.js'
+import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money, _id } from '../common/types.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 
@@ -130,6 +131,7 @@ export async function writeToDisk(
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await fs.writeFile(filePath, data)
+      logger.debug(`Wrote to file ${filePath}`)
       return
     } catch (err: any) {
       if (err.code === 'EAGAIN' && attempt < retries) {
@@ -167,4 +169,8 @@ export function genAuthenticatedLink(
       }
     })
   })
+}
+
+export function setAdvanceBalance(advance: { budget: Money; balance?: BaseCurrencyMoneyNotNull }) {
+  advance.balance = { amount: getBaseCurrencyAmount(advance.budget) }
 }

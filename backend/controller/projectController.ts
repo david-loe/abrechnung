@@ -24,11 +24,13 @@ export class ProjectController extends Controller {
       !settings.userCanSeeAllProjects &&
       !(await isUserAllowedToAccess(request.user, [
         'admin',
+        'approve/advance',
         'approve/travel',
         'examine/travel',
         'examine/expenseReport',
         'examine/healthCareCost',
         'confirm/healthCareCost',
+        'approved/advance',
         'refunded/expenseReport',
         'refunded/travel',
         'refunded/healthCareCost'
@@ -36,7 +38,7 @@ export class ProjectController extends Controller {
     ) {
       throw new AuthorizationError()
     }
-    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 }, sort: { identifier: 1 } })
+    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1, name: 1 }, sort: { identifier: 1 } })
   }
 }
 
@@ -74,10 +76,11 @@ export class ProjectAdminController extends Controller {
     return await this.deleter(Project, {
       _id: _id,
       referenceChecks: [
-        { model: ExpenseReport, paths: ['project'] },
-        { model: Travel, paths: ['project'] },
-        { model: HealthCareCost, paths: ['project'] }
-      ]
+        { model: ExpenseReport, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
+        { model: Travel, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } }
+      ],
+      minDocumentCount: 1
     })
   }
   @Get('form')

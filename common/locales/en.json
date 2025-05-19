@@ -1,7 +1,10 @@
 {
   "accesses": {
     "admin": "Administrator",
-    "appliedFor:travel": "Apply For Travels",
+    "appliedFor:advance": "Apply for Advance",
+    "appliedFor:travel": "Apply for Travels",
+    "approve/advance": "Approve Advance",
+    "approved/advance": "Show Approved Advances",
     "approve/travel": "Approve Travels",
     "approved:travel": "Initiate Own Travel Expenses Without Approval",
     "confirm/healthCareCost": "Confirm Health Care Costs",
@@ -10,9 +13,9 @@
     "examine/travel": "Examine Travels",
     "inWork:expenseReport": "Initiate Own Expenses",
     "inWork:healthCareCost": "Initiate Own Health Care Costs",
-    "refunded/expenseReport": "Show refunded Expenses",
-    "refunded/healthCareCost": "Show refunded Health Care Costs",
-    "refunded/travel": "Show refunded Travels",
+    "refunded/expenseReport": "Show Refunded Expenses",
+    "refunded/healthCareCost": "Show Refunded Health Care Costs",
+    "refunded/travel": "Show Refunded Travels",
     "user": "Home"
   },
   "alerts": {
@@ -22,7 +25,7 @@
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
-    "departureAndArrivalOnDifferentDays": "Are you sure you were sitting in '{X}' for several days?",
+    "departureAndArrivalOnDifferentDaysX": "Are you sure you were sitting in '{X}' for several days?",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
     "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
@@ -31,8 +34,10 @@
     "loginFailed": "Failed to login!",
     "mailSend": "E-mail was send.",
     "noData": {
+      "advanceForUserX": "No approved advance for '{X}'. Apply for one!",
       "expense": "There are no expenses jet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
+      "searchX": "Nothing found for '{X}'.",
       "stage": "There are no stages jet. Add one!"
     },
     "notAllowed": "Not allowed!",
@@ -69,7 +74,7 @@
     "title": "abrechnung"
   },
   "info": {
-    "advance": "If you need an advance (e.g. for the plane tickets), specify here how much you need.",
+    "advance": "Select the advances you want to offset against your expenses here.",
     "cateringRefund": "If the meal is already paid by the employer (e.g. conference fee / breakfast in hotel) no meal allowance can be reimbursed. Please enter which meals are already paid by the employer.",
     "claimSpouseRefund": "If you are traveling with your spouse and he is also eligible for reimbursement, you can bill him as well.",
     "cost": "Enter the cost here.",
@@ -173,6 +178,7 @@
     "addX": "Add {X}",
     "advance": "Advance",
     "advanceFromEmployer": "Advance From Employer",
+    "advances": "Advances",
     "airplane": "Airplane ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Allow accounting for spouses when traveling",
@@ -191,6 +197,7 @@
     "backToApplicant": "Back to applicant",
     "balance": "Balance",
     "bankDetails": "Bank details",
+    "bookingRemark": "Booking remark",
     "borderColor": "Border color",
     "borderThickness": "Border Thickness",
     "bottom": "Bottom",
@@ -198,6 +205,8 @@
     "budget": "Budget",
     "by": "by",
     "cancel": "Cancel",
+    "categories": "Categories",
+    "category": "Category",
     "catering": "Catering",
     "cateringNoRefund": "Catering refund cut",
     "cellPadding": "Cell padding",
@@ -229,6 +238,7 @@
     "defaultAccess": "Default access rights",
     "delete": "Delete",
     "deleteApprovedTravelAfterXDaysUnused": "Delete approved, unused trips - in days",
+    "deleted": "deleted",
     "deleteInWorkReportsAfterXDaysUnused": "Delete unused expense and healthcare cost reports - in days",
     "deleteRefundedAfterXDays": "Delete refunded reports and trips - in days",
     "deleteX": "Delete {X}",
@@ -294,15 +304,18 @@
     "import": "Import",
     "includingSpouseRefund": "incl. spouse refunds",
     "install": "Install",
+    "installApp": "Install app",
     "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
     "inWorkX": "{X} in work",
     "isCrossBorder": "Is a cross-border trip",
+    "isDefault": "Is default?",
     "label": "Label",
     "language": "Language",
     "lastCountries": "Last countries",
     "lastCurrencies": "Last currencies",
     "lastPlaceOfWork": "Last place of work",
+    "left": "left",
     "locale": "Language",
     "location": "Location",
     "logo": "Logo",
@@ -330,6 +343,7 @@
     "none": "not at all",
     "note": "Note",
     "object": "Object",
+    "offsetAgainst": "Offset against",
     "on": "on",
     "optional": "optional",
     "organisation": "Organisation",
@@ -367,7 +381,9 @@
     "reject": "Reject",
     "report": "Report",
     "reportEmail": "Email Address for Reports",
+    "reportTypeIcons": "Icons for report types",
     "required": "required",
+    "reset": "Reset",
     "retentionPolicy": "Retention policy",
     "route": "Route",
     "save": "Save",
@@ -392,6 +408,7 @@
     "state": "State",
     "stateColors": "State colors",
     "stay": "Stay",
+    "style": "Style",
     "subfolderPath": "Subfolder path",
     "submittedOn": "Submitted on",
     "submitX": "Submit {X}",
@@ -408,15 +425,16 @@
     "toExaminationByInsurance": "To examination by health insurance",
     "toleranceStageDatesToApprovedTravelDates": "Deviation tolerance of the stages from the requested dates [days]",
     "total": "Total",
+    "totalBalance": "Total balance",
     "toX": "To {X}",
     "transport": "Transport",
     "travel": "Travel",
-    "travelDetails": "Travel details",
     "traveler": "Traveler",
     "travelInsideOfEU": "Travel inside of the EU",
     "travelName": "Travel name",
     "travels": "Travels",
     "travelSettings": "Travel Settings",
+    "type": "Type",
     "typeToSearch": "Type to search...",
     "underExaminationByInsuranceHealthCareCosts": "Health care costs under examination by health insurances",
     "updatedAt": "Updated at",
@@ -424,6 +442,7 @@
     "uploading": "Uploading 🔄",
     "uploadLink": "Upload Link",
     "uploadTokenExpireAfterSeconds": "Upload token expiration time [seconds]",
+    "useDifferentProject": "Use different project",
     "user": "User",
     "userCanSeeAllProjects": "Users can see ALL projects",
     "username": "User name",
@@ -435,7 +454,8 @@
     "version": "Version",
     "viewX": "View {X}",
     "website": "Website",
-    "width": "Width"
+    "width": "Width",
+    "XDetails": "{X} details"
   },
   "login": {
     "signIn": "Please sign in"
@@ -449,6 +469,23 @@
     "overnight\n": "Overnight lump sum"
   },
   "mail": {
+    "advance": {
+      "appliedFor": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "A new advance request from {owner} just came in.",
+        "subject": "🆕 New advance request"
+      },
+      "approved": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "Your advance request has been approved.",
+        "subject": "✅ Advance approved"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} wrote: {comment}'",
+        "paragraph": "Your advance request was rejected.",
+        "subject": "❌ Advance rejected"
+      }
+    },
     "expenseReport": {
       "backToInWork": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
@@ -601,15 +638,11 @@
     "10": "Nov",
     "11": "Dec"
   },
-  "report": {
-    "advance": {
-      "approvedXonYbyZ": "Advance in the amount of {X} approved by {Z} on {Y}."
-    }
-  },
   "settings": {},
   "states": {
     "appliedFor": "Applied for",
     "approved": "Approved",
+    "completed": "Completed",
     "inWork": "In work",
     "refunded": "Refunded",
     "rejected": "Rejected",

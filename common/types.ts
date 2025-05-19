@@ -5,6 +5,12 @@ import { Types, mongo } from 'mongoose'
  */
 export type _id = Types.ObjectId
 
+export type IdDocument<idType = _id> = idType | { _id: idType }
+
+export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
+  return doc ? (doc as { _id: idType })._id || (doc as idType) : doc
+}
+
 /**
  * @pattern /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
  */
@@ -113,8 +119,9 @@ export interface DisplaySettings {
     fallback: Locale
     overwrite: { [key in Locale]: { [key: string]: string } }
   }
-  stateColors: { [key in AnyState]: { color: HexColor; text: string } }
+  stateColors: { [key in AnyState]: BadgeStyle }
   accessIcons: { [key in Access]: string[] }
+  reportTypeIcons: { [key in ReportType]: string[] }
   _id: _id
 }
 
@@ -131,6 +138,18 @@ export interface PrintSettingsBase {
   borderThickness: number
   cellPadding: { x: number; bottom: number }
   pageSize: { width: number; height: number }
+}
+
+export interface BadgeStyle {
+  color: HexColor
+  text: TextColor
+}
+
+export interface Category {
+  name: string
+  style: BadgeStyle
+  isDefault: boolean
+  _id: _id
 }
 
 /**
@@ -234,9 +253,12 @@ export interface ProjectSimple {
   _id: _id
 }
 
-export interface Project extends ProjectSimple {
+export interface ProjectSimpleWithName extends ProjectSimple {
   name?: string
-  balance: BaseCurrencyMoney
+}
+
+export interface Project extends ProjectSimpleWithName {
+  balance: BaseCurrencyMoneyNotNull
   budget?: BaseCurrencyMoney
 }
 
@@ -285,6 +307,15 @@ export interface User extends UserSimple {
   token?: Token | null
 }
 
+export interface UserWithName {
+  _id: _id
+  name: User['name']
+}
+
+export interface UserWithNameAndProject extends UserWithName {
+  projects: User['projects']
+}
+
 export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {
   access: { user: User['access']['user']; admin: User['access']['admin'] }
 } = {
@@ -294,6 +325,9 @@ export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_i
   access: { user: true, admin: true }
 }
 
+export interface BaseCurrencyMoneyNotNull extends BaseCurrencyMoney {
+  amount: number
+}
 export interface BaseCurrencyMoney {
   amount: number | null
 }
@@ -305,6 +339,9 @@ export interface Money extends BaseCurrencyMoney {
     rate: number
     amount: number
   } | null
+}
+export interface MoneyNotNull extends Money {
+  amount: number
 }
 
 export interface MoneyPlus extends Money {
@@ -326,6 +363,7 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }
@@ -333,6 +371,7 @@ export interface Stage {
 export interface Expense {
   description: string
   cost: Cost
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }
@@ -351,27 +390,6 @@ export interface Comment<State extends AnyState = AnyState> {
   _id: _id
 }
 
-export interface TravelSimple extends RequestSimple {
-  state: TravelState
-  log: Log<TravelState>
-  comments: Comment<TravelState>[]
-  comment?: string | null
-  reason: string
-  destinationPlace: Place
-  startDate: Date | string
-  endDate: Date | string
-  advance: Money
-  progress: number
-  addUp: AddUpResult<Travel>
-  isCrossBorder?: boolean | null
-  a1Certificate?: {
-    exactAddress: string
-    destinationName: string
-  } | null
-  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
-  fellowTravelersNames?: string | null //settings.allowSpouseRefund
-}
-
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | {
@@ -379,12 +397,6 @@ export type Transport =
       distance: number
       distanceRefundType: DistanceRefundType
     }
-
-export interface Refund {
-  type: LumpsumType
-  refund: BaseCurrencyMoney
-  _id: Types.ObjectId
-}
 
 export interface TravelDayFullCountry extends Omit<TravelDay, 'country'> {
   country: Country
@@ -400,70 +412,97 @@ export interface TravelDay {
   overnightRefund: boolean
   purpose: PurposeSimple
   lumpSums: {
-    overnight: { refund: BaseCurrencyMoney }
-    catering: { refund: BaseCurrencyMoney; type: CateringType }
+    overnight: { refund: BaseCurrencyMoneyNotNull }
+    catering: { refund: BaseCurrencyMoneyNotNull; type: CateringType }
   }
   _id: _id
 }
 
-export type Log<StateType extends AnyState = AnyState> = {
-  [key in StateType]?: {
+export type Log<S extends AnyState = AnyState> = {
+  [key in S]?: {
     date: Date | string
     editor: UserSimple
   }
 }
 
-export interface RequestSimple {
+export interface ReportSimple<S extends AnyState = AnyState> {
   name: string
   owner: UserSimple
-  state: AnyState
-  log: Log<AnyState>
-  project: Project
   editor: UserSimple
+  project: Project
+  comment?: string | null
+  bookingRemark?: string | null
+  comments: Comment<S>[]
+  state: S
+  log: Log<S>
   createdAt: Date | string
   updatedAt: Date | string
   _id: _id
 }
 
-export interface Travel extends TravelSimple {
-  lastPlaceOfWork: Place
-  professionalShare: number | null
+export interface Report<S extends AnyState = AnyState> extends ReportSimple<S> {
   history: _id[]
   historic: boolean
+}
+
+export interface AdvanceBase {
+  name: string
+  budget: MoneyNotNull
+  project: Project
+  balance: BaseCurrencyMoneyNotNull
+  reason: string
+  state: AdvanceState
+  _id: _id
+}
+
+export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
+  offsetAgainst: { type: ReportModelName; report: { _id: _id; name: string } | null | undefined; amount: number }[]
+}
+
+export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
+
+export interface TravelSimple extends ReportSimple<TravelState> {
+  reason: string
+  destinationPlace: Place
+  startDate: Date | string
+  endDate: Date | string
+  progress: number
+  addUp: AddUp<Travel>[]
+  advances: AdvanceBase[]
+  isCrossBorder?: boolean | null
+  a1Certificate?: {
+    exactAddress: string
+    destinationName: string
+  } | null
+  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
+  fellowTravelersNames?: string | null //settings.allowSpouseRefund
+}
+
+export interface Travel extends TravelSimple, Report<TravelState> {
+  lastPlaceOfWork: Place
+  professionalShare: number | null
   stages: Stage[]
   expenses: TravelExpense[]
   days: TravelDay[]
 }
 
-export interface ExpenseReportSimple extends RequestSimple {
-  state: ExpenseReportState
-  log: Log<ExpenseReportState>
-  advance: Money
-  comments: Comment<ExpenseReportState>[]
-  addUp: AddUpResult<ExpenseReport>
-  comment?: string | null
+export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
+  addUp: AddUp<ExpenseReport>[]
+  advances: AdvanceBase[]
+  category: Category
 }
-
-export interface ExpenseReport extends ExpenseReportSimple {
-  history: _id[]
-  historic: boolean
+export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
   expenses: Expense[]
 }
 
-export interface HealthCareCostSimple extends RequestSimple {
+export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> {
   patientName: string
   insurance: HealthInsurance
   refundSum: MoneyPlus
-  state: HealthCareCostState
-  log: Log<HealthCareCostState>
-  comments: Comment<HealthCareCostState>[]
-  addUp: AddUpResult<HealthCareCost>
-  comment?: string | null
+  addUp: AddUp<HealthCareCost>[]
+  advances: AdvanceBase[]
 }
-
-export interface HealthCareCost extends HealthCareCostSimple {
-  history: _id[]
-  historic: boolean
+export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
   expenses: Expense[]
 }
 
@@ -479,7 +518,11 @@ export type ExpenseReportState = (typeof expenseReportStates)[number]
 export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
 export type HealthCareCostState = (typeof healthCareCostStates)[number]
 
-export type AnyState = TravelState | HealthCareCostState | ExpenseReportState
+export const advanceStates = ['rejected', 'appliedFor', 'approved', 'completed'] as const
+export type AdvanceState = (typeof advanceStates)[number]
+
+export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
+export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
 
 const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const
 export const transportTypes = ['ownCar', ...transportTypesButOwnCar] as const
@@ -494,8 +537,21 @@ export type ImageType = (typeof imageTypes)[number]
 export const documentFileTypes = ['application/pdf', ...imageTypes] as const
 export type DocumentFileType = (typeof documentFileTypes)[number]
 
-export const reportTypes = ['travel', 'expenseReport', 'healthCareCost'] as const
+export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+
+export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
+
+export function getReportTypeFromModelName(modelName: ReportModelName) {
+  switch (modelName) {
+    case 'Travel':
+      return 'travel'
+    case 'ExpenseReport':
+      return 'expenseReport'
+    case 'HealthCareCost':
+      return 'healthCareCost'
+  }
+}
 
 export const retention = [
   'deleteRefundedAfterXDays',
@@ -511,13 +567,16 @@ export const accesses = [
   'user',
   'inWork:expenseReport',
   'inWork:healthCareCost',
+  'appliedFor:advance',
   'appliedFor:travel',
   'approved:travel',
+  'approve/advance',
   'approve/travel',
   'examine/travel',
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
+  'approved/advance',
   'refunded/travel',
   'refunded/expenseReport',
   'refunded/healthCareCost',
@@ -539,6 +598,9 @@ export type CateringType = (typeof cateringTypes)[number]
 export const lumpsumTypes = ['overnight', ...cateringTypes] as const
 export type LumpsumType = (typeof lumpsumTypes)[number]
 export type LumpSum = { [key in LumpsumType]: number }
+
+export const textColors = ['black', 'white'] as const
+export type TextColor = (typeof textColors)[number]
 
 export type PurposeSimple = 'professional' | 'private'
 
@@ -566,46 +628,47 @@ export type UserReplaceReferencesResult = {
   [key in (typeof userReplaceCollections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number }
 }
 
-export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost): report is Travel
-export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is TravelSimple
-export function reportIsTravel(report: any): report is { reason: string } {
-  return typeof report.reason === 'string'
+export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Travel
+export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is TravelSimple
+export function reportIsTravel(report: any): report is { startDate: Date | string } {
+  return typeof report.startDate === 'string' || report.startDate instanceof Date
 }
 
-export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost): report is HealthCareCost
-export function reportIsHealthCareCost(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is HealthCareCost
+export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost | Advance): report is HealthCareCost
+export function reportIsHealthCareCost(
+  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
+): report is HealthCareCostSimple
 export function reportIsHealthCareCost(report: any): report is { patientName: string } {
   return typeof report.patientName === 'string'
 }
 
-export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost): report is ExpenseReport
-export function reportIsExpenseReport(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple): report is ExpenseReport
-export function reportIsExpenseReport(report: any): report is any {
-  return !reportIsTravel(report) && !reportIsHealthCareCost(report)
+export function reportIsAdvance(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Advance
+export function reportIsAdvance(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is Advance
+export function reportIsAdvance(report: any): report is { startDate: Exclude<unknown, Date | string>; reason: string } {
+  return !reportIsTravel(report) && typeof report.reason === 'string'
 }
 
-export type AddUpResult<T> = T extends Travel
-  ? {
-      balance: BaseCurrencyMoney
-      total: BaseCurrencyMoney
-      advance: BaseCurrencyMoney
-      expenses: BaseCurrencyMoney
-      lumpSums: BaseCurrencyMoney
-    }
-  : T extends ExpenseReport
-    ? {
-        balance: BaseCurrencyMoney
-        total: BaseCurrencyMoney
-        advance: BaseCurrencyMoney
-        expenses: BaseCurrencyMoney
-      }
-    : T extends HealthCareCost
-      ? {
-          balance: BaseCurrencyMoney
-          total: BaseCurrencyMoney
-          expenses: BaseCurrencyMoney
-        }
-      : never
+export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost | Advance): report is ExpenseReport
+export function reportIsExpenseReport(
+  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
+): report is ExpenseReportSimple
+export function reportIsExpenseReport(report: any): report is any {
+  return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
+}
+
+type AddUpBase = {
+  project: ProjectSimple
+  balance: BaseCurrencyMoneyNotNull
+  total: BaseCurrencyMoneyNotNull
+  advance: BaseCurrencyMoneyNotNull
+  expenses: BaseCurrencyMoneyNotNull
+  advanceOverflow: boolean
+}
+export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
+  ? AddUpBase & { lumpSums: BaseCurrencyMoneyNotNull }
+  : AddUpBase
+
+export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = any> = AddUp<T> | (Omit<AddUp<T>, 'project'> & { project: _id })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

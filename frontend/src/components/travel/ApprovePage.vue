@@ -3,7 +3,7 @@
     <ModalComponent
       :header="modalTravel.state ? modalTravel.name : $t('labels.newX', { X: $t('labels.travel') })"
       ref="modalComp"
-      @beforeClose="modalMode === 'view' ? resetModal() : null">
+      @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalTravel">
         <TravelApproveForm
           v-if="modalTravel.state === 'appliedFor'"
@@ -11,18 +11,15 @@
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
           @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
-        <TravelApply
-          v-else-if="modalTravel.state === 'approved'"
-          :travel="(modalTravel as TravelSimple)"
-          :showButtons="false"></TravelApply>
+        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="(modalTravel as TravelSimple)"></TravelApply>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
-          @cancel="resetAndHide()"
           :travel="modalTravel"
           minStartDate=""
-          askOwner
           :loading="modalFormIsLoading"
+          endpoint-prefix="examine/"
+          @cancel="resetAndHide()"
           @add="(t) => approveTravel(t, 'approved')">
         </TravelApplyForm>
       </div>
@@ -47,12 +44,12 @@
         :columns-to-hide="[
           'state',
           'editor',
-          'addUp.total.amount',
-          'addUp.balance.amount',
+          'addUp.totalTotal',
+          'addUp.totalBalance',
           'updatedAt',
           'report',
           'organisation',
-          'comments'
+          'bookingRemark'
         ]"></TravelList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
         {{ $t('labels.showX', { X: $t('labels.approvedX', { X: $t('labels.travels') }) }) }} <i class="bi bi-chevron-down"></i>
@@ -65,7 +62,7 @@
         <TravelList
           endpoint="approve/travel"
           stateFilter="approved"
-          :columns-to-hide="['state', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report', 'organisation', 'comments']">
+          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark']">
         </TravelList>
       </template>
     </div>

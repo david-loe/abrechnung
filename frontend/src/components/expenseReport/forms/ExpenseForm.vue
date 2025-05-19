@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="mb-2">
+    <div class="mb-3">
       <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
       <InfoPoint :text="$t('info.receipts')" />
       <FileUpload
@@ -33,15 +33,29 @@
         :ownerId="ownerId" />
     </div>
 
+    <div class="mb-3" v-if="useDifferentProject || formExpense.project">
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}</label>
+      <InfoPoint :text="$t('info.project')" />
+      <button
+        type="button"
+        class="btn btn-sm btn-link ms-3"
+        @click="
+          //prettier-ignore
+          useDifferentProject = false;
+          formExpense.project = ''
+        ">
+        {{ $t('labels.reset') }}
+      </button>
+
+      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project"> </ProjectSelector>
+    </div>
+    <div class="mb-2" v-else>
+      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ $t('labels.useDifferentProject') }}</button>
+    </div>
+
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
-      <textarea
-        type="text"
-        class="form-control form-control-sm"
-        id="travelFormDescription"
-        v-model="formExpense.note"
-        :disabled="disabled"
-        rows="1"></textarea>
+      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled"></TextArea>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -86,11 +100,14 @@ import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
+import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import TextArea from '@/components/elements/TextArea.vue'
+
 import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, DateInput },
+  components: { InfoPoint, CurrencySelector, FileUpload, DateInput, ProjectSelector, TextArea },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev'],
   props: {
     expense: {
@@ -109,7 +126,8 @@ export default defineComponent({
   },
   data() {
     return {
-      formExpense: this.default()
+      formExpense: this.default(),
+      useDifferentProject: false
     }
   },
   methods: {
@@ -122,6 +140,7 @@ export default defineComponent({
           receipts: [],
           date: ''
         },
+        project: undefined,
         note: undefined
       }
     },
@@ -130,6 +149,7 @@ export default defineComponent({
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
       this.formExpense = this.default()
+      this.useDifferentProject = false
     },
     output() {
       return this.formExpense

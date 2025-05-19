@@ -4,6 +4,7 @@ import { Contact, User as IUser, Locale } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
+import { logger } from '../logger.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
 import { getMailTemplate } from '../templates/cache.js'
 
@@ -68,6 +69,7 @@ async function _sendMail(
   })
   const plainText = `${salutation}\n\n${paragraph}\n\n${button ? `${button.text}: ${button.link}\n\n` : ''}${lastParagraph ? `${Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph}\n\n` : ''}${regards}\n\n${app.name}: ${app.url}`
 
+  logger.debug(`Send mail to ${recipient.email}`)
   return await mailClient.sendMail({
     from: `"${app.name}" <${mailClient.options.from}>`, // sender address
     to: recipient.email, // list of receivers

@@ -1,14 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import {
-  Expense,
-  HealthCareCostState,
-  HealthCareCost as IHealthCareCost,
-  Organisation as IOrganisation,
-  Locale,
-  _id
-} from '../../common/types.js'
+import { Expense, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -17,9 +10,9 @@ import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, IdDocument, MoneyPlusPost } from './types.js'
+import { AuthenticatedExpressRequest, MoneyPlusPost } from './types.js'
 
 @Tags('Health Care Cost')
 @Route('healthCareCost')
@@ -31,14 +24,14 @@ export class HealthCareCostController extends Controller {
     return await this.getter(HealthCareCost, {
       query,
       filter: { owner: request.user._id, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
   }
   @Delete()
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(HealthCareCost, { _id: _id, checkOldObject: this.checkOwner(request.user) })
+    return await this.deleter(HealthCareCost, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 
   @Post('expense')
@@ -48,6 +41,11 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: SetterBody<Expense>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody,
       parentId,
@@ -81,12 +79,18 @@ export class HealthCareCostController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; insurance?: IdDocument; patientName?: string; _id?: _id; name?: string },
+    @Body() requestBody: {
+      project?: IdDocument
+      insurance?: IdDocument
+      patientName?: string
+      _id?: _id
+      name?: string
+      advances?: IdDocument[]
+    },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'inWork' as HealthCareCostState,
-      owner: request.user._id,
+      state: 'inWork',
       editor: request.user._id
     })
 
@@ -94,6 +98,7 @@ export class HealthCareCostController extends Controller {
       if (!request.user.access['inWork:healthCareCost']) {
         throw new AuthorizationError()
       }
+      Object.assign(extendedBody, { owner: request.user._id })
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -101,14 +106,16 @@ export class HealthCareCostController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
+
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (
-          (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork' && request.user.access['inWork:healthCareCost']) ||
-          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
-        ) {
-          await oldObject.saveToHistory()
-          await oldObject.save()
-          return true
+        if (oldObject.owner._id.equals(request.user._id)) {
+          if (oldObject.state === 'inWork' && request.user.access['inWork:healthCareCost']) {
+            return true
+          }
+          if (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id)) {
+            await oldObject.saveToHistory()
+            return true
+          }
         }
         return false
       },
@@ -121,7 +128,7 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as HealthCareCostState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -130,7 +137,6 @@ export class HealthCareCostController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -203,6 +209,11 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: SetterBody<Expense>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody,
       parentId,
@@ -244,11 +255,11 @@ export class HealthCareCostExamineController extends Controller {
 
   @Post('underExaminationByInsurance')
   public async postUnderExaminationByInsurance(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'underExaminationByInsurance' as HealthCareCostState,
+      state: 'underExaminationByInsurance',
       editor: request.user._id
     })
 
@@ -267,11 +278,34 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
       }
+    })
+  }
+
+  @Post()
+  public async postAny(
+    @Body() requestBody: {
+      project?: IdDocument
+      insurance?: IdDocument
+      patientName?: string
+      _id: _id
+      name?: string
+      advances?: IdDocument[]
+    },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { editor: request.user._id })
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      allowNew: false,
+      checkOldObject: async (oldObject: HealthCareCostDoc) =>
+        !oldObject.historic &&
+        (oldObject.state === 'inWork' || oldObject.state === 'underExamination') &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
 
@@ -286,13 +320,17 @@ export class HealthCareCostExamineController extends Controller {
       name?: string
       owner?: IdDocument
       comment?: string
+      advances?: IdDocument[]
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork' as HealthCareCostState, editor: request.user._id })
-    if (!extendedBody._id && !extendedBody.name) {
-      const date = new Date()
-      extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+    const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
+    if (!extendedBody._id) {
+      ;(extendedBody as any).log = { inWork: { date: new Date(), editor: request.user._id } }
+      if (!extendedBody.name) {
+        const date = new Date()
+        extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -301,7 +339,6 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -314,7 +351,7 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination' as HealthCareCostState, editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -323,7 +360,6 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false
@@ -384,7 +420,7 @@ export class HealthCareCostConfirmController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'refunded' as HealthCareCostState,
+      state: 'refunded',
       editor: request.user._id
     })
 
@@ -404,7 +440,6 @@ export class HealthCareCostConfirmController extends Controller {
         if (oldObject.state === 'underExaminationByInsurance' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await documentFileHandler(['refundSum', 'receipts'], { owner: oldObject.owner._id })(request)
           await oldObject.saveToHistory()
-          await oldObject.save()
           return true
         }
         return false

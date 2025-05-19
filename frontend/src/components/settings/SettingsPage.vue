@@ -91,6 +91,12 @@
           </template>
           <template #fallback> Loading.. </template>
         </Suspense>
+        <Suspense v-else-if="entry === 'categories'">
+          <template #default>
+            <CategoryList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
@@ -118,6 +124,7 @@
 <script lang="ts">
 import APP_LOADER from '@/appData.js'
 import CSVImport from '@/components/settings/elements/CSVImport.vue'
+import CategoryList from '@/components/settings/elements/CategoryList.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
 import CountryList from '@/components/settings/elements/CountryList.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
@@ -132,7 +139,7 @@ import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
 import { defineComponent } from 'vue'
 
-const items = ['users', 'projects', 'organisations', 'countries', 'currencies', 'healthInsurances'] as const
+const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
 
 const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
 
@@ -147,6 +154,7 @@ export default defineComponent({
     ProjectList,
     CountryList,
     CurrencyList,
+    CategoryList,
     HealthInsuranceList,
     UserMerge,
     CSVImport,

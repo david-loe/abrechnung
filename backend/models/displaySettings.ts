@@ -1,27 +1,18 @@
 import { Schema, model } from 'mongoose'
 import {
   Access,
+  AnyState,
   DisplaySettings,
-  ExpenseReportState,
-  HealthCareCostState,
   Locale,
-  TravelState,
+  ReportType,
   accesses,
+  anyStates,
   defaultLocale,
-  expenseReportStates,
-  healthCareCostStates,
   hexColorRegex,
   locales,
-  travelStates
+  reportTypes
 } from '../../common/types.js'
-
-function color(state: string) {
-  return {
-    type: { color: { type: String, required: true, validate: hexColorRegex }, text: { type: String, required: true } },
-    required: true,
-    label: `states.${state}`
-  }
-}
+import { colorSchema } from './helper.js'
 
 export const displaySettingsSchema = () => {
   const overwrites = {} as { [key in Locale]: { type: typeof Schema.Types.Mixed; required: true; default: () => object } }
@@ -29,20 +20,19 @@ export const displaySettingsSchema = () => {
     overwrites[locale] = { type: Schema.Types.Mixed, required: true, default: () => ({}) }
   }
 
-  const stateColors = {} as { [key in TravelState | HealthCareCostState | ExpenseReportState]: ReturnType<typeof color> }
-  for (const state of travelStates) {
-    stateColors[state] = color(state)
-  }
-  for (const state of healthCareCostStates) {
-    stateColors[state] = color(state)
-  }
-  for (const state of expenseReportStates) {
-    stateColors[state] = color(state)
+  const stateColors = {} as { [key in AnyState]: ReturnType<typeof colorSchema> }
+  for (const state of anyStates) {
+    stateColors[state] = colorSchema(`states.${state}`)
   }
 
   const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }
   for (const access of accesses) {
     accessIcons[access] = { type: [{ type: String, required: true }], required: true, label: `accesses.${access}` }
+  }
+
+  const reportTypeIcons = {} as { [key in ReportType]: { type: { type: StringConstructor; required: true }[]; required: true } }
+  for (const reportType of reportTypes) {
+    reportTypeIcons[reportType] = { type: [{ type: String, required: true }], required: true }
   }
 
   return new Schema<DisplaySettings>(
@@ -74,7 +64,8 @@ export const displaySettingsSchema = () => {
         required: true
       },
       stateColors: { type: stateColors, required: true },
-      accessIcons: { type: accessIcons, required: true, description: "https://icons.getbootstrap.com/ (e.g. 'airplane')" }
+      accessIcons: { type: accessIcons, required: true, description: "https://icons.getbootstrap.com/ (e.g. 'airplane')" },
+      reportTypeIcons: { type: reportTypeIcons, required: true, description: "https://icons.getbootstrap.com/ (e.g. 'airplane')" }
     },
     { minimize: false, toObject: { minimize: false }, toJSON: { minimize: false } }
   )

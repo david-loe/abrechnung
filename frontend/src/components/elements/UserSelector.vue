@@ -4,8 +4,7 @@
     :options="APP_DATA.users"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(_id: string) => $emit('update:modelValue', _id)"
-    :reduce="(u: UserWithName) => u._id"
+    @update:modelValue="(u: UserWithNameAndProject) => $emit('update:modelValue', u)"
     :filter="filter"
     :disabled="disabled"
     style="min-width: 160px">
@@ -22,14 +21,10 @@
 </template>
 
 <script lang="ts">
-import { User } from '@/../../common/types.js'
+import { UserWithNameAndProject } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { PropType, defineComponent } from 'vue'
 
-interface UserWithName {
-  name: User['name']
-  _id: string
-}
 export default defineComponent({
   name: 'UserSelector',
   data() {
@@ -37,14 +32,14 @@ export default defineComponent({
   },
   components: {},
   props: {
-    modelValue: { type: String as PropType<string | null> },
+    modelValue: { type: Object as PropType<UserWithNameAndProject> },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     placeholder: { type: String, default: '' }
   },
   emits: ['update:modelValue'],
   methods: {
-    filter(options: UserWithName[], search: string): UserWithName[] {
+    filter(options: UserWithNameAndProject[], search: string): UserWithNameAndProject[] {
       return options.filter((option) => {
         const givenName = option.name.givenName.toLowerCase().indexOf(search.toLowerCase()) > -1
         if (givenName) {

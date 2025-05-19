@@ -16,26 +16,44 @@ export default defineComponent({
   name: 'ConnectionSettingsForm',
   data() {
     return {
-      schema: {},
-      connectionSettings: undefined as ConnectionSettings | undefined
+      schema: {}
     }
   },
   methods: {
     async postConnectionSettings(connectionSettings: ConnectionSettings) {
       if (!connectionSettings.smtp?.host) {
-        connectionSettings.smtp = undefined
+        connectionSettings.smtp = null
       }
       if (!connectionSettings.auth.ldapauth?.url) {
-        connectionSettings.auth.ldapauth = undefined
+        connectionSettings.auth.ldapauth = null
       }
       if (!connectionSettings.auth.microsoft?.clientId) {
-        connectionSettings.auth.microsoft = undefined
+        connectionSettings.auth.microsoft = null
+      }
+      if (!connectionSettings.auth.oidc?.clientId) {
+        connectionSettings.auth.oidc = null
       }
       const result = await API.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
       if (result.ok) {
-        this.connectionSettings = result.ok
-        ;(this.$refs.form$ as any).load(this.connectionSettings)
+        this.loadConnectionSettings(result.ok)
       }
+    },
+    loadConnectionSettings(connectionSettings: ConnectionSettings) {
+      if (connectionSettings) {
+        if (connectionSettings.smtp === null) {
+          connectionSettings.smtp = undefined
+        }
+        if (connectionSettings.auth.ldapauth === null) {
+          connectionSettings.auth.ldapauth = undefined
+        }
+        if (connectionSettings.auth.microsoft === null) {
+          connectionSettings.auth.microsoft = undefined
+        }
+        if (connectionSettings.auth.oidc === null) {
+          connectionSettings.auth.oidc = undefined
+        }
+      }
+      queueMicrotask(() => (this.$refs.form$ as any).load(connectionSettings))
     }
   },
 
@@ -49,8 +67,10 @@ export default defineComponent({
       },
       _id: { type: 'hidden', meta: true }
     })
-    this.connectionSettings = (await API.getter<ConnectionSettings>('admin/connectionSettings')).ok?.data
-    queueMicrotask(() => (this.$refs.form$ as any).load(this.connectionSettings))
+    const result = await API.getter<ConnectionSettings>('admin/connectionSettings')
+    if (result.ok) {
+      this.loadConnectionSettings(result.ok.data)
+    }
   }
 })
 </script>

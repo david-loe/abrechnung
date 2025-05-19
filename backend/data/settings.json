@@ -1,7 +1,10 @@
 {
   "defaultAccess": {
     "admin": false,
+    "appliedFor:advance": true,
     "appliedFor:travel": true,
+    "approve/advance": false,
+    "approved/advance": false,
     "approve/travel": false,
     "approved:travel": false,
     "confirm/healthCareCost": false,
@@ -16,6 +19,7 @@
     "user": true
   },
   "disableReportType": {
+    "advance": false,
     "expenseReport": false,
     "healthCareCost": false,
     "travel": false
@@ -28,5 +32,5 @@
   },
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
-  "version": "1.7.4"
+  "version": "2.0.0"
 }

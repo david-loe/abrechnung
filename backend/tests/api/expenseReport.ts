@@ -22,6 +22,16 @@ test.serial('GET /project', async (t) => {
   }
 })
 
+test.serial('GET /category', async (t) => {
+  const res = await agent.get('/category')
+  expenseReport.category = res.body.data[0]
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+})
+
 test.serial('POST /expenseReport/inWork', async (t) => {
   const res = await agent.post('/expenseReport/inWork').send(expenseReport)
   expenseReport = res.body.result

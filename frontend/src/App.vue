@@ -1,7 +1,7 @@
 <template>
   <div>
     <OfflineBanner v-if="isOffline"></OfflineBanner>
-    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @beforeClose=";($refs.apiKeyForm as any).resetForm()">
+    <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @afterClose=";($refs.apiKeyForm as any).resetForm()">
       <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm">
       </ApiKeyForm>
     </ModalComponent>
@@ -61,7 +61,7 @@
                     <li>
                       <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
                         <i class="fs-4 bi bi-box-arrow-down"></i>
-                        <span class="ms-1">{{ $t('headlines.installApp') }}</span>
+                        <span class="ms-1">{{ $t('labels.installApp') }}</span>
                       </button>
                     </li>
                   </template>
@@ -144,7 +144,7 @@
         <div class="d-flex align-items-center lh-1">
           <i class="fs-3 bi bi-receipt"></i>
 
-          <span class="ps-2 text-muted">
+          <span class="ps-2 text-secondary">
             © {{ new Date().getFullYear() }} abrechnung
             <small v-if="APP_DATA?.settings.version"
               ><a

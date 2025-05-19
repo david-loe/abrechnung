@@ -1,7 +1,10 @@
 {
   "accesses": {
     "admin": "Administrator",
+    "appliedFor:advance": "Vorschuss beantragen",
     "appliedFor:travel": "Reisekostenabrechnung beantragen",
+    "approve/advance": "Vorschuss genehmigen",
+    "approved/advance": "Genehmigte Vorschüsse anzeigen",
     "approve/travel": "Reisen genehmigen",
     "approved:travel": "Eigene Reisekostenabrechnung ohne Genehmigung initiieren",
     "confirm/healthCareCost": "Krankenkosten bestätigen",
@@ -31,8 +34,10 @@
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "mailSend": "E-mail wurde versandt.",
     "noData": {
+      "advanceForUserX": "Kein genehmigter Vorschuss für '{X}'. Beantrage einen!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
+      "searchX": "Kein Eintrag für '{X}' gefunden.",
       "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu."
     },
     "notAllowed": "Nicht erlaubt!",
@@ -63,14 +68,13 @@
   "headlines": {
     "emoji": "🧾",
     "home": "Home",
-    "installApp": "App installieren",
     "login": "Login",
     "logout": "Logout",
     "settings": "Einstellungen",
     "title": "abrechnung"
   },
   "info": {
-    "advance": "Falls du einen Vorschuss benötigst (z.B. für die Flugtickets), gib hier an wie viel du benötigst.",
+    "advance": "Wähle hier die Vorschüsse aus die du mit deiner abrechnung🧾 verrechnen willst.",
     "cateringRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "claimSpouseRefund": "Wenn du gemeinsam mit deinem Ehepartner verreist und er auch erstattungberechtigt ist, kannst du ihn mitabrechnen.",
     "cost": "Trage hier die Kosten ein.",
@@ -174,6 +178,7 @@
     "addX": "{X} hinzufügen",
     "advance": "Vorschuss",
     "advanceFromEmployer": "Vorschuss vom Arbeitgeber",
+    "advances": "Vorschüsse",
     "airplane": "Flugzeug ✈",
     "alias": "Alias",
     "allowSpouseRefund": "Abrechnung für Ehepartner bei Reisen erlauben",
@@ -192,6 +197,7 @@
     "backToApplicant": "Zurück zum Antragsteller",
     "balance": "Saldo",
     "bankDetails": "Bankverbindung",
+    "bookingRemark": "Buchungsvermerk",
     "borderColor": "Rahmenfarbe",
     "borderThickness": "Rahmenstärke",
     "bottom": "Unten",
@@ -199,6 +205,8 @@
     "budget": "Budget",
     "by": "von",
     "cancel": "Abbrechen",
+    "categories": "Kategorien",
+    "category": "Kategorie",
     "catering": "Verpflegung",
     "cateringNoRefund": "Keine Verpflegungspauschale",
     "cellPadding": "Zellenrand",
@@ -230,6 +238,7 @@
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
     "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
+    "deleted": "gelöscht",
     "deleteInWorkReportsAfterXDaysUnused": "Löschen von ungenutzten Auslagen- und Krankenkostenanträgen - in Tagen",
     "deleteRefundedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
     "deleteX": "{X} löschen",
@@ -239,7 +248,7 @@
     "destinationName": "Name des Reiseziels",
     "destinationPlace": "Reiseziel",
     "dinner": "Abendessen",
-    "disableReportType": "Antragsarten deaktivieren",
+    "disableReportType": "Abrechnungsarten deaktivieren",
     "displaySettings": "Anzeigeeinstellungen",
     "distance": "Entfernung [km]",
     "distanceRefunds": "Entfernungspauschalen",
@@ -295,15 +304,18 @@
     "import": "Importieren",
     "includingSpouseRefund": "inkl. Ehepartner Pauschalen",
     "install": "Installieren",
+    "installApp": "App installieren",
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "inWorkX": "{X} in Arbeit",
     "isCrossBorder": "Ist eine Grenzüberschreitende Reise",
+    "isDefault": "Ist Standard?",
     "label": "Bezeichnung",
     "language": "Sprache",
     "lastCountries": "Letzte Länder",
     "lastCurrencies": "Letzte Währungen",
     "lastPlaceOfWork": "Letzter Tätigkeitsort",
+    "left": "übrig",
     "locale": "Sprache",
     "location": "Ort",
     "logo": "Logo",
@@ -331,6 +343,7 @@
     "none": "gar nicht",
     "note": "Bemerkung",
     "object": "Objekt",
+    "offsetAgainst": "Verrechnet mit",
     "on": "am",
     "optional": "optional",
     "organisation": "Organisation",
@@ -368,7 +381,9 @@
     "reject": "Ablehnen",
     "report": "Bericht",
     "reportEmail": "Email Adresse für Berichte",
+    "reportTypeIcons": "Icons für Abrechnungstypen",
     "required": "erforderlich",
+    "reset": "Zurücksetzen",
     "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
     "save": "Speichern",
@@ -393,6 +408,7 @@
     "state": "Status",
     "stateColors": "Status Farben",
     "stay": "Aufenthalt",
+    "style": "Stil",
     "subfolderPath": "Unterordner Pfad",
     "submittedOn": "Eingereicht am",
     "submitX": "{X} einreichen",
@@ -409,15 +425,16 @@
     "toExaminationByInsurance": "Zum Prüfen durch Krankenkasse",
     "toleranceStageDatesToApprovedTravelDates": "Abweichungstoleranz der Etappen von den beantragten Daten [Tage]",
     "total": "Gesamt",
+    "totalBalance": "Gesamtsaldo",
     "toX": "Zu {X}",
     "transport": "Verkehrsmittel",
     "travel": "Reise",
-    "travelDetails": "Reisedetails",
     "traveler": "Reisender",
     "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "travelName": "Name der Reise",
     "travels": "Reisen",
     "travelSettings": "Reisekostenabrechnungseinstellungen",
+    "type": "Art",
     "typeToSearch": "Tippe um zu Suchen...",
     "underExaminationByInsuranceHealthCareCosts": "Krankenkosten in Prüfung bei Krankenkassen",
     "updatedAt": "Aktualisiert am",
@@ -425,6 +442,7 @@
     "uploading": "Wird hochgeladen 🔄",
     "uploadLink": "Upload Link",
     "uploadTokenExpireAfterSeconds": "Uploadtoken Ablaufzeit [Sekunden]",
+    "useDifferentProject": "Anderes Projekt auswählen",
     "user": "Benutzer",
     "userCanSeeAllProjects": "Benutzer können ALLE Projekte sehen",
     "username": "Benutzername",
@@ -436,7 +454,8 @@
     "version": "Version",
     "viewX": "{X} ansehen",
     "website": "Website",
-    "width": "Breite"
+    "width": "Breite",
+    "XDetails": "{X}details"
   },
   "login": {
     "signIn": "Bitte Anmelden"
@@ -450,6 +469,23 @@
     "overnight\n": "Übernachtungs\npauschale"
   },
   "mail": {
+    "advance": {
+      "appliedFor": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Ein neuer Vorschussantrag von {owner} kam grade rein.",
+        "subject": "🆕 Neue Vorschussantrag"
+      },
+      "approved": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Dein Vorschussantrag wurde genehmigt.",
+        "subject": "✅ Vorschuss genehmigt"
+      },
+      "rejected": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Dein Vorschussantrag wurde abgelehnt.",
+        "subject": "❌ Vorschuss abgelehnt"
+      }
+    },
     "expenseReport": {
       "backToInWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -602,15 +638,11 @@
     "10": "Nov",
     "11": "Dez"
   },
-  "report": {
-    "advance": {
-      "approvedXonYbyZ": "Vorschuss in Höhe von {X} am {Y} durch {Z} genehmigt."
-    }
-  },
   "settings": {},
   "states": {
     "appliedFor": "Beantragt",
     "approved": "Genehmigt",
+    "completed": "Abgeschlossen",
     "inWork": "in Arbeit",
     "refunded": "Erstattet",
     "rejected": "Abgelehnt",

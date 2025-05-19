@@ -2,11 +2,10 @@ import { DeleteResult } from 'mongodb'
 import { FilterQuery, HydratedDocument, Model, ProjectionType, SortOrder, Types, mongo } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
-import { GETResponse, Meta, User, _id } from '../../common/types.js'
+import { GETResponse, IdDocument, Meta, User, _id } from '../../common/types.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
-import { IdDocument } from './types.js'
 
 export interface GetterQuery<ModelType> {
   /**
@@ -153,6 +152,7 @@ export interface DeleterQuery {
 
 export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQuery {
   referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
+  minDocumentCount?: number
   cb?: (data: DeleteResult) => any
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
@@ -325,6 +325,12 @@ export class Controller extends TsoaController {
     if (options.checkOldObject && !(await options.checkOldObject(doc))) {
       throw new NotAllowedError(`Not allowed to delete this ${model.modelName}`)
     }
+    if (options.minDocumentCount) {
+      const countAfterDelete = (await model.countDocuments()) - 1
+      if (countAfterDelete < options.minDocumentCount) {
+        throw new ConflictError(`${options.minDocumentCount} ${model.modelName}${options.minDocumentCount > 1 ? 's' : ''} required.`)
+      }
+    }
     if (options.referenceChecks) {
       for (const referenceCheck of options.referenceChecks) {
         const filter = { $or: [] as { [key: string]: any }[] }
@@ -339,6 +345,7 @@ export class Controller extends TsoaController {
         }
       }
     }
+
     const result = await doc.deleteOne()
     if (options.cb) {
       options.cb(result)
@@ -377,10 +384,6 @@ export class Controller extends TsoaController {
     return { message: 'alerts.successDeleting', result: result }
   }
 
-  checkOwner(requestUser: User) {
-    return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
-  }
-
   async insertMany<ModelType extends { _id?: Types.ObjectId | string }>(
     model: Model<ModelType>,
     options: { requestBody: SetterBody<ModelType>[]; cb?: (data: ModelType[]) => any }
@@ -391,4 +394,7 @@ export class Controller extends TsoaController {
     }
     return { message: 'alerts.successSaving', result }
   }
+}
+export function checkOwner(requestUser: User) {
+  return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
 }

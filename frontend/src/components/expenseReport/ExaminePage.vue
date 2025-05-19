@@ -9,9 +9,9 @@
         :mode="modalMode"
         :expenseReport="modalExpenseReport"
         :loading="modalFormIsLoading"
+        endpointPrefix="examine/"
         @cancel="resetAndHide()"
-        @add="addExpenseReport"
-        askOwner>
+        @add="addExpenseReport">
       </ExpenseReportForm>
     </ModalComponent>
     <div class="container py-3">
@@ -30,7 +30,7 @@
         class="mb-5"
         endpoint="examine/expenseReport"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.total.amount', 'organisation']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
       </ExpenseReportList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = 'refunded'">
@@ -46,7 +46,7 @@
         <ExpenseReportList
           endpoint="examine/expenseReport"
           :stateFilter="show"
-          :columns-to-hide="['state', 'report', 'addUp.total.amount', 'organisation']">
+          :columns-to-hide="['state', 'report', 'addUp.totalTotal', 'organisation']">
         </ExpenseReportList>
       </template>
     </div>

@@ -1,5 +1,5 @@
 import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
-import { BaseCurrencyMoney, Locale, Money, baseCurrency } from './types.js'
+import { BaseCurrencyMoney, Locale, Money, baseCurrency, idDocumentToId } from './types.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
@@ -110,7 +110,7 @@ class Formatter {
     this.setLocale(opts.locale)
     let amount = 0
     const money = baseCurrencyMoneyToMoney(baseMoney)
-    let currency = typeof money.currency === 'string' ? money.currency : money.currency._id
+    let currency = idDocumentToId(money.currency)
     if (opts.useExchangeRate && money.exchangeRate) {
       amount = money.exchangeRate.amount
       currency = baseCurrency._id
@@ -130,7 +130,7 @@ class Formatter {
     if (money.amount === null || (!money.amount && !printZero)) {
       return ''
     }
-    let str = this.currency(money.amount, money.currency._id)
+    let str = this.currency(money.amount, idDocumentToId(money.currency))
     if (money.exchangeRate?.rate) {
       str = `${str} / ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
     }

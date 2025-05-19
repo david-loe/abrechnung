@@ -3,6 +3,7 @@ import { loadLocales } from '../../common/locales/load'
 import { getById } from '../../common/scripts'
 import { TravelCalculator } from '../../common/travel'
 import {
+  Category,
   Country,
   CountryCode,
   Currency,
@@ -10,10 +11,12 @@ import {
   HealthInsurance,
   Locale,
   OrganisationSimple,
-  ProjectSimple,
+  ProjectSimpleWithName,
   Settings,
   TravelSettings,
-  User
+  User,
+  UserWithNameAndProject,
+  _id
 } from '../../common/types'
 import API from './api.js'
 import { formatter } from './formatter'
@@ -30,10 +33,13 @@ export class APP_DATA {
   displaySettings: DisplaySettings
   healthInsurances: HealthInsurance[]
   organisations: OrganisationSimple[]
+  categories: Category[]
+  defaultCategory: Category | undefined
+
   specialLumpSums: { [key: string]: string[] }
 
-  projects?: ProjectSimple[]
-  users?: { name: User['name']; _id: string }[]
+  projects?: ProjectSimpleWithName[]
+  users?: UserWithNameAndProject[]
 
   travelCalculator: TravelCalculator
 
@@ -46,10 +52,11 @@ export class APP_DATA {
     displaySettings: DisplaySettings,
     healthInsurances: HealthInsurance[],
     organisations: OrganisationSimple[],
+    categories: Category[],
 
     specialLumpSums: { [key: string]: string[] },
-    projects?: ProjectSimple[],
-    users?: { name: User['name']; _id: string }[]
+    projects?: ProjectSimpleWithName[],
+    users?: UserWithNameAndProject[]
   ) {
     this.currencies = currencies
     this.countries = countries
@@ -59,6 +66,8 @@ export class APP_DATA {
     this.displaySettings = displaySettings
     this.healthInsurances = healthInsurances
     this.organisations = organisations
+    this.categories = categories
+    this.defaultCategory = categories.length === 1 ? categories[0] : categories.find((category) => category.isDefault)
     this.specialLumpSums = specialLumpSums
 
     this.projects = projects
@@ -96,12 +105,13 @@ class APP_LOADER {
             this.withProgress(API.getter<TravelSettings>('travelSettings')),
             this.withProgress(API.getter<HealthInsurance[]>('healthInsurance')),
             this.withProgress(API.getter<OrganisationSimple[]>('organisation')),
+            this.withProgress(API.getter<Category[]>('category')),
             this.withProgress(API.getter<{ [key: string]: string[] }>('specialLumpSums')),
             this.withProgress(API.getter<DisplaySettings>('displaySettings'))
           ]),
           Promise.allSettled([
-            this.withProgress(API.getter<ProjectSimple[]>('project', {}, {}, false)),
-            this.withProgress(API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false))
+            this.withProgress(API.getter<ProjectSimpleWithName[]>('project', {}, {}, false)),
+            this.withProgress(API.getter<UserWithNameAndProject[]>('users', {}, {}, false))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
@@ -115,6 +125,7 @@ class APP_LOADER {
               travelSettingsRes,
               healthInsurancesRes,
               organisationsRes,
+              categoriesRes,
               specialLumpSumsRes,
               displaySettingsRes
             ] = result[0].value
@@ -133,6 +144,7 @@ class APP_LOADER {
               travelSettingsRes.ok &&
               healthInsurancesRes.ok &&
               organisationsRes.ok &&
+              categoriesRes.ok &&
               specialLumpSumsRes.ok &&
               displaySettingsRes.ok
             ) {
@@ -145,6 +157,7 @@ class APP_LOADER {
                 displaySettingsRes.ok.data,
                 healthInsurancesRes.ok.data,
                 organisationsRes.ok.data,
+                categoriesRes.ok.data,
                 specialLumpSumsRes.ok.data,
                 projectsRes?.ok?.data,
                 usersRes?.ok?.data

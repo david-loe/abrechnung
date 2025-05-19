@@ -4,9 +4,9 @@
     <table class="table">
       <tbody>
         <tr v-for="key of keys" :key="key">
-          <template v-if="displayKey(key as keyof TravelSimple)">
+          <template v-if="displayKey(key)">
             <th>{{ $t('labels.' + key) }}</th>
-            <td>{{ displayKey(key as keyof TravelSimple) }}</td>
+            <td>{{ displayKey(key) }}</td>
           </template>
         </tr>
         <tr>
@@ -15,32 +15,8 @@
             <PlaceElement :place="travel.destinationPlace"></PlaceElement>
           </td>
         </tr>
-        <tr v-if="travel.advance.amount != null">
-          <th>{{ $t('labels.advance') }}</th>
-          <td>
-            <span>
-              {{ $formatter.money(travel.advance) }}
-            </span>
-            <span v-if="travel.advance.exchangeRate" class="text-secondary">
-              &nbsp;-&nbsp;
-              {{ $formatter.money(travel.advance, { useExchangeRate: false }) }}
-            </span>
-          </td>
-        </tr>
       </tbody>
     </table>
-
-    <div v-if="showButtons" class="mb-2">
-      <button type="submit" class="btn btn-primary me-2" @click="$emit('edit')">
-        {{ $t('labels.edit') }}
-      </button>
-      <button type="button" class="btn btn-danger me-2" @click="$emit('deleted', travel._id)">
-        {{ $t('labels.delete') }}
-      </button>
-      <button type="button" class="btn btn-light" @click="$emit('cancel')">
-        {{ $t('labels.cancel') }}
-      </button>
-    </div>
   </div>
 </template>
 
@@ -51,7 +27,19 @@ import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { PropType, defineComponent } from 'vue'
 
-const keys = ['owner', 'reason', 'startDate', 'endDate', 'editor', 'comments', 'claimSpouseRefund', 'fellowTravelersNames', 'a1Certificate']
+const keys: (keyof TravelSimple)[] = [
+  'owner',
+  'project',
+  'reason',
+  'startDate',
+  'endDate',
+  'editor',
+  'comments',
+  'advances',
+  'claimSpouseRefund',
+  'fellowTravelersNames',
+  'a1Certificate'
+]
 export default defineComponent({
   name: 'TravelApply',
   data() {
@@ -61,10 +49,8 @@ export default defineComponent({
     }
   },
   components: { StatePipeline, PlaceElement },
-  emits: ['cancel', 'edit', 'deleted'],
   props: {
-    travel: { type: Object as PropType<TravelSimple>, required: true },
-    showButtons: { type: Boolean, default: true }
+    travel: { type: Object as PropType<TravelSimple>, required: true }
   },
   methods: {
     displayKey(key: keyof TravelSimple): string {
@@ -95,6 +81,21 @@ export default defineComponent({
             return `${this.travel.a1Certificate.destinationName} - ${this.travel.a1Certificate.exactAddress}`
           }
           return ''
+        case 'advances':
+          if (this.travel.advances.length > 0) {
+            return this.travel.advances
+              .map(
+                (a) =>
+                  `${a.name} - ${this.$formatter.money(a.balance)} ${
+                    a.budget.amount !== a.balance.amount ? `(${this.$formatter.money(a.budget)})` : ''
+                  }`
+              )
+              .join('\n')
+          }
+          return ''
+        case 'project':
+          return `${this.travel.project.identifier} - ${this.travel.project.name || ''}`
+
         default:
           if (typeof this.travel[key] === 'boolean') {
             return this.travel[key] ? '✅' : ''

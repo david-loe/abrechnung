@@ -1,16 +1,8 @@
-import { Document, HydratedDocument, Model, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import {
-  Comment,
-  ExpenseReport,
-  ExpenseReportState,
-  Currency as ICurrency,
-  Money,
-  baseCurrency,
-  expenseReportStates
-} from '../../common/types.js'
-import { convertCurrency } from './exchangeRate.js'
-import { costObject, logObject } from './helper.js'
+import { AddUp, Comment, ExpenseReport, ExpenseReportState, _id, expenseReportStates } from '../../common/types.js'
+import { addExchangeRate } from './exchangeRate.js'
+import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
 
 interface Methods {
@@ -23,68 +15,40 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
 const expenseReportSchema = () =>
   new Schema<ExpenseReport, ExpenseReportModel, Methods>(
-    {
-      name: { type: String },
-      owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      state: {
-        type: String,
-        required: true,
-        enum: expenseReportStates,
-        default: 'inWork'
-      },
-      log: logObject(expenseReportStates),
-      editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      comments: [
-        {
-          text: { type: String },
-          author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: String,
-            required: true,
-            enum: expenseReportStates
-          }
-        }
-      ],
-      advance: costObject(true, false, false, baseCurrency._id),
-      addUp: {
-        type: {
-          balance: costObject(false, false, true, null, 0, null),
-          total: costObject(false, false, true),
-          expenses: costObject(false, false, true),
-          advance: costObject(false, false, true)
-        }
-      },
-      history: [{ type: Schema.Types.ObjectId, ref: 'ExpenseReport' }],
-      historic: { type: Boolean, required: true, default: false },
+    Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport', true, false), {
+      category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
       expenses: [
         {
           description: { type: String, required: true },
           cost: costObject(true, true, true),
+          project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }
       ]
-    },
+    }),
     { timestamps: true }
   )
 
-function populate(doc: Document) {
-  return Promise.allSettled([
-    doc.populate({ path: 'advance.currency' }),
-    doc.populate({ path: 'expenses.cost.currency' }),
-    doc.populate({ path: 'project' }),
-    doc.populate({ path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }),
-    doc.populate({ path: 'owner', select: { name: 1, email: 1 } }),
-    doc.populate({ path: 'editor', select: { name: 1, email: 1 } }),
-    ...expenseReportStates.map((state) => doc.populate({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
-    doc.populate({ path: 'comments.author', select: { name: 1, email: 1 } })
-  ])
-}
-
 const schema = expenseReportSchema()
 
-schema.pre(/^find((?!Update).)*$/, function (this: ExpenseReportDoc) {
-  populate(this)
+const populates = {
+  category: [{ path: 'category' }],
+  expenses: [
+    { path: 'expenses.cost.currency' },
+    { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } },
+    { path: 'expenses.project', select: { identifier: 1, organisation: 1 } }
+  ],
+  addUp: [{ path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
+  project: [{ path: 'project' }],
+  owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
+  editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
+  log: expenseReportStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
+}
+
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<ExpenseReport, ExpenseReport>) {
+  await populateSelected(this, populates)
 })
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {
@@ -109,32 +73,15 @@ schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
-}
-
-async function exchange(costObject: Money, date: string | number | Date) {
-  let exchangeRate = null
-
-  if (costObject.amount !== null && costObject.amount > 0) {
-    exchangeRate = await convertCurrency(date, costObject.amount, (costObject.currency as ICurrency)._id)
-  }
-  costObject.exchangeRate = exchangeRate
-
-  return costObject
+  await this.save()
 }
 
 schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
-    promiseList.push(exchange(expense.cost, expense.cost.date))
+    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
   }
-  const results = await Promise.allSettled(promiseList)
-  let i = 0
-  for (const expense of this.expenses) {
-    if (results[i].status === 'fulfilled') {
-      Object.assign(expense.cost, (results[i] as PromiseFulfilledResult<Money>).value)
-    }
-    i++
-  }
+  await Promise.allSettled(promiseList)
 }
 
 schema.methods.addComment = function (this: ExpenseReportDoc) {
@@ -148,17 +95,18 @@ schema.pre('validate', function (this: ExpenseReportDoc) {
   this.addComment()
 })
 
-schema.pre('save', async function (this: ExpenseReportDoc, next) {
-  await populate(this)
+schema.pre('save', async function (this: ExpenseReportDoc) {
+  await populateAll(this, populates)
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this)
-  next()
+  this.addUp = addUp(this) as AddUp<ExpenseReport>[]
+  await populateAll(this, populates)
 })
 
 schema.post('save', async function (this: ExpenseReportDoc) {
   if (this.state === 'refunded') {
-    ;(this.project as ProjectDoc).updateBalance()
+    await (this.project as ProjectDoc).updateBalance()
+    await offsetAdvance(this, 'ExpenseReport')
   }
 })
 

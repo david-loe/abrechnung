@@ -10,7 +10,7 @@ interface SessionWithSubscription extends SessionData {
 
 export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
   if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
-    logger.warn('Frontend-URL fehlt oder ist nicht HTTPS, Push-Sendung abgebrochen')
+    logger.debug('Frontend-URL is not HTTPS, Push-Notification sending stopped.')
     return
   }
   const payload = JSON.stringify({ title, body, url })
@@ -29,6 +29,7 @@ export async function sendPushNotification(title: string, body: string, users: U
           privateKey: process.env.PRIVATE_VAPID_KEY
         }
       })
+      logger.debug(`Send push notification to ${user.email}`)
     } catch (err) {
       if ((err as WebPushError).statusCode === 410 || (err as WebPushError).statusCode === 404) {
         // need to clean up out-of-date subscriptions
