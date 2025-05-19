@@ -1,5 +1,5 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
-import { ExpenseReport, HealthCareCost, Project, ProjectUsers, Travel, _id } from '../../common/types.js'
+import { ExpenseReport, HealthCareCost, Project, ProjectUsers, Travel, _id, idDocumentToId } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {
@@ -21,23 +21,35 @@ const schema = projectSchema()
 
 schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
   let sum = 0
-  const filter: mongoose.mongo.Filter<any> = { project: this._id, state: 'refunded', historic: false }
+  const filter: mongoose.mongo.Filter<any> = {
+    addUp: {
+      $elemMatch: { project: this._id }
+    },
+    state: 'refunded',
+    historic: false
+  }
   const travels = mongoose.connection.collection<Travel>('travels').find(filter)
   const expenseReports = mongoose.connection.collection<ExpenseReport>('expensereports').find(filter)
   const healthCareCosts = mongoose.connection.collection<HealthCareCost>('healthcarecosts').find(filter)
   for await (const travel of travels) {
-    if (travel.addUp.total.amount) {
-      sum += travel.addUp.total.amount
+    for (const addUp of travel.addUp) {
+      if (this._id.equals(idDocumentToId(addUp.project))) {
+        sum += addUp.total.amount
+      }
     }
   }
   for await (const expenseReport of expenseReports) {
-    if (expenseReport.addUp.total.amount) {
-      sum += expenseReport.addUp.total.amount
+    for (const addUp of expenseReport.addUp) {
+      if (this._id.equals(idDocumentToId(addUp.project))) {
+        sum += addUp.total.amount
+      }
     }
   }
   for await (const healthCareCost of healthCareCosts) {
-    if (healthCareCost.addUp.total.amount) {
-      sum += healthCareCost.addUp.total.amount
+    for (const addUp of healthCareCost.addUp) {
+      if (this._id.equals(idDocumentToId(addUp.project))) {
+        sum += addUp.total.amount
+      }
     }
   }
   this.balance = { amount: sum }

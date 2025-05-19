@@ -11,7 +11,7 @@
       <div v-if="healthCareCost._id">
         <ExpenseForm
           v-if="modalObjectType === 'expense'"
-          :expense="modalObject"
+          :expense="modalObject as Partial<Expense>"
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
@@ -29,9 +29,9 @@
         <HealthCareCostForm
           v-else
           :mode="(modalMode as 'add' | 'edit')"
-          :healthCareCost="modalObject"
+          :healthCareCost="modalObject as HealthCareCostSimple"
           :loading="modalFormIsLoading"
-          :owner="healthCareCost.owner._id"
+          :owner="healthCareCost.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
@@ -185,10 +185,7 @@
             </tbody>
           </table>
         </div>
-        <div
-          :class="
-            endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance' ? 'col-lg-4 col' : 'col-lg-3 col'
-          ">
+        <div class="col-lg-4 col">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
@@ -302,7 +299,7 @@
 </template>
 
 <script lang="ts" setup>
-import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import { getTotalTotal, mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Expense,
@@ -548,7 +545,7 @@ if (props.endpointPrefix === 'examine/') {
       owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,
       organisationName: orga.name,
-      amount: formatter.money(healthCareCost.value.addUp.total)
+      amount: formatter.baseCurrency(getTotalTotal(healthCareCost.value.addUp))
     })
     mailToInsuranceLink = mailToLink([healthCareCost.value.insurance.email], subject, body)
   }

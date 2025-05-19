@@ -24,6 +24,7 @@ export class ProjectController extends Controller {
       !settings.userCanSeeAllProjects &&
       !(await isUserAllowedToAccess(request.user, [
         'admin',
+        'approve/advance',
         'approve/travel',
         'examine/travel',
         'examine/expenseReport',
@@ -36,7 +37,7 @@ export class ProjectController extends Controller {
     ) {
       throw new AuthorizationError()
     }
-    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1 }, sort: { identifier: 1 } })
+    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1, name: 1 }, sort: { identifier: 1 } })
   }
 }
 

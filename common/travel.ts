@@ -1,6 +1,5 @@
 import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
 import {
-  BaseCurrencyMoney,
   CateringType,
   Country,
   CountryCode,
@@ -194,7 +193,7 @@ export class TravelCalculator {
   }
 
   async getCateringRefund(day: TravelDayFullCountry, type: CateringType, claimSpouseRefund: boolean) {
-    const result: TravelDay['lumpSums']['catering'] = { type, refund: { amount: null } }
+    const result: TravelDay['lumpSums']['catering'] = { type, refund: { amount: 0 } }
     const amount = (await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special))[result.type]
     let leftover = 1
     if (!day.cateringRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
@@ -299,7 +298,7 @@ export class TravelCalculator {
         ) {
           continue
         }
-        const refund: BaseCurrencyMoney = { amount: null }
+        const refund = { amount: 0 }
         const amount = (await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)).overnight
         refund.amount =
           Math.round(

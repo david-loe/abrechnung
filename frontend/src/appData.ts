@@ -10,10 +10,12 @@ import {
   HealthInsurance,
   Locale,
   OrganisationSimple,
-  ProjectSimple,
+  ProjectSimpleWithName,
   Settings,
   TravelSettings,
-  User
+  User,
+  UserWithNameAndProject,
+  _id
 } from '../../common/types'
 import API from './api.js'
 import { formatter } from './formatter'
@@ -32,8 +34,8 @@ export class APP_DATA {
   organisations: OrganisationSimple[]
   specialLumpSums: { [key: string]: string[] }
 
-  projects?: ProjectSimple[]
-  users?: { name: User['name']; _id: string }[]
+  projects?: ProjectSimpleWithName[]
+  users?: UserWithNameAndProject[]
 
   travelCalculator: TravelCalculator
 
@@ -48,8 +50,8 @@ export class APP_DATA {
     organisations: OrganisationSimple[],
 
     specialLumpSums: { [key: string]: string[] },
-    projects?: ProjectSimple[],
-    users?: { name: User['name']; _id: string }[]
+    projects?: ProjectSimpleWithName[],
+    users?: UserWithNameAndProject[]
   ) {
     this.currencies = currencies
     this.countries = countries
@@ -100,8 +102,8 @@ class APP_LOADER {
             this.withProgress(API.getter<DisplaySettings>('displaySettings'))
           ]),
           Promise.allSettled([
-            this.withProgress(API.getter<ProjectSimple[]>('project', {}, {}, false)),
-            this.withProgress(API.getter<{ name: User['name']; _id: string }[]>('users', {}, {}, false))
+            this.withProgress(API.getter<ProjectSimpleWithName[]>('project', {}, {}, false)),
+            this.withProgress(API.getter<UserWithNameAndProject[]>('users', {}, {}, false))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {

@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : $emit('save', localDays, localLastPlaceOfWork)">
+  <form @submit.prevent="disabled ? null : emit('save', localDays, localLastPlaceOfWork)">
     <table class="table table-sm table-hover align-middle text-center">
       <thead>
         <tr>
@@ -107,7 +107,7 @@
         {{ t('labels.save') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="$emit('cancel')">
+      <button type="button" class="btn btn-light" @click="emit('cancel')">
         {{ $t('labels.cancel') }}
       </button>
     </div>
@@ -115,7 +115,7 @@
 </template>
 <script lang="ts" setup>
 import { getLumpSumsSum, mergeDeep } from '@/../../common/scripts'
-import { BaseCurrencyMoney, Place, Travel, TravelDay, meals } from '@/../../common/types.js'
+import { Place, Travel, TravelDay, meals } from '@/../../common/types.js'
 import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
@@ -140,8 +140,8 @@ const props = defineProps({
 const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>]; cancel: [] }>()
 
 const lastPlaceOfWorkList = ref<Omit<Place, 'place'>[]>([])
-const localLastPlaceOfWork = ref<Place>(props.travel.lastPlaceOfWork)
-const lumpSumsSum = ref<BaseCurrencyMoney>(getLumpSumsSum(props.travel.days))
+const localLastPlaceOfWork = ref(props.travel.lastPlaceOfWork)
+const lumpSumsSum = ref(getLumpSumsSum(props.travel.days))
 const isCalculatingLumpSumsSum = ref(false)
 const localDays = ref<TravelDay[]>([])
 

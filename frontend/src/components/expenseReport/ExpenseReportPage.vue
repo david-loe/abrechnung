@@ -31,7 +31,7 @@
           :mode="modalMode"
           :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
           :loading="modalFormIsLoading"
-          :owner="expenseReport.owner._id"
+          :owner="expenseReport.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
@@ -168,7 +168,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-lg-3 col">
+        <div class="col-lg-4 col">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>

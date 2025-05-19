@@ -27,8 +27,7 @@
       <AdvanceSelector
         id="expenseReportFormAdvance"
         v-model="formExpenseReport.advances"
-        :owner-id="formExpenseReport.owner"
-        :project-id="formExpenseReport.project?._id"
+        :owner="formExpenseReport.owner"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
@@ -46,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { ExpenseReportSimple, baseCurrency } from '@/../../common/types.js'
+import { ExpenseReportSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
@@ -61,7 +60,7 @@ export default defineComponent({
   props: {
     expenseReport: { type: Object as PropType<Partial<ExpenseReportSimple>>, required: true },
     mode: { type: String as PropType<'add' | 'edit'>, required: true },
-    owner: { type: String },
+    owner: { type: Object as PropType<UserWithName> },
     updateUserOrg: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
     loading: { type: Boolean, default: false }
@@ -73,6 +72,7 @@ export default defineComponent({
     }
   },
   methods: {
+    idDocumentToId,
     default() {
       return {
         name: '',

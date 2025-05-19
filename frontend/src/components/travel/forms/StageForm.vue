@@ -183,9 +183,29 @@
 
     <label for="stageFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
     <InfoPoint :text="$t('info.purpose')" />
-    <select class="form-select mb-2" v-model="formStage.purpose" id="stageFormPurpose" :disabled="disabled" required>
+    <select class="form-select mb-3" v-model="formStage.purpose" id="stageFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
     </select>
+
+    <div class="mb-3" v-if="useDifferentProject || formStage.project">
+      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}</label>
+      <InfoPoint :text="$t('info.project')" />
+      <button
+        type="button"
+        class="btn btn-sm btn-link ms-3"
+        @click="
+          //prettier-ignore
+          useDifferentProject = false;
+          formStage.project = ''
+        ">
+        {{ $t('labels.reset') }}
+      </button>
+
+      <ProjectSelector id="healthCareCostFormProject" v-model="formStage.project"> </ProjectSelector>
+    </div>
+    <div class="mb-2" v-else>
+      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ $t('labels.useDifferentProject') }}</button>
+    </div>
 
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
@@ -238,12 +258,13 @@ import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
+import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'StageForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput, TextArea },
+  components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput, TextArea, ProjectSelector },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev', 'postVehicleRegistration'],
   props: {
     stage: {
@@ -265,6 +286,7 @@ export default defineComponent({
   },
   data() {
     return {
+      useDifferentProject: false,
       formStage: this.default(),
       minDate: '' as string | Date,
       maxDate: '' as string | Date,
@@ -292,7 +314,8 @@ export default defineComponent({
           date: ''
         },
         purpose: 'professional',
-        note: undefined
+        note: undefined,
+        project: undefined
       }
     },
     showMidnightCountries() {
@@ -351,6 +374,7 @@ export default defineComponent({
         ;(this.$refs.fileUpload as typeof FileUpload).clear()
       }
       this.formStage = this.default()
+      this.useDifferentProject = false
     },
     output() {
       if (this.vehicleRegistrationChanged) {

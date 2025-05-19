@@ -3,14 +3,14 @@
     <div class="row align-items-center">
       <div class="col">
         <label>{{ $t('labels.user') }}</label>
-        <UserSelector v-model="userId" required></UserSelector>
+        <UserSelector v-model="user" required></UserSelector>
       </div>
       <div class="col-auto">
         <i class="bi bi-chevron-double-right fs-2"></i>
       </div>
       <div class="col">
         <label>{{ $t('labels.userToOverwrite') }}</label>
-        <UserSelector @update:model-value="(_id) => (userIdToOverwrite = _id)"></UserSelector>
+        <UserSelector @update:model-value="(u: UserWithNameAndProject) => (userIdToOverwrite = idDocumentToId(u))"></UserSelector>
         <input
           class="form-control form-control-sm"
           type="text"
@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { User, UserReplaceReferencesResult, objectIdRegex } from '@/../../common/types.js'
+import { User, UserReplaceReferencesResult, UserWithNameAndProject, idDocumentToId, objectIdRegex } from '@/../../common/types.js'
 import API from '@/api.js'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { defineComponent } from 'vue'
@@ -72,7 +72,7 @@ export default defineComponent({
   components: { UserSelector },
   data() {
     return {
-      userId: null as string | null,
+      user: undefined as UserWithNameAndProject | undefined,
       userIdToOverwrite: null as string | null,
       delOverwritten: false,
       result: undefined as MergeResult | undefined,
@@ -80,11 +80,12 @@ export default defineComponent({
     }
   },
   methods: {
+    idDocumentToId,
     async mergeUser() {
       if (confirm(this.$t('alerts.areYouSureMerge'))) {
         const result = await API.setter<MergeResult>(
           'admin/user/merge',
-          { userId: this.userId, userIdToOverwrite: this.userIdToOverwrite },
+          { userId: idDocumentToId(this.user), userIdToOverwrite: this.userIdToOverwrite },
           { params: { delOverwritten: this.delOverwritten } }
         )
         if (result.ok) {

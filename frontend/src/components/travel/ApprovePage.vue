@@ -44,8 +44,8 @@
         :columns-to-hide="[
           'state',
           'editor',
-          'addUp.total.amount',
-          'addUp.balance.amount',
+          'addUp.totalTotal',
+          'addUp.totalBalance',
           'updatedAt',
           'report',
           'organisation',
@@ -62,7 +62,7 @@
         <TravelList
           endpoint="approve/travel"
           stateFilter="approved"
-          :columns-to-hide="['state', 'addUp.total.amount', 'addUp.balance.amount', 'updatedAt', 'report', 'organisation', 'comments']">
+          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'comments']">
         </TravelList>
       </template>
     </div>

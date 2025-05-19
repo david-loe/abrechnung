@@ -1,6 +1,7 @@
 import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
+  AddUp,
   Comment,
   Travel,
   TravelRecord,
@@ -64,7 +65,8 @@ const travelSchema = () =>
             type: { type: String, enum: transportTypes, required: true }
           },
           cost: costObject(true, true, false),
-          purpose: { type: String, enum: ['professional', 'mixed', 'private'] },
+          purpose: { type: String, enum: ['professional', 'mixed', 'private'], required: true, default: 'professional' },
+          project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }
       ],
@@ -72,7 +74,8 @@ const travelSchema = () =>
         {
           description: { type: String, required: true },
           cost: costObject(true, true, true),
-          purpose: { type: String, enum: ['professional', 'mixed'] },
+          purpose: { type: String, enum: ['professional', 'mixed'], required: true, default: 'professional' },
+          project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }
       ],
@@ -112,10 +115,16 @@ const populates = {
     { path: 'stages.cost.receipts', select: { name: 1, type: 1 } },
     { path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } },
     { path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } },
-    { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } }
+    { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } },
+    { path: 'stages.project', select: { identifier: 1, organisation: 1 } }
   ],
-  expenses: [{ path: 'expenses.cost.currency' }, { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } }],
-  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1 } }],
+  expenses: [
+    { path: 'expenses.cost.currency' },
+    { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } },
+    { path: 'expenses.project', select: { identifier: 1, organisation: 1 } }
+  ],
+  addUp: [{ path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -206,7 +215,7 @@ schema.pre('validate', async function (this: TravelDoc) {
   }
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this)
+  this.addUp = addUp(this) as AddUp<Travel>[]
   await populateAll(this, populates)
 })
 

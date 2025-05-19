@@ -29,7 +29,7 @@
             :mode="modalMode"
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit"
@@ -40,7 +40,7 @@
             :mode="(modalMode as 'add' | 'edit')"
             :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">
@@ -50,7 +50,7 @@
             :mode="(modalMode as 'add' | 'edit')"
             :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
             :loading="modalFormIsLoading"
-            :owner="APP_DATA?.user._id"
+            :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit">
@@ -105,7 +105,7 @@
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'comments']"
           @clicked-applied="(t) => showModal('view', 'travel', t)"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
@@ -114,14 +114,22 @@
           class="mb-4"
           ref="expenseReportList"
           endpoint="expenseReport"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.total.amount', 'organisation', 'comments']"></ExpenseReportList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'comments']"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'comments', 'log.underExamination.date']"></HealthCareCostList>
+          :columns-to-hide="[
+            'owner',
+            'updatedAt',
+            'report',
+            'addUp.totalTotal',
+            'organisation',
+            'comments',
+            'log.underExamination.date'
+          ]"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
         <h3>{{ t('labels.advance') }}</h3>

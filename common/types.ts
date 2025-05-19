@@ -8,7 +8,7 @@ export type _id = Types.ObjectId
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
 export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
-  return (doc as { _id: idType })._id || (doc as idType)
+  return doc ? (doc as { _id: idType })._id || (doc as idType) : doc
 }
 
 /**
@@ -241,9 +241,12 @@ export interface ProjectSimple {
   _id: _id
 }
 
-export interface Project extends ProjectSimple {
+export interface ProjectSimpleWithName extends ProjectSimple {
   name?: string
-  balance: BaseCurrencyMoney
+}
+
+export interface Project extends ProjectSimpleWithName {
+  balance: BaseCurrencyMoneyNotNull
   budget?: BaseCurrencyMoney
 }
 
@@ -292,6 +295,15 @@ export interface User extends UserSimple {
   token?: Token | null
 }
 
+export interface UserWithName {
+  _id: _id
+  name: User['name']
+}
+
+export interface UserWithNameAndProject extends UserWithName {
+  projects: User['projects']
+}
+
 export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {
   access: { user: User['access']['user']; admin: User['access']['admin'] }
 } = {
@@ -301,6 +313,9 @@ export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_i
   access: { user: true, admin: true }
 }
 
+export interface BaseCurrencyMoneyNotNull extends BaseCurrencyMoney {
+  amount: number
+}
 export interface BaseCurrencyMoney {
   amount: number | null
 }
@@ -312,6 +327,9 @@ export interface Money extends BaseCurrencyMoney {
     rate: number
     amount: number
   } | null
+}
+export interface MoneyNotNull extends Money {
+  amount: number
 }
 
 export interface MoneyPlus extends Money {
@@ -333,6 +351,7 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }
@@ -340,6 +359,7 @@ export interface Stage {
 export interface Expense {
   description: string
   cost: Cost
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }
@@ -366,12 +386,6 @@ export type Transport =
       distanceRefundType: DistanceRefundType
     }
 
-export interface Refund {
-  type: LumpsumType
-  refund: BaseCurrencyMoney
-  _id: Types.ObjectId
-}
-
 export interface TravelDayFullCountry extends Omit<TravelDay, 'country'> {
   country: Country
 }
@@ -386,8 +400,8 @@ export interface TravelDay {
   overnightRefund: boolean
   purpose: PurposeSimple
   lumpSums: {
-    overnight: { refund: BaseCurrencyMoney }
-    catering: { refund: BaseCurrencyMoney; type: CateringType }
+    overnight: { refund: BaseCurrencyMoneyNotNull }
+    catering: { refund: BaseCurrencyMoneyNotNull; type: CateringType }
   }
   _id: _id
 }
@@ -420,8 +434,9 @@ export interface Report<S extends AnyState = AnyState> extends ReportSimple<S> {
 
 export interface AdvanceBase {
   name: string
-  budget: Money
-  balance: BaseCurrencyMoney
+  budget: MoneyNotNull
+  project: Project
+  balance: BaseCurrencyMoneyNotNull
   reason: string
   state: AdvanceState
   _id: _id
@@ -439,7 +454,7 @@ export interface TravelSimple extends ReportSimple<TravelState> {
   startDate: Date | string
   endDate: Date | string
   progress: number
-  addUp: AddUpResult<Travel>
+  addUp: AddUp<Travel>[]
   advances: AdvanceBase[]
   isCrossBorder?: boolean | null
   a1Certificate?: {
@@ -459,7 +474,7 @@ export interface Travel extends TravelSimple, Report<TravelState> {
 }
 
 export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
-  addUp: AddUpResult<ExpenseReport>
+  addUp: AddUp<ExpenseReport>[]
   advances: AdvanceBase[]
 }
 export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
@@ -470,7 +485,7 @@ export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> 
   patientName: string
   insurance: HealthInsurance
   refundSum: MoneyPlus
-  addUp: AddUpResult<HealthCareCost>
+  addUp: AddUp<HealthCareCost>[]
   advances: AdvanceBase[]
 }
 export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
@@ -624,15 +639,18 @@ export function reportIsExpenseReport(report: any): report is any {
 }
 
 type AddUpBase = {
-  balance: BaseCurrencyMoney
-  total: BaseCurrencyMoney
-  advance: BaseCurrencyMoney
-  expenses: BaseCurrencyMoney
+  project: ProjectSimple
+  balance: BaseCurrencyMoneyNotNull
+  total: BaseCurrencyMoneyNotNull
+  advance: BaseCurrencyMoneyNotNull
+  expenses: BaseCurrencyMoneyNotNull
   advanceOverflow: boolean
 }
-export type AddUpResult<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
-  ? AddUpBase & { lumpSums: BaseCurrencyMoney }
+export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
+  ? AddUpBase & { lumpSums: BaseCurrencyMoneyNotNull }
   : AddUpBase
+
+export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = any> = AddUp<T> | (Omit<AddUp<T>, 'project'> & { project: _id })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
