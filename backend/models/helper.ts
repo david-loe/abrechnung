@@ -94,6 +94,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
         }
       ]
     },
+    bookingRemark: { type: String },
     history: { type: [{ type: Schema.Types.ObjectId, ref: modelName }] },
     historic: { type: Boolean, required: true, default: false }
   }

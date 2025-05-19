@@ -17,12 +17,9 @@
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
       @loaded="hideExpandColumn">
-      <template #expand="{ comments }">
-        <div class="m-1" v-for="comment in comments" :key="comment._id">
-          <small>
-            <i>{{ `${(comment as Comment).author.name.givenName} ${(comment as Comment).author.name.familyName.substring(0, 1)}: ` }}</i>
-            <span>{{ (comment as Comment).text }}</span>
-          </small>
+      <template #expand="{ bookingRemark }">
+        <div v-if="bookingRemark" class="px-3 pb-1 border-bottom border-4">
+          <small style="white-space: pre-wrap">{{ bookingRemark }}</small>
         </div>
       </template>
     </TravelList>
@@ -30,7 +27,6 @@
 </template>
 
 <script lang="ts" setup>
-import { Comment } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import TravelList from '@/components/travel/TravelList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
@@ -47,7 +43,7 @@ function hideExpandColumn() {
 
 const { handlePrint } = useVueToPrint({
   content: tableRef as any,
-  documentTitle: 'AwesomeFileName',
+  documentTitle: 'List',
   removeAfterPrint: true,
   onBeforeGetContent() {
     return new Promise((resolve) => {

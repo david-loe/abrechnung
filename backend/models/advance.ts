@@ -13,6 +13,7 @@ import {
   advanceStates,
   baseCurrency
 } from '../../common/types.js'
+import { setAdvanceBalance } from '../helper.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 
@@ -75,8 +76,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
   if (this.state === 'appliedFor') {
-    const budgetAmount = getBaseCurrencyAmount(this.budget)
-    this.balance.amount = budgetAmount
+    setAdvanceBalance(this)
   }
   if (save) {
     await this.save({ session })

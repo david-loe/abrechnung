@@ -114,7 +114,7 @@ export async function checkForMigrations() {
                       ? {}
                       : { appliedFor: report.log.appliedFor ?? { date: report.createdAt, editor: travelApprover?._id } },
                   state: report.state === 'appliedFor' ? 'appliedFor' : 'approved',
-                  editor: report.editor
+                  editor: report.state === 'appliedFor' ? report.editor : travelApprover?._id
                 })
                 await advance.save()
                 report.advances = [advance]

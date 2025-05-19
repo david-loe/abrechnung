@@ -30,7 +30,7 @@
         class="mb-5"
         endpoint="examine/expenseReport"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
       </ExpenseReportList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = 'refunded'">

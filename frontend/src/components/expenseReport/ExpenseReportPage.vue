@@ -199,7 +199,14 @@
                     v-model="expenseReport.comment as string | undefined"
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
                 </div>
-                <template v-if="expenseReport.state === 'inWork'">
+                <div v-if="endpointPrefix === 'examine/'" class="mb-3">
+                  <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
+                  <TextArea
+                    id="comment"
+                    v-model="expenseReport.bookingRemark"
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
+                </div>
+                <div v-if="expenseReport.state === 'inWork'">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
@@ -210,28 +217,30 @@
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
-                </template>
+                </div>
                 <template v-else-if="expenseReport.state === 'underExamination'">
-                  <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
-                    <i class="bi bi-coin"></i>
-                    <span class="ms-1">{{ t('labels.refund') }}</span>
-                  </button>
-                  <button
-                    class="btn btn-secondary"
-                    @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
-                    :disabled="expenseReport.editor._id !== expenseReport.owner._id">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                    <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
-                  </button>
+                  <div class="mb-2" v-if="endpointPrefix === 'examine/'">
+                    <button class="btn btn-success" @click="refund()">
+                      <i class="bi bi-coin"></i>
+                      <span class="ms-1">{{ t('labels.refund') }}</span>
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      class="btn btn-secondary"
+                      @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
+                      :disabled="expenseReport.editor._id !== expenseReport.owner._id">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                    </button>
+                  </div>
                 </template>
-                <a
-                  v-else-if="expenseReport.state === 'refunded'"
-                  class="btn btn-primary"
-                  :href="reportLink"
-                  :download="expenseReport.name + '.pdf'">
-                  <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                </a>
+                <div v-else-if="expenseReport.state === 'refunded'">
+                  <a class="btn btn-primary" :href="reportLink" :download="expenseReport.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -356,7 +365,8 @@ async function backToInWork() {
 async function refund() {
   const result = await API.setter<ExpenseReport>('examine/expenseReport/refunded', {
     _id: expenseReport.value._id,
-    comment: expenseReport.value.comment
+    comment: expenseReport.value.comment,
+    bookingRemark: expenseReport.value.bookingRemark
   })
   if (result.ok) {
     router.push({ path: '/examine/expenseReport' })

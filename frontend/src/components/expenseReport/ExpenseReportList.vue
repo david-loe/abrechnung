@@ -140,11 +140,9 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-comments="{ comments }">
-      <span v-if="comments.length > 0">
-        <TooltipElement
-          html
-          :text="comments.map((comment: Comment) => `<b>${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}</b>: ${comment.text}`).join('<br>')">
+    <template #item-bookingRemark="{ bookingRemark }">
+      <span v-if="bookingRemark">
+        <TooltipElement html :text="bookingRemark.replace(/\n/g, '<br>')">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
@@ -159,7 +157,7 @@
 
 <script lang="ts" setup>
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
-import { Comment, ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
+import { ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
 import CategorySelector from '@/components/elements/CategorySelector.vue'
@@ -216,7 +214,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt' },
     { text: '', value: 'report', width: 40 },
-    { text: '', value: 'comments', width: 25 }
+    { text: '', value: 'bookingRemark', width: 25 }
   )
 }
 

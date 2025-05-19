@@ -313,15 +313,22 @@
                     </p>
                   </small>
                 </div>
+                <div v-if="travel.state !== 'refunded'" class="mb-3">
+                  <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
+                  <TextArea
+                    id="comment"
+                    v-model="travel.comment"
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
+                </div>
+                <div v-if="endpointPrefix === 'examine/'" class="mb-3">
+                  <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
+                  <TextArea
+                    id="comment"
+                    v-model="travel.bookingRemark"
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
+                </div>
                 <template v-if="travel.state !== 'refunded'">
-                  <div class="mb-3">
-                    <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                    <TextArea
-                      id="comment"
-                      v-model="travel.comment"
-                      :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
-                  </div>
-                  <template v-if="travel.state === 'approved'">
+                  <div v-if="travel.state === 'approved'">
                     <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
                       <button class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
@@ -332,25 +339,31 @@
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
-                  </template>
+                  </div>
                   <template v-else-if="travel.state === 'underExamination'">
-                    <button v-if="endpointPrefix === 'examine/'" class="btn btn-success mb-2" @click="refund()">
-                      <i class="bi bi-coin"></i>
-                      <span class="ms-1">{{ t('labels.refund') }}</span>
-                    </button>
-                    <button
-                      class="btn btn-secondary"
-                      @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
-                      :disabled="travel.editor._id !== travel.owner._id">
-                      <i class="bi bi-arrow-counterclockwise"></i>
-                      <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
-                    </button>
+                    <div v-if="endpointPrefix === 'examine/'" class="mb-2">
+                      <button class="btn btn-success" @click="refund()">
+                        <i class="bi bi-coin"></i>
+                        <span class="ms-1">{{ t('labels.refund') }}</span>
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        class="btn btn-secondary"
+                        @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
+                        :disabled="travel.editor._id !== travel.owner._id">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
+                      </button>
+                    </div>
                   </template>
                 </template>
-                <a v-else-if="travel.state === 'refunded'" class="btn btn-primary" :href="reportLink" :download="travel.name + '.pdf'">
-                  <i class="bi bi-download"></i>
-                  <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                </a>
+                <div v-else>
+                  <a class="btn btn-primary" :href="reportLink" :download="travel.name + '.pdf'">
+                    <i class="bi bi-download"></i>
+                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -544,7 +557,11 @@ async function backToApproved() {
 }
 
 async function refund() {
-  const result = await API.setter<Travel>('examine/travel/refunded', { _id: travel.value._id, comment: travel.value.comment })
+  const result = await API.setter<Travel>('examine/travel/refunded', {
+    _id: travel.value._id,
+    comment: travel.value.comment,
+    bookingRemark: travel.value.bookingRemark
+  })
   if (result.ok) {
     router.push({ path: '/examine/travel' })
   }

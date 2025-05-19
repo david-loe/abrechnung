@@ -32,7 +32,7 @@
         class="mb-5"
         endpoint="examine/healthCareCost"
         stateFilter="underExamination"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.underExamination.date', 'bookingRemark']">
       </HealthCareCostList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = 'underExaminationByInsurance'">

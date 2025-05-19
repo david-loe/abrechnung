@@ -24,7 +24,7 @@ export class HealthCareCostController extends Controller {
     return await this.getter(HealthCareCost, {
       query,
       filter: { owner: request.user._id, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
@@ -255,7 +255,7 @@ export class HealthCareCostExamineController extends Controller {
 
   @Post('underExaminationByInsurance')
   public async postUnderExaminationByInsurance(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
@@ -325,9 +325,12 @@ export class HealthCareCostExamineController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
-    if (!extendedBody._id && !extendedBody.name) {
-      const date = new Date()
-      extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+    if (!extendedBody._id) {
+      ;(extendedBody as any).log = { inWork: { date: new Date(), editor: request.user._id } }
+      if (!extendedBody.name) {
+        const date = new Date()
+        extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
