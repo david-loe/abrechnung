@@ -10,5 +10,3 @@ import { BadgeStyle } from '@/../../common/types.js'
 import { PropType } from 'vue'
 defineProps({ text: { type: String, required: true }, style: { type: Object as PropType<BadgeStyle> } })
 </script>
-
-<style></style>
