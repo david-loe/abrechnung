@@ -43,11 +43,11 @@
 </template>
 
 <script setup lang="ts">
+import { Base64 } from '@/../../common/scripts'
 import { AdvanceSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import API from '@/api'
 import { PropType, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Base64 } from '../../../../common/scripts'
 
 // Props
 const props = defineProps({

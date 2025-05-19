@@ -146,6 +146,7 @@
 import { getById } from '@/../../common/scripts.js'
 import { AdvanceSimple, AdvanceState, Comment, advanceStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
@@ -156,7 +157,6 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 
