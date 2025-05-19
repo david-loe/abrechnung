@@ -1,6 +1,10 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Currency as ICurrency, _id, locales } from '../../common/types.js'
+import Advance from '../models/advance.js'
 import Currency, { currencySchema } from '../models/currency.js'
+import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
+import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
@@ -30,7 +34,32 @@ export class CurrencyAdminController extends Controller {
   }
   @Delete()
   public async delete(@Query() _id: _id) {
-    return await this.deleter(Currency, { _id: _id })
+    return await this.deleter(Currency, {
+      _id: _id,
+      referenceChecks: [
+        {
+          model: Travel,
+          paths: ['stages.cost.currency', 'expenses.cost.currency'],
+          conditions: { historic: false }
+        },
+        {
+          model: ExpenseReport,
+          paths: ['expenses.cost.currency'],
+          conditions: { historic: false }
+        },
+        {
+          model: HealthCareCost,
+          paths: ['expenses.cost.currency', 'refundSum.currency'],
+          conditions: { historic: false }
+        },
+        {
+          model: Advance,
+          paths: ['budget.currency'],
+          conditions: { historic: false }
+        }
+      ],
+      minDocumentCount: 1
+    })
   }
   @Get('form')
   public async getForm() {

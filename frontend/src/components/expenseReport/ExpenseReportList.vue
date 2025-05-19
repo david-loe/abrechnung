@@ -36,6 +36,18 @@
         </div>
       </div>
     </template>
+    <template #header-category="header">
+      <div class="filter-column">
+        {{ header.text }}
+        <span style="cursor: pointer" @click="clickFilter('category')">
+          <i v-if="showFilter.category" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.category">
+          <CategorySelector v-model="filter.category as any"></CategorySelector>
+        </div>
+      </div>
+    </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ header.text }}
@@ -108,6 +120,9 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" style="display: inline-block"></StateBadge>
     </template>
+    <template #item-category="{ category }">
+      <Badge :text="category.name" :style="category.style"></Badge>
+    </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
@@ -146,6 +161,9 @@
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { Comment, ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import Badge from '@/components/elements/Badge.vue'
+import CategorySelector from '@/components/elements/CategorySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
@@ -156,7 +174,6 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 
@@ -186,6 +203,9 @@ const headers: Header[] = [
   { text: t('labels.name'), value: 'name' },
   { text: t('labels.state'), value: 'state' }
 ]
+if (APP_DATA.value && APP_DATA.value.categories.length > 1) {
+  headers.push({ text: t('labels.category'), value: 'category' })
+}
 if (window.innerWidth > bp.md) {
   headers.push(
     { text: t('labels.project'), value: 'project.identifier' },
@@ -216,6 +236,7 @@ const getEmptyFilter = () =>
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
+    category: undefined,
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined }
   }) as Filter
@@ -230,6 +251,7 @@ const showFilter = ref({
   name: false,
   owner: false,
   state: false,
+  category: false,
   project: false,
   'project.organisation': false,
   updatedAt: false

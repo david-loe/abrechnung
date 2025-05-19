@@ -106,13 +106,16 @@ export class HealthCareCostController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
+
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (
-          (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork' && request.user.access['inWork:healthCareCost']) ||
-          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
-        ) {
-          await oldObject.saveToHistory()
-          return true
+        if (oldObject.owner._id.equals(request.user._id)) {
+          if (oldObject.state === 'inWork' && request.user.access['inWork:healthCareCost']) {
+            return true
+          }
+          if (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id)) {
+            await oldObject.saveToHistory()
+            return true
+          }
         }
         return false
       },

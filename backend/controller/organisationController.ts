@@ -47,7 +47,11 @@ export class OrganisationAdminController extends Controller {
 
   @Delete()
   public async delete(@Query() _id: _id) {
-    return await this.deleter(Organisation, { _id: _id, referenceChecks: [{ model: Project, paths: ['organisation'] }] })
+    return await this.deleter(Organisation, {
+      _id: _id,
+      referenceChecks: [{ model: Project, paths: ['organisation'] }],
+      minDocumentCount: 1
+    })
   }
 
   @Get('form')

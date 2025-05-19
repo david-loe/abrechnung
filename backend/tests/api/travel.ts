@@ -16,12 +16,7 @@ let travel: TravelSimple = {
     place: 'Ankara'
   },
   startDate: new Date('2023-08-24T00:00:00.000Z'),
-  endDate: new Date('2023-09-02T00:00:00.000Z'),
-  advance: {
-    amount: null, //@ts-ignore
-    currency: { _id: 'EUR' },
-    exchangeRate: null
-  }
+  endDate: new Date('2023-09-02T00:00:00.000Z')
 }
 
 test.serial('GET /project', async (t) => {

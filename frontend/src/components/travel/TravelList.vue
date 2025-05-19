@@ -177,6 +177,7 @@ import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.
 import { Comment, TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
@@ -189,7 +190,6 @@ import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import DateInput from '../elements/DateInput.vue'
 
 const { t } = useI18n()
 

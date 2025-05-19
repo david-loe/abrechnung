@@ -39,7 +39,7 @@ export class NotImplementedError extends ClientError {
 
 export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): void {
   if (!(err instanceof AuthorizationError)) {
-    logger.warn(`Error on request of ${req.path}`)
+    logger.warn(`Error on request: ${req.user?.email || 'Guest'} -> ${req.method} ${req.url}`)
     logger.warn(err)
   }
 

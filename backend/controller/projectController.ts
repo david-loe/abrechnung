@@ -75,10 +75,11 @@ export class ProjectAdminController extends Controller {
     return await this.deleter(Project, {
       _id: _id,
       referenceChecks: [
-        { model: ExpenseReport, paths: ['project'] },
-        { model: Travel, paths: ['project'] },
-        { model: HealthCareCost, paths: ['project'] }
-      ]
+        { model: ExpenseReport, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
+        { model: Travel, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } }
+      ],
+      minDocumentCount: 1
     })
   }
   @Get('form')

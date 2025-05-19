@@ -78,7 +78,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[] },
+    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; category?: IdDocument },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
@@ -99,12 +99,14 @@ export class ExpenseReportController extends Controller {
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (
-          (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork' && request.user.access['inWork:expenseReport']) ||
-          (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id))
-        ) {
-          await oldObject.saveToHistory()
-          return true
+        if (oldObject.owner._id.equals(request.user._id)) {
+          if (oldObject.state === 'inWork' && request.user.access['inWork:expenseReport']) {
+            return true
+          }
+          if (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id)) {
+            await oldObject.saveToHistory()
+            return true
+          }
         }
         return false
       },
@@ -247,7 +249,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post()
   public async postAny(
-    @Body() requestBody: { project?: IdDocument; _id: _id; name?: string; advances?: IdDocument[] },
+    @Body() requestBody: { project?: IdDocument; _id: _id; name?: string; advances?: IdDocument[]; category?: IdDocument },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
@@ -265,7 +267,15 @@ export class ExpenseReportExamineController extends Controller {
   @Post('inWork')
   public async postBackInWork(
     @Body()
-    requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; owner?: IdDocument; comment?: string },
+    requestBody: {
+      project?: IdDocument
+      _id?: _id
+      name?: string
+      advances?: IdDocument[]
+      category?: IdDocument
+      owner?: IdDocument
+      comment?: string
+    },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
