@@ -106,6 +106,8 @@ export class UserController extends Controller {
 @Security('httpBearer', ['user', 'examine/healthCareCost'])
 @Security('cookieAuth', ['user', 'confirm/healthCareCost'])
 @Security('httpBearer', ['user', 'confirm/healthCareCost'])
+@Security('cookieAuth', ['user', 'approved/advance'])
+@Security('httpBearer', ['user', 'approved/advance'])
 @Security('cookieAuth', ['user', 'refunded/expenseReport'])
 @Security('httpBearer', ['user', 'refunded/expenseReport'])
 @Security('cookieAuth', ['user', 'refunded/travel'])
