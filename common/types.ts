@@ -576,6 +576,7 @@ export const accesses = [
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
+  'approved/advance',
   'refunded/travel',
   'refunded/expenseReport',
   'refunded/healthCareCost',

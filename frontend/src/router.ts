@@ -3,6 +3,7 @@ import { RouteLocationNormalized, createRouter, createWebHistory } from 'vue-rou
 import HomePage from './components/HomePage.vue'
 import LoginPage from './components/LoginPage.vue'
 import AdvanceApprovePage from './components/advance/ApprovePage.vue'
+import ApprovedAdvancePage from './components/advance/ApprovedPage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
@@ -35,14 +36,19 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
-    component: TravelApprovePage,
+    path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
+    component: AdvanceApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
-    component: AdvanceApprovePage,
+    path: '/approved/advance',
+    component: ApprovedAdvancePage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
+    component: TravelApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },

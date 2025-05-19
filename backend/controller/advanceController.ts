@@ -211,3 +211,41 @@ export class AdvanceApproveController extends Controller {
     return Readable.from([report])
   }
 }
+
+@Tags('Advance')
+@Route('approved/advance')
+@Security('cookieAuth', ['approved/advance'])
+@Security('httpBearer', ['approved/advance'])
+export class AdvanceRefundedController extends Controller {
+  @Get()
+  public async getRefunded(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IAdvance> = { historic: false, state: { $in: ['approved', 'completed'] } }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
+    }
+    return await this.getter(Advance, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0 },
+      sort: { 'log.appliedFor.date': -1 }
+    })
+  }
+
+  @Get('report')
+  @Produces('application/pdf')
+  public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IAdvance> = { _id, historic: false, state: { $in: ['approved', 'completed'] } }
+    if (request.user.projects.supervised.length > 0) {
+      filter.project = { $in: request.user.projects.supervised }
+    }
+    const advance = await Advance.findOne(filter).lean()
+    if (!advance) {
+      throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
+    }
+    const report = await reportPrinter.print(advance, request.user.settings.language)
+    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
+    this.setHeader('Content-Type', 'application/pdf')
+    this.setHeader('Content-Length', report.length)
+    return Readable.from([report])
+  }
+}

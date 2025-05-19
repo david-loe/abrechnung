@@ -30,6 +30,7 @@
     "examine/travel": ["airplane", "pencil-square"],
     "inWork:expenseReport": ["coin", "plus"],
     "inWork:healthCareCost": ["hospital", "plus"],
+    "approved/advance": ["briefcase", "cash-coin", "bank"],
     "refunded/expenseReport": ["coin", "bank"],
     "refunded/healthCareCost": ["hospital", "bank"],
     "refunded/travel": ["airplane", "bank"],

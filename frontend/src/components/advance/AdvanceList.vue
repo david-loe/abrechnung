@@ -72,15 +72,15 @@
         </div>
       </div>
     </template>
-    <template #header-updatedAt="header">
+    <template #header-log.appliedFor.date="header">
       <div class="filter-column">
         {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('updatedAt')">
-          <i v-if="showFilter.updatedAt" class="bi bi-funnel-fill"></i>
+        <span style="cursor: pointer" @click="clickFilter('log.appliedFor.date')">
+          <i v-if="showFilter['log.appliedFor.date']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter.updatedAt">
-          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()"></DateInput>
+        <div v-if="showFilter['log.appliedFor.date']">
+          <DateInput v-model="(filter['log.appliedFor.date'] as any).$gt" :max="new Date()"></DateInput>
         </div>
       </div>
     </template>
@@ -89,6 +89,7 @@
         {{ advance.name }}
       </span>
       <a
+        v-else
         class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover"
         style="cursor: pointer"
         @click="emits('clicked', advance)">
@@ -122,7 +123,7 @@
         <i class="bi bi-download"></i>
       </a>
     </template>
-    <template #item-log.approved.date="{ log }">
+    <template #item-log.appliedFor.date="{ log }">
       {{ $formatter.dateTime(log.appliedFor?.date) }}
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
@@ -192,7 +193,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.balance'), value: 'balance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.approvedOn'), value: 'log.approved.date' },
+    { text: t('labels.approvedOn'), value: 'log.appliedFor.date' },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -215,7 +216,7 @@ const getEmptyFilter = () =>
     owner: undefined,
     state: undefined,
     project: { $in: [undefined] },
-    updatedAt: { $gt: undefined }
+    'log.appliedFor.date': { $gt: undefined }
   }) as Filter
 
 const filter = ref(getEmptyFilter())
@@ -230,7 +231,7 @@ const showFilter = ref({
   state: false,
   project: false,
   'project.organisation': false,
-  updatedAt: false
+  'log.appliedFor.date': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value) {

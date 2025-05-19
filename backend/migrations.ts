@@ -75,6 +75,7 @@ export async function checkForMigrations() {
             'accessIcons.appliedFor:advance': ['briefcase', 'cash-coin', 'plus'],
             'accessIcons.approve/travel': ['airplane', 'clipboard-check'],
             'accessIcons.approve/advance': ['briefcase', 'cash-coin', 'clipboard-check'],
+            'accessIcons.approved/advance': ['briefcase', 'cash-coin', 'bank'],
             reportTypeIcons: {
               travel: ['airplane'],
               expenseReport: ['coin'],
