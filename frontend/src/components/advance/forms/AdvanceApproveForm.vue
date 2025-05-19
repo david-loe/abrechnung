@@ -7,8 +7,8 @@
     </div>
 
     <div class="mb-3">
-      <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
-      <TextArea id="comment" v-model="bookingRemark"></TextArea>
+      <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
+      <TextArea id="bookingRemark" v-model="bookingRemark"></TextArea>
     </div>
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-success me-2" @click="emit('decision', 'approved', comment, bookingRemark)" :disabled="loading">

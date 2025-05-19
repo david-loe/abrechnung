@@ -321,9 +321,9 @@
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
-                  <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
+                  <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
                   <TextArea
-                    id="comment"
+                    id="bookingRemark"
                     v-model="travel.bookingRemark"
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
                 </div>
