@@ -54,6 +54,11 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -77,6 +82,11 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<Stage>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -360,6 +370,11 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,
@@ -387,6 +402,11 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<Stage>,
     @Request() request: AuthenticatedExpressRequest
   ) {
+    // multipart/form-data does not send null values
+    // so we need to set it to null if the value is an empty string
+    if (requestBody.project?.toString() === '') {
+      requestBody.project = null
+    }
     return await this.setterForArrayElement(Travel, {
       requestBody,
       parentId,

@@ -167,7 +167,6 @@
     }
   },
   "labels": {
-    "installApp": "Install app",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "E-mail address for A1 certificate notifications",
     "access": "Access",
@@ -301,6 +300,7 @@
     "import": "Import",
     "includingSpouseRefund": "incl. spouse refunds",
     "install": "Install",
+    "installApp": "Install app",
     "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
     "inWorkX": "{X} in work",
@@ -378,6 +378,7 @@
     "reportEmail": "Email Address for Reports",
     "reportTypeIcons": "Icons for report types",
     "required": "required",
+    "reset": "Reset",
     "retentionPolicy": "Retention policy",
     "route": "Route",
     "save": "Save",
@@ -437,6 +438,7 @@
     "uploadTokenExpireAfterSeconds": "Upload token expiration time [seconds]",
     "user": "User",
     "userCanSeeAllProjects": "Users can see ALL projects",
+    "useDifferentProject": "Use different project",
     "username": "User name",
     "users": "Users",
     "userToOverwrite": "User to overwrite",

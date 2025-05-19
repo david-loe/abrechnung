@@ -351,7 +351,7 @@ export interface Stage {
   transport: Transport
   cost: Cost
   purpose: Purpose
-  project?: ProjectSimple
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }
@@ -359,7 +359,7 @@ export interface Stage {
 export interface Expense {
   description: string
   cost: Cost
-  project?: ProjectSimple
+  project?: ProjectSimple | null
   note?: string | null
   _id: _id
 }

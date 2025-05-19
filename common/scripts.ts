@@ -226,7 +226,7 @@ function addToAddUps(
   addUps: FlatAddUp[],
   add: number,
   key: 'balance' | 'total' | 'advance' | 'expenses' | 'lumpSums',
-  project: ProjectSimple | undefined,
+  project: ProjectSimple | undefined | null,
   isTravel = false
 ): void {
   if (project) {

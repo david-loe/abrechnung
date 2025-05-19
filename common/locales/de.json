@@ -167,7 +167,6 @@
     }
   },
   "labels": {
-    "installApp": "App installieren",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",
@@ -301,6 +300,7 @@
     "import": "Importieren",
     "includingSpouseRefund": "inkl. Ehepartner Pauschalen",
     "install": "Installieren",
+    "installApp": "App installieren",
     "insurance": "Versicherung",
     "invoiceDate": "Rechnungsdatum",
     "inWorkX": "{X} in Arbeit",
@@ -378,6 +378,7 @@
     "reportEmail": "Email Adresse für Berichte",
     "reportTypeIcons": "Icons für Abrechnungstypen",
     "required": "erforderlich",
+    "reset": "Zurücksetzen",
     "retentionPolicy": "Aufbewahrungsrichtlinien",
     "route": "Strecke",
     "save": "Speichern",
@@ -437,6 +438,7 @@
     "uploadTokenExpireAfterSeconds": "Uploadtoken Ablaufzeit [Sekunden]",
     "user": "Benutzer",
     "userCanSeeAllProjects": "Benutzer können ALLE Projekte sehen",
+    "useDifferentProject": "Anderes Projekt auswählen",
     "username": "Benutzername",
     "users": "Benutzer",
     "userToOverwrite": "Benutzer der überschrieben werden soll",
