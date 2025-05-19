@@ -144,7 +144,7 @@
         <div class="d-flex align-items-center lh-1">
           <i class="fs-3 bi bi-receipt"></i>
 
-          <span class="ps-2 text-muted">
+          <span class="ps-2 text-secondary">
             © {{ new Date().getFullYear() }} abrechnung
             <small v-if="APP_DATA?.settings.version"
               ><a

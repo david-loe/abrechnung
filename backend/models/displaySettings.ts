@@ -12,14 +12,7 @@ import {
   locales,
   reportTypes
 } from '../../common/types.js'
-
-function color(state: string) {
-  return {
-    type: { color: { type: String, required: true, validate: hexColorRegex }, text: { type: String, required: true } },
-    required: true,
-    label: `states.${state}`
-  }
-}
+import { colorSchema } from './helper.js'
 
 export const displaySettingsSchema = () => {
   const overwrites = {} as { [key in Locale]: { type: typeof Schema.Types.Mixed; required: true; default: () => object } }
@@ -27,9 +20,9 @@ export const displaySettingsSchema = () => {
     overwrites[locale] = { type: Schema.Types.Mixed, required: true, default: () => ({}) }
   }
 
-  const stateColors = {} as { [key in AnyState]: ReturnType<typeof color> }
+  const stateColors = {} as { [key in AnyState]: ReturnType<typeof colorSchema> }
   for (const state of anyStates) {
-    stateColors[state] = color(state)
+    stateColors[state] = colorSchema(`states.${state}`)
   }
 
   const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }

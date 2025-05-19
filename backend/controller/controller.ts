@@ -152,6 +152,7 @@ export interface DeleterQuery {
 
 export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQuery {
   referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
+  minDocumentCount?: number
   cb?: (data: DeleteResult) => any
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
@@ -324,6 +325,12 @@ export class Controller extends TsoaController {
     if (options.checkOldObject && !(await options.checkOldObject(doc))) {
       throw new NotAllowedError(`Not allowed to delete this ${model.modelName}`)
     }
+    if (options.minDocumentCount) {
+      const countAfterDelete = (await model.countDocuments()) - 1
+      if (countAfterDelete < options.minDocumentCount) {
+        throw new ConflictError(`${options.minDocumentCount} ${model.modelName}${options.minDocumentCount > 1 ? 's' : ''} required.`)
+      }
+    }
     if (options.referenceChecks) {
       for (const referenceCheck of options.referenceChecks) {
         const filter = { $or: [] as { [key: string]: any }[] }
@@ -338,6 +345,7 @@ export class Controller extends TsoaController {
         }
       }
     }
+
     const result = await doc.deleteOne()
     if (options.cb) {
       options.cb(result)

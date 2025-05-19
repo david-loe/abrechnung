@@ -1,6 +1,7 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { Country as ICountry, _id, locales } from '../../common/types.js'
 import Country, { countrySchema } from '../models/country.js'
+import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
@@ -53,7 +54,23 @@ export class CountryAdminController extends Controller {
   }
   @Delete()
   public async delete(@Query() _id: _id) {
-    return await this.deleter(Country, { _id: _id })
+    return await this.deleter(Country, {
+      _id: _id,
+      referenceChecks: [
+        {
+          model: Travel,
+          paths: [
+            'lastPlaceOfWork.country',
+            'destinationPlace.country',
+            'stages.startLocation.country',
+            'stages.endLocation.country',
+            'stages.midnightCountries.country'
+          ],
+          conditions: { historic: false }
+        }
+      ],
+      minDocumentCount: 1
+    })
   }
   @Get('form')
   public async getForm() {

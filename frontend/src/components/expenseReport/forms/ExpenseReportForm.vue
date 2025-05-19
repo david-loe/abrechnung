@@ -1,7 +1,7 @@
 <template>
   <form class="container" @submit.prevent="$emit(mode, output())">
     <div v-if="!owner" class="mb-3">
-      <label for="travelFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
+      <label for="expenseReportFormOwner" class="form-label"> {{ $t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formExpenseReport.owner" required></UserSelector>
     </div>
 
@@ -10,6 +10,11 @@
         {{ $t('labels.expenseReportName') }}
       </label>
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" />
+    </div>
+
+    <div v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1" class="mb-3">
+      <label for="expenseReportFormCategory" class="form-label"> {{ $t('labels.category') }}<span class="text-danger">*</span> </label>
+      <CategorySelector v-model="formExpenseReport.category" id="expenseReportFormCategory" required></CategorySelector>
     </div>
 
     <div class="mb-3">
@@ -45,9 +50,10 @@
 </template>
 
 <script lang="ts">
-import { ExpenseReportSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
+import { Category, ExpenseReportSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
+import CategorySelector from '@/components/elements/CategorySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -55,7 +61,7 @@ import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
-  components: { InfoPoint, ProjectSelector, UserSelector, AdvanceSelector },
+  components: { InfoPoint, ProjectSelector, UserSelector, AdvanceSelector, CategorySelector },
   emits: ['cancel', 'edit', 'add'],
   props: {
     expenseReport: { type: Object as PropType<Partial<ExpenseReportSimple>>, required: true },
@@ -77,7 +83,8 @@ export default defineComponent({
       return {
         name: '',
         advances: [],
-        owner: this.owner
+        owner: this.owner,
+        category: this.APP_DATA?.defaultCategory
       }
     },
     clear() {

@@ -1,18 +1,11 @@
 <template>
-  <span
-    v-if="APP_DATA?.displaySettings.stateColors"
-    :class="'badge text-' + APP_DATA.displaySettings.stateColors[state].text"
-    :style="'background-color: ' + APP_DATA.displaySettings.stateColors[state].color + ';'"
-    >{{ $t('states.' + state) }}
-  </span>
-  <span v-else class="badge text">
-    {{ $t('states.' + state) }}
-  </span>
+  <Badge :text="$t(`states.${state}`)" :style="APP_DATA?.displaySettings.stateColors[state]"></Badge>
 </template>
 
 <script lang="ts">
 import { AnyState } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import Badge from '@/components/elements/Badge.vue'
 import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
@@ -21,6 +14,7 @@ export default defineComponent({
       APP_DATA: APP_LOADER.data
     }
   },
+  components: { Badge },
   name: 'StateBadge',
   props: { state: { type: String as PropType<AnyState>, required: true } },
   async created() {

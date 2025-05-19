@@ -324,7 +324,7 @@ class ReportPrint {
     let y = options.yStart
     if (reportIsExpenseReport(this.report)) {
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.expensePayer')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}`,
+        `${this.t('labels.expensePayer')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}    ${this.t('labels.category')}: ${this.report.category.name}`,
         {
           xStart: options.xStart,
           yStart: y,

@@ -119,7 +119,7 @@ export interface DisplaySettings {
     fallback: Locale
     overwrite: { [key in Locale]: { [key: string]: string } }
   }
-  stateColors: { [key in AnyState]: { color: HexColor; text: string } }
+  stateColors: { [key in AnyState]: BadgeStyle }
   accessIcons: { [key in Access]: string[] }
   reportTypeIcons: { [key in ReportType]: string[] }
   _id: _id
@@ -138,6 +138,18 @@ export interface PrintSettingsBase {
   borderThickness: number
   cellPadding: { x: number; bottom: number }
   pageSize: { width: number; height: number }
+}
+
+export interface BadgeStyle {
+  color: HexColor
+  text: TextColor
+}
+
+export interface Category {
+  name: string
+  style: BadgeStyle
+  isDefault: boolean
+  _id: _id
 }
 
 /**
@@ -476,6 +488,7 @@ export interface Travel extends TravelSimple, Report<TravelState> {
 export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
   addUp: AddUp<ExpenseReport>[]
   advances: AdvanceBase[]
+  category: Category
 }
 export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
   expenses: Expense[]
@@ -583,6 +596,9 @@ export type CateringType = (typeof cateringTypes)[number]
 export const lumpsumTypes = ['overnight', ...cateringTypes] as const
 export type LumpsumType = (typeof lumpsumTypes)[number]
 export type LumpSum = { [key in LumpsumType]: number }
+
+export const textColors = ['black', 'white'] as const
+export type TextColor = (typeof textColors)[number]
 
 export type PurposeSimple = 'professional' | 'private'
 

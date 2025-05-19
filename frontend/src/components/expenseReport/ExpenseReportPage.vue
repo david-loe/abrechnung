@@ -70,8 +70,15 @@
 
       <div class="mb-2">
         <div class="row justify-content-between align-items-end">
-          <div class="col-auto">
+          <div class="col-auto d-flex align-items-center">
             <h2 class="m-0">{{ expenseReport.name }}</h2>
+            <div>
+              <Badge
+                v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1"
+                class="ms-2 fs-6"
+                :text="expenseReport.category.name"
+                :style="expenseReport.category.style"></Badge>
+            </div>
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -238,7 +245,9 @@
 import { mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
 import { Expense, ExpenseReport, ExpenseReportSimple, UserSimple, expenseReportStates } from '@/../../common/types.js'
 import API from '@/api.js'
+import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
+import Badge from '@/components/elements/Badge.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TextArea from '@/components/elements/TextArea.vue'
@@ -282,6 +291,9 @@ const isReadOnly = computed(() => {
 })
 
 const modalCompRef = useTemplateRef('modalComp')
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
 
 function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
   if (object) {

@@ -22,6 +22,7 @@ import settings from './data/settings.json' with { type: 'json' }
 import travelSettings from './data/travelSettings.json' with { type: 'json' }
 import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'
+import Category from './models/category.js'
 import ConnectionSettings from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
@@ -108,6 +109,8 @@ export async function initDB() {
   const org = await Organisation.findOne()
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
+  const categories = [{ name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true }]
+  await initer(Category, 'category', categories)
 
   const tokenAdmin = await mongoose.connection.collection('users').findOne({ fk: { magiclogin: tokenAdminUser.fk.magiclogin } })
   if (tokenAdmin) {

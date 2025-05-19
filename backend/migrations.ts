@@ -9,8 +9,11 @@ export async function checkForMigrations() {
   const settings = await Settings.findOne()
   if (settings?.migrateFrom) {
     const migrateFrom = settings?.migrateFrom
+    if (semver.lt(migrateFrom, '1.7.0')) {
+      throw new Error(`Migration from v${migrateFrom} to v${settings.version} not supported. Migrate to at least v1.7.0 first.`)
+    }
 
-    if (semver.lte(migrateFrom, '1.7.0')) {
+    if (semver.eq(migrateFrom, '1.7.0')) {
       logger.info('Apply migration from v1.7.0: redesign settings')
       const { travelSettings, accessIcons, stateColors } = (await mongoose.connection.collection('settings').findOne({})) as any
 
@@ -134,6 +137,10 @@ export async function checkForMigrations() {
       await rewriteAdvance('travels')
       await rewriteAdvance('expensereports')
       await rewriteAdvance('healthcarecosts')
+
+      logger.info('Apply migration from v1.7.4: add expense report categories')
+      const defaultCategory = await mongoose.connection.collection('categories').findOne()
+      await mongoose.connection.collection('expensereports').updateMany({}, { $set: { category: defaultCategory?._id } })
     }
 
     if (settings) {

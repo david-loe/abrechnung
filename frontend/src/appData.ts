@@ -3,6 +3,7 @@ import { loadLocales } from '../../common/locales/load'
 import { getById } from '../../common/scripts'
 import { TravelCalculator } from '../../common/travel'
 import {
+  Category,
   Country,
   CountryCode,
   Currency,
@@ -32,6 +33,9 @@ export class APP_DATA {
   displaySettings: DisplaySettings
   healthInsurances: HealthInsurance[]
   organisations: OrganisationSimple[]
+  categories: Category[]
+  defaultCategory: Category | undefined
+
   specialLumpSums: { [key: string]: string[] }
 
   projects?: ProjectSimpleWithName[]
@@ -48,6 +52,7 @@ export class APP_DATA {
     displaySettings: DisplaySettings,
     healthInsurances: HealthInsurance[],
     organisations: OrganisationSimple[],
+    categories: Category[],
 
     specialLumpSums: { [key: string]: string[] },
     projects?: ProjectSimpleWithName[],
@@ -61,6 +66,8 @@ export class APP_DATA {
     this.displaySettings = displaySettings
     this.healthInsurances = healthInsurances
     this.organisations = organisations
+    this.categories = categories
+    this.defaultCategory = categories.length === 1 ? categories[0] : categories.find((category) => category.isDefault)
     this.specialLumpSums = specialLumpSums
 
     this.projects = projects
@@ -98,6 +105,7 @@ class APP_LOADER {
             this.withProgress(API.getter<TravelSettings>('travelSettings')),
             this.withProgress(API.getter<HealthInsurance[]>('healthInsurance')),
             this.withProgress(API.getter<OrganisationSimple[]>('organisation')),
+            this.withProgress(API.getter<Category[]>('category')),
             this.withProgress(API.getter<{ [key: string]: string[] }>('specialLumpSums')),
             this.withProgress(API.getter<DisplaySettings>('displaySettings'))
           ]),
@@ -117,6 +125,7 @@ class APP_LOADER {
               travelSettingsRes,
               healthInsurancesRes,
               organisationsRes,
+              categoriesRes,
               specialLumpSumsRes,
               displaySettingsRes
             ] = result[0].value
@@ -135,6 +144,7 @@ class APP_LOADER {
               travelSettingsRes.ok &&
               healthInsurancesRes.ok &&
               organisationsRes.ok &&
+              categoriesRes.ok &&
               specialLumpSumsRes.ok &&
               displaySettingsRes.ok
             ) {
@@ -147,6 +157,7 @@ class APP_LOADER {
                 displaySettingsRes.ok.data,
                 healthInsurancesRes.ok.data,
                 organisationsRes.ok.data,
+                categoriesRes.ok.data,
                 specialLumpSumsRes.ok.data,
                 projectsRes?.ok?.data,
                 usersRes?.ok?.data
