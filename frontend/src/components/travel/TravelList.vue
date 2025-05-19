@@ -157,7 +157,7 @@
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
-        <TooltipElement html :text="bookingRemark.replace(/\n/g, '<br>')">
+        <TooltipElement :text="bookingRemark">
           <i class="bi bi-chat-left-text"></i>
         </TooltipElement>
       </span>
@@ -285,4 +285,8 @@ function clickFilter(header: keyof typeof showFilter.value) {
 }
 </script>
 
-<style></style>
+<style scoped>
+.tooltip-inner {
+  white-space: pre-wrap;
+}
+</style>
