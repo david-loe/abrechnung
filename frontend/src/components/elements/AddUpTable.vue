@@ -50,7 +50,7 @@ import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
 import { AddUp, Money, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import { formatter } from '@/formatter'
-import { PropType, ref, watch } from 'vue'
+import { PropType, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -64,12 +64,5 @@ const props = defineProps({
   showAdvanceOverflow: { type: Boolean, default: true }
 })
 
-const addUpTableData = ref(getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
-
-watch(
-  () => props.addUp,
-  () => {
-    addUpTableData.value = getAddUpTableData(formatter, props.addUp, props.progress !== undefined)
-  }
-)
+const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
 </script>
