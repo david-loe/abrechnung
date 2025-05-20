@@ -21,7 +21,12 @@ interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
   calculateExchangeRates(): Promise<void>
   addComment(): void
-  offset(reportTotal: number, reportModelName: ReportModelName, reportId: _id, session?: mongoose.ClientSession | null): Promise<number>
+  offset(
+    reportTotal: number,
+    reportModelName: ReportModelName,
+    reportId: _id | null,
+    session?: mongoose.ClientSession | null
+  ): Promise<number>
 }
 
 type AdvanceModel = Model<Advance, {}, Methods>
@@ -120,7 +125,7 @@ schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
   reportModelName: ReportModelName,
-  reportId: _id,
+  reportId: _id | null,
   session: mongoose.ClientSession | null = null
 ) {
   if (this.state !== 'approved' || reportTotal <= 0) {
