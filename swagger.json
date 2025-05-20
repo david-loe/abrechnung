@@ -18834,6 +18834,74 @@
 				}
 			}
 		},
+		"/approve/advance/offset": {
+			"post": {
+				"operationId": "Offset",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Advance"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"advanceId": {
+										"$ref": "#/components/schemas/IdDocument"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"advanceId",
+									"amount"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/approve/advance/report": {
 			"get": {
 				"operationId": "GetReportForAny",
