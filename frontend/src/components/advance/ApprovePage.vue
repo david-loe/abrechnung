@@ -15,30 +15,32 @@
               @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple), d, c, br)"></AdvanceApproveForm>
             <template v-else>
               <Advance :advance="(modalAdvance as AdvanceSimple)" endpointPrefix="approve/"></Advance>
-              <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
-                <div class="row">
-                  <label for="amount" class="col-form-label col-auto"> {{ t('labels.amount') }}<span class="text-danger">*</span> </label>
-                  <div class="col-auto">
-                    <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required />
-                  </div>
-                  <div class="col-auto">
-                    <div class="mb-1 d-flex align-items-center">
-                      <button type="submit" class="btn btn-primary me-2" :disabled="modalFormIsLoading">
-                        {{ t('labels.offset') }}
-                      </button>
-                      <span v-if="modalFormIsLoading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-                      <button type="button" class="btn btn-light" @click="resetAndHide()">
-                        {{ t('labels.cancel') }}
-                      </button>
+              <template v-if="modalAdvance.state === 'approved'">
+                <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
+                  <div class="row">
+                    <label for="amount" class="col-form-label col-auto"> {{ t('labels.amount') }}<span class="text-danger">*</span> </label>
+                    <div class="col-auto">
+                      <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required />
+                    </div>
+                    <div class="col-auto">
+                      <div class="mb-1 d-flex align-items-center">
+                        <button type="submit" class="btn btn-primary me-2" :disabled="modalFormIsLoading">
+                          {{ t('labels.offset') }}
+                        </button>
+                        <span v-if="modalFormIsLoading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+                        <button type="button" class="btn btn-light" @click="resetAndHide()">
+                          {{ t('labels.cancel') }}
+                        </button>
+                      </div>
                     </div>
                   </div>
+                </form>
+                <div class="mb-2 d-flex" v-else>
+                  <button type="button" class="btn btn-link pt-0 ms-auto" @click="showOffsetForm = true">
+                    {{ t('labels.addOffsetEntry') }}
+                  </button>
                 </div>
-              </form>
-              <div class="mb-2 d-flex" v-else>
-                <button type="button" class="btn btn-link pt-0 ms-auto" @click="showOffsetForm = true">
-                  {{ t('labels.addOffsetEntry') }}
-                </button>
-              </div>
+              </template>
             </template>
           </template>
         </template>

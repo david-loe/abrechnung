@@ -196,7 +196,7 @@ export class AdvanceApproveController extends Controller {
   @Post('offset')
   public async offset(@Body() requestBody: { amount: number; advanceId: IdDocument }, @Request() request: AuthenticatedExpressRequest) {
     const advance = await Advance.findOne({ _id: requestBody.advanceId, historic: false })
-    if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id)) {
+    if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id) || advance.state !== 'approved') {
       throw new NotFoundError(`No advance with id: '${requestBody.advanceId}' found or not allowed`)
     }
     await advance.offset(requestBody.amount, 'ExpenseReport', null)
