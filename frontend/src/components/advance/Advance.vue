@@ -32,7 +32,6 @@
                 v-if="APP_DATA"
                 :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
               <span v-if="report.report">{{ report.report.name }}</span>
-              <i class="text-secondary" v-else>{{ t('labels.deleted') }}</i>
             </small>
           </div>
         </td>

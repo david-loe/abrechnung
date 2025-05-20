@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Advance as IAdvance, IdDocument, Locale, _id } from '../../common/types.js'
+import { BaseCurrencyMoneyNotNull, Advance as IAdvance, IdDocument, Locale, _id } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -114,7 +114,7 @@ export class AdvanceExamineController extends Controller {
     return await this.getter(Advance, {
       query,
       filter,
-      projection: { history: 0, historic: 0 },
+      projection: { history: 0, historic: 0, bookingRemark: 0 },
       sort: { updatedAt: -1 }
     })
   }
@@ -191,6 +191,22 @@ export class AdvanceApproveController extends Controller {
       checkOldObject: async (oldObject: AdvanceDoc) =>
         oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
+  }
+
+  @Post('offset')
+  public async offset(@Body() requestBody: { amount: number; advanceId: IdDocument }, @Request() request: AuthenticatedExpressRequest) {
+    const advance = await Advance.findOne({ _id: requestBody.advanceId, historic: false })
+    if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id)) {
+      throw new NotFoundError(`No advance with id: '${requestBody.advanceId}' found or not allowed`)
+    }
+    await advance.offset(requestBody.amount, 'ExpenseReport', null)
+    const result: IAdvance | null = await Advance.findOne(
+      { _id: requestBody.advanceId, historic: false },
+      { historic: 0, history: 0 }
+    ).lean()
+    if (result) {
+      return { message: 'alerts.successSaving', result }
+    }
   }
 
   @Get('report')

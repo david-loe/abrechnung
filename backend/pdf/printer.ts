@@ -728,7 +728,7 @@ class ReportPrint {
       width: 280,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.name'),
-      fn: (r: { name: string } | null) => r?.name ?? this.t('labels.deleted')
+      fn: (r: { name: string } | null) => r?.name ?? ''
     })
     columns.push({
       key: 'type',
