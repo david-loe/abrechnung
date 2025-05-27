@@ -35,7 +35,7 @@
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
-          @add="editHealthCareCostDetails">
+          @edit="editHealthCareCostDetails">
         </HealthCareCostForm>
       </div>
     </ModalComponent>
