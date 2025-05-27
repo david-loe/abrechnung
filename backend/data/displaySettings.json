@@ -21,7 +21,7 @@
     "enabled": true,
     "examinersMail": true,
     "examinersMsTeams": false,
-    "customOptions": {}
+    "customOptions": []
   },
   "accessIcons": {
     "admin": ["person-fill"],

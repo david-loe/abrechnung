@@ -154,7 +154,7 @@ export async function checkForMigrations() {
               enabled: true,
               examinersMail: true,
               examinersMsTeams: true,
-              customOptions: {}
+              customOptions: []
             }
           }
         }
