@@ -32,7 +32,7 @@
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "loginFailed": "Anmeldung fehlgeschlagen!",
-    "mailSend": "E-mail wurde versandt.",
+    "mailSend": "E-Mail wurde versandt.",
     "noData": {
       "advanceForUserX": "Kein genehmigter Vorschuss für '{X}'. Beantrage einen!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
@@ -54,9 +54,9 @@
     "wrongPassword": "Falsches Passwort"
   },
   "description": {
-    "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
-    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische  Löschung durchzuführen 0 eingeben",
-    "deleteRefundedAfterXDays": "Um keine automatische  Löschung durchzuführen 0 eingeben",
+    "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
+    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
+    "deleteRefundedAfterXDays": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}",
     "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben"
   },
@@ -74,7 +74,7 @@
     "title": "abrechnung"
   },
   "info": {
-    "advance": "Wähle hier die Vorschüsse aus die du mit deiner abrechnung🧾 verrechnen willst.",
+    "advance": "Wähle hier die Vorschüsse aus, die du mit deiner abrechnung🧾 verrechnen willst.",
     "cateringRefund": "Wenn das Essen schon vom Arbeitgeber bezahlt wird (z.B. Tagungspreis / Frühstück im Hotel) kann keine Verpflegungspauschale erstattet werden. Bitte trage ein welche Mahlzeiten schon vom Arbeitgeber bezahlt werden.",
     "claimSpouseRefund": "Wenn du gemeinsam mit deinem Ehepartner verreist und er auch erstattungberechtigt ist, kannst du ihn mitabrechnen.",
     "cost": "Trage hier die Kosten ein.",
@@ -102,7 +102,7 @@
     "AndroidChrome": {
       "steps": {
         "one": {
-          "one": "1. Klicke auf das Menü ",
+          "one": "1. Klicke auf das Menü",
           "two": " (oben rechts)."
         },
         "three": "3. Klicke auf 'Installieren'",
@@ -112,7 +112,7 @@
     "AndroidFirefox": {
       "steps": {
         "one": {
-          "one": "1. Klicke auf das Menü ",
+          "one": "1. Klicke auf das Menü",
           "two": " (oben rechts)."
         },
         "three": "3. Klicke auf 'Hinzufügen'.",
@@ -122,7 +122,7 @@
     "AndroidSamsung": {
       "steps": {
         "one": {
-          "one": "1. Klicke auf das ",
+          "one": "1. Klicke auf das",
           "two": " Symbol (oben neben der Adressleiste)"
         },
         "two": "2. Klicke auf 'Installieren'."
@@ -138,32 +138,32 @@
     "iosChrome": {
       "steps": {
         "one": {
-          "one": "1. Gehe auf das Teilen ",
+          "one": "1. Gehe auf das Teilen",
           "two": " Menü (rechts oben neben der Adressleiste)."
         },
         "three": "3. Klicke 'Hinzufügen'.",
-        "two": "2. Klicke auf 'Zum Home-Bildschirm'  "
+        "two": "2. Klicke auf 'Zum Home-Bildschirm'"
       }
     },
     "iosFirefox": {
       "steps": {
         "four": "4. Klicke 'Hinzufügen'.",
         "one": {
-          "one": "1. Gehe auf das Menü ",
+          "one": "1. Gehe auf das Menü",
           "two": " (unten rechts)."
         },
-        "three": "3. Klicke auf 'Zum Home-Bildschirm'  ",
+        "three": "3. Klicke auf 'Zum Home-Bildschirm'",
         "two": "2. Gehe auf Teilen "
       }
     },
     "iosSafari": {
       "steps": {
         "one": {
-          "one": "1. Gehe auf das Teilen ",
+          "one": "1. Gehe auf das Teilen",
           "two": " Menü (unten mittig am Bildschirm)."
         },
         "three": "3. Klicke 'Hinzufügen'.",
-        "two": "2. Klicke auf 'Zum Home-Bildschirm' "
+        "two": "2. Klicke auf 'Zum Home-Bildschirm'"
       }
     }
   },
@@ -263,7 +263,7 @@
     "editAgain": "Nochmal bearbeiten",
     "editor": "Bearbeiter",
     "editX": "{X} bearbeiten",
-    "email": "Email Adresse",
+    "email": "E-Mail Adresse",
     "en": "Englisch 🇬🇧",
     "enabled": "Aktiviert",
     "endDate": "Enddatum",
@@ -390,7 +390,7 @@
     "refundSum": "Durch Versicherung erstatteter Betrag",
     "reject": "Ablehnen",
     "report": "Bericht",
-    "reportEmail": "Email Adresse für Berichte",
+    "reportEmail": "E-Mail Adresse für Berichte",
     "reportTypeIcons": "Icons für Abrechnungstypen",
     "required": "erforderlich",
     "reset": "Zurücksetzen",
@@ -402,7 +402,7 @@
     "secondNightOnAirplaneLumpSumCountry": "Land für die Verpflegungspauschalen ab 2. Nacht im Flugzeug",
     "secondNightOnShipOrFerryLumpSumCountry": "Land für die Verpflegungspauschalen ab 2. Nacht auf dem Schiff",
     "sendMail": "E-Mail senden",
-    "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-Email senden",
+    "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-E-Mail senden",
     "settings": "Einstellungen",
     "shipOrFerry": "Schiff oder Fähre 🚢",
     "showInstallBanner": "Installationshinweis anzeigen",
@@ -468,7 +468,7 @@
     "XDetails": "{X}details"
   },
   "login": {
-    "signIn": "Bitte Anmelden"
+    "signIn": "Bitte anmelden"
   },
   "lumpSums": {
     "catering24": "Verpflegungspauschale",
@@ -482,7 +482,7 @@
     "advance": {
       "appliedFor": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Ein neuer Vorschussantrag von {owner} kam grade rein.",
+        "paragraph": "Ein neuer Vorschussantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Vorschussantrag"
       },
       "approved": {
@@ -504,7 +504,7 @@
       },
       "inWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Eine neue Auslagenabrechnung wurden für dich erstellt.",
+        "paragraph": "Eine neue Auslagenabrechnung wurde für dich erstellt.",
         "subject": "🆕 Auslagenabrechnung"
       },
       "inWorkDeletedSoon": {
@@ -517,13 +517,8 @@
         "subject": "💲 Auslagen erstattet"
       },
       "refundedDeletedSoon": {
-        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}'  wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
-      },
-      "rejected": {
-        "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Auslagenabrechnung wurde abgelehnt.",
-        "subject": "❌ Auslagen abgelehnt"
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -539,7 +534,7 @@
       },
       "inWork": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Eine neue Krankenkostenabrechnung wurden für dich erstellt.",
+        "paragraph": "Eine neue Krankenkostenabrechnung wurde für dich erstellt.",
         "subject": "🆕 Krankenkosten"
       },
       "inWorkDeletedSoon": {
@@ -552,13 +547,8 @@
         "subject": "💲 Krankenkosten erstattet"
       },
       "refundedDeletedSoon": {
-        "paragraph": "Deine erstatteter Krankenkostenantrag  '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "paragraph": "Dein erstatteter Krankenkostenantrag '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
-      },
-      "rejected": {
-        "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Krankenkosten wurden abgelehnt.",
-        "subject": "❌ Health Care Costs rejected"
       },
       "underExamination": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -567,7 +557,7 @@
       },
       "underExaminationByInsurance": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischzeit den gesamt Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die original Belege solange auf, bis du die Bearbeitungs- bzw. Erstattungs-meldung der Krankenkasse bekommen hast.",
+        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischzeit den gesamt Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die Originalbelege solange auf, bis du die Bearbeitungs- bzw. Erstattungsmeldung der Krankenkasse bekommen hast.",
         "subject": "🔜 Krankenkosten an Versicherung"
       }
     },
@@ -592,7 +582,7 @@
       },
       "appliedFor": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Ein neuer Reiseantrag von {owner} kam grade rein.",
+        "paragraph": "Ein neuer Reiseantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Reise"
       },
       "approved": {
@@ -601,7 +591,7 @@
         "subject": "✅ Reise genehmigt"
       },
       "approvedDeletedSoon": {
-        "paragraph": "Deine genehmigte Reise  '{reportName}'  wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
+        "paragraph": "Deine genehmigte Reise '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
         "subject": "Automatische Löschung steht bevor"
       },
       "backToApproved": {

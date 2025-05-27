@@ -31,14 +31,14 @@
     "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
-    "loginFailed": "Failed to login!",
-    "mailSend": "E-mail was send.",
+    "loginFailed": "Failed to log in!",
+    "mailSend": "Email was sent.",
     "noData": {
       "advanceForUserX": "No approved advance for '{X}'. Apply for one!",
-      "expense": "There are no expenses jet. Add one!",
+      "expense": "There are no expenses yet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
       "searchX": "Nothing found for '{X}'.",
-      "stage": "There are no stages jet. Add one!"
+      "stage": "There are no stages yet. Add one!"
     },
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
@@ -102,7 +102,7 @@
     "AndroidChrome": {
       "steps": {
         "one": {
-          "one": "1. Click on the menu ",
+          "one": "1. Click on the menu",
           "two": " (top right corner)."
         },
         "three": "3. Click on 'Install'.",
@@ -112,7 +112,7 @@
     "AndroidFirefox": {
       "steps": {
         "one": {
-          "one": "1. Click on the menu ",
+          "one": "1. Click on the menu",
           "two": " (top right corner)."
         },
         "three": "3. Click on 'Add'.",
@@ -122,15 +122,15 @@
     "AndroidSamsung": {
       "steps": {
         "one": {
-          "one": "1. Click on the ",
-          "two": " symbol (on the top, next to adress bar)."
+          "one": "1. Click on the",
+          "two": " symbol (on the top, next to address bar)."
         },
         "two": "2. Click on 'Install'."
       }
     },
     "default": {
       "steps": {
-        "one": "1. By using the menu or the share menu and clicking on 'Add to Homescreen' or 'Install' the installation can be started.",
+        "one": "1. By using the menu or the share menu and clicking on 'Add to Home Screen' or 'Install' the installation can be started.",
         "two": "2. Follow the instructions."
       }
     },
@@ -138,38 +138,38 @@
     "iosChrome": {
       "steps": {
         "one": {
-          "one": "1. Go to the Share ",
-          "two": " Menu (on the top, next to adress bar)."
+          "one": "1. Go to the Share",
+          "two": " Menu (on the top, next to address bar)."
         },
         "three": "3. Click on 'Add'.",
-        "two": "2. Click on 'Add to Home Screen'  "
+        "two": "2. Click on 'Add to Home Screen'"
       }
     },
     "iosFirefox": {
       "steps": {
         "four": "4. Click on 'Add'.",
         "one": {
-          "one": "1. Go to the menu ",
+          "one": "1. Go to the menu",
           "two": " (bottom right corner)."
         },
-        "three": "3. Click on 'Add to Home Screen'  ",
+        "three": "3. Click on 'Add to Home Screen'",
         "two": "2. Click on 'Share' "
       }
     },
     "iosSafari": {
       "steps": {
         "one": {
-          "one": "1. Go to the Share ",
+          "one": "1. Go to the Share",
           "two": " Menu (in the middle of the bottom)."
         },
         "three": "3. Click on 'Add'.",
-        "two": "2. Click on 'Add to Home Screen'  "
+        "two": "2. Click on 'Add to Home Screen'"
       }
     }
   },
   "labels": {
     "a1Certificate": "A1 Certificate",
-    "a1CertificateEmail": "E-mail address for A1 certificate notifications",
+    "a1CertificateEmail": "Email address for A1 certificate notifications",
     "access": "Access",
     "accessIcons": "Icons for access rights",
     "add": "Add",
@@ -273,7 +273,7 @@
     "examine": "Examine",
     "examinedBy": "Examined by",
     "examinedOn": "Examined on",
-    "examinersMail": "Examiners E-Mail",
+    "examinersMail": "Examiners Email",
     "examinersMsTeams": "Examiners MS Teams",
     "expandAll": "Expand all",
     "expense": "Expense",
@@ -401,7 +401,7 @@
     "search": "Search",
     "secondNightOnAirplaneLumpSumCountry": "Country for the catering lump sums from the 2nd night in an aircraft",
     "secondNightOnShipOrFerryLumpSumCountry": "Country for the catering lump sums from the 2nd night on a ship",
-    "sendMail": "Send E-Mail",
+    "sendMail": "Send Email",
     "sendPDFReportsToOrganisationEmail": "Send PDF reports to organisation email",
     "settings": "Settings",
     "shipOrFerry": "Ship or ferry 🚢",
@@ -423,7 +423,7 @@
     "submittedOn": "Submitted on",
     "submitX": "Submit {X}",
     "subunit": "Subunit",
-    "success": "Sucess ✅",
+    "success": "Success ✅",
     "summary": "Summary",
     "supervisedProjects": "Supervised Projects",
     "symbol": "Symbol",
@@ -481,17 +481,17 @@
   "mail": {
     "advance": {
       "appliedFor": {
-        "lastParagraph": "{commentator} wrote: {comment}'",
+        "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new advance request from {owner} just came in.",
         "subject": "🆕 New advance request"
       },
       "approved": {
-        "lastParagraph": "{commentator} wrote: {comment}'",
+        "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request has been approved.",
         "subject": "✅ Advance approved"
       },
       "rejected": {
-        "lastParagraph": "{commentator} wrote: {comment}'",
+        "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request was rejected.",
         "subject": "❌ Advance rejected"
       }
@@ -519,11 +519,6 @@
       "refundedDeletedSoon": {
         "paragraph": "Your refunded expense report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
-      },
-      "rejected": {
-        "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your expense report got rejected.",
-        "subject": "❌ Expense report rejected"
       },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
@@ -555,19 +550,14 @@
         "paragraph": "Your refunded health care cost report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
-      "rejected": {
-        "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your health care costs got rejected.",
-        "subject": "❌ Health care costs rejected"
-      },
       "underExamination": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "{owner} has submit his health care costs.",
+        "paragraph": "{owner} has submitted his health care costs.",
         "subject": "🛂 Health care costs to examine"
       },
       "underExaminationByInsurance": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your health care costs have been send to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
+        "paragraph": "Your health care costs have been sent to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
         "subject": "🔜 Health care costs at insurance"
       }
     },
@@ -580,7 +570,7 @@
     },
     "newMagiclogin": {
       "buttonText": "To @:{'headlines.title'}@:{'headlines.emoji'}",
-      "lastParagraph": "To log in, all you need is your e-mail address.\nClick on 'Sign in with E-Mail', enter your e-mail address and you will receive an e-mail with a link that will log you in directly when you click on it.",
+      "lastParagraph": "To log in, all you need is your email address.\nClick on 'Sign in with Email', enter your email address and you will receive an email with a link that will log you in directly when you click on it.",
       "paragraph": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}. Here you can submit all your expenses.",
       "subject": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}"
     },
@@ -597,7 +587,7 @@
       },
       "approved": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your travel application got approved.",
+        "paragraph": "Your travel application was approved",
         "subject": "✅ Travel approved"
       },
       "approvedDeletedSoon": {
@@ -620,7 +610,7 @@
       },
       "rejected": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your travel application got rejected.",
+        "paragraph": "Your travel application was rejected.",
         "subject": "❌ Travel rejected"
       },
       "underExamination": {
