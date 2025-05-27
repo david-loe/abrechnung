@@ -78,16 +78,9 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootHealthInsurances = (await API.getter<HealthInsurance[]>('healthInsurance')).ok?.data
-    if (rootHealthInsurances && APP_DATA.value) {
-      APP_DATA.value.healthInsurances = rootHealthInsurances
-    }
   }
 }
 defineExpose({ loadFromServer })
-
-await APP_LOADER.loadData()
-const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' }, email: { $regex: undefined, $options: 'i' } })
 
@@ -119,6 +112,7 @@ async function postHealthInsurance(healthInsurance: HealthInsurance) {
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
+    APP_LOADER.loadRequired('healthInsurance')
   }
   healthInsuranceToEdit.value = undefined
 }
@@ -126,6 +120,7 @@ async function deleteHealthInsurance(healthInsurance: HealthInsurance) {
   const result = await API.deleter('admin/healthInsurance', { _id: healthInsurance._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadRequired('healthInsurance')
   }
 }
 

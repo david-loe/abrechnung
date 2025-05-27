@@ -66,16 +66,9 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootOrganisations = (await API.getter<Organisation[]>('organisation')).ok?.data
-    if (rootOrganisations && APP_DATA.value) {
-      APP_DATA.value.organisations = rootOrganisations
-    }
   }
 }
 defineExpose({ loadFromServer })
-
-await APP_LOADER.loadData()
-const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
 
@@ -110,6 +103,7 @@ async function postOrganisation(organisation: Organisation) {
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
+    APP_LOADER.loadRequired('organisation')
   }
   organisationToEdit.value = undefined
 }
@@ -117,6 +111,7 @@ async function deleteOrganisation(organisation: Organisation) {
   const result = await API.deleter('admin/organisation', { _id: organisation._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadRequired('organisation')
   }
 }
 

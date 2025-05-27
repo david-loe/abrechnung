@@ -83,10 +83,6 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootCountries = (await API.getter<Country[]>('country')).ok?.data
-    if (rootCountries && APP_DATA.value) {
-      APP_DATA.value.countries = rootCountries
-    }
   }
 }
 defineExpose({ loadFromServer })
@@ -132,6 +128,7 @@ async function postCountry(country: Country) {
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
+    APP_LOADER.loadRequired('country')
   }
   countryToEdit.value = undefined
 }
@@ -139,6 +136,7 @@ async function deleteCountry(country: Country) {
   const result = await API.deleter('admin/country', { _id: country._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadRequired('country')
   }
 }
 const schema = Object.assign({}, (await API.getter<any>('admin/country/form')).ok?.data, {

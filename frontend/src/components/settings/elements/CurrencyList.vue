@@ -82,10 +82,6 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootCurrencies = (await API.getter<Currency[]>('currency')).ok?.data
-    if (rootCurrencies && APP_DATA.value) {
-      APP_DATA.value.currencies = rootCurrencies
-    }
   }
 }
 defineExpose({ loadFromServer })
@@ -130,6 +126,7 @@ async function postCurrency(currency: Currency) {
   const result = await API.setter<Currency>('admin/currency', currency)
   if (result.ok) {
     loadFromServer()
+    APP_LOADER.loadRequired('currency')
     _showForm.value = false
   }
   currencyToEdit.value = undefined
@@ -138,6 +135,7 @@ async function deleteCurrency(currency: Currency) {
   const result = await API.deleter('admin/currency', { _id: currency._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadRequired('currency')
   }
 }
 
