@@ -6974,6 +6974,48 @@
 						],
 						"type": "object"
 					},
+					"helpButton": {
+						"properties": {
+							"customOptions": {
+								"items": {
+									"properties": {
+										"icon": {
+											"type": "string"
+										},
+										"link": {
+											"type": "string"
+										},
+										"label": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"icon",
+										"link",
+										"label"
+									],
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"examinersMsTeams": {
+								"type": "boolean"
+							},
+							"examinersMail": {
+								"type": "boolean"
+							},
+							"enabled": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"customOptions",
+							"examinersMsTeams",
+							"examinersMail",
+							"enabled"
+						],
+						"type": "object"
+					},
 					"stateColors": {
 						"properties": {
 							"rejected": {
@@ -7182,6 +7224,7 @@
 					"auth",
 					"oidc",
 					"locale",
+					"helpButton",
 					"stateColors",
 					"accessIcons",
 					"reportTypeIcons",
@@ -7449,6 +7492,37 @@
 									}
 								},
 								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"helpButton": {
+						"properties": {
+							"customOptions": {
+								"items": {
+									"properties": {
+										"icon": {
+											"type": "string"
+										},
+										"label": {
+											"type": "string"
+										},
+										"link": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"examinersMsTeams": {
+								"type": "boolean"
+							},
+							"examinersMail": {
+								"type": "boolean"
+							},
+							"enabled": {
+								"type": "boolean"
 							}
 						},
 						"type": "object"
