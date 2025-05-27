@@ -118,6 +118,12 @@ export class APP_DATA {
       case 'displaySettings':
         this.setDisplaySettings(data)
         break
+      case 'project':
+        this.setProjects(data)
+        break
+      case 'users':
+        this.setUsers(data)
+        break
     }
   }
   setCurrencies(currencies: Currency[]) {
