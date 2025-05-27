@@ -48,7 +48,10 @@ Click below to launch a ready-to-use Gitpod workspace in your browser.
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
 2. Copy `.env.example` to `.env` and adapt if needed
 3. Run `docker compose up`
-4. Open `http://localhost:5000` and login with `professor:professor`
+4. Login via:
+   - `http://localhost:5000` with `professor:professor` (with test LDAP and `NODE_ENV=development`)  
+     OR
+   - Login link in backend logs
 
 > ℹ You can change ports and URLs in the `.env` file
 
