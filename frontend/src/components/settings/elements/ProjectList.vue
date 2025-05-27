@@ -82,10 +82,6 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootProjects = (await API.getter<Project[]>('project')).ok?.data
-    if (rootProjects && APP_DATA.value) {
-      APP_DATA.value.projects = rootProjects
-    }
   }
 }
 defineExpose({ loadFromServer })
@@ -123,6 +119,7 @@ async function postProject(project: Project) {
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
+    APP_LOADER.loadOptional('project')
   }
   projectToEdit.value = undefined
 }
@@ -130,6 +127,7 @@ async function deleteProject(project: Project) {
   const result = await API.deleter('admin/project', { _id: project._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadOptional('project')
   }
 }
 

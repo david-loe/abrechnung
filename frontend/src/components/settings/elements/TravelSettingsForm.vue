@@ -26,8 +26,8 @@ export default defineComponent({
     async postTravelSettings(travelSettings: TravelSettings) {
       const result = await API.setter<TravelSettings>('admin/travelSettings', travelSettings)
       if (result.ok && APP_DATA.value) {
-        APP_DATA.value.travelSettings = result.ok
-        ;(this.$refs.form$ as any).load(APP_DATA.value.travelSettings)
+        APP_DATA.value?.setTravelSettings(result.ok)
+        ;(this.$refs.form$ as any).load(APP_DATA.value?.travelSettings)
       }
     }
   },
@@ -44,7 +44,7 @@ export default defineComponent({
     })
     queueMicrotask(() => {
       if (APP_DATA.value) {
-        ;(this.$refs.form$ as any).load(APP_DATA.value.travelSettings)
+        ;(this.$refs.form$ as any).load(APP_DATA.value?.travelSettings)
       }
     })
   }

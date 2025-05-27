@@ -126,10 +126,6 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootUsers = (await API.getter<UserWithNameAndProject[]>('users', {}, {}, false)).ok?.data
-    if (rootUsers && APP_DATA.value) {
-      APP_DATA.value.users = rootUsers
-    }
   }
 }
 defineExpose({ loadFromServer })
@@ -188,6 +184,7 @@ async function postUser(user: User) {
   if (result.ok) {
     _showForm.value = false
     loadFromServer()
+    APP_LOADER.loadOptional('users')
   }
   userToEdit.value = undefined
 }
@@ -195,6 +192,7 @@ async function deleteUser(user: User) {
   const result = await API.deleter('admin/user', { _id: user._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadOptional('users')
   }
 }
 

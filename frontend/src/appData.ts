@@ -24,24 +24,37 @@ import i18n from './i18n'
 import { logger } from './logger'
 import { vueform } from './main'
 
-export class APP_DATA {
-  currencies: Currency[]
-  countries: Country[]
-  user: User
-  settings: Settings
-  travelSettings: TravelSettings
-  displaySettings: DisplaySettings
-  healthInsurances: HealthInsurance[]
-  organisations: OrganisationSimple[]
-  categories: Category[]
-  defaultCategory: Category | undefined
+type APP_DATA_REQUIRED_ENDPOINTS =
+  | 'user'
+  | 'currency'
+  | 'country'
+  | 'settings'
+  | 'travelSettings'
+  | 'healthInsurance'
+  | 'organisation'
+  | 'category'
+  | 'specialLumpSums'
+  | 'displaySettings'
+type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
+type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
 
-  specialLumpSums: { [key: string]: string[] }
+export class APP_DATA {
+  user!: User
+  currencies!: Currency[]
+  countries!: Country[]
+  settings!: Settings
+  travelSettings!: TravelSettings
+  displaySettings!: DisplaySettings
+  healthInsurances!: HealthInsurance[]
+  organisations!: OrganisationSimple[]
+  categories!: Category[]
+  defaultCategory: Category | undefined
+  specialLumpSums!: Record<string, string[]>
 
   projects?: ProjectSimpleWithName[]
   users?: UserWithNameAndProject[]
 
-  travelCalculator: TravelCalculator
+  travelCalculator!: TravelCalculator
 
   constructor(
     currencies: Currency[],
@@ -54,32 +67,121 @@ export class APP_DATA {
     organisations: OrganisationSimple[],
     categories: Category[],
 
-    specialLumpSums: { [key: string]: string[] },
+    specialLumpSums: Record<string, string[]>,
     projects?: ProjectSimpleWithName[],
     users?: UserWithNameAndProject[]
   ) {
+    this.setUser(user)
+    this.setCurrencies(currencies)
+    this.setCountries(countries)
+    this.setSettings(settings)
+    this.setTravelSettings(travelSettings) // needs countries to be set first
+    this.setDisplaySettings(displaySettings)
+    this.setHealthInsurances(healthInsurances)
+    this.setOrganisations(organisations)
+    this.setCategories(categories)
+    this.setSpecialLumpSums(specialLumpSums)
+
+    this.setProjects(projects)
+    this.setUsers(users)
+  }
+
+  setAny(endpoint: APP_DATA_ENDPOINTS, data: any) {
+    switch (endpoint) {
+      case 'currency':
+        this.setCurrencies(data)
+        break
+      case 'country':
+        this.setCountries(data)
+        break
+      case 'user':
+        this.setUser(data)
+        break
+      case 'settings':
+        this.setSettings(data)
+        break
+      case 'travelSettings':
+        this.setTravelSettings(data)
+        break
+      case 'healthInsurance':
+        this.setHealthInsurances(data)
+        break
+      case 'organisation':
+        this.setOrganisations(data)
+        break
+      case 'category':
+        this.setCategories(data)
+        break
+      case 'specialLumpSums':
+        this.setSpecialLumpSums(data)
+        break
+      case 'displaySettings':
+        this.setDisplaySettings(data)
+        break
+      case 'project':
+        this.setProjects(data)
+        break
+      case 'users':
+        this.setUsers(data)
+        break
+    }
+  }
+  setCurrencies(currencies: Currency[]) {
     this.currencies = currencies
+  }
+  setCountries(countries: Country[]) {
     this.countries = countries
+  }
+  setUser(user: User) {
     this.user = user
+    setLanguage(this.user.settings.language)
+    //@ts-ignore
+    logger.info(`${i18n.global.t('labels.user')}:`)
+    logger.info(user)
+  }
+  setSettings(settings: Settings) {
     this.settings = settings
+  }
+  setTravelSettings(travelSettings: TravelSettings) {
     this.travelSettings = travelSettings
+    if (this.travelCalculator) {
+      this.travelCalculator.updateSettings(travelSettings)
+    } else {
+      this.travelCalculator = new TravelCalculator(async (code: CountryCode) => {
+        const country = getById(code, this.countries)
+        if (!country) {
+          throw new Error(`No Country found for code ${code}`)
+        }
+        return country
+      }, this.travelSettings)
+    }
+  }
+  setDisplaySettings(displaySettings: DisplaySettings) {
     this.displaySettings = displaySettings
+    updateLocales(displaySettings)
+  }
+  setHealthInsurances(healthInsurances: HealthInsurance[]) {
     this.healthInsurances = healthInsurances
+  }
+  setOrganisations(organisations: OrganisationSimple[]) {
     this.organisations = organisations
+  }
+  setCategories(categories: Category[]) {
     this.categories = categories
     this.defaultCategory = categories.length === 1 ? categories[0] : categories.find((category) => category.isDefault)
+  }
+  setSpecialLumpSums(specialLumpSums: Record<string, string[]>) {
     this.specialLumpSums = specialLumpSums
-
-    this.projects = projects
-    this.users = users
-
-    this.travelCalculator = new TravelCalculator(async (code: CountryCode) => {
-      const country = getById(code, this.countries)
-      if (!country) {
-        throw new Error(`No Country found for code ${code}`)
-      }
-      return country
-    }, this.travelSettings)
+  }
+  setProjects(projects?: ProjectSimpleWithName[]) {
+    if (projects) {
+      this.projects = projects
+    }
+  }
+  setUsers(users?: UserWithNameAndProject[]) {
+    if (users) {
+      this.users = users
+    }
   }
 }
 
@@ -91,6 +193,28 @@ class APP_LOADER {
   progress = ref(0)
   progressIncrement = 10 // 10 * 10 = 100
 
+  async loadRequired<T>(endpoint: APP_DATA_REQUIRED_ENDPOINTS) {
+    const res = await API.getter<T>(endpoint)
+    if (!res.ok) {
+      throw new Error(`Failed to load ${endpoint} data`)
+    }
+    if (this.data.value) {
+      this.data.value.setAny(endpoint, res.ok.data)
+    }
+    return res.ok.data
+  }
+
+  async loadOptional<T>(endpoint: APP_DATA_OPTIONAL_ENDPOINTS) {
+    const res = await API.getter<T>(endpoint, {}, {}, false)
+    if (res.ok) {
+      if (this.data.value) {
+        this.data.value.setAny(endpoint, res.ok.data)
+      }
+      return res.ok.data
+    }
+    return undefined
+  }
+
   loadData(reload = false) {
     if (this.dataPromise === undefined || reload) {
       this.state.value = 'LOADING'
@@ -98,80 +222,62 @@ class APP_LOADER {
       this.dataPromise = new Promise((resolve, reject) => {
         Promise.allSettled([
           Promise.all([
-            this.withProgress(API.getter<User>('user')),
-            this.withProgress(API.getter<Currency[]>('currency')),
-            this.withProgress(API.getter<Country[]>('country')),
-            this.withProgress(API.getter<Settings>('settings')),
-            this.withProgress(API.getter<TravelSettings>('travelSettings')),
-            this.withProgress(API.getter<HealthInsurance[]>('healthInsurance')),
-            this.withProgress(API.getter<OrganisationSimple[]>('organisation')),
-            this.withProgress(API.getter<Category[]>('category')),
-            this.withProgress(API.getter<{ [key: string]: string[] }>('specialLumpSums')),
-            this.withProgress(API.getter<DisplaySettings>('displaySettings'))
+            this.withProgress(this.loadRequired<User>('user')),
+            this.withProgress(this.loadRequired<Currency[]>('currency')),
+            this.withProgress(this.loadRequired<Country[]>('country')),
+            this.withProgress(this.loadRequired<Settings>('settings')),
+            this.withProgress(this.loadRequired<TravelSettings>('travelSettings')),
+            this.withProgress(this.loadRequired<HealthInsurance[]>('healthInsurance')),
+            this.withProgress(this.loadRequired<OrganisationSimple[]>('organisation')),
+            this.withProgress(this.loadRequired<Category[]>('category')),
+            this.withProgress(this.loadRequired<Record<string, string[]>>('specialLumpSums')),
+            this.withProgress(this.loadRequired<DisplaySettings>('displaySettings'))
           ]),
           Promise.allSettled([
-            this.withProgress(API.getter<ProjectSimpleWithName[]>('project', {}, {}, false)),
-            this.withProgress(API.getter<UserWithNameAndProject[]>('users', {}, {}, false))
+            this.withProgress(this.loadOptional<ProjectSimpleWithName[]>('project')),
+            this.withProgress(this.loadOptional<UserWithNameAndProject[]>('users'))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
             reject(result[0].reason)
           } else {
             const [
-              userRes,
-              currenciesRes,
-              countriesRes,
-              settingsRes,
-              travelSettingsRes,
-              healthInsurancesRes,
-              organisationsRes,
-              categoriesRes,
-              specialLumpSumsRes,
-              displaySettingsRes
+              user,
+              currencies,
+              countries,
+              settings,
+              travelSettings,
+              healthInsurances,
+              organisations,
+              categories,
+              specialLumpSums,
+              displaySettings
             ] = result[0].value
 
-            let projectsRes = undefined
-            let usersRes = undefined
+            let projects = undefined
+            let users = undefined
             if (result[1].status === 'fulfilled') {
-              projectsRes = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
-              usersRes = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
+              projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
+              users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
             }
-            if (
-              userRes.ok &&
-              currenciesRes.ok &&
-              countriesRes.ok &&
-              settingsRes.ok &&
-              travelSettingsRes.ok &&
-              healthInsurancesRes.ok &&
-              organisationsRes.ok &&
-              categoriesRes.ok &&
-              specialLumpSumsRes.ok &&
-              displaySettingsRes.ok
-            ) {
-              const data = new APP_DATA(
-                currenciesRes.ok.data,
-                countriesRes.ok.data,
-                userRes.ok.data,
-                settingsRes.ok.data,
-                travelSettingsRes.ok.data,
-                displaySettingsRes.ok.data,
-                healthInsurancesRes.ok.data,
-                organisationsRes.ok.data,
-                categoriesRes.ok.data,
-                specialLumpSumsRes.ok.data,
-                projectsRes?.ok?.data,
-                usersRes?.ok?.data
-              )
-              resolve(data)
-              this.data.value = data
-              this.updateLocales(displaySettingsRes.ok.data)
-              this.setLanguage(data.user.settings.language)
-              this.state.value = 'LOADED'
-              logger.info(`${i18n.global.t('labels.user')}:`)
-              logger.info(userRes.ok.data)
-            } else {
-              reject('Error loading essential data')
-            }
+
+            const data = new APP_DATA(
+              currencies,
+              countries,
+              user,
+              settings,
+              travelSettings,
+              displaySettings,
+              healthInsurances,
+              organisations,
+              categories,
+              specialLumpSums,
+              projects,
+              users
+            )
+            resolve(data)
+            this.data.value = data
+            this.state.value = 'LOADED'
           }
         })
       })
@@ -187,7 +293,7 @@ class APP_LOADER {
           if (result.ok) {
             resolve(result.ok.data)
             this.state.value = 'LOADED'
-            this.updateLocales(result.ok.data)
+            updateLocales(result.ok.data)
           } else {
             reject(result.error)
           }
@@ -197,28 +303,28 @@ class APP_LOADER {
     return this.displaySettingsPromise
   }
 
-  updateLocales(displaySettings: DisplaySettings) {
-    const messages = loadLocales(displaySettings.locale.overwrite)
-    for (const locale in messages) {
-      i18n.global.setLocaleMessage(locale, messages[locale as Locale])
-    }
-    ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
-    //@ts-ignore
-    document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
-  }
-
-  setLanguage(locale: Locale) {
-    ;(i18n.global.locale as unknown as Ref<Locale>).value = locale
-    vueform.i18n.locale = locale
-    formatter.setLocale(locale)
-  }
-
   private withProgress<T>(promise: Promise<T>): Promise<T> {
     return promise.then((result) => {
       this.progress.value += this.progressIncrement
       return result
     })
   }
+}
+
+function updateLocales(displaySettings: DisplaySettings) {
+  const messages = loadLocales(displaySettings.locale.overwrite)
+  for (const locale in messages) {
+    i18n.global.setLocaleMessage(locale, messages[locale as Locale])
+  }
+  ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
+  //@ts-ignore
+  document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
+}
+
+function setLanguage(locale: Locale) {
+  ;(i18n.global.locale as unknown as Ref<Locale>).value = locale
+  vueform.i18n.locale = locale
+  formatter.setLocale(locale)
 }
 
 export default new APP_LOADER()

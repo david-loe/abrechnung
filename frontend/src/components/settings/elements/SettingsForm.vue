@@ -26,8 +26,8 @@ export default defineComponent({
     async postSettings(settings: Settings) {
       const result = await API.setter<Settings>('admin/settings', settings)
       if (result.ok && APP_DATA.value) {
-        APP_DATA.value.settings = result.ok
-        ;(this.$refs.form$ as any).load(APP_DATA.value.settings)
+        APP_DATA.value?.setSettings(result.ok)
+        ;(this.$refs.form$ as any).load(APP_DATA.value?.settings)
       }
     }
   },

@@ -17,6 +17,12 @@
       "en": {}
     }
   },
+  "helpButton": {
+    "enabled": true,
+    "examinersMail": true,
+    "examinersMsTeams": false,
+    "customOptions": []
+  },
   "accessIcons": {
     "admin": ["person-fill"],
     "appliedFor:travel": ["airplane", "plus"],

@@ -10,44 +10,38 @@
 <script lang="ts">
 import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
+import APP_LOADER from '@/appData.js'
 import { defineComponent } from 'vue'
 
+const APP_DATA = APP_LOADER.data
 export default defineComponent({
   name: 'DisplaySettingsForm',
   data() {
     return {
-      schema: {},
-      displaySettings: undefined as DisplaySettings | undefined
+      schema: {}
     }
   },
   methods: {
     async postDisplaySettings(displaySettings: DisplaySettings) {
       const result = await API.setter<DisplaySettings>('admin/displaySettings', displaySettings)
-      if (result.ok) {
-        this.displaySettings = result.ok
-        ;(this.$refs.form$ as any).load(this.displaySettings)
+      if (result.ok && APP_DATA.value) {
+        APP_DATA.value?.setDisplaySettings(result.ok)
+        ;(this.$refs.form$ as any).load(APP_DATA.value?.displaySettings)
       }
     }
   },
-  async mounted() {
+  async created() {
+    await APP_LOADER.loadData()
     this.schema = Object.assign({}, (await API.getter<any>('admin/displaySettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: {
-          submit: {
-            type: 'button',
-            submits: true,
-            buttonLabel: this.$t('labels.save'),
-            full: true,
-            columns: { container: 6 },
-            id: 'submit-button'
-          }
+          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } }
         }
       },
       _id: { type: 'hidden', meta: true }
     })
-    this.displaySettings = (await API.getter<DisplaySettings>('displaySettings')).ok?.data
-    queueMicrotask(() => (this.$refs.form$ as any).load(this.displaySettings))
+    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA.value?.displaySettings))
   }
 })
 </script>

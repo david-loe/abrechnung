@@ -82,19 +82,7 @@
           </nav>
         </div>
         <div class="col-auto">
-          <div class="dropdown">
-            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ t('labels.help') }}
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <a class="dropdown-item" :href="mailToLinkVal"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
-              </li>
-              <li>
-                <a class="dropdown-item" :href="msTeamsToLinkVal" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
-              </li>
-            </ul>
-          </div>
+          <HelpButton :examinerMails="examinerMails" />
         </div>
       </div>
 
@@ -374,7 +362,6 @@
 </template>
 
 <script lang="ts" setup>
-import { mailToLink as mailLinkFunc, msTeamsToLink as teamsLinkFunc } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Place,
@@ -393,6 +380,7 @@ import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ErrorBanner from '@/components/elements/ErrorBanner.vue'
+import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
@@ -638,7 +626,7 @@ async function postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
     { headers: { 'Content-Type': 'multipart/form-data' } }
   )
   if (result.ok && APP_DATA.value) {
-    APP_DATA.value.user = result.ok
+    APP_DATA.value.setUser(result.ok)
   }
 }
 
@@ -759,9 +747,7 @@ try {
 } catch (e) {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
-const mails = await getExaminerMails()
-const mailToLinkVal = mailLinkFunc(mails)
-const msTeamsToLinkVal = teamsLinkFunc(mails)
+const examinerMails = await getExaminerMails()
 
 const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}travel/report?_id=${travel.value._id}`
 </script>

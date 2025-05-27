@@ -69,16 +69,9 @@ const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
     list.value.loadFromServer()
-    const rootCategories = (await API.getter<Category[]>('category')).ok?.data
-    if (rootCategories && APP_DATA.value) {
-      APP_DATA.value.categories = rootCategories
-    }
   }
 }
 defineExpose({ loadFromServer })
-
-await APP_LOADER.loadData()
-const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
 
@@ -108,6 +101,7 @@ async function postCategory(category: Category) {
   const result = await API.setter<Category>('admin/category', category)
   if (result.ok) {
     loadFromServer()
+    APP_LOADER.loadRequired('category')
     _showForm.value = false
   }
   categoryToEdit.value = undefined
@@ -116,6 +110,7 @@ async function deleteCategory(category: Category) {
   const result = await API.deleter('admin/category', { _id: category._id })
   if (result) {
     loadFromServer()
+    APP_LOADER.loadRequired('category')
   }
 }
 
