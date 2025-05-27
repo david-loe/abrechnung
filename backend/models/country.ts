@@ -24,19 +24,23 @@ export const countrySchema = () =>
     lumpSums: {
       type: [
         {
-          validFrom: { type: Date },
-          catering24: { type: Number, label: 'lumpSums.catering24' },
-          catering8: { type: Number, label: 'lumpSums.catering8' },
-          overnight: { type: Number, label: 'lumpSums.overnight' },
-          specials: {
-            type: [
-              {
-                city: { type: String, trim: true },
-                catering24: { type: Number, label: 'lumpSums.catering24' },
-                catering8: { type: Number, label: 'lumpSums.catering8' },
-                overnight: { type: Number, label: 'lumpSums.overnight' }
-              }
-            ]
+          type: {
+            validFrom: { type: Date },
+            catering24: { type: Number, label: 'lumpSums.catering24' },
+            catering8: { type: Number, label: 'lumpSums.catering8' },
+            overnight: { type: Number, label: 'lumpSums.overnight' },
+            specials: {
+              type: [
+                {
+                  type: {
+                    city: { type: String, trim: true },
+                    catering24: { type: Number, label: 'lumpSums.catering24' },
+                    catering8: { type: Number, label: 'lumpSums.catering8' },
+                    overnight: { type: Number, label: 'lumpSums.overnight' }
+                  }
+                }
+              ]
+            }
           }
         }
       ]

@@ -143,6 +143,23 @@ export async function checkForMigrations() {
       const defaultCategory = await mongoose.connection.collection('categories').findOne()
       await mongoose.connection.collection('expensereports').updateMany({}, { $set: { category: defaultCategory?._id } })
     }
+    if (semver.lte(migrateFrom, '2.0.1')) {
+      logger.info('Apply migration from v2.0.1: add help button settings')
+
+      await mongoose.connection.collection('displaysettings').updateOne(
+        {},
+        {
+          $set: {
+            helpButton: {
+              enabled: true,
+              examinersMail: true,
+              examinersMsTeams: true,
+              customOptions: {}
+            }
+          }
+        }
+      )
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

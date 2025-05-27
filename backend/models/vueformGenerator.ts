@@ -118,6 +118,11 @@ function mapSchemaTypeToVueformElement(
     vueformElement.label = undefined
   } else if (schemaType.type === Schema.Types.Mixed) {
     vueformElement.type = 'mixed'
+  } else if (schemaType.type === Schema.Types.Map) {
+    vueformElement.type = 'matrix'
+    vueformElement.inputType = 'text'
+    vueformElement.hideRows = true
+    vueformElement.cols = ['Key', 'Value']
   } else if (Array.isArray(schemaType.type)) {
     if (schemaType.type[0].ref) {
       vueformElement.type = schemaType.type[0].ref.toString().toLowerCase()
@@ -128,9 +133,10 @@ function mapSchemaTypeToVueformElement(
         vueformElement.placeholder = vueformElement.label
         vueformElement.label = undefined
       }
-    } else if (schemaType.type[0].type === undefined && typeof schemaType.type[0] === 'object') {
+    } else if (!isFlatType(schemaType.type[0].type)) {
+      // Array of Objects
       vueformElement.type = 'list'
-      vueformElement.object = { schema: mongooseSchemaToVueformSchema(schemaType.type[0], language, { columns: 12 }) }
+      vueformElement.object = { schema: mongooseSchemaToVueformSchema(schemaType.type[0].type, language) }
     } else {
       vueformElement.type = 'list'
       vueformElement.element = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr, { columns: 12 })

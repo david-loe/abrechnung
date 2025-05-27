@@ -52,19 +52,7 @@
           </nav>
         </div>
         <div class="col-auto">
-          <div class="dropdown">
-            <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ t('labels.help') }}
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <a class="dropdown-item" :href="mailToLinkVal"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
-              </li>
-              <li>
-                <a class="dropdown-item" :href="msTeamsToLinkVal" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
-              </li>
-            </ul>
-          </div>
+          <HelpButton :examinerMails="examinerMails" />
         </div>
       </div>
 
@@ -310,7 +298,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getTotalTotal, mailToLink, msTeamsToLink } from '@/../../common/scripts.js'
+import { getTotalTotal, mailToLink } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Expense,
@@ -325,6 +313,7 @@ import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
+import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TextArea from '@/components/elements/TextArea.vue'
@@ -563,9 +552,7 @@ if (props.endpointPrefix === 'examine/') {
   }
 }
 
-const mails = await getExaminerMails()
-const mailToLinkVal = mailToLink(mails)
-const msTeamsToLinkVal = msTeamsToLink(mails)
+const examinerMails = await getExaminerMails()
 
 const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}healthCareCost/report?_id=${healthCareCost.value._id}`
 </script>

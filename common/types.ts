@@ -119,6 +119,12 @@ export interface DisplaySettings {
     fallback: Locale
     overwrite: { [key in Locale]: { [key: string]: string } }
   }
+  helpButton: {
+    enabled: boolean
+    examinersMail: boolean
+    examinersMsTeams: boolean
+    customOptions: { label: string; link: string; icon: string }[]
+  }
   stateColors: { [key in AnyState]: BadgeStyle }
   accessIcons: { [key in Access]: string[] }
   reportTypeIcons: { [key in ReportType]: string[] }

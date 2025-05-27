@@ -63,6 +63,26 @@ export const displaySettingsSchema = () => {
         },
         required: true
       },
+      helpButton: {
+        type: {
+          enabled: { type: Boolean, required: true, default: true },
+          examinersMail: { type: Boolean, required: true, default: true, conditions: [['helpButton.enabled', true]] },
+          examinersMsTeams: { type: Boolean, required: true, default: true, conditions: [['helpButton.enabled', true]] },
+          customOptions: {
+            type: [
+              {
+                type: {
+                  label: { type: String, required: true },
+                  link: { type: String, required: true },
+                  icon: { type: String, required: true }
+                }
+              }
+            ],
+            conditions: [['helpButton.enabled', true]],
+            description: "https://icons.getbootstrap.com/ (e.g. 'envelope')"
+          }
+        }
+      },
       stateColors: { type: stateColors, required: true },
       accessIcons: { type: accessIcons, required: true, description: "https://icons.getbootstrap.com/ (e.g. 'airplane')" },
       reportTypeIcons: { type: reportTypeIcons, required: true, description: "https://icons.getbootstrap.com/ (e.g. 'airplane')" }
