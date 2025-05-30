@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-backend",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -8,7 +8,7 @@
     "body-parser": "^2.2.0",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
-    "cron": "^4.3.0",
+    "cron": "^4.3.1",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
@@ -42,7 +42,7 @@
     "@types/express-session": "^1.18.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.27",
     "@types/nodemailer": "^6.4.17",
     "@types/passport": "^1.0.17",
     "@types/passport-http-bearer": "^1.0.41",
