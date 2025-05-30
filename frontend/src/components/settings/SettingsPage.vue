@@ -89,6 +89,12 @@
           </template>
           <template #fallback> Loading.. </template>
         </Suspense>
+        <Suspense v-else-if="entry === 'ledgerAccounts'">
+          <template #default>
+            <LedgerAccountList />
+          </template>
+          <template #fallback> Loading.. </template>
+        </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
@@ -123,6 +129,7 @@ import CountryList from '@/components/settings/elements/CountryList.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
+import LedgerAccountList from '@/components/settings/elements/LedgerAccountList.vue'
 import OrganisationList from '@/components/settings/elements/OrganisationList.vue'
 import PrinterSettingsForm from '@/components/settings/elements/PrinterSettingsForm.vue'
 import ProjectList from '@/components/settings/elements/ProjectList.vue'
@@ -132,7 +139,7 @@ import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
 import { defineComponent } from 'vue'
 
-const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
+const items = ['users', 'projects', 'organisations', 'categories', 'ledgerAccounts', 'countries', 'currencies', 'healthInsurances'] as const
 
 const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
 
@@ -147,6 +154,7 @@ export default defineComponent({
     ProjectList,
     CountryList,
     CurrencyList,
+    LedgerAccountList,
     CategoryList,
     HealthInsuranceList,
     UserMerge,

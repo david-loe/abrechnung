@@ -7,7 +7,7 @@ import {
   hexColorRegex,
   IdDocument,
   idDocumentToId,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   textColors
 } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
@@ -172,7 +172,10 @@ export function populateAll<DocType extends Record<string, any>>(
   return Promise.allSettled(populates)
 }
 
-export async function offsetAdvance(report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
+export async function offsetAdvance(
+  report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id },
+  modelName: ReportModelNameWithoutAdvance
+) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {

@@ -9,7 +9,8 @@ import {
   Comment,
   ExpenseReport,
   HealthCareCost,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
+  reportModelNamesWithoutAdvance,
   State,
   Travel
 } from '../../common/types.js'
@@ -23,7 +24,7 @@ interface Methods {
   addComment(): void
   offset(
     reportTotal: number,
-    reportModelName: ReportModelName,
+    reportModelName: ReportModelNameWithoutAdvance,
     reportId: _id | null,
     session?: mongoose.ClientSession | null
   ): Promise<number>
@@ -40,7 +41,7 @@ const advanceSchema = () =>
       offsetAgainst: {
         type: [
           {
-            type: { type: String, enum: ['Travel', 'ExpenseReport', 'HealthCareCost'], required: true },
+            type: { type: String, enum: reportModelNamesWithoutAdvance, required: true },
             report: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
             amount: { type: Number, min: 0, required: true }
           }
@@ -125,7 +126,7 @@ interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
-  reportModelName: ReportModelName,
+  reportModelName: ReportModelNameWithoutAdvance,
   reportId: _id | null,
   session: mongoose.ClientSession | null = null
 ) {

@@ -6,10 +6,15 @@ import {
   CountryLumpSum,
   ConnectionSettings as IConnectionSettings,
   DisplaySettings as IDisplaySettings,
+  LedgerAccount as ILedgerAccount,
+  Organisation as IOrganisation,
   PrinterSettings as IPrinterSettings,
   Settings as ISettings,
   TravelSettings as ITravelSettings,
-  tokenAdminUser
+  TravelExpenseItem,
+  _id,
+  tokenAdminUser,
+  travelExpenseItems
 } from '../common/types.js'
 import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
 import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
@@ -28,6 +33,7 @@ import Country from './models/country.js'
 import Currency from './models/currency.js'
 import DisplaySettings from './models/displaySettings.js'
 import HealthInsurance from './models/healthInsurance.js'
+import LedgerAccount from './models/ledgerAccount.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
 
@@ -104,12 +110,37 @@ export async function initDB() {
   await fetchAndUpdateLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
 
-  const organisations = [{ name: 'My Organisation' }]
-  await initer(Organisation, 'organisation', organisations)
+  const ledgerAccounts = [
+    { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' },
+    { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' },
+    { identifier: '4660', name: 'Reisekosten Arbeitnehmer' },
+    { identifier: '4900', name: 'Sonstige betriebliche Aufwendungen' }
+  ]
+  await initer(LedgerAccount, 'ledger accounts', ledgerAccounts)
+
+  const account1530 = await LedgerAccount.findOne({ identifier: '1530' })
+  const account1740 = await LedgerAccount.findOne({ identifier: '1740' })
+  const account4660 = await LedgerAccount.findOne({ identifier: '4660' })
+  const account4900 = await LedgerAccount.findOne({ identifier: '4900' })
+  const organisation = {
+    name: 'My Organisation',
+    accountingSettings: {
+      employeeLiabilitiesAccount: account1740?._id,
+      employeeClaimsAccount: account1530?._id,
+      accountMapping: {} as { [key in TravelExpenseItem]?: _id }
+    }
+  }
+  for (const item of travelExpenseItems) {
+    organisation.accountingSettings.accountMapping[item] = account4660?._id
+  }
+
+  await initer(Organisation, 'organisation', [organisation as any])
   const org = await Organisation.findOne()
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
-  const categories = [{ name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true }]
+  const categories = [
+    { name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true, ledgerAccount: account4900 ?? undefined }
+  ]
   await initer(Category, 'category', categories)
 
   const tokenAdmin = await mongoose.connection.collection('users').findOne({ 'fk.magiclogin': tokenAdminUser.fk.magiclogin })

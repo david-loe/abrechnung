@@ -24,7 +24,7 @@ import {
   PrintSettingsBase,
   Purpose,
   PurposeSimple,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   reportIsAdvance,
   reportIsExpenseReport,
   reportIsHealthCareCost,
@@ -716,7 +716,7 @@ class ReportPrint {
       width: 105,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.type'),
-      fn: (t: ReportModelName) => this.t(`labels.${getReportTypeFromModelName(t)}`)
+      fn: (t: ReportModelNameWithoutAdvance) => this.t(`labels.${getReportTypeFromModelName(t)}`)
     })
     columns.push({
       key: 'amount',
