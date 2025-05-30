@@ -7,6 +7,7 @@ import CountryElement from '@/components/elements/vueform/CountryElement.vue'
 import CurrencyElement from '@/components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from '@/components/elements/vueform/DocumentfileElement.vue'
 import HealthinsuranceElement from '@/components/elements/vueform/HealthinsuranceElement.vue'
+import LedgeraccountElement from '@/components/elements/vueform/LedgeraccountElement.vue'
 import MixedElement from '@/components/elements/vueform/MixedElement.vue'
 import OrganisationElement from '@/components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from '@/components/elements/vueform/ProjectElement.vue'
@@ -38,6 +39,7 @@ export default defineConfig({
     OrganisationElement,
     CurrencyElement,
     ProjectElement,
+    LedgeraccountElement,
     HealthinsuranceElement,
     UserElement,
     MixedElement,

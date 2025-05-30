@@ -97,6 +97,12 @@
           </template>
           <template #fallback>Loading.. </template>
         </Suspense>
+        <Suspense v-else-if="entry === 'ledgerAccounts'">
+          <template #default>
+            <LedgerAccountList />
+          </template>
+          <template #fallback>Loading.. </template>
+        </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
@@ -131,6 +137,7 @@ import CountryList from '@/components/settings/elements/CountryList.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
+import LedgerAccountList from '@/components/settings/elements/LedgerAccountList.vue'
 import OrganisationList from '@/components/settings/elements/OrganisationList.vue'
 import PrinterSettingsForm from '@/components/settings/elements/PrinterSettingsForm.vue'
 import ProjectList from '@/components/settings/elements/ProjectList.vue'
@@ -148,7 +155,17 @@ import WebhookList from './elements/WebhookList.vue'
 
 const { t } = useI18n()
 
-const items = ['users', 'projects', 'organisations', 'categories', 'webhooks', 'countries', 'currencies', 'healthInsurances'] as const
+const items = [
+  'users',
+  'projects',
+  'organisations',
+  'categories',
+  'ledgerAccounts',
+  'webhooks',
+  'countries',
+  'currencies',
+  'healthInsurances'
+] as const
 
 const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
 

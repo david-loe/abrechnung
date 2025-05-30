@@ -65,8 +65,9 @@ export const userSchema = async () => {
       type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
       required: true
     },
+    employeeId: { type: String, index: true, unique: true, sparse: true },
     access: { type: accessObject, default: () => ({}) },
-    loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
+    loseAccessAt: { type: Date, description: 'info.loseAccessAt' },
     projects: {
       type: {
         assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },

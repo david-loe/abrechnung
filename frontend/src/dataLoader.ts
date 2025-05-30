@@ -15,6 +15,7 @@ import {
   UserSimpleWithProject
 } from 'abrechnung-common/types.js'
 import { Ref, ref } from 'vue'
+import { LedgerAccount } from '../../common/types.js'
 import API from './api.js'
 import { app } from './app.js'
 import { APP_DATA, LOGIN_APP_DATA } from './appData.js'
@@ -35,7 +36,7 @@ type APP_DATA_REQUIRED_ENDPOINTS =
   | 'specialLumpSums'
   | 'displaySettings'
   | 'printerSettings'
-type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
+type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users' | 'admin/ledgerAccount'
 type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
 
 const languageChangeCB = (locale: Locale) => {
@@ -105,7 +106,8 @@ class APP_LOADER {
           ]),
           Promise.allSettled([
             this.withProgress(this.loadOptional<ProjectSimpleWithName<string>[]>('project')),
-            this.withProgress(this.loadOptional<UserSimpleWithProject<string>[]>('users'))
+            this.withProgress(this.loadOptional<UserSimpleWithProject<string>[]>('users')),
+            this.withProgress(this.loadOptional<LedgerAccount[]>('admin/ledgerAccount'))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
@@ -127,9 +129,11 @@ class APP_LOADER {
 
             let projects: ProjectSimpleWithName<string>[] | undefined
             let users: UserSimpleWithProject<string>[] | undefined
+            let ledgerAccounts: LedgerAccount[] | undefined
             if (result[1].status === 'fulfilled') {
               projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
               users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
+              ledgerAccounts = result[1].value[2].status === 'fulfilled' ? result[1].value[2].value : undefined
             }
 
             const data = new APP_DATA(
@@ -146,7 +150,8 @@ class APP_LOADER {
                 printerSettings,
                 specialLumpSums,
                 projects,
-                users
+                users,
+                ledgerAccounts
               },
               i18n.global,
               formatter,

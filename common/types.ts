@@ -190,6 +190,7 @@ export interface BadgeStyle {
 export interface Category<idType extends _id = _id> {
   name: string
   style: BadgeStyle
+  ledgerAccount: LedgerAccount
   isDefault: boolean
   _id: idType
 }
@@ -309,8 +310,16 @@ export interface ProjectUsers<idType extends _id = _id> {
 
 export interface ProjectWithUsers<idType extends _id = _id> extends Project<idType>, ProjectUsers<idType> {}
 
+export interface AccountingSettings {
+  employeeLiabilitiesAccount: LedgerAccount
+  employeeClaimsAccount: LedgerAccount
+  employeeSpecificTemplate?: string | null
+  accountMapping: { [key in TravelExpenseItem]: LedgerAccount }
+}
+
 export interface Organisation<idType extends _id = _id, dataType extends binary = binary> extends OrganisationSimple<idType> {
   subfolderPath: string
+  accountingSettings: AccountingSettings
   reportEmail?: string | null
   a1CertificateEmail?: string | null
   bankDetails?: string | null
@@ -320,6 +329,7 @@ export interface Organisation<idType extends _id = _id, dataType extends binary 
 }
 
 export interface User<idType extends _id = _id, dataType extends binary = binary> extends UserSimple<idType> {
+  employeeId?: string | null
   fk: { microsoft?: string | null; ldapauth?: string | null; magiclogin?: string | null; oidc?: string | null; httpBearer?: string | null }
   access: {
     [key in Access]: boolean
@@ -597,8 +607,30 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
+export interface Booking {
+  state: BookingState
+  ledgerAccount: LedgerAccount
+  report: { _id: _id; name: string }
+  reportType: ReportModelNameWithoutAdvance
+  amount: number
+  date: Date | string
+  project: ProjectSimple
+  employee: { _id: _id; name: User['name']; employeeId: User['employeeId'] }
+  remark?: string | null
+  _id: _id
+}
+
+export interface LedgerAccount {
+  identifier: string
+  name: string
+  _id: _id
+}
+
 export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const
 export type Locale = (typeof locales)[number]
+
+export const bookingStates = ['open', 'booked'] as const
+export type BookingState = (typeof bookingStates)[number]
 
 export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
 export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
@@ -625,6 +657,9 @@ export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
 
 export const defaultLastPlaceOfWorkSettings = ['destinationPlace', 'lastEndLocation'] as const
 export type DefaultLastPlaceOfWorkSetting = (typeof defaultLastPlaceOfWorkSettings)[number]
+
+export const travelExpenseItems = ['cateringLumpSum', 'overnightLumpSum', 'airplane', 'shipOrFerry', 'otherTransport', 'ownCar'] as const
+export type TravelExpenseItem = (typeof travelExpenseItems)[number]
 
 export function getReportTypeFromModelName(modelName: ReportModelName): ReportType {
   switch (modelName) {

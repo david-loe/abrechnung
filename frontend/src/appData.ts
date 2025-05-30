@@ -8,6 +8,7 @@ import {
   Currency,
   DisplaySettings,
   HealthInsurance,
+  LedgerAccount,
   Locale,
   OrganisationSimple,
   PrinterSettings,
@@ -171,6 +172,7 @@ export class APP_DATA extends TRAVEL_APP_DATA {
 
   // projects?: ProjectSimpleWithName<string>[]
   users?: UserSimpleWithProject<string>[]
+  ledgerAccounts?: LedgerAccount[]
 
   constructor(
     data: {
@@ -188,6 +190,7 @@ export class APP_DATA extends TRAVEL_APP_DATA {
       specialLumpSums: Record<string, string[]>
       projects?: ProjectSimpleWithName<string>[]
       users?: UserSimpleWithProject<string>[]
+      ledgerAccounts?: LedgerAccount[]
     },
     i18n: Composer<{}, {}, {}, Locale>,
     formatter: Formatter,
@@ -201,6 +204,7 @@ export class APP_DATA extends TRAVEL_APP_DATA {
 
     this.projects = data.projects
     this.users = data.users
+    this.ledgerAccounts = data.ledgerAccounts
   }
 
   get user() {
