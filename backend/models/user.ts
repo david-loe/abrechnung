@@ -30,6 +30,12 @@ export const userSchema = async () => {
     accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: `accesses.${access}` }
   }
   return new Schema<User, UserModel, Methods>({
+    name: {
+      type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
+      required: true
+    },
+    email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
+    employeeId: { type: String, index: true, unique: true },
     fk: {
       type: {
         microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
@@ -54,13 +60,8 @@ export const userSchema = async () => {
       },
       required: true
     },
-    email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
-    name: {
-      type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
-      required: true
-    },
     access: { type: accessObject, default: () => ({}) },
-    loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
+    loseAccessAt: { type: Date, description: 'info.loseAccessAt' },
     projects: {
       type: {
         assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },

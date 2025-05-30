@@ -9,6 +9,7 @@ import {
   Currency,
   DisplaySettings,
   HealthInsurance,
+  LedgerAccount,
   Locale,
   OrganisationSimple,
   ProjectSimpleWithName,
@@ -35,7 +36,7 @@ type APP_DATA_REQUIRED_ENDPOINTS =
   | 'category'
   | 'specialLumpSums'
   | 'displaySettings'
-type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
+type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users' | 'admin/ledgerAccount'
 type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
 
 export class APP_DATA {
@@ -53,6 +54,7 @@ export class APP_DATA {
 
   projects?: ProjectSimpleWithName[]
   users?: UserWithNameAndProject[]
+  ledgerAccounts?: LedgerAccount[]
 
   travelCalculator!: TravelCalculator
 
@@ -69,7 +71,8 @@ export class APP_DATA {
 
     specialLumpSums: Record<string, string[]>,
     projects?: ProjectSimpleWithName[],
-    users?: UserWithNameAndProject[]
+    users?: UserWithNameAndProject[],
+    ledgerAccounts?: LedgerAccount[]
   ) {
     this.setUser(user)
     this.setCurrencies(currencies)
@@ -84,6 +87,7 @@ export class APP_DATA {
 
     this.setProjects(projects)
     this.setUsers(users)
+    this.setLedgerAccounts(ledgerAccounts)
   }
 
   setAny(endpoint: APP_DATA_ENDPOINTS, data: any) {
@@ -123,6 +127,9 @@ export class APP_DATA {
         break
       case 'users':
         this.setUsers(data)
+        break
+      case 'admin/ledgerAccount':
+        this.setLedgerAccounts(data)
         break
     }
   }
@@ -183,6 +190,11 @@ export class APP_DATA {
       this.users = users
     }
   }
+  setLedgerAccounts(ledgerAccounts?: LedgerAccount[]) {
+    if (ledgerAccounts) {
+      this.ledgerAccounts = ledgerAccounts
+    }
+  }
 }
 
 class APP_LOADER {
@@ -235,7 +247,8 @@ class APP_LOADER {
           ]),
           Promise.allSettled([
             this.withProgress(this.loadOptional<ProjectSimpleWithName[]>('project')),
-            this.withProgress(this.loadOptional<UserWithNameAndProject[]>('users'))
+            this.withProgress(this.loadOptional<UserWithNameAndProject[]>('users')),
+            this.withProgress(this.loadOptional<LedgerAccount[]>('admin/ledgerAccount'))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
@@ -256,9 +269,11 @@ class APP_LOADER {
 
             let projects = undefined
             let users = undefined
+            let ledgerAccounts = undefined
             if (result[1].status === 'fulfilled') {
               projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
               users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
+              ledgerAccounts = result[1].value[2].status === 'fulfilled' ? result[1].value[2].value : undefined
             }
 
             const data = new APP_DATA(
@@ -273,7 +288,8 @@ class APP_LOADER {
               categories,
               specialLumpSums,
               projects,
-              users
+              users,
+              ledgerAccounts
             )
             resolve(data)
             this.data.value = data
