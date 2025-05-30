@@ -5,6 +5,7 @@ import { colorSchema } from './helper.js'
 export const categorySchema = () =>
   new Schema<Category<Types.ObjectId>>({
     name: { type: String, trim: true, required: true, index: true },
+    ledgerAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
     isDefault: { type: Boolean, default: false },
     style: colorSchema(undefined)
   })

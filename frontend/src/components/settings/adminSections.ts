@@ -14,6 +14,7 @@ export type AdminSectionId =
   | 'projects'
   | 'organisations'
   | 'categories'
+  | 'ledgerAccounts'
   | 'countries'
   | 'currencies'
   | 'healthInsurances'
@@ -81,6 +82,14 @@ export const adminSections: readonly AdminSection[] = [
     group: 'data',
     labelKey: 'labels.categories',
     keywordKey: 'settingsSearch.categories'
+  },
+  {
+    id: 'ledgerAccounts',
+    path: 'ledger-accounts',
+    routeName: 'admin-ledger-accounts',
+    group: 'data',
+    labelKey: 'labels.ledgerAccounts',
+    keywordKey: 'settingsSearch.ledgerAccounts'
   },
   {
     id: 'countries',

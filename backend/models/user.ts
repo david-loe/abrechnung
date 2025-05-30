@@ -75,8 +75,9 @@ function createUserSchema(useRuntimeMetadata: boolean) {
       required: true
     },
     additionalDetails: { type: String, multiline: true, trim: true },
+    employeeId: { type: String, index: true, unique: true, sparse: true },
     access: { type: accessObject, default: () => ({}) },
-    loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
+    loseAccessAt: { type: Date, description: 'info.loseAccessAt' },
     projects: {
       type: {
         assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },

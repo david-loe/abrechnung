@@ -73,6 +73,12 @@
       </template>
       <template #fallback>Loading.. </template>
     </Suspense>
+    <Suspense v-else-if="activeSectionId === 'ledgerAccounts'">
+      <template #default>
+        <LedgerAccountList />
+      </template>
+      <template #fallback>Loading.. </template>
+    </Suspense>
     <Suspense v-else-if="activeSectionId === 'countries'">
       <template #default>
         <CountryList />
@@ -125,6 +131,7 @@ import CurrencyList from './elements/CurrencyList.vue'
 import DisplaySettingsForm from './elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from './elements/HealthInsuranceList.vue'
 import IntegrationSettingsForm from './elements/IntegrationSettingsForm.vue'
+import LedgerAccountList from './elements/LedgerAccountList.vue'
 import OrganisationList from './elements/OrganisationList.vue'
 import PrinterSettingsForm from './elements/PrinterSettingsForm.vue'
 import ProjectList from './elements/ProjectList.vue'

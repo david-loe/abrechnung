@@ -797,6 +797,7 @@
     "currencies": ["devises", "argent", "taux de change"],
     "displaySettings": ["langue", "icônes", "apparence", "affichage"],
     "healthInsurances": ["assurance maladie", "assurance", "caisse"],
+    "ledgerAccounts": ["comptes généraux", "comptabilité", "plan comptable"],
     "lumpSumSync": ["forfaits", "indemnité journalière", "synchronisation"],
     "organisations": ["organisations", "entreprises", "sociétés"],
     "printerSettings": ["impression", "pdf", "export", "mise en page"],
