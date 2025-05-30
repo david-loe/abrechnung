@@ -1,10 +1,9 @@
 import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
 import {
-  AddUp,
   AdvanceBase,
   AnyState,
   FlatAddUp,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   _id,
   hexColorRegex,
   idDocumentToId,
@@ -169,7 +168,10 @@ export function populateAll<DocType extends Record<string, any>>(
   return Promise.allSettled(populates)
 }
 
-export async function offsetAdvance(report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
+export async function offsetAdvance(
+  report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id },
+  modelName: ReportModelNameWithoutAdvance
+) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {
