@@ -429,7 +429,7 @@ async function toExaminationByInsurance() {
     bookingRemark: healthCareCost.value.bookingRemark
   })
   if (result.ok) {
-    await getHealthCareCost()
+    setHealthCareCost(result.ok)
   }
 }
 

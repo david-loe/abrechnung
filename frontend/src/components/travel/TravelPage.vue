@@ -551,7 +551,7 @@ async function refund() {
     bookingRemark: travel.value.bookingRemark
   })
   if (result.ok) {
-    router.push({ path: '/examine/travel' })
+    setTravel(result.ok)
   }
 }
 
