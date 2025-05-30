@@ -77,11 +77,11 @@
         @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
         :columns-to-hide="['balance', 'state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']"></AdvanceList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
-        {{ t('labels.showX', { X: t('labels.approvedX', { X: t('labels.advances') }) }) }} <i class="bi bi-chevron-down"></i>
+        {{ t('labels.show') }} <StateBadge state="approved"></StateBadge> <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hideX', { X: t('labels.approvedX', { X: t('labels.advances') }) }) }} <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <AdvanceList
@@ -104,6 +104,7 @@ import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceApproveForm from '@/components/advance/forms/AdvanceApproveForm.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

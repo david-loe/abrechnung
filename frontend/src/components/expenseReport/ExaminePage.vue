@@ -33,15 +33,17 @@
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
       </ExpenseReportList>
       <template v-if="!show">
-        <button type="button" class="btn btn-light me-2" @click="show = 'refunded'">
-          {{ $t('labels.showX', { X: $t('labels.refundedX', { X: $t('labels.expenseReports') }) }) }} <i class="bi bi-chevron-down"></i>
+        <button type="button" class="btn btn-light me-2" @click="show = 'inWork'">
+          {{ $t('labels.show') }} <StateBadge state="inWork"> </StateBadge> <i class="bi bi-chevron-down"></i>
         </button>
-        <button type="button" class="btn btn-light" @click="show = 'inWork'">
-          {{ $t('labels.showX', { X: $t('labels.inWorkX', { X: $t('labels.expenseReports') }) }) }} <i class="bi bi-chevron-down"></i>
+        <button type="button" class="btn btn-light" @click="show = 'refunded'">
+          {{ $t('labels.show') }} <StateBadge state="refunded"></StateBadge> <i class="bi bi-chevron-down"></i>
         </button>
       </template>
       <template v-else>
-        <button type="button" class="btn btn-light" @click="show = null">{{ $t('labels.hide') }} <i class="bi bi-chevron-up"></i></button>
+        <button type="button" class="btn btn-light" @click="show = null">
+          {{ $t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
+        </button>
         <hr class="hr" />
         <ExpenseReportList
           endpoint="examine/expenseReport"
@@ -58,6 +60,7 @@ import { ExpenseReportSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { defineComponent } from 'vue'
@@ -65,7 +68,7 @@ import { defineComponent } from 'vue'
 type ModalMode = 'add' | 'edit'
 export default defineComponent({
   name: 'ExaminePage',
-  components: { ExpenseReportList, ExpenseReportForm, ModalComponent },
+  components: { ExpenseReportList, ExpenseReportForm, ModalComponent, StateBadge },
   props: [],
   data() {
     return {

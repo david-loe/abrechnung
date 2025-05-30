@@ -52,11 +52,11 @@
           'bookingRemark'
         ]"></TravelList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
-        {{ $t('labels.showX', { X: $t('labels.approvedX', { X: $t('labels.travels') }) }) }} <i class="bi bi-chevron-down"></i>
+        {{ $t('labels.show') }} <StateBadge state="approved"></StateBadge> <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ $t('labels.hideX', { X: $t('labels.approvedX', { X: $t('labels.travels') }) }) }} <i class="bi bi-chevron-up"></i>
+          {{ $t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <TravelList
@@ -74,6 +74,7 @@ import { TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
@@ -82,7 +83,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ApprovePage',
-  components: { TravelList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent },
+  components: { TravelList, TravelApproveForm, TravelApply, TravelApplyForm, ModalComponent, StateBadge },
   props: { _id: { type: String } },
   data() {
     return {
