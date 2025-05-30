@@ -49,17 +49,17 @@
         </template>
 
         <template v-slot:singlelabel="{ value }">
-          <div class="position-absolute start-0 ms-3">
-            <span>{{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
-          </div>
+          <span class="text-truncate ms-2 me-auto">
+            {{ value.identifier + (value.name ? ' ' + value.name : '') }}
+          </span>
         </template>
 
         <template v-slot:multiplelabel="{ values }">
-          <div class="position-absolute start-0 ms-3">
+          <span class="ms-2 mt-1 me-auto">
             <span v-for="value of values" class="me-3">
-              <span>{{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
+              {{ value.identifier + (value.name ? ' ' + value.name : '') }}
             </span>
-          </div>
+          </span>
         </template>
 
         <template v-slot:option="{ option }">
