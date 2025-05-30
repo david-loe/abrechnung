@@ -166,7 +166,13 @@
                 :key="expense._id"
                 style="cursor: pointer"
                 @click="showModal('edit', 'expense', expense)">
-                <td>{{ formatter.simpleDate(expense.cost.date) }}</td>
+                <td>
+                  {{
+                    new Date(expense.cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+                      ? formatter.simpleDate(expense.cost.date)
+                      : formatter.date(expense.cost.date)
+                  }}
+                </td>
                 <td>{{ expense.description }}</td>
                 <td>{{ formatter.money(expense.cost) }}</td>
               </tr>
