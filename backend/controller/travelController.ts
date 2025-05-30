@@ -67,6 +67,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -95,6 +96,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -109,8 +111,13 @@ export class TravelController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'expenses',
-      checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)
+      checkOldObject: async (oldObject: TravelDoc) => {
+        if (!oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)) {
+          oldObject.editor = request.user._id as any
+          return true
+        }
+        return false
+      }
     })
   }
 
@@ -120,8 +127,13 @@ export class TravelController extends Controller {
       _id,
       parentId,
       arrayElementKey: 'stages',
-      checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)
+      checkOldObject: async (oldObject: TravelDoc) => {
+        if (!oldObject.historic && oldObject.state === 'approved' && request.user._id.equals(oldObject.owner._id)) {
+          oldObject.editor = request.user._id as any
+          return true
+        }
+        return false
+      }
     })
   }
 
@@ -388,6 +400,7 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -420,6 +433,7 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -435,11 +449,15 @@ export class TravelExamineController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject: TravelDoc) {
-        return (
+        if (
           !oldObject.historic &&
           (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-        )
+        ) {
+          oldObject.editor = request.user._id as any
+          return true
+        }
+        return false
       }
     })
   }
@@ -451,11 +469,15 @@ export class TravelExamineController extends Controller {
       parentId,
       arrayElementKey: 'stages',
       async checkOldObject(oldObject: TravelDoc) {
-        return (
+        if (
           !oldObject.historic &&
           (oldObject.state === 'underExamination' || oldObject.state === 'approved') &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-        )
+        ) {
+          oldObject.editor = request.user._id as any
+          return true
+        }
+        return false
       }
     })
   }

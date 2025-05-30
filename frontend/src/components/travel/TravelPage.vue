@@ -338,8 +338,8 @@
                     <div>
                       <button
                         class="btn btn-secondary"
-                        @click="travel.editor._id !== travel.owner._id ? null : backToApproved()"
-                        :disabled="travel.editor._id !== travel.owner._id">
+                        @click="travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/' ? null : backToApproved()"
+                        :disabled="travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/'">
                         <i class="bi bi-arrow-counterclockwise"></i>
                         <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                       </button>

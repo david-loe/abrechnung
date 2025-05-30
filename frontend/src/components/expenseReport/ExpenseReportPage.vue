@@ -216,8 +216,8 @@
                   <div>
                     <button
                       class="btn btn-secondary"
-                      @click="expenseReport.editor._id !== expenseReport.owner._id ? null : backToInWork()"
-                      :disabled="expenseReport.editor._id !== expenseReport.owner._id">
+                      @click="expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/' ? null : backToInWork()"
+                      :disabled="expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/'">
                       <i class="bi bi-arrow-counterclockwise"></i>
                       <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                     </button>

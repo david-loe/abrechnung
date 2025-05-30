@@ -54,6 +54,7 @@ export class HealthCareCostController extends Controller {
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -70,6 +71,7 @@ export class HealthCareCostController extends Controller {
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -226,6 +228,7 @@ export class HealthCareCostExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
@@ -246,6 +249,7 @@ export class HealthCareCostExamineController extends Controller {
           (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
+          oldObject.editor = request.user._id as any
           return true
         }
         return false
