@@ -112,7 +112,7 @@ export async function initDB() {
   const categories = [{ name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true }]
   await initer(Category, 'category', categories)
 
-  const tokenAdmin = await mongoose.connection.collection('users').findOne({ fk: { magiclogin: tokenAdminUser.fk.magiclogin } })
+  const tokenAdmin = await mongoose.connection.collection('users').findOne({ 'fk.magiclogin': tokenAdminUser.fk.magiclogin })
   if (tokenAdmin) {
     await mongoose.connection.collection('users').updateOne({ _id: tokenAdmin._id }, { $set: { access: tokenAdminUser.access } })
   } else {
