@@ -128,15 +128,25 @@
 
       <StatePipeline class="mb-3" :state="expenseReport.state" :states="expenseReportStates"></StatePipeline>
 
-      <div class="row row justify-content-between">
-        <div class="col-lg-auto col-12">
-          <div class="row g-1 mb-3">
+      <div class="row justify-content-between">
+        <div class="col-lg-8 col-12">
+          <div class="row mb-3">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
               </button>
+            </div>
+            <div class="col-auto ms-auto">
+              <CSVImport
+                :template-fields="['cost.date', 'description', 'cost.amount', 'cost.currency', 'note']"
+                :transformers="[
+                  { path: 'cost.date', fn: convertGermanDateToHTMLDate },
+                  { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
+                  { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
+                ]"
+                @submitted="addDrafts" />
             </div>
           </div>
           <div v-if="expenseReport.expenses.length == 0" class="alert alert-light" role="alert">
@@ -152,10 +162,11 @@
             </thead>
             <tbody>
               <tr
-                v-for="expense of expenseReport.expenses"
-                :key="expense._id"
+                v-for="expense of [...expenseReport.expenses, ...(expenseReport.drafts ? expenseReport.drafts : [])]"
+                :key="(expense as Expense)._id || (expense as ExpenseDraft).id"
                 style="cursor: pointer"
-                @click="showModal('edit', 'expense', expense)">
+                @click="showModal('edit', 'expense', expense)"
+                :class="(expense as Expense)._id ? '' : 'table-warning'">
                 <td>
                   {{
                     new Date(expense.cost.date).getUTCFullYear() === new Date().getUTCFullYear()
@@ -164,7 +175,7 @@
                   }}
                 </td>
                 <td>{{ expense.description }}</td>
-                <td>{{ formatter.money(expense.cost) }}</td>
+                <td class="text-end">{{ formatter.money(expense.cost) }}</td>
               </tr>
             </tbody>
           </table>
@@ -245,11 +256,22 @@
 </template>
 
 <script lang="ts" setup>
-import { Expense, ExpenseReport, ExpenseReportSimple, UserSimple, expenseReportStates } from '@/../../common/types.js'
+import { convertGermanDateToHTMLDate, getById } from '@/../../common/scripts.js'
+import {
+  Currency,
+  DocumentFile,
+  Expense,
+  ExpenseReport,
+  ExpenseReportSimple,
+  UserSimple,
+  expenseReportStates
+} from '@/../../common/types.js'
+
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
+import CSVImport from '@/components/elements/CSVImport.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
@@ -276,7 +298,22 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 
-const expenseReport = ref<ExpenseReport>({} as ExpenseReport)
+type ExpenseDraft = {
+  cost: {
+    date: string
+    amount: number
+    currency: Currency
+    receipts: DocumentFile[]
+  }
+  description: string
+  note?: string
+  id: number
+}
+interface ExpenseReportWithDrafts extends ExpenseReport {
+  drafts?: ExpenseDraft[]
+}
+
+const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
@@ -379,6 +416,10 @@ async function postExpense(expense: Expense) {
   })
   modalFormIsLoading.value = false
   if (result.ok) {
+    const draftIndex = expenseReport.value.drafts?.findIndex((d) => d.id === (expense as unknown as ExpenseDraft).id)
+    if (draftIndex !== undefined && draftIndex !== -1) {
+      expenseReport.value.drafts?.splice(draftIndex, 1)
+    }
     setExpenseReport(result.ok)
     resetAndHide()
   } else {
@@ -423,7 +464,9 @@ async function getExpenseReport() {
 }
 
 function setExpenseReport(er: ExpenseReport) {
+  const drafts = expenseReport.value.drafts || []
   expenseReport.value = er
+  expenseReport.value.drafts = drafts
   logger.info(`${t('labels.expenseReport')}:`)
   logger.info(expenseReport.value)
 }
@@ -451,6 +494,18 @@ function getPrev(expense: Expense): Expense | undefined {
     return undefined
   }
   return expenseReport.value.expenses[index - 1]
+}
+
+function addDrafts(draftExpenses: ExpenseDraft[]) {
+  for (const draft of draftExpenses) {
+    draft.cost.receipts = []
+    draft.id = Math.random()
+  }
+
+  if (!expenseReport.value.drafts) {
+    expenseReport.value.drafts = []
+  }
+  expenseReport.value.drafts.push(...draftExpenses)
 }
 
 try {
