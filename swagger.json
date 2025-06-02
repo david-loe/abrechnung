@@ -3994,7 +3994,7 @@
 			},
 			"HexColor": {
 				"type": "string",
-				"pattern": "/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
+				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
 			},
 			"TextColor": {
 				"type": "string",
