@@ -110,10 +110,10 @@ async function postLedgerAccount(ledgerAccount: LedgerAccount) {
   const result = await API.setter<LedgerAccount>('admin/ledgerAccount', ledgerAccount)
   if (result.ok) {
     _showForm.value = false
+    ledgerAccountToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadOptional('admin/ledgerAccount')
   }
-  ledgerAccountToEdit.value = undefined
 }
 async function deleteLedgerAccount(ledgerAccount: LedgerAccount) {
   const result = await API.deleter('admin/ledgerAccount', { _id: ledgerAccount._id })
