@@ -26,6 +26,7 @@ if (BACKEND_URL.startsWith(FRONTEND_URL)) {
   denylist.push(
     new RegExp(`^${backendPath}/auth`),
     new RegExp(`^${backendPath}.*/report(?:\\?|$)`),
+    new RegExp(`^${backendPath}/upload`),
     new RegExp(`^${backendPath}/ip`),
     new RegExp(`^${backendPath}/docs`)
   )
