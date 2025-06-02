@@ -102,10 +102,10 @@ async function postOrganisation(organisation: Organisation) {
   const result = await API.setter<Organisation>('admin/organisation', organisation, { headers })
   if (result.ok) {
     _showForm.value = false
+    organisationToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadRequired('organisation')
   }
-  organisationToEdit.value = undefined
 }
 async function deleteOrganisation(organisation: Organisation) {
   const result = await API.deleter('admin/organisation', { _id: organisation._id })

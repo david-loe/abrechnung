@@ -127,10 +127,10 @@ async function postCountry(country: Country) {
   const result = await API.setter<Country>('admin/country', country)
   if (result.ok) {
     _showForm.value = false
+    countryToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadRequired('country')
   }
-  countryToEdit.value = undefined
 }
 async function deleteCountry(country: Country) {
   const result = await API.deleter('admin/country', { _id: country._id })

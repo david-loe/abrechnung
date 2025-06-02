@@ -183,10 +183,10 @@ async function postUser(user: User) {
   const result = await API.setter<User>('admin/user', user)
   if (result.ok) {
     _showForm.value = false
+    userToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadOptional('users')
   }
-  userToEdit.value = undefined
 }
 async function deleteUser(user: User) {
   const result = await API.deleter('admin/user', { _id: user._id })

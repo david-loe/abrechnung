@@ -118,10 +118,10 @@ async function postProject(project: Project) {
   const result = await API.setter<Project>('admin/project', project)
   if (result.ok) {
     _showForm.value = false
+    projectToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadOptional('project')
   }
-  projectToEdit.value = undefined
 }
 async function deleteProject(project: Project) {
   const result = await API.deleter('admin/project', { _id: project._id })

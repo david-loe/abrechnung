@@ -125,11 +125,11 @@ function showForm(currency?: Currency) {
 async function postCurrency(currency: Currency) {
   const result = await API.setter<Currency>('admin/currency', currency)
   if (result.ok) {
+    _showForm.value = false
+    currencyToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadRequired('currency')
-    _showForm.value = false
   }
-  currencyToEdit.value = undefined
 }
 async function deleteCurrency(currency: Currency) {
   const result = await API.deleter('admin/currency', { _id: currency._id })

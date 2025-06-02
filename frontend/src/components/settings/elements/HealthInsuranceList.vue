@@ -111,10 +111,10 @@ async function postHealthInsurance(healthInsurance: HealthInsurance) {
   const result = await API.setter<HealthInsurance>('admin/healthInsurance', healthInsurance)
   if (result.ok) {
     _showForm.value = false
+    healthInsuranceToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadRequired('healthInsurance')
   }
-  healthInsuranceToEdit.value = undefined
 }
 async function deleteHealthInsurance(healthInsurance: HealthInsurance) {
   const result = await API.deleter('admin/healthInsurance', { _id: healthInsurance._id })
