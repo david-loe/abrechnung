@@ -192,6 +192,7 @@ export interface Category<idType extends _id = _id> {
   style: BadgeStyle
   ledgerAccount: LedgerAccount
   isDefault: boolean
+  for: 'Travel' | 'ExpenseReport' | 'both'
   _id: idType
 }
 
