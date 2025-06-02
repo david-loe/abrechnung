@@ -22,8 +22,8 @@ export const printerSettingsSchema = () =>
       type: { x: { type: Number, min: 0, required: true, label: 'X' }, bottom: { type: Number, min: 0, required: true } },
       required: true
     },
-    textColor: { type: String, required: true, validate: hexColorRegex },
-    borderColor: { type: String, required: true, validate: hexColorRegex },
+    textColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
+    borderColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
     borderThickness: { type: Number, min: 0, required: true }
   })
 

@@ -12,7 +12,7 @@ export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
 }
 
 /**
- * @pattern /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
+ * @pattern /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
  */
 export type HexColor = string
 
@@ -681,7 +681,7 @@ export const emailRegex =
 
 export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
-export const hexColorRegex = /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
+export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
 
 export const baseCurrency: Currency = {
   _id: 'EUR',

@@ -60,7 +60,10 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
 
 export function colorSchema(label?: string, required = true) {
   return {
-    type: { color: { type: String, required: true, validate: hexColorRegex }, text: { type: String, enum: textColors, required: true } },
+    type: {
+      color: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
+      text: { type: String, enum: textColors, required: true }
+    },
     required,
     label
   }

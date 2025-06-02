@@ -8,7 +8,6 @@ import {
   accesses,
   anyStates,
   defaultLocale,
-  hexColorRegex,
   locales,
   reportTypes
 } from '../../common/types.js'

@@ -46,6 +46,9 @@ function mapSchemaTypeToVueformElement(
   if (schemaType.max !== undefined) {
     vueformElement.rules.push(`max:${schemaType.max}`)
   }
+  if (schemaType.validate && schemaType.validate instanceof RegExp) {
+    vueformElement.rules.push(`regex:${schemaType.validate.toString()}`)
+  }
 
   if (schemaType.description) {
     vueformElement.description = translate(schemaType.description, language)
@@ -94,9 +97,6 @@ function mapSchemaTypeToVueformElement(
       vueformElement.type = 'textarea'
     } else {
       vueformElement.type = 'text'
-      if (schemaType.validate === emailRegex) {
-        vueformElement.rules.push('email')
-      }
     }
   } else if (schemaType.type === Number) {
     vueformElement.type = 'text'
