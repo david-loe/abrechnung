@@ -156,6 +156,7 @@ export interface Category {
   style: BadgeStyle
   ledgerAccount: LedgerAccount
   isDefault: boolean
+  for: 'Travel' | 'ExpenseReport' | 'both'
   _id: _id
 }
 

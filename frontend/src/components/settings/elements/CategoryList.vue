@@ -14,9 +14,20 @@
         </div>
       </template>
 
+      <template #item-for="category">
+        <i
+          v-if="APP_DATA && category.for !== 'both'"
+          :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(category.for)]}`"></i>
+      </template>
       <template #item-name="category">
         <Badge :text="category.name" :style="category.style"></Badge>
       </template>
+      <template #item-ledgerAccount="{ ledgerAccount }">
+        <template v-if="APP_DATA?.ledgerAccounts">
+          {{ getById(ledgerAccount, APP_DATA.ledgerAccounts)?.identifier }}
+        </template>
+      </template>
+
       <template #item-buttons="category">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(category)">
           <div class="d-none d-md-block">
@@ -48,7 +59,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Category } from '@/../../common/types.js'
+import { getById } from '@/../../common/scripts.js'
+import { Category, getReportTypeFromModelName } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
@@ -61,7 +73,9 @@ import type { Header } from 'vue3-easy-data-table'
 const { t } = useI18n()
 
 const headers: Header[] = [
+  { text: '', value: 'for', width: 20 },
   { text: t('labels.name'), value: 'name' },
+  { text: t('labels.ledgerAccount'), value: 'ledgerAccount' },
   { text: '', value: 'buttons', width: 80 }
 ]
 
@@ -72,6 +86,9 @@ async function loadFromServer() {
   }
 }
 defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
 
 const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
 
@@ -101,11 +118,11 @@ function showForm(category?: Category) {
 async function postCategory(category: Category) {
   const result = await API.setter<Category>('admin/category', category)
   if (result.ok) {
+    _showForm.value = false
+    categoryToEdit.value = undefined
     loadFromServer()
     APP_LOADER.loadRequired('category')
-    _showForm.value = false
   }
-  categoryToEdit.value = undefined
 }
 async function deleteCategory(category: Category) {
   const result = await API.deleter('admin/category', { _id: category._id })
