@@ -1,31 +1,53 @@
 <template>
-  <span :data-bs-title="text" ref="tooltip" :data-bs-html="html">
+  <div style="display: none" ref="contentHolder">
+    <slot name="content" />
+  </div>
+
+  <span ref="tooltipTrigger">
     <slot />
   </span>
 </template>
 
 <script lang="ts">
 import { Tooltip } from 'bootstrap'
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 
 export default defineComponent({
   name: 'TooltipElement',
+  props: {
+    text: { type: String, default: '' },
+    html: { type: Boolean, default: false }
+  },
   data() {
     return {
-      tooltip: undefined as Tooltip | undefined
+      tooltipInstance: null as Tooltip | null
     }
   },
-  components: {},
-  props: { text: { type: String, required: true }, html: { type: Boolean, default: false } },
-  mounted() {
-    this.tooltip = new Tooltip(this.$refs.tooltip as Element, { trigger: 'click hover focus' })
+  async mounted() {
+    await nextTick()
+
+    let htmlContent = (this.$refs.contentHolder as HTMLElement)?.innerHTML?.trim()
+
+    // fix vue3-easy-data-table issue adding style="display: none;" to all th elements
+    htmlContent = htmlContent.replace(/style="display:\s*none;?"/g, '')
+
+    const hasHTMLContent = Boolean(htmlContent)
+    if (hasHTMLContent || this.text) {
+      this.tooltipInstance = new Tooltip(this.$refs.tooltipTrigger as Element, {
+        trigger: 'click hover focus',
+        html: hasHTMLContent || this.html,
+        sanitize: !hasHTMLContent,
+        title: htmlContent || this.text
+      })
+    }
   },
   watch: {
-    text: function () {
-      if (this.tooltip) {
-        this.tooltip.setContent({ '.tooltip-inner': this.text })
-      }
+    text(newVal) {
+      this.tooltipInstance?.setContent({ '.tooltip-inner': newVal })
     }
+  },
+  beforeUnmount() {
+    this.tooltipInstance?.dispose()
   }
 })
 </script>

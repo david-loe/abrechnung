@@ -1,5 +1,5 @@
 <template>
-  <table class="table align-bottom">
+  <table :class="`${noBootstrapTable ? '' : 'table '}align-bottom`">
     <tbody>
       <tr v-if="progress !== undefined">
         <th>{{ t('labels.progress') }}</th>
@@ -56,6 +56,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const props = defineProps({
+  noBootstrapTable: { type: Boolean, default: false },
   addUp: { type: Array as PropType<AddUp[]>, required: true },
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },

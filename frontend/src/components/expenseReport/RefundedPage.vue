@@ -18,9 +18,19 @@
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
       @loaded="hideExpandColumn">
-      <template #expand="{ bookingRemark }">
-        <div v-if="bookingRemark" class="px-3 pb-1 border-bottom border-4">
-          <small style="white-space: pre-wrap">{{ bookingRemark }}</small>
+      <template #expand="report">
+        <div class="px-3 pb-1 border-bottom border-4">
+          <div v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" class="d-inline-block">
+            <AddUpTable
+              class="table-sm"
+              :add-up="report.addUp"
+              :project="report.project"
+              :showAdvanceOverflow="false"
+              id="addUp"></AddUpTable>
+          </div>
+          <div v-if="report.bookingRemark">
+            <small style="white-space: pre-wrap">{{ report.bookingRemark }}</small>
+          </div>
         </div>
       </template>
     </ExpenseReportList>
@@ -29,6 +39,7 @@
 
 <script lang="ts" setup>
 import APP_LOADER from '@/appData.js'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
 import { onMounted, useTemplateRef } from 'vue'
@@ -59,6 +70,14 @@ const { handlePrint } = useVueToPrint({
     @page {
       size: landscape; /* Sets the page to landscape orientation */
       margin: 0;        /* Removes header and footer margins */
+    }
+    #addUp tr {
+      display: block;
+      float: left;
+    }
+    #addUp th,
+    #addUp td {
+      display: block;
     }`
 })
 

@@ -133,8 +133,13 @@
     <template #item-addUp.totalTotal="{ addUp }">
       {{ $formatter.baseCurrency(getTotalTotal(addUp)) }}
     </template>
-    <template #item-addUp.totalBalance="{ addUp }">
-      {{ $formatter.baseCurrency(getTotalBalance(addUp)) }}
+    <template #item-addUp.totalBalance="report">
+      <TooltipElement>
+        {{ $formatter.baseCurrency(getTotalBalance(report.addUp)) }}
+        <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
+          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false"></AddUpTable>
+        </template>
+      </TooltipElement>
     </template>
     <template #item-report="{ _id, name }">
       <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
@@ -163,6 +168,7 @@
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
 import CategorySelector from '@/components/elements/CategorySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
