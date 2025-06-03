@@ -71,8 +71,8 @@ export default defineComponent({
           }
         }
       }
-      const seperator = detectSeparator(csvWithoutComment)
-      return csvToObjects(csvWithoutComment, transformer, seperator)
+      const separator = detectSeparator(csvWithoutComment)
+      return csvToObjects(csvWithoutComment, transformer, separator)
     },
     async submit(data: any[]) {
       if (this.endpoint) {
