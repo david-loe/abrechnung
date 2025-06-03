@@ -12,7 +12,7 @@
     <template #header-name="header">
       <div class="filter-column">
         {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('name')">
+        <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -24,7 +24,7 @@
     <template #header-state="header">
       <div class="filter-column">
         {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('state')">
+        <span style="cursor: pointer" @click="(e) => clickFilter('state', e)">
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -39,7 +39,7 @@
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('project')">
+        <span style="cursor: pointer" @click="(e) => clickFilter('project', e)">
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -51,7 +51,7 @@
     <template #header-organisation="header">
       <div class="filter-column">
         {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('project.organisation')">
+        <span style="cursor: pointer" @click="(e) => clickFilter('project.organisation', e)">
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -62,11 +62,13 @@
     </template>
     <template #header-owner="header">
       <div class="filter-column">
-        {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('owner')">
-          <i v-if="showFilter.owner" class="bi bi-funnel-fill"></i>
-          <i v-else class="bi bi-funnel"></i>
-        </span>
+        <div class="d-flex align-items-stretch">
+          {{ header.text }}
+          <span style="cursor: pointer" @click="(e) => clickFilter('owner', e)">
+            <i v-if="showFilter.owner" class="bi bi-funnel-fill mx-1"></i>
+            <i v-else class="bi bi-funnel mx-1"></i>
+          </span>
+        </div>
         <div v-if="showFilter.owner">
           <UserSelector v-model="(filter.owner as any)"></UserSelector>
         </div>
@@ -74,13 +76,15 @@
     </template>
     <template #header-log.appliedFor.date="header">
       <div class="filter-column">
-        {{ header.text }}
-        <span style="cursor: pointer" @click="clickFilter('log.appliedFor.date')">
-          <i v-if="showFilter['log.appliedFor.date']" class="bi bi-funnel-fill"></i>
-          <i v-else class="bi bi-funnel"></i>
-        </span>
+        <div class="d-flex align-items-stretch">
+          {{ header.text }}
+          <span style="cursor: pointer" @click="(e) => clickFilter('log.appliedFor.date', e)">
+            <i v-if="showFilter['log.appliedFor.date']" class="bi bi-funnel-fill mx-1"></i>
+            <i v-else class="bi bi-funnel mx-1"></i>
+          </span>
+        </div>
         <div v-if="showFilter['log.appliedFor.date']">
-          <DateInput v-model="(filter['log.appliedFor.date'] as any).$gt" :max="new Date()"></DateInput>
+          <DateInput v-model="(filter['log.appliedFor.date'] as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
     </template>
@@ -193,7 +197,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.balance'), value: 'balance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.approvedOn'), value: 'log.appliedFor.date' },
+    { text: t('labels.approvedOn'), value: 'log.appliedFor.date', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -234,7 +238,8 @@ const showFilter = ref({
   'log.appliedFor.date': false
 })
 
-function clickFilter(header: keyof typeof showFilter.value) {
+function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
+  event?.stopPropagation()
   if (showFilter.value[header]) {
     showFilter.value[header] = false
     let filterHeader = header

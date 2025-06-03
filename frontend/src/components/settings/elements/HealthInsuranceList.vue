@@ -4,7 +4,7 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('name')">
+          <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
@@ -17,7 +17,7 @@
       <template #header-email="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('email')">
+          <span style="cursor: pointer" @click="(e) => clickFilter('email', e)">
             <i v-if="showFilter.email" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
@@ -91,7 +91,8 @@ const showFilter = ref({
   email: false
 })
 
-function clickFilter(header: keyof typeof showFilter.value) {
+function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
+  event?.stopPropagation()
   if (showFilter.value[header]) {
     showFilter.value[header] = false
     filter.value[header] = getEmptyFilter()[header]

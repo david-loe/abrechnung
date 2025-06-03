@@ -17,7 +17,7 @@
       <template #header-_id="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('_id')">
+          <span style="cursor: pointer" @click="(e) => clickFilter('_id', e)">
             <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
@@ -107,7 +107,8 @@ const showFilter = ref({
 })
 showFilter.value[nameFilterKey] = false
 
-function clickFilter(header: string) {
+function clickFilter(header: string, event?: MouseEvent) {
+  event?.stopPropagation()
   if (showFilter.value[header]) {
     showFilter.value[header] = false
     filter.value[header] = getEmptyFilter()[header]

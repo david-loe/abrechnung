@@ -5,7 +5,6 @@
     :server-items-length="serverItemsLength"
     :loading="loading"
     :items="items"
-    sort-by="name"
     :headers="headers"
     alternating
     :preventContextMenuRow="false"
