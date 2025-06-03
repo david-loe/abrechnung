@@ -138,15 +138,16 @@
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
               </button>
             </div>
-            <div class="col-auto ms-auto">
+            <div v-if="!isReadOnly" class="col-auto ms-auto">
               <CSVImport
+                button-style="outline-secondary btn-sm"
                 :template-fields="['cost.date', 'description', 'cost.amount', 'cost.currency', 'note']"
                 :transformers="[
                   { path: 'cost.date', fn: convertGermanDateToHTMLDate },
                   { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
                   { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
                 ]"
-                @submitted="addDrafts" />
+                @submitted="(d) => (isReadOnly ? null : addDrafts(d))" />
             </div>
           </div>
           <div v-if="expenseReport.expenses.length == 0" class="alert alert-light" role="alert">
@@ -179,6 +180,16 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="expenseReport.drafts && expenseReport.drafts.length > 0" class="row g-2 text-danger">
+            <div class="col-auto">
+              <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="col">
+              <span>
+                {{ t('alerts.draftsWillBeLost') }}
+              </span>
+            </div>
+          </div>
         </div>
         <div class="col-lg-4 col">
           <div class="card">
@@ -281,9 +292,9 @@ import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { formatter } from '@/formatter.js'
 import { logger } from '@/logger.js'
-import { PropType, computed, ref, useTemplateRef } from 'vue'
+import { PropType, computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 type ModalObject = Partial<Expense> | ExpenseReportSimple
 type ModalObjectType = 'expense' | 'expenseReport'
@@ -365,17 +376,19 @@ function resetAndHide() {
 async function deleteExpenseReport() {
   const result = await API.deleter(`${props.endpointPrefix}expenseReport`, { _id: props._id })
   if (result) {
-    router.push({ path: '/' })
+    router.push({ path: '/', hash: '#skip' })
   }
 }
 
 async function toExamination() {
-  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
-    _id: expenseReport.value._id,
-    comment: expenseReport.value.comment
-  })
-  if (result.ok) {
-    router.push({ path: '/' })
+  if (shouldContinue()) {
+    const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
+      _id: expenseReport.value._id,
+      comment: expenseReport.value.comment
+    })
+    if (result.ok) {
+      router.push({ path: '/', hash: '#skip' })
+    }
   }
 }
 
@@ -506,6 +519,34 @@ function addDrafts(draftExpenses: ExpenseDraft[]) {
     expenseReport.value.drafts = []
   }
   expenseReport.value.drafts.push(...draftExpenses)
+}
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (expenseReport.value.drafts && expenseReport.value.drafts.length > 0) {
+    e.preventDefault()
+  }
+}
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+onBeforeRouteLeave((to, from, next) => {
+  if (to.hash === '#skip') {
+    to.hash = ''
+    next()
+    return
+  }
+  next(shouldContinue())
+})
+
+function shouldContinue(): boolean {
+  if (expenseReport.value.drafts && expenseReport.value.drafts.length > 0) {
+    return window.confirm(t('alerts.unsavedChanges'))
+  }
+  return true
 }
 
 try {
