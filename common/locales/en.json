@@ -26,6 +26,7 @@
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
     "departureAndArrivalOnDifferentDaysX": "Are you sure you were sitting in '{X}' for several days?",
+    "draftsWillBeLost": "All drafts will be lost once you leave this page! Add receipts and save them so they are retained.",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
     "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
@@ -49,6 +50,7 @@
     "successDeleting": "Deleted successfully",
     "successSaving": "Saved successfully",
     "unauthorized": "Unauthorized!",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "wrongPassword": "Wrong Password"

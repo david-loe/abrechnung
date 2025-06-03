@@ -577,6 +577,48 @@ export function csvToObjects(
   return result
 }
 
+export function detectSeparator(csvString: string, fallBackSeparator: '\t' | ';' | ',' = ','): '\t' | ';' | ',' {
+  const lines = csvString.split(/\r?\n/)
+
+  let firstNonEmptyLine: string | undefined
+  for (const line of lines) {
+    if (line.trim() !== '') {
+      firstNonEmptyLine = line
+      break
+    }
+  }
+  if (!firstNonEmptyLine) {
+    return fallBackSeparator
+  }
+
+  const counts = {
+    '\t': (firstNonEmptyLine.match(/\t/g) || []).length,
+    ';': (firstNonEmptyLine.match(/;/g) || []).length,
+    ',': (firstNonEmptyLine.match(/,/g) || []).length
+  }
+
+  let maxCount = -1
+  let chosen: '\t' | ';' | ',' = fallBackSeparator
+  for (const sep of ['\t', ';', ','] as const) {
+    if (counts[sep] > maxCount) {
+      maxCount = counts[sep]
+      chosen = sep
+    }
+  }
+
+  return chosen
+}
+
+export function convertGermanDateToHTMLDate(val: string | undefined) {
+  if (val) {
+    const match = val.match(/^(?<d>[0-3]?\d)\.(?<m>[0-1]?\d).(?<y>\d\d\d\d)$/)
+    if (match?.groups) {
+      return `${match.groups.y}-${match.groups.m.padStart(2, '0')}-${match.groups.d.padStart(2, '0')}`
+    }
+  }
+  return val
+}
+
 export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', ') {
   const array = [Object.keys(objects[0])].concat(objects)
 

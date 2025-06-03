@@ -39,22 +39,14 @@
             <template #fallback> Loading.. </template>
           </Suspense>
 
-          <h3>{{ $t('labels.csvImport') }}</h3>
+          <h3>{{ $t('labels.import') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/user/bulk"
             :transformers="[
               { path: 'projects.assigned', key: 'identifier', array: APP_DATA.projects! },
               { path: 'settings.organisation', key: 'name', array: APP_DATA.organisations },
-              {path: 'loseAccessAt', fn: (val:string|undefined) => {
-                if(val){
-                  const match = val.match(/^(?<d>[0-3]?\d)\.(?<m>[0-1]?\d).(?<y>\d\d\d\d)$/)
-                  if(match){
-                    return match.groups!.y + '-' + match.groups!.m.padStart(2, '0') + '-' + match.groups!.d.padStart(2, '0')
-                  }
-                }
-                return val
-              }}
+              {path: 'loseAccessAt', fn: convertGermanDateToHTMLDate}
             ]"
             :template-fields="[
               'name.givenName',
@@ -65,7 +57,7 @@
               'projects.assigned',
               'settings.organisation'
             ]"
-            @imported=";($refs.userList as any).loadFromServer()" />
+            @submitted=";($refs.userList as any).loadFromServer()" />
           <h3>{{ $t('labels.mergeUsers') }}</h3>
           <UserMerge />
         </template>
@@ -77,13 +69,13 @@
             <template #fallback> Loading.. </template>
           </Suspense>
 
-          <h3>{{ $t('labels.csvImport') }}</h3>
+          <h3>{{ $t('labels.import') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
             :transformers="[{ path: 'organisation', key: 'name', array: APP_DATA.organisations }]"
             :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
-            @imported=";($refs.projectList as any).loadFromServer()" />
+            @submitted=";($refs.projectList as any).loadFromServer()" />
         </template>
         <Suspense v-else-if="entry === 'organisations'">
           <template #default>
@@ -122,8 +114,9 @@
 </template>
 
 <script lang="ts">
+import { convertGermanDateToHTMLDate } from '@/../../common/scripts.js'
 import APP_LOADER from '@/appData.js'
-import CSVImport from '@/components/settings/elements/CSVImport.vue'
+import CSVImport from '@/components/elements/CSVImport.vue'
 import CategoryList from '@/components/settings/elements/CategoryList.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
 import CountryList from '@/components/settings/elements/CountryList.vue'
@@ -172,7 +165,7 @@ export default defineComponent({
     }
   },
   props: [],
-
+  methods: { convertGermanDateToHTMLDate },
   computed: {
     rightMargin() {
       const container = document.getElementById('navBarContent')

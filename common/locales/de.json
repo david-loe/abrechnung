@@ -26,6 +26,7 @@
     "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
+    "draftsWillBeLost": "Alle Entwürfe gehen verloren sobald du diese Seite verlässt! Füge Belege hinzu und speichere sie, damit sie erhalten bleiben.",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "fileXToLargeMaxIsY": "Die Datei '{X}' ist zu groß. Maximalgröße ist {Y}.",
@@ -49,6 +50,7 @@
     "successDeleting": "Gelöscht",
     "successSaving": "Gespeichert",
     "unauthorized": "Nicht autorisiert!",
+    "unsavedChanges": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du die Seite verlassen willst?",
     "ValidationError": "Validierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubeantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"
