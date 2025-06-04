@@ -8,7 +8,7 @@
             <i v-if="showFilter[nameFilterKey]" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="showFilter[nameFilterKey]">
+          <div v-if="showFilter[nameFilterKey]" @click.stop>
             <input type="text" class="form-control" v-model="(filter[nameFilterKey] as any).$regex" />
           </div>
         </div>
@@ -21,7 +21,7 @@
             <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
-          <div v-if="showFilter._id">
+          <div v-if="showFilter._id" @click.stop>
             <input type="text" class="form-control" v-model="(filter._id as any).$regex" style="max-width: 80px" />
           </div>
         </div>

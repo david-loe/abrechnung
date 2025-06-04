@@ -16,7 +16,7 @@
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter.name">
+        <div v-if="showFilter.name" @click.stop>
           <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
         </div>
       </div>
@@ -28,7 +28,7 @@
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter.state">
+        <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
             <option v-for="state of travelStates" :value="state">{{ t('states.' + state) }}</option>
@@ -43,7 +43,7 @@
           <i v-if="showFilter['destinationPlace.country']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter['destinationPlace.country']">
+        <div v-if="showFilter['destinationPlace.country']" @click.stop>
           <CountrySelector v-model="filter['destinationPlace.country'] as any"></CountrySelector>
         </div>
       </div>
@@ -55,7 +55,7 @@
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter.project">
+        <div v-if="showFilter.project" @click.stop>
           <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
         </div>
       </div>
@@ -67,7 +67,7 @@
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
-        <div v-if="showFilter['project.organisation']">
+        <div v-if="showFilter['project.organisation']" @click.stop>
           <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
         </div>
       </div>
@@ -81,7 +81,7 @@
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter.owner">
+        <div v-if="showFilter.owner" @click.stop>
           <UserSelector v-model="filter.owner as any"></UserSelector>
         </div>
       </div>
@@ -95,7 +95,7 @@
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter.updatedAt">
+        <div v-if="showFilter.updatedAt" @click.stop>
           <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
