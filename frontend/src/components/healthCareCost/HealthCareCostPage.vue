@@ -254,10 +254,22 @@
                 </template>
                 <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
                   <div>
-                    <a class="btn btn-primary" :href="reportLink" :download="healthCareCost.name + '.pdf'">
-                      <i class="bi bi-download"></i>
-                      <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                    </a>
+                    <button
+                      class="btn btn-primary"
+                      @click="
+                        showFile({
+                          endpoint: `${props.endpointPrefix}healthCareCost/report`,
+                          _id: healthCareCost._id,
+                          filename: `${healthCareCost.name}.pdf`,
+                          isDownloading: isDownloadingFn()
+                        })
+                      "
+                      :title="t('labels.report')"
+                      :disabled="Boolean(isDownloading)">
+                      <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
+                      <i v-else class="bi bi-file-earmark-pdf"></i>
+                      <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
+                    </button>
                   </div>
                   <div class="mt-2">
                     <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
@@ -329,6 +341,7 @@ import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
 import { formatter } from '@/formatter.js'
+import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -354,6 +367,9 @@ const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
+
+const isDownloading = ref('')
+const isDownloadingFn = () => isDownloading
 
 const isReadOnly = computed(() => {
   return (
@@ -561,8 +577,6 @@ if (props.endpointPrefix === 'examine/') {
 }
 
 const examinerMails = await getExaminerMails()
-
-const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}healthCareCost/report?_id=${healthCareCost.value._id}`
 </script>
 
 <style></style>

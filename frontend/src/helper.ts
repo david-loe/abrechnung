@@ -3,6 +3,9 @@
  * checking permission and asking for it if needed
  */
 
+import API from '@/api'
+import { Ref } from 'vue'
+
 export async function subscribeToPush() {
   if (!('PushManager' in window) || !import.meta.env.VITE_PUBLIC_VAPID_KEY) {
     return
@@ -103,4 +106,25 @@ export function expandCollapseComments() {
   for (const td of document.querySelectorAll<HTMLElement>('td.can-expand')) {
     td.click()
   }
+}
+
+export async function showFile(file: { endpoint: string; _id: string; filename: string; isDownloading?: Ref<string> } | File) {
+  let fileObj: File
+  if (file instanceof File) {
+    fileObj = file
+  } else {
+    if (file.isDownloading) {
+      file.isDownloading.value = file._id
+    }
+    const result = (await API.getter<Blob>(file.endpoint, { _id: file._id }, { responseType: 'blob' })).ok
+    if (file.isDownloading) {
+      file.isDownloading.value = ''
+    }
+    if (result) {
+      fileObj = new File([result.data], file.filename || 'file', { type: result.data.type })
+    } else {
+      return
+    }
+  }
+  window.open(URL.createObjectURL(fileObj), '_blank')
 }

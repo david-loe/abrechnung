@@ -61,20 +61,30 @@
       </tr>
     </tbody>
   </table>
-  <a
+  <button
     v-if="advance.state === 'completed' || advance.state === 'approved'"
     class="btn btn-primary"
-    :href="advanceReportLink(advance._id)"
-    :download="advance.name + '.pdf'">
-    <i class="bi bi-download"></i>
-    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-  </a>
+    @click="
+      showFile({
+        endpoint: `${props.endpointPrefix}advance/report`,
+        _id: advance._id,
+        filename: `${advance.name}.pdf`,
+        isDownloading: isDownloadingFn()
+      })
+    "
+    :title="t('labels.report')"
+    :disabled="Boolean(isDownloading)">
+    <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
+    <i v-else class="bi bi-file-earmark-pdf"></i>
+    <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
+  </button>
 </template>
 <script setup lang="ts">
 import { AdvanceSimple, advanceStates, getReportTypeFromModelName } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
-import { PropType } from 'vue'
+import { showFile } from '@/helper.js'
+import { PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -87,8 +97,9 @@ const props = defineProps({
   endpointPrefix: { type: String, default: '' }
 })
 
+const isDownloading = ref('')
+const isDownloadingFn = () => isDownloading
+
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
-
-const advanceReportLink = (id: string) => `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}advance/report?_id=${id}`
 </script>

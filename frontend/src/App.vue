@@ -109,8 +109,8 @@
             role="alert"
             style="z-index: 1100; max-width: 250px; max-height: 150px; overflow-y: hidden">
             <strong>
-              <i v-if="alert.type == 'danger'" class="bi bi-x-octagon-fill"></i>
-              <i v-if="alert.type == 'success'" class="bi bi-check-circle-fill"></i>
+              <i v-if="alert.type === 'danger'" class="bi bi-x-octagon-fill"></i>
+              <i v-else-if="alert.type === 'success'" class="bi bi-check-circle-fill"></i>
               {{ alert.title }}{{ alert.title && alert.message ? ': ' : '' }}
             </strong>
             {{ alert.message }}

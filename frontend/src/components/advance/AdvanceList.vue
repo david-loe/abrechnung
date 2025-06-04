@@ -125,9 +125,14 @@
       {{ $formatter.money(balance) }}
     </template>
     <template #item-report="{ _id, name }">
-      <a class="btn btn-primary btn-sm" :href="reportLink(_id)" :download="name + '.pdf'" :title="t('labels.report')">
-        <i class="bi bi-download"></i>
-      </a>
+      <button
+        class="btn btn-primary btn-sm"
+        @click="showFile({ endpoint: `${props.endpoint}/report`, _id, filename: `${name}.pdf`, isDownloading: isDownloadingFn() })"
+        :title="t('labels.report')"
+        :disabled="isDownloading === _id">
+        <span v-if="isDownloading === _id" class="spinner-border spinner-border-sm"></span>
+        <i v-else class="bi bi-file-earmark-pdf"></i>
+      </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
@@ -161,7 +166,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { bp } from '@/helper.js'
+import { bp, showFile } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header, SortType } from 'vue3-easy-data-table'
@@ -180,6 +185,9 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple] }>()
+
+const isDownloading = ref('')
+const isDownloadingFn = () => isDownloading
 
 const list = useTemplateRef('list')
 function loadFromServer() {

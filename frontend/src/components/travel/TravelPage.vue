@@ -347,10 +347,22 @@
                   </template>
                 </template>
                 <div v-else>
-                  <a class="btn btn-primary" :href="reportLink" :download="travel.name + '.pdf'">
-                    <i class="bi bi-download"></i>
-                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                  </a>
+                  <button
+                    class="btn btn-primary"
+                    @click="
+                      showFile({
+                        endpoint: `${props.endpointPrefix}travel/report`,
+                        _id: travel._id,
+                        filename: `${travel.name}.pdf`,
+                        isDownloading: isDownloadingFn()
+                      })
+                    "
+                    :title="t('labels.report')"
+                    :disabled="Boolean(isDownloading)">
+                    <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
+                    <i v-else class="bi bi-file-earmark-pdf"></i>
+                    <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -391,6 +403,7 @@ import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
 import StageForm from '@/components/travel/forms/StageForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { formatter } from '@/formatter.js'
+import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -425,6 +438,9 @@ const table = ref<Table>([])
 const error = ref<any>(undefined)
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
+
+const isDownloading = ref('')
+const isDownloadingFn = () => isDownloading
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -748,8 +764,6 @@ try {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
 const examinerMails = await getExaminerMails()
-
-const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}travel/report?_id=${travel.value._id}`
 </script>
 
 <style></style>

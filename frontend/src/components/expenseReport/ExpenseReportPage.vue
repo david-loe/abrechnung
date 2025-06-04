@@ -252,10 +252,22 @@
                   </div>
                 </template>
                 <div v-else-if="expenseReport.state === 'refunded'">
-                  <a class="btn btn-primary" :href="reportLink" :download="expenseReport.name + '.pdf'">
-                    <i class="bi bi-download"></i>
-                    <span class="ms-1">{{ t('labels.downloadX', { X: t('labels.report') }) }}</span>
-                  </a>
+                  <button
+                    class="btn btn-primary"
+                    @click="
+                      showFile({
+                        endpoint: `${props.endpointPrefix}expenseReport/report`,
+                        _id: expenseReport._id,
+                        filename: `${expenseReport.name}.pdf`,
+                        isDownloading: isDownloadingFn()
+                      })
+                    "
+                    :title="t('labels.report')"
+                    :disabled="Boolean(isDownloading)">
+                    <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
+                    <i v-else class="bi bi-file-earmark-pdf"></i>
+                    <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -291,6 +303,7 @@ import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { formatter } from '@/formatter.js'
+import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { PropType, computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -328,6 +341,9 @@ const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
+
+const isDownloading = ref('')
+const isDownloadingFn = () => isDownloading
 
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
@@ -555,7 +571,5 @@ try {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
 const examinerMails = await getExaminerMails()
-
-const reportLink = `${import.meta.env.VITE_BACKEND_URL}/${props.endpointPrefix}expenseReport/report?_id=${expenseReport.value._id}`
 </script>
 <style></style>

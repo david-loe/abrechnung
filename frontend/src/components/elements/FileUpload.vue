@@ -59,6 +59,7 @@ import { DocumentFile, Token } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
+import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import QRCode from 'qrcode'
 import { PropType, defineComponent } from 'vue'
@@ -93,18 +94,14 @@ export default defineComponent({
   emits: ['update:modelValue'],
   methods: {
     async showFile(file: Partial<DocumentFile>): Promise<void> {
-      const windowProxy = window.open('', '_blank') as Window
-      if (file._id) {
-        const result = (await API.getter<Blob>(`${this.endpointPrefix}documentFile`, { _id: file._id }, { responseType: 'blob' })).ok
-        if (result) {
-          const fileURL = URL.createObjectURL(result.data)
-          windowProxy.location.assign(fileURL)
-        } else {
-          windowProxy.close()
-        }
-      } else if (file.data) {
-        const fileURL = URL.createObjectURL(file.data)
-        windowProxy.location.assign(fileURL)
+      if (file.data) {
+        await showFile(file.data as File)
+      } else if (file._id) {
+        await showFile({
+          _id: file._id,
+          endpoint: `${this.endpointPrefix}documentFile`,
+          filename: file.name as string
+        })
       }
     },
     async deleteFile(file: Partial<DocumentFile>, index?: number) {
