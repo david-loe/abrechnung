@@ -6,6 +6,8 @@
     :loading="loading"
     :items="items"
     :headers="headers"
+    :sort-by="sortBy"
+    :sort-type="sortType"
     alternating
     :preventContextMenuRow="false"
     body-item-class-name="text-truncate">
@@ -20,7 +22,7 @@
 import { Base64 } from '@/../../common/scripts.js'
 import API from '@/api.js'
 import { PropType, ref, watch } from 'vue'
-import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
+import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 
@@ -43,7 +45,9 @@ const props = defineProps({
   filter: { type: Object as PropType<Filter>, required: true },
   params: { type: Object, default: () => ({}) },
   rowsItems: { type: Array as PropType<number[]>, default: () => [5, 15, 25] },
-  rowsPerPage: { type: Number, default: 5 }
+  rowsPerPage: { type: Number, default: 5 },
+  sortBy: { type: String },
+  sortType: { type: String as PropType<SortType>, default: 'asc' }
 })
 
 const emits = defineEmits<{ loaded: [] }>()
@@ -62,7 +66,9 @@ const loading = ref(false)
 const serverItemsLength = ref(0)
 const serverOptions = ref<ServerOptions>({
   page: 1,
-  rowsPerPage: props.rowsPerPage
+  rowsPerPage: props.rowsPerPage,
+  sortBy: props.sortBy,
+  sortType: props.sortType
 })
 
 let oldFilterValue = ''

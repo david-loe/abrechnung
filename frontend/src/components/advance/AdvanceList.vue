@@ -8,7 +8,9 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
-    @loaded="emits('loaded')">
+    @loaded="emits('loaded')"
+    :sort-by="sortBy"
+    :sort-type="sortType">
     <template #header-name="header">
       <div class="filter-column">
         {{ header.text }}
@@ -127,6 +129,9 @@
         <i class="bi bi-download"></i>
       </a>
     </template>
+    <template #item-updatedAt="{ updatedAt }">
+      {{ $formatter.dateTime(updatedAt) }}
+    </template>
     <template #item-log.appliedFor.date="{ log }">
       {{ $formatter.dateTime(log.appliedFor?.date) }}
     </template>
@@ -159,7 +164,7 @@ import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp } from '@/helper.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
+import type { Header, SortType } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
@@ -170,6 +175,8 @@ const props = defineProps<{
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
+  sortBy?: string
+  sortType?: SortType
 }>()
 
 const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple] }>()
@@ -197,6 +204,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.balance'), value: 'balance' },
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
+    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
     { text: t('labels.approvedOn'), value: 'log.appliedFor.date', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }

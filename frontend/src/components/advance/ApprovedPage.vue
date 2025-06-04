@@ -13,7 +13,7 @@
       ref="table"
       class="mb-5"
       endpoint="approved/advance"
-      :columns-to-hide="['balance']"
+      :columns-to-hide="['balance', 'updatedAt']"
       make-name-no-link
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"

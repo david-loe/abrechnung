@@ -380,7 +380,7 @@ class ReportPrint {
     let summary = []
     if (reportIsAdvance(this.report)) {
       columns.push(moneyColumn('1'))
-      summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.baseCurrency(this.report.budget.amount) })
+      summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.money(this.report.budget) })
       summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.baseCurrency(this.report.balance.amount) })
     } else {
       for (let i = 0; i < this.report.addUp.length; i++) {
