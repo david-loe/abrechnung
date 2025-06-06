@@ -17,14 +17,14 @@ case "$(uname -s)" in
     ;;
 esac
 
-BIOME_VERSION="1.9.4"
+BIOME_VERSION="2.0.0-beta.6"
 IMAGE_NAME="biome-with-git:${BIOME_VERSION}"
 
 if docker image inspect "$IMAGE_NAME" > /dev/null 2>&1; then
   echo "Image '$IMAGE_NAME' existiert bereits."
 else
   echo "Image nicht gefunden. Baue es jetzt..."
-  docker build -t "$IMAGE_NAME" "$REPO_ROOT/dev-tools/biome"
+  docker build --build-arg BIOME_VERSION=$BIOME_VERSION -t "$IMAGE_NAME" "$REPO_ROOT/dev-tools/biome"
 fi
 
 # Run Docker
