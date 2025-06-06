@@ -1,7 +1,16 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, HealthCareCost as IHealthCareCost, Organisation as IOrganisation, IdDocument, Locale, _id } from '../../common/types.js'
+import {
+  _id,
+  Expense,
+  HealthCareCostState,
+  IdDocument,
+  HealthCareCost as IHealthCareCost,
+  Organisation as IOrganisation,
+  Locale,
+  State
+} from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -10,7 +19,7 @@ import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
+import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPlusPost } from './types.js'
 
@@ -52,7 +61,7 @@ export class HealthCareCostController extends Controller {
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           oldObject.editor = request.user._id as any
           return true
@@ -70,7 +79,7 @@ export class HealthCareCostController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           oldObject.editor = request.user._id as any
           return true
         }
@@ -92,7 +101,7 @@ export class HealthCareCostController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'inWork',
+      state: HealthCareCostState.IN_WORK,
       editor: request.user._id
     })
 
@@ -111,10 +120,10 @@ export class HealthCareCostController extends Controller {
 
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
-          if (oldObject.state === 'inWork' && request.user.access['inWork:healthCareCost']) {
+          if (oldObject.state === HealthCareCostState.IN_WORK && request.user.access['inWork:healthCareCost']) {
             return true
           }
-          if (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id)) {
+          if (oldObject.state === HealthCareCostState.IN_REVIEW && oldObject.editor._id.equals(request.user._id)) {
             await oldObject.saveToHistory()
             return true
           }
@@ -130,14 +139,14 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_REVIEW, editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
+        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
           await oldObject.saveToHistory()
           return true
         }
@@ -150,7 +159,7 @@ export class HealthCareCostController extends Controller {
   @Produces('application/pdf')
   public async getReportFromOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const healthCareCost = await HealthCareCost.findOne({
-      $and: [{ _id, owner: request.user._id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }]
     }).lean()
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
@@ -180,7 +189,7 @@ export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'inWork' }, { state: 'underExamination' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER, $lt: HealthCareCostState.REVIEW_COMPLETED } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -224,7 +233,7 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (
           !oldObject.historic &&
-          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -246,7 +255,7 @@ export class HealthCareCostExamineController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (
           !oldObject.historic &&
-          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           oldObject.editor = request.user._id as any
@@ -263,7 +272,7 @@ export class HealthCareCostExamineController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'underExaminationByInsurance',
+      state: HealthCareCostState.IN_REVIEW_BY_INSURANCE,
       editor: request.user._id
     })
 
@@ -280,7 +289,7 @@ export class HealthCareCostExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -308,7 +317,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: false,
       checkOldObject: async (oldObject: HealthCareCostDoc) =>
         !oldObject.historic &&
-        (oldObject.state === 'inWork' || oldObject.state === 'underExamination') &&
+        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
         checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
@@ -328,9 +337,9 @@ export class HealthCareCostExamineController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { inWork: { date: new Date(), editor: request.user._id } }
+      ;(extendedBody as any).log = { [HealthCareCostState.IN_WORK]: { date: new Date(), editor: request.user._id } }
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -341,7 +350,7 @@ export class HealthCareCostExamineController extends Controller {
       cb: (e: IHealthCareCost) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -355,14 +364,14 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_REVIEW, editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -374,7 +383,7 @@ export class HealthCareCostExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getunderExaminationByInsuranceReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: 'underExaminationByInsurance' }
+    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: HealthCareCostState.IN_REVIEW_BY_INSURANCE }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -403,7 +412,7 @@ export class HealthCareCostConfirmController extends Controller {
   @Get()
   public async getHealthCareCostToConfirm(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'underExaminationByInsurance' }, { state: 'refunded' }] }]
+      $and: [{ historic: false, state: { $gte: HealthCareCostState.IN_REVIEW_BY_INSURANCE } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -424,7 +433,7 @@ export class HealthCareCostConfirmController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'refunded',
+      state: HealthCareCostState.REVIEW_COMPLETED,
       editor: request.user._id
     })
 
@@ -441,7 +450,10 @@ export class HealthCareCostConfirmController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === 'underExaminationByInsurance' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          oldObject.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await documentFileHandler(['refundSum', 'receipts'], { owner: oldObject.owner._id })(request)
           await oldObject.saveToHistory()
           return true
@@ -465,7 +477,7 @@ export class HealthCareCostConfirmController extends Controller {
   @Produces('application/pdf')
   public async getConfirmedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ _id, historic: false, state: { $gte: HealthCareCostState.IN_REVIEW_BY_INSURANCE } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -490,7 +502,7 @@ export class HealthCareCostRefundedController extends Controller {
   @Get()
   public async getRefunded(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ historic: false, state: { $gte: State.BOOKABLE } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -500,7 +512,7 @@ export class HealthCareCostRefundedController extends Controller {
       filter,
       projection: { history: 0, historic: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
-      sort: { 'log.underExamination.date': -1 }
+      sort: { [`log.${HealthCareCostState.IN_REVIEW}.date`]: -1 }
     })
   }
 
@@ -508,7 +520,7 @@ export class HealthCareCostRefundedController extends Controller {
   @Produces('application/pdf')
   public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ _id, historic: false }, { $or: [{ state: 'refunded' }, { state: 'underExaminationByInsurance' }] }]
+      $and: [{ _id, historic: false, state: { $gte: State.BOOKABLE } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })

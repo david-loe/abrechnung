@@ -5,20 +5,22 @@
       class="mb-5"
       ref="travelListRef"
       endpoint="examine/travel"
-      stateFilter="underExamination"
+      :stateFilter="TravelState.IN_REVIEW"
       :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
     </TravelList>
     <template v-if="!show">
-      <button type="button" class="btn btn-light me-2" @click="show = 'approved'">
-        {{ $t('labels.show') }} <StateBadge state="approved"></StateBadge> <i class="bi bi-chevron-down"></i>
+      <button type="button" class="btn btn-light me-2" @click="show = TravelState.APPROVED">
+        {{ $t('labels.show') }} <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState"></StateBadge>
+        <i class="bi bi-chevron-down"></i>
       </button>
-      <button type="button" class="btn btn-light" @click="show = 'refunded'">
-        {{ $t('labels.show') }} <StateBadge state="refunded"></StateBadge> <i class="bi bi-chevron-down"></i>
+      <button type="button" class="btn btn-light" @click="show = TravelState.REVIEW_COMPLETED">
+        {{ $t('labels.show') }} <StateBadge :state="TravelState.REVIEW_COMPLETED" :StateEnum="TravelState"></StateBadge>
+        <i class="bi bi-chevron-down"></i>
       </button>
     </template>
     <template v-else>
       <button type="button" class="btn btn-light" @click="show = null">
-        {{ $t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
+        {{ $t('labels.hide') }} <StateBadge :state="show" :StateEnum="TravelState"></StateBadge> <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
       <TravelList endpoint="examine/travel" :stateFilter="show" :columns-to-hide="['state', 'report', 'addUp.totalTotal', 'organisation']">
@@ -27,26 +29,13 @@
   </div>
 </template>
 
-<script lang="ts">
-import APP_LOADER from '@/appData.js'
+<script lang="ts" setup>
+import { Ref, ref } from 'vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
-import { defineComponent } from 'vue'
+import { TravelState } from '../../../../common/types'
 
-export default defineComponent({
-  name: 'ExaminePage',
-  components: { TravelList, StateBadge },
-  props: [],
-  data() {
-    return {
-      show: null as 'approved' | 'refunded' | null
-    }
-  },
-  methods: {},
-  async created() {
-    await APP_LOADER.loadData()
-  }
-})
+const show: Ref<TravelState.APPROVED | TravelState.REVIEW_COMPLETED | null> = ref(null)
 </script>
 
 <style></style>

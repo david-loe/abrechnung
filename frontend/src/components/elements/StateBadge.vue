@@ -1,26 +1,20 @@
 <template>
-  <Badge :text="$t(`states.${state}`)" :style="APP_DATA?.displaySettings.stateColors[state]"></Badge>
+  <Badge :text="$t(`states.${StateEnum[state]}`)" :style="APP_DATA?.displaySettings.stateColors[state]"></Badge>
 </template>
 
-<script lang="ts">
-import { AnyState } from '@/../../common/types.js'
+<script lang="ts" setup>
+import { PropType } from 'vue'
+import { AnyState, AnyStateEnum } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
-import { PropType, defineComponent } from 'vue'
 
-export default defineComponent({
-  data() {
-    return {
-      APP_DATA: APP_LOADER.data
-    }
-  },
-  components: { Badge },
-  name: 'StateBadge',
-  props: { state: { type: String as PropType<AnyState>, required: true } },
-  async created() {
-    await APP_LOADER.loadData()
-  }
+defineProps({
+  state: { type: Number as PropType<AnyState>, required: true },
+  StateEnum: { type: Object as PropType<AnyStateEnum>, required: true }
 })
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
 </script>
 
 <style></style>

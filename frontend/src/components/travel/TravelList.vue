@@ -105,7 +105,7 @@
         {{ travel.name }}
       </span>
       <template v-else>
-        <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
+        <template v-if="endpoint == 'travel' && travel.state <= TravelState.APPLIED_FOR">
           <a
             class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover"
             style="cursor: pointer"
@@ -139,8 +139,12 @@
       </span>
     </template>
     <template #item-state="{ progress, state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
-      <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
+      <StateBadge :state="state" :StateEnum="TravelState" style="display: inline-block"></StateBadge>
+      <ProgressCircle
+        class="ms-3"
+        v-if="state === TravelState.APPROVED"
+        :progress="progress"
+        style="display: inline-block"></ProgressCircle>
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
@@ -185,6 +189,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
@@ -200,9 +207,6 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 

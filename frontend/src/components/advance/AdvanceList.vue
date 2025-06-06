@@ -76,17 +76,17 @@
         </div>
       </div>
     </template>
-    <template #header-log.appliedFor.date="header">
+    <template #header-log.0.date="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ header.text }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('log.appliedFor.date', e)">
-            <i v-if="showFilter['log.appliedFor.date']" class="bi bi-funnel-fill mx-1"></i>
+          <span style="cursor: pointer" @click="(e) => clickFilter('log.0.date', e)">
+            <i v-if="showFilter['log.0.date']" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter['log.appliedFor.date']" @click.stop>
-          <DateInput v-model="(filter['log.appliedFor.date'] as any).$gt" :max="new Date()" with-time></DateInput>
+        <div v-if="showFilter['log.0.date']" @click.stop>
+          <DateInput v-model="(filter['log.0.date'] as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
     </template>
@@ -113,7 +113,7 @@
       </span>
     </template>
     <template #item-state="{ state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block"></StateBadge>
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
@@ -156,6 +156,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header, SortType } from 'vue3-easy-data-table'
 import { getById } from '@/../../common/scripts.js'
 import { AdvanceSimple, AdvanceState, advanceStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
@@ -167,15 +170,12 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header, SortType } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: AdvanceState | { $in: AdvanceState[] }
+  stateFilter?: AdvanceState | { $gte: AdvanceState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
@@ -213,7 +213,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.approvedOn'), value: 'log.appliedFor.date', sortable: true },
+    { text: t('labels.approvedOn'), value: 'log.0.date', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -236,7 +236,7 @@ const getEmptyFilter = () =>
     owner: undefined,
     state: undefined,
     project: { $in: [undefined] },
-    'log.appliedFor.date': { $gt: undefined }
+    'log.0.date': { $gt: undefined }
   }) as Filter
 
 const filter = ref(getEmptyFilter())
@@ -251,7 +251,7 @@ const showFilter = ref({
   state: false,
   project: false,
   'project.organisation': false,
-  'log.appliedFor.date': false
+  'log.0.date': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {

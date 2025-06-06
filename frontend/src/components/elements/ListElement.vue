@@ -19,11 +19,11 @@
 </template>
 
 <script lang="ts" setup>
-import { Base64 } from '@/../../common/scripts.js'
-import API from '@/api.js'
 import { PropType, ref, watch } from 'vue'
 import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
+import { Base64 } from '@/../../common/scripts.js'
+import API from '@/api.js'
 import 'vue3-easy-data-table/dist/style.css'
 
 import '@/vue3-easy-data-table.css'
@@ -31,12 +31,14 @@ import '@/vue3-easy-data-table.css'
 export type Filter = {
   [key: string]:
     | string
+    | number
     | undefined
     | null
     | { $regex: string | undefined; $options: string }
     | { $in: Array<any> | [undefined] | [null] }
-    | { $gt: Date | string | undefined }
-    | { $lt: Date | string | undefined }
+    | { $gt: Date | string | number | undefined }
+    | { $gte: Date | string | number | undefined }
+    | { $lt: Date | string | number | undefined }
 }
 const props = defineProps({
   endpoint: { type: String, required: true },

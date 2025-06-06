@@ -8,7 +8,7 @@
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
           <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
-          <div v-if="modalObject.state === 'appliedFor' || modalObject.state === 'rejected'" class="mb-1">
+          <div v-if="modalObject.state !== undefined && modalObject.state <= State.APPLIED_FOR" class="mb-1">
             <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
               {{ t('labels.edit') }}
             </button>
@@ -128,7 +128,7 @@
             'addUp.totalTotal',
             'organisation',
             'bookingRemark',
-            'log.underExamination.date'
+            'log.20.date'
           ]"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
@@ -136,7 +136,7 @@
         <AdvanceList
           ref="advanceList"
           endpoint="advance"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.appliedFor.date']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.0.date']"
           @clicked="(t) => showModal('view', 'advance', t)"></AdvanceList>
       </template>
     </div>
@@ -144,7 +144,10 @@
 </template>
 
 <script setup lang="ts">
-import type { AdvanceSimple, ExpenseReportSimple, HealthCareCostSimple, TravelSimple } from '@/../../common/types.js'
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { type AdvanceSimple, type ExpenseReportSimple, type HealthCareCostSimple, State, type TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Advance from '@/components/advance/Advance.vue'
@@ -153,14 +156,11 @@ import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
-import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
-import TravelList from '@/components/travel/TravelList.vue'
+import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import TravelList from '@/components/travel/TravelList.vue'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost' | 'advance'

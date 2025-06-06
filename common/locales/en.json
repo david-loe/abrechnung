@@ -170,6 +170,7 @@
     }
   },
   "labels": {
+    "completeReview": "Complete Review",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "Email address for A1 certificate notifications",
     "access": "Access",

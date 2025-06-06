@@ -55,5 +55,18 @@
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": { "level": "off", "fix": "none" },
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    }
+  ]
 }

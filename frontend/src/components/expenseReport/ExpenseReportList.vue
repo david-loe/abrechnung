@@ -122,7 +122,7 @@
       </span>
     </template>
     <template #item-state="{ state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="ExpenseReportState" style="display: inline-block"></StateBadge>
     </template>
     <template #item-category="{ category }">
       <Badge :text="category.name" :style="category.style"></Badge>
@@ -170,6 +170,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
@@ -184,9 +187,6 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 

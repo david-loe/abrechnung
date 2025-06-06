@@ -1,5 +1,5 @@
 import { RootFilterQuery } from 'mongoose'
-import { PlaceToString, getDiffInDays } from '../../common/scripts.js'
+import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
 import {
   Advance,
   ExpenseReportSimple,
@@ -7,10 +7,11 @@ import {
   User as IUser,
   Locale,
   ReportType,
-  TravelSimple,
   reportIsAdvance,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  State,
+  TravelSimple
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
 import { formatter } from '../factory.js'
@@ -41,19 +42,19 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }]
   }
   const userFilter: RootFilterQuery<IUser> = {}
-  if (report.state === 'appliedFor') {
+  if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
-  } else if (report.state === 'underExamination') {
+  } else if (report.state === State.IN_REVIEW) {
     userFilter[`access.examine/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
-    // 'rejected', 'approved', 'refunded', 'underExaminationByInsurance'
+    // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED', 'IN_REVIEW_BY_INSURANCE'
     userFilter._id = report.owner._id
     button.link =
-      report.state === 'rejected'
+      report.state === State.REJECTED
         ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
         : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
   }

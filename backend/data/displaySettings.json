@@ -49,36 +49,32 @@
     "healthCareCost": ["hospital"]
   },
   "stateColors": {
-    "appliedFor": {
-      "color": "#cae5ff",
-      "text": "black"
-    },
-    "approved": {
-      "color": "#89bbfe",
-      "text": "black"
-    },
-    "inWork": {
-      "color": "#AAD0FF",
-      "text": "black"
-    },
-    "refunded": {
-      "color": "#615d6c",
-      "text": "white"
-    },
-    "completed": {
-      "color": "#615d6c",
-      "text": "white"
-    },
-    "rejected": {
+    "-10": {
       "color": "#E8998D",
       "text": "black"
     },
-    "underExamination": {
+    "0": {
+      "color": "#cae5ff",
+      "text": "black"
+    },
+    "10": {
+      "color": "#89BBFE",
+      "text": "black"
+    },
+    "20": {
       "color": "#6f8ab7",
       "text": "white"
     },
-    "underExaminationByInsurance": {
-      "color": "#687492",
+    "30": {
+      "color": "#615d6c",
+      "text": "white"
+    },
+    "31": {
+      "color": "#65697F",
+      "text": "white"
+    },
+    "40": {
+      "color": "#5E8C61",
       "text": "white"
     }
   }

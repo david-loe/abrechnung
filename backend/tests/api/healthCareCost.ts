@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Expense, HealthCareCost, HealthCareCostSimple } from '../../../common/types.js'
+import { Expense, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
@@ -115,9 +115,9 @@ test.serial('POST /healthCareCost/underExamination', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as HealthCareCost).state, 'underExamination')
+  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.IN_REVIEW)
   t.is((res.body.result as HealthCareCost).history.length, 1)
-  t.like((res.body.result as HealthCareCost).comments[0], { text: comment, toState: 'underExamination' })
+  t.like((res.body.result as HealthCareCost).comments[0], { text: comment, toState: HealthCareCostState.IN_REVIEW })
 })
 
 // EXAMINE
@@ -132,9 +132,9 @@ test.serial('POST /examine/healthCareCost/inWork AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as HealthCareCost).state, 'inWork')
+  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.IN_WORK)
   t.is((res.body.result as HealthCareCost).history.length, 2)
-  t.like((res.body.result as HealthCareCost).comments[1], { text: comment, toState: 'inWork' })
+  t.like((res.body.result as HealthCareCost).comments[1], { text: comment, toState: HealthCareCostState.IN_WORK })
 })
 
 // USER
@@ -148,7 +148,7 @@ test.serial('POST /healthCareCost/underExamination AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as HealthCareCost).state, 'underExamination')
+  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.IN_REVIEW)
   t.is((res.body.result as HealthCareCost).history.length, 3)
 })
 
@@ -164,7 +164,7 @@ test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as HealthCareCost).state, 'underExaminationByInsurance')
+  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.IN_REVIEW_BY_INSURANCE)
   t.is((res.body.result as HealthCareCost).history.length, 4)
   t.is((res.body.result as HealthCareCost).comments.length, 2)
 })

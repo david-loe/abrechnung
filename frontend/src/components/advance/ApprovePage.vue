@@ -8,14 +8,14 @@
         <template v-if="modalMode === 'view'">
           <template v-if="modalAdvance._id">
             <AdvanceApproveForm
-              v-if="modalAdvance.state === 'appliedFor'"
+              v-if="modalAdvance.state === AdvanceState.APPLIED_FOR"
               :advance="(modalAdvance as AdvanceSimple)"
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
               @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple), d, c, br)"></AdvanceApproveForm>
             <template v-else>
               <Advance :advance="(modalAdvance as AdvanceSimple)" endpointPrefix="approve/"></Advance>
-              <template v-if="modalAdvance.state === 'approved'">
+              <template v-if="!modalAdvance.settledOn">
                 <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
                   <div class="row">
                     <label for="amount" class="col-form-label col-auto"> {{ t('labels.amount') }}<span class="text-danger">*</span> </label>
@@ -73,24 +73,25 @@
         class="mb-5"
         ref="advanceList"
         endpoint="approve/advance"
-        stateFilter="appliedFor"
+        :stateFilter="AdvanceState.APPLIED_FOR"
         @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
-        :columns-to-hide="['balance', 'state', 'editor', 'report', 'organisation', 'bookingRemark', 'log.appliedFor.date']"></AdvanceList>
-      <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
-        {{ t('labels.show') }} <StateBadge state="approved"></StateBadge> <i class="bi bi-chevron-down"></i>
+        :columns-to-hide="['balance', 'state', 'editor', 'report', 'organisation', 'bookingRemark', 'log.0.date']"></AdvanceList>
+      <button v-if="!show" type="button" class="btn btn-light" @click="show = AdvanceState.APPROVED">
+        {{ t('labels.show') }} <StateBadge :state="AdvanceState.APPROVED" :StateEnum="AdvanceState"></StateBadge>
+        <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="AdvanceState"></StateBadge> <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <AdvanceList
           ref="approvedAdvanceList"
           endpoint="approve/advance"
-          :stateFilter="{ $in: ['approved', 'completed'] }"
+          :stateFilter="{ $gte: AdvanceState.APPROVED }"
           :columns-to-hide="['updatedAt', 'report', 'organisation']"
           @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
-          sort-by="log.appliedFor.date"
+          sort-by="log.0.date"
           sort-type="desc">
         </AdvanceList>
       </template>
@@ -99,7 +100,10 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple } from '@/../../common/types.js'
+import { onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { AdvanceSimple, AdvanceState } from '@/../../common/types.js'
 import API from '@/api.js'
 import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
@@ -107,9 +111,6 @@ import AdvanceApproveForm from '@/components/advance/forms/AdvanceApproveForm.vu
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
-import { onMounted, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const props = defineProps<{ _id?: string }>()
 const router = useRouter()
@@ -117,7 +118,7 @@ const { t } = useI18n()
 
 const modalAdvance = ref<Partial<AdvanceSimple>>({})
 const modalMode = ref<'view' | 'add'>('view')
-const show = ref<null | 'approved'>(null)
+const show = ref<null | AdvanceState.APPROVED>(null)
 const modalFormIsLoading = ref(false)
 const showOffsetForm = ref(false)
 const offsetAmount = ref(0)

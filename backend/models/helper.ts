@@ -1,15 +1,5 @@
 import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
-import {
-  AddUp,
-  AdvanceBase,
-  AnyState,
-  FlatAddUp,
-  ReportModelName,
-  _id,
-  hexColorRegex,
-  idDocumentToId,
-  textColors
-} from '../../common/types.js'
+import { _id, AdvanceBase, AnyState, FlatAddUp, hexColorRegex, idDocumentToId, ReportModelName, textColors } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 
 export function costObject(
@@ -80,7 +70,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    state: { type: String, required: true, enum: stages, default: defaultState },
+    state: { type: Number, required: true, enum: stages, default: defaultState },
     log: logObject(stages),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comment: { type: String },

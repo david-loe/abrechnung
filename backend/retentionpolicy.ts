@@ -9,6 +9,7 @@ import {
   RetentionType,
   reportIsHealthCareCost,
   reportIsTravel,
+  State,
   schemaNames
 } from '../common/types.js'
 import { getSettings } from './db.js'
@@ -41,12 +42,12 @@ function getDateThreshold(days: number) {
 
 async function getPolicyElements(retentionPolicy: { [key in RetentionType]: number }) {
   const elements: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
-    { schema: 'Travel', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'Travel', state: 'approved', deletionPeriod: retentionPolicy.deleteApprovedTravelAfterXDaysUnused },
-    { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'ExpenseReport', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused },
-    { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused }
+    { schema: 'Travel', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'Travel', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteApprovedTravelAfterXDaysUnused },
+    { schema: 'ExpenseReport', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'ExpenseReport', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused },
+    { schema: 'HealthCareCost', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
+    { schema: 'HealthCareCost', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused }
   ]
   return elements
 }

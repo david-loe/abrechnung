@@ -170,6 +170,7 @@
     }
   },
   "labels": {
+    "completeReview": "Prüfung abschließen",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",

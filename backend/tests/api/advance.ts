@@ -1,8 +1,7 @@
 import test from 'ava'
-import { Advance, AdvanceSimple, Expense } from '../../../common/types.js'
+import { Advance, AdvanceSimple, AdvanceState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
-import { objectToFormFields } from './_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -62,7 +61,7 @@ test.serial('POST /examine/advance/approved', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Advance).state, 'approved')
+  t.is((res.body.result as Advance).state, AdvanceState.APPROVED)
   t.is((res.body.result as Advance).bookingRemark, bookingRemark)
 })
 

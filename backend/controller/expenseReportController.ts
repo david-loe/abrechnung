@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Expense, ExpenseReport as IExpenseReport, IdDocument, Locale, _id } from '../../common/types.js'
+import { _id, Expense, ExpenseReportState, IdDocument, ExpenseReport as IExpenseReport, Locale, State } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -9,7 +9,7 @@ import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody, checkOwner } from './controller.js'
+import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
@@ -51,7 +51,7 @@ export class ExpenseReportController extends Controller {
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
           oldObject.editor = request.user._id as any
           return true
@@ -69,7 +69,7 @@ export class ExpenseReportController extends Controller {
       parentId,
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (!oldObject.historic && oldObject.state === 'inWork' && request.user._id.equals(oldObject.owner._id)) {
+        if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           oldObject.editor = request.user._id as any
           return true
         }
@@ -84,7 +84,7 @@ export class ExpenseReportController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'inWork',
+      state: ExpenseReportState.IN_WORK,
       editor: request.user._id
     })
 
@@ -102,10 +102,10 @@ export class ExpenseReportController extends Controller {
       requestBody: extendedBody,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
-          if (oldObject.state === 'inWork' && request.user.access['inWork:expenseReport']) {
+          if (oldObject.state === ExpenseReportState.IN_WORK && request.user.access['inWork:expenseReport']) {
             return true
           }
-          if (oldObject.state === 'underExamination' && oldObject.editor._id.equals(request.user._id)) {
+          if (oldObject.state === ExpenseReportState.IN_REVIEW && oldObject.editor._id.equals(request.user._id)) {
             await oldObject.saveToHistory()
             return true
           }
@@ -121,14 +121,14 @@ export class ExpenseReportController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_REVIEW, editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === 'inWork') {
+        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
           await oldObject.saveToHistory()
           return true
         }
@@ -144,7 +144,7 @@ export class ExpenseReportController extends Controller {
       _id: _id,
       owner: request.user._id,
       historic: false,
-      state: 'refunded'
+      state: { $gte: State.BOOKABLE }
     }).lean()
     if (!expenseReport) {
       throw new NotFoundError(`No expense report with id: '${_id}' found or not allowed`)
@@ -218,7 +218,7 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
           !oldObject.historic &&
-          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
@@ -240,7 +240,7 @@ export class ExpenseReportExamineController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (
           !oldObject.historic &&
-          (oldObject.state === 'underExamination' || oldObject.state === 'inWork') &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           oldObject.editor = request.user._id as any
@@ -263,7 +263,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       checkOldObject: async (oldObject: ExpenseReportDoc) =>
         !oldObject.historic &&
-        (oldObject.state === 'inWork' || oldObject.state === 'underExamination') &&
+        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
         checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
@@ -282,9 +282,9 @@ export class ExpenseReportExamineController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'inWork', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { inWork: { date: new Date(), editor: request.user._id } }
+      ;(extendedBody as any).log = { [ExpenseReportState.IN_WORK]: { date: new Date(), editor: request.user._id } }
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -295,7 +295,7 @@ export class ExpenseReportExamineController extends Controller {
       cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -309,7 +309,7 @@ export class ExpenseReportExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'refunded', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.REVIEW_COMPLETED, editor: request.user._id })
 
     const cb = async (expenseReport: IExpenseReport) => {
       sendNotification(expenseReport)
@@ -324,7 +324,7 @@ export class ExpenseReportExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'underExamination' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -338,14 +338,14 @@ export class ExpenseReportExamineController extends Controller {
     @Body() requestBody: { _id: _id; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'underExamination', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_REVIEW, editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === 'inWork' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -357,7 +357,7 @@ export class ExpenseReportExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
+    const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -380,7 +380,7 @@ export class ExpenseReportExamineController extends Controller {
 export class ExpenseReportRefundedController extends Controller {
   @Get()
   public async getRefunded(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { historic: false, state: 'refunded' }
+    const filter: Condition<IExpenseReport> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -396,7 +396,7 @@ export class ExpenseReportRefundedController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { _id, historic: false, state: 'refunded' }
+    const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }

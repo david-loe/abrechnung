@@ -146,19 +146,152 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '2.0.1')) {
       logger.info('Apply migration from v2.0.1: add help button settings')
 
+      await mongoose.connection
+        .collection('displaysettings')
+        .updateOne({}, { $set: { helpButton: { enabled: true, examinersMail: true, examinersMsTeams: true, customOptions: [] } } })
+    }
+
+    if (semver.lte(migrateFrom, '2.0.4')) {
+      logger.info('Apply migration from v2.0.4: rewrite states')
+
       await mongoose.connection.collection('displaysettings').updateOne(
         {},
         {
           $set: {
-            helpButton: {
-              enabled: true,
-              examinersMail: true,
-              examinersMsTeams: true,
-              customOptions: []
+            stateColors: {
+              '-10': { color: '#E8998D', text: 'black' },
+              '0': { color: '#cae5ff', text: 'black' },
+              '10': { color: '#89BBFE', text: 'black' },
+              '20': { color: '#6f8ab7', text: 'white' },
+              '30': { color: '#615d6c', text: 'white' },
+              '31': { color: '#65697F', text: 'white' },
+              '40': { color: '#5E8C61', text: 'white' }
             }
           }
         }
       )
+      // biome-ignore-start lint/suspicious/noThenProperty: mongodb uses then
+      const switchTravelStates = (field: string) => ({
+        $switch: {
+          branches: [
+            { case: { $eq: [field, 'rejected'] }, then: -10 },
+            { case: { $eq: [field, 'appliedFor'] }, then: 0 },
+            { case: { $eq: [field, 'approved'] }, then: 10 },
+            { case: { $eq: [field, 'underExamination'] }, then: 20 },
+            { case: { $eq: [field, 'refunded'] }, then: 30 }
+          ],
+          default: field
+        }
+      })
+      await mongoose.connection.collection('travels').updateMany({}, [
+        {
+          $set: {
+            state: switchTravelStates('$state'),
+            comments: {
+              $map: {
+                input: '$comments',
+                as: 'comment',
+                in: { $mergeObjects: ['$$comment', { state: switchTravelStates('$$comment.toState') }] }
+              }
+            }
+          }
+        }
+      ])
+      const switchExpenseReportStates = (field: string) => ({
+        $switch: {
+          branches: [
+            { case: { $eq: [field, 'inWork'] }, then: 10 },
+            { case: { $eq: [field, 'underExamination'] }, then: 20 },
+            { case: { $eq: [field, 'refunded'] }, then: 30 }
+          ],
+          default: field
+        }
+      })
+      await mongoose.connection.collection('expensereports').updateMany({}, [
+        {
+          $set: {
+            state: switchExpenseReportStates('$state'),
+            comments: {
+              $map: {
+                input: '$comments',
+                as: 'comment',
+                in: { $mergeObjects: ['$$comment', { state: switchExpenseReportStates('$$comment.toState') }] }
+              }
+            }
+          }
+        }
+      ])
+      const switchHealthCareCostStates = (field: string) => ({
+        $switch: {
+          branches: [
+            { case: { $eq: [field, 'inWork'] }, then: 10 },
+            { case: { $eq: [field, 'underExamination'] }, then: 20 },
+            { case: { $eq: [field, 'underExaminationByInsurance'] }, then: 30 },
+            { case: { $eq: [field, 'refunded'] }, then: 31 }
+          ],
+          default: field
+        }
+      })
+      await mongoose.connection.collection('healthcarecosts').updateMany({}, [
+        {
+          $set: {
+            state: switchHealthCareCostStates('$state'),
+            comments: {
+              $map: {
+                input: '$comments',
+                as: 'comment',
+                in: { $mergeObjects: ['$$comment', { state: switchHealthCareCostStates('$$comment.toState') }] }
+              }
+            }
+          }
+        }
+      ])
+      const switchAdvancesStates = (field: string) => ({
+        $switch: {
+          branches: [
+            { case: { $eq: [field, 'rejected'] }, then: -10 },
+            { case: { $eq: [field, 'appliedFor'] }, then: 0 },
+            { case: { $eq: [field, 'approved'] }, then: 30 },
+            { case: { $eq: [field, 'completed'] }, then: 30 }
+          ],
+          default: field
+        }
+      })
+      await mongoose.connection.collection('advances').updateMany({}, [
+        {
+          $set: {
+            state: switchAdvancesStates('$state'),
+            comments: {
+              $map: {
+                input: '$comments',
+                as: 'comment',
+                in: { $mergeObjects: ['$$comment', { state: switchAdvancesStates('$$comment.toState') }] }
+              }
+            },
+            settledOn: '$log.approved.date'
+          }
+        }
+      ])
+      // biome-ignore-end lint/suspicious/noThenProperty: mongodb uses then
+      const logRenameTraAdv = (approvedState = 10) => ({
+        $rename: {
+          'log.rejected': 'log.-10',
+          'log.appliedFor': 'log.0',
+          'log.approved': `log.${approvedState}`,
+          'log.underExamination': 'log.20'
+        }
+      })
+      const logRenameExpHea = {
+        $rename: {
+          'log.inWork': 'log.10',
+          'log.underExamination': 'log.20',
+          'log.underExaminationByInsurance': 'log.30'
+        }
+      }
+      await mongoose.connection.collection('travels').updateMany({}, logRenameTraAdv(10))
+      await mongoose.connection.collection('expensereports').updateMany({}, logRenameExpHea)
+      await mongoose.connection.collection('healthcarecosts').updateMany({}, logRenameExpHea)
+      await mongoose.connection.collection('advances').updateMany({}, logRenameTraAdv(30))
     }
 
     if (settings) {

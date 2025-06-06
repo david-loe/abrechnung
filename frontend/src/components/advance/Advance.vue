@@ -1,5 +1,5 @@
 <template>
-  <StatePipeline class="mb-4" :state="advance.state" :states="advanceStates"></StatePipeline>
+  <StatePipeline class="mb-4" :state="advance.state" :StateEnum="AdvanceState"></StatePipeline>
   <table class="table mb-4">
     <tbody>
       <tr>
@@ -36,7 +36,7 @@
           </div>
         </td>
       </tr>
-      <tr v-if="advance.state === 'approved' || advance.state === 'completed'">
+      <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
         <td>
           <span>
@@ -62,7 +62,7 @@
     </tbody>
   </table>
   <button
-    v-if="advance.state === 'completed' || advance.state === 'approved'"
+    v-if="advance.state >= State.BOOKABLE"
     class="btn btn-primary"
     @click="
       showFile({
@@ -80,12 +80,12 @@
   </button>
 </template>
 <script setup lang="ts">
-import { AdvanceSimple, advanceStates, getReportTypeFromModelName } from '@/../../common/types'
+import { PropType, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { showFile } from '@/helper.js'
-import { PropType, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

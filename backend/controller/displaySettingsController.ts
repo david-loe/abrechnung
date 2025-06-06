@@ -9,7 +9,7 @@ import { Controller, SetterBody } from './controller.js'
 export class DisplaySettingsController extends Controller {
   @Get()
   public async get() {
-    return { data: (await DisplaySettings.findOne({}, { __v: 0 }).lean()) as IDisplaySettings }
+    return { data: (await DisplaySettings.findOne({}, { __v: 0 }).lean()) as any as IDisplaySettings }
   }
 }
 

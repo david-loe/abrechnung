@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { BaseCurrencyMoneyNotNull, Advance as IAdvance, IdDocument, Locale, _id } from '../../common/types.js'
+import { _id, AdvanceState, Advance as IAdvance, IdDocument, Locale, State } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -39,14 +39,14 @@ export class AdvanceController extends Controller {
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(Advance, {
       _id: _id,
-      checkOldObject: async (oldObject: AdvanceDoc) => request.user._id.equals(oldObject.owner._id) && oldObject.state === 'appliedFor'
+      checkOldObject: async (oldObject: AdvanceDoc) => request.user._id.equals(oldObject.owner._id) && oldObject.state < State.BOOKABLE
     })
   }
 
   @Post('appliedFor')
   public async postOwnInWork(@Body() requestBody: AdvanceApplication, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, {
-      state: 'appliedFor',
+      state: AdvanceState.APPLIED_FOR,
       owner: request.user._id,
       editor: request.user._id
     })
@@ -65,7 +65,7 @@ export class AdvanceController extends Controller {
       cb: sendNotification,
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
-        (oldObject.state === 'appliedFor' || oldObject.state === 'rejected') &&
+        oldObject.state <= AdvanceState.APPLIED_FOR &&
         request.user._id.equals(oldObject.owner._id) &&
         request.user.access['appliedFor:advance'],
       allowNew: true
@@ -79,7 +79,7 @@ export class AdvanceController extends Controller {
       _id: _id,
       owner: request.user._id,
       historic: false,
-      state: { $in: ['completed', 'approved'] }
+      state: { $gte: State.BOOKABLE }
     }).lean()
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
@@ -106,7 +106,7 @@ export class AdvanceExamineController extends Controller {
   @Get()
   public async getForExamineReport(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IAdvance> = {
-      $and: [{ historic: false }, { state: 'approved' }]
+      $and: [{ historic: false }, { state: AdvanceState.APPROVED }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -128,7 +128,7 @@ export class AdvanceApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IAdvance> = {
-      $and: [{ historic: false }, { $or: [{ state: 'appliedFor' }, { state: 'approved' }, { state: 'completed' }] }]
+      $and: [{ historic: false }, { state: { $gte: State.APPLIED_FOR } }]
     }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
@@ -148,7 +148,7 @@ export class AdvanceApproveController extends Controller {
       | { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, { state: 'approved', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       ;(extendedBody as any).log = { appliedFor: { date: new Date(), editor: request.user._id } }
       setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
@@ -171,7 +171,7 @@ export class AdvanceApproveController extends Controller {
       cb,
       allowNew: true,
       async checkOldObject(oldObject: AdvanceDoc) {
-        if (oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
           return true
         }
@@ -182,21 +182,26 @@ export class AdvanceApproveController extends Controller {
 
   @Post('rejected')
   public async postAnyRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, { state: 'rejected', editor: request.user._id })
+    const extendedBody = Object.assign(requestBody, { state: AdvanceState.REJECTED, editor: request.user._id })
 
     return await this.setter(Advance, {
       requestBody: extendedBody,
       cb: sendNotification,
       allowNew: false,
       checkOldObject: async (oldObject: AdvanceDoc) =>
-        oldObject.state === 'appliedFor' && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
 
   @Post('offset')
   public async offset(@Body() requestBody: { amount: number; advanceId: IdDocument }, @Request() request: AuthenticatedExpressRequest) {
-    const advance = await Advance.findOne({ _id: requestBody.advanceId, historic: false })
-    if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id) || advance.state !== 'approved') {
+    const advance = await Advance.findOne({
+      _id: requestBody.advanceId,
+      historic: false,
+      state: { $gte: AdvanceState.APPROVED },
+      settledOn: null
+    })
+    if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id)) {
       throw new NotFoundError(`No advance with id: '${requestBody.advanceId}' found or not allowed`)
     }
     await advance.offset(requestBody.amount, 'ExpenseReport', null)
@@ -212,7 +217,7 @@ export class AdvanceApproveController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReportForAny(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { _id, historic: false, state: { $in: ['completed', 'approved'] } }
+    const filter: Condition<IAdvance> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -235,7 +240,7 @@ export class AdvanceApproveController extends Controller {
 export class AdvanceRefundedController extends Controller {
   @Get()
   public async getRefunded(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { historic: false, state: { $in: ['approved', 'completed'] } }
+    const filter: Condition<IAdvance> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -243,14 +248,14 @@ export class AdvanceRefundedController extends Controller {
       query,
       filter,
       projection: { history: 0, historic: 0 },
-      sort: { 'log.appliedFor.date': -1 }
+      sort: { [`log.${AdvanceState.APPLIED_FOR}.date`]: -1 }
     })
   }
 
   @Get('report')
   @Produces('application/pdf')
   public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { _id, historic: false, state: { $in: ['approved', 'completed'] } }
+    const filter: Condition<IAdvance> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }

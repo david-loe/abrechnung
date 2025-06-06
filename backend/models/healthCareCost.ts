@@ -1,7 +1,6 @@
-import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { AddUp, Comment, HealthCareCost, HealthCareCostState, baseCurrency, healthCareCostStates } from '../../common/types.js'
-import { AdvanceDoc } from './advance.js'
+import { AddUp, baseCurrency, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
@@ -16,7 +15,7 @@ type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
 const healthCareCostSchema = () =>
   new Schema<HealthCareCost, HealthCareCostModel, Methods>(
-    Object.assign(requestBaseSchema(healthCareCostStates, 'inWork', 'HealthCareCost', true, false), {
+    Object.assign(requestBaseSchema(healthCareCostStates, HealthCareCostState.IN_WORK, 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
       refundSum: costObject(true, true, false, baseCurrency._id),
@@ -108,7 +107,7 @@ schema.pre('save', async function (this: HealthCareCostDoc) {
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {
-  if (this.state === 'refunded') {
+  if (this.state === HealthCareCostState.REVIEW_COMPLETED) {
     ;(this.project as ProjectDoc).updateBalance()
     await offsetAdvance(this, 'HealthCareCost')
   }
