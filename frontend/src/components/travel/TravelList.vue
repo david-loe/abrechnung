@@ -262,7 +262,6 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
     headers.splice(index, 1)
   }
 }
-
 const getEmptyFilter = () =>
   ({
     name: { $regex: undefined, $options: 'i' },
@@ -275,11 +274,8 @@ const getEmptyFilter = () =>
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
-}
-const reportLink = (_id: string) => {
-  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
 }
 
 const showFilter = ref({

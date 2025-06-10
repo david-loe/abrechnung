@@ -254,7 +254,7 @@ const getEmptyFilter = () =>
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 

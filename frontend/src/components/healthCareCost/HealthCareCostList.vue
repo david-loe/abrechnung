@@ -227,10 +227,6 @@ defineExpose({ loadFromServer })
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
-const reportLink = (_id: string) => {
-  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
-}
-
 const headers: Header[] = [
   //@ts-ignore
   { text: t('labels.name'), value: 'name' },
@@ -273,7 +269,7 @@ const getEmptyFilter = () =>
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 

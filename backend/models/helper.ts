@@ -80,7 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
           text: { type: String },
           author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
           toState: {
-            type: String,
+            type: Number,
             required: true,
             enum: stages
           }
