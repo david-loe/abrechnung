@@ -287,7 +287,7 @@ export class TravelApproveController extends Controller {
 
   @Post('approved')
   public async postAnyBackApproved(
-    @Body() requestBody: (TravelApplication & { owner: IdDocument }) | { _id: _id; comment?: string },
+    @Body() requestBody: ((TravelApplication & { owner: IdDocument }) | { _id: _id }) & { comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
