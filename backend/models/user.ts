@@ -76,10 +76,10 @@ export const userSchema = async () => {
               ['access.examine/expenseReport', true],
               ['access.examine/healthCareCost', true],
               ['access.confirm/healthCareCost', true],
-              ['access.bookable/advance', true],
-              ['access.bookable/travel', true],
-              ['access.bookable/expenseReport', true],
-              ['access.bookable/healthCareCost', true]
+              ['access.book/advance', true],
+              ['access.book/travel', true],
+              ['access.book/expenseReport', true],
+              ['access.book/healthCareCost', true]
             ]
           ]
         }

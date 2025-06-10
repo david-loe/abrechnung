@@ -234,9 +234,9 @@ export class AdvanceApproveController extends Controller {
 }
 
 @Tags('Advance')
-@Route('bookable/advance')
-@Security('cookieAuth', ['bookable/advance'])
-@Security('httpBearer', ['bookable/advance'])
+@Route('book/advance')
+@Security('cookieAuth', ['book/advance'])
+@Security('httpBearer', ['book/advance'])
 export class AdvanceBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {

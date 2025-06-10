@@ -2,7 +2,7 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2 class="mb-3">{{ $t('accesses.bookable/travel') }}</h2>
+        <h2 class="mb-3">{{ $t('accesses.book/travel') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
@@ -11,7 +11,7 @@
     <TravelList
       ref="table"
       class="mb-5"
-      endpoint="bookable/travel"
+      endpoint="book/travel"
       :columns-to-hide="['state', 'startDate']"
       make-name-no-link
       :rows-per-page="10"

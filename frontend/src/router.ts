@@ -42,7 +42,7 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/bookable/advance',
+    path: '/book/advance',
     component: BookableAdvancePage,
     meta: { requiresAuth: true }
   },
@@ -53,7 +53,7 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/bookable/travel',
+    path: '/book/travel',
     component: BookableTravelPage,
     meta: { requiresAuth: true }
   },
@@ -79,7 +79,7 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
-    path: '/bookable/expenseReport',
+    path: '/book/expenseReport',
     component: BookableExpenseReportPage,
     meta: { requiresAuth: true }
   },
@@ -120,7 +120,7 @@ const routes = [
     })
   },
   {
-    path: '/bookable/healthCareCost',
+    path: '/book/healthCareCost',
     component: BookableHealthCareCostPage,
     meta: { requiresAuth: true }
   },

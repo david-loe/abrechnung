@@ -296,10 +296,21 @@ export async function checkForMigrations() {
         {},
         {
           $rename: {
-            'access.approved/advance': 'access.bookable/advance',
-            'access.refunded/travel': 'access.bookable/travel',
-            'access.refunded/expenseReport': 'access.bookable/expenseReport',
-            'access.refunded/healthCareCost': 'access.bookable/healthCareCost'
+            'access.approved/advance': 'access.book/advance',
+            'access.refunded/travel': 'access.book/travel',
+            'access.refunded/expenseReport': 'access.book/expenseReport',
+            'access.refunded/healthCareCost': 'access.book/healthCareCost'
+          }
+        }
+      )
+      await mongoose.connection.collection('displaysettings').updateMany(
+        {},
+        {
+          $rename: {
+            'accessIcons.approved/advance': 'accessIcons.book/advance',
+            'accessIcons.refunded/travel': 'accessIcons.book/travel',
+            'accessIcons.refunded/expenseReport': 'accessIcons.book/expenseReport',
+            'accessIcons.refunded/healthCareCost': 'accessIcons.book/healthCareCost'
           }
         }
       )

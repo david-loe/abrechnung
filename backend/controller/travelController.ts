@@ -579,9 +579,9 @@ export class TravelExamineController extends Controller {
 }
 
 @Tags('Travel')
-@Route('bookable/travel')
-@Security('cookieAuth', ['bookable/travel'])
-@Security('httpBearer', ['bookable/travel'])
+@Route('book/travel')
+@Security('cookieAuth', ['book/travel'])
+@Security('httpBearer', ['book/travel'])
 export class TravelBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {

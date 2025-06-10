@@ -36,10 +36,10 @@
     "examine/travel": ["airplane", "pencil-square"],
     "inWork:expenseReport": ["coin", "plus"],
     "inWork:healthCareCost": ["hospital", "plus"],
-    "bookable/advance": ["briefcase", "cash-coin", "bank"],
-    "bookable/expenseReport": ["coin", "bank"],
-    "bookable/healthCareCost": ["hospital", "bank"],
-    "bookable/travel": ["airplane", "bank"],
+    "book/advance": ["briefcase", "cash-coin", "bank"],
+    "book/expenseReport": ["coin", "bank"],
+    "book/healthCareCost": ["hospital", "bank"],
+    "book/travel": ["airplane", "bank"],
     "user": ["card-list"]
   },
   "reportTypeIcons": {

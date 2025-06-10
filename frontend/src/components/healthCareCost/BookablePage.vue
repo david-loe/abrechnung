@@ -2,7 +2,7 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2 class="mb-3">{{ $t('accesses.bookable/healthCareCost') }}</h2>
+        <h2 class="mb-3">{{ $t('accesses.book/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
@@ -11,7 +11,7 @@
     <HealthCareCostList
       ref="table"
       class="mb-5"
-      endpoint="bookable/healthCareCost"
+      endpoint="book/healthCareCost"
       :columns-to-hide="['state', 'updatedAt']"
       make-name-no-link
       :rows-per-page="10"

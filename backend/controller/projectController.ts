@@ -30,10 +30,10 @@ export class ProjectController extends Controller {
         'examine/expenseReport',
         'examine/healthCareCost',
         'confirm/healthCareCost',
-        'bookable/advance',
-        'bookable/expenseReport',
-        'bookable/travel',
-        'bookable/healthCareCost'
+        'book/advance',
+        'book/expenseReport',
+        'book/travel',
+        'book/healthCareCost'
       ]))
     ) {
       throw new AuthorizationError()

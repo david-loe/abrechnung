@@ -137,8 +137,8 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-log.appliedFor.date="{ log }">
-      {{ $formatter.dateTime(log.appliedFor?.date) }}
+    <template #item-log.0.date="{ log }">
+      {{ $formatter.dateTime(log[0].date) }}
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">

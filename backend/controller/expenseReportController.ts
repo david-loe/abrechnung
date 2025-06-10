@@ -1,7 +1,16 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, Expense, ExpenseReportState, IdDocument, ExpenseReport as IExpenseReport, Locale, State } from '../../common/types.js'
+import {
+  _id,
+  Expense,
+  ExpenseReportState,
+  IdDocument,
+  ExpenseReport as IExpenseReport,
+  idDocumentToId,
+  Locale,
+  State
+} from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -374,9 +383,9 @@ export class ExpenseReportExamineController extends Controller {
 }
 
 @Tags('Expense Report')
-@Route('bookable/expenseReport')
-@Security('cookieAuth', ['bookable/expenseReport'])
-@Security('httpBearer', ['bookable/expenseReport'])
+@Route('book/expenseReport')
+@Security('cookieAuth', ['book/expenseReport'])
+@Security('httpBearer', ['book/expenseReport'])
 export class ExpenseReportBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
@@ -409,5 +418,33 @@ export class ExpenseReportBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('booked')
+  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+    return {
+      result: (
+        await Promise.allSettled(
+          requestBody.map((id) => {
+            const doc = { _id: idDocumentToId(id), state: ExpenseReportState.BOOKED, editor: request.user._id }
+            return this.setter(ExpenseReport, {
+              requestBody: doc,
+              allowNew: false,
+              async checkOldObject(oldObject: ExpenseReportDoc) {
+                if (
+                  oldObject.state === ExpenseReportState.REVIEW_COMPLETED &&
+                  checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+                ) {
+                  await oldObject.saveToHistory()
+                  return true
+                }
+                return false
+              }
+            })
+          })
+        )
+      ).map((r) => ({ status: r.status, reason: (r as PromiseRejectedResult).reason })),
+      message: 'alerts.successSaving'
+    }
   }
 }

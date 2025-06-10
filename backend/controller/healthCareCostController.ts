@@ -495,9 +495,9 @@ export class HealthCareCostConfirmController extends Controller {
 }
 
 @Tags('Health Care Cost')
-@Route('bookable/healthCareCost')
-@Security('cookieAuth', ['bookable/healthCareCost'])
-@Security('httpBearer', ['bookable/healthCareCost'])
+@Route('book/healthCareCost')
+@Security('cookieAuth', ['book/healthCareCost'])
+@Security('httpBearer', ['book/healthCareCost'])
 export class HealthCareCostBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {

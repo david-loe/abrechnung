@@ -620,10 +620,10 @@ export const accesses = [
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
-  'bookable/advance',
-  'bookable/travel',
-  'bookable/expenseReport',
-  'bookable/healthCareCost',
+  'book/advance',
+  'book/travel',
+  'book/expenseReport',
+  'book/healthCareCost',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]
