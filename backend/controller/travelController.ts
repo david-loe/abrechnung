@@ -487,8 +487,8 @@ export class TravelExamineController extends Controller {
     })
   }
 
-  @Post('refunded')
-  public async postRefunded(
+  @Post('reviewCompleted')
+  public async postReviewCompleted(
     @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -579,12 +579,12 @@ export class TravelExamineController extends Controller {
 }
 
 @Tags('Travel')
-@Route('refunded/travel')
-@Security('cookieAuth', ['refunded/travel'])
-@Security('httpBearer', ['refunded/travel'])
-export class TravelRefundedController extends Controller {
+@Route('bookable/travel')
+@Security('cookieAuth', ['bookable/travel'])
+@Security('httpBearer', ['bookable/travel'])
+export class TravelBookableController extends Controller {
   @Get()
-  public async getRefunded(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookable(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<ITravel> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -600,7 +600,7 @@ export class TravelRefundedController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }

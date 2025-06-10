@@ -2,7 +2,7 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2 class="mb-3">{{ $t('accesses.approved/advance') }}</h2>
+        <h2 class="mb-3">{{ $t('accesses.bookable/advance') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
@@ -12,7 +12,7 @@
     <AdvanceList
       ref="table"
       class="mb-5"
-      endpoint="approved/advance"
+      endpoint="bookable/advance"
       :columns-to-hide="['balance', 'updatedAt']"
       make-name-no-link
       :rows-per-page="10"
@@ -28,11 +28,11 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, useTemplateRef } from 'vue'
+import { useVueToPrint } from 'vue-to-print'
 import APP_LOADER from '@/appData.js'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
-import { onMounted, useTemplateRef } from 'vue'
-import { useVueToPrint } from 'vue-to-print'
 
 const tableRef = useTemplateRef('table')
 

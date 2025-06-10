@@ -234,12 +234,12 @@ export class AdvanceApproveController extends Controller {
 }
 
 @Tags('Advance')
-@Route('approved/advance')
-@Security('cookieAuth', ['approved/advance'])
-@Security('httpBearer', ['approved/advance'])
-export class AdvanceRefundedController extends Controller {
+@Route('bookable/advance')
+@Security('cookieAuth', ['bookable/advance'])
+@Security('httpBearer', ['bookable/advance'])
+export class AdvanceBookableController extends Controller {
   @Get()
-  public async getRefunded(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookable(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IAdvance> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -254,7 +254,7 @@ export class AdvanceRefundedController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IAdvance> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }

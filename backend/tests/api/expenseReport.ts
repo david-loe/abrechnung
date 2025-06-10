@@ -147,11 +147,11 @@ test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
 
 // EXAMINE
 
-test.serial('POST /examine/expenseReport/refunded', async (t) => {
+test.serial('POST /examine/expenseReport/reviewCompleted', async (t) => {
   await loginUser(agent, 'expenseReport')
   t.plan(3)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
+  const res = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {

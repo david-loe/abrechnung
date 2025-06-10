@@ -422,7 +422,7 @@ async function backToInWork() {
 }
 
 async function completeReview() {
-  const result = await API.setter<ExpenseReport>('examine/expenseReport/refunded', {
+  const result = await API.setter<ExpenseReport>('examine/expenseReport/reviewCompleted', {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment,
     bookingRemark: expenseReport.value.bookingRemark

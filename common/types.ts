@@ -598,7 +598,7 @@ export function getReportTypeFromModelName(modelName: ReportModelName) {
 }
 
 export const retention = [
-  'deleteRefundedAfterXDays',
+  'deleteBookedAfterXDays',
   'deleteApprovedTravelAfterXDaysUnused',
   'deleteInWorkReportsAfterXDaysUnused',
   'mailXDaysBeforeDeletion'
@@ -620,10 +620,10 @@ export const accesses = [
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
-  'approved/advance',
-  'refunded/travel',
-  'refunded/expenseReport',
-  'refunded/healthCareCost',
+  'bookable/advance',
+  'bookable/travel',
+  'bookable/expenseReport',
+  'bookable/healthCareCost',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]

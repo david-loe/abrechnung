@@ -561,7 +561,7 @@ async function backToApproved() {
 }
 
 async function completeReview() {
-  const result = await API.setter<Travel>('examine/travel/refunded', {
+  const result = await API.setter<Travel>('examine/travel/reviewCompleted', {
     _id: travel.value._id,
     comment: travel.value.comment,
     bookingRemark: travel.value.bookingRemark

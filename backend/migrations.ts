@@ -292,6 +292,17 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('expensereports').updateMany({}, logRenameExpHea)
       await mongoose.connection.collection('healthcarecosts').updateMany({}, logRenameExpHea)
       await mongoose.connection.collection('advances').updateMany({}, logRenameTraAdv(30))
+      await mongoose.connection.collection('users').updateMany(
+        {},
+        {
+          $rename: {
+            'access.approved/advance': 'access.bookable/advance',
+            'access.refunded/travel': 'access.bookable/travel',
+            'access.refunded/expenseReport': 'access.bookable/expenseReport',
+            'access.refunded/healthCareCost': 'access.bookable/healthCareCost'
+          }
+        }
+      )
     }
 
     if (settings) {

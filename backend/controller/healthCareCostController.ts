@@ -426,9 +426,9 @@ export class HealthCareCostConfirmController extends Controller {
     })
   }
 
-  @Post('refunded')
+  @Post('reviewCompleted')
   @Middlewares(fileHandler.any())
-  public async postRefunded(
+  public async postReviewCompleted(
     @Body() requestBody: { _id: _id; comment?: string; refundSum: MoneyPlusPost },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -495,12 +495,12 @@ export class HealthCareCostConfirmController extends Controller {
 }
 
 @Tags('Health Care Cost')
-@Route('refunded/healthCareCost')
-@Security('cookieAuth', ['refunded/healthCareCost'])
-@Security('httpBearer', ['refunded/healthCareCost'])
-export class HealthCareCostRefundedController extends Controller {
+@Route('bookable/healthCareCost')
+@Security('cookieAuth', ['bookable/healthCareCost'])
+@Security('httpBearer', ['bookable/healthCareCost'])
+export class HealthCareCostBookableController extends Controller {
   @Get()
-  public async getRefunded(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookable(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
       $and: [{ historic: false, state: { $gte: State.BOOKABLE } }]
     }
@@ -518,7 +518,7 @@ export class HealthCareCostRefundedController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getRefundedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
       $and: [{ _id, historic: false, state: { $gte: State.BOOKABLE } }]
     }

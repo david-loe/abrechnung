@@ -3,11 +3,11 @@ import { Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PushSubscription } from 'web-push'
 import {
+  _id,
   DocumentFile,
+  IdDocument,
   Token as IToken,
   User as IUser,
-  IdDocument,
-  _id,
   idDocumentToId,
   locales,
   tokenAdminUser
@@ -106,14 +106,14 @@ export class UserController extends Controller {
 @Security('httpBearer', ['user', 'examine/healthCareCost'])
 @Security('cookieAuth', ['user', 'confirm/healthCareCost'])
 @Security('httpBearer', ['user', 'confirm/healthCareCost'])
-@Security('cookieAuth', ['user', 'approved/advance'])
-@Security('httpBearer', ['user', 'approved/advance'])
-@Security('cookieAuth', ['user', 'refunded/expenseReport'])
-@Security('httpBearer', ['user', 'refunded/expenseReport'])
-@Security('cookieAuth', ['user', 'refunded/travel'])
-@Security('httpBearer', ['user', 'refunded/travel'])
-@Security('cookieAuth', ['user', 'refunded/healthCareCost'])
-@Security('httpBearer', ['user', 'refunded/healthCareCost'])
+@Security('cookieAuth', ['user', 'bookable/advance'])
+@Security('httpBearer', ['user', 'bookable/advance'])
+@Security('cookieAuth', ['user', 'bookable/expenseReport'])
+@Security('httpBearer', ['user', 'bookable/expenseReport'])
+@Security('cookieAuth', ['user', 'bookable/travel'])
+@Security('httpBearer', ['user', 'bookable/travel'])
+@Security('cookieAuth', ['user', 'bookable/healthCareCost'])
+@Security('httpBearer', ['user', 'bookable/healthCareCost'])
 @Security('cookieAuth', ['user', 'admin'])
 @Security('httpBearer', ['user', 'admin'])
 export class UsersController extends Controller {
@@ -157,7 +157,7 @@ export class UserAdminController extends Controller {
 
   @Post()
   public async post(@Body() requestBody: SetterBodyUser) {
-    let cb: ((data: IUser) => any) | undefined = undefined
+    let cb: ((data: IUser) => any) | undefined
 
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
       cb = sendNewMagicloginMail
@@ -223,7 +223,7 @@ export class UserAdminController extends Controller {
     }
 
     const unmergedUser = user.toObject()
-    let mergedUser: IUser | undefined = undefined
+    let mergedUser: IUser | undefined
     if (userToOverwrite) {
       mergedUser = await user.merge(userToOverwrite, Boolean(delOverwritten))
     }

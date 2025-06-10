@@ -2,7 +2,7 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2 class="mb-3">{{ $t('accesses.refunded/healthCareCost') }}</h2>
+        <h2 class="mb-3">{{ $t('accesses.bookable/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
@@ -11,7 +11,7 @@
     <HealthCareCostList
       ref="table"
       class="mb-5"
-      endpoint="refunded/healthCareCost"
+      endpoint="bookable/healthCareCost"
       :columns-to-hide="['state', 'updatedAt']"
       make-name-no-link
       :rows-per-page="10"
@@ -37,12 +37,12 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, useTemplateRef } from 'vue'
+import { useVueToPrint } from 'vue-to-print'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
-import { onMounted, useTemplateRef } from 'vue'
-import { useVueToPrint } from 'vue-to-print'
 
 const tableRef = useTemplateRef('table')
 let colDeleted = false

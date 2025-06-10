@@ -442,7 +442,7 @@ async function refund() {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   const result = await API.setter<HealthCareCost>(
-    'confirm/healthCareCost/refunded',
+    'confirm/healthCareCost/reviewCompleted',
     {
       _id: healthCareCost.value._id,
       comment: healthCareCost.value.comment,
