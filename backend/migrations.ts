@@ -191,7 +191,7 @@ export async function checkForMigrations() {
               $map: {
                 input: '$comments',
                 as: 'comment',
-                in: { $mergeObjects: ['$$comment', { state: switchTravelStates('$$comment.toState') }] }
+                in: { $mergeObjects: ['$$comment', { toState: switchTravelStates('$$comment.toState') }] }
               }
             }
           }
@@ -215,7 +215,7 @@ export async function checkForMigrations() {
               $map: {
                 input: '$comments',
                 as: 'comment',
-                in: { $mergeObjects: ['$$comment', { state: switchExpenseReportStates('$$comment.toState') }] }
+                in: { $mergeObjects: ['$$comment', { toState: switchExpenseReportStates('$$comment.toState') }] }
               }
             }
           }
@@ -240,7 +240,7 @@ export async function checkForMigrations() {
               $map: {
                 input: '$comments',
                 as: 'comment',
-                in: { $mergeObjects: ['$$comment', { state: switchHealthCareCostStates('$$comment.toState') }] }
+                in: { $mergeObjects: ['$$comment', { toState: switchHealthCareCostStates('$$comment.toState') }] }
               }
             }
           }
@@ -265,7 +265,7 @@ export async function checkForMigrations() {
               $map: {
                 input: '$comments',
                 as: 'comment',
-                in: { $mergeObjects: ['$$comment', { state: switchAdvancesStates('$$comment.toState') }] }
+                in: { $mergeObjects: ['$$comment', { toState: switchAdvancesStates('$$comment.toState') }] }
               }
             },
             settledOn: '$log.approved.date'
