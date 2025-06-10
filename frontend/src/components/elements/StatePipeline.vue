@@ -5,7 +5,7 @@
     </div>
     <div v-else class="row align-items-center justify-content-around m-0 flex-nowrap">
       <template v-for="(value, index) of states">
-        <template v-if="value !==  State.REJECTED"">
+        <template v-if="value !== State.REJECTED">
           <div class="col-auto p-0" :key="value">
             <StateBadge :state="value" :StateEnum="StateEnum" :class="state === value ? 'fs-6' : 'fw-normal'"></StateBadge>
           </div>

@@ -2,8 +2,11 @@ import { RootFilterQuery } from 'mongoose'
 import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
 import {
   Advance,
+  AdvanceState,
   ExpenseReportSimple,
+  ExpenseReportState,
   HealthCareCostSimple,
+  HealthCareCostState,
   User as IUser,
   Locale,
   ReportType,
@@ -11,7 +14,8 @@ import {
   reportIsHealthCareCost,
   reportIsTravel,
   State,
-  TravelSimple
+  TravelSimple,
+  TravelState
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
 import { formatter } from '../factory.js'
@@ -24,14 +28,19 @@ import { sendPushNotification } from './push.js'
 export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, textState?: string) {
   let recipients = []
   let reportType: ReportType
+  let stateLabel: string
   if (reportIsTravel(report)) {
     reportType = 'travel'
+    stateLabel = textState || TravelState[report.state]
   } else if (reportIsAdvance(report)) {
     reportType = 'advance'
+    stateLabel = textState || AdvanceState[report.state]
   } else if (reportIsHealthCareCost(report)) {
     reportType = 'healthCareCost'
+    stateLabel = textState || HealthCareCostState[report.state]
   } else {
     reportType = 'expenseReport'
+    stateLabel = textState || ExpenseReportState[report.state]
   }
   const button = {
     text: '',
@@ -80,9 +89,9 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     }
   }
 
-  const subject = i18n.t(`mail.${reportType}.${textState || report.state}.subject`, interpolation)
-  const paragraph = i18n.t(`mail.${reportType}.${textState || report.state}.paragraph`, interpolation)
-  const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${textState || report.state}.lastParagraph`, interpolation) : ''
+  const subject = i18n.t(`mail.${reportType}.${stateLabel}.subject`, interpolation)
+  const paragraph = i18n.t(`mail.${reportType}.${stateLabel}.paragraph`, interpolation)
+  const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation) : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)

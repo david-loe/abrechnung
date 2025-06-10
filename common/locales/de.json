@@ -170,7 +170,6 @@
     }
   },
   "labels": {
-    "completeReview": "Prüfung abschließen",
     "a1Certificate": "A1 Bescheinigung",
     "a1CertificateEmail": "E-Mail Adresse für A1 Bescheinigungsbenachrichtigungen",
     "access": "Zugriffsrechte",
@@ -221,6 +220,7 @@
     "comment": "Kommentar",
     "comments": "Kommentare",
     "companyNumber": "Betriebsnummer",
+    "completeReview": "Prüfung abschließen",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
     "confirm": "Bestätigen",
     "connectionSettings": "Verbindungseinstellungen",
@@ -481,29 +481,29 @@
   },
   "mail": {
     "advance": {
-      "appliedFor": {
+      "APPLIED_FOR": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Vorschussantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Vorschussantrag"
       },
-      "approved": {
+      "APPROVED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Vorschussantrag wurde genehmigt.",
         "subject": "✅ Vorschuss genehmigt"
       },
-      "rejected": {
+      "REJECTED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Vorschussantrag wurde abgelehnt.",
         "subject": "❌ Vorschuss abgelehnt"
       }
     },
     "expenseReport": {
-      "backToInWork": {
+      "BACK_TO_IN_WORK": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Auslagenabrechnung wurde dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Auslagen überarbeiten"
       },
-      "inWork": {
+      "IN_WORK": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Eine neue Auslagenabrechnung wurde für dich erstellt.",
         "subject": "🆕 Auslagenabrechnung"
@@ -512,28 +512,28 @@
         "paragraph": "Deine angelegte Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Auslagenabrechnung wird erstattet.",
-        "subject": "💲 Auslagen erstattet"
+        "paragraph": "Die Prüfung deiner Auslagenabrechnung ist abgeschlossen.",
+        "subject": "💲 Auslagenabrechnung abgeschlossen"
       },
       "refundedDeletedSoon": {
         "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat die Auslagenabrechnung fertiggestellt.",
         "subject": "🛂 Auslagen zu prüfen"
       }
     },
     "healthCareCost": {
-      "backToInWork": {
+      "BACK_TO_IN_WORK": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Krankenkosten überarbeiten"
       },
-      "inWork": {
+      "IN_WORK": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Eine neue Krankenkostenabrechnung wurde für dich erstellt.",
         "subject": "🆕 Krankenkosten"
@@ -542,23 +542,23 @@
         "paragraph": "Deine angelegte Krankenkostenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
-        "subject": "💲 Krankenkosten erstattet"
+        "subject": "💲 Krankenkosten abgeschlossen"
       },
       "refundedDeletedSoon": {
         "paragraph": "Dein erstatteter Krankenkostenantrag '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat Krankenkosten eingereicht.",
         "subject": "🛂 Krankenkosten zu prüfen"
       },
-      "underExaminationByInsurance": {
+      "IN_REVIEW_BY_INSURANCE": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischzeit den gesamt Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die Originalbelege solange auf, bis du die Bearbeitungs- bzw. Erstattungsmeldung der Krankenkasse bekommen hast.",
+        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischenzeit den Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die Originalbelege solange auf, bis du die Bearbeitungs- bzw. Erstattungsmeldung der Krankenkasse bekommen hast.",
         "subject": "🔜 Krankenkosten an Versicherung"
       }
     },
@@ -581,12 +581,12 @@
         "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",
         "subject": "🗂️ A1 Bescheinigung nötig"
       },
-      "appliedFor": {
+      "APPLIED_FOR": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Reiseantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Reise"
       },
-      "approved": {
+      "APPROVED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Reiseantrag wurde genehmigt.",
         "subject": "✅ Reise genehmigt"
@@ -595,32 +595,32 @@
         "paragraph": "Deine genehmigte Reise '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "backToApproved": {
+      "BACK_TO_APPROVED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Reisekosten wurden dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Reisekosten überarbeiten"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Reisekosten werden erstattet.",
-        "subject": "💲 Reisekosten erstattet"
+        "paragraph": "Die Prüfung deiner Reisekosten wurde abgeschlossen.",
+        "subject": "💲 Reisekosten abgeschlossen"
       },
       "refundedDeletedSoon": {
         "paragraph": "Deine erstattete Reise '{reportName}' wird in {days} Tagen automatisch gelöscht.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "rejected": {
+      "REJECTED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Reiseantrag wurde abgelehnt.",
         "subject": "❌ Reise abgelehnt"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat die Reiseabrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
       }
     },
-    "underExaminationByInsurance": {
+    "IN_REVIEW_BY_INSURANCE": {
       "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     }
@@ -641,14 +641,14 @@
   },
   "settings": {},
   "states": {
-    "appliedFor": "Beantragt",
-    "approved": "Genehmigt",
-    "completed": "Abgeschlossen",
-    "inWork": "in Arbeit",
-    "refunded": "Erstattet",
-    "rejected": "Abgelehnt",
-    "underExamination": "Wird Geprüft",
-    "underExaminationByInsurance": "Prüfung durch Krankenkasse"
+    "APPLIED_FOR": "Beantragt",
+    "APPROVED": "Genehmigt",
+    "BOOKED": "Gebucht",
+    "IN_REVIEW": "Wird Geprüft",
+    "IN_REVIEW_BY_INSURANCE": "Prüfung durch Krankenkasse",
+    "IN_WORK": "in Arbeit",
+    "REJECTED": "Abgelehnt",
+    "REVIEW_COMPLETED": "Prüfung abgeschlossen"
   },
   "weekdays": {
     "0": "Sonntag",

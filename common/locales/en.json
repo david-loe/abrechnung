@@ -481,29 +481,29 @@
   },
   "mail": {
     "advance": {
-      "appliedFor": {
+      "APPLIED_FOR": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new advance request from {owner} just came in.",
         "subject": "🆕 New advance request"
       },
-      "approved": {
+      "APPROVED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request has been approved.",
         "subject": "✅ Advance approved"
       },
-      "rejected": {
+      "REJECTED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request was rejected.",
         "subject": "❌ Advance rejected"
       }
     },
     "expenseReport": {
-      "backToInWork": {
+      "BACK_TO_IN_WORK": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your expense report has been sent back to you for revision.",
         "subject": "🔙 Revise expense report"
       },
-      "inWork": {
+      "IN_WORK": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new expense report was created for you.",
         "subject": "🆕 Expense Report"
@@ -512,28 +512,28 @@
         "paragraph": "Your created expense report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your expense report gets refunded.",
-        "subject": "💲 Expense report refunded"
+        "paragraph": "Your expense report review was completed.",
+        "subject": "💲 Expense report completed"
       },
       "refundedDeletedSoon": {
         "paragraph": "Your refunded expense report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has finished his expense report.",
         "subject": "🛂 Expense report to examine"
       }
     },
     "healthCareCost": {
-      "backToInWork": {
+      "BACK_TO_IN_WORK": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs have been sent back to you for revision.",
         "subject": "🔙 Revise health care costs"
       },
-      "inWork": {
+      "IN_WORK": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new health care cost was created for you.",
         "subject": "🆕 Health care cost"
@@ -542,21 +542,21 @@
         "paragraph": "Your created health care cost report '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs got reimbursed in the amount of {refundSum} by the insurance.",
-        "subject": "💲 Health care costs refunded"
+        "subject": "💲 Health care costs completed"
       },
       "refundedDeletedSoon": {
         "paragraph": "Your refunded health care cost report '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has submitted his health care costs.",
         "subject": "🛂 Health care costs to examine"
       },
-      "underExaminationByInsurance": {
+      "IN_REVIEW_BY_INSURANCE": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your health care costs have been sent to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
         "subject": "🔜 Health care costs at insurance"
@@ -581,12 +581,12 @@
         "paragraph": "A new business trip requires an A1 certificate:",
         "subject": "🗂️ A1 certificate required"
       },
-      "appliedFor": {
+      "APPLIED_FOR": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new travel application from {owner} just came in.",
         "subject": "🆕 New Travel"
       },
-      "approved": {
+      "APPROVED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel application was approved",
         "subject": "✅ Travel approved"
@@ -595,32 +595,32 @@
         "paragraph": "Your approved travel '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
       },
-      "backToApproved": {
+      "BACK_TO_APPROVED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel expenses have been sent back to you for revision.",
         "subject": "🔙 Revise travel expenses"
       },
-      "refunded": {
+      "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your travel expenses get refunded.",
-        "subject": "💲 Travel refunded"
+        "paragraph": "Your travel expenses review was completed.",
+        "subject": "💲 Travel completed"
       },
       "refundedDeletedSoon": {
         "paragraph": "Your refunded travel '{reportName}' will be automatically deleted in {days} days. You can download the report until then.",
         "subject": "Automatic deletion soon"
       },
-      "rejected": {
+      "REJECTED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your travel application was rejected.",
         "subject": "❌ Travel rejected"
       },
-      "underExamination": {
+      "IN_REVIEW": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "{owner} has finished his travel expenses.",
         "subject": "🛂 Travel to examine"
       }
     },
-    "underExaminationByInsurance": {
+    "IN_REVIEW_BY_INSURANCE": {
       "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     }
@@ -641,14 +641,14 @@
   },
   "settings": {},
   "states": {
-    "appliedFor": "Applied for",
-    "approved": "Approved",
-    "completed": "Completed",
-    "inWork": "In work",
-    "refunded": "Refunded",
-    "rejected": "Rejected",
-    "underExamination": "Under examination",
-    "underExaminationByInsurance": "Under examination by insurance"
+    "APPLIED_FOR": "Applied for",
+    "APPROVED": "Approved",
+    "BOOKED": "Booked",
+    "IN_REVIEW": "In Review",
+    "IN_REVIEW_BY_INSURANCE": "In Review by Insurance",
+    "IN_WORK": "In Work",
+    "REJECTED": "Rejected",
+    "REVIEW_COMPLETED": "Review completed"
   },
   "weekdays": {
     "0": "Sunday",

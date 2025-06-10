@@ -292,7 +292,7 @@ export class ExpenseReportExamineController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
+      cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

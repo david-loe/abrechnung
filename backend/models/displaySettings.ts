@@ -1,15 +1,17 @@
-import { Schema, model } from 'mongoose'
+import { model, Schema } from 'mongoose'
 import {
   Access,
   AnyState,
-  DisplaySettings,
-  Locale,
-  ReportType,
   accesses,
   anyStates,
+  DisplaySettings,
   defaultLocale,
+  HealthCareCostState,
+  Locale,
   locales,
-  reportTypes
+  ReportType,
+  reportTypes,
+  TravelState
 } from '../../common/types.js'
 import { colorSchema } from './helper.js'
 
@@ -21,7 +23,8 @@ export const displaySettingsSchema = () => {
 
   const stateColors = {} as { [key in AnyState]: ReturnType<typeof colorSchema> }
   for (const state of anyStates) {
-    stateColors[state] = colorSchema(`states.${state}`)
+    const stateLabel = TravelState[state] || HealthCareCostState[state]
+    stateColors[state] = colorSchema(`states.${stateLabel}`)
   }
 
   const accessIcons = {} as { [key in Access]: { type: { type: StringConstructor; required: true }[]; required: true; label: string } }

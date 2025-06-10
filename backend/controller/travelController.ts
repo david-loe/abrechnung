@@ -527,7 +527,7 @@ export class TravelExamineController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
-      cb: (e: ITravel) => sendNotification(e, 'backToApproved'),
+      cb: (e: ITravel) => sendNotification(e, 'BACK_TO_APPROVED'),
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()

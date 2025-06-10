@@ -347,7 +347,7 @@ export class HealthCareCostExamineController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: (e: IHealthCareCost) => sendNotification(e, extendedBody._id ? 'backToInWork' : undefined),
+      cb: (e: IHealthCareCost) => sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
