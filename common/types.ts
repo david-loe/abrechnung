@@ -609,7 +609,6 @@ export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
 export interface Booking {
-  state: BookingState
   ledgerAccount: LedgerAccount
   report: { _id: _id; name: string }
   reportType: ReportModelNameWithoutAdvance
@@ -629,9 +628,6 @@ export interface LedgerAccount {
 
 export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const
 export type Locale = (typeof locales)[number]
-
-export const bookingStates = ['open', 'booked'] as const
-export type BookingState = (typeof bookingStates)[number]
 
 export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
 export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
