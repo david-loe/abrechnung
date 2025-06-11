@@ -495,8 +495,8 @@ if (props.endpointPrefix === 'examine/') {
   const result = await API.getter<Organisation>('examine/healthCareCost/organisation', { _id: healthCareCost.value.project.organisation })
   if (result.ok) {
     const orga = result.ok.data
-    const subject = t('mail.underExaminationByInsurance.subject', { companyNumber: orga.companyNumber })
-    const body = t('mail.underExaminationByInsurance.body', {
+    const subject = t('mail.toInsurance.subject', { companyNumber: orga.companyNumber })
+    const body = t('mail.toInsurance.body', {
       insuranceName: healthCareCost.value.insurance.name,
       owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,

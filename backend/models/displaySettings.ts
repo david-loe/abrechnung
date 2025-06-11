@@ -6,7 +6,6 @@ import {
   anyStates,
   DisplaySettings,
   defaultLocale,
-  HealthCareCostState,
   Locale,
   locales,
   ReportType,
@@ -23,7 +22,7 @@ export const displaySettingsSchema = () => {
 
   const stateColors = {} as { [key in AnyState]: ReturnType<typeof colorSchema> }
   for (const state of anyStates) {
-    const stateLabel = TravelState[state] || HealthCareCostState[state]
+    const stateLabel = TravelState[state]
     stateColors[state] = colorSchema(`states.${stateLabel}`)
   }
 

@@ -556,7 +556,7 @@
     },
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
-    "underExaminationByInsurance": {
+    "toInsurance": {
       "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitte um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     },

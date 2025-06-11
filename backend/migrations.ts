@@ -164,7 +164,6 @@ export async function checkForMigrations() {
               '10': { color: '#89BBFE', text: 'black' },
               '20': { color: '#6f8ab7', text: 'white' },
               '30': { color: '#615d6c', text: 'white' },
-              '31': { color: '#65697F', text: 'white' },
               '40': { color: '#5E8C61', text: 'white' }
             }
           }
