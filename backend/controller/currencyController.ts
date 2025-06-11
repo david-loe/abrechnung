@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { Currency as ICurrency, _id, locales } from '../../common/types.js'
+import { _id, Currency as ICurrency, locales } from '../../common/types.js'
 import Advance from '../models/advance.js'
 import Currency, { currencySchema } from '../models/currency.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -49,7 +49,7 @@ export class CurrencyAdminController extends Controller {
         },
         {
           model: HealthCareCost,
-          paths: ['expenses.cost.currency', 'refundSum.currency'],
+          paths: ['expenses.cost.currency'],
           conditions: { historic: false }
         },
         {

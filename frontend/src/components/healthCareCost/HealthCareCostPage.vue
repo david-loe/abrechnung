@@ -175,7 +175,6 @@
                   <AddUpTable
                     :add-up="healthCareCost.addUp"
                     :project="healthCareCost.project"
-                    :refundSum="healthCareCost.state === HealthCareCostState.REVIEW_COMPLETED ? healthCareCost.refundSum : undefined"
                     :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE"></AddUpTable>
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
@@ -186,18 +185,12 @@
                     </p>
                   </small>
                 </div>
-                <div v-if="healthCareCost.state < HealthCareCostState.REVIEW_COMPLETED" class="mb-3">
+                <div v-if="healthCareCost.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <TextArea
                     id="comment"
                     v-model="healthCareCost.comment as string | undefined"
-                    :disabled="
-                      isReadOnly &&
-                      !(
-                        (endpointPrefix === 'examine/' && healthCareCost.state === HealthCareCostState.IN_REVIEW) ||
-                        (endpointPrefix === 'confirm/' && healthCareCost.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE)
-                      )
-                    "></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)"></TextArea>
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
@@ -220,9 +213,9 @@
                 </div>
                 <template v-else-if="healthCareCost.state === State.IN_REVIEW">
                   <div v-if="endpointPrefix === 'examine/'" class="mb-2">
-                    <a class="btn btn-primary" :href="mailToInsuranceLink" @click="toExaminationByInsurance()">
+                    <a class="btn btn-primary" :href="mailToInsuranceLink" @click="completeReview()">
                       <i class="bi bi-pencil-square"></i>
-                      <span class="ms-1">{{ t('labels.toExaminationByInsurance') }}</span>
+                      <span class="ms-1">{{ t('labels.completeReview') }}</span>
                     </a>
                   </div>
                   <div>
@@ -263,36 +256,6 @@
                     </a>
                   </div>
                 </template>
-                <form
-                  class="mt-3"
-                  v-if="endpointPrefix === 'confirm/' && healthCareCost.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE"
-                  @submit.prevent="refund()">
-                  <label for="refundSum" class="form-label me-2"> {{ t('labels.refundSum') }}<span class="text-danger">*</span> </label>
-                  <div id="refundSum" class="input-group mb-3">
-                    <input
-                      style="min-width: 100px"
-                      type="number"
-                      class="form-control"
-                      step="0.01"
-                      v-model="healthCareCost.refundSum.amount"
-                      min="0"
-                      required />
-                    <CurrencySelector v-model="healthCareCost.refundSum!.currency" :required="true"></CurrencySelector>
-                  </div>
-                  <div class="mb-3">
-                    <label for="expenseFormFile" class="form-label me-2">{{ t('labels.receipts') }}</label>
-                    <FileUpload
-                      ref="fileUpload"
-                      id="expenseFormFile"
-                      v-model="(healthCareCost.refundSum.receipts as DocumentFile[] | undefined)"
-                      :endpointPrefix="endpointPrefix"
-                      :ownerId="healthCareCost.owner._id" />
-                  </div>
-                  <button type="submit" class="btn btn-success">
-                    <i class="bi bi-coin"></i>
-                    <span class="ms-1">{{ t('labels.confirm') }}</span>
-                  </button>
-                </form>
               </div>
             </div>
           </div>
@@ -425,33 +388,14 @@ async function backToInWork() {
   }
 }
 
-async function toExaminationByInsurance() {
-  const result = await API.setter<HealthCareCost>('examine/healthCareCost/underExaminationByInsurance', {
+async function completeReview() {
+  const result = await API.setter<HealthCareCost>('examine/healthCareCost/reviewCompleted', {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment,
     bookingRemark: healthCareCost.value.bookingRemark
   })
   if (result.ok) {
     setHealthCareCost(result.ok)
-  }
-}
-
-async function refund() {
-  let headers: Record<string, string> = {}
-  if (healthCareCost.value.refundSum.receipts && healthCareCost.value.refundSum.receipts.length > 0) {
-    headers = { 'Content-Type': 'multipart/form-data' }
-  }
-  const result = await API.setter<HealthCareCost>(
-    'confirm/healthCareCost/reviewCompleted',
-    {
-      _id: healthCareCost.value._id,
-      comment: healthCareCost.value.comment,
-      refundSum: healthCareCost.value.refundSum
-    },
-    { headers }
-  )
-  if (result.ok) {
-    router.push({ path: props.parentPages[0].link })
   }
 }
 
@@ -551,8 +495,8 @@ if (props.endpointPrefix === 'examine/') {
   const result = await API.getter<Organisation>('examine/healthCareCost/organisation', { _id: healthCareCost.value.project.organisation })
   if (result.ok) {
     const orga = result.ok.data
-    const subject = t('mail.underExaminationByInsurance.subject', { companyNumber: orga.companyNumber })
-    const body = t('mail.underExaminationByInsurance.body', {
+    const subject = t('mail.toInsurance.subject', { companyNumber: orga.companyNumber })
+    const body = t('mail.toInsurance.body', {
       insuranceName: healthCareCost.value.insurance.name,
       owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,

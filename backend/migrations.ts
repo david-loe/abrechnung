@@ -164,7 +164,6 @@ export async function checkForMigrations() {
               '10': { color: '#89BBFE', text: 'black' },
               '20': { color: '#6f8ab7', text: 'white' },
               '30': { color: '#615d6c', text: 'white' },
-              '31': { color: '#65697F', text: 'white' },
               '40': { color: '#5E8C61', text: 'white' }
             }
           }
@@ -227,7 +226,7 @@ export async function checkForMigrations() {
             { case: { $eq: [field, 'inWork'] }, then: 10 },
             { case: { $eq: [field, 'underExamination'] }, then: 20 },
             { case: { $eq: [field, 'underExaminationByInsurance'] }, then: 30 },
-            { case: { $eq: [field, 'refunded'] }, then: 31 }
+            { case: { $eq: [field, 'refunded'] }, then: 30 }
           ],
           default: field
         }
@@ -284,8 +283,8 @@ export async function checkForMigrations() {
       const logRenameExpHea = {
         $rename: {
           'log.inWork': 'log.10',
-          'log.underExamination': 'log.20',
-          'log.underExaminationByInsurance': 'log.30'
+          'log.underExamination': 'log.20'
+          // 'log.underExaminationByInsurance' left as is
         }
       }
       await mongoose.connection.collection('travels').updateMany({}, logRenameTraAdv(10))

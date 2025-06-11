@@ -29,10 +29,6 @@
         <th>{{ t('labels.totalBalance') }}</th>
         <td :colspan="addUp.length" class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
-      <tr v-if="refundSum">
-        <th :colspan="addUp.length">{{ t('labels.refundSum') }}</th>
-        <td class="text-end">{{ $formatter.money(refundSum) }}</td>
-      </tr>
       <tr v-if="project.budget && project.budget.amount">
         <td>
           <small>{{ t('labels.project') }}</small>
@@ -46,12 +42,12 @@
 </template>
 
 <script setup lang="ts">
+import { computed, PropType, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
 import { AddUp, Money, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import { formatter } from '@/formatter'
-import { PropType, computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
@@ -61,7 +57,6 @@ const props = defineProps({
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },
-  refundSum: { type: Object as PropType<Money> },
   showAdvanceOverflow: { type: Boolean, default: true }
 })
 

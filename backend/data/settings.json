@@ -10,7 +10,6 @@
     "book/expenseReport": false,
     "book/healthCareCost": false,
     "book/travel": false,
-    "confirm/healthCareCost": false,
     "examine/expenseReport": false,
     "examine/healthCareCost": false,
     "examine/travel": false,

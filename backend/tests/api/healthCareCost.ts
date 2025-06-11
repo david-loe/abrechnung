@@ -154,17 +154,17 @@ test.serial('POST /healthCareCost/underExamination AGAIN', async (t) => {
 
 // EXAMINE
 
-test.serial('POST /examine/healthCareCost/underExaminationByInsurance', async (t) => {
+test.serial('POST /examine/healthCareCost/reviewCompleted', async (t) => {
   await loginUser(agent, 'healthCareCost')
   t.plan(4)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/examine/healthCareCost/underExaminationByInsurance').send({ _id: healthCareCost._id, comment })
+  const res = await agent.post('/examine/healthCareCost/reviewCompleted').send({ _id: healthCareCost._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.IN_REVIEW_BY_INSURANCE)
+  t.is((res.body.result as HealthCareCost).state, HealthCareCostState.REVIEW_COMPLETED)
   t.is((res.body.result as HealthCareCost).history.length, 4)
   t.is((res.body.result as HealthCareCost).comments.length, 2)
 })

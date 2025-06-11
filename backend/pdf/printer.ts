@@ -16,7 +16,6 @@ import {
   ExpenseReport,
   getReportTypeFromModelName,
   HealthCareCost,
-  HealthCareCostState,
   Locale,
   Meal,
   PageOrientation,
@@ -214,13 +213,7 @@ class ReportPrint {
     const receiptMap = {}
     if (!reportIsAdvance(this.report)) {
       const optionalMapTravel = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 1 }
-      const optionalMapHealth: ReceiptMap = {}
-      if (reportIsHealthCareCost(this.report) && this.report.refundSum.receipts && this.report.refundSum.receipts.length > 0) {
-        for (const receipt of this.report.refundSum.receipts) {
-          optionalMapHealth[receipt._id?.toString()] = Object.assign({ number: 0, date: new Date(), noNumberPrint: true }, receipt)
-        }
-      }
-      Object.assign(receiptMap, optionalMapTravel.map, optionalMapHealth, getReceiptMap(this.report.expenses, optionalMapTravel.number).map)
+      Object.assign(receiptMap, optionalMapTravel.map, getReceiptMap(this.report.expenses, optionalMapTravel.number).map)
     }
     let yDates = y
     y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
@@ -405,13 +398,6 @@ class ReportPrint {
       options.yStart = y
       y = this.drawer.drawMultilineText(
         `${this.t('labels.totalBalance')}: ${this.drawer.formatter.baseCurrency(getTotalBalance(this.report.addUp))}`,
-        options
-      )
-    }
-    if (reportIsHealthCareCost(this.report) && this.report.state === HealthCareCostState.REVIEW_COMPLETED) {
-      options.yStart = y
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.refundSum')}: ${this.drawer.formatter.detailedMoney(this.report.refundSum)}`,
         options
       )
     }

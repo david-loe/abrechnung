@@ -105,7 +105,7 @@
           class="mb-4"
           ref="travelList"
           endpoint="travel"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
+          :columns-to-hide="COMMON_HIDDEN_COLUMNS"
           @clicked-applied="(t) => showModal('view', 'travel', t)"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
@@ -114,22 +114,14 @@
           class="mb-4"
           ref="expenseReportList"
           endpoint="expenseReport"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"></ExpenseReportList>
+          :columns-to-hide="COMMON_HIDDEN_COLUMNS"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="[
-            'owner',
-            'updatedAt',
-            'report',
-            'addUp.totalTotal',
-            'organisation',
-            'bookingRemark',
-            'log.20.date'
-          ]"></HealthCareCostList>
+          :columns-to-hide="COMMON_HIDDEN_COLUMNS"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
         <h3>{{ t('labels.advance') }}</h3>
@@ -176,6 +168,8 @@ const expenseReportList = useTemplateRef('expenseReportList')
 const healthCareCostList = useTemplateRef('healthCareCostList')
 const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
+
+const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']
 
 const router = useRouter()
 const { t } = useI18n()

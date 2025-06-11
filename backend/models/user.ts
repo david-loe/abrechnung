@@ -75,7 +75,6 @@ export const userSchema = async () => {
               ['access.examine/travel', true],
               ['access.examine/expenseReport', true],
               ['access.examine/healthCareCost', true],
-              ['access.confirm/healthCareCost', true],
               ['access.book/advance', true],
               ['access.book/travel', true],
               ['access.book/expenseReport', true],

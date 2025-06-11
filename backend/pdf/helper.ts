@@ -3,7 +3,6 @@ import {
   Advance,
   ExpenseReport,
   HealthCareCost,
-  HealthCareCostState,
   Locale,
   reportIsAdvance,
   reportIsHealthCareCost,
@@ -27,11 +26,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
     if (reportIsTravel(report)) {
       path += 'travel/'
     } else if (reportIsHealthCareCost(report)) {
-      if (report.state === HealthCareCostState.REVIEW_COMPLETED) {
-        path += 'healthCareCost/confirmed/'
-      } else {
-        path += 'healthCareCost/'
-      }
+      path += 'healthCareCost/'
     } else {
       path += 'expenseReport/'
     }

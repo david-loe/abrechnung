@@ -559,7 +559,7 @@ onBeforeRouteLeave((to, from, next) => {
 
 function shouldContinue(): boolean {
   if (expenseReport.value.drafts && expenseReport.value.drafts.length > 0) {
-    return window.confirm(t('alerts.unsavedChanges'))
+    return confirm(t('alerts.unsavedChanges'))
   }
   return true
 }
