@@ -19,7 +19,7 @@
       <HealthCareCostList
         endpoint="confirm/healthCareCost"
         :stateFilter="{ $gte: show }"
-        :columns-to-hide="[ 'report', 'organisation', 'log.20.date']">
+        :columns-to-hide="['report', 'organisation', 'log.20.date']">
       </HealthCareCostList>
     </template>
   </div>
@@ -27,9 +27,9 @@
 
 <script lang="ts" setup>
 import { Ref, ref } from 'vue'
+import { HealthCareCostState } from '@/../../common/types'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
-import { HealthCareCostState } from '../../../../common/types'
 
 const show: Ref<HealthCareCostState.REVIEW_COMPLETED | null> = ref(null)
 </script>

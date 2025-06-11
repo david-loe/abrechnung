@@ -70,12 +70,12 @@
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
+import { State, TravelSimple, TravelState } from '@/../../common/types'
 import API from '@/api'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
-import { State, TravelSimple, TravelState } from '../../../../common/types'
 
 const { t } = useI18n()
 

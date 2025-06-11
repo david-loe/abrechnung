@@ -34,9 +34,9 @@
 
 <script lang="ts" setup>
 import { Ref, ref } from 'vue'
+import { TravelState } from '@/../../common/types'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
-import { TravelState } from '../../../../common/types'
 
 const show: Ref<TravelState.APPROVED | TravelState.REVIEW_COMPLETED | null> = ref(null)
 </script>

@@ -70,12 +70,12 @@
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
+import { ExpenseReportSimple, ExpenseReportState, State } from '@/../../common/types'
 import API from '@/api'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
-import { ExpenseReportSimple, ExpenseReportState, State } from '../../../../common/types'
 
 const { t } = useI18n()
 
