@@ -380,9 +380,6 @@
 							"examine/healthCareCost": {
 								"type": "boolean"
 							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
 							"book/advance": {
 								"type": "boolean"
 							},
@@ -411,7 +408,6 @@
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
-							"confirm/healthCareCost",
 							"book/advance",
 							"book/travel",
 							"book/expenseReport",
@@ -919,9 +915,6 @@
 							"examine/healthCareCost": {
 								"type": "boolean"
 							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
 							"book/advance": {
 								"type": "boolean"
 							},
@@ -950,7 +943,6 @@
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
-							"confirm/healthCareCost",
 							"book/advance",
 							"book/travel",
 							"book/expenseReport",
@@ -1242,9 +1234,6 @@
 								"type": "boolean"
 							},
 							"book/advance": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
 							"examine/healthCareCost": {
@@ -1590,9 +1579,6 @@
 								"type": "boolean"
 							},
 							"book/advance": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
 							"examine/healthCareCost": {
@@ -4039,73 +4025,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"MoneyPlus": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile"
-						},
-						"type": "array",
-						"nullable": true
-					},
-					"date": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					}
-				},
-				"required": [
-					"amount",
-					"currency"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"AddUp_HealthCareCost_": {
 				"$ref": "#/components/schemas/AddUpBase"
 			},
@@ -4114,7 +4033,6 @@
 					10,
 					20,
 					30,
-					31,
 					40
 				],
 				"type": "number"
@@ -4212,9 +4130,6 @@
 					"insurance": {
 						"$ref": "#/components/schemas/HealthInsurance"
 					},
-					"refundSum": {
-						"$ref": "#/components/schemas/MoneyPlus"
-					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
@@ -4241,7 +4156,6 @@
 					"_id",
 					"patientName",
 					"insurance",
-					"refundSum",
 					"addUp",
 					"advances"
 				],
@@ -5143,9 +5057,6 @@
 							"examine/healthCareCost": {
 								"type": "boolean"
 							},
-							"confirm/healthCareCost": {
-								"type": "boolean"
-							},
 							"book/advance": {
 								"type": "boolean"
 							},
@@ -5174,7 +5085,6 @@
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
-							"confirm/healthCareCost",
 							"book/advance",
 							"book/travel",
 							"book/expenseReport",
@@ -5322,9 +5232,6 @@
 								"type": "boolean"
 							},
 							"book/advance": {
-								"type": "boolean"
-							},
-							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
 							"examine/healthCareCost": {
@@ -6270,9 +6177,6 @@
 					"insurance": {
 						"$ref": "#/components/schemas/HealthInsurance"
 					},
-					"refundSum": {
-						"$ref": "#/components/schemas/MoneyPlus"
-					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
@@ -6314,7 +6218,6 @@
 					"_id",
 					"patientName",
 					"insurance",
-					"refundSum",
 					"addUp",
 					"advances",
 					"history",
@@ -6415,9 +6318,6 @@
 					"insurance": {
 						"$ref": "#/components/schemas/HealthInsurance"
 					},
-					"refundSum": {
-						"$ref": "#/components/schemas/MoneyPlus"
-					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp_HealthCareCost_"
@@ -6459,7 +6359,6 @@
 					"_id",
 					"patientName",
 					"insurance",
-					"refundSum",
 					"addUp",
 					"advances",
 					"history",
@@ -6504,7 +6403,6 @@
 								"_id",
 								"patientName",
 								"insurance",
-								"refundSum",
 								"addUp",
 								"advances",
 								"name",
@@ -6637,71 +6535,6 @@
 			},
 			"SetterBody_Expense_": {
 				"$ref": "#/components/schemas/SetterPartial_Expense.NoPost_"
-			},
-			"MoneyPlusPost": {
-				"properties": {
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument_CurrencyCode_"
-							},
-							{
-								"$ref": "#/components/schemas/Currency"
-							}
-						]
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/File"
-						},
-						"type": "array"
-					},
-					"date": {
-						"type": "string",
-						"format": "date-time"
-					}
-				},
-				"required": [
-					"amount",
-					"currency"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"ExpenseReport": {
 				"properties": {
@@ -7154,9 +6987,6 @@
 							"30": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"31": {
-								"$ref": "#/components/schemas/BadgeStyle"
-							},
 							"40": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
@@ -7170,8 +7000,7 @@
 							"10",
 							"20",
 							"30",
-							"40",
-							"31"
+							"40"
 						],
 						"type": "object"
 					},
@@ -7243,12 +7072,6 @@
 								},
 								"type": "array"
 							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
 							"book/advance": {
 								"items": {
 									"type": "string"
@@ -7292,7 +7115,6 @@
 							"examine/travel",
 							"examine/expenseReport",
 							"examine/healthCareCost",
-							"confirm/healthCareCost",
 							"book/advance",
 							"book/travel",
 							"book/expenseReport",
@@ -7416,12 +7238,6 @@
 								},
 								"type": "array"
 							},
-							"confirm/healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
 							"examine/healthCareCost": {
 								"items": {
 									"type": "string"
@@ -7539,21 +7355,6 @@
 								"type": "object"
 							},
 							"30": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string",
-										"enum": [
-											"black",
-											"white"
-										]
-									}
-								},
-								"type": "object"
-							},
-							"31": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -9425,18 +9226,6 @@
 						"httpBearer": [
 							"user",
 							"examine/healthCareCost"
-						]
-					},
-					{
-						"cookieAuth": [
-							"user",
-							"confirm/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"user",
-							"confirm/healthCareCost"
 						]
 					},
 					{
@@ -12021,7 +11810,7 @@
 		},
 		"/examine/travel/report": {
 			"get": {
-				"operationId": "GetAnyReport",
+				"operationId": "GetReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -13749,7 +13538,6 @@
 									"_id",
 									"patientName",
 									"insurance",
-									"refundSum",
 									"addUp",
 									"advances",
 									"name",
@@ -14272,7 +14060,6 @@
 									"_id",
 									"patientName",
 									"insurance",
-									"refundSum",
 									"addUp",
 									"advances",
 									"name",
@@ -14557,76 +14344,6 @@
 				]
 			}
 		},
-		"/examine/healthCareCost/underExaminationByInsurance": {
-			"post": {
-				"operationId": "PostUnderExaminationByInsurance",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {
-											"$ref": "#/components/schemas/HealthCareCost"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"result",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Health Care Cost"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"examine/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"examine/healthCareCost"
-						]
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"bookingRemark": {
-										"type": "string",
-										"nullable": true
-									},
-									"comment": {
-										"type": "string"
-									},
-									"_id": {
-										"$ref": "#/components/schemas/_id"
-									}
-								},
-								"required": [
-									"_id"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
 		"/examine/healthCareCost/inWork": {
 			"post": {
 				"operationId": "PostBackInWork",
@@ -14704,6 +14421,76 @@
 										"$ref": "#/components/schemas/IdDocument"
 									}
 								},
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/examine/healthCareCost/reviewCompleted": {
+			"post": {
+				"operationId": "PostReviewCompleted",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/HealthCareCost"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"bookingRemark": {
+										"type": "string",
+										"nullable": true
+									},
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"$ref": "#/components/schemas/_id"
+									}
+								},
+								"required": [
+									"_id"
+								],
 								"type": "object"
 							}
 						}
@@ -14792,7 +14579,7 @@
 		},
 		"/examine/healthCareCost/report": {
 			"get": {
-				"operationId": "GetunderExaminationByInsuranceReport",
+				"operationId": "GetReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -14936,285 +14723,6 @@
 				]
 			}
 		},
-		"/confirm/healthCareCost": {
-			"get": {
-				"operationId": "GetHealthCareCostToConfirm",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GETResponse_HealthCareCost-or-HealthCareCost-Array_"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Health Care Cost"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"confirm/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"confirm/healthCareCost"
-						]
-					}
-				],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"default": 0,
-							"format": "int32",
-							"type": "integer",
-							"minimum": 0
-						}
-					},
-					{
-						"in": "query",
-						"name": "page",
-						"required": false,
-						"schema": {
-							"default": 1,
-							"format": "int32",
-							"type": "integer",
-							"minimum": 1
-						}
-					},
-					{
-						"in": "query",
-						"name": "_id",
-						"required": false,
-						"schema": {
-							"$ref": "#/components/schemas/_id"
-						}
-					},
-					{
-						"in": "query",
-						"name": "additionalFields",
-						"required": false,
-						"schema": {
-							"type": "array",
-							"items": {
-								"type": "string",
-								"enum": [
-									"name",
-									"owner",
-									"editor",
-									"project",
-									"comment",
-									"bookingRemark",
-									"comments",
-									"state",
-									"log",
-									"createdAt",
-									"updatedAt",
-									"_id",
-									"patientName",
-									"insurance",
-									"refundSum",
-									"addUp",
-									"advances",
-									"name",
-									"owner",
-									"editor",
-									"project",
-									"comment",
-									"bookingRemark",
-									"comments",
-									"state",
-									"log",
-									"createdAt",
-									"updatedAt",
-									"_id",
-									"history",
-									"historic",
-									"expenses"
-								],
-								"nullable": false
-							}
-						}
-					},
-					{
-						"in": "query",
-						"name": "filterJSON",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "sortJSON",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			},
-			"delete": {
-				"operationId": "DeleteAnyConfirm",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/DeleteResult"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Health Care Cost"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"confirm/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"confirm/healthCareCost"
-						]
-					}
-				],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "_id",
-						"required": true,
-						"schema": {
-							"$ref": "#/components/schemas/_id"
-						}
-					}
-				]
-			}
-		},
-		"/confirm/healthCareCost/reviewCompleted": {
-			"post": {
-				"operationId": "PostReviewCompleted",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {
-											"$ref": "#/components/schemas/HealthCareCost"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"result",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Health Care Cost"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"confirm/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"confirm/healthCareCost"
-						]
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"refundSum": {
-										"$ref": "#/components/schemas/MoneyPlusPost"
-									},
-									"comment": {
-										"type": "string"
-									},
-									"_id": {
-										"$ref": "#/components/schemas/_id"
-									}
-								},
-								"required": [
-									"refundSum",
-									"_id"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/confirm/healthCareCost/report": {
-			"get": {
-				"operationId": "GetConfirmedReport",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/pdf": {
-								"schema": {
-									"type": "string",
-									"format": "byte"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Health Care Cost"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"confirm/healthCareCost"
-						]
-					},
-					{
-						"httpBearer": [
-							"confirm/healthCareCost"
-						]
-					}
-				],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "_id",
-						"required": true,
-						"schema": {
-							"$ref": "#/components/schemas/_id"
-						}
-					}
-				]
-			}
-		},
 		"/book/healthCareCost": {
 			"get": {
 				"operationId": "GetBookable",
@@ -15299,7 +14807,6 @@
 									"_id",
 									"patientName",
 									"insurance",
-									"refundSum",
 									"addUp",
 									"advances",
 									"name",
