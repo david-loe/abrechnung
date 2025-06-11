@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "@vueform/vueform": "^1.12.8",
+    "@vueform/vueform": "^1.12.10",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
@@ -28,13 +28,13 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.15.29",
+    "@types/node": "^22.15.31",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.14.0",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^5.2.4",
     "eslint": "^9.28.0",
-    "eslint-plugin-vue": "^10.1.0",
+    "eslint-plugin-vue": "^10.2.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-pwa": "^1.0.0",
@@ -46,8 +46,14 @@
       "node": true,
       "es2022": true
     },
-    "extends": ["plugin:vue/vue3-essential"],
+    "extends": [
+      "plugin:vue/vue3-essential"
+    ],
     "rules": {}
   },
-  "browserslist": ["> 1%", "last 2 versions", "not dead"]
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
