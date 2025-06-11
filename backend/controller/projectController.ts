@@ -29,7 +29,6 @@ export class ProjectController extends Controller {
         'examine/travel',
         'examine/expenseReport',
         'examine/healthCareCost',
-        'confirm/healthCareCost',
         'book/advance',
         'book/expenseReport',
         'book/travel',

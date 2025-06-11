@@ -561,7 +561,7 @@ export class TravelExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getAnyReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }

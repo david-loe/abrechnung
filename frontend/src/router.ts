@@ -1,19 +1,18 @@
 import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import AdvanceApprovePage from './components/advance/ApprovePage.vue'
-import BookableAdvancePage from './components/advance/BookPage.vue'
-import BookableExpenseReportPage from './components/expenseReport/BookPage.vue'
+import BookAdvancePage from './components/advance/BookPage.vue'
+import BookExpenseReportPage from './components/expenseReport/BookPage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
 import HomePage from './components/HomePage.vue'
-import BookableHealthCareCostPage from './components/healthCareCost/BookPage.vue'
-import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
+import BookHealthCareCostPage from './components/healthCareCost/BookPage.vue'
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
 import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import TravelApprovePage from './components/travel/ApprovePage.vue'
-import BookableTravelPage from './components/travel/BookPage.vue'
+import BookTravelPage from './components/travel/BookPage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import { logger } from './logger.js'
@@ -43,7 +42,7 @@ const routes = [
   },
   {
     path: '/book/advance',
-    component: BookableAdvancePage,
+    component: BookAdvancePage,
     meta: { requiresAuth: true }
   },
   {
@@ -54,7 +53,7 @@ const routes = [
   },
   {
     path: '/book/travel',
-    component: BookableTravelPage,
+    component: BookTravelPage,
     meta: { requiresAuth: true }
   },
   {
@@ -80,7 +79,7 @@ const routes = [
   },
   {
     path: '/book/expenseReport',
-    component: BookableExpenseReportPage,
+    component: BookExpenseReportPage,
     meta: { requiresAuth: true }
   },
   {
@@ -105,23 +104,8 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
-    path: '/confirm/healthCareCost',
-    component: ConfirmHealthCareCostPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/confirm/healthCareCost/:_id([0-9a-fA-F]{24})',
-    component: HealthCareCostPage,
-    meta: { requiresAuth: true },
-    props: (route: RouteLocationNormalized) => ({
-      _id: route.params._id,
-      parentPages: [{ link: '/confirm/healthCareCost', title: 'accesses.confirm/healthCareCost' }],
-      endpointPrefix: 'confirm/'
-    })
-  },
-  {
     path: '/book/healthCareCost',
-    component: BookableHealthCareCostPage,
+    component: BookHealthCareCostPage,
     meta: { requiresAuth: true }
   },
   {

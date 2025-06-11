@@ -32,16 +32,16 @@
         class="mb-5"
         endpoint="examine/healthCareCost"
         :stateFilter="HealthCareCostState.IN_REVIEW"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'log.20.date', 'bookingRemark']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']">
       </HealthCareCostList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = HealthCareCostState.IN_WORK">
           {{ $t('labels.show') }} <StateBadge :state="HealthCareCostState.IN_WORK" :StateEnum="HealthCareCostState"></StateBadge>
           <i class="bi bi-chevron-down"></i>
         </button>
-        <button type="button" class="btn btn-light" @click="show = HealthCareCostState.IN_REVIEW_BY_INSURANCE">
+        <button type="button" class="btn btn-light" @click="show = HealthCareCostState.REVIEW_COMPLETED">
           {{ $t('labels.show') }}
-          <StateBadge :state="HealthCareCostState.IN_REVIEW_BY_INSURANCE" :StateEnum="HealthCareCostState"></StateBadge>
+          <StateBadge :state="HealthCareCostState.REVIEW_COMPLETED" :StateEnum="HealthCareCostState"></StateBadge>
           <i class="bi bi-chevron-down"></i>
         </button>
       </template>
@@ -52,8 +52,8 @@
         <hr class="hr" />
         <HealthCareCostList
           endpoint="examine/healthCareCost"
-          :stateFilter="show"
-          :columns-to-hide="['state', 'report', 'organisation', 'log.20.date']">
+          :stateFilter="show === HealthCareCostState.IN_WORK ? show : { $gte: show }"
+          :columns-to-hide="['report', 'organisation']">
         </HealthCareCostList>
       </template>
     </div>
@@ -80,7 +80,7 @@ export default defineComponent({
     return {
       modalHealthCareCost: {} as Partial<HealthCareCostSimple>,
       modalMode: 'add' as ModalMode,
-      show: null as HealthCareCostState.IN_WORK | HealthCareCostState.IN_REVIEW_BY_INSURANCE | null,
+      show: null as HealthCareCostState.IN_WORK | HealthCareCostState.REVIEW_COMPLETED | null,
       modalFormIsLoading: false,
       HealthCareCostState
     }

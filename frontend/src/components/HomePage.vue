@@ -121,15 +121,7 @@
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="[
-            'owner',
-            'updatedAt',
-            'report',
-            'addUp.totalTotal',
-            'organisation',
-            'bookingRemark',
-            'log.20.date'
-          ]"></HealthCareCostList>
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
         <h3>{{ t('labels.advance') }}</h3>

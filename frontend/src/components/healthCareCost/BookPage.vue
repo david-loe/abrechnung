@@ -20,11 +20,11 @@
       class="mb-5"
       table-class-name="small-table"
       endpoint="book/healthCareCost"
-      :columns-to-hide="['state', 'updatedAt']"
+      :columns-to-hide="['state']"
       make-name-no-link
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
-      :stateFilter="HealthCareCostState.REVIEW_COMPLETED"
+      :stateFilter="State.BOOKABLE"
       v-model:items-selected="selected"
       @loaded="hideExpandColumn">
       <template #expand="report">
@@ -56,7 +56,7 @@
         class="mb-5"
         table-class-name="small-table"
         endpoint="book/healthCareCost"
-        :columns-to-hide="['state', 'log.20.date']"
+        :columns-to-hide="['state']"
         make-name-no-link
         :stateFilter="show"
         :rows-per-page="10"

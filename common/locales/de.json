@@ -10,7 +10,6 @@
     "book/expenseReport": "Auslagen buchen",
     "book/healthCareCost": "Krankenkosten buchen",
     "book/travel": "Reisen buchen",
-    "confirm/healthCareCost": "Krankenkosten bestätigen",
     "examine/expenseReport": "Auslagen prüfen",
     "examine/healthCareCost": "Krankenkosten prüfen",
     "examine/travel": "Reisen prüfen",
@@ -387,7 +386,6 @@
     "receiptNumber": "Beleg Nr.",
     "receipts": "Belege",
     "refund": "Erstatten",
-    "refundSum": "Durch Versicherung erstatteter Betrag",
     "reject": "Ablehnen",
     "report": "Bericht",
     "reportEmail": "E-Mail Adresse für Berichte",
@@ -434,7 +432,6 @@
     "textColor": "Textfarbe",
     "to": "Bis",
     "toExamination": "Zum Prüfen",
-    "toExaminationByInsurance": "Zum Prüfen durch Krankenkasse",
     "toleranceStageDatesToApprovedTravelDates": "Abweichungstoleranz der Etappen von den beantragten Daten [Tage]",
     "total": "Gesamt",
     "totalBalance": "Gesamtsaldo",
@@ -448,7 +445,6 @@
     "travelSettings": "Reisekostenabrechnungseinstellungen",
     "type": "Art",
     "typeToSearch": "Tippe um zu Suchen...",
-    "underExaminationByInsuranceHealthCareCosts": "Krankenkosten in Prüfung bei Krankenkassen",
     "updatedAt": "Aktualisiert am",
     "uploadFromPhone": "Vom Handy hochladen",
     "uploading": "Wird hochgeladen 🔄",
@@ -543,11 +539,6 @@
         "paragraph": "{owner} hat Krankenkosten eingereicht.",
         "subject": "🛂 Krankenkosten zu prüfen"
       },
-      "IN_REVIEW_BY_INSURANCE": {
-        "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Krankenkosten wurden zur Erstattung an die Versicherung geschickt. Du bekommst in der Zwischenzeit den Betrag auf dein Konto ausgezahlt.\n Bitte bewahre die Originalbelege solange auf, bis du die Bearbeitungs- bzw. Erstattungsmeldung der Krankenkasse bekommen hast.",
-        "subject": "🔜 Krankenkosten an Versicherung"
-      },
       "IN_WORK": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Eine neue Krankenkostenabrechnung wurde für dich erstellt.",
@@ -559,13 +550,13 @@
       },
       "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
-        "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
+        "paragraph": "Die Prüfung deiner Krankenkosten ist abgeschlossen.",
         "subject": "💲 Krankenkosten abgeschlossen"
       }
     },
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
-    "IN_REVIEW_BY_INSURANCE": {
+    "underExaminationByInsurance": {
       "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitte um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     },
@@ -646,7 +637,6 @@
     "APPROVED": "Genehmigt",
     "BOOKED": "Gebucht",
     "IN_REVIEW": "Wird Geprüft",
-    "IN_REVIEW_BY_INSURANCE": "Prüfung durch Krankenkasse",
     "IN_WORK": "In Arbeit",
     "REJECTED": "Abgelehnt",
     "REVIEW_COMPLETED": "Prüfung abgeschlossen"

@@ -30,7 +30,6 @@
     "approve/travel": ["airplane", "clipboard-check"],
     "approve/advance": ["briefcase", "cash-coin", "clipboard-check"],
     "approved:travel": ["airplane", "calendar-check", "plus"],
-    "confirm/healthCareCost": ["check-square", "hospital"],
     "examine/expenseReport": ["coin", "pencil-square"],
     "examine/healthCareCost": ["hospital", "pencil-square"],
     "examine/travel": ["airplane", "pencil-square"],

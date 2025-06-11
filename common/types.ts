@@ -505,7 +505,6 @@ export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReport
 export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> {
   patientName: string
   insurance: HealthInsurance
-  refundSum: MoneyPlus
   addUp: AddUp<HealthCareCost>[]
   advances: AdvanceBase[]
 }
@@ -554,8 +553,7 @@ export const expenseReportStates = Object.values(ExpenseReportState).filter((v) 
 export enum HealthCareCostState {
   IN_WORK = 10, //State.EDITABLE_BY_OWNER
   IN_REVIEW = 20, //State.IN_REVIEW
-  IN_REVIEW_BY_INSURANCE = 30, //State.BOOKABLE
-  REVIEW_COMPLETED = 31,
+  REVIEW_COMPLETED = 30, //State.BOOKABLE
   BOOKED = 40 //State.BOOKED
 }
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
@@ -619,7 +617,6 @@ export const accesses = [
   'examine/travel',
   'examine/expenseReport',
   'examine/healthCareCost',
-  'confirm/healthCareCost',
   'book/advance',
   'book/travel',
   'book/expenseReport',

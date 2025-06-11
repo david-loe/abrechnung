@@ -10,7 +10,6 @@
     "book/expenseReport": "Book Expenses",
     "book/healthCareCost": "Book Health Care Costs",
     "book/travel": "Book Travels",
-    "confirm/healthCareCost": "Confirm Health Care Costs",
     "examine/expenseReport": "Examine Expenses",
     "examine/healthCareCost": "Examine Health Care Costs",
     "examine/travel": "Examine Travels",
@@ -387,7 +386,6 @@
     "receiptNumber": "Receipt No.",
     "receipts": "Receipts",
     "refund": "Refund",
-    "refundSum": "Amount refunded by insurance",
     "reject": "Reject",
     "report": "Report",
     "reportEmail": "Email Address for Reports",
@@ -434,7 +432,6 @@
     "textColor": "Text color",
     "to": "To",
     "toExamination": "To Examination",
-    "toExaminationByInsurance": "To examination by health insurance",
     "toleranceStageDatesToApprovedTravelDates": "Deviation tolerance of the stages from the requested dates [days]",
     "total": "Total",
     "totalBalance": "Total balance",
@@ -448,7 +445,6 @@
     "travelSettings": "Travel Settings",
     "type": "Type",
     "typeToSearch": "Type to search...",
-    "underExaminationByInsuranceHealthCareCosts": "Health care costs under examination by health insurances",
     "updatedAt": "Updated at",
     "uploadFromPhone": "Upload from Phone",
     "uploading": "Uploading 🔄",
@@ -543,11 +539,6 @@
         "paragraph": "{owner} has submitted his health care costs.",
         "subject": "🛂 Health care costs to examine"
       },
-      "IN_REVIEW_BY_INSURANCE": {
-        "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your health care costs have been sent to the insurance for a refund. In the meantime you will get the total amount paid to your account.",
-        "subject": "🔜 Health care costs at insurance"
-      },
       "IN_WORK": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new health care cost was created for you.",
@@ -559,13 +550,13 @@
       },
       "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
-        "paragraph": "Your health care costs got reimbursed in the amount of {refundSum} by the insurance.",
+        "paragraph": "Your health care costs review was completed.",
         "subject": "💲 Health care costs completed"
       }
     },
     "hi": "Hi there,",
     "hiX": "Hi {X},",
-    "IN_REVIEW_BY_INSURANCE": {
+    "underExaminationByInsurance": {
       "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     },
@@ -646,7 +637,6 @@
     "APPROVED": "Approved",
     "BOOKED": "Booked",
     "IN_REVIEW": "In Review",
-    "IN_REVIEW_BY_INSURANCE": "In Review by Insurance",
     "IN_WORK": "In Work",
     "REJECTED": "Rejected",
     "REVIEW_COMPLETED": "Review completed"

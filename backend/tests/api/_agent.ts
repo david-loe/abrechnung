@@ -21,12 +21,12 @@ const users = {
   healthCareCost: {
     username: 'bender',
     password: 'bender',
-    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true, 'approve/advance': true }
+    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true }
   },
   advance: {
     username: 'bender',
     password: 'bender',
-    access: { user: true, 'examine/healthCareCost': true, 'confirm/healthCareCost': true, 'approve/advance': true }
+    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true }
   }
 }
 

@@ -22,7 +22,7 @@ import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, MoneyPlusPost } from './types.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Health Care Cost')
 @Route('healthCareCost')
@@ -190,10 +190,10 @@ export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER, $lt: HealthCareCostState.REVIEW_COMPLETED } }]
+      historic: false
     }
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      filter.project = { $in: request.user.projects.supervised }
     }
     return await this.getter(HealthCareCost, {
       query,
@@ -266,39 +266,6 @@ export class HealthCareCostExamineController extends Controller {
       }
     })
   }
-
-  @Post('underExaminationByInsurance')
-  public async postUnderExaminationByInsurance(
-    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
-    const extendedBody = Object.assign(requestBody, {
-      state: HealthCareCostState.IN_REVIEW_BY_INSURANCE,
-      editor: request.user._id
-    })
-
-    const cb = async (healthCareCost: IHealthCareCost) => {
-      sendNotification(healthCareCost)
-      sendViaMail(healthCareCost)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
-      }
-    }
-
-    return await this.setter(HealthCareCost, {
-      requestBody: extendedBody,
-      cb,
-      allowNew: false,
-      async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          await oldObject.saveToHistory()
-          return true
-        }
-        return false
-      }
-    })
-  }
-
   @Post()
   public async postAny(
     @Body() requestBody: {
@@ -360,6 +327,35 @@ export class HealthCareCostExamineController extends Controller {
     })
   }
 
+  @Post('reviewCompleted')
+  public async postReviewCompleted(
+    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.REVIEW_COMPLETED, editor: request.user._id })
+
+    const cb = async (expenseReport: IHealthCareCost) => {
+      sendNotification(expenseReport)
+      sendViaMail(expenseReport)
+      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+        await writeToDisk(await writeToDiskFilePath(expenseReport), await reportPrinter.print(expenseReport, i18n.language as Locale))
+      }
+    }
+
+    return await this.setter(HealthCareCost, {
+      requestBody: extendedBody,
+      cb,
+      allowNew: false,
+      async checkOldObject(oldObject: HealthCareCostDoc) {
+        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          await oldObject.saveToHistory()
+          return true
+        }
+        return false
+      }
+    })
+  }
+
   @Post('underExamination')
   public async postOwnUnderExamination(
     @Body() requestBody: { _id: _id; comment?: string },
@@ -383,8 +379,8 @@ export class HealthCareCostExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getunderExaminationByInsuranceReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: HealthCareCostState.IN_REVIEW_BY_INSURANCE }
+  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -406,17 +402,16 @@ export class HealthCareCostExamineController extends Controller {
 }
 
 @Tags('Health Care Cost')
-@Route('confirm/healthCareCost')
-@Security('cookieAuth', ['confirm/healthCareCost'])
-@Security('httpBearer', ['confirm/healthCareCost'])
-export class HealthCareCostConfirmController extends Controller {
+@Route('book/healthCareCost')
+@Security('cookieAuth', ['book/healthCareCost'])
+@Security('httpBearer', ['book/healthCareCost'])
+export class HealthCareCostBookableController extends Controller {
   @Get()
-  public async getHealthCareCostToConfirm(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false, state: { $gte: HealthCareCostState.IN_REVIEW_BY_INSURANCE } }]
-    }
+  public async getBookable(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
+    const filter: Condition<IHealthCareCost> = { historic: false, state: { $gte: State.BOOKABLE } }
+
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      filter.project = { $in: request.user.projects.supervised }
     }
     return await this.getter(HealthCareCost, {
       query,
@@ -427,104 +422,13 @@ export class HealthCareCostConfirmController extends Controller {
     })
   }
 
-  @Post('reviewCompleted')
-  @Middlewares(fileHandler.any())
-  public async postReviewCompleted(
-    @Body() requestBody: { _id: _id; comment?: string; refundSum: MoneyPlusPost },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
-    const extendedBody = Object.assign(requestBody, {
-      state: HealthCareCostState.REVIEW_COMPLETED,
-      editor: request.user._id
-    })
-
-    const cb = async (healthCareCost: IHealthCareCost) => {
-      sendNotification(healthCareCost)
-      sendViaMail(healthCareCost)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
-      }
-    }
-
-    return await this.setter(HealthCareCost, {
-      requestBody: extendedBody,
-      cb,
-      allowNew: false,
-      async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (
-          oldObject.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE &&
-          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-        ) {
-          await documentFileHandler(['refundSum', 'receipts'], { owner: oldObject.owner._id })(request)
-          await oldObject.saveToHistory()
-          return true
-        }
-        return false
-      }
-    })
-  }
-
-  @Delete()
-  public async deleteAnyConfirm(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    return await this.deleter(HealthCareCost, {
-      _id: _id,
-      async checkOldObject(oldObject: HealthCareCostDoc) {
-        return checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-      }
-    })
-  }
-
-  @Get('report')
-  @Produces('application/pdf')
-  public async getConfirmedReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = {
-      $and: [{ _id, historic: false, state: { $gte: HealthCareCostState.IN_REVIEW_BY_INSURANCE } }]
-    }
-    if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
-    }
-    const healthCareCost = await HealthCareCost.findOne(filter).lean()
-    if (!healthCareCost) {
-      throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
-    }
-    const report = await reportPrinter.print(healthCareCost, request.user.settings.language)
-    this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(healthCareCost.name)}.pdf`)
-    this.setHeader('Content-Type', 'application/pdf')
-    this.setHeader('Content-Length', report.length)
-    return Readable.from([report])
-  }
-}
-
-@Tags('Health Care Cost')
-@Route('book/healthCareCost')
-@Security('cookieAuth', ['book/healthCareCost'])
-@Security('httpBearer', ['book/healthCareCost'])
-export class HealthCareCostBookableController extends Controller {
-  @Get()
-  public async getBookable(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = {
-      $and: [{ historic: false, state: { $gte: State.BOOKABLE } }]
-    }
-    if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
-    }
-    return await this.getter(HealthCareCost, {
-      query,
-      filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
-      allowedAdditionalFields: ['expenses'],
-      sort: { [`log.${HealthCareCostState.IN_REVIEW}.date`]: -1 }
-    })
-  }
-
   @Get('report')
   @Produces('application/pdf')
   public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = {
-      $and: [{ _id, historic: false, state: { $gte: State.BOOKABLE } }]
-    }
+    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      filter.project = { $in: request.user.projects.supervised }
     }
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (!healthCareCost) {
@@ -546,10 +450,7 @@ export class HealthCareCostBookableController extends Controller {
           requestBody: doc,
           allowNew: false,
           async checkOldObject(oldObject: HealthCareCostDoc) {
-            if (
-              oldObject.state === HealthCareCostState.REVIEW_COMPLETED &&
-              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-            ) {
+            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
               await oldObject.saveToHistory()
               return true
             }

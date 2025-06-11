@@ -1,6 +1,6 @@
 import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { AddUp, baseCurrency, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from '../../common/types.js'
+import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
@@ -18,7 +18,6 @@ const healthCareCostSchema = () =>
     Object.assign(requestBaseSchema(healthCareCostStates, HealthCareCostState.IN_WORK, 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
-      refundSum: costObject(true, true, false, baseCurrency._id),
       expenses: [
         {
           description: { type: String, required: true },
@@ -34,7 +33,6 @@ const healthCareCostSchema = () =>
 const schema = healthCareCostSchema()
 
 const populates = {
-  refundSum: [{ path: 'refundSum.receipts', select: { name: 1, type: 1 } }, { path: 'refundSum.currency' }],
   insurance: [{ path: 'insurance' }],
   expenses: [
     { path: 'expenses.cost.currency' },

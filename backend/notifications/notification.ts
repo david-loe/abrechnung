@@ -60,7 +60,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
-    // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED', 'IN_REVIEW_BY_INSURANCE'
+    // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED'
     userFilter._id = report.owner._id
     button.link =
       report.state === State.REJECTED
@@ -73,12 +73,9 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   }
   const language = recipients[0].settings.language
 
-  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string; refundSum?: string } = {
+  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string } = {
     owner: report.owner.name.givenName,
-    lng: language,
-    refundSum: (report as HealthCareCostSimple).refundSum
-      ? formatter.money((report as HealthCareCostSimple).refundSum, { locale: language })
-      : undefined
+    lng: language
   }
 
   if (report.comments.length > 0) {
