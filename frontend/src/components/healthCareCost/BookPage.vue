@@ -85,14 +85,15 @@ const selected = ref([])
 const show = ref<null | HealthCareCostState.BOOKED>(null)
 const loading = ref(false)
 
-async function book(expenseReports: HealthCareCostSimple[]) {
+async function book(healthCareCosts: HealthCareCostSimple[]) {
   loading.value = true
   const result = await API.setter(
     'book/healthCareCost/booked',
-    expenseReports.map((e) => e._id)
+    healthCareCosts.map((e) => e._id)
   )
   loading.value = false
   if (result.ok) {
+    selected.value = []
     tableRef.value?.loadFromServer()
   }
 }

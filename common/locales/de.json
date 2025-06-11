@@ -242,7 +242,7 @@
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
     "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
-    "deleteBookedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
+    "deleteBookedAfterXDays": "Löschen von gebuchten Anträge und Reisen - in Tagen",
     "deleted": "gelöscht",
     "deleteInWorkReportsAfterXDaysUnused": "Löschen von ungenutzten Auslagen- und Krankenkostenanträgen - in Tagen",
     "deleteX": "{X} löschen",

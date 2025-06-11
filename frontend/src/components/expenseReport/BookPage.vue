@@ -93,6 +93,7 @@ async function book(expenseReports: ExpenseReportSimple[]) {
   )
   loading.value = false
   if (result.ok) {
+    selected.value = []
     tableRef.value?.loadFromServer()
   }
 }
