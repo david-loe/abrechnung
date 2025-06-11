@@ -5,6 +5,7 @@
     :placeholder="placeholder"
     @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => emit('update:modelValue', v)"
     :filter="filter"
+    :getOptionKey="(option: AdvanceSimple) => option._id"
     :getOptionLabel="(option: AdvanceSimple) => option.name"
     :disabled="disabled"
     :multiple="multiple"
@@ -74,7 +75,10 @@ function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
 }
 
 async function getAdvances(ownerId: string | undefined) {
-  const filter: Partial<Record<keyof AdvanceSimple, string | number>> = { state: AdvanceState.APPROVED }
+  const filter: Partial<Record<keyof AdvanceSimple, string | number | null | { $gte: number }>> = {
+    state: { $gte: AdvanceState.APPROVED },
+    settledOn: null
+  }
   if (ownerId) filter.owner = ownerId
   const response = await API.getter<AdvanceSimple[]>(`${props.endpointPrefix}advance`, {
     filterJSON: Base64.encode(JSON.stringify(filter))

@@ -1,5 +1,15 @@
-import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
-import { _id, AdvanceBase, AnyState, FlatAddUp, hexColorRegex, idDocumentToId, ReportModelName, textColors } from '../../common/types.js'
+import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
+import {
+  _id,
+  AdvanceBase,
+  AnyState,
+  FlatAddUp,
+  hexColorRegex,
+  IdDocument,
+  idDocumentToId,
+  ReportModelName,
+  textColors
+} from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 
 export function costObject(
@@ -113,9 +123,9 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
       ? {
           advances: {
             type: [{ type: Schema.Types.ObjectId, ref: 'Advance' }],
-            validate: {
-              validator: (value: unknown) => Array.isArray(value) && new Set(value).size === value.length,
-              message: 'Array values must be unique.'
+            set: (arr: IdDocument[]) => {
+              const unique = Array.from(new Set(arr.map((doc) => idDocumentToId(doc).toString())))
+              return unique.map((str) => new Types.ObjectId(str))
             }
           },
           addUp: {
