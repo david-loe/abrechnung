@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as TravelSimple[]))"
     @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
@@ -31,7 +33,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of travelStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of travelStates" :value="state">{{ t('states.' + TravelState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -105,7 +107,7 @@
         {{ travel.name }}
       </span>
       <template v-else>
-        <template v-if="endpoint == 'travel' && (travel.state === 'rejected' || travel.state === 'appliedFor')">
+        <template v-if="endpoint == 'travel' && travel.state <= TravelState.APPLIED_FOR">
           <a
             class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover"
             style="cursor: pointer"
@@ -139,8 +141,12 @@
       </span>
     </template>
     <template #item-state="{ progress, state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
-      <ProgressCircle class="ms-3" v-if="state === 'approved'" :progress="progress" style="display: inline-block"></ProgressCircle>
+      <StateBadge :state="state" :StateEnum="TravelState" style="display: inline-block"></StateBadge>
+      <ProgressCircle
+        class="ms-3"
+        v-if="state === TravelState.APPROVED"
+        :progress="progress"
+        style="display: inline-block"></ProgressCircle>
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
@@ -185,6 +191,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
 import { TravelSimple, TravelState, travelStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
@@ -200,22 +209,20 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: TravelState
+  stateFilter?: TravelState | { $gte: TravelState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
+  itemsSelected?: TravelSimple[]
 }>()
 
-const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: [] }>()
+const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: []; 'update:itemsSelected': [TravelSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -258,7 +265,6 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
     headers.splice(index, 1)
   }
 }
-
 const getEmptyFilter = () =>
   ({
     name: { $regex: undefined, $options: 'i' },
@@ -271,11 +277,8 @@ const getEmptyFilter = () =>
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
-}
-const reportLink = (_id: string) => {
-  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
 }
 
 const showFilter = ref({

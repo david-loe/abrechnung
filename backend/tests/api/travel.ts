@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Stage, Travel, TravelExpense, TravelSimple } from '../../../common/types.js'
+import { Stage, Travel, TravelExpense, TravelSimple, TravelState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
@@ -83,9 +83,9 @@ test.serial('POST /approve/travel/approved', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Travel).state, 'approved')
+  t.is((res.body.result as Travel).state, TravelState.APPROVED)
   t.is((res.body.result as Travel).history.length, 1)
-  t.like((res.body.result as Travel).comments[0], { text: comment, toState: 'approved' })
+  t.like((res.body.result as Travel).comments[0], { text: comment, toState: TravelState.APPROVED })
 })
 
 // FILL OUT
@@ -222,9 +222,9 @@ test.serial('POST /travel/underExamination', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Travel).state, 'underExamination')
+  t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
   t.is((res.body.result as Travel).history.length, 2)
-  t.like((res.body.result as Travel).comments[1], { text: comment, toState: 'underExamination' })
+  t.like((res.body.result as Travel).comments[1], { text: comment, toState: TravelState.IN_REVIEW })
 })
 
 test.serial('POST /travel/approved AGAIN', async (t) => {
@@ -235,7 +235,7 @@ test.serial('POST /travel/approved AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Travel).state, 'approved')
+  t.is((res.body.result as Travel).state, TravelState.APPROVED)
   t.is((res.body.result as Travel).history.length, 3)
 })
 
@@ -247,23 +247,23 @@ test.serial('POST /travel/underExamination AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Travel).state, 'underExamination')
+  t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
   t.is((res.body.result as Travel).history.length, 4)
 })
 
 // EXAMINE
 
-test.serial('POST /examine/travel/refunded', async (t) => {
+test.serial('POST /examine/travel/reviewCompleted', async (t) => {
   await loginUser(agent, 'travel')
   t.plan(4)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/examine/travel/refunded').send({ _id: travel._id, comment })
+  const res = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as Travel).state, 'refunded')
+  t.is((res.body.result as Travel).state, TravelState.REVIEW_COMPLETED)
   t.is((res.body.result as Travel).history.length, 5)
   t.is((res.body.result as Travel).comments.length, 2)
 })

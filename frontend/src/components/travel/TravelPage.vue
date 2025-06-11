@@ -18,7 +18,7 @@
           :travelEndDate="travel.endDate"
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
-          :showVehicleRegistration="travel.state === 'approved'"
+          :showVehicleRegistration="travel.state === TravelState.APPROVED"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext((modalObject as Stage), modalObjectType))"
@@ -65,7 +65,7 @@
           :travel="travel"
           :loading="modalFormIsLoading"
           :disabled="isReadOnly"
-          @save="postTravelSettings"
+          @save="postLumpSums"
           @cancel="resetAndHide"></LumpSumEditor>
       </div>
     </ModalComponent>
@@ -102,7 +102,7 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <template v-if="endpointPrefix === 'examine/' && travel.state !== 'refunded'">
+                <template v-if="endpointPrefix === 'examine/' && travel.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
@@ -127,10 +127,10 @@
                 <li>
                   <a
                     :class="
-                      'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' && travel.state !== 'refunded' ? ' disabled' : '')
+                      'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? ' disabled' : '')
                     "
                     href="#"
-                    @click="isReadOnly && endpointPrefix === 'examine/' && travel.state !== 'refunded' ? null : deleteTravel()">
+                    @click="isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? null : deleteTravel()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ t('labels.delete') }}</span>
                   </a>
@@ -148,7 +148,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="travel.state" :states="travelStates"></StatePipeline>
+      <StatePipeline class="mb-3" :state="travel.state" :StateEnum="TravelState"></StatePipeline>
 
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
@@ -292,7 +292,7 @@
                   :claim-spouse-refund="travel.claimSpouseRefund"
                   :progress="travel.progress"
                   :project="travel.project"
-                  :showAdvanceOverflow="travel.state !== 'refunded'"></AddUpTable>
+                  :showAdvanceOverflow="travel.state < State.BOOKABLE"></AddUpTable>
                 <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
@@ -301,22 +301,22 @@
                     </p>
                   </small>
                 </div>
-                <div v-if="travel.state !== 'refunded'" class="mb-3">
+                <div v-if="travel.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <TextArea
                     id="comment"
                     v-model="travel.comment"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)"></TextArea>
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
                   <TextArea
                     id="bookingRemark"
                     v-model="travel.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === 'underExamination')"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)"></TextArea>
                 </div>
-                <template v-if="travel.state !== 'refunded'">
-                  <div v-if="travel.state === 'approved'">
+                <template v-if="travel.state < State.BOOKABLE">
+                  <div v-if="travel.state === TravelState.APPROVED">
                     <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
                       <button class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
@@ -328,11 +328,11 @@
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
                   </div>
-                  <template v-else-if="travel.state === 'underExamination'">
+                  <template v-else-if="travel.state === State.IN_REVIEW">
                     <div v-if="endpointPrefix === 'examine/'" class="mb-2">
-                      <button class="btn btn-success" @click="refund()">
-                        <i class="bi bi-coin"></i>
-                        <span class="ms-1">{{ t('labels.refund') }}</span>
+                      <button class="btn btn-success" @click="completeReview()">
+                        <i class="bi bi-check2-square"></i>
+                        <span class="ms-1">{{ t('labels.completeReview') }}</span>
                       </button>
                     </div>
                     <div>
@@ -374,19 +374,24 @@
 </template>
 
 <script lang="ts" setup>
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import {
   DocumentFile,
   Place,
   Stage,
+  State,
   Travel,
   TravelDay,
   TravelExpense,
   TravelRecord,
   TravelRecordType,
   TravelSimple,
+  TravelState,
   User,
-  UserSimple,
-  travelStates
+  UserSimple
 } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
@@ -405,10 +410,6 @@ import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -449,9 +450,8 @@ const modalCompRef = useTemplateRef('modalComp')
 
 const isReadOnly = computed(() => {
   return (
-    (travel.value.state === 'underExamination' ||
-      travel.value.state === 'refunded' ||
-      (travel.value.state === 'approved' && props.endpointPrefix === 'examine/')) &&
+    (travel.value.state > State.EDITABLE_BY_OWNER ||
+      (travel.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
     isReadOnlySwitchOn.value
   )
 })
@@ -482,7 +482,7 @@ function resetAndHide() {
   hideModal()
 }
 
-async function postTravelSettings(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
+async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
   const travelObj = {
     _id: travel.value._id,
     lastPlaceOfWork,
@@ -560,8 +560,8 @@ async function backToApproved() {
   }
 }
 
-async function refund() {
-  const result = await API.setter<Travel>('examine/travel/refunded', {
+async function completeReview() {
+  const result = await API.setter<Travel>('examine/travel/reviewCompleted', {
     _id: travel.value._id,
     comment: travel.value.comment,
     bookingRemark: travel.value.bookingRemark

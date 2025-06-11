@@ -4,7 +4,9 @@ import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { getAddUpTableData, getTotalBalance, hexToRGB } from '../../common/scripts.js'
 import {
+  _id,
   Advance,
+  baseCurrency,
   Comment,
   Cost,
   CountryCode,
@@ -12,28 +14,28 @@ import {
   DocumentFile,
   DocumentFileType,
   ExpenseReport,
+  getReportTypeFromModelName,
   HealthCareCost,
+  HealthCareCostState,
   Locale,
   Meal,
   PageOrientation,
   Place,
-  PrintSettingsBase,
   PrinterSettings,
+  PrintSettingsBase,
   Purpose,
   PurposeSimple,
   ReportModelName,
+  reportIsAdvance,
+  reportIsExpenseReport,
+  reportIsHealthCareCost,
+  reportIsTravel,
+  State,
   Transport,
   Travel,
   TravelDay,
   TravelExpense,
-  TravelSettings,
-  _id,
-  baseCurrency,
-  getReportTypeFromModelName,
-  reportIsAdvance,
-  reportIsExpenseReport,
-  reportIsHealthCareCost,
-  reportIsTravel
+  TravelSettings
 } from '../../common/types.js'
 
 interface PrintSettings extends PrintSettingsBase {
@@ -406,7 +408,7 @@ class ReportPrint {
         options
       )
     }
-    if (reportIsHealthCareCost(this.report) && this.report.state === 'refunded') {
+    if (reportIsHealthCareCost(this.report) && this.report.state === HealthCareCostState.REVIEW_COMPLETED) {
       options.yStart = y
       y = this.drawer.drawMultilineText(
         `${this.t('labels.refundSum')}: ${this.drawer.formatter.detailedMoney(this.report.refundSum)}`,
@@ -432,26 +434,19 @@ class ReportPrint {
       summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.createdAt })
       summary.push({
         reference: this.t('labels.approvedOn'),
-        value: this.report.log.appliedFor?.date
+        value: this.report.log[State.APPLIED_FOR]?.date
       })
       summary.push({
         reference: this.t('labels.approvedBy'),
-        value: `${this.report.log.appliedFor?.editor.name.givenName} ${this.report.log.appliedFor?.editor.name.familyName}`
-      })
-    } else {
-      summary.push({
-        reference: this.t('labels.submittedOn'),
-        value: this.report.log.inWork?.date
-      })
-    }
-    if (reportIsTravel(this.report)) {
-      summary.push({
-        reference: this.t('labels.submittedOn'),
-        value: this.report.log.approved?.date
+        value: `${this.report.log[State.APPLIED_FOR]?.editor.name.givenName} ${this.report.log[State.APPLIED_FOR]?.editor.name.familyName}`
       })
     }
     if (!reportIsAdvance(this.report)) {
-      summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log.underExamination?.date })
+      summary.push({
+        reference: this.t('labels.submittedOn'),
+        value: this.report.log[State.EDITABLE_BY_OWNER]?.date
+      })
+      summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log[State.IN_REVIEW]?.date })
       summary.push({
         reference: this.t('labels.examinedBy'),
         value: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`

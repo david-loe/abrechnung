@@ -115,7 +115,7 @@
         {{
           mode === 'add' && owner
             ? $t('labels.applyForX', { X: $t('labels.travel') })
-            : travel.state === 'rejected' || travel.state === 'approved'
+            : travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
@@ -129,8 +129,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { datetimeToDateString, isValidDate } from '@/../../common/scripts.js'
-import { TravelSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
+import { idDocumentToId, TravelSimple, TravelState, UserWithName } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -138,7 +139,6 @@ import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'TravelApplyForm',
@@ -156,7 +156,8 @@ export default defineComponent({
   data() {
     return {
       APP_DATA: APP_LOADER.data,
-      formTravel: this.default()
+      formTravel: this.default(),
+      TravelState
     }
   },
   methods: {

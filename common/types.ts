@@ -1,4 +1,4 @@
-import { Types, mongo } from 'mongoose'
+import { mongo, Types } from 'mongoose'
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$
@@ -458,6 +458,7 @@ export interface AdvanceBase {
   balance: BaseCurrencyMoneyNotNull
   reason: string
   state: AdvanceState
+  settledOn?: Date | string | null
   _id: _id
 }
 
@@ -512,23 +513,60 @@ export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareC
   expenses: Expense[]
 }
 
+export const State = {
+  REJECTED: -10,
+  APPLIED_FOR: 0,
+  EDITABLE_BY_OWNER: 10,
+  IN_REVIEW: 20,
+  BOOKABLE: 30,
+  BOOKED: 40
+} as const
+
+export enum TravelState {
+  REJECTED = -10, //State.REJECTED
+  APPLIED_FOR = 0, //State.APPLIED_FOR
+  APPROVED = 10, //State.EDITABLE_BY_OWNER
+  IN_REVIEW = 20, //State.IN_REVIEW
+  REVIEW_COMPLETED = 30, //State.BOOKABLE
+  BOOKED = 40 //State.BOOKED
+}
+export type TravelStateStrings = keyof typeof TravelState
+export const travelStates = Object.values(TravelState).filter((v) => typeof v === 'number')
+
+export enum AdvanceState {
+  REJECTED = -10, //State.REJECTED
+  APPLIED_FOR = 0, //State.APPLIED_FOR,
+  APPROVED = 30, //State.BOOKABLE,
+  BOOKED = 40 //State.BOOKED
+}
+export type AdvanceStateStrings = keyof typeof AdvanceState
+export const advanceStates = Object.values(AdvanceState).filter((v) => typeof v === 'number')
+
+export enum ExpenseReportState {
+  IN_WORK = 10, //State.EDITABLE_BY_OWNER
+  IN_REVIEW = 20, //State.IN_REVIEW
+  REVIEW_COMPLETED = 30, //State.BOOKABLE
+  BOOKED = 40 //State.BOOKED
+}
+export type ExpenseReportStateStrings = keyof typeof ExpenseReportState
+export const expenseReportStates = Object.values(ExpenseReportState).filter((v) => typeof v === 'number')
+
+export enum HealthCareCostState {
+  IN_WORK = 10, //State.EDITABLE_BY_OWNER
+  IN_REVIEW = 20, //State.IN_REVIEW
+  IN_REVIEW_BY_INSURANCE = 30, //State.BOOKABLE
+  REVIEW_COMPLETED = 31,
+  BOOKED = 40 //State.BOOKED
+}
+export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
+export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
+
 export const locales = ['de', 'en'] as const
 export type Locale = (typeof locales)[number]
 
-export const travelStates = ['rejected', 'appliedFor', 'approved', 'underExamination', 'refunded'] as const
-export type TravelState = (typeof travelStates)[number]
-
-export const expenseReportStates = ['inWork', 'underExamination', 'refunded'] as const
-export type ExpenseReportState = (typeof expenseReportStates)[number]
-
-export const healthCareCostStates = ['inWork', 'underExamination', 'underExaminationByInsurance', 'refunded'] as const
-export type HealthCareCostState = (typeof healthCareCostStates)[number]
-
-export const advanceStates = ['rejected', 'appliedFor', 'approved', 'completed'] as const
-export type AdvanceState = (typeof advanceStates)[number]
-
 export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
 export type AnyState = TravelState | HealthCareCostState | ExpenseReportState | AdvanceState
+export type AnyStateEnum = typeof TravelState | typeof HealthCareCostState | typeof ExpenseReportState | typeof AdvanceState
 
 const transportTypesButOwnCar = ['airplane', 'shipOrFerry', 'otherTransport'] as const
 export const transportTypes = ['ownCar', ...transportTypesButOwnCar] as const
@@ -560,7 +598,7 @@ export function getReportTypeFromModelName(modelName: ReportModelName) {
 }
 
 export const retention = [
-  'deleteRefundedAfterXDays',
+  'deleteBookedAfterXDays',
   'deleteApprovedTravelAfterXDaysUnused',
   'deleteInWorkReportsAfterXDaysUnused',
   'mailXDaysBeforeDeletion'
@@ -582,10 +620,10 @@ export const accesses = [
   'examine/expenseReport',
   'examine/healthCareCost',
   'confirm/healthCareCost',
-  'approved/advance',
-  'refunded/travel',
-  'refunded/expenseReport',
-  'refunded/healthCareCost',
+  'book/advance',
+  'book/travel',
+  'book/expenseReport',
+  'book/healthCareCost',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]

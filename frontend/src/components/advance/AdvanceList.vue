@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as AdvanceSimple[]))"
     @loaded="emits('loaded')"
     :sort-by="sortBy"
     :sort-type="sortType">
@@ -33,7 +35,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of advanceStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of advanceStates" :value="state">{{ t('states.' + AdvanceState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -76,17 +78,17 @@
         </div>
       </div>
     </template>
-    <template #header-log.appliedFor.date="header">
+    <template #header-log.0.date="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ header.text }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('log.appliedFor.date', e)">
-            <i v-if="showFilter['log.appliedFor.date']" class="bi bi-funnel-fill mx-1"></i>
+          <span style="cursor: pointer" @click="(e) => clickFilter('log.0.date', e)">
+            <i v-if="showFilter['log.0.date']" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter['log.appliedFor.date']" @click.stop>
-          <DateInput v-model="(filter['log.appliedFor.date'] as any).$gt" :max="new Date()" with-time></DateInput>
+        <div v-if="showFilter['log.0.date']" @click.stop>
+          <DateInput v-model="(filter['log.0.date'] as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
     </template>
@@ -113,7 +115,7 @@
       </span>
     </template>
     <template #item-state="{ state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block"></StateBadge>
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
@@ -137,8 +139,8 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-log.appliedFor.date="{ log }">
-      {{ $formatter.dateTime(log.appliedFor?.date) }}
+    <template #item-log.0.date="{ log }">
+      {{ $formatter.dateTime(log[0].date) }}
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
@@ -156,6 +158,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header, SortType } from 'vue3-easy-data-table'
 import { getById } from '@/../../common/scripts.js'
 import { AdvanceSimple, AdvanceState, advanceStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
@@ -167,24 +172,22 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header, SortType } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: AdvanceState | { $in: AdvanceState[] }
+  stateFilter?: AdvanceState | { $gte: AdvanceState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
   sortBy?: string
   sortType?: SortType
+  itemsSelected?: AdvanceSimple[]
 }>()
 
-const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple] }>()
+const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple]; 'update:itemsSelected': [AdvanceSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -213,7 +216,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.approvedOn'), value: 'log.appliedFor.date', sortable: true },
+    { text: t('labels.approvedOn'), value: 'log.0.date', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -226,22 +229,18 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
   }
 }
 
-const reportLink = (_id: string) => {
-  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
-}
-
 const getEmptyFilter = () =>
   ({
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
     project: { $in: [undefined] },
-    'log.appliedFor.date': { $gt: undefined }
+    'log.0.date': { $gt: undefined }
   }) as Filter
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 
@@ -251,7 +250,7 @@ const showFilter = ref({
   state: false,
   project: false,
   'project.organisation': false,
-  'log.appliedFor.date': false
+  'log.0.date': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {

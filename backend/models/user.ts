@@ -1,12 +1,12 @@
-import mongoose, { HydratedDocument, Model, Query, Schema, Types, model } from 'mongoose'
+import mongoose, { HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import {
-  Access,
-  User,
-  UserReplaceReferencesResult,
   _id,
+  Access,
   accesses,
   emailRegex,
   locales,
+  User,
+  UserReplaceReferencesResult,
   userReplaceCollections
 } from '../../common/types.js'
 import { getDisplaySettings, getSettings } from '../db.js'
@@ -70,14 +70,16 @@ export const userSchema = async () => {
           label: 'labels.supervisedProjects',
           conditions: [
             [
+              ['access.approve/advance', true],
               ['access.approve/travel', true],
               ['access.examine/travel', true],
               ['access.examine/expenseReport', true],
               ['access.examine/healthCareCost', true],
               ['access.confirm/healthCareCost', true],
-              ['access.refunded/travel', true],
-              ['access.refunded/expenseReport', true],
-              ['access.refunded/healthCareCost', true]
+              ['access.book/advance', true],
+              ['access.book/travel', true],
+              ['access.book/expenseReport', true],
+              ['access.book/healthCareCost', true]
             ]
           ]
         }

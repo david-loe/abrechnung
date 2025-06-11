@@ -6,6 +6,8 @@
     :placeholder="placeholder"
     @update:modelValue="updateInsurance"
     :filter="filter"
+    :getOptionKey="(option: HealthInsurance) => option._id"
+    :getOptionLabel="(option: HealthInsurance) => option.name"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name }">
@@ -21,10 +23,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { HealthInsurance } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthInsuranceSelector',

@@ -1,18 +1,17 @@
-import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
   AddUp,
   Comment,
+  cateringTypes,
+  distanceRefundTypes,
   Travel,
   TravelRecord,
   TravelState,
-  cateringTypes,
-  distanceRefundTypes,
   transportTypes,
   travelStates
 } from '../../common/types.js'
 import { travelCalculator } from '../factory.js'
-import { AdvanceDoc } from './advance.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
@@ -40,7 +39,7 @@ type TravelModel = Model<Travel, {}, Methods>
 
 const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
-    Object.assign(requestBaseSchema(travelStates, 'appliedFor', 'Travel'), {
+    Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), {
       reason: { type: String, required: true },
       destinationPlace: place(true),
       isCrossBorder: { type: Boolean },
@@ -163,7 +162,7 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
 
-  if (this.state === 'approved') {
+  if (this.state === TravelState.APPROVED) {
     // move vehicle registration of owner as receipt to 'ownCar' stages
     const receipts = []
     for (const stage of this.stages) {
@@ -220,7 +219,7 @@ schema.pre('validate', async function (this: TravelDoc) {
 })
 
 schema.post('save', async function (this: TravelDoc) {
-  if (this.state === 'refunded') {
+  if (this.state === TravelState.REVIEW_COMPLETED) {
     ;(this.project as ProjectDoc).updateBalance()
     await offsetAdvance(this, 'Travel')
   }

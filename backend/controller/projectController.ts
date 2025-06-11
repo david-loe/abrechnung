@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Project as IProject, ProjectSimple, ProjectWithUsers, _id, locales } from '../../common/types.js'
+import { _id, Project as IProject, locales, ProjectSimple, ProjectWithUsers } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -30,10 +30,10 @@ export class ProjectController extends Controller {
         'examine/expenseReport',
         'examine/healthCareCost',
         'confirm/healthCareCost',
-        'approved/advance',
-        'refunded/expenseReport',
-        'refunded/travel',
-        'refunded/healthCareCost'
+        'book/advance',
+        'book/expenseReport',
+        'book/travel',
+        'book/healthCareCost'
       ]))
     ) {
       throw new AuthorizationError()

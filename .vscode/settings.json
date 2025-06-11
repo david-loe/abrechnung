@@ -27,8 +27,8 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "biome.lsp.bin": {
-    "linux-arm64": "./backend/node_modules/@biomejs/cli-linux-arm64/biome",
-    "linux-x64": "./backend/node_modules/@biomejs/cli-linux-x64/biome",
+    "linux-arm64": "./backend/node_modules/@biomejs/cli-linux-arm64-musl/biome",
+    "linux-x64": "./backend/node_modules/@biomejs/cli-linux-x64-musl/biome",
     "darwin-arm64": "./backend/node_modules/@biomejs/cli-darwin-arm64/biome",
     "darwin-x64": "./backend/node_modules/@biomejs/cli-darwin-x64/biome",
     "win32-x64": "./backend/node_modules/@biomejs/cli-win32-x64/biome.exe",

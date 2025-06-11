@@ -1,6 +1,8 @@
 import { model } from 'mongoose'
 import {
   AnyState,
+  ExpenseReportState,
+  HealthCareCostState,
   ExpenseReport as IExpenseReport,
   HealthCareCost as IHealthCareCost,
   Travel as ITravel,
@@ -9,7 +11,9 @@ import {
   RetentionType,
   reportIsHealthCareCost,
   reportIsTravel,
-  schemaNames
+  State,
+  schemaNames,
+  TravelState
 } from '../common/types.js'
 import { getSettings } from './db.js'
 import i18n from './i18n.js'
@@ -41,12 +45,12 @@ function getDateThreshold(days: number) {
 
 async function getPolicyElements(retentionPolicy: { [key in RetentionType]: number }) {
   const elements: { schema: schemaNames; state: AnyState; deletionPeriod: number }[] = [
-    { schema: 'Travel', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'Travel', state: 'approved', deletionPeriod: retentionPolicy.deleteApprovedTravelAfterXDaysUnused },
-    { schema: 'ExpenseReport', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'ExpenseReport', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused },
-    { schema: 'HealthCareCost', state: 'refunded', deletionPeriod: retentionPolicy.deleteRefundedAfterXDays },
-    { schema: 'HealthCareCost', state: 'inWork', deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused }
+    { schema: 'Travel', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteBookedAfterXDays },
+    { schema: 'Travel', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteApprovedTravelAfterXDaysUnused },
+    { schema: 'ExpenseReport', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteBookedAfterXDays },
+    { schema: 'ExpenseReport', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused },
+    { schema: 'HealthCareCost', state: State.BOOKED, deletionPeriod: retentionPolicy.deleteBookedAfterXDays },
+    { schema: 'HealthCareCost', state: State.EDITABLE_BY_OWNER, deletionPeriod: retentionPolicy.deleteInWorkReportsAfterXDaysUnused }
   ]
   return elements
 }
@@ -106,12 +110,16 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
       const recipients = [owner]
 
       let reportType: ReportType
+      let stateLabel: string
       if (reportIsTravel(report)) {
         reportType = 'travel'
+        stateLabel = TravelState[report.state]
       } else if (reportIsHealthCareCost(report)) {
         reportType = 'healthCareCost'
+        stateLabel = HealthCareCostState[report.state]
       } else {
         reportType = 'expenseReport'
+        stateLabel = ExpenseReportState[report.state]
       }
 
       const language = recipients[0].settings.language
@@ -132,8 +140,8 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 
       button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
 
-      const subject = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.subject`, interpolation)
-      const paragraph = i18n.t(`mail.${reportType}.${report.state}DeletedSoon.paragraph`, interpolation)
+      const subject = i18n.t(`mail.${reportType}.${stateLabel}_getsDeletedSoon.subject`, interpolation)
+      const paragraph = i18n.t(`mail.${reportType}.${stateLabel}_getsDeletedSoon.paragraph`, interpolation)
       await sendMail(recipients, subject, paragraph, button)
     }
   }

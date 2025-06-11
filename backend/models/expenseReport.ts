@@ -1,6 +1,6 @@
-import { HydratedDocument, Model, Query, Schema, model } from 'mongoose'
+import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
-import { AddUp, Comment, ExpenseReport, ExpenseReportState, _id, expenseReportStates } from '../../common/types.js'
+import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import { ProjectDoc } from './project.js'
@@ -15,7 +15,7 @@ type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
 const expenseReportSchema = () =>
   new Schema<ExpenseReport, ExpenseReportModel, Methods>(
-    Object.assign(requestBaseSchema(expenseReportStates, 'inWork', 'ExpenseReport', true, false), {
+    Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
       category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
       expenses: [
         {
@@ -104,7 +104,7 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
 })
 
 schema.post('save', async function (this: ExpenseReportDoc) {
-  if (this.state === 'refunded') {
+  if (this.state === ExpenseReportState.REVIEW_COMPLETED) {
     await (this.project as ProjectDoc).updateBalance()
     await offsetAdvance(this, 'ExpenseReport')
   }

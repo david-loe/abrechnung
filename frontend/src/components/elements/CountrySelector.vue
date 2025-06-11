@@ -7,6 +7,8 @@
     @update:modelValue="(v: CountrySimple) => $emit('update:modelValue', v)"
     @option:selected="$root.setLastCountry"
     :filter="filter"
+    :getOptionKey="(option: CountrySimple) => option._id"
+    :getOptionLabel="(option: CountrySimple) => option.name[$i18n.locale as Locale]"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name, flag }">
@@ -32,9 +34,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { CountrySimple, Locale } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'CountrySelector',

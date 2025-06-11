@@ -5,6 +5,7 @@
     :placeholder="placeholder"
     @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => emit('update:modelValue', v)"
     :filter="filter"
+    :getOptionKey="(option: AdvanceSimple) => option._id"
     :getOptionLabel="(option: AdvanceSimple) => option.name"
     :disabled="disabled"
     :multiple="multiple"
@@ -43,11 +44,11 @@
 </template>
 
 <script setup lang="ts">
-import { Base64 } from '@/../../common/scripts'
-import { AdvanceSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
-import API from '@/api'
-import { PropType, onMounted, ref, watch } from 'vue'
+import { onMounted, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Base64 } from '@/../../common/scripts'
+import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from '@/../../common/types.js'
+import API from '@/api'
 
 // Props
 const props = defineProps({
@@ -74,7 +75,10 @@ function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
 }
 
 async function getAdvances(ownerId: string | undefined) {
-  const filter: Partial<Record<keyof AdvanceSimple, string>> = { state: 'approved' }
+  const filter: Partial<Record<keyof AdvanceSimple, string | number | null | { $gte: number }>> = {
+    state: { $gte: AdvanceState.APPROVED },
+    settledOn: null
+  }
   if (ownerId) filter.owner = ownerId
   const response = await API.getter<AdvanceSimple[]>(`${props.endpointPrefix}advance`, {
     filterJSON: Base64.encode(JSON.stringify(filter))

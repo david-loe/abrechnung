@@ -29,26 +29,28 @@
       <ExpenseReportList
         class="mb-5"
         endpoint="examine/expenseReport"
-        stateFilter="underExamination"
+        :stateFilter="ExpenseReportState.IN_REVIEW"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
       </ExpenseReportList>
       <template v-if="!show">
-        <button type="button" class="btn btn-light me-2" @click="show = 'inWork'">
-          {{ $t('labels.show') }} <StateBadge state="inWork"> </StateBadge> <i class="bi bi-chevron-down"></i>
+        <button type="button" class="btn btn-light me-2" @click="show = ExpenseReportState.IN_WORK">
+          {{ $t('labels.show') }} <StateBadge :state="ExpenseReportState.IN_WORK" :StateEnum="ExpenseReportState"> </StateBadge>
+          <i class="bi bi-chevron-down"></i>
         </button>
-        <button type="button" class="btn btn-light" @click="show = 'refunded'">
-          {{ $t('labels.show') }} <StateBadge state="refunded"></StateBadge> <i class="bi bi-chevron-down"></i>
+        <button type="button" class="btn btn-light" @click="show = ExpenseReportState.REVIEW_COMPLETED">
+          {{ $t('labels.show') }} <StateBadge :state="ExpenseReportState.REVIEW_COMPLETED" :StateEnum="ExpenseReportState"></StateBadge>
+          <i class="bi bi-chevron-down"></i>
         </button>
       </template>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ $t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ $t('labels.hide') }} <StateBadge :state="show" :StateEnum="ExpenseReportState"></StateBadge> <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <ExpenseReportList
           endpoint="examine/expenseReport"
-          :stateFilter="show"
-          :columns-to-hide="['state', 'report', 'addUp.totalTotal', 'organisation']">
+          :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
+          :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']">
         </ExpenseReportList>
       </template>
     </div>
@@ -56,14 +58,14 @@
 </template>
 
 <script lang="ts">
-import { ExpenseReportSimple } from '@/../../common/types.js'
+import { defineComponent } from 'vue'
+import { ExpenseReportSimple, ExpenseReportState } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
-import { defineComponent } from 'vue'
 
 type ModalMode = 'add' | 'edit'
 export default defineComponent({
@@ -72,10 +74,11 @@ export default defineComponent({
   props: [],
   data() {
     return {
-      show: null as 'inWork' | 'refunded' | null,
+      show: null as ExpenseReportState.IN_WORK | ExpenseReportState.REVIEW_COMPLETED | null,
       modalExpenseReport: {} as Partial<ExpenseReportSimple>,
       modalMode: 'add' as ModalMode,
-      modalFormIsLoading: false
+      modalFormIsLoading: false,
+      ExpenseReportState
     }
   },
   methods: {

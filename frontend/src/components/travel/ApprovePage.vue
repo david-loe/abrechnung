@@ -6,12 +6,12 @@
       @afterClose="modalMode === 'view' ? resetModal() : null">
       <div v-if="modalTravel">
         <TravelApproveForm
-          v-if="modalTravel.state === 'appliedFor'"
+          v-if="modalTravel.state === TravelState.APPLIED_FOR"
           :travel="(modalTravel as TravelSimple)"
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
           @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
-        <TravelApply v-else-if="modalTravel.state === 'approved'" :travel="(modalTravel as TravelSimple)"></TravelApply>
+        <TravelApply v-else-if="modalTravel.state === TravelState.APPROVED" :travel="(modalTravel as TravelSimple)"></TravelApply>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
@@ -40,7 +40,7 @@
         class="mb-5"
         ref="travelListRef"
         endpoint="approve/travel"
-        stateFilter="appliedFor"
+        :stateFilter="TravelState.APPLIED_FOR"
         :columns-to-hide="[
           'state',
           'editor',
@@ -51,17 +51,18 @@
           'organisation',
           'bookingRemark'
         ]"></TravelList>
-      <button v-if="!show" type="button" class="btn btn-light" @click="show = 'approved'">
-        {{ $t('labels.show') }} <StateBadge state="approved"></StateBadge> <i class="bi bi-chevron-down"></i>
+      <button v-if="!show" type="button" class="btn btn-light" @click="show = TravelState.APPROVED">
+        {{ $t('labels.show') }} <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState"></StateBadge>
+        <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ $t('labels.hide') }} <StateBadge :state="show"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ $t('labels.hide') }} <StateBadge :state="show" :StateEnum="TravelState"></StateBadge> <i class="bi bi-chevron-up"></i>
         </button>
         <hr class="hr" />
         <TravelList
           endpoint="approve/travel"
-          stateFilter="approved"
+          :stateFilter="show"
           :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark']">
         </TravelList>
       </template>
@@ -70,16 +71,16 @@
 </template>
 
 <script lang="ts">
-import { TravelSimple } from '@/../../common/types.js'
+import { defineComponent } from 'vue'
+import { TravelSimple, TravelState } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
-import TravelList from '@/components/travel/TravelList.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
-import { defineComponent } from 'vue'
+import TravelList from '@/components/travel/TravelList.vue'
 
 export default defineComponent({
   name: 'ApprovePage',
@@ -89,8 +90,9 @@ export default defineComponent({
     return {
       modalTravel: {} as Partial<TravelSimple>,
       modalMode: 'view' as 'view' | 'add',
-      show: null as 'approved' | null,
-      modalFormIsLoading: false
+      show: null as TravelState.APPROVED | null,
+      modalFormIsLoading: false,
+      TravelState
     }
   },
   methods: {

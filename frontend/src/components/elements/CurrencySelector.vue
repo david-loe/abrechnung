@@ -7,6 +7,8 @@
     @update:modelValue="(v: Currency) => $emit('update:modelValue', v)"
     @option:selected="$root.setLastCurrency"
     :filter="filter"
+    :getOptionKey="(option: Currency) => option._id"
+    :getOptionLabel="(option: Currency) => option.name[$i18n.locale as Locale]"
     :disabled="disabled"
     style="min-width: 200px">
     <template #option="{ name, _id, symbol, flag }: Currency">
@@ -40,9 +42,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { Currency, Locale } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'CurrencySelector',

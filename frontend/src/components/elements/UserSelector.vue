@@ -6,6 +6,8 @@
     :placeholder="placeholder"
     @update:modelValue="(u: UserWithNameAndProject) => $emit('update:modelValue', u)"
     :filter="filter"
+    :getOptionKey="(option: UserWithNameAndProject) => option._id"
+    :getOptionLabel="(option: UserWithNameAndProject) => `${option.name.givenName} ${option.name.familyName}`"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name }">
@@ -21,9 +23,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { UserWithNameAndProject } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'UserSelector',

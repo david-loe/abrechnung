@@ -67,7 +67,7 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state !== 'underExaminationByInsurance'">
+                <template v-if="endpointPrefix === 'examine/' && healthCareCost.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
@@ -100,23 +100,10 @@
                 <li>
                   <a
                     :class="
-                      'dropdown-item' +
-                      (isReadOnly &&
-                      endpointPrefix !== '' &&
-                      healthCareCost.state !== 'refunded' &&
-                      healthCareCost.state !== 'underExaminationByInsurance'
-                        ? ' disabled'
-                        : '')
+                      'dropdown-item' + (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? ' disabled' : '')
                     "
                     href="#"
-                    @click="
-                      isReadOnly &&
-                      endpointPrefix !== '' &&
-                      healthCareCost.state !== 'refunded' &&
-                      healthCareCost.state !== 'underExaminationByInsurance'
-                        ? null
-                        : deleteHealthCareCost()
-                    ">
+                    @click="isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? null : deleteHealthCareCost()">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ t('labels.delete') }}</span>
                   </a>
@@ -136,7 +123,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="healthCareCost.state" :states="healthCareCostStates"></StatePipeline>
+      <StatePipeline class="mb-3" :state="healthCareCost.state" :StateEnum="HealthCareCostState"></StatePipeline>
 
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
@@ -188,10 +175,8 @@
                   <AddUpTable
                     :add-up="healthCareCost.addUp"
                     :project="healthCareCost.project"
-                    :refundSum="healthCareCost.state === 'refunded' ? healthCareCost.refundSum : undefined"
-                    :showAdvanceOverflow="
-                      healthCareCost.state !== 'refunded' && healthCareCost.state !== 'underExaminationByInsurance'
-                    "></AddUpTable>
+                    :refundSum="healthCareCost.state === HealthCareCostState.REVIEW_COMPLETED ? healthCareCost.refundSum : undefined"
+                    :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE"></AddUpTable>
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
@@ -201,7 +186,7 @@
                     </p>
                   </small>
                 </div>
-                <div v-if="healthCareCost.state !== 'refunded'" class="mb-3">
+                <div v-if="healthCareCost.state < HealthCareCostState.REVIEW_COMPLETED" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <TextArea
                     id="comment"
@@ -209,8 +194,8 @@
                     :disabled="
                       isReadOnly &&
                       !(
-                        (endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination') ||
-                        (endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance')
+                        (endpointPrefix === 'examine/' && healthCareCost.state === HealthCareCostState.IN_REVIEW) ||
+                        (endpointPrefix === 'confirm/' && healthCareCost.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE)
                       )
                     "></TextArea>
                 </div>
@@ -219,9 +204,9 @@
                   <TextArea
                     id="bookingRemark"
                     v-model="healthCareCost.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === 'underExamination')"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)"></TextArea>
                 </div>
-                <div v-if="healthCareCost.state === 'inWork'">
+                <div v-if="healthCareCost.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
@@ -233,7 +218,7 @@
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
                 </div>
-                <template v-else-if="healthCareCost.state === 'underExamination'">
+                <template v-else-if="healthCareCost.state === State.IN_REVIEW">
                   <div v-if="endpointPrefix === 'examine/'" class="mb-2">
                     <a class="btn btn-primary" :href="mailToInsuranceLink" @click="toExaminationByInsurance()">
                       <i class="bi bi-pencil-square"></i>
@@ -252,7 +237,7 @@
                     </button>
                   </div>
                 </template>
-                <template v-else-if="healthCareCost.state === 'refunded' || healthCareCost.state === 'underExaminationByInsurance'">
+                <template v-else-if="healthCareCost.state >= State.BOOKABLE">
                   <div>
                     <button
                       class="btn btn-primary"
@@ -280,7 +265,7 @@
                 </template>
                 <form
                   class="mt-3"
-                  v-if="endpointPrefix === 'confirm/' && healthCareCost.state === 'underExaminationByInsurance'"
+                  v-if="endpointPrefix === 'confirm/' && healthCareCost.state === HealthCareCostState.IN_REVIEW_BY_INSURANCE"
                   @submit.prevent="refund()">
                   <label for="refundSum" class="form-label me-2"> {{ t('labels.refundSum') }}<span class="text-danger">*</span> </label>
                   <div id="refundSum" class="input-group mb-3">
@@ -318,15 +303,20 @@
 </template>
 
 <script lang="ts" setup>
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { getTotalTotal, mailToLink } from '@/../../common/scripts.js'
 import {
   DocumentFile,
   Expense,
   HealthCareCost,
   HealthCareCostSimple,
+  HealthCareCostState,
   Organisation,
-  UserSimple,
-  healthCareCostStates
+  State,
+  UserSimple
 } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
@@ -343,10 +333,6 @@ import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCost
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 type ModalObject = Partial<Expense> | HealthCareCostSimple
 type ModalObjectType = 'expense' | 'healthCareCost'
@@ -373,7 +359,8 @@ const isDownloadingFn = () => isDownloading
 
 const isReadOnly = computed(() => {
   return (
-    (healthCareCost.value.state !== 'inWork' || (healthCareCost.value.state === 'inWork' && props.endpointPrefix === 'examine/')) &&
+    (healthCareCost.value.state > State.EDITABLE_BY_OWNER ||
+      (healthCareCost.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
     isReadOnlySwitchOn.value
   )
 })
@@ -455,7 +442,7 @@ async function refund() {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   const result = await API.setter<HealthCareCost>(
-    'confirm/healthCareCost/refunded',
+    'confirm/healthCareCost/reviewCompleted',
     {
       _id: healthCareCost.value._id,
       comment: healthCareCost.value.comment,

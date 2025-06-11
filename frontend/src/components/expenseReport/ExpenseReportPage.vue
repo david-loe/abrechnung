@@ -74,7 +74,7 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <template v-if="endpointPrefix === 'examine/' && expenseReport.state !== 'refunded'">
+                <template v-if="endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
@@ -103,11 +103,11 @@
                   <a
                     :class="
                       'dropdown-item' +
-                      (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state !== 'refunded' ? ' disabled' : '')
+                      (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? ' disabled' : '')
                     "
                     href="#"
                     @click="
-                      isReadOnly && endpointPrefix === 'examine/' && expenseReport.state !== 'refunded' ? null : deleteExpenseReport()
+                      isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? null : deleteExpenseReport()
                     ">
                     <span class="me-1"><i class="bi bi-trash"></i></span>
                     <span>{{ t('labels.delete') }}</span>
@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="expenseReport.state" :states="expenseReportStates"></StatePipeline>
+      <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState"></StatePipeline>
 
       <div class="row justify-content-between">
         <div class="col-lg-8 col-12">
@@ -199,7 +199,7 @@
                 <AddUpTable
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
-                  :showAdvanceOverflow="expenseReport.state !== 'refunded'"></AddUpTable>
+                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE"></AddUpTable>
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
@@ -208,21 +208,21 @@
                     </p>
                   </small>
                 </div>
-                <div v-if="expenseReport.state !== 'refunded'" class="mb-3">
+                <div v-if="expenseReport.state <= State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <TextArea
                     id="comment"
                     v-model="expenseReport.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
                   <TextArea
                     id="bookingRemark"
                     v-model="expenseReport.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === 'underExamination')"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
                 </div>
-                <div v-if="expenseReport.state === 'inWork'">
+                <div v-if="expenseReport.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
@@ -234,11 +234,11 @@
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
                 </div>
-                <template v-else-if="expenseReport.state === 'underExamination'">
+                <template v-else-if="expenseReport.state === State.IN_REVIEW">
                   <div class="mb-2" v-if="endpointPrefix === 'examine/'">
-                    <button class="btn btn-success" @click="refund()">
-                      <i class="bi bi-coin"></i>
-                      <span class="ms-1">{{ t('labels.refund') }}</span>
+                    <button class="btn btn-success" @click="completeReview()">
+                      <i class="bi bi-check2-square"></i>
+                      <span class="ms-1">{{ t('labels.completeReview') }}</span>
                     </button>
                   </div>
                   <div>
@@ -251,7 +251,7 @@
                     </button>
                   </div>
                 </template>
-                <div v-else-if="expenseReport.state === 'refunded'">
+                <div v-else-if="expenseReport.state >= State.BOOKABLE">
                   <button
                     class="btn btn-primary"
                     @click="
@@ -279,6 +279,9 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { convertGermanDateToHTMLDate, getById } from '@/../../common/scripts.js'
 import {
   Currency,
@@ -286,10 +289,10 @@ import {
   Expense,
   ExpenseReport,
   ExpenseReportSimple,
-  UserSimple,
-  expenseReportStates
+  ExpenseReportState,
+  State,
+  UserSimple
 } from '@/../../common/types.js'
-
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
@@ -305,9 +308,6 @@ import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportFor
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
-import { PropType, computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 type ModalObject = Partial<Expense> | ExpenseReportSimple
 type ModalObjectType = 'expense' | 'expenseReport'
@@ -350,9 +350,8 @@ const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
-    (expenseReport.value.state === 'underExamination' ||
-      expenseReport.value.state === 'refunded' ||
-      (expenseReport.value.state === 'inWork' && props.endpointPrefix === 'examine/')) &&
+    (expenseReport.value.state > State.EDITABLE_BY_OWNER ||
+      (expenseReport.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
     isReadOnlySwitchOn.value
   )
 })
@@ -422,8 +421,8 @@ async function backToInWork() {
   }
 }
 
-async function refund() {
-  const result = await API.setter<ExpenseReport>('examine/expenseReport/refunded', {
+async function completeReview() {
+  const result = await API.setter<ExpenseReport>('examine/expenseReport/reviewCompleted', {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment,
     bookingRemark: expenseReport.value.bookingRemark

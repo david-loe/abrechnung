@@ -1,17 +1,17 @@
-import mongoose, { Document, HydratedDocument, Model, Query, Schema, model } from 'mongoose'
-import { getBaseCurrencyAmount } from '../../common/scripts.js'
+import mongoose, { Document, HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import {
+  _id,
   Advance,
   AdvanceBase,
   AdvanceState,
+  advanceStates,
+  baseCurrency,
   Comment,
   ExpenseReport,
   HealthCareCost,
   ReportModelName,
-  Travel,
-  _id,
-  advanceStates,
-  baseCurrency
+  State,
+  Travel
 } from '../../common/types.js'
 import { setAdvanceBalance } from '../helper.js'
 import { addExchangeRate } from './exchangeRate.js'
@@ -33,7 +33,7 @@ type AdvanceModel = Model<Advance, {}, Methods>
 
 const advanceSchema = () =>
   new Schema<Advance, AdvanceModel, Methods>(
-    Object.assign(requestBaseSchema(advanceStates, 'appliedFor', 'Advance', false), {
+    Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject(true, false, true, baseCurrency._id),
       balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true)),
@@ -45,7 +45,8 @@ const advanceSchema = () =>
             amount: { type: Number, min: 0, required: true }
           }
         ]
-      }
+      },
+      settledOn: { type: Date }
     }),
     { timestamps: true }
   )
@@ -80,7 +81,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
   this.history.push(old[0]._id)
   this.markModified('history')
   this.log[this.state] = { date: new Date(), editor: this.editor }
-  if (this.state === 'appliedFor') {
+  if (this.state === AdvanceState.APPLIED_FOR) {
     setAdvanceBalance(this)
   }
   if (save) {
@@ -96,12 +97,12 @@ async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.Clie
   const reports: Document[] = []
   reports.push(
     ...(await model<Travel>('Travel')
-      .find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })
+      .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
     ...(await model<ExpenseReport>('ExpenseReport')
-      .find({ advances: advanceId, historic: false, state: { $ne: 'refunded' } })
+      .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
@@ -109,7 +110,7 @@ async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.Clie
       .find({
         advances: advanceId,
         historic: false,
-        state: { $nin: ['refunded', 'underExaminationByInsurance'] }
+        state: { $lt: State.BOOKABLE }
       })
       .session(session))
   )
@@ -128,7 +129,7 @@ schema.methods.offset = async function (
   reportId: _id | null,
   session: mongoose.ClientSession | null = null
 ) {
-  if (this.state !== 'approved' || reportTotal <= 0) {
+  if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal <= 0) {
     return reportTotal
   }
   const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
@@ -138,10 +139,9 @@ schema.methods.offset = async function (
   let amount = reportTotal
   let difference = reportTotal - doc.balance.amount
   if (difference >= 0) {
-    await doc.saveToHistory(false, session)
     amount = doc.balance.amount
     doc.balance.amount = 0
-    doc.state = 'completed'
+    doc.settledOn = new Date()
   } else {
     doc.balance.amount = -difference
     difference = 0

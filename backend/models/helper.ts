@@ -1,13 +1,13 @@
-import mongoose, { HydratedDocument, PopulateOptions, Query, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import {
-  AddUp,
+  _id,
   AdvanceBase,
   AnyState,
   FlatAddUp,
-  ReportModelName,
-  _id,
   hexColorRegex,
+  IdDocument,
   idDocumentToId,
+  ReportModelName,
   textColors
 } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
@@ -80,7 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     name: { type: String },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    state: { type: String, required: true, enum: stages, default: defaultState },
+    state: { type: Number, required: true, enum: stages, default: defaultState },
     log: logObject(stages),
     editor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comment: { type: String },
@@ -90,7 +90,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
           text: { type: String },
           author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
           toState: {
-            type: String,
+            type: Number,
             required: true,
             enum: stages
           }
@@ -123,9 +123,9 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
       ? {
           advances: {
             type: [{ type: Schema.Types.ObjectId, ref: 'Advance' }],
-            validate: {
-              validator: (value: unknown) => Array.isArray(value) && new Set(value).size === value.length,
-              message: 'Array values must be unique.'
+            set: (arr: IdDocument[]) => {
+              const unique = Array.from(new Set(arr.map((doc) => idDocumentToId(doc).toString())))
+              return unique.map((str) => new Types.ObjectId(str))
             }
           },
           addUp: {

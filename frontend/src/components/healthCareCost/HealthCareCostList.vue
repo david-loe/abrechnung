@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as HealthCareCostSimple[]))"
     @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
@@ -31,7 +33,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of healthCareCostStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of healthCareCostStates" :value="state">{{ t('states.' + HealthCareCostState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -98,17 +100,17 @@
         </div>
       </div>
     </template>
-    <template #header-log.underExamination.date="header">
+    <template #header-log.20.date="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ header.text }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('log.underExamination.date', e)">
-            <i v-if="showFilter['log.underExamination.date']" class="bi bi-funnel-fill mx-1"></i>
+          <span style="cursor: pointer" @click="(e) => clickFilter('log.20.date', e)">
+            <i v-if="showFilter['log.20.date']" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter['log.underExamination.date']" @click.stop>
-          <DateInput v-model="(filter['log.underExamination.date'] as any).$gt" :max="new Date()" with-time></DateInput>
+        <div v-if="showFilter['log.20.date']" @click.stop>
+          <DateInput v-model="(filter['log.20.date'] as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
     </template>
@@ -134,7 +136,7 @@
       </span>
     </template>
     <template #item-state="{ state }">
-      <StateBadge :state="state" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="HealthCareCostState" style="display: inline-block"></StateBadge>
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
@@ -163,9 +165,9 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ $formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-log.underExamination.date="{ log }">
-      <span v-if="(log as Log).underExamination">
-        {{ $formatter.dateTime((log as Log).underExamination!.date) }}
+    <template #item-log.20.date="{ log }">
+      <span v-if="(log as Log)[HealthCareCostState.IN_REVIEW]">
+        {{ $formatter.dateTime((log as Log)[HealthCareCostState.IN_REVIEW]!.date) }}
       </span>
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
@@ -184,8 +186,11 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
-import { HealthCareCostState, Log, healthCareCostStates } from '@/../../common/types.js'
+import { HealthCareCostSimple, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -197,22 +202,20 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 import { bp, showFile } from '@/helper.js'
-import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: HealthCareCostState
+  stateFilter?: HealthCareCostState | { $gte: HealthCareCostState; $lt?: HealthCareCostState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
+  itemsSelected?: HealthCareCostSimple[]
 }>()
 
-const emits = defineEmits<{ loaded: [] }>()
+const emits = defineEmits<{ loaded: []; 'update:itemsSelected': [HealthCareCostSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -226,10 +229,6 @@ defineExpose({ loadFromServer })
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
-
-const reportLink = (_id: string) => {
-  return `${import.meta.env.VITE_BACKEND_URL}/${props.endpoint}/report?_id=${_id}`
-}
 
 const headers: Header[] = [
   //@ts-ignore
@@ -247,7 +246,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt' },
-    { text: t('labels.examinedOn'), value: 'log.underExamination.date', sortable: true },
+    { text: t('labels.examinedOn'), value: 'log.20.date', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -268,12 +267,12 @@ const getEmptyFilter = () =>
     insurance: undefined,
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined },
-    'log.underExamination.date': { $gt: undefined }
+    'log.20.date': { $gt: undefined }
   }) as Filter
 
 const filter = ref(getEmptyFilter())
 
-if (props.stateFilter) {
+if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 
@@ -285,7 +284,7 @@ const showFilter = ref({
   project: false,
   'project.organisation': false,
   updatedAt: false,
-  'log.underExamination.date': false
+  'log.20.date': false
 })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {

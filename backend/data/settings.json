@@ -4,18 +4,18 @@
     "appliedFor:advance": true,
     "appliedFor:travel": true,
     "approve/advance": false,
-    "approved/advance": false,
     "approve/travel": false,
     "approved:travel": false,
+    "book/advance": false,
+    "book/expenseReport": false,
+    "book/healthCareCost": false,
+    "book/travel": false,
     "confirm/healthCareCost": false,
     "examine/expenseReport": false,
     "examine/healthCareCost": false,
     "examine/travel": false,
     "inWork:expenseReport": true,
     "inWork:healthCareCost": true,
-    "refunded/expenseReport": false,
-    "refunded/healthCareCost": false,
-    "refunded/travel": false,
     "user": true
   },
   "disableReportType": {
@@ -27,10 +27,10 @@
   "retentionPolicy": {
     "deleteApprovedTravelAfterXDaysUnused": 0,
     "deleteInWorkReportsAfterXDaysUnused": 0,
-    "deleteRefundedAfterXDays": 0,
+    "deleteBookedAfterXDays": 0,
     "mailXDaysBeforeDeletion": 7
   },
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
-  "version": "2.0.4"
+  "version": "2.1.0"
 }

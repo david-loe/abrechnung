@@ -1,5 +1,5 @@
-import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model } from 'mongoose'
-import { ExpenseReport, HealthCareCost, Project, ProjectUsers, Travel, _id, idDocumentToId } from '../../common/types.js'
+import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema } from 'mongoose'
+import { _id, ExpenseReport, HealthCareCost, idDocumentToId, Project, ProjectUsers, State, Travel } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {
@@ -25,7 +25,7 @@ schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> 
     addUp: {
       $elemMatch: { project: this._id }
     },
-    state: 'refunded',
+    state: { $gte: State.BOOKABLE },
     historic: false
   }
   const travels = mongoose.connection.collection<Travel>('travels').find(filter)

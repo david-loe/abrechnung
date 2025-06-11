@@ -14,6 +14,8 @@
       :placeholder="$t('labels.project')"
       @update:modelValue="(v: ProjectSimple) => $emit('update:modelValue', v)"
       :filter="filter"
+      :getOptionKey="(option: ProjectSimple) => option._id"
+      :getOptionLabel="(option: ProjectSimple) => option.identifier"
       :disabled="disabled"
       :class="APP_DATA && APP_DATA.organisations.length > 1 ? 'col-' + (12 - orgSelectSplit) : ''">
       <template #option="{ identifier, name }: Project">
@@ -30,10 +32,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { Project, ProjectSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ProjectSelector',

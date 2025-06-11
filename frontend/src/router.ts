@@ -1,20 +1,20 @@
 import axios from 'axios'
-import { RouteLocationNormalized, createRouter, createWebHistory } from 'vue-router'
-import HomePage from './components/HomePage.vue'
-import LoginPage from './components/LoginPage.vue'
+import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import AdvanceApprovePage from './components/advance/ApprovePage.vue'
-import ApprovedAdvancePage from './components/advance/ApprovedPage.vue'
+import BookableAdvancePage from './components/advance/BookPage.vue'
+import BookableExpenseReportPage from './components/expenseReport/BookPage.vue'
 import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
 import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
-import RefundedExpenseReportPage from './components/expenseReport/RefundedPage.vue'
+import HomePage from './components/HomePage.vue'
+import BookableHealthCareCostPage from './components/healthCareCost/BookPage.vue'
 import ConfirmHealthCareCostPage from './components/healthCareCost/ConfirmPage.vue'
 import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
-import RefundedHealthCareCostPage from './components/healthCareCost/RefundedPage.vue'
+import LoginPage from './components/LoginPage.vue'
 import SettingsPage from './components/settings/SettingsPage.vue'
 import TravelApprovePage from './components/travel/ApprovePage.vue'
+import BookableTravelPage from './components/travel/BookPage.vue'
 import ExamineTravelPage from './components/travel/ExaminePage.vue'
-import RefundedTravelPage from './components/travel/RefundedPage.vue'
 import TravelPage from './components/travel/TravelPage.vue'
 import { logger } from './logger.js'
 
@@ -42,8 +42,8 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/approved/advance',
-    component: ApprovedAdvancePage,
+    path: '/book/advance',
+    component: BookableAdvancePage,
     meta: { requiresAuth: true }
   },
   {
@@ -53,8 +53,8 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
   {
-    path: '/refunded/travel',
-    component: RefundedTravelPage,
+    path: '/book/travel',
+    component: BookableTravelPage,
     meta: { requiresAuth: true }
   },
   {
@@ -79,8 +79,8 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   {
-    path: '/refunded/expenseReport',
-    component: RefundedExpenseReportPage,
+    path: '/book/expenseReport',
+    component: BookableExpenseReportPage,
     meta: { requiresAuth: true }
   },
   {
@@ -120,8 +120,8 @@ const routes = [
     })
   },
   {
-    path: '/refunded/healthCareCost',
-    component: RefundedHealthCareCostPage,
+    path: '/book/healthCareCost',
+    component: BookableHealthCareCostPage,
     meta: { requiresAuth: true }
   },
   {

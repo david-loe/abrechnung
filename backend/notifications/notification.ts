@@ -1,16 +1,21 @@
 import { RootFilterQuery } from 'mongoose'
-import { PlaceToString, getDiffInDays } from '../../common/scripts.js'
+import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
 import {
   Advance,
+  AdvanceState,
   ExpenseReportSimple,
+  ExpenseReportState,
   HealthCareCostSimple,
+  HealthCareCostState,
   User as IUser,
   Locale,
   ReportType,
-  TravelSimple,
   reportIsAdvance,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  State,
+  TravelSimple,
+  TravelState
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
 import { formatter } from '../factory.js'
@@ -23,14 +28,19 @@ import { sendPushNotification } from './push.js'
 export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, textState?: string) {
   let recipients = []
   let reportType: ReportType
+  let stateLabel: string
   if (reportIsTravel(report)) {
     reportType = 'travel'
+    stateLabel = textState || TravelState[report.state]
   } else if (reportIsAdvance(report)) {
     reportType = 'advance'
+    stateLabel = textState || AdvanceState[report.state]
   } else if (reportIsHealthCareCost(report)) {
     reportType = 'healthCareCost'
+    stateLabel = textState || HealthCareCostState[report.state]
   } else {
     reportType = 'expenseReport'
+    stateLabel = textState || ExpenseReportState[report.state]
   }
   const button = {
     text: '',
@@ -41,19 +51,19 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }]
   }
   const userFilter: RootFilterQuery<IUser> = {}
-  if (report.state === 'appliedFor') {
+  if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
-  } else if (report.state === 'underExamination') {
+  } else if (report.state === State.IN_REVIEW) {
     userFilter[`access.examine/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
-    // 'rejected', 'approved', 'refunded', 'underExaminationByInsurance'
+    // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED', 'IN_REVIEW_BY_INSURANCE'
     userFilter._id = report.owner._id
     button.link =
-      report.state === 'rejected'
+      report.state === State.REJECTED
         ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
         : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
   }
@@ -79,9 +89,9 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     }
   }
 
-  const subject = i18n.t(`mail.${reportType}.${textState || report.state}.subject`, interpolation)
-  const paragraph = i18n.t(`mail.${reportType}.${textState || report.state}.paragraph`, interpolation)
-  const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${textState || report.state}.lastParagraph`, interpolation) : ''
+  const subject = i18n.t(`mail.${reportType}.${stateLabel}.subject`, interpolation)
+  const paragraph = i18n.t(`mail.${reportType}.${stateLabel}.paragraph`, interpolation)
+  const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation) : ''
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)

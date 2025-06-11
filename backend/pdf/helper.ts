@@ -1,13 +1,14 @@
-import { addUp, getTotalBalance, sanitizeFilename } from '../../common/scripts.js'
+import { getTotalBalance, sanitizeFilename } from '../../common/scripts.js'
 import {
   Advance,
   ExpenseReport,
   HealthCareCost,
+  HealthCareCostState,
   Locale,
-  Travel,
   reportIsAdvance,
   reportIsHealthCareCost,
-  reportIsTravel
+  reportIsTravel,
+  Travel
 } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import { formatter, reportPrinter } from '../factory.js'
@@ -26,7 +27,7 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
     if (reportIsTravel(report)) {
       path += 'travel/'
     } else if (reportIsHealthCareCost(report)) {
-      if (report.state === 'refunded') {
+      if (report.state === HealthCareCostState.REVIEW_COMPLETED) {
         path += 'healthCareCost/confirmed/'
       } else {
         path += 'healthCareCost/'

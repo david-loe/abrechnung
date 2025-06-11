@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Expense, ExpenseReport, ExpenseReportSimple } from '../../../common/types.js'
+import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'
@@ -114,9 +114,9 @@ test.serial('POST /expenseReport/underExamination', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as ExpenseReport).state, 'underExamination')
+  t.is((res.body.result as ExpenseReport).state, ExpenseReportState.IN_REVIEW)
   t.is((res.body.result as ExpenseReport).history.length, 1)
-  t.like((res.body.result as ExpenseReport).comments[0], { text: comment, toState: 'underExamination' })
+  t.like((res.body.result as ExpenseReport).comments[0], { text: comment, toState: ExpenseReportState.IN_REVIEW })
 })
 
 test.serial('POST /expenseReport/inWork AGAIN', async (t) => {
@@ -128,7 +128,7 @@ test.serial('POST /expenseReport/inWork AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as ExpenseReport).state, 'inWork')
+  t.is((res.body.result as ExpenseReport).state, ExpenseReportState.IN_WORK)
   t.is((res.body.result as ExpenseReport).history.length, 2)
   t.is((res.body.result as ExpenseReport).comments.length, 1)
 })
@@ -141,23 +141,23 @@ test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as ExpenseReport).state, 'underExamination')
+  t.is((res.body.result as ExpenseReport).state, ExpenseReportState.IN_REVIEW)
   t.is((res.body.result as ExpenseReport).history.length, 3)
 })
 
 // EXAMINE
 
-test.serial('POST /examine/expenseReport/refunded', async (t) => {
+test.serial('POST /examine/expenseReport/reviewCompleted', async (t) => {
   await loginUser(agent, 'expenseReport')
   t.plan(3)
   const comment = '' // empty string should not create comment
-  const res = await agent.post('/examine/expenseReport/refunded').send({ _id: expenseReport._id, comment })
+  const res = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
     t.pass()
   } else {
     console.log(res.body)
   }
-  t.is((res.body.result as ExpenseReport).state, 'refunded')
+  t.is((res.body.result as ExpenseReport).state, ExpenseReportState.REVIEW_COMPLETED)
   t.is((res.body.result as ExpenseReport).history.length, 4)
 })
 

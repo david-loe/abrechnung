@@ -6,6 +6,8 @@
     :placeholder="placeholder"
     @update:modelValue="(c: Category) => $emit('update:modelValue', c)"
     :filter="filter"
+    :getOptionKey="(option: Category) => option._id"
+    :getOptionLabel="(option: Category) => option.name"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="category">
@@ -21,10 +23,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { Category } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'CategorySelector',
