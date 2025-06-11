@@ -383,16 +383,16 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
 							"admin": {
@@ -412,10 +412,10 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
-							"approved/advance",
-							"refunded/travel",
-							"refunded/expenseReport",
-							"refunded/healthCareCost",
+							"book/advance",
+							"book/travel",
+							"book/expenseReport",
+							"book/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -922,16 +922,16 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
 							"admin": {
@@ -951,10 +951,10 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
-							"approved/advance",
-							"refunded/travel",
-							"refunded/expenseReport",
-							"refunded/healthCareCost",
+							"book/advance",
+							"book/travel",
+							"book/expenseReport",
+							"book/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -1232,16 +1232,16 @@
 							"admin": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -1580,16 +1580,16 @@
 							"admin": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -2673,13 +2673,13 @@
 				"additionalProperties": false
 			},
 			"AdvanceState": {
-				"type": "string",
 				"enum": [
-					"rejected",
-					"appliedFor",
-					"approved",
-					"completed"
-				]
+					-10,
+					0,
+					30,
+					40
+				],
+				"type": "number"
 			},
 			"AdvanceBase": {
 				"properties": {
@@ -2700,6 +2700,18 @@
 					},
 					"state": {
 						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -2750,14 +2762,15 @@
 				"additionalProperties": false
 			},
 			"TravelState": {
-				"type": "string",
 				"enum": [
-					"rejected",
-					"appliedFor",
-					"approved",
-					"underExamination",
-					"refunded"
-				]
+					-10,
+					0,
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
 			},
 			"Comment_TravelState_": {
 				"properties": {
@@ -3285,152 +3298,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_TravelPost.NoPost_": {
+			"SetterPartial__days-TravelPost-at-days--lastPlaceOfWork-TravelPost-at-lastPlaceOfWork--_id-TravelPost_91__id_93__.NoPost_": {
 				"properties": {
-					"bookingRemark": {
-						"type": "string"
-					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Project"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
-					},
-					"fellowTravelersNames": {
-						"type": "string"
-					},
-					"claimSpouseRefund": {
-						"type": "boolean"
-					},
-					"a1Certificate": {
-						"properties": {
-							"destinationName": {
-								"type": "string"
-							},
-							"exactAddress": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"isCrossBorder": {
-						"type": "boolean"
-					},
-					"advances": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"properties": {
-										"project": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/Project"
-												},
-												{
-													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-												}
-											]
-										},
-										"reason": {
-											"type": "string"
-										},
-										"budget": {
-											"properties": {
-												"amount": {
-													"type": "number",
-													"format": "double"
-												},
-												"currency": {
-													"anyOf": [
-														{
-															"$ref": "#/components/schemas/Currency"
-														},
-														{
-															"$ref": "#/components/schemas/IdDocument_string_"
-														}
-													]
-												}
-											},
-											"type": "object"
-										},
-										"balance": {
-											"properties": {
-												"amount": {
-													"type": "number",
-													"format": "double"
-												}
-											},
-											"type": "object"
-										},
-										"name": {
-											"type": "string"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"destinationPlace": {
-						"properties": {
-							"special": {
-								"type": "string"
-							},
-							"country": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/CountrySimple"
-									},
-									{
-										"$ref": "#/components/schemas/IdDocument_string_"
-									}
-								]
-							},
-							"place": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"reason": {
-						"type": "string"
-					},
 					"days": {
 						"items": {
 							"properties": {
@@ -3484,17 +3353,14 @@
 						},
 						"type": "object"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					}
 				},
 				"type": "object"
 			},
-			"SetterBody_TravelPost_": {
-				"$ref": "#/components/schemas/SetterPartial_TravelPost.NoPost_"
+			"SetterBody__days-TravelPost-at-days--lastPlaceOfWork-TravelPost-at-lastPlaceOfWork--_id-TravelPost_91__id_93___": {
+				"$ref": "#/components/schemas/SetterPartial__days-TravelPost-at-days--lastPlaceOfWork-TravelPost-at-lastPlaceOfWork--_id-TravelPost_91__id_93__.NoPost_"
 			},
 			"SetterPartial_TravelExpense.NoPost_": {
 				"properties": {
@@ -4044,12 +3910,13 @@
 				"additionalProperties": false
 			},
 			"ExpenseReportState": {
-				"type": "string",
 				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork"
-				]
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
 			},
 			"Comment_ExpenseReportState_": {
 				"properties": {
@@ -4243,13 +4110,14 @@
 				"$ref": "#/components/schemas/AddUpBase"
 			},
 			"HealthCareCostState": {
-				"type": "string",
 				"enum": [
-					"underExamination",
-					"refunded",
-					"inWork",
-					"underExaminationByInsurance"
-				]
+					10,
+					20,
+					30,
+					31,
+					40
+				],
+				"type": "number"
 			},
 			"Comment_HealthCareCostState_": {
 				"properties": {
@@ -4493,6 +4361,18 @@
 					"reason": {
 						"type": "string"
 					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"offsetAgainst": {
 						"items": {
 							"properties": {
@@ -4711,6 +4591,17 @@
 							{
 								"items": {
 									"properties": {
+										"settledOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -4866,6 +4757,17 @@
 							{
 								"items": {
 									"properties": {
+										"settledOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -4979,6 +4881,228 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"SetterPartial_TravelPost.NoPost_": {
+				"properties": {
+					"bookingRemark": {
+						"type": "string"
+					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Project"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
+					"fellowTravelersNames": {
+						"type": "string"
+					},
+					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"isCrossBorder": {
+						"type": "boolean"
+					},
+					"advances": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"properties": {
+										"settledOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Project"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"reason": {
+											"type": "string"
+										},
+										"budget": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"balance": {
+											"properties": {
+												"amount": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"type": "object"
+										},
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"destinationPlace": {
+						"properties": {
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/CountrySimple"
+									},
+									{
+										"$ref": "#/components/schemas/IdDocument_string_"
+									}
+								]
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"days": {
+						"items": {
+							"properties": {
+								"overnightRefund": {
+									"type": "boolean"
+								},
+								"cateringRefund": {
+									"properties": {
+										"dinner": {
+											"type": "boolean"
+										},
+										"lunch": {
+											"type": "boolean"
+										},
+										"breakfast": {
+											"type": "boolean"
+										}
+									},
+									"type": "object"
+								},
+								"purpose": {
+									"$ref": "#/components/schemas/PurposeSimple"
+								},
+								"date": {
+									"type": "string",
+									"format": "date-time"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"lastPlaceOfWork": {
+						"properties": {
+							"special": {
+								"type": "string"
+							},
+							"country": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/CountrySimple"
+									},
+									{
+										"$ref": "#/components/schemas/IdDocument_string_"
+									}
+								]
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_TravelPost_": {
+				"$ref": "#/components/schemas/SetterPartial_TravelPost.NoPost_"
+			},
 			"Settings": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -5022,16 +5146,16 @@
 							"confirm/healthCareCost": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
 							"admin": {
@@ -5051,10 +5175,10 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
-							"approved/advance",
-							"refunded/travel",
-							"refunded/expenseReport",
-							"refunded/healthCareCost",
+							"book/advance",
+							"book/travel",
+							"book/expenseReport",
+							"book/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -5084,7 +5208,7 @@
 					},
 					"retentionPolicy": {
 						"properties": {
-							"deleteRefundedAfterXDays": {
+							"deleteBookedAfterXDays": {
 								"type": "number",
 								"format": "double"
 							},
@@ -5102,7 +5226,7 @@
 							}
 						},
 						"required": [
-							"deleteRefundedAfterXDays",
+							"deleteBookedAfterXDays",
 							"deleteApprovedTravelAfterXDaysUnused",
 							"deleteInWorkReportsAfterXDaysUnused",
 							"mailXDaysBeforeDeletion"
@@ -5159,7 +5283,7 @@
 								"type": "number",
 								"format": "double"
 							},
-							"deleteRefundedAfterXDays": {
+							"deleteBookedAfterXDays": {
 								"type": "number",
 								"format": "double"
 							}
@@ -5188,16 +5312,16 @@
 							"admin": {
 								"type": "boolean"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"type": "boolean"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"type": "boolean"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"type": "boolean"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"type": "boolean"
 							},
 							"confirm/healthCareCost": {
@@ -7018,40 +7142,36 @@
 					},
 					"stateColors": {
 						"properties": {
-							"rejected": {
+							"0": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"appliedFor": {
+							"10": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"approved": {
+							"20": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"underExamination": {
+							"30": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"refunded": {
+							"31": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"inWork": {
+							"40": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							},
-							"underExaminationByInsurance": {
-								"$ref": "#/components/schemas/BadgeStyle"
-							},
-							"completed": {
+							"-10": {
 								"$ref": "#/components/schemas/BadgeStyle"
 							}
 						},
 						"required": [
-							"rejected",
-							"appliedFor",
-							"approved",
-							"underExamination",
-							"refunded",
-							"inWork",
-							"underExaminationByInsurance",
-							"completed"
+							"-10",
+							"0",
+							"10",
+							"20",
+							"30",
+							"40",
+							"31"
 						],
 						"type": "object"
 					},
@@ -7129,25 +7249,25 @@
 								},
 								"type": "array"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"items": {
 									"type": "string"
 								},
@@ -7173,10 +7293,10 @@
 							"examine/expenseReport",
 							"examine/healthCareCost",
 							"confirm/healthCareCost",
-							"approved/advance",
-							"refunded/travel",
-							"refunded/expenseReport",
-							"refunded/healthCareCost",
+							"book/advance",
+							"book/travel",
+							"book/expenseReport",
+							"book/healthCareCost",
 							"admin"
 						],
 						"type": "object"
@@ -7272,25 +7392,25 @@
 								},
 								"type": "array"
 							},
-							"refunded/healthCareCost": {
+							"book/healthCareCost": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"refunded/expenseReport": {
+							"book/expenseReport": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"refunded/travel": {
+							"book/travel": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"approved/advance": {
+							"book/advance": {
 								"items": {
 									"type": "string"
 								},
@@ -7373,7 +7493,7 @@
 					},
 					"stateColors": {
 						"properties": {
-							"completed": {
+							"0": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7388,7 +7508,7 @@
 								},
 								"type": "object"
 							},
-							"underExaminationByInsurance": {
+							"10": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7403,7 +7523,7 @@
 								},
 								"type": "object"
 							},
-							"inWork": {
+							"20": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7418,7 +7538,7 @@
 								},
 								"type": "object"
 							},
-							"refunded": {
+							"30": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7433,7 +7553,7 @@
 								},
 								"type": "object"
 							},
-							"underExamination": {
+							"31": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7448,7 +7568,7 @@
 								},
 								"type": "object"
 							},
-							"approved": {
+							"40": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -7463,22 +7583,7 @@
 								},
 								"type": "object"
 							},
-							"appliedFor": {
-								"properties": {
-									"color": {
-										"type": "string"
-									},
-									"text": {
-										"type": "string",
-										"enum": [
-											"black",
-											"white"
-										]
-									}
-								},
-								"type": "object"
-							},
-							"rejected": {
+							"-10": {
 								"properties": {
 									"color": {
 										"type": "string"
@@ -8635,6 +8740,18 @@
 					"reason": {
 						"type": "string"
 					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"offsetAgainst": {
 						"items": {
 							"properties": {
@@ -8745,6 +8862,7 @@
 								"balance",
 								"reason",
 								"state",
+								"settledOn",
 								"_id",
 								"offsetAgainst"
 							],
@@ -9324,49 +9442,49 @@
 					{
 						"cookieAuth": [
 							"user",
-							"approved/advance"
+							"book/advance"
 						]
 					},
 					{
 						"httpBearer": [
 							"user",
-							"approved/advance"
+							"book/advance"
 						]
 					},
 					{
 						"cookieAuth": [
 							"user",
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					},
 					{
 						"httpBearer": [
 							"user",
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					},
 					{
 						"cookieAuth": [
 							"user",
-							"refunded/travel"
+							"book/travel"
 						]
 					},
 					{
 						"httpBearer": [
 							"user",
-							"refunded/travel"
+							"book/travel"
 						]
 					},
 					{
 						"cookieAuth": [
 							"user",
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					},
 					{
 						"httpBearer": [
 							"user",
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					},
 					{
@@ -10318,7 +10436,7 @@
 				]
 			},
 			"post": {
-				"operationId": "PostOwn",
+				"operationId": "PostLumpSums",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -10364,7 +10482,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_TravelPost_"
+								"$ref": "#/components/schemas/SetterBody__days-TravelPost-at-days--lastPlaceOfWork-TravelPost-at-lastPlaceOfWork--_id-TravelPost_91__id_93___"
 							}
 						}
 					}
@@ -11081,20 +11199,35 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"anyOf": [
+								"allOf": [
 									{
-										"allOf": [
+										"anyOf": [
 											{
-												"$ref": "#/components/schemas/TravelApplication"
+												"allOf": [
+													{
+														"$ref": "#/components/schemas/TravelApplication"
+													},
+													{
+														"properties": {
+															"owner": {
+																"$ref": "#/components/schemas/IdDocument"
+															}
+														},
+														"required": [
+															"owner"
+														],
+														"type": "object"
+													}
+												]
 											},
 											{
 												"properties": {
-													"owner": {
-														"$ref": "#/components/schemas/IdDocument"
+													"_id": {
+														"$ref": "#/components/schemas/_id"
 													}
 												},
 												"required": [
-													"owner"
+													"_id"
 												],
 												"type": "object"
 											}
@@ -11104,14 +11237,8 @@
 										"properties": {
 											"comment": {
 												"type": "string"
-											},
-											"_id": {
-												"$ref": "#/components/schemas/_id"
 											}
 										},
-										"required": [
-											"_id"
-										],
 										"type": "object"
 									}
 								]
@@ -11677,9 +11804,9 @@
 				]
 			}
 		},
-		"/examine/travel/refunded": {
+		"/examine/travel/reviewCompleted": {
 			"post": {
-				"operationId": "PostRefunded",
+				"operationId": "PostReviewCompleted",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -11935,9 +12062,9 @@
 				]
 			}
 		},
-		"/refunded/travel": {
+		"/book/travel": {
 			"get": {
-				"operationId": "GetRefunded",
+				"operationId": "GetBookable",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -11956,12 +12083,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/travel"
+							"book/travel"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/travel"
+							"book/travel"
 						]
 					}
 				],
@@ -12071,9 +12198,9 @@
 				]
 			}
 		},
-		"/refunded/travel/report": {
+		"/book/travel/report": {
 			"get": {
-				"operationId": "GetRefundedReport",
+				"operationId": "GetBookableReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -12093,12 +12220,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/travel"
+							"book/travel"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/travel"
+							"book/travel"
 						]
 					}
 				],
@@ -12112,6 +12239,81 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/travel/booked": {
+			"post": {
+				"operationId": "PostBooked",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										},
+										"result": {
+											"items": {
+												"properties": {
+													"reason": {},
+													"status": {
+														"type": "string",
+														"enum": [
+															"rejected",
+															"fulfilled"
+														]
+													}
+												},
+												"required": [
+													"reason",
+													"status"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"message",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/settings": {
@@ -14900,9 +15102,9 @@
 				]
 			}
 		},
-		"/confirm/healthCareCost/refunded": {
+		"/confirm/healthCareCost/reviewCompleted": {
 			"post": {
-				"operationId": "PostRefunded",
+				"operationId": "PostReviewCompleted",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -15013,9 +15215,9 @@
 				]
 			}
 		},
-		"/refunded/healthCareCost": {
+		"/book/healthCareCost": {
 			"get": {
-				"operationId": "GetRefunded",
+				"operationId": "GetBookable",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -15034,12 +15236,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					}
 				],
@@ -15139,9 +15341,9 @@
 				]
 			}
 		},
-		"/refunded/healthCareCost/report": {
+		"/book/healthCareCost/report": {
 			"get": {
-				"operationId": "GetRefundedReport",
+				"operationId": "GetBookableReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -15161,12 +15363,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/healthCareCost"
+							"book/healthCareCost"
 						]
 					}
 				],
@@ -15180,6 +15382,81 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/healthCareCost/booked": {
+			"post": {
+				"operationId": "PostBooked",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										},
+										"result": {
+											"items": {
+												"properties": {
+													"reason": {},
+													"status": {
+														"type": "string",
+														"enum": [
+															"rejected",
+															"fulfilled"
+														]
+													}
+												},
+												"required": [
+													"reason",
+													"status"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"message",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/expenseReport": {
@@ -16145,9 +16422,9 @@
 				}
 			}
 		},
-		"/examine/expenseReport/refunded": {
+		"/examine/expenseReport/reviewCompleted": {
 			"post": {
-				"operationId": "PostRefunded",
+				"operationId": "PostReviewCompleted",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -16337,9 +16614,9 @@
 				]
 			}
 		},
-		"/refunded/expenseReport": {
+		"/book/expenseReport": {
 			"get": {
-				"operationId": "GetRefunded",
+				"operationId": "GetBookable",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -16358,12 +16635,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					}
 				],
@@ -16461,9 +16738,9 @@
 				]
 			}
 		},
-		"/refunded/expenseReport/report": {
+		"/book/expenseReport/report": {
 			"get": {
-				"operationId": "GetRefundedReport",
+				"operationId": "GetBookableReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -16483,12 +16760,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					},
 					{
 						"httpBearer": [
-							"refunded/expenseReport"
+							"book/expenseReport"
 						]
 					}
 				],
@@ -16502,6 +16779,81 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/expenseReport/booked": {
+			"post": {
+				"operationId": "PostBooked",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										},
+										"result": {
+											"items": {
+												"properties": {
+													"reason": {},
+													"status": {
+														"type": "string",
+														"enum": [
+															"rejected",
+															"fulfilled"
+														]
+													}
+												},
+												"required": [
+													"reason",
+													"status"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"message",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/documentFile": {
@@ -18262,6 +18614,7 @@
 									"balance",
 									"reason",
 									"state",
+									"settledOn",
 									"_id",
 									"offsetAgainst"
 								],
@@ -18579,6 +18932,7 @@
 									"balance",
 									"reason",
 									"state",
+									"settledOn",
 									"_id",
 									"offsetAgainst"
 								],
@@ -18707,6 +19061,7 @@
 									"balance",
 									"reason",
 									"state",
+									"settledOn",
 									"_id",
 									"offsetAgainst"
 								],
@@ -19019,9 +19374,9 @@
 				]
 			}
 		},
-		"/approved/advance": {
+		"/book/advance": {
 			"get": {
-				"operationId": "GetRefunded",
+				"operationId": "GetBookable",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -19040,12 +19395,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"approved/advance"
+							"book/advance"
 						]
 					},
 					{
 						"httpBearer": [
-							"approved/advance"
+							"book/advance"
 						]
 					}
 				],
@@ -19121,6 +19476,7 @@
 									"balance",
 									"reason",
 									"state",
+									"settledOn",
 									"_id",
 									"offsetAgainst"
 								],
@@ -19147,9 +19503,9 @@
 				]
 			}
 		},
-		"/approved/advance/report": {
+		"/book/advance/report": {
 			"get": {
-				"operationId": "GetRefundedReport",
+				"operationId": "GetBookableReport",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -19169,12 +19525,12 @@
 				"security": [
 					{
 						"cookieAuth": [
-							"approved/advance"
+							"book/advance"
 						]
 					},
 					{
 						"httpBearer": [
-							"approved/advance"
+							"book/advance"
 						]
 					}
 				],
@@ -19188,6 +19544,81 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/advance/booked": {
+			"post": {
+				"operationId": "PostBooked",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										},
+										"result": {
+											"items": {
+												"properties": {
+													"reason": {},
+													"status": {
+														"type": "string",
+														"enum": [
+															"rejected",
+															"fulfilled"
+														]
+													}
+												},
+												"required": [
+													"reason",
+													"status"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"message",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		}
 	},
