@@ -111,9 +111,9 @@ export function expandCollapseComments() {
   }
 }
 
-export async function showFile(file: { endpoint: string; _id: string; filename: string; isDownloading?: Ref<string> } | File) {
-  let fileObj: File
-  if (file instanceof File) {
+export async function showFile(file: { endpoint: string; _id: string; filename: string; isDownloading?: Ref<string> } | Blob | File) {
+  let fileObj: File | Blob
+  if (file instanceof Blob) {
     fileObj = file
   } else {
     if (file.isDownloading) {

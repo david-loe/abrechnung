@@ -54,6 +54,8 @@
 </template>
 
 <script lang="ts">
+import QRCode from 'qrcode'
+import { defineComponent, PropType } from 'vue'
 import { formatBytes, resizeImage } from '@/../../common/scripts.js'
 import { DocumentFile, Token } from '@/../../common/types.js'
 import API from '@/api.js'
@@ -61,8 +63,6 @@ import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
-import QRCode from 'qrcode'
-import { PropType, defineComponent } from 'vue'
 
 const APP_DATA = APP_LOADER.data
 
