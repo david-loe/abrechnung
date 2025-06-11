@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { BookingState, LedgerAccount as ILedgerAccount, _id, locales, travelExpenseItems } from '../../common/types.js'
+import { _id, LedgerAccount as ILedgerAccount, locales, travelExpenseItems } from '../../common/types.js'
 import Booking from '../models/booking.js'
 import Category from '../models/category.js'
 import LedgerAccount, { ledgerAccountSchema } from '../models/ledgerAccount.js'
@@ -40,7 +40,7 @@ export class LedgerAccountAdminController extends Controller {
             ...travelExpenseItems.map((item) => `accountingSettings.accountMapping.${item}`)
           ]
         },
-        { model: Booking, paths: ['ledgerAccount'], conditions: { state: 'open' } as { state: BookingState } }
+        { model: Booking, paths: ['ledgerAccount'] }
       ],
       minDocumentCount: 1
     })
