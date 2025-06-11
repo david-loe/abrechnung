@@ -3,15 +3,15 @@
  * checking permission and asking for it if needed
  */
 
-import API from '@/api'
 import { Ref } from 'vue'
+import API from '@/api'
 
 export async function subscribeToPush() {
   if (!('PushManager' in window) || !import.meta.env.VITE_PUBLIC_VAPID_KEY) {
     return
   }
   if (Notification.permission === 'default') {
-    const permission = await Notification.requestPermission()
+    await Notification.requestPermission()
   }
   if (!(Notification.permission === 'granted')) {
     return
@@ -41,7 +41,7 @@ export async function subscribeToPush() {
  */
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
   const rawData = window.atob(base64)
   const outputArray = new Uint8Array(rawData.length)
   for (let i = 0; i < rawData.length; ++i) {
@@ -85,18 +85,21 @@ export async function clearingDB() {
 
 export const bp = { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 } as const
 
-export function hideExpandColumn(colDeleted: boolean) {
+export function hideExpandColumn(colDeleted: boolean, colIndex = 0) {
   queueMicrotask(() => {
-    for (const tr of document.querySelectorAll('tr')) {
-      const firstCell = tr.querySelector<HTMLElement>('th, td')
-      if (firstCell) {
-        firstCell.style.display = 'none'
+    for (const tr of document.querySelectorAll<HTMLTableRowElement>('tr')) {
+      const cells = tr.querySelectorAll<HTMLElement>('th, td')
+      const cell = cells[colIndex]
+      if (cell) {
+        cell.style.display = 'none'
       }
     }
+
     if (!colDeleted) {
-      const firstCol = document.querySelector<HTMLElement>('col')
-      if (firstCol) {
-        firstCol.remove()
+      const cols = document.querySelectorAll<HTMLElement>('col')
+      const col = cols[colIndex]
+      if (col) {
+        col.remove()
       }
     }
   })

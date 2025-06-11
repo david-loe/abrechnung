@@ -2,6 +2,8 @@
   <Vue3EasyDataTable
     :rows-items="rowsItems"
     v-model:server-options="serverOptions"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected', v)"
     :server-items-length="serverItemsLength"
     :loading="loading"
     :items="items"
@@ -49,10 +51,11 @@ const props = defineProps({
   rowsItems: { type: Array as PropType<number[]>, default: () => [5, 15, 25] },
   rowsPerPage: { type: Number, default: 5 },
   sortBy: { type: String },
-  sortType: { type: String as PropType<SortType>, default: 'asc' }
+  sortType: { type: String as PropType<SortType>, default: 'asc' },
+  itemsSelected: { type: Array as PropType<Item[]> }
 })
 
-const emits = defineEmits<{ loaded: [] }>()
+const emits = defineEmits<{ loaded: []; 'update:itemsSelected': [Item[]] }>()
 
 for (const columnToHide of props.columnsToHide) {
   for (let i = 0; i < props.headers.length; i++) {

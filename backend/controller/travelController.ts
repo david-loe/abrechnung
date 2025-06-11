@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Condition } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, IdDocument, Travel as ITravel, Locale, Stage, State, TravelExpense, TravelState } from '../../common/types.js'
+import { _id, IdDocument, Travel as ITravel, idDocumentToId, Locale, Stage, State, TravelExpense, TravelState } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -614,5 +614,35 @@ export class TravelBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('booked')
+  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+    const results = await Promise.allSettled(
+      requestBody.map((id) => {
+        const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }
+        return this.setter(Travel, {
+          requestBody: doc,
+          allowNew: false,
+          async checkOldObject(oldObject: TravelDoc) {
+            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+              await oldObject.saveToHistory()
+              return true
+            }
+            return false
+          }
+        })
+      })
+    )
+    const reducedResults = results.map((r) => ({ status: r.status, reason: (r as PromiseRejectedResult).reason }))
+    const count = reducedResults.length
+    const fulfilledCount = reducedResults.filter((entry) => entry.status === 'fulfilled').length
+    if (fulfilledCount === 0 && count > 0) {
+      throw new Error(reducedResults[0].reason)
+    }
+    return {
+      result: reducedResults,
+      message: `${fulfilledCount}/${count}`
+    }
   }
 }

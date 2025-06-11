@@ -8,6 +8,7 @@ import {
   IdDocument,
   HealthCareCost as IHealthCareCost,
   Organisation as IOrganisation,
+  idDocumentToId,
   Locale,
   State
 } from '../../common/types.js'
@@ -534,5 +535,38 @@ export class HealthCareCostBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('booked')
+  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+    const results = await Promise.allSettled(
+      requestBody.map((id) => {
+        const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }
+        return this.setter(HealthCareCost, {
+          requestBody: doc,
+          allowNew: false,
+          async checkOldObject(oldObject: HealthCareCostDoc) {
+            if (
+              oldObject.state === HealthCareCostState.REVIEW_COMPLETED &&
+              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+            ) {
+              await oldObject.saveToHistory()
+              return true
+            }
+            return false
+          }
+        })
+      })
+    )
+    const reducedResults = results.map((r) => ({ status: r.status, reason: (r as PromiseRejectedResult).reason }))
+    const count = reducedResults.length
+    const fulfilledCount = reducedResults.filter((entry) => entry.status === 'fulfilled').length
+    if (fulfilledCount === 0 && count > 0) {
+      throw new Error(reducedResults[0].reason)
+    }
+    return {
+      result: reducedResults,
+      message: `${fulfilledCount}/${count}`
+    }
   }
 }

@@ -422,29 +422,31 @@ export class ExpenseReportBookableController extends Controller {
 
   @Post('booked')
   public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+    const results = await Promise.allSettled(
+      requestBody.map((id) => {
+        const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }
+        return this.setter(ExpenseReport, {
+          requestBody: doc,
+          allowNew: false,
+          async checkOldObject(oldObject: ExpenseReportDoc) {
+            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+              await oldObject.saveToHistory()
+              return true
+            }
+            return false
+          }
+        })
+      })
+    )
+    const reducedResults = results.map((r) => ({ status: r.status, reason: (r as PromiseRejectedResult).reason }))
+    const count = reducedResults.length
+    const fulfilledCount = reducedResults.filter((entry) => entry.status === 'fulfilled').length
+    if (fulfilledCount === 0 && count > 0) {
+      throw new Error(reducedResults[0].reason)
+    }
     return {
-      result: (
-        await Promise.allSettled(
-          requestBody.map((id) => {
-            const doc = { _id: idDocumentToId(id), state: ExpenseReportState.BOOKED, editor: request.user._id }
-            return this.setter(ExpenseReport, {
-              requestBody: doc,
-              allowNew: false,
-              async checkOldObject(oldObject: ExpenseReportDoc) {
-                if (
-                  oldObject.state === ExpenseReportState.REVIEW_COMPLETED &&
-                  checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
-                ) {
-                  await oldObject.saveToHistory()
-                  return true
-                }
-                return false
-              }
-            })
-          })
-        )
-      ).map((r) => ({ status: r.status, reason: (r as PromiseRejectedResult).reason })),
-      message: 'alerts.successSaving'
+      result: reducedResults,
+      message: `${fulfilledCount}/${count}`
     }
   }
 }

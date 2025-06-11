@@ -18,8 +18,8 @@
       <hr class="hr" />
       <HealthCareCostList
         endpoint="confirm/healthCareCost"
-        :stateFilter="show"
-        :columns-to-hide="['state', 'report', 'organisation', 'log.20.date']">
+        :stateFilter="{ $gte: show }"
+        :columns-to-hide="[ 'report', 'organisation', 'log.20.date']">
       </HealthCareCostList>
     </template>
   </div>

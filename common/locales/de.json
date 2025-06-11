@@ -57,8 +57,8 @@
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
-    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "deleteBookedAfterXDays": "Um keine automatische Löschung durchzuführen 0 eingeben",
+    "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}",
     "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben"
   },
@@ -242,9 +242,9 @@
     "defaultAccess": "Standard Zugriffsrechte",
     "delete": "Löschen",
     "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
+    "deleteBookedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
     "deleted": "gelöscht",
     "deleteInWorkReportsAfterXDaysUnused": "Löschen von ungenutzten Auslagen- und Krankenkostenanträgen - in Tagen",
-    "deleteBookedAfterXDays": "Löschen von erstatteten Anträge und Reisen - in Tagen",
     "deleteX": "{X} löschen",
     "delOverwritten": "Soll der zu überschreibende Benutzer gelöscht werden?",
     "departure": "Abfahrt /-flug",
@@ -403,6 +403,7 @@
     "secondNightOnShipOrFerryLumpSumCountry": "Land für die Verpflegungspauschalen ab 2. Nacht auf dem Schiff",
     "sendMail": "E-Mail senden",
     "sendPDFReportsToOrganisationEmail": "PDF Berichte an Organisations-E-Mail senden",
+    "setSelectedToBooked": "Auswahl auf @:{'states.BOOKED'} setzen",
     "settings": "Einstellungen",
     "shipOrFerry": "Schiff oder Fähre 🚢",
     "show": "Anzeigen",
@@ -503,6 +504,10 @@
         "paragraph": "Deine Auslagenabrechnung wurde dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Auslagen überarbeiten"
       },
+      "BOOKED_getsDeletedSoon": {
+        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat die Auslagenabrechnung fertiggestellt.",
@@ -517,10 +522,6 @@
         "paragraph": "Deine angelegte Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "BOOKED_getsDeletedSoon": {
-        "paragraph": "Deine erstattete Auslagenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
-        "subject": "Automatische Löschung steht bevor"
-      },
       "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Die Prüfung deiner Auslagenabrechnung ist abgeschlossen.",
@@ -532,6 +533,10 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Krankenkosten überarbeiten"
+      },
+      "BOOKED_getsDeletedSoon": {
+        "paragraph": "Dein erstatteter Krankenkostenantrag '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
+        "subject": "Automatische Löschung steht bevor"
       },
       "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -552,10 +557,6 @@
         "paragraph": "Deine angelegte Krankenkostenabrechnung '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet.",
         "subject": "Automatische Löschung steht bevor"
       },
-      "BOOKED_getsDeletedSoon": {
-        "paragraph": "Dein erstatteter Krankenkostenantrag '{reportName}' wird in {days} Tagen automatisch gelöscht. Du kannst dir den Bericht noch bis dahin herunterladen.",
-        "subject": "Automatische Löschung steht bevor"
-      },
       "REVIEW_COMPLETED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Deine Krankenkosten wurden in Höhe von {refundSum} von der Versicherung erstattet.",
@@ -565,7 +566,7 @@
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
     "IN_REVIEW_BY_INSURANCE": {
-      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitten um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitte um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     },
     "magiclogin": {
@@ -604,14 +605,14 @@
         "paragraph": "Deine Reisekosten wurden dir zum Überarbeiten zurückgeschickt.",
         "subject": "🔙 Reisekosten überarbeiten"
       },
+      "BOOKED_getsDeletedSoon": {
+        "paragraph": "Deine erstattete Reise '{reportName}' wird in {days} Tagen automatisch gelöscht.",
+        "subject": "Automatische Löschung steht bevor"
+      },
       "IN_REVIEW": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "{owner} hat die Reiseabrechnung fertiggestellt.",
         "subject": "🛂 Reise zu prüfen"
-      },
-      "BOOKED_getsDeletedSoon": {
-        "paragraph": "Deine erstattete Reise '{reportName}' wird in {days} Tagen automatisch gelöscht.",
-        "subject": "Automatische Löschung steht bevor"
       },
       "REJECTED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
@@ -646,7 +647,7 @@
     "BOOKED": "Gebucht",
     "IN_REVIEW": "Wird Geprüft",
     "IN_REVIEW_BY_INSURANCE": "Prüfung durch Krankenkasse",
-    "IN_WORK": "in Arbeit",
+    "IN_WORK": "In Arbeit",
     "REJECTED": "Abgelehnt",
     "REVIEW_COMPLETED": "Prüfung abgeschlossen"
   },

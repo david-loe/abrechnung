@@ -49,8 +49,8 @@
         <hr class="hr" />
         <ExpenseReportList
           endpoint="examine/expenseReport"
-          :stateFilter="show"
-          :columns-to-hide="['state', 'report', 'addUp.totalTotal', 'organisation']">
+          :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
+          :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']">
         </ExpenseReportList>
       </template>
     </div>

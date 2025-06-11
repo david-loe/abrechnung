@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as AdvanceSimple[]))"
     @loaded="emits('loaded')"
     :sort-by="sortBy"
     :sort-type="sortType">
@@ -33,7 +35,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of advanceStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of advanceStates" :value="state">{{ t('states.' + AdvanceState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -182,9 +184,10 @@ const props = defineProps<{
   rowsPerPage?: number
   sortBy?: string
   sortType?: SortType
+  itemsSelected?: AdvanceSimple[]
 }>()
 
-const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple] }>()
+const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple]; 'update:itemsSelected': [AdvanceSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading

@@ -2,20 +2,30 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2 class="mb-3">{{ $t('accesses.book/healthCareCost') }}</h2>
+        <h2>{{ $t('accesses.book/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
         <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
       </div>
     </div>
+    <div class="mb-3 d-flex align-items-center">
+      <button type="button" class="btn btn-success" :disabled="selected.length === 0 || loading" @click="book(selected)">
+        {{ t('labels.setSelectedToBooked') }}
+      </button>
+      <span v-if="loading" class="spinner-border spinner-border-sm ms-1"></span>
+    </div>
+
     <HealthCareCostList
       ref="table"
       class="mb-5"
+      table-class-name="small-table"
       endpoint="book/healthCareCost"
       :columns-to-hide="['state', 'updatedAt']"
       make-name-no-link
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
+      :stateFilter="HealthCareCostState.REVIEW_COMPLETED"
+      v-model:items-selected="selected"
       @loaded="hideExpandColumn">
       <template #expand="report">
         <div class="px-3 pb-1 border-bottom border-4">
@@ -33,22 +43,64 @@
         </div>
       </template>
     </HealthCareCostList>
+    <button v-if="!show" type="button" class="btn btn-light" @click="show = HealthCareCostState.BOOKED">
+      {{ t('labels.show') }} <StateBadge :state="HealthCareCostState.BOOKED" :StateEnum="HealthCareCostState"></StateBadge>
+      <i class="bi bi-chevron-down"></i>
+    </button>
+    <template v-else>
+      <button type="button" class="btn btn-light" @click="show = null">
+        {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="HealthCareCostState"></StateBadge> <i class="bi bi-chevron-up"></i>
+      </button>
+      <hr class="hr" />
+      <HealthCareCostList
+        class="mb-5"
+        table-class-name="small-table"
+        endpoint="book/healthCareCost"
+        :columns-to-hide="['state', 'log.20.date']"
+        make-name-no-link
+        :stateFilter="show"
+        :rows-per-page="10"
+        :rows-items="[10, 20, 50]">
+      </HealthCareCostList>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
-import APP_LOADER from '@/appData.js'
+import API from '@/api'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
+import StateBadge from '@/components/elements/StateBadge.vue'
 import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
+import { HealthCareCostSimple, HealthCareCostState, State } from '../../../../common/types'
+
+const { t } = useI18n()
 
 const tableRef = useTemplateRef('table')
+
+const selected = ref([])
+const show = ref<null | HealthCareCostState.BOOKED>(null)
+const loading = ref(false)
+
+async function book(expenseReports: HealthCareCostSimple[]) {
+  loading.value = true
+  const result = await API.setter(
+    'book/healthCareCost/booked',
+    expenseReports.map((e) => e._id)
+  )
+  loading.value = false
+  if (result.ok) {
+    tableRef.value?.loadFromServer()
+  }
+}
+
 let colDeleted = false
 
 function hideExpandColumn() {
-  hideExpCol(colDeleted)
+  hideExpCol(colDeleted, 1)
   colDeleted = true
 }
 
@@ -79,13 +131,14 @@ const { handlePrint } = useVueToPrint({
       display: block;
     }`
 })
-
-onMounted(async () => {
-  await APP_LOADER.loadData()
-})
 </script>
 
 <style>
+.small-table {
+  --easy-table-header-font-size: 0.9em;
+  --easy-table-body-row-font-size: 0.9em;
+}
+
 .vue3-easy-data-table__body td.expand {
   padding: 0 !important;
 }

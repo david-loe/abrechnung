@@ -23,7 +23,10 @@
         {{ $t('labels.hide') }} <StateBadge :state="show" :StateEnum="TravelState"></StateBadge> <i class="bi bi-chevron-up"></i>
       </button>
       <hr class="hr" />
-      <TravelList endpoint="examine/travel" :stateFilter="show" :columns-to-hide="['state', 'report', 'addUp.totalTotal', 'organisation']">
+      <TravelList
+        endpoint="examine/travel"
+        :stateFilter="show === TravelState.APPROVED ? show : { $gte: show }"
+        :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']">
       </TravelList>
     </template>
   </div>

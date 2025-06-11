@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as TravelSimple[]))"
     @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
@@ -31,7 +33,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of travelStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of travelStates" :value="state">{{ t('states.' + TravelState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -212,14 +214,15 @@ const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: TravelState
+  stateFilter?: TravelState | { $gte: TravelState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
+  itemsSelected?: TravelSimple[]
 }>()
 
-const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: [] }>()
+const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: []; 'update:itemsSelected': [TravelSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading

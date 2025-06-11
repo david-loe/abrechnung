@@ -8,6 +8,8 @@
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
+    :items-selected="itemsSelected"
+    @update:items-selected="(v) => emits('update:itemsSelected',(v as ExpenseReportSimple[]))"
     @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
@@ -31,7 +33,7 @@
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of expenseReportStates" :value="state">{{ t('states.' + state) }}</option>
+            <option v-for="state of expenseReportStates" :value="state">{{ t('states.' + ExpenseReportState[state]) }}</option>
           </select>
         </div>
       </div>
@@ -174,7 +176,7 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
-import { ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
+import { ExpenseReportSimple, ExpenseReportState, expenseReportStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
@@ -192,14 +194,15 @@ const { t } = useI18n()
 
 const props = defineProps<{
   endpoint: string
-  stateFilter?: ExpenseReportState
+  stateFilter?: ExpenseReportState | { $gte: ExpenseReportState }
   columnsToHide?: string[]
   makeNameNoLink?: boolean
   rowsItems?: number[]
   rowsPerPage?: number
+  itemsSelected?: ExpenseReportSimple[]
 }>()
 
-const emits = defineEmits<{ loaded: [] }>()
+const emits = defineEmits<{ loaded: []; 'update:itemsSelected': [ExpenseReportSimple[]] }>()
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
