@@ -501,7 +501,8 @@ if (props.endpointPrefix === 'examine/') {
       owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
       bankDetails: orga.bankDetails,
       organisationName: orga.name,
-      amount: formatter.baseCurrency(getTotalTotal(healthCareCost.value.addUp))
+      amount: formatter.baseCurrency(getTotalTotal(healthCareCost.value.addUp)),
+      projectIdentifier: healthCareCost.value.project.identifier
     })
     mailToInsuranceLink = mailToLink([healthCareCost.value.insurance.email], subject, body)
   }
