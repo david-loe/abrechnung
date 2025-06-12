@@ -297,25 +297,29 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Name": {
+				"properties": {
+					"givenName": {
+						"type": "string"
+					},
+					"familyName": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"givenName",
+					"familyName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"User": {
 				"properties": {
 					"email": {
 						"type": "string"
 					},
 					"name": {
-						"properties": {
-							"familyName": {
-								"type": "string"
-							},
-							"givenName": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"familyName",
-							"givenName"
-						],
-						"type": "object"
+						"$ref": "#/components/schemas/Name"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -838,19 +842,7 @@
 						"type": "string"
 					},
 					"name": {
-						"properties": {
-							"familyName": {
-								"type": "string"
-							},
-							"givenName": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"familyName",
-							"givenName"
-						],
-						"type": "object"
+						"$ref": "#/components/schemas/Name"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -2721,19 +2713,7 @@
 						"type": "string"
 					},
 					"name": {
-						"properties": {
-							"familyName": {
-								"type": "string"
-							},
-							"givenName": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"familyName",
-							"givenName"
-						],
-						"type": "object"
+						"$ref": "#/components/schemas/Name"
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -6852,6 +6832,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"NameDisplayFormat": {
+				"type": "string",
+				"enum": [
+					"givenNameFirst",
+					"familyNameFirst"
+				]
+			},
 			"DisplaySettings": {
 				"properties": {
 					"auth": {
@@ -6930,6 +6917,9 @@
 							"default"
 						],
 						"type": "object"
+					},
+					"nameDisplayFormat": {
+						"$ref": "#/components/schemas/NameDisplayFormat"
 					},
 					"helpButton": {
 						"properties": {
@@ -7166,6 +7156,7 @@
 					"auth",
 					"oidc",
 					"locale",
+					"nameDisplayFormat",
 					"helpButton",
 					"stateColors",
 					"accessIcons",
@@ -7432,6 +7423,13 @@
 							}
 						},
 						"type": "object"
+					},
+					"nameDisplayFormat": {
+						"type": "string",
+						"enum": [
+							"givenNameFirst",
+							"familyNameFirst"
+						]
 					},
 					"locale": {
 						"properties": {
