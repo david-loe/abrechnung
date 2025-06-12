@@ -290,6 +290,7 @@
     "fallback": "Ersatz",
     "fallBackLumpSumCountry": "Ausweichland für die Pauschalen",
     "familyName": "Nachname",
+    "familyNameFirst": "Nachnamen zuerst",
     "fellowTravelersNames": "Namen aller Mitreisenden",
     "filter": "Filter",
     "fk": "Authentifizierung",
@@ -297,6 +298,7 @@
     "fontSizes": "Schriftgrößen",
     "from": "Von",
     "givenName": "Vorname",
+    "givenNameFirst": "Vornamen zuerst",
     "healthCareCost": "Krankenkosten",
     "healthCareCostName": "Name der Krankenkostenabrechnung",
     "healthCareCosts": "Krankenkosten",
@@ -345,6 +347,7 @@
     "model": "Modell",
     "models": "Modelle",
     "name": "Name",
+    "nameDisplayFormat": "Namensanzeigeformat",
     "needsA1Certificate": "Benötigt A1 Bescheinigung",
     "new": "Neu",
     "newX": "{X} - Neu",
@@ -556,10 +559,6 @@
     },
     "hi": "Hallo Zusammen,",
     "hiX": "Hallo {X},",
-    "toInsurance": {
-      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitte um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
-      "subject": "Erstattung Krankenkosten BN:{companyNumber}"
-    },
     "magiclogin": {
       "buttonText": "Weiter zu @:{'headlines.title'}@:{'headlines.emoji'}",
       "paragraph": "Klicke hier um zu deinen Abrechnungen zu gelangen.",
@@ -572,6 +571,10 @@
       "subject": "Willkommen bei @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "regards": "Beste Grüße",
+    "toInsurance": {
+      "body": "Guten Tag {insuranceName},\n\nIm Anhang befindet sich eine Übersicht der von {owner} vorgestreckten Leistungen in Höhe von {amount}.\nIch bitte um die Erstattung dieser:\n{bankDetails}\n\n{organisationName}",
+      "subject": "Erstattung Krankenkosten BN:{companyNumber}"
+    },
     "travel": {
       "a1": {
         "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",

@@ -169,6 +169,9 @@
     }
   },
   "labels": {
+    "nameDisplayFormat": "Name display format",
+    "givenNameFirst": "Given name first",
+    "familyNameFirst": "Family name first",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "Email address for A1 certificate notifications",
     "access": "Access",

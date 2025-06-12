@@ -16,10 +16,10 @@
           {{ `${name} [${project.identifier}]` }}
         </div>
         <div class="col-auto px-1">
-          <span>{{ $formatter.money(balance) }}</span>
+          <span>{{ formatter.money(balance) }}</span>
         </div>
         <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75">
-          <span>{{ $formatter.money(budget) }}</span>
+          <span>{{ formatter.money(budget) }}</span>
         </div>
       </div>
     </template>
@@ -29,7 +29,7 @@
           {{ `${name} [${project.identifier}]` }}
         </div>
         <div class="col-auto opacity-75">
-          <span>{{ $formatter.money(balance) }}</span>
+          <span>{{ formatter.money(balance) }}</span>
         </div>
       </div>
     </template>
@@ -38,7 +38,7 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
-      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: `${owner?.name?.givenName} ${owner?.name?.familyName}` }) }}</span>
+      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name(owner?.name) }) }}</span>
     </template>
   </v-select>
 </template>
@@ -49,6 +49,7 @@ import { useI18n } from 'vue-i18n'
 import { Base64 } from '@/../../common/scripts'
 import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import API from '@/api'
+import { formatter } from '@/formatter.js'
 
 // Props
 const props = defineProps({

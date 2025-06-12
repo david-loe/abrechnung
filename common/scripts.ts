@@ -1,22 +1,21 @@
 import Formatter from './formatter.js'
 import {
+  _id,
   AddUp,
   BaseCurrencyMoney,
+  baseCurrency,
   ExpenseReport,
   FlatAddUp,
   HealthCareCost,
   HexColor,
+  idDocumentToId,
   Locale,
   Money,
   Place,
   ProjectSimple,
+  reportIsTravel,
   Travel,
-  TravelDay,
-  _id,
-  baseCurrency,
-  idDocumentToId,
-  reportIsHealthCareCost,
-  reportIsTravel
+  TravelDay
 } from './types.js'
 
 export function PlaceToString(place: Place, language?: Locale) {
@@ -392,7 +391,7 @@ export class Base64 {
     let enc4: number
     let i = 0
 
-    const validBase64Input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '')
+    const validBase64Input = input.replace(/[^A-Za-z0-9+/=]/g, '')
 
     while (i < validBase64Input.length) {
       enc1 = Base64.#keyStr.indexOf(validBase64Input.charAt(i++))

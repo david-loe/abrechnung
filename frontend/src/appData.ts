@@ -15,8 +15,7 @@ import {
   Settings,
   TravelSettings,
   User,
-  UserWithNameAndProject,
-  _id
+  UserWithNameAndProject
 } from '../../common/types'
 import API from './api.js'
 import { formatter } from './formatter'
@@ -158,6 +157,7 @@ export class APP_DATA {
   }
   setDisplaySettings(displaySettings: DisplaySettings) {
     this.displaySettings = displaySettings
+    formatter.setNameDisplayFormat(displaySettings.nameDisplayFormat)
     updateLocales(displaySettings)
   }
   setHealthInsurances(healthInsurances: HealthInsurance[]) {
@@ -254,8 +254,8 @@ class APP_LOADER {
               displaySettings
             ] = result[0].value
 
-            let projects = undefined
-            let users = undefined
+            let projects: ProjectSimpleWithName[] | undefined
+            let users: UserWithNameAndProject[] | undefined
             if (result[1].status === 'fulfilled') {
               projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
               users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined

@@ -105,13 +105,13 @@
       </a>
     </template>
     <template #item-editor="{ editor }">
-      <span :title="editor.name.givenName + ' ' + editor.name.familyName">
-        {{ editor.name.givenName + ' ' + editor.name.familyName.substring(0, 1) + '.' }}
+      <span :title="formatter.name(editor.name)">
+        {{ formatter.name(editor.name, 'short') }}
       </span>
     </template>
     <template #item-owner="{ owner }">
-      <span :title="owner.name.givenName + ' ' + owner.name.familyName">
-        {{ owner.name.familyName + ', ' + owner.name.givenName.substring(0, 1) + '.' }}
+      <span :title="formatter.name(owner.name)">
+        {{ formatter.name(owner.name, 'short') }}
       </span>
     </template>
     <template #item-state="{ state }">
@@ -121,10 +121,10 @@
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
     <template #item-budget="{ budget }">
-      {{ $formatter.money(budget) }}
+      {{ formatter.money(budget) }}
     </template>
     <template #item-balance="{ balance }">
-      {{ $formatter.money(balance) }}
+      {{ formatter.money(balance) }}
     </template>
     <template #item-report="{ _id, name }">
       <button
@@ -137,10 +137,10 @@
       </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">
-      {{ $formatter.dateTime(updatedAt) }}
+      {{ formatter.dateTime(updatedAt) }}
     </template>
     <template #item-log.0.date="{ log }">
-      {{ $formatter.dateTime(log[0].date) }}
+      {{ formatter.dateTime(log[0].date) }}
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
@@ -171,6 +171,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
+import { formatter } from '@/formatter.js'
 import { bp, showFile } from '@/helper.js'
 
 const { t } = useI18n()

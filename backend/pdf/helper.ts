@@ -18,6 +18,7 @@ import { getClient } from '../notifications/mail.js'
 export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost | Advance): Promise<string> {
   let path = '/reports/'
   let totalSum = ''
+  formatter.setLocale(i18n.language as Locale)
   if (reportIsAdvance(report)) {
     path += 'advance/'
     totalSum = formatter.baseCurrency(report.budget.amount)
@@ -31,11 +32,10 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
       path += 'expenseReport/'
     }
   }
-  formatter.setLocale(i18n.language as Locale)
   const org = await Organisation.findOne({ _id: report.project.organisation._id })
   const subfolder = org ? org.subfolderPath : ''
   const filename = sanitizeFilename(
-    `${report.project.identifier} ${report.owner.name.familyName} ${report.owner.name.givenName.substring(0, 1)} - ${report.name} ${totalSum}.pdf`
+    `${report.project.identifier} ${formatter.name(report.owner.name, 'shortWithoutPoint')} - ${report.name} ${totalSum}.pdf`
   )
   path += subfolder + filename
   return path
@@ -71,7 +71,7 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
       const text =
         `${i18n.t('labels.project', { lng })}: ${report.project.identifier}\n` +
         `${i18n.t('labels.name', { lng })}: ${report.name}\n` +
-        `${i18n.t('labels.owner', { lng })}: ${report.owner.name.givenName} ${report.owner.name.familyName}\n` +
+        `${i18n.t('labels.owner', { lng })}: ${formatter.name(report.owner.name)}\n` +
         `${i18n.t('labels.balance', { lng })}: ${totalSum}\n`
 
       return await mailClient.sendMail({

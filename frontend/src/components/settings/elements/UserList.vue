@@ -2,7 +2,7 @@
   <div>
     <template v-if="userToEdit">
       <ModalComponent
-        :header="`API Key (${userToEdit.name.givenName} ${userToEdit.name.familyName})`"
+        :header="`API Key (${formatter.name(userToEdit.name)})`"
         @afterClose=";($refs.apiKeyForm as any).resetForm()"
         ref="modal">
         <ApiKeyForm
@@ -57,7 +57,7 @@
       </template>
 
       <template #item-name="{ name }">
-        {{ name.givenName + ' ' + name.familyName }}
+        {{ formatter.name(name) }}
       </template>
       <template #item-projects.assigned="{ projects }">
         <span class="me-1" v-for="p in projects.assigned">{{ p.identifier }}</span>
@@ -102,15 +102,16 @@
 </template>
 
 <script lang="ts" setup>
-import { User, UserWithNameAndProject, accesses } from '@/../../common/types.js'
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
+import { accesses, User, UserWithNameAndProject } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
-import { Ref, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
+import { formatter } from '@/formatter.js'
 
 const { t } = useI18n()
 

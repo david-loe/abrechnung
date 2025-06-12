@@ -119,6 +119,7 @@ export interface DisplaySettings {
     fallback: Locale
     overwrite: { [key in Locale]: { [key: string]: string } }
   }
+  nameDisplayFormat: NameDisplayFormat
   helpButton: {
     enabled: boolean
     examinersMail: boolean
@@ -235,7 +236,12 @@ export interface Token {
 
 export interface Contact {
   email: string
-  name: { givenName: string; familyName: string }
+  name: Name
+}
+
+export interface Name {
+  givenName: string
+  familyName: string
 }
 
 export interface UserSimple extends Contact {
@@ -315,7 +321,7 @@ export interface User extends UserSimple {
 
 export interface UserWithName {
   _id: _id
-  name: User['name']
+  name: Name
 }
 
 export interface UserWithNameAndProject extends UserWithName {
@@ -583,6 +589,9 @@ export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
+
+export const nameDisplayFormats = ['givenNameFirst', 'familyNameFirst'] as const
+export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
 
 export function getReportTypeFromModelName(modelName: ReportModelName) {
   switch (modelName) {

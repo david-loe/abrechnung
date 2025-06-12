@@ -8,6 +8,7 @@ import {
   defaultLocale,
   Locale,
   locales,
+  nameDisplayFormats,
   ReportType,
   reportTypes,
   TravelState
@@ -64,6 +65,7 @@ export const displaySettingsSchema = () => {
         },
         required: true
       },
+      nameDisplayFormat: { type: String, enum: nameDisplayFormats, required: true },
       helpButton: {
         type: {
           enabled: { type: Boolean, required: true, default: true },

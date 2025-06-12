@@ -141,7 +141,7 @@
         </div>
         <div class="text-secondary">
           {{
-            (endpointPrefix === 'examine/' ? travel.owner.name.givenName + ' ' + travel.owner.name.familyName + ' - ' : '') +
+            (endpointPrefix === 'examine/' ? formatter.name(travel.owner.name) + ' - ' : '') +
             travel.project.identifier +
             (travel.project.name ? ' ' + travel.project.name : '')
           }}

@@ -114,9 +114,7 @@
         </div>
         <div class="text-secondary">
           {{
-            (endpointPrefix === 'examine/'
-              ? healthCareCost.owner.name.givenName + ' ' + healthCareCost.owner.name.familyName + ' - '
-              : '') +
+            (endpointPrefix === 'examine/' ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
             healthCareCost.project.identifier +
             (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '')
           }}
@@ -498,7 +496,7 @@ if (props.endpointPrefix === 'examine/') {
     const subject = t('mail.toInsurance.subject', { companyNumber: orga.companyNumber })
     const body = t('mail.toInsurance.body', {
       insuranceName: healthCareCost.value.insurance.name,
-      owner: `${healthCareCost.value.owner.name.givenName} ${healthCareCost.value.owner.name.familyName}`,
+      owner: formatter.name(healthCareCost.value.owner.name),
       bankDetails: orga.bankDetails,
       organisationName: orga.name,
       amount: formatter.baseCurrency(getTotalTotal(healthCareCost.value.addUp)),
