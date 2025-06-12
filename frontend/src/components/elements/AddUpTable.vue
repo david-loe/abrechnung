@@ -34,7 +34,7 @@
           <small>{{ t('labels.project') }}</small>
         </td>
         <td class="text-end">
-          <small>{{ formatter.money(project.balance) + ' von ' + formatter.money(project.budget) }}</small>
+          <small>{{ formatter.money(project.balance) + ' ' + t('labels.from') + ' ' + formatter.money(project.budget) }}</small>
         </td>
       </tr>
     </tbody>

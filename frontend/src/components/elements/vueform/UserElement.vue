@@ -50,7 +50,7 @@
 
         <template v-slot:singlelabel="{ value }">
           <span class="text-truncate ms-2 me-auto">
-            <span>{{ displayName(name) }}</span>
+            <span>{{ displayName(value.name) }}</span>
           </span>
         </template>
 

@@ -42,14 +42,9 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     reportType = 'expenseReport'
     stateLabel = textState || ExpenseReportState[report.state]
   }
-  const button = {
-    text: '',
-    link: ''
-  }
+  const button = { text: '', link: '' }
 
-  const supervisedProjectsFilter = {
-    $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }]
-  }
+  const supervisedProjectsFilter = { $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }] }
   const userFilter: RootFilterQuery<IUser> = {}
   if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
@@ -107,7 +102,7 @@ export async function sendA1Notification(report: TravelSimple) {
       `${t('labels.traveler')}: ${formatter.name(report.owner.name)}`,
       `${t('labels.reason')}: ${report.reason}`,
       `${t('labels.startDate')}: ${formatter.date(report.startDate, language)}`,
-      `${t('labels.endDate')}: ${formatter.date(report.endDate)} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
+      `${t('labels.endDate')}: ${formatter.date(report.endDate, language)} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
       `${t('labels.destinationPlace')}: ${PlaceToString(report.destinationPlace, language)}`,
       `${t('labels.approvedBy')}: ${formatter.name(report.editor.name)}`,
       `${t('labels.destinationName')}: ${report.a1Certificate?.destinationName}`,
