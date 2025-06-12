@@ -163,8 +163,10 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios'
+import { defineComponent } from 'vue'
 import { getFlagEmoji } from '@/../../common/scripts.js'
-import { CountrySimple, Currency, Locale, accesses, locales } from '@/../../common/types.js'
+import { accesses, CountrySimple, Currency, Locale, locales } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
@@ -173,8 +175,6 @@ import ModalComponent from '@/components/elements/ModalComponent.vue'
 import OfflineBanner from '@/components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from '@/helper.js'
 import { logger } from '@/logger.js'
-import axios from 'axios'
-import { defineComponent } from 'vue'
 
 export default defineComponent({
   data() {

@@ -26,7 +26,7 @@ import { getDiffInDays } from '@/../../common/scripts.js'
 import { TravelSimple, TravelState } from '@/../../common/types.js'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 
 const keys: (keyof TravelSimple)[] = [
   'owner',
@@ -57,10 +57,10 @@ export default defineComponent({
     displayKey(key: keyof TravelSimple): string {
       switch (key) {
         case 'startDate':
-          return this.$formatter.date(this.travel[key])
+          return formatter.date(this.travel[key])
         case 'endDate': {
           const dif = getDiffInDays(this.travel.startDate, this.travel.endDate) + 1
-          return `${this.$formatter.date(this.travel[key])} (${dif} ${this.$t(`labels.${dif === 1 ? 'day' : 'days'}`)})`
+          return `${formatter.date(this.travel[key])} (${dif} ${this.$t(`labels.${dif === 1 ? 'day' : 'days'}`)})`
         }
         case 'state':
           return this.$t(`states.${this.travel[key]}`)
@@ -87,8 +87,8 @@ export default defineComponent({
             return this.travel.advances
               .map(
                 (a) =>
-                  `${a.name} - ${this.$formatter.money(a.balance)} ${
-                    a.budget.amount !== a.balance.amount ? `(${this.$formatter.money(a.budget)})` : ''
+                  `${a.name} - ${formatter.money(a.balance)} ${
+                    a.budget.amount !== a.balance.amount ? `(${formatter.money(a.budget)})` : ''
                   }`
               )
               .join('\n')

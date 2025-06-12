@@ -20,21 +20,21 @@
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
               <br />
-              {{ `(${$formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
+              {{ `(${formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
             </small>
           </td>
         </template>
       </tr>
       <tr v-if="addUp.length > 1">
         <th>{{ t('labels.totalBalance') }}</th>
-        <td :colspan="addUp.length" class="text-end">{{ $formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
+        <td :colspan="addUp.length" class="text-end">{{ formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
       <tr v-if="project.budget && project.budget.amount">
         <td>
           <small>{{ t('labels.project') }}</small>
         </td>
         <td class="text-end">
-          <small>{{ $formatter.money(project.balance) + ' von ' + $formatter.money(project.budget) }}</small>
+          <small>{{ formatter.money(project.balance) + ' von ' + formatter.money(project.budget) }}</small>
         </td>
       </tr>
     </tbody>
@@ -42,12 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, PropType, ref, watch } from 'vue'
+import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
-import { AddUp, Money, Project } from '@/../../common/types.js'
+import { AddUp, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 
 const { t } = useI18n()
 

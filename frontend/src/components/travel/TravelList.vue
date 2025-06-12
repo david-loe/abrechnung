@@ -125,7 +125,7 @@
       </template>
     </template>
     <template #item-startDate="{ startDate }">
-      {{ $formatter.simpleDate(startDate) }}
+      {{ formatter.simpleDate(startDate) }}
     </template>
     <template #item-destinationPlace="{ destinationPlace }">
       <PlaceElement :place="destinationPlace"></PlaceElement>
@@ -152,11 +152,11 @@
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
     <template #item-addUp.totalTotal="{ addUp }">
-      {{ $formatter.baseCurrency(getTotalTotal(addUp)) }}
+      {{ formatter.baseCurrency(getTotalTotal(addUp)) }}
     </template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
-        {{ $formatter.baseCurrency(getTotalBalance(report.addUp)) }}
+        {{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}
         <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
           <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false"></AddUpTable>
         </template>
@@ -173,7 +173,7 @@
       </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">
-      {{ $formatter.dateTime(updatedAt) }}
+      {{ formatter.dateTime(updatedAt) }}
     </template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
@@ -208,7 +208,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 import { bp, showFile } from '@/helper.js'
 
 const { t } = useI18n()

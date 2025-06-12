@@ -249,8 +249,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { datetimeToDate, datetimeToDateString, getDayList } from '@/../../common/scripts.js'
-import { DocumentFile, Place, Stage, baseCurrency, distanceRefundTypes, transportTypes } from '@/../../common/types.js'
+import { baseCurrency, DocumentFile, distanceRefundTypes, Place, Stage, transportTypes } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
@@ -260,7 +261,6 @@ import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceInput from '@/components/elements/PlaceInput.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import TextArea from '@/components/elements/TextArea.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'StageForm',

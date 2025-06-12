@@ -83,7 +83,7 @@ import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
 import APP_LOADER from '@/appData.js'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 
 export default defineElement({
   ...SelectElement, // adding props, mixins, emits

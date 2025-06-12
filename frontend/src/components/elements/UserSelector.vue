@@ -26,7 +26,7 @@
 import { PropType } from 'vue'
 import { UserWithNameAndProject } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 
 defineProps({
   modelValue: { type: Object as PropType<UserWithNameAndProject> },

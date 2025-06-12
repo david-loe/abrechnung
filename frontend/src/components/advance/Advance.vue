@@ -14,11 +14,11 @@
         <th scope="row">{{ t('labels.budget') }}</th>
         <td>
           <span>
-            {{ $formatter.money(advance.budget) }}
+            {{ formatter.money(advance.budget) }}
           </span>
           <span v-if="advance.budget.exchangeRate" class="text-secondary">
             &nbsp;-&nbsp;
-            {{ $formatter.money(advance.budget, { useExchangeRate: false }) }}
+            {{ formatter.money(advance.budget, { useExchangeRate: false }) }}
           </span>
         </td>
       </tr>
@@ -27,7 +27,7 @@
         <td>
           <div class="mb-1" v-for="report in advance.offsetAgainst">
             <small>
-              <span class="me-2">{{ $formatter.money(report) }}</span>
+              <span class="me-2">{{ formatter.money(report) }}</span>
               <i
                 v-if="APP_DATA"
                 :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
@@ -40,7 +40,7 @@
         <th scope="row">{{ t('labels.balance') }}</th>
         <td>
           <span>
-            {{ $formatter.money(advance.balance) }}
+            {{ formatter.money(advance.balance) }}
           </span>
         </td>
       </tr>
@@ -85,7 +85,7 @@ import { useI18n } from 'vue-i18n'
 import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 
 const { t } = useI18n()

@@ -97,7 +97,7 @@
       <div class="col-auto">
         <span v-if="isCalculatingLumpSumsSum" class="spinner-border spinner-border-sm ms-1 me-3"></span>
         <span v-else class="text-secondary">
-          {{ $formatter.money(lumpSumsSum) }}
+          {{ formatter.money(lumpSumsSum) }}
         </span>
       </div>
     </div>
@@ -114,14 +114,14 @@
   </form>
 </template>
 <script lang="ts" setup>
+import { computed, PropType, Ref, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getLumpSumsSum, mergeDeep } from '@/../../common/scripts'
-import { Place, Travel, TravelDay, meals } from '@/../../common/types.js'
+import { meals, Place, Travel, TravelDay } from '@/../../common/types.js'
 import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import { formatter } from '@/formatter.js'
-import { PropType, Ref, computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const emojis = {
   breakfast: '🥐',

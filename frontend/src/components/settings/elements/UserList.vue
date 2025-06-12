@@ -111,7 +111,7 @@ import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
-import { formatter } from '@/formatter'
+import { formatter } from '@/formatter.js'
 
 const { t } = useI18n()
 
