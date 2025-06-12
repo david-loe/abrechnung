@@ -1,5 +1,5 @@
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Organisation as IOrganisation, _id, locales } from '../../common/types.js'
+import { _id, Organisation as IOrganisation, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import Organisation, { organisationSchema } from '../models/organisation.js'
 import Project from '../models/project.js'

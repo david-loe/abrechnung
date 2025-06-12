@@ -1,8 +1,8 @@
 import { SessionData } from 'express-session'
 import webpush, { WebPushError } from 'web-push'
+import { User } from './../../common/types.js'
 import { sessionStore } from '../db.js'
 import { logger } from '../logger.js'
-import { User } from './../../common/types.js'
 
 interface SessionWithSubscription extends SessionData {
   subscription: NonNullable<SessionData['subscription']>

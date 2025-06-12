@@ -4,6 +4,7 @@ import { NotAllowedError } from '../controller/error.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
 import { sendMail } from '../notifications/mail.js'
+
 const secret = process.env.MAGIC_LOGIN_SECRET
 const callbackUrl = `${process.env.VITE_BACKEND_URL}/auth/magiclogin/callback`
 const options = {

@@ -61,13 +61,13 @@
 </template>
 
 <script lang="ts" setup>
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { Currency } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
-import { Ref, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
@@ -99,11 +99,7 @@ const getEmptyFilter = () => {
 
 const filter = ref(getEmptyFilter())
 
-const showFilter = ref({
-  _id: false
-} as {
-  [key: string]: boolean
-})
+const showFilter = ref({ _id: false } as { [key: string]: boolean })
 showFilter.value[nameFilterKey] = false
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {

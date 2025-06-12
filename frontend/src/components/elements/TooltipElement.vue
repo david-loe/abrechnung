@@ -14,14 +14,9 @@ import { defineComponent, nextTick } from 'vue'
 
 export default defineComponent({
   name: 'TooltipElement',
-  props: {
-    text: { type: String, default: '' },
-    html: { type: Boolean, default: false }
-  },
+  props: { text: { type: String, default: '' }, html: { type: Boolean, default: false } },
   data() {
-    return {
-      tooltipInstance: null as Tooltip | null
-    }
+    return { tooltipInstance: null as Tooltip | null }
   },
   async mounted() {
     await nextTick()

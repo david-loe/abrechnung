@@ -193,9 +193,7 @@ export default defineComponent({
   methods: {
     async logout() {
       try {
-        const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
-          withCredentials: true
-        })
+        const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, { withCredentials: true })
         if (res.status === 204) {
           this.APP_DATA = null
           clearingDB()

@@ -4,6 +4,7 @@ import { fetchAndUpdateLumpSums } from './db.js'
 import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
 import { retentionPolicy } from './retentionpolicy.js'
+
 const port = Number.parseInt(process.env.BACKEND_PORT)
 const url = process.env.VITE_BACKEND_URL
 

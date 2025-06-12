@@ -12,19 +12,13 @@
 </template>
 
 <script>
-import FileUpload from '@/components/elements/FileUpload.vue'
 import { defineElement } from '@vueform/vueform'
+import FileUpload from '@/components/elements/FileUpload.vue'
 
 export default defineElement({
   name: 'DocumentfileElement',
   components: { FileUpload },
-  props: {
-    multiple: { type: Boolean, default: false },
-    accept: {
-      type: String,
-      default: null
-    }
-  },
+  props: { multiple: { type: Boolean, default: false }, accept: { type: String, default: null } },
   setup(props, { element }) {
     // ...
   }

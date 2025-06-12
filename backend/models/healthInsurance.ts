@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose'
-import { HealthInsurance, emailRegex } from '../../common/types.js'
+import { model, Schema } from 'mongoose'
+import { emailRegex, HealthInsurance } from '../../common/types.js'
 
 export const healthInsuranceSchema = () =>
   new Schema<HealthInsurance>({

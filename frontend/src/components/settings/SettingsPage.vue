@@ -114,6 +114,7 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { convertGermanDateToHTMLDate } from '@/../../common/scripts.js'
 import APP_LOADER from '@/appData.js'
 import CSVImport from '@/components/elements/CSVImport.vue'
@@ -130,7 +131,6 @@ import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
 import TravelSettingsForm from '@/components/settings/elements/TravelSettingsForm.vue'
 import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
-import { defineComponent } from 'vue'
 
 const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
 
@@ -157,12 +157,7 @@ export default defineComponent({
     PrinterSettingsForm
   },
   data() {
-    return {
-      items,
-      settings,
-      APP_DATA: APP_LOADER.data,
-      entry: 'users' as Entry
-    }
+    return { items, settings, APP_DATA: APP_LOADER.data, entry: 'users' as Entry }
   },
   props: [],
   methods: { convertGermanDateToHTMLDate },

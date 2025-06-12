@@ -37,26 +37,10 @@ export class CurrencyAdminController extends Controller {
     return await this.deleter(Currency, {
       _id: _id,
       referenceChecks: [
-        {
-          model: Travel,
-          paths: ['stages.cost.currency', 'expenses.cost.currency'],
-          conditions: { historic: false }
-        },
-        {
-          model: ExpenseReport,
-          paths: ['expenses.cost.currency'],
-          conditions: { historic: false }
-        },
-        {
-          model: HealthCareCost,
-          paths: ['expenses.cost.currency'],
-          conditions: { historic: false }
-        },
-        {
-          model: Advance,
-          paths: ['budget.currency'],
-          conditions: { historic: false }
-        }
+        { model: Travel, paths: ['stages.cost.currency', 'expenses.cost.currency'], conditions: { historic: false } },
+        { model: ExpenseReport, paths: ['expenses.cost.currency'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['expenses.cost.currency'], conditions: { historic: false } },
+        { model: Advance, paths: ['budget.currency'], conditions: { historic: false } }
       ],
       minDocumentCount: 1
     })

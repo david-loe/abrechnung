@@ -1,4 +1,4 @@
-import { HydratedDocument, Schema, model } from 'mongoose'
+import { HydratedDocument, model, Schema } from 'mongoose'
 import { ConnectionSettings, defaultLocale, emailRegex, locales } from '../../common/types.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
@@ -73,9 +73,7 @@ export const connectionSettingsSchema = () =>
             searchBase: { type: String, trim: true, required: true, label: 'Search Base', rules: requiredIf('auth.ldapauth.url') },
             searchFilter: { type: String, trim: true, required: true, label: 'Search Filter', rules: requiredIf('auth.ldapauth.url') },
             tlsOptions: {
-              type: {
-                rejectUnauthorized: { type: Boolean, default: true, label: 'Reject Unauthorized' }
-              },
+              type: { rejectUnauthorized: { type: Boolean, default: true, label: 'Reject Unauthorized' } },
               required: true,
               label: 'TLS Options'
             },
@@ -116,13 +114,7 @@ export const connectionSettingsSchema = () =>
         },
         oidc: {
           type: {
-            server: {
-              type: String,
-              trim: true,
-              required: true,
-              label: 'Server',
-              rules: requiredIf('auth.oidc.clientId')
-            },
+            server: { type: String, trim: true, required: true, label: 'Server', rules: requiredIf('auth.oidc.clientId') },
             clientId: { type: String, trim: true, required: true, label: 'Client ID', rules: requiredIf('auth.oidc.server') },
             clientSecret: { type: String, trim: true, required: true, label: 'Client Secret', rules: requiredIf('auth.oidc.server') }
           },

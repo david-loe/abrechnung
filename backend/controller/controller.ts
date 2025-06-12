@@ -1,8 +1,8 @@
 import { DeleteResult } from 'mongodb'
-import { FilterQuery, HydratedDocument, Model, ProjectionType, SortOrder, Types, mongo } from 'mongoose'
+import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder, Types } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import { Base64 } from '../../common/scripts.js'
-import { GETResponse, IdDocument, Meta, User, _id } from '../../common/types.js'
+import { _id, GETResponse, IdDocument, Meta, User } from '../../common/types.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
@@ -175,12 +175,7 @@ export class Controller extends TsoaController {
     options.filter ||= {}
     options.projection ||= {}
 
-    const meta: Meta = {
-      limit: options.query.limit,
-      page: options.query.page,
-      count: 1,
-      countPages: 1
-    }
+    const meta: Meta = { limit: options.query.limit, page: options.query.page, count: 1, countPages: 1 }
 
     if (Object.keys(options.projection).length > 0 && options.query.additionalFields && options.allowedAdditionalFields) {
       for (const additionalField of options.query.additionalFields) {

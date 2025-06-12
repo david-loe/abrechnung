@@ -89,9 +89,7 @@ export default defineElement({
   ...SelectElement, // adding props, mixins, emits
   name: 'UserElement',
   components: { Multiselect },
-  props: Object.assign(SelectElement.props, {
-    native: { type: Boolean, default: false }
-  }),
+  props: Object.assign(SelectElement.props, { native: { type: Boolean, default: false } }),
   data() {
     return { APP_DATA: APP_LOADER.data }
   },
@@ -114,13 +112,8 @@ export default defineElement({
 
   setup(props, context) {
     const element = SelectElement.setup(props, context)
-    const defaultClasses = ref({
-      ...SelectElementTemplate.data().defaultClasses
-    })
-    return {
-      ...element,
-      defaultClasses
-    }
+    const defaultClasses = ref({ ...SelectElementTemplate.data().defaultClasses })
+    return { ...element, defaultClasses }
   },
   async created() {
     await APP_LOADER.loadData()

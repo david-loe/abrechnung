@@ -101,10 +101,7 @@ class Formatter {
     if (currency === baseCurrency._id) {
       return this.baseCurrency(number)
     }
-    return number.toLocaleString(this.locale, {
-      style: 'currency',
-      currency: currency
-    })
+    return number.toLocaleString(this.locale, { style: 'currency', currency: currency })
   }
   float(number: number) {
     return this.#floatFormat.format(number)

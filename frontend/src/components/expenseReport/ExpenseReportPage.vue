@@ -323,12 +323,7 @@ const router = useRouter()
 const { t } = useI18n()
 
 type ExpenseDraft = {
-  cost: {
-    date: string
-    amount: number
-    currency: Currency
-    receipts: DocumentFile[]
-  }
+  cost: { date: string; amount: number; currency: Currency; receipts: DocumentFile[] }
   description: string
   note?: string
   id: number
@@ -480,10 +475,7 @@ async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
 }
 
 async function getExpenseReport() {
-  const params: any = {
-    _id: props._id,
-    additionalFields: ['expenses']
-  }
+  const params: any = { _id: props._id, additionalFields: ['expenses'] }
   const response = await API.getter<ExpenseReport>(`${props.endpointPrefix}expenseReport`, params)
   const result = response.ok
   if (result) {

@@ -6,7 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import { BadgeStyle } from '@/../../common/types.js'
 import { PropType } from 'vue'
+import { BadgeStyle } from '@/../../common/types.js'
+
 defineProps({ text: { type: String, required: true }, style: { type: Object as PropType<BadgeStyle> } })
 </script>

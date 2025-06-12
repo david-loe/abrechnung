@@ -3,6 +3,7 @@ import { Types } from 'mongoose'
 import passport from 'passport'
 import { User as IUser } from '../common/types.js'
 import User from './models/user.js'
+
 const router = express.Router()
 
 passport.serializeUser(async (user: IUser, cb) => {

@@ -4,7 +4,7 @@ import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
-import { RateLimitExceededError, errorHandler } from './controller/error.js'
+import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
@@ -32,12 +32,7 @@ export default async function () {
 
   app.use(express.json({ limit: '2mb' }))
   app.use(express.urlencoded({ limit: '2mb', extended: true }))
-  app.use(
-    cors({
-      credentials: true,
-      origin: [process.env.VITE_FRONTEND_URL, process.env.VITE_BACKEND_URL]
-    })
-  )
+  app.use(cors({ credentials: true, origin: [process.env.VITE_FRONTEND_URL, process.env.VITE_BACKEND_URL] }))
 
   if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
     app.use(
@@ -59,11 +54,7 @@ export default async function () {
     session({
       store: await sessionStore(),
       secret: process.env.COOKIE_SECRET,
-      cookie: {
-        maxAge: 2 * 24 * 60 * 60 * 1000,
-        secure: useSecureCookie,
-        sameSite: useSecureCookie ? 'none' : 'lax'
-      },
+      cookie: { maxAge: 2 * 24 * 60 * 60 * 1000, secure: useSecureCookie, sameSite: useSecureCookie ? 'none' : 'lax' },
       resave: true,
       saveUninitialized: false,
       name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')

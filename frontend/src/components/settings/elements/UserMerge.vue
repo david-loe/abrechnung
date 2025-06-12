@@ -53,18 +53,15 @@
 </template>
 
 <script lang="ts">
-import { User, UserReplaceReferencesResult, UserWithNameAndProject, idDocumentToId, objectIdRegex } from '@/../../common/types.js'
+import { defineComponent } from 'vue'
+import { idDocumentToId, objectIdRegex, User, UserReplaceReferencesResult, UserWithNameAndProject } from '@/../../common/types.js'
 import API from '@/api.js'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { defineComponent } from 'vue'
 
 type MergeResult = {
   mergedUser: User
   replacedReferences: UserReplaceReferencesResult
-  deleteResult: {
-    acknowledged: boolean
-    deletedCount: number
-  } | null
+  deleteResult: { acknowledged: boolean; deletedCount: number } | null
 }
 
 export default defineComponent({

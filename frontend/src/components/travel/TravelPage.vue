@@ -483,11 +483,7 @@ function resetAndHide() {
 }
 
 async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
-  const travelObj = {
-    _id: travel.value._id,
-    lastPlaceOfWork,
-    days
-  }
+  const travelObj = { _id: travel.value._id, lastPlaceOfWork, days }
   modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
   modalFormIsLoading.value = false
@@ -580,10 +576,7 @@ async function postStage(stage: Stage) {
     stage.cost.amount = 0
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/stage`, stage, {
-    headers,
-    params: { parentId: travel.value._id }
-  })
+  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/stage`, stage, { headers, params: { parentId: travel.value._id } })
   modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
@@ -709,10 +702,7 @@ function renderTable() {
 }
 
 async function getTravel() {
-  const params: any = {
-    _id: props._id,
-    additionalFields: ['stages', 'expenses', 'days']
-  }
+  const params: any = { _id: props._id, additionalFields: ['stages', 'expenses', 'days'] }
   const res = (await API.getter<Travel>(`${props.endpointPrefix}travel`, params)).ok
   if (res) {
     setTravel(res.data)

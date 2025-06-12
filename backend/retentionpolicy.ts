@@ -130,10 +130,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
         reportName: report.name
       }
 
-      const button = {
-        text: '',
-        link: ''
-      }
+      const button = { text: '', link: '' }
 
       button.link = `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
 

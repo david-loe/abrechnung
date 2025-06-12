@@ -5,14 +5,10 @@
 </template>
 
 <script lang="ts">
-import TooltipElement from '@/components/elements/TooltipElement.vue'
 import { defineComponent } from 'vue'
+import TooltipElement from '@/components/elements/TooltipElement.vue'
 
-export default defineComponent({
-  name: 'InfoPoint',
-  components: { TooltipElement },
-  props: { text: { type: String, required: true } }
-})
+export default defineComponent({ name: 'InfoPoint', components: { TooltipElement }, props: { text: { type: String, required: true } } })
 </script>
 
 <style></style>

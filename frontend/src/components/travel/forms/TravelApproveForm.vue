@@ -22,20 +22,14 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { TravelSimple } from '@/../../common/types.js'
 import TextArea from '@/components/elements/TextArea.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
-import { PropType, defineComponent } from 'vue'
 export default defineComponent({
   name: 'TravelApproveForm',
   data() {
-    return {
-      comment: '',
-      loading: {
-        approved: false,
-        rejected: false
-      }
-    }
+    return { comment: '', loading: { approved: false, rejected: false } }
   },
   components: { TravelApply, TextArea },
   props: { travel: { type: Object as PropType<TravelSimple>, required: true } },
@@ -43,10 +37,7 @@ export default defineComponent({
   methods: {
     clear() {
       this.comment = ''
-      this.loading = {
-        approved: false,
-        rejected: false
-      }
+      this.loading = { approved: false, rejected: false }
     },
     output(decision: 'approved' | 'rejected') {
       this.loading[decision] = true

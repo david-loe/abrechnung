@@ -86,11 +86,11 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios'
+import { defineComponent } from 'vue'
 import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import axios from 'axios'
-import { defineComponent } from 'vue'
 
 type Strategy = 'ldapauth' | 'magiclogin'
 
@@ -111,10 +111,7 @@ export default defineComponent({
       try {
         const res = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/auth/ldapauth`,
-          {
-            username: this.usernameLDAP,
-            password: this.passwordLDAP
-          },
+          { username: this.usernameLDAP, password: this.passwordLDAP },
           { withCredentials: true }
         )
         if (res.status === 204) {

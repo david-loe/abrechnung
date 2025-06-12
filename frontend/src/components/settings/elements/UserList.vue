@@ -142,10 +142,7 @@ const getEmptyFilter = () => ({
 
 const filter = ref(getEmptyFilter())
 
-const showFilter = ref({
-  name: false,
-  email: false
-})
+const showFilter = ref({ name: false, email: false })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()
@@ -208,9 +205,7 @@ const schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.
   },
   _id: { type: 'hidden', meta: true }
 })
-Object.assign(schema.fk.schema, {
-  genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true }
-})
+Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
 </script>
 
 <style></style>

@@ -69,12 +69,7 @@ for (const columnToHide of props.columnsToHide) {
 const items = ref<Item[]>([])
 const loading = ref(false)
 const serverItemsLength = ref(0)
-const serverOptions = ref<ServerOptions>({
-  page: 1,
-  rowsPerPage: props.rowsPerPage,
-  sortBy: props.sortBy,
-  sortType: props.sortType
-})
+const serverOptions = ref<ServerOptions>({ page: 1, rowsPerPage: props.rowsPerPage, sortBy: props.sortBy, sortType: props.sortType })
 
 let oldFilterValue = ''
 const loadFromServer = async () => {

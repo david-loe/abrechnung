@@ -123,12 +123,7 @@ import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import { formatter } from '@/formatter.js'
 
-const emojis = {
-  breakfast: '🥐',
-  lunch: '🥪',
-  dinner: '🍽️',
-  overnight: '🛏️'
-} as const
+const emojis = { breakfast: '🥐', lunch: '🥪', dinner: '🍽️', overnight: '🛏️' } as const
 
 const { t } = useI18n()
 
@@ -170,9 +165,7 @@ function getLastPaceOfWorkList(travelObj: Travel) {
       }
     }
     if (!found) {
-      const adding: Omit<Place, 'place'> = {
-        country: place.country
-      }
+      const adding: Omit<Place, 'place'> = { country: place.country }
       if (place.special) {
         adding.special = place.special
       }

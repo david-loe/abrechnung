@@ -1,5 +1,5 @@
 import { Schema, SchemaDefinition, SchemaTypeOptions } from 'mongoose'
-import { Locale, emailRegex } from '../../common/types.js'
+import { Locale } from '../../common/types.js'
 import i18n from '../i18n.js'
 
 export function mongooseSchemaToVueformSchema(

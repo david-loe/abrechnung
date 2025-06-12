@@ -16,9 +16,7 @@ export default defineComponent({
   name: 'ProgressCircle',
   props: { progress: { type: Number, required: true } },
   data() {
-    return {
-      dashoffset: 50
-    }
+    return { dashoffset: 50 }
   },
   methods: {
     calc(): void {

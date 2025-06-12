@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { HealthInsurance as IHealthInsurance, _id, locales } from '../../common/types.js'
+import { _id, HealthInsurance as IHealthInsurance, locales } from '../../common/types.js'
 import HealthInsurance, { healthInsuranceSchema } from '../models/healthInsurance.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'

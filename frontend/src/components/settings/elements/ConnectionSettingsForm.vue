@@ -8,16 +8,14 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { ConnectionSettings } from '@/../../common/types.js'
 import API from '@/api.js'
-import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ConnectionSettingsForm',
   data() {
-    return {
-      schema: {}
-    }
+    return { schema: {} }
   },
   methods: {
     async postConnectionSettings(connectionSettings: ConnectionSettings) {
@@ -61,9 +59,7 @@ export default defineComponent({
     this.schema = Object.assign({}, (await API.getter<any>('admin/connectionSettings/form')).ok?.data, {
       buttons: {
         type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } }
-        }
+        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
       },
       _id: { type: 'hidden', meta: true }
     })

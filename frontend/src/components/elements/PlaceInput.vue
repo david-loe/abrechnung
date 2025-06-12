@@ -36,17 +36,13 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { Place } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
-import { PropType, defineComponent } from 'vue'
 
-const defaultPlace = {
-  country: null,
-  place: null,
-  special: undefined
-}
+const defaultPlace = { country: null, place: null, special: undefined }
 export default defineComponent({
   name: 'PlaceInput',
   data() {

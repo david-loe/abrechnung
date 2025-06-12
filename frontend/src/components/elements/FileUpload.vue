@@ -70,10 +70,7 @@ export default defineComponent({
   name: 'FileUpload',
   components: { FileUploadFileElement },
   props: {
-    modelValue: {
-      type: [Array, Object] as PropType<Partial<DocumentFile>[] | Partial<DocumentFile> | null>,
-      default: () => null
-    },
+    modelValue: { type: [Array, Object] as PropType<Partial<DocumentFile>[] | Partial<DocumentFile> | null>, default: () => null },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     id: { type: String },
@@ -97,11 +94,7 @@ export default defineComponent({
       if (file.data) {
         await showFile(file.data as File)
       } else if (file._id) {
-        await showFile({
-          _id: file._id,
-          endpoint: `${this.endpointPrefix}documentFile`,
-          filename: file.name as string
-        })
+        await showFile({ _id: file._id, endpoint: `${this.endpointPrefix}documentFile`, filename: file.name as string })
       }
     },
     async deleteFile(file: Partial<DocumentFile>, index?: number) {

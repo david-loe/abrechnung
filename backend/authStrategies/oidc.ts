@@ -43,32 +43,25 @@ export async function getOidcStrategy() {
 
   const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
 
-  return new CustomStrategy(
-    {
-      callbackURL: `${process.env.VITE_BACKEND_URL}${callbackPath}`,
-      config,
-      scope
-    },
-    async (tokens, verified) => {
-      try {
-        const claims = tokens.claims()
-        if (claims?.email && claims.name) {
-          const nameSplit = displayNameSplit(claims.name as string)
-          await findOrCreateUser(
-            { oidc: claims.sub },
-            {
-              email: claims.email as string,
-              name: {
-                familyName: (claims.family_name as string) || nameSplit.familyName,
-                givenName: (claims.given_name as string) || nameSplit.givenName
-              }
-            },
-            verified
-          )
-        }
-      } catch (error) {
-        verified(error)
+  return new CustomStrategy({ callbackURL: `${process.env.VITE_BACKEND_URL}${callbackPath}`, config, scope }, async (tokens, verified) => {
+    try {
+      const claims = tokens.claims()
+      if (claims?.email && claims.name) {
+        const nameSplit = displayNameSplit(claims.name as string)
+        await findOrCreateUser(
+          { oidc: claims.sub },
+          {
+            email: claims.email as string,
+            name: {
+              familyName: (claims.family_name as string) || nameSplit.familyName,
+              givenName: (claims.given_name as string) || nameSplit.givenName
+            }
+          },
+          verified
+        )
       }
+    } catch (error) {
+      verified(error)
     }
-  )
+  })
 }

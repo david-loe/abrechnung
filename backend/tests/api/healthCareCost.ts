@@ -8,10 +8,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-ignore
-let healthCareCost: HealthCareCostSimple = {
-  name: 'Broken leg',
-  patientName: 'Ben Logas'
-}
+let healthCareCost: HealthCareCostSimple = { name: 'Broken leg', patientName: 'Ben Logas' }
 
 test.serial('GET /healthInsurance', async (t) => {
   const res = await agent.get('/healthInsurance')

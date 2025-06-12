@@ -1,10 +1,11 @@
 /// <reference lib="webworker" />
-import { logger } from '@/logger.js'
-import { DBSchema, StoreNames, openDB } from 'idb'
+
+import { DBSchema, openDB, StoreNames } from 'idb'
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { logger } from '@/logger.js'
 import { escapeRegExp } from '../common/scripts'
 import { GETResponse } from '../common/types'
 
@@ -53,12 +54,7 @@ setDefaultHandler(new NetworkOnly())
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
 
 // 2️⃣ Static Assets
-registerRoute(
-  ({ request }) => request.destination === 'font',
-  new StaleWhileRevalidate({
-    cacheName: 'font-cache'
-  })
-)
+registerRoute(({ request }) => request.destination === 'font', new StaleWhileRevalidate({ cacheName: 'font-cache' }))
 // 3️⃣ API Calls
 registerRoute(
   ({ request }) => request.url.startsWith(BACKEND_URL) && !request.url.startsWith(`${BACKEND_URL}/auth`),
@@ -85,16 +81,10 @@ async function networkFirstWithDBFallback({ request }: { request: Request }) {
     if (dbEntry) {
       return new Response(JSON.stringify(dbEntry), { headers: { 'Content-Type': 'application/json' } })
     }
-    return new Response(
-      JSON.stringify({
-        error: 'offline',
-        message: 'No data'
-      }),
-      {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    )
+    return new Response(JSON.stringify({ error: 'offline', message: 'No data' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }
 
@@ -102,13 +92,7 @@ async function networkFirstWithDBFallback({ request }: { request: Request }) {
  * Open IndexedDB and create `urls` store if needed.
  */
 interface MyDB extends DBSchema {
-  urls: {
-    key: string
-    value: {
-      data: GETResponse<any>
-      timestamp: number
-    }
-  }
+  urls: { key: string; value: { data: GETResponse<any>; timestamp: number } }
 }
 const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
   upgrade(db) {
@@ -119,10 +103,7 @@ const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
 })
 
 async function storeToDB(storeName: StoreNames<MyDB>, value: GETResponse<any>, key: string) {
-  const entry = {
-    data: value,
-    timestamp: Date.now()
-  }
+  const entry = { data: value, timestamp: Date.now() }
   await (await dbPromise).put(storeName, entry, key)
 }
 

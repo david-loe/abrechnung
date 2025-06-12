@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
 import { getBaseCurrencyAmount } from '../common/scripts.js'
-import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money, _id } from '../common/types.js'
+import { _id, BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from '../common/types.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 

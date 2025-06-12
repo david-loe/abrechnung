@@ -26,13 +26,7 @@ class API {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
-        Object.assign(
-          {
-            params: params,
-            withCredentials: true
-          },
-          config
-        )
+        Object.assign({ params: params, withCredentials: true }, config)
       )
       if (config.responseType === 'blob') {
         return { ok: { data: res.data, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } }
@@ -59,12 +53,7 @@ class API {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
         data,
-        Object.assign(
-          {
-            withCredentials: true
-          },
-          config
-        )
+        Object.assign({ withCredentials: true }, config)
       )
       if (showAlert) this.addAlert({ title: i18n.global.t(res.data.message), type: 'success' })
       return { ok: (res.data as SETResponse<T>).result }
@@ -92,10 +81,7 @@ class API {
       }
     }
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/${endpoint}`, {
-        params: params,
-        withCredentials: true
-      })
+      const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/${endpoint}`, { params: params, withCredentials: true })
       if (res.status === 200) {
         if (showAlert) this.addAlert({ message: '', title: i18n.global.t('alerts.successDeleting'), type: 'success' })
         if (res.data.result) {

@@ -16,10 +16,7 @@ export async function subscribeToPush() {
   if (!(Notification.permission === 'granted')) {
     return
   }
-  const options = {
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY)
-  }
+  const options = { userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY) }
   const registration = await window.navigator.serviceWorker.getRegistration()
   if (!registration) {
     return

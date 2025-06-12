@@ -101,10 +101,7 @@ export class HealthCareCostController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, {
-      state: HealthCareCostState.IN_WORK,
-      editor: request.user._id
-    })
+    const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_WORK, editor: request.user._id })
 
     if (!extendedBody._id) {
       if (!request.user.access['inWork:healthCareCost']) {
@@ -189,9 +186,7 @@ export class HealthCareCostController extends Controller {
 export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = {
-      historic: false
-    }
+    const filter: Condition<IHealthCareCost> = { historic: false }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -465,9 +460,6 @@ export class HealthCareCostBookableController extends Controller {
     if (fulfilledCount === 0 && count > 0) {
       throw new Error(reducedResults[0].reason)
     }
-    return {
-      result: reducedResults,
-      message: `${fulfilledCount}/${count}`
-    }
+    return { result: reducedResults, message: `${fulfilledCount}/${count}` }
   }
 }

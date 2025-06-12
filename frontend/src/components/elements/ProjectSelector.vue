@@ -40,10 +40,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 export default defineComponent({
   name: 'ProjectSelector',
   data() {
-    return {
-      projects: [] as ProjectSimple[],
-      APP_DATA: APP_LOADER.data
-    }
+    return { projects: [] as ProjectSimple[], APP_DATA: APP_LOADER.data }
   },
   components: { ProjectsOfOrganisationSelector },
   props: {

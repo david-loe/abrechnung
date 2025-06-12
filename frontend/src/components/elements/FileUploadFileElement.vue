@@ -25,15 +25,12 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { DocumentFile } from '@/../../common/types.js'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'FileUploadFileElement',
-  props: {
-    file: { type: Object as PropType<DocumentFile>, required: true },
-    disabled: { type: Boolean, default: false }
-  },
+  props: { file: { type: Object as PropType<DocumentFile>, required: true }, disabled: { type: Boolean, default: false } },
   emits: ['show', 'deleted']
 })
 </script>

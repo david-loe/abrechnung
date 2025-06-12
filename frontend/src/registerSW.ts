@@ -4,10 +4,7 @@ if ('serviceWorker' in navigator) {
   const swType = isProductionMode ? 'classic' : 'module'
 
   navigator.serviceWorker
-    .register(swUrl, {
-      type: swType,
-      updateViaCache: 'imports'
-    })
+    .register(swUrl, { type: swType, updateViaCache: 'imports' })
     .then(async (registration) => {
       // Gleich nach der Registration eine Update-Prüfung anstoßen
       await registration.update()

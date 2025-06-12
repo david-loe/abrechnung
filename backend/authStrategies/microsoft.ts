@@ -46,10 +46,7 @@ export async function getMicrosoftStrategy() {
         { microsoft: profile._json.id },
         {
           email: profile._json.mail,
-          name: {
-            familyName: profile._json.surname || nameSplit.familyName,
-            givenName: profile._json.givenName || nameSplit.givenName
-          }
+          name: { familyName: profile._json.surname || nameSplit.familyName, givenName: profile._json.givenName || nameSplit.givenName }
         },
         verified
       )

@@ -1,5 +1,5 @@
-import { Query, Schema, model } from 'mongoose'
-import { Organisation, emailRegex } from '../../common/types.js'
+import { model, Query, Schema } from 'mongoose'
+import { emailRegex, Organisation } from '../../common/types.js'
 import { populateSelected } from './helper.js'
 
 export const organisationSchema = () =>
@@ -16,9 +16,7 @@ export const organisationSchema = () =>
 
 const schema = organisationSchema()
 
-const populates = {
-  logo: [{ path: 'logo', select: { name: 1, type: 1 } }]
-}
+const populates = { logo: [{ path: 'logo', select: { name: 1, type: 1 } }] }
 
 schema.pre(/^find((?!Update).)*$/, async function (this: Query<Organisation, Organisation>) {
   await populateSelected(this, populates)

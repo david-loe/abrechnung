@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 
 interface RequestError {
   message: string
@@ -27,14 +27,7 @@ interface RequestError {
 interface ValidationError extends RequestError {
   _message: string
   name: 'ValidationError'
-  errors: {
-    [path: string]: {
-      path: string
-      message: string
-      kind: string
-      name: string
-    }
-  }
+  errors: { [path: string]: { path: string; message: string; kind: string; name: string } }
 }
 
 export default defineComponent({

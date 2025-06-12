@@ -8,9 +8,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-ignore
-let expenseReport: ExpenseReportSimple = {
-  name: 'Expenses from last Month'
-}
+let expenseReport: ExpenseReportSimple = { name: 'Expenses from last Month' }
 
 test.serial('GET /project', async (t) => {
   const res = await agent.get('/project')

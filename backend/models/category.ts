@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose'
+import { model, Schema } from 'mongoose'
 import { Category } from '../../common/types.js'
 import { colorSchema } from './helper.js'
 

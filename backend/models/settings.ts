@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose'
-import { Access, ReportType, RetentionType, Settings, accesses, reportTypes, retention } from '../../common/types.js'
+import { model, Schema } from 'mongoose'
+import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from '../../common/types.js'
 
 export const settingsSchema = () => {
   const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
@@ -26,10 +26,7 @@ export const settingsSchema = () => {
       type: Number,
       min: 0,
       required: true,
-      validate: {
-        validator: Number.isInteger,
-        message: 'Must be Integer'
-      },
+      validate: { validator: Number.isInteger, message: 'Must be Integer' },
       description: `description.${policy}`
     }
   }

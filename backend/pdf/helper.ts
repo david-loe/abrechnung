@@ -79,13 +79,7 @@ export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCos
         to: org?.reportEmail, // list of receivers
         subject: subject, // Subject line
         text,
-        attachments: [
-          {
-            content: Buffer.from(pdf),
-            contentType: 'application/pdf',
-            filename: 'report.pdf'
-          }
-        ]
+        attachments: [{ content: Buffer.from(pdf), contentType: 'application/pdf', filename: 'report.pdf' }]
       })
     }
   }

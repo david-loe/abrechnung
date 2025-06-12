@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { Country as ICountry, _id, locales } from '../../common/types.js'
+import { _id, Country as ICountry, locales } from '../../common/types.js'
 import Country, { countrySchema } from '../models/country.js'
 import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
@@ -12,9 +12,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 export class CountryController extends Controller {
   @Get('country')
   public async get(@Queries() query: GetterQuery<ICountry>) {
-    return await this.getter(Country, {
-      query
-    })
+    return await this.getter(Country, { query })
   }
   @Get('specialLumpSums')
   public async getSpecialLumpSums() {

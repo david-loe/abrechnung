@@ -81,9 +81,9 @@
   </div>
 </template>
 <script lang="ts">
+import { defineComponent } from 'vue'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import { defineComponent } from 'vue'
 
 type OperationSystems = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
 type BrowserTypes = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge' | 'SamsungInternet'

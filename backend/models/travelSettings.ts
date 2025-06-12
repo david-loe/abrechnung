@@ -1,5 +1,5 @@
-import { HydratedDocument, Schema, model } from 'mongoose'
-import { DistanceRefundType, Meal, TravelSettings, distanceRefundTypes, meals } from '../../common/types.js'
+import { HydratedDocument, model, Schema } from 'mongoose'
+import { DistanceRefundType, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
 import { reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {

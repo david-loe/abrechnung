@@ -20,25 +20,16 @@ export function costObject(
   defaultAmount: number | null = null,
   min: number | null = 0
 ) {
-  const type: any = {
-    amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount }
-  }
+  const type: any = { amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount } }
   if (exchangeRate) {
-    type.exchangeRate = {
-      date: { type: Date },
-      rate: { type: Number, min: 0 },
-      amount: { type: Number, min }
-    }
+    type.exchangeRate = { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min } }
     type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
     type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }] }
     type.date = {
       type: Date,
-      validate: {
-        validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(),
-        message: 'futureNotAllowed'
-      },
+      validate: { validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(), message: 'futureNotAllowed' },
       required: required
     }
   }
@@ -89,11 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
         {
           text: { type: String },
           author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          toState: {
-            type: Number,
-            required: true,
-            enum: stages
-          }
+          toState: { type: Number, required: true, enum: stages }
         }
       ]
     },
@@ -111,11 +98,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
       advance: costObject(false, false, true),
       advanceOverflow: { type: Boolean, required: true, default: false }
     },
-    addUpLumpSums
-      ? {
-          lumpSums: costObject(false, false, true)
-        }
-      : {}
+    addUpLumpSums ? { lumpSums: costObject(false, false, true) } : {}
   )
   const schemaWithAdvances = Object.assign(
     schema,
@@ -128,9 +111,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
               return unique.map((str) => new Types.ObjectId(str))
             }
           },
-          addUp: {
-            type: [addUp]
-          }
+          addUp: { type: [addUp] }
         }
       : {}
   )

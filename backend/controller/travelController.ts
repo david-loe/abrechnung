@@ -238,12 +238,7 @@ export class TravelController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getOwnReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const travel = await Travel.findOne({
-      _id: _id,
-      owner: request.user._id,
-      historic: false,
-      state: { $gte: State.BOOKABLE }
-    }).lean()
+    const travel = await Travel.findOne({ _id: _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }).lean()
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
@@ -256,11 +251,7 @@ export class TravelController extends Controller {
 
   @Get('examiner')
   public async getExaminer() {
-    return await this.getter(User, {
-      query: { limit: 5 },
-      filter: { 'access.examine/travel': true },
-      projection: { name: 1, email: 1 }
-    })
+    return await this.getter(User, { query: { limit: 5 }, filter: { 'access.examine/travel': true }, projection: { name: 1, email: 1 } })
   }
 }
 
@@ -271,9 +262,7 @@ export class TravelController extends Controller {
 export class TravelApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = {
-      $and: [{ historic: false, state: { $gte: State.APPLIED_FOR, $lt: State.IN_REVIEW } }]
-    }
+    const filter: Condition<ITravel> = { $and: [{ historic: false, state: { $gte: State.APPLIED_FOR, $lt: State.IN_REVIEW } }] }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
@@ -342,9 +331,7 @@ export class TravelApproveController extends Controller {
 export class TravelExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = {
-      $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER } }]
-    }
+    const filter: Condition<ITravel> = { $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER } }] }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
@@ -640,9 +627,6 @@ export class TravelBookableController extends Controller {
     if (fulfilledCount === 0 && count > 0) {
       throw new Error(reducedResults[0].reason)
     }
-    return {
-      result: reducedResults,
-      message: `${fulfilledCount}/${count}`
-    }
+    return { result: reducedResults, message: `${fulfilledCount}/${count}` }
   }
 }

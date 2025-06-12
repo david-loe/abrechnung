@@ -45,11 +45,7 @@ export class AdvanceController extends Controller {
 
   @Post('appliedFor')
   public async postOwnInWork(@Body() requestBody: AdvanceApplication, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, {
-      state: AdvanceState.APPLIED_FOR,
-      owner: request.user._id,
-      editor: request.user._id
-    })
+    const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPLIED_FOR, owner: request.user._id, editor: request.user._id })
 
     if (!extendedBody._id) {
       if (!request.user.access['appliedFor:advance']) {
@@ -75,12 +71,7 @@ export class AdvanceController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReportForOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
-    const advance = await Advance.findOne({
-      _id: _id,
-      owner: request.user._id,
-      historic: false,
-      state: { $gte: State.BOOKABLE }
-    }).lean()
+    const advance = await Advance.findOne({ _id: _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }).lean()
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
@@ -105,18 +96,11 @@ export class AdvanceController extends Controller {
 export class AdvanceExamineController extends Controller {
   @Get()
   public async getForExamineReport(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = {
-      $and: [{ historic: false }, { state: AdvanceState.APPROVED }]
-    }
+    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: AdvanceState.APPROVED }] }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
-    return await this.getter(Advance, {
-      query,
-      filter,
-      projection: { history: 0, historic: 0, bookingRemark: 0 },
-      sort: { updatedAt: -1 }
-    })
+    return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0, bookingRemark: 0 }, sort: { updatedAt: -1 } })
   }
 }
 
@@ -127,18 +111,11 @@ export class AdvanceExamineController extends Controller {
 export class AdvanceApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = {
-      $and: [{ historic: false }, { state: { $gte: State.APPLIED_FOR } }]
-    }
+    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: { $gte: State.APPLIED_FOR } }] }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
-    return await this.getter(Advance, {
-      query,
-      filter,
-      projection: { history: 0, historic: 0 },
-      sort: { updatedAt: -1 }
-    })
+    return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0 }, sort: { updatedAt: -1 } })
   }
 
   @Post('approved')
@@ -294,9 +271,6 @@ export class AdvanceBookableController extends Controller {
     if (fulfilledCount === 0 && count > 0) {
       throw new Error(reducedResults[0].reason)
     }
-    return {
-      result: reducedResults,
-      message: `${fulfilledCount}/${count}`
-    }
+    return { result: reducedResults, message: `${fulfilledCount}/${count}` }
   }
 }

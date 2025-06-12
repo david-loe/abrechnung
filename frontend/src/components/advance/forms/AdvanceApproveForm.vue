@@ -25,11 +25,11 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { AdvanceSimple } from '@/../../common/types.js'
 import Advance from '@/components/advance/Advance.vue'
 import TextArea from '@/components/elements/TextArea.vue'
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

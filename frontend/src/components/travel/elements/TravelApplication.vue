@@ -44,15 +44,10 @@ const keys: (keyof TravelSimple)[] = [
 export default defineComponent({
   name: 'TravelApply',
   data() {
-    return {
-      keys,
-      TravelState
-    }
+    return { keys, TravelState }
   },
   components: { StatePipeline, PlaceElement },
-  props: {
-    travel: { type: Object as PropType<TravelSimple>, required: true }
-  },
+  props: { travel: { type: Object as PropType<TravelSimple>, required: true } },
   methods: {
     displayKey(key: keyof TravelSimple): string {
       switch (key) {

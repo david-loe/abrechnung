@@ -184,31 +184,19 @@ class ReportPrint {
     y = y - this.drawer.settings.pagePadding
 
     y =
-      this.drawNameAndProject({
-        xStart: this.drawer.settings.pagePadding,
-        yStart: y - 24,
-        fontSize: this.drawer.settings.fontSizes.M
-      }) - 10
+      this.drawNameAndProject({ xStart: this.drawer.settings.pagePadding, yStart: y - 24, fontSize: this.drawer.settings.fontSizes.M }) - 10
     y = await this.drawTravelInformation({
       xStart: this.drawer.settings.pagePadding,
       yStart: y,
       fontSize: this.drawer.settings.fontSizes.M
     })
-    y = this.drawExpenseInformation({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y,
-      fontSize: this.drawer.settings.fontSizes.M
-    })
+    y = this.drawExpenseInformation({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
     y = this.drawHealthCareCostInformation({
       xStart: this.drawer.settings.pagePadding,
       yStart: y,
       fontSize: this.drawer.settings.fontSizes.M
     })
-    y = this.drawAdvanceInformation({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y,
-      fontSize: this.drawer.settings.fontSizes.M
-    })
+    y = this.drawAdvanceInformation({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
 
     const receiptMap = {}
     if (!reportIsAdvance(this.report)) {
@@ -235,21 +223,9 @@ class ReportPrint {
       yStart: y - 16,
       fontSize: this.drawer.settings.fontSizes.S
     })
-    y = await this.drawDays({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.S
-    })
-    y = await this.drawReports({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.S
-    })
-    y = await this.drawComments({
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.S
-    })
+    y = await this.drawDays({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
+    y = await this.drawReports({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
+    y = await this.drawComments({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
 
     await this.drawer.attachReceipts(receiptMap)
 
@@ -261,11 +237,7 @@ class ReportPrint {
     y = this.drawer.drawMultilineText(this.report.name, { xStart: options.xStart, yStart: y, fontSize: options.fontSize * 1.5 })
     y = this.drawer.drawMultilineText(
       `${this.t('labels.project')}: ${this.report.project.identifier}${this.report.project.name ? ` - ${this.report.project.name}` : ''}`,
-      {
-        xStart: options.xStart,
-        yStart: y,
-        fontSize: options.fontSize
-      }
+      { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
     )
     return y
   }
@@ -276,22 +248,14 @@ class ReportPrint {
       // Traveler
       y = this.drawer.drawMultilineText(
         `${this.t('labels.traveler')}: ${this.drawer.formatter.name(this.report.owner.name)}${this.report.claimSpouseRefund ? ` & ${this.report.fellowTravelersNames}` : ''}`,
-        {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        }
+        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
 
       // Reason + Place
       y = await this.drawer.drawMultilineTextWithPlace(
         `${this.t('labels.reason')}: ${this.report.reason}    ${this.t('labels.destinationPlace')}: `,
         this.report.destinationPlace,
-        {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        }
+        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
       let text = ''
       // Dates + professionalShare + lastPlaceOfWork
@@ -320,19 +284,11 @@ class ReportPrint {
     if (reportIsExpenseReport(this.report)) {
       y = this.drawer.drawMultilineText(
         `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}    ${this.t('labels.category')}: ${this.report.category.name}`,
-        {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        }
+        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
       // Dates
       const text = `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
-      y = this.drawer.drawMultilineText(text, {
-        xStart: options.xStart,
-        yStart: y,
-        fontSize: options.fontSize
-      })
+      y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
     }
     return y
   }
@@ -343,11 +299,7 @@ class ReportPrint {
       // Insurance + patientName
       y = this.drawer.drawMultilineText(
         `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
-        {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        }
+        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
     }
     return y
@@ -358,11 +310,7 @@ class ReportPrint {
     if (reportIsAdvance(this.report)) {
       y = this.drawer.drawMultilineText(
         `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.reason')}: ${this.report.reason}`,
-        {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        }
+        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
     }
     return y
@@ -385,11 +333,7 @@ class ReportPrint {
       summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(10), value])))
     }
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.summary'), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
+    this.drawer.drawText(this.t('labels.summary'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     const tableOptions: TableOptions = options
     tableOptions.yStart -= fontSize * 1.25
     tableOptions.firstRow = false
@@ -418,25 +362,16 @@ class ReportPrint {
     const summary = []
     if (reportIsTravel(this.report) || reportIsAdvance(this.report)) {
       summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.createdAt })
-      summary.push({
-        reference: this.t('labels.approvedOn'),
-        value: this.report.log[State.APPLIED_FOR]?.date
-      })
+      summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[State.APPLIED_FOR]?.date })
       summary.push({
         reference: this.t('labels.approvedBy'),
         value: `${this.drawer.formatter.name(this.report.log[State.APPLIED_FOR]?.editor.name)}`
       })
     }
     if (!reportIsAdvance(this.report)) {
-      summary.push({
-        reference: this.t('labels.submittedOn'),
-        value: this.report.log[State.EDITABLE_BY_OWNER]?.date
-      })
+      summary.push({ reference: this.t('labels.submittedOn'), value: this.report.log[State.EDITABLE_BY_OWNER]?.date })
       summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log[State.IN_REVIEW]?.date })
-      summary.push({
-        reference: this.t('labels.examinedBy'),
-        value: `${this.drawer.formatter.name(this.report.editor.name)}`
-      })
+      summary.push({ reference: this.t('labels.examinedBy'), value: `${this.drawer.formatter.name(this.report.editor.name)}` })
     }
 
     const tabelOptions: TableOptions = options
@@ -457,19 +392,10 @@ class ReportPrint {
       title: 'author',
       fn: (a: Comment['author']) => `${this.drawer.formatter.name(a.name)}`
     })
-    columns.push({
-      key: 'text',
-      width: 300,
-      alignment: pdf_lib.TextAlignment.Left,
-      title: 'value'
-    })
+    columns.push({ key: 'text', width: 300, alignment: pdf_lib.TextAlignment.Left, title: 'value' })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.comments'), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
+    this.drawer.drawText(this.t('labels.comments'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
     const tabelOptions: TableOptions = options
@@ -546,12 +472,7 @@ class ReportPrint {
       title: this.t('labels.cost'),
       fn: (m: Cost) => this.drawer.formatter.detailedMoney(m)
     })
-    columns.push({
-      key: 'note',
-      width: 70,
-      alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.note')
-    })
+    columns.push({ key: 'note', width: 70, alignment: pdf_lib.TextAlignment.Left, title: this.t('labels.note') })
     columns.push({
       key: 'cost',
       width: 45,
@@ -561,11 +482,7 @@ class ReportPrint {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.stages'), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
+    this.drawer.drawText(this.t('labels.stages'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(this.report.stages, columns, options)
@@ -576,12 +493,7 @@ class ReportPrint {
       return options.yStart
     }
     const columns: Column[] = []
-    columns.push({
-      key: 'description',
-      width: 270,
-      alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.description')
-    })
+    columns.push({ key: 'description', width: 270, alignment: pdf_lib.TextAlignment.Left, title: this.t('labels.description') })
     if (reportIsTravel(this.report)) {
       const travel = this.report
       columns.push({
@@ -607,12 +519,7 @@ class ReportPrint {
       title: this.t('labels.invoiceDate'),
       fn: (c: Cost) => this.drawer.formatter.date(c.date)
     })
-    columns.push({
-      key: 'note',
-      width: 130,
-      alignment: pdf_lib.TextAlignment.Left,
-      title: this.t('labels.note')
-    })
+    columns.push({ key: 'note', width: 130, alignment: pdf_lib.TextAlignment.Left, title: this.t('labels.note') })
     columns.push({
       key: 'cost',
       width: 45,
@@ -622,11 +529,7 @@ class ReportPrint {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.expenses'), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
+    this.drawer.drawText(this.t('labels.expenses'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(this.report.expenses, columns, options)
@@ -727,11 +630,7 @@ class ReportPrint {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.offsetAgainst'), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
+    this.drawer.drawText(this.t('labels.offsetAgainst'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(this.report.offsetAgainst, columns, options)
@@ -766,12 +665,7 @@ const splitOutLines = (input: string, maxWidth: number, font: pdf_lib.PDFFont, f
 
   // We were unable to split the input enough to get a chunk that would fit
   // within the specified `maxWidth` so we'll just return everything
-  return {
-    line: input,
-    encoded: font.encodeText(input),
-    width: font.widthOfTextAtSize(input, fontSize),
-    remainder: undefined
-  }
+  return { line: input, encoded: font.encodeText(input), width: font.widthOfTextAtSize(input, fontSize), remainder: undefined }
 }
 
 const layoutMultilineText = (
@@ -827,17 +721,7 @@ const layoutMultilineText = (
     }
   }
 
-  return {
-    fontSize,
-    lineHeight,
-    lines: textLines,
-    bounds: {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY
-    }
-  }
+  return { fontSize, lineHeight, lines: textLines, bounds: { x: minX, y: minY, width: maxX - minX, height: maxY - minY } }
 }
 
 const FLAG_PSEUDO_SUFFIX = 'mim'
@@ -1087,18 +971,9 @@ class PDFDrawer {
     const logoSize = this.font.heightAtSize(options.fontSize)
     const y = options.yStart - logoSize * 0.8
 
-    this.currentPage.drawImage(logo, {
-      x: options.xStart,
-      y: y - logoSize / 5,
-      height: logoSize,
-      width: logoSize
-    })
+    this.currentPage.drawImage(logo, { x: options.xStart, y: y - logoSize / 5, height: logoSize, width: logoSize })
 
-    this.drawText(title, {
-      xStart: options.xStart + logoSize + options.fontSize / 4,
-      yStart: y,
-      fontSize: options.fontSize
-    })
+    this.drawText(title, { xStart: options.xStart + logoSize + options.fontSize / 4, yStart: y, fontSize: options.fontSize })
   }
 
   async drawOrganisationLogo(organisationId: _id, options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }) {
@@ -1132,12 +1007,7 @@ class PDFDrawer {
     if (orga.website) {
       this.drawLink(orga.website, { xStart: x, yStart: y, width: size.width, height: size.height })
     }
-    this.currentPage.drawImage(image, {
-      x: x,
-      y: y,
-      width: size.width,
-      height: size.height
-    })
+    this.currentPage.drawImage(image, { x: x, y: y, width: size.width, height: size.height })
   }
 
   drawLink(url: string, options: { xStart: number; yStart: number; width: number; height: number }) {
@@ -1147,11 +1017,7 @@ class PDFDrawer {
       Rect: [options.xStart, options.yStart, options.xStart + options.width, options.yStart + options.height],
       Border: [0, 0, 0],
       C: [0, 0, 1],
-      A: {
-        Type: 'Action',
-        S: 'URI',
-        URI: PDFString.of(url)
-      }
+      A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) }
     })
     const linkAnnotationRef = this.doc.context.register(linkAnnotation)
     this.currentPage.node.set(PDFName.of('Annots'), this.doc.context.obj([linkAnnotationRef]))
@@ -1187,12 +1053,7 @@ class PDFDrawer {
       const columnBorders: pdf_lib.PDFPageDrawLineOptions[] = []
       const cellTexts: {
         text: string
-        options: {
-          xStart: number
-          yStart: number
-          width: number
-          fontSize: number
-        }
+        options: { xStart: number; yStart: number; width: number; fontSize: number }
         countryCodeForFlag?: CountryCode
       }[] = []
       for (const column of columns) {
@@ -1212,12 +1073,7 @@ class PDFDrawer {
           alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
           font: this.font,
           fontSize: fontSize,
-          bounds: {
-            width: column.width - this.settings.cellPadding.x * 3,
-            height: fontSize,
-            x: x,
-            y: y
-          },
+          bounds: { width: column.width - this.settings.cellPadding.x * 3, height: fontSize, x: x, y: y },
           lineHeightFactor: 0
         })
         for (const line of multiText.lines) {

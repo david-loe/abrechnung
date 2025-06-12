@@ -8,18 +8,16 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import { defineComponent } from 'vue'
 
 const APP_DATA = APP_LOADER.data
 export default defineComponent({
   name: 'DisplaySettingsForm',
   data() {
-    return {
-      schema: {}
-    }
+    return { schema: {} }
   },
   methods: {
     async postDisplaySettings(displaySettings: DisplaySettings) {
@@ -35,9 +33,7 @@ export default defineComponent({
     this.schema = Object.assign({}, (await API.getter<any>('admin/displaySettings/form')).ok?.data, {
       buttons: {
         type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } }
-        }
+        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
       },
       _id: { type: 'hidden', meta: true }
     })

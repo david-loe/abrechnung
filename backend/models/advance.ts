@@ -107,11 +107,7 @@ async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.Clie
   )
   reports.push(
     ...(await model<HealthCareCost>('HealthCareCost')
-      .find({
-        advances: advanceId,
-        historic: false,
-        state: { $lt: State.BOOKABLE }
-      })
+      .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   for (const report of reports) {

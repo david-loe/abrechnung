@@ -48,15 +48,14 @@
 </template>
 
 <script lang="ts" setup>
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
 import { Category } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
 import ListElement from '@/components/elements/ListElement.vue'
-
-import { Ref, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { Header } from 'vue3-easy-data-table'
 
 const { t } = useI18n()
 
@@ -77,9 +76,7 @@ const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
 
 const filter = ref(getEmptyFilter())
 
-const showFilter = ref({
-  name: false
-})
+const showFilter = ref({ name: false })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()

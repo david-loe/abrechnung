@@ -19,9 +19,16 @@
     "lineEnding": "lf",
     "lineWidth": 140,
     "attributePosition": "auto",
-    "bracketSpacing": true
+    "bracketSpacing": true,
+    "expand": "never"
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -56,13 +63,21 @@
       "unsafeParameterDecoratorsEnabled": true
     }
   },
+  "json": {
+    "formatter": {
+      "expand": "auto"
+    }
+  },
   "overrides": [
     {
       "includes": ["**/*.vue"],
       "linter": {
         "rules": {
           "correctness": {
-            "noUnusedImports": { "level": "off", "fix": "none" },
+            "noUnusedImports": {
+              "level": "off",
+              "fix": "none"
+            },
             "noUnusedVariables": "off"
           }
         }

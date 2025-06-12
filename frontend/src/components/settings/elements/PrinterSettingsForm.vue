@@ -8,17 +8,14 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { PrinterSettings } from '@/../../common/types.js'
 import API from '@/api.js'
-import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'PrinterSettingsForm',
   data() {
-    return {
-      schema: {},
-      printerSettings: undefined as PrinterSettings | undefined
-    }
+    return { schema: {}, printerSettings: undefined as PrinterSettings | undefined }
   },
   methods: {
     async postPrinterSettings(printerSettings: PrinterSettings) {
@@ -34,9 +31,7 @@ export default defineComponent({
     this.schema = Object.assign({}, (await API.getter<any>('admin/printerSettings/form')).ok?.data, {
       buttons: {
         type: 'group',
-        schema: {
-          submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } }
-        }
+        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
       },
       _id: { type: 'hidden', meta: true }
     })

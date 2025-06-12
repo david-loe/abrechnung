@@ -61,38 +61,27 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, Project, UserWithNameAndProject, baseCurrency } from '@/../../common/types.js'
+import { PropType, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { AdvanceSimple, baseCurrency, Project, UserWithNameAndProject } from '@/../../common/types.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { PropType, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps({
-  advance: {
-    type: Object as PropType<Partial<AdvanceSimple>>,
-    required: true
-  },
-  mode: {
-    type: String as PropType<'add' | 'edit'>,
-    required: true
-  },
+  advance: { type: Object as PropType<Partial<AdvanceSimple>>, required: true },
+  mode: { type: String as PropType<'add' | 'edit'>, required: true },
   disabled: { type: Boolean, default: false },
   askOwner: { type: Boolean, default: false },
   askBookingRemark: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
 
-const emit = defineEmits<{
-  cancel: []
-  edit: [Partial<AdvanceSimple>]
-  add: [Partial<AdvanceSimple>]
-  deleted: [string]
-}>()
+const emit = defineEmits<{ cancel: []; edit: [Partial<AdvanceSimple>]; add: [Partial<AdvanceSimple>]; deleted: [string] }>()
 
 const formAdvance = ref(defaultAdvance())
 
@@ -102,10 +91,7 @@ function defaultAdvance() {
   return {
     name: undefined as string | undefined,
     reason: undefined as string | undefined,
-    budget: {
-      amount: null as number | null,
-      currency: baseCurrency
-    },
+    budget: { amount: null as number | null, currency: baseCurrency },
     owner: undefined as UserWithNameAndProject | undefined,
     project: undefined as Project | undefined,
     comment: undefined as string | undefined,

@@ -29,12 +29,7 @@ export async function findOrCreateUser(filter: IUser['fk'], userData: Omit<NewUs
   if (!user && email) {
     user = await User.findOne({ email: email })
   }
-  const newUser: NewUser = {
-    fk: filter,
-    email: email,
-    name: userData.name,
-    access: (await getSettings()).defaultAccess
-  }
+  const newUser: NewUser = { fk: filter, email: email, name: userData.name, access: (await getSettings()).defaultAccess }
   if (!user) {
     user = new User(newUser)
   } else {
@@ -58,8 +53,5 @@ export function displayNameSplit(displayName: string) {
   const split = displayName.split(splitStr)
   const one = split.shift() as string
   const two = split.join(' ') || ' '
-  return {
-    givenName: isComma ? two : one,
-    familyName: isComma ? one : two
-  }
+  return { givenName: isComma ? two : one, familyName: isComma ? one : two }
 }

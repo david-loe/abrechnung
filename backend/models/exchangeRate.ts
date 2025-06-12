@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { Schema, model } from 'mongoose'
-import { Currency, ExchangeRate as IExchangeRate, Money, baseCurrency, idDocumentToId } from '../../common/types.js'
+import { model, Schema } from 'mongoose'
+import { baseCurrency, ExchangeRate as IExchangeRate, idDocumentToId, Money } from '../../common/types.js'
 
 const exchangeRateSchema = () =>
   new Schema<IExchangeRate>({

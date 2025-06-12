@@ -69,9 +69,7 @@ test('POST /user/settings', async (t) => {
   t.like(res2.body.data.settings, settings)
 })
 
-const vehicleRegistration = {
-  vehicleRegistration: [{ name: 'dummy.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
-}
+const vehicleRegistration = { vehicleRegistration: [{ name: 'dummy.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }] }
 
 test('POST /user/vehicleRegistration', async (t) => {
   t.plan(2)

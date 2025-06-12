@@ -21,13 +21,9 @@ export default defineComponent({
   name: 'ModalComponent',
   emits: ['afterClose'],
   data() {
-    return {
-      modal: undefined as Modal | undefined
-    }
+    return { modal: undefined as Modal | undefined }
   },
-  props: {
-    header: String
-  },
+  props: { header: String },
   methods: {
     hideModal() {
       this.modal?.hide()

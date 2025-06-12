@@ -97,27 +97,22 @@
 </template>
 
 <script lang="ts">
-import { Expense, baseCurrency } from '@/../../common/types.js'
+import { defineComponent, PropType } from 'vue'
+import { baseCurrency, Expense } from '@/../../common/types.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import TextArea from '@/components/elements/TextArea.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseForm',
   components: { InfoPoint, CurrencySelector, FileUpload, DateInput, TextArea, ProjectSelector },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev'],
   props: {
-    expense: {
-      type: Object as PropType<Partial<Expense>>
-    },
-    mode: {
-      type: String as PropType<'add' | 'edit'>,
-      required: true
-    },
+    expense: { type: Object as PropType<Partial<Expense>> },
+    mode: { type: String as PropType<'add' | 'edit'>, required: true },
     disabled: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
     ownerId: { type: String },
@@ -126,21 +121,13 @@ export default defineComponent({
     loading: { type: Boolean, default: false }
   },
   data() {
-    return {
-      formExpense: this.default(),
-      useDifferentProject: false
-    }
+    return { formExpense: this.default(), useDifferentProject: false }
   },
   methods: {
     default() {
       return {
         description: '',
-        cost: {
-          amount: null,
-          currency: baseCurrency,
-          receipts: [],
-          date: ''
-        },
+        cost: { amount: null, currency: baseCurrency, receipts: [], date: '' },
         note: undefined,
         project: undefined
       }

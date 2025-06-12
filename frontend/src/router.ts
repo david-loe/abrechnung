@@ -29,38 +29,22 @@ const routes = [
       return true
     }
   },
-  {
-    path: '/admin',
-    component: SettingsPage,
-    meta: { requiresAuth: true }
-  },
+  { path: '/admin', component: SettingsPage, meta: { requiresAuth: true } },
   {
     path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
     component: AdvanceApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
-  {
-    path: '/book/advance',
-    component: BookAdvancePage,
-    meta: { requiresAuth: true }
-  },
+  { path: '/book/advance', component: BookAdvancePage, meta: { requiresAuth: true } },
   {
     path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
     component: TravelApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
-  {
-    path: '/book/travel',
-    component: BookTravelPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/examine/travel',
-    component: ExamineTravelPage,
-    meta: { requiresAuth: true }
-  },
+  { path: '/book/travel', component: BookTravelPage, meta: { requiresAuth: true } },
+  { path: '/examine/travel', component: ExamineTravelPage, meta: { requiresAuth: true } },
   {
     path: '/examine/travel/:_id([0-9a-fA-F]{24})',
     component: TravelPage,
@@ -77,16 +61,8 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
-  {
-    path: '/book/expenseReport',
-    component: BookExpenseReportPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/examine/expenseReport',
-    component: ExamineExpenseReportPage,
-    meta: { requiresAuth: true }
-  },
+  { path: '/book/expenseReport', component: BookExpenseReportPage, meta: { requiresAuth: true } },
+  { path: '/examine/expenseReport', component: ExamineExpenseReportPage, meta: { requiresAuth: true } },
   {
     path: '/examine/expenseReport/:_id([0-9a-fA-F]{24})',
     component: ExpenseReportPage,
@@ -103,16 +79,8 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
-  {
-    path: '/book/healthCareCost',
-    component: BookHealthCareCostPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/examine/healthCareCost',
-    component: ExamineHealthCareCostPage,
-    meta: { requiresAuth: true }
-  },
+  { path: '/book/healthCareCost', component: BookHealthCareCostPage, meta: { requiresAuth: true } },
+  { path: '/examine/healthCareCost', component: ExamineHealthCareCostPage, meta: { requiresAuth: true } },
   {
     path: '/examine/healthCareCost/:_id([0-9a-fA-F]{24})',
     component: HealthCareCostPage,
@@ -129,15 +97,8 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
-  {
-    path: '/user',
-    component: HomePage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/user'
-  }
+  { path: '/user', component: HomePage, meta: { requiresAuth: true } },
+  { path: '/:pathMatch(.*)*', redirect: '/user' }
 ]
 
 const router = createRouter({
@@ -145,10 +106,7 @@ const router = createRouter({
   routes,
   scrollBehavior(to) {
     if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth'
-      }
+      return { el: to.hash, behavior: 'smooth' }
     }
   }
 })
@@ -159,9 +117,7 @@ export async function auth() {
     return true
   }
   try {
-    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/authenticated`, {
-      withCredentials: true
-    })
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/authenticated`, { withCredentials: true })
     auth = res.status === 204
   } catch (error: any) {
     if (error.response && error.response.status !== 401) {

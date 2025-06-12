@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from 'vue'
 import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from '@/../../common/scripts.js'
-import { PropType, defineComponent } from 'vue'
 export default defineComponent({
   name: 'DateInput',
   data() {
@@ -38,11 +38,7 @@ export default defineComponent({
     max: { type: [String, Date] as PropType<string | Date>, default: '' }
   },
   emits: ['update:modelValue'],
-  methods: {
-    datetimeToDateString,
-    datetimeToDatetimeString,
-    htmlInputStringToDateTime
-  }
+  methods: { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime }
 })
 </script>
 

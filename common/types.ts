@@ -58,9 +58,7 @@ export interface ldapauthSettings {
   bindCredentials: string
   searchBase: string
   searchFilter: string
-  tlsOptions: {
-    rejectUnauthorized: boolean
-  }
+  tlsOptions: { rejectUnauthorized: boolean }
   mailAttribute: string
   uidAttribute: string
   familyNameAttribute: string
@@ -89,36 +87,17 @@ export interface oidcSettings {
 }
 
 export interface ConnectionSettings {
-  PDFReportsViaEmail: {
-    sendPDFReportsToOrganisationEmail: boolean
-    locale: Locale
-  }
-  auth: {
-    microsoft?: microsoftSettings | null
-    ldapauth?: ldapauthSettings | null
-    oidc?: oidcSettings | null
-  }
+  PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: boolean; locale: Locale }
+  auth: { microsoft?: microsoftSettings | null; ldapauth?: ldapauthSettings | null; oidc?: oidcSettings | null }
   smtp?: smtpSettings | null
 
   _id: _id
 }
 
 export interface DisplaySettings {
-  auth: {
-    magiclogin: boolean
-    microsoft: boolean
-    ldapauth: boolean
-    oidc: boolean
-  }
-  oidc: {
-    label: string
-    icon: string
-  }
-  locale: {
-    default: Locale
-    fallback: Locale
-    overwrite: { [key in Locale]: { [key: string]: string } }
-  }
+  auth: { magiclogin: boolean; microsoft: boolean; ldapauth: boolean; oidc: boolean }
+  oidc: { label: string; icon: string }
+  locale: { default: Locale; fallback: Locale; overwrite: { [key in Locale]: { [key: string]: string } } }
   nameDisplayFormat: NameDisplayFormat
   helpButton: {
     enabled: boolean
@@ -166,24 +145,16 @@ export type CountryCode = string
 
 export interface CountrySimple {
   _id: CountryCode
-  name: {
-    de: string
-    en: string
-  }
+  name: { de: string; en: string }
   needsA1Certificate?: boolean | null
-  alias?: {
-    de: string[]
-    en?: string[]
-  }
+  alias?: { de: string[]; en?: string[] }
   flag?: string | null
   currency?: CurrencyCode | null
 }
 
 export interface CountryLumpSum extends LumpSum {
   validFrom: Date | string
-  specials?: ({
-    city: string
-  } & LumpSum)[]
+  specials?: ({ city: string } & LumpSum)[]
 }
 
 export interface Country extends CountrySimple {
@@ -204,10 +175,7 @@ export interface ExchangeRate {
 export type CurrencyCode = string
 
 export interface Currency {
-  name: {
-    de: string
-    en: string
-  }
+  name: { de: string; en: string }
   _id: CurrencyCode
   subunit?: string | null
   symbol?: string | null
@@ -292,20 +260,11 @@ export interface Organisation extends OrganisationSimple {
 }
 
 export interface User extends UserSimple {
-  fk: {
-    microsoft?: string | null
-    ldapauth?: string | null
-    magiclogin?: string | null
-    oidc?: string | null
-    httpBearer?: string | null
-  }
+  fk: { microsoft?: string | null; ldapauth?: string | null; magiclogin?: string | null; oidc?: string | null; httpBearer?: string | null }
   access: {
     [key in Access]: boolean
   }
-  projects: {
-    assigned: Project[]
-    supervised: _id[]
-  }
+  projects: { assigned: Project[]; supervised: _id[] }
   loseAccessAt?: null | Date | string
   settings: {
     language: Locale
@@ -346,11 +305,7 @@ export interface BaseCurrencyMoney {
 
 export interface Money extends BaseCurrencyMoney {
   currency: Currency
-  exchangeRate?: {
-    date: Date | string
-    rate: number
-    amount: number
-  } | null
+  exchangeRate?: { date: Date | string; rate: number; amount: number } | null
 }
 export interface MoneyNotNull extends Money {
   amount: number
@@ -404,11 +359,7 @@ export interface Comment<State extends AnyState = AnyState> {
 
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
-  | {
-      type: 'ownCar'
-      distance: number
-      distanceRefundType: DistanceRefundType
-    }
+  | { type: 'ownCar'; distance: number; distanceRefundType: DistanceRefundType }
 
 export interface TravelDayFullCountry extends Omit<TravelDay, 'country'> {
   country: Country
@@ -423,18 +374,12 @@ export interface TravelDay {
   }
   overnightRefund: boolean
   purpose: PurposeSimple
-  lumpSums: {
-    overnight: { refund: BaseCurrencyMoneyNotNull }
-    catering: { refund: BaseCurrencyMoneyNotNull; type: CateringType }
-  }
+  lumpSums: { overnight: { refund: BaseCurrencyMoneyNotNull }; catering: { refund: BaseCurrencyMoneyNotNull; type: CateringType } }
   _id: _id
 }
 
 export type Log<S extends AnyState = AnyState> = {
-  [key in S]?: {
-    date: Date | string
-    editor: UserSimple
-  }
+  [key in S]?: { date: Date | string; editor: UserSimple }
 }
 
 export interface ReportSimple<S extends AnyState = AnyState> {
@@ -483,10 +428,7 @@ export interface TravelSimple extends ReportSimple<TravelState> {
   addUp: AddUp<Travel>[]
   advances: AdvanceBase[]
   isCrossBorder?: boolean | null
-  a1Certificate?: {
-    exactAddress: string
-    destinationName: string
-  } | null
+  a1Certificate?: { exactAddress: string; destinationName: string } | null
   claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
   fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
@@ -518,14 +460,7 @@ export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareC
   expenses: Expense[]
 }
 
-export const State = {
-  REJECTED: -10,
-  APPLIED_FOR: 0,
-  EDITABLE_BY_OWNER: 10,
-  IN_REVIEW: 20,
-  BOOKABLE: 30,
-  BOOKED: 40
-} as const
+export const State = { REJECTED: -10, APPLIED_FOR: 0, EDITABLE_BY_OWNER: 10, IN_REVIEW: 20, BOOKABLE: 30, BOOKED: 40 } as const
 
 export enum TravelState {
   REJECTED = -10, //State.REJECTED
@@ -727,14 +662,5 @@ export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
 
-export const baseCurrency: Currency = {
-  _id: 'EUR',
-  flag: '🇪🇺',
-  name: {
-    de: 'Euro',
-    en: 'euro'
-  },
-  subunit: 'Cent',
-  symbol: '€'
-}
+export const baseCurrency: Currency = { _id: 'EUR', flag: '🇪🇺', name: { de: 'Euro', en: 'euro' }, subunit: 'Cent', symbol: '€' }
 export const defaultLocale: Locale = 'de'

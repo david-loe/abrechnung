@@ -267,13 +267,8 @@ export default defineComponent({
   components: { InfoPoint, CurrencySelector, FileUpload, PlaceInput, CountrySelector, DateInput, TextArea, ProjectSelector },
   emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev', 'postVehicleRegistration'],
   props: {
-    stage: {
-      type: Object as PropType<Partial<Stage>>
-    },
-    mode: {
-      type: String as PropType<'add' | 'edit'>,
-      required: true
-    },
+    stage: { type: Object as PropType<Partial<Stage>> },
+    mode: { type: String as PropType<'add' | 'edit'>, required: true },
     disabled: { type: Boolean, default: false },
     travelStartDate: { type: [String, Date], required: true },
     travelEndDate: { type: [String, Date], required: true },
@@ -307,12 +302,7 @@ export default defineComponent({
         endLocation: undefined as Place | undefined,
         midnightCountries: [],
         transport: { type: 'otherTransport', distance: null, distanceRefundType: distanceRefundTypes[0] },
-        cost: {
-          amount: null,
-          currency: baseCurrency,
-          receipts: [],
-          date: ''
-        },
+        cost: { amount: null, currency: baseCurrency, receipts: [], date: '' },
         purpose: 'professional',
         note: undefined,
         project: undefined

@@ -37,9 +37,7 @@ export function mapLdapauthConfig(config: ldapauthSettings): LdapStrategy.Option
     bindCredentials: config.bindCredentials,
     searchBase: config.searchBase,
     searchFilter: config.searchFilter,
-    tlsOptions: {
-      rejectUnauthorized: config.tlsOptions.rejectUnauthorized
-    }
+    tlsOptions: { rejectUnauthorized: config.tlsOptions.rejectUnauthorized }
   }
 }
 
@@ -48,10 +46,7 @@ export function mapSmtpConfig(config: smtpSettings): SMTPTransport.Options {
     host: config.host,
     port: config.port,
     secure: config.secure,
-    auth: {
-      user: config.user,
-      pass: config.password
-    },
+    auth: { user: config.user, pass: config.password },
     from: config.senderAddress,
     dnsTimeout: 1500
   }

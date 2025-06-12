@@ -44,13 +44,7 @@ export const userSchema = async () => {
           label: 'Magic Login Email',
           hide: !displaySettings.auth.magiclogin
         },
-        httpBearer: {
-          type: String,
-          index: true,
-          unique: true,
-          sparse: true,
-          label: 'API Key Hash'
-        }
+        httpBearer: { type: String, index: true, unique: true, sparse: true, label: 'API Key Hash' }
       },
       required: true
     },

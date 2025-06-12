@@ -92,10 +92,7 @@ export class ExpenseReportController extends Controller {
     @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; category?: IdDocument },
     @Request() request: AuthenticatedExpressRequest
   ) {
-    const extendedBody = Object.assign(requestBody, {
-      state: ExpenseReportState.IN_WORK,
-      editor: request.user._id
-    })
+    const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
 
     if (!extendedBody._id) {
       if (!request.user.access['inWork:expenseReport']) {
@@ -182,9 +179,7 @@ export class ExpenseReportController extends Controller {
 export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = {
-      historic: false
-    }
+    const filter: Condition<IExpenseReport> = { historic: false }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
     }
@@ -444,9 +439,6 @@ export class ExpenseReportBookableController extends Controller {
     if (fulfilledCount === 0 && count > 0) {
       throw new Error(reducedResults[0].reason)
     }
-    return {
-      result: reducedResults,
-      message: `${fulfilledCount}/${count}`
-    }
+    return { result: reducedResults, message: `${fulfilledCount}/${count}` }
   }
 }

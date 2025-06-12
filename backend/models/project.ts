@@ -22,9 +22,7 @@ const schema = projectSchema()
 schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
   let sum = 0
   const filter: mongoose.mongo.Filter<any> = {
-    addUp: {
-      $elemMatch: { project: this._id }
-    },
+    addUp: { $elemMatch: { project: this._id } },
     state: { $gte: State.BOOKABLE },
     historic: false
   }

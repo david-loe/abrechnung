@@ -14,14 +14,8 @@ export default {
       filename: 'sw.ts',
       injectRegister: false,
       manifest: false,
-      devOptions: {
-        enabled: true,
-        navigateFallback: 'index.html',
-        type: 'module'
-      },
-      injectManifest: {
-        maximumFileSizeToCacheInBytes: 4000000
-      }
+      devOptions: { enabled: true, navigateFallback: 'index.html', type: 'module' },
+      injectManifest: { maximumFileSizeToCacheInBytes: 4000000 }
     })
   ],
   server: {
@@ -32,9 +26,5 @@ export default {
     fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
   },
   preview: { port: 80, host: '0.0.0.0' },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src')
-    }
-  }
+  resolve: { alias: { '@': resolve(__dirname, './src') } }
 }

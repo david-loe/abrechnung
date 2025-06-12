@@ -10,21 +10,16 @@ export async function getLdapauthStrategy() {
     throw new Error('LDAP not configured in Connection Settings')
   }
   const config: ldapauthSettings = connectionSettings.auth.ldapauth
-  return new LdapStrategy(
-    {
-      server: mapLdapauthConfig(config)
-    },
-    async (ldapUser: any, cb: (error: any, user?: any) => void) => {
-      const email: string | string[] = ldapUser[config.mailAttribute]
+  return new LdapStrategy({ server: mapLdapauthConfig(config) }, async (ldapUser: any, cb: (error: any, user?: any) => void) => {
+    const email: string | string[] = ldapUser[config.mailAttribute]
 
-      findOrCreateUser(
-        { ldapauth: ldapUser[config.uidAttribute] },
-        {
-          email: Array.isArray(email) ? (email.length > 0 ? email[0] : '') : email,
-          name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
-        },
-        cb
-      )
-    }
-  )
+    findOrCreateUser(
+      { ldapauth: ldapUser[config.uidAttribute] },
+      {
+        email: Array.isArray(email) ? (email.length > 0 ? email[0] : '') : email,
+        name: { familyName: ldapUser[config.familyNameAttribute], givenName: ldapUser[config.givenNameAttribute] }
+      },
+      cb
+    )
+  })
 }

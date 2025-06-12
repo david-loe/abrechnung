@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { model, Schema } from 'mongoose'
 import { DocumentFile, documentFileTypes } from '../../common/types.js'
 
 const fileSchema = () =>

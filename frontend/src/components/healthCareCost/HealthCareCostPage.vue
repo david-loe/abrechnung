@@ -440,10 +440,7 @@ async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) 
 }
 
 async function getHealthCareCost() {
-  const params: any = {
-    _id: props._id,
-    additionalFields: ['expenses']
-  }
+  const params: any = { _id: props._id, additionalFields: ['expenses'] }
   const result = (await API.getter<HealthCareCost>(`${props.endpointPrefix}healthCareCost`, params)).ok
   if (result) {
     setHealthCareCost(result.data)

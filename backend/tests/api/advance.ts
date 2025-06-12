@@ -7,11 +7,7 @@ const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-ignore
-let advance: Advance = {
-  name: 'Advance for next trip',
-  reason: 'Traveling is expensive',
-  budget: { amount: 1000, currency: 'USD' as any }
-}
+let advance: Advance = { name: 'Advance for next trip', reason: 'Traveling is expensive', budget: { amount: 1000, currency: 'USD' as any } }
 
 test.serial('GET /project', async (t) => {
   const res = await agent.get('/project')

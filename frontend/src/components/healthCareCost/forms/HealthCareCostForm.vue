@@ -58,14 +58,14 @@
 </template>
 
 <script lang="ts">
-import { HealthCareCostSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
+import { defineComponent, PropType } from 'vue'
+import { HealthCareCostSimple, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HealthCareCostForm',
@@ -80,20 +80,12 @@ export default defineComponent({
     loading: { type: Boolean, default: false }
   },
   data() {
-    return {
-      APP_DATA: APP_LOADER.data,
-      formHealthCareCost: this.default()
-    }
+    return { APP_DATA: APP_LOADER.data, formHealthCareCost: this.default() }
   },
   methods: {
     idDocumentToId,
     default() {
-      return {
-        name: '',
-        patientName: '',
-        advances: [],
-        owner: this.owner
-      }
+      return { name: '', patientName: '', advances: [], owner: this.owner }
     },
     clear() {
       this.formHealthCareCost = this.default()

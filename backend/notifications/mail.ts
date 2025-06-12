@@ -27,7 +27,7 @@ export async function sendMail(
   const mailPromises = []
   for (const recipient of recipients) {
     const language = recipient.settings.language
-    let recipientButton: { text: string; link: string } | undefined = undefined
+    let recipientButton: { text: string; link: string } | undefined
     if (button) {
       recipientButton = { ...button }
       if (authenticateLink && recipient.fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
@@ -59,14 +59,7 @@ async function _sendMail(
   }
 
   const template = await getMailTemplate()
-  const renderedHTML = ejs.render(template, {
-    salutation,
-    paragraph,
-    button,
-    lastParagraph,
-    regards,
-    app
-  })
+  const renderedHTML = ejs.render(template, { salutation, paragraph, button, lastParagraph, regards, app })
   const plainText = `${salutation}\n\n${paragraph}\n\n${button ? `${button.text}: ${button.link}\n\n` : ''}${lastParagraph ? `${Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph}\n\n` : ''}${regards}\n\n${app.name}: ${app.url}`
 
   logger.debug(`Send mail to ${recipient.email}`)

@@ -23,11 +23,7 @@ const users = {
     password: 'bender',
     access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true }
   },
-  advance: {
-    username: 'bender',
-    password: 'bender',
-    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true }
-  }
+  advance: { username: 'bender', password: 'bender', access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true } }
 }
 
 async function createUser(agent: request.Agent, userKey: keyof typeof users) {
@@ -40,10 +36,7 @@ async function createUser(agent: request.Agent, userKey: keyof typeof users) {
     throw new Error('Unable to get user. Probably an access issue.')
   }
   const userId = (res.body.data as User[])[0]._id
-  const user = {
-    _id: userId,
-    access: users[userKey].access
-  }
+  const user = { _id: userId, access: users[userKey].access }
   await agent.post('/admin/user').send(user)
 }
 

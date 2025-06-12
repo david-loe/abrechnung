@@ -50,14 +50,14 @@
 </template>
 
 <script lang="ts">
-import { Category, ExpenseReportSimple, UserWithName, idDocumentToId } from '@/../../common/types.js'
+import { defineComponent, PropType } from 'vue'
+import { Category, ExpenseReportSimple, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import CategorySelector from '@/components/elements/CategorySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
-import { PropType, defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'ExpenseReportForm',
@@ -72,20 +72,12 @@ export default defineComponent({
     loading: { type: Boolean, default: false }
   },
   data() {
-    return {
-      APP_DATA: APP_LOADER.data,
-      formExpenseReport: this.default()
-    }
+    return { APP_DATA: APP_LOADER.data, formExpenseReport: this.default() }
   },
   methods: {
     idDocumentToId,
     default() {
-      return {
-        name: '',
-        advances: [],
-        owner: this.owner,
-        category: this.APP_DATA?.defaultCategory
-      }
+      return { name: '', advances: [], owner: this.owner, category: this.APP_DATA?.defaultCategory }
     },
     clear() {
       this.formExpenseReport = this.default()

@@ -19,10 +19,7 @@ import { ProjectDoc } from './project.js'
 import User from './user.js'
 
 function place(required = false, withPlace = true) {
-  const obj: any = {
-    country: { type: String, ref: 'Country', required: required },
-    special: { type: String }
-  }
+  const obj: any = { country: { type: String, ref: 'Country', required: required }, special: { type: String } }
   if (withPlace) {
     obj.place = { type: String, required: required }
   }

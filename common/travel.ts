@@ -1,5 +1,6 @@
 import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
 import {
+  baseCurrency,
   CateringType,
   Country,
   CountryCode,
@@ -12,8 +13,7 @@ import {
   TravelDay,
   TravelDayFullCountry,
   TravelExpense,
-  TravelSettings,
-  baseCurrency
+  TravelSettings
 } from './types.js'
 
 export class TravelCalculator {

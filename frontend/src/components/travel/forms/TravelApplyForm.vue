@@ -154,11 +154,7 @@ export default defineComponent({
     loading: { type: Boolean, default: false }
   },
   data() {
-    return {
-      APP_DATA: APP_LOADER.data,
-      formTravel: this.default(),
-      TravelState
-    }
+    return { APP_DATA: APP_LOADER.data, formTravel: this.default(), TravelState }
   },
   methods: {
     idDocumentToId,
@@ -170,10 +166,7 @@ export default defineComponent({
         endDate: '',
         destinationPlace: undefined,
         claimSpouseRefund: false,
-        a1Certificate: {
-          exactAddress: '',
-          destinationName: ''
-        },
+        a1Certificate: { exactAddress: '', destinationName: '' },
         isCrossBorder: undefined,
         advances: [],
         owner: this.owner

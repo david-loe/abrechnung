@@ -245,14 +245,7 @@ if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 
-const showFilter = ref({
-  name: false,
-  owner: false,
-  state: false,
-  project: false,
-  'project.organisation': false,
-  'log.0.date': false
-})
+const showFilter = ref({ name: false, owner: false, state: false, project: false, 'project.organisation': false, 'log.0.date': false })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()

@@ -38,10 +38,10 @@
 </template>
 
 <script lang="ts" setup>
+import { PropType, ref } from 'vue'
 import { User } from '@/../../common/types.js'
 import API from '@/api.js'
 import { logger } from '@/logger.js'
-import { PropType, ref } from 'vue'
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: true },
