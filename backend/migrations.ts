@@ -314,6 +314,18 @@ export async function checkForMigrations() {
         }
       )
     }
+    if (semver.lte(migrateFrom, '2.1.0')) {
+      logger.info('Apply migration from v2.1.0: add name display format setting')
+
+      await mongoose.connection.collection('displaysettings').updateOne(
+        {},
+        {
+          $set: {
+            nameDisplayFormat: 'givenNameFirst'
+          }
+        }
+      )
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

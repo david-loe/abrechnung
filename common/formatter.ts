@@ -1,5 +1,5 @@
 import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
-import { BaseCurrencyMoney, Locale, Money, baseCurrency, idDocumentToId } from './types.js'
+import { BaseCurrencyMoney, baseCurrency, idDocumentToId, Locale, Money, Name, NameDisplayFormat } from './types.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
@@ -30,9 +30,11 @@ class Formatter {
   #baseCurrencyFormatOptions: Intl.NumberFormatOptions = { style: 'currency', currency: baseCurrency._id }
   #floatFormatOptions: Intl.NumberFormatOptions = { maximumFractionDigits: 4 }
   locale!: Locale
+  nameDisplayFormat!: NameDisplayFormat
 
-  constructor(locale: Locale) {
+  constructor(locale: Locale, nameDisplayFormat: NameDisplayFormat) {
     this.setLocale(locale)
+    this.setNameDisplayFormat(nameDisplayFormat)
   }
   setLocale(locale?: Locale) {
     if (locale && locale !== this.locale) {
@@ -44,6 +46,9 @@ class Formatter {
       this.#baseCurrencyFormat = new Intl.NumberFormat(locale, this.#baseCurrencyFormatOptions)
       this.#floatFormat = new Intl.NumberFormat(locale, this.#floatFormatOptions)
     }
+  }
+  setNameDisplayFormat(nameDisplayFormat: NameDisplayFormat) {
+    this.nameDisplayFormat = nameDisplayFormat
   }
   /**
    * Day + Month + Year
@@ -135,6 +140,15 @@ class Formatter {
       str = `${str} / ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
     }
     return str
+  }
+  name(name?: Name, length: 'long' | 'short' | 'shortWithoutPoint' = 'long') {
+    if (!name) {
+      return ''
+    }
+    if (this.nameDisplayFormat === 'givenNameFirst') {
+      return `${name.givenName} ${length === 'long' ? name.familyName : `${name.familyName.substring(0, 1)}${length === 'short' ? '.' : ''}`}`
+    }
+    return `${name.familyName}, ${length === 'long' ? name.givenName : `${name.givenName.substring(0, 1)}${length === 'short' ? '.' : ''}`}`
   }
 }
 

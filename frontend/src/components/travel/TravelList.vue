@@ -131,13 +131,13 @@
       <PlaceElement :place="destinationPlace"></PlaceElement>
     </template>
     <template #item-editor="{ editor }">
-      <span :title="editor.name.givenName + ' ' + editor.name.familyName">
-        {{ editor.name.givenName + ' ' + editor.name.familyName.substring(0, 1) + '.' }}
+      <span :title="formatter.name(editor.name)">
+        {{ formatter.name(editor.name, 'short') }}
       </span>
     </template>
     <template #item-owner="{ owner }">
-      <span :title="owner.name.givenName + ' ' + owner.name.familyName">
-        {{ owner.name.familyName + ', ' + owner.name.givenName.substring(0, 1) + '.' }}
+      <span :title="formatter.name(owner.name)">
+        {{ formatter.name(owner.name, 'short') }}
       </span>
     </template>
     <template #item-state="{ progress, state }">
@@ -208,6 +208,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
+import { formatter } from '@/formatter'
 import { bp, showFile } from '@/helper.js'
 
 const { t } = useI18n()

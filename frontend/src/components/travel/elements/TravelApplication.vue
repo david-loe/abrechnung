@@ -26,6 +26,7 @@ import { getDiffInDays } from '@/../../common/scripts.js'
 import { TravelSimple, TravelState } from '@/../../common/types.js'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import { formatter } from '@/formatter'
 
 const keys: (keyof TravelSimple)[] = [
   'owner',
@@ -67,9 +68,9 @@ export default defineComponent({
           if (this.travel.owner._id === this.travel.editor._id) {
             return ''
           }
-          return `${this.travel[key].name.givenName} ${this.travel[key].name.familyName}`
+          return formatter.name(this.travel[key].name)
         case 'owner':
-          return `${this.travel[key].name.givenName} ${this.travel[key].name.familyName}`
+          return formatter.name(this.travel[key].name)
         case 'comments':
           if (this.travel.comments.length > 0) {
             const c = this.travel.comments[this.travel.comments.length - 1]

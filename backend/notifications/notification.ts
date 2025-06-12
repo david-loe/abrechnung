@@ -97,18 +97,19 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
 export async function sendA1Notification(report: TravelSimple) {
   const org = await Organisation.findOne({ _id: report.project.organisation })
   if (org?.a1CertificateEmail) {
-    const language = (await getDisplaySettings()).locale.default
+    const displaySettings = await getDisplaySettings()
+    const language = displaySettings.locale.default
     const dif = getDiffInDays(report.startDate, report.endDate) + 1
     const t = (key: string) => i18n.t(key, { lng: language })
     const subject = t('mail.travel.a1.subject')
     const paragraph = t('mail.travel.a1.paragraph')
     const lastParagraph = [
-      `${t('labels.traveler')}: ${report.owner.name.givenName} ${report.owner.name.familyName}`,
+      `${t('labels.traveler')}: ${formatter.name(report.owner.name)}`,
       `${t('labels.reason')}: ${report.reason}`,
       `${t('labels.startDate')}: ${formatter.date(report.startDate, language)}`,
       `${t('labels.endDate')}: ${formatter.date(report.endDate)} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
       `${t('labels.destinationPlace')}: ${PlaceToString(report.destinationPlace, language)}`,
-      `${t('labels.approvedBy')}: ${report.editor.name.givenName} ${report.editor.name.familyName}`,
+      `${t('labels.approvedBy')}: ${formatter.name(report.editor.name)}`,
       `${t('labels.destinationName')}: ${report.a1Certificate?.destinationName}`,
       `${t('labels.exactAddress')}: ${report.a1Certificate?.exactAddress}`
     ]

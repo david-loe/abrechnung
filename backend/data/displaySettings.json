@@ -17,6 +17,7 @@
       "en": {}
     }
   },
+  "nameDisplayFormat": "givenNameFirst",
   "helpButton": {
     "enabled": true,
     "examinersMail": true,

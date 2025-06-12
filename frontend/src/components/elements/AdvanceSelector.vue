@@ -38,7 +38,7 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
-      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: `${owner?.name?.givenName} ${owner?.name?.familyName}` }) }}</span>
+      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name(owner?.name) }) }}</span>
     </template>
   </v-select>
 </template>
@@ -49,6 +49,7 @@ import { useI18n } from 'vue-i18n'
 import { Base64 } from '@/../../common/scripts'
 import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import API from '@/api'
+import { formatter } from '@/formatter'
 
 // Props
 const props = defineProps({

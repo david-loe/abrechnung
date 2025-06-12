@@ -119,7 +119,7 @@
         </div>
         <div class="text-secondary">
           {{
-            (endpointPrefix === 'examine/' ? expenseReport.owner.name.givenName + ' ' + expenseReport.owner.name.familyName + ' - ' : '') +
+            (endpointPrefix === 'examine/' ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
             expenseReport.project.identifier +
             (expenseReport.project.name ? ' ' + expenseReport.project.name : '')
           }}

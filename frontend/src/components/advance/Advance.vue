@@ -4,7 +4,7 @@
     <tbody>
       <tr>
         <th scope="row">{{ t('labels.owner') }}</th>
-        <td>{{ `${advance.owner.name.givenName} ${advance.owner.name.familyName}` }}</td>
+        <td>{{ `${formatter.name(advance.owner.name)}` }}</td>
       </tr>
       <tr>
         <th scope="row">{{ t('labels.reason') }}</th>
@@ -53,7 +53,7 @@
         <td>
           <div class="mb-1" v-for="comment in advance.comments" :key="comment._id">
             <small>
-              <b>{{ `${comment.author.name.givenName} ${comment.author.name.familyName.substring(0, 1)}: ` }}</b>
+              <b>{{ `${formatter.name(comment.author.name, 'short')}: ` }}</b>
               <span>{{ comment.text }}</span>
             </small>
           </div>
@@ -85,6 +85,7 @@ import { useI18n } from 'vue-i18n'
 import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import { formatter } from '@/formatter'
 import { showFile } from '@/helper.js'
 
 const { t } = useI18n()

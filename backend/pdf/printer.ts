@@ -275,7 +275,7 @@ class ReportPrint {
     if (reportIsTravel(this.report)) {
       // Traveler
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.traveler')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}${this.report.claimSpouseRefund ? ` & ${this.report.fellowTravelersNames}` : ''}`,
+        `${this.t('labels.traveler')}: ${this.drawer.formatter.name(this.report.owner.name)}${this.report.claimSpouseRefund ? ` & ${this.report.fellowTravelersNames}` : ''}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -319,7 +319,7 @@ class ReportPrint {
     let y = options.yStart
     if (reportIsExpenseReport(this.report)) {
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.expensePayer')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}    ${this.t('labels.category')}: ${this.report.category.name}`,
+        `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}    ${this.t('labels.category')}: ${this.report.category.name}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -342,7 +342,7 @@ class ReportPrint {
     if (reportIsHealthCareCost(this.report)) {
       // Insurance + patientName
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
+        `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -357,7 +357,7 @@ class ReportPrint {
     let y = options.yStart
     if (reportIsAdvance(this.report)) {
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.applicant')}: ${this.report.owner.name.givenName} ${this.report.owner.name.familyName}      ${this.t('labels.reason')}: ${this.report.reason}`,
+        `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.reason')}: ${this.report.reason}`,
         {
           xStart: options.xStart,
           yStart: y,
@@ -424,7 +424,7 @@ class ReportPrint {
       })
       summary.push({
         reference: this.t('labels.approvedBy'),
-        value: `${this.report.log[State.APPLIED_FOR]?.editor.name.givenName} ${this.report.log[State.APPLIED_FOR]?.editor.name.familyName}`
+        value: `${this.drawer.formatter.name(this.report.log[State.APPLIED_FOR]?.editor.name)}`
       })
     }
     if (!reportIsAdvance(this.report)) {
@@ -435,7 +435,7 @@ class ReportPrint {
       summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log[State.IN_REVIEW]?.date })
       summary.push({
         reference: this.t('labels.examinedBy'),
-        value: `${this.report.editor.name.givenName} ${this.report.editor.name.familyName}`
+        value: `${this.drawer.formatter.name(this.report.editor.name)}`
       })
     }
 
@@ -455,7 +455,7 @@ class ReportPrint {
       width: 120,
       alignment: pdf_lib.TextAlignment.Left,
       title: 'author',
-      fn: (a: Comment['author']) => `${a.name.givenName} ${a.name.familyName}`
+      fn: (a: Comment['author']) => `${this.drawer.formatter.name(a.name)}`
     })
     columns.push({
       key: 'text',

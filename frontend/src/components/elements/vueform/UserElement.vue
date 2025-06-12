@@ -50,21 +50,21 @@
 
         <template v-slot:singlelabel="{ value }">
           <span class="text-truncate ms-2 me-auto">
-            <span>{{ value.name.givenName + ' ' + value.name.familyName }}</span>
+            <span>{{ displayName(name) }}</span>
           </span>
         </template>
 
         <template v-slot:multiplelabel="{ values }">
           <span class="ms-2 mt-1 me-auto">
             <span v-for="value of values" class="me-3">
-              {{ value.name.givenName + ' ' + value.name.familyName }}
+              {{ displayName(value.name) }}
             </span>
           </span>
         </template>
 
         <template v-slot:option="{ option }">
           <div>
-            {{ option.name.givenName + ' ' + option.name.familyName }}
+            {{ displayName(option.name) }}
           </div>
         </template>
       </Multiselect>
@@ -78,11 +78,12 @@
 </template>
 
 <script>
-import APP_LOADER from '@/appData.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { SelectElement, defineElement } from '@vueform/vueform'
+import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
+import APP_LOADER from '@/appData.js'
+import { formatter } from '@/formatter'
 
 export default defineElement({
   ...SelectElement, // adding props, mixins, emits
@@ -104,9 +105,13 @@ export default defineElement({
       if (familyName) {
         return familyName
       }
-      return `${option.name.givenName} ${option.name.familyName}`.toLowerCase().indexOf(search.toLowerCase()) > -1
+      return formatter.name(option.name).toLowerCase().indexOf(search.toLowerCase()) > -1
+    },
+    displayName(name) {
+      return formatter.name(name)
     }
   },
+
   setup(props, context) {
     const element = SelectElement.setup(props, context)
     const defaultClasses = ref({
