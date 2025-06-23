@@ -11,6 +11,7 @@ import { getOidcStrategy } from '../authStrategies/oidc.js'
 import { getDisplaySettings } from '../db.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
+import { AuthenticatedExpressRequest } from './types.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by display settings.'
 
@@ -98,9 +99,14 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
   }
 }
 
+const logoutMiddleware = async (req: AuthenticatedExpressRequest, res: ExResponse, next: NextFunction) => {
+  req.logout((err) => {
+    next(err)
+  })
+}
+
 @Tags('Auth')
 @Route('auth')
-@Response(501, disabledMessage)
 export class AuthController extends Controller {
   /**
    * Provides the authentication cookie.
@@ -108,6 +114,7 @@ export class AuthController extends Controller {
    */
   @Post('ldapauth')
   @Middlewares(ldapauthHandler)
+  @Response(501, disabledMessage)
   public ldapauth(@Body() requestBody: { username: string; password: string }) {}
 
   /**
@@ -116,6 +123,7 @@ export class AuthController extends Controller {
   @Get('microsoft')
   @Middlewares(microsoftHandler)
   @SuccessResponse(302, 'Redirecting to Microsoft')
+  @Response(501, disabledMessage)
   public microsoft(@Query() redirect?: string) {}
 
   /**
@@ -125,6 +133,7 @@ export class AuthController extends Controller {
   @Get('microsoft/callback')
   @Middlewares(microsoftCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
+  @Response(501, disabledMessage)
   public microsoftCallback() {}
 
   /**
@@ -134,6 +143,7 @@ export class AuthController extends Controller {
   @Post('magiclogin')
   @Middlewares(magicloginHandler)
   @SuccessResponse(200)
+  @Response(501, disabledMessage)
   public magiclogin(@Body() requestBody: { destination: string; redirect?: string }) {}
 
   /**
@@ -143,6 +153,7 @@ export class AuthController extends Controller {
   @Get('magiclogin/callback')
   @Middlewares(magicloginCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
+  @Response(501, disabledMessage)
   public magicloginCallback(@Query() token: string, @Request() req: ExRequest) {
     this.redirectToFrontend(req.authInfo?.redirect)
   }
@@ -153,6 +164,7 @@ export class AuthController extends Controller {
   @Get('oidc')
   @Middlewares(oidcHandler)
   @SuccessResponse(302, 'Redirecting to OIDC Provider')
+  @Response(501, disabledMessage)
   public oidc(@Query() redirect?: string) {}
 
   /**
@@ -161,6 +173,7 @@ export class AuthController extends Controller {
   @Get('oidc/callback')
   @Middlewares(oidcCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
+  @Response(501, disabledMessage)
   public oidcCallback() {}
 
   private redirectToFrontend(path?: string) {
@@ -171,29 +184,23 @@ export class AuthController extends Controller {
     this.setHeader('Location', process.env.VITE_FRONTEND_URL + redirect)
     this.setStatus(302)
   }
-}
 
-@Tags('Auth')
-@Security('cookieAuth')
-@Security('httpBearer')
-@Route('auth')
-export class logoutController extends Controller {
   /**
    * Logout and delete session
    * @summary Logout
    */
   @Delete('logout')
-  public logout(@Request() request: ExRequest) {
-    request.logout((err) => {
-      if (err) {
-        throw new Error(err)
-      }
-    })
-  }
+  @Security('cookieAuth')
+  @Middlewares(logoutMiddleware)
+  public logout() {}
+
   /**
    * Empty method
    * @summary Check if request is authenticated
    */
   @Get('authenticated')
+  @Security('cookieAuth')
+  @Security('httpBearer')
+  @Response(401, 'Unauthorized')
   public authenticated(): void {}
 }
