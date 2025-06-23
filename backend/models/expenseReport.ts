@@ -2,8 +2,7 @@ import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
-import { ProjectDoc } from './project.js'
+import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -105,7 +104,7 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
 
 schema.post('save', async function (this: ExpenseReportDoc) {
   if (this.state === ExpenseReportState.REVIEW_COMPLETED) {
-    await (this.project as ProjectDoc).updateBalance()
+    await addToProjectBalance(this)
     await offsetAdvance(this, 'ExpenseReport')
   }
 })
