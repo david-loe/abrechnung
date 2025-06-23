@@ -9,7 +9,7 @@ export async function checkForMigrations() {
     const migrateFrom = settings?.migrateFrom
     const minVersion = '2.0.0'
     if (semver.lt(migrateFrom, minVersion)) {
-      throw new Error(`Migration from v${migrateFrom} to v${settings.version} not supported. Migrate to at least v${minVersion} first.`)
+      throw new Error(`Migration from v${migrateFrom} to v${settings.version} not supported. Migrate to v${minVersion} first.`)
     }
 
     if (semver.lte(migrateFrom, '2.0.1')) {
