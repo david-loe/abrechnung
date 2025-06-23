@@ -21,6 +21,7 @@ declare global {
       readonly ADMIN_UID: string
       readonly VITE_FRONTEND_URL: string
       readonly VITE_BACKEND_URL: string
+      readonly COOKIE_MAX_AGE_DAYS: string
       readonly COOKIE_SECRET: string
       readonly MAGIC_LOGIN_SECRET: string
       readonly BACKEND_PORT: string
