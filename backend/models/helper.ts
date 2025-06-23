@@ -1,16 +1,19 @@
 import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import {
   _id,
+  AddUp,
   AdvanceBase,
   AnyState,
   FlatAddUp,
   hexColorRegex,
   IdDocument,
   idDocumentToId,
+  Project,
   ReportModelName,
   textColors
 } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
+import { ProjectDoc } from './project.js'
 
 export function costObject(
   exchangeRate = true,
@@ -170,7 +173,24 @@ export async function offsetAdvance(report: { addUp: FlatAddUp[]; advances: Adva
     // await session.commitTransaction() // needs Replica Set
   } catch (error) {
     // await session.abortTransaction() // needs Replica Set
-    // biome-ignore lint/complexity/noUselessCatch: <explanation>
+    // biome-ignore lint/complexity/noUselessCatch: finally needs catch
+    throw error
+  } finally {
+    await session.endSession()
+  }
+}
+
+export async function addToProjectBalance(report: { addUp: AddUp[]; project: Project }) {
+  const session = await mongoose.startSession()
+  // session.startTransaction() // needs Replica Set
+  try {
+    for (const addUp of report.addUp) {
+      await (addUp.project as ProjectDoc).addToBalance(addUp.total.amount, session)
+    }
+    // await session.commitTransaction() // needs Replica Set
+  } catch (error) {
+    // await session.abortTransaction() // needs Replica Set
+    // biome-ignore lint/complexity/noUselessCatch: finally needs catch
     throw error
   } finally {
     await session.endSession()

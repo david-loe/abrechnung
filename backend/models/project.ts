@@ -1,9 +1,9 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema } from 'mongoose'
-import { _id, ExpenseReport, HealthCareCost, idDocumentToId, Project, ProjectUsers, State, Travel } from '../../common/types.js'
+import { _id, Project, ProjectSimple, ProjectUsers } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {
-  updateBalance(): Promise<void>
+  addToBalance(reportTotal: number, session?: mongoose.ClientSession | null): Promise<void>
 }
 
 type ProjectModel = Model<Project, {}, Methods>
@@ -19,39 +19,19 @@ export const projectSchema = () =>
 
 const schema = projectSchema()
 
-schema.methods.updateBalance = async function (this: ProjectDoc): Promise<void> {
-  let sum = 0
-  const filter: mongoose.mongo.Filter<any> = {
-    addUp: { $elemMatch: { project: this._id } },
-    state: { $gte: State.BOOKABLE },
-    historic: false
+// When calling this method from populated paths, only the populated field are in the document
+interface ProjectSimpleDoc extends Methods, HydratedDocument<ProjectSimple> {}
+
+schema.methods.addToBalance = async function (this: ProjectSimpleDoc, reportTotal: number, session: mongoose.ClientSession | null = null) {
+  if (reportTotal <= 0) {
+    return
   }
-  const travels = mongoose.connection.collection<Travel>('travels').find(filter)
-  const expenseReports = mongoose.connection.collection<ExpenseReport>('expensereports').find(filter)
-  const healthCareCosts = mongoose.connection.collection<HealthCareCost>('healthcarecosts').find(filter)
-  for await (const travel of travels) {
-    for (const addUp of travel.addUp) {
-      if (this._id.equals(idDocumentToId(addUp.project))) {
-        sum += addUp.total.amount
-      }
-    }
+  const doc = await model<Project, ProjectModel>('Project').findOne({ _id: this._id }).session(session)
+  if (!doc) {
+    return
   }
-  for await (const expenseReport of expenseReports) {
-    for (const addUp of expenseReport.addUp) {
-      if (this._id.equals(idDocumentToId(addUp.project))) {
-        sum += addUp.total.amount
-      }
-    }
-  }
-  for await (const healthCareCost of healthCareCosts) {
-    for (const addUp of healthCareCost.addUp) {
-      if (this._id.equals(idDocumentToId(addUp.project))) {
-        sum += addUp.total.amount
-      }
-    }
-  }
-  this.balance = { amount: sum }
-  await this.save()
+  doc.balance.amount += reportTotal
+  await doc.save({ session })
 }
 
 export type ProjectSchema = InferSchemaType<typeof schema>

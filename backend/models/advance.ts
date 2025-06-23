@@ -115,7 +115,7 @@ async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.Clie
   }
 }
 
-// When calling this method from populated paths, only the populated field are in die document
+// When calling this method from populated paths, only the populated field are in the document
 interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
 schema.methods.offset = async function (

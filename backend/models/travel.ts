@@ -14,8 +14,7 @@ import {
 import { travelCalculator } from '../factory.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
-import { ProjectDoc } from './project.js'
+import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
 import User from './user.js'
 
 function place(required = false, withPlace = true) {
@@ -217,7 +216,7 @@ schema.pre('validate', async function (this: TravelDoc) {
 
 schema.post('save', async function (this: TravelDoc) {
   if (this.state === TravelState.REVIEW_COMPLETED) {
-    ;(this.project as ProjectDoc).updateBalance()
+    await addToProjectBalance(this)
     await offsetAdvance(this, 'Travel')
   }
 })
