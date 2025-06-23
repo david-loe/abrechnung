@@ -17985,9 +17985,6 @@
 				"security": [
 					{
 						"cookieAuth": []
-					},
-					{
-						"httpBearer": []
 					}
 				],
 				"parameters": []
@@ -17999,6 +17996,9 @@
 				"responses": {
 					"204": {
 						"description": "No content"
+					},
+					"401": {
+						"description": "Unauthorized"
 					}
 				},
 				"description": "Empty method",
