@@ -1,5 +1,5 @@
 import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema } from 'mongoose'
-import { _id, Project, ProjectUsers } from '../../common/types.js'
+import { _id, Project, ProjectSimple, ProjectUsers } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {
@@ -19,7 +19,10 @@ export const projectSchema = () =>
 
 const schema = projectSchema()
 
-schema.methods.addToBalance = async function (this: ProjectDoc, reportTotal: number, session: mongoose.ClientSession | null = null) {
+// When calling this method from populated paths, only the populated field are in the document
+interface ProjectSimpleDoc extends Methods, HydratedDocument<ProjectSimple> {}
+
+schema.methods.addToBalance = async function (this: ProjectSimpleDoc, reportTotal: number, session: mongoose.ClientSession | null = null) {
   if (reportTotal <= 0) {
     return
   }
