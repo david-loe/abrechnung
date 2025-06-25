@@ -29,6 +29,7 @@
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
     "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
+    "fileTypeOfXNotSupportedY": "File type of '{X}' not supported. Supported file types are: {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
     "loginFailed": "Failed to log in!",

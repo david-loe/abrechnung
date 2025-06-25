@@ -57,7 +57,7 @@
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
 import { formatBytes, resizeImage } from '@/../../common/scripts.js'
-import { DocumentFile, Token } from '@/../../common/types.js'
+import { DocumentFile, DocumentFileType, documentFileTypes, Token } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
@@ -131,15 +131,19 @@ export default defineComponent({
       if (target.files) {
         for (const file of target.files) {
           const maxSize = Number.parseInt(import.meta.env.VITE_MAX_FILE_SIZE)
-          if (file.size < maxSize) {
-            if (file.type.indexOf('image') > -1) {
-              const resizedImage = await resizeImage(file, 1400)
-              files.push({ data: resizedImage, type: resizedImage.type as DocumentFile['type'], name: file.name })
-            } else {
-              files.push({ data: file, type: file.type as DocumentFile['type'], name: file.name })
-            }
-          } else {
+          if (file.size > maxSize) {
             alert(this.$t('alerts.fileXToLargeMaxIsY', { X: file.name, Y: formatBytes(maxSize) }))
+            continue
+          }
+          if (!documentFileTypes.includes(file.type as DocumentFileType)) {
+            alert(this.$t('alerts.fileTypeOfXNotSupportedY', { X: file.name, Y: documentFileTypes.join(', ') }))
+            continue
+          }
+          if (file.type.indexOf('image') > -1) {
+            const resizedImage = await resizeImage(file, 1400)
+            files.push({ data: resizedImage, type: resizedImage.type as DocumentFileType, name: file.name })
+          } else {
+            files.push({ data: file, type: file.type as DocumentFileType, name: file.name })
           }
         }
         target.value = ''
