@@ -46,7 +46,7 @@ export async function convertCurrency(
       const rates = (res.data as InforEuroResponse).map(
         (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year }) as IExchangeRate
       )
-      ExchangeRate.insertMany(rates)
+      await ExchangeRate.insertMany(rates)
       data = rates.find((r) => r.currency === from.toUpperCase())
     }
   }
