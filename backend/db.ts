@@ -165,7 +165,7 @@ async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
           const newLumpSum: CountryLumpSum = Object.assign({ validFrom: new Date(lumpSums.validFrom) }, lumpSum)
           country.lumpSums.push(newLumpSum)
           country.markModified('lumpSums')
-          country.save()
+          await country.save()
           count++
         }
       } else {
