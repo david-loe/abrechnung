@@ -29,6 +29,7 @@
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
     "errorSaving": "Beim Speichern ist ein Fehler aufgetreten",
     "fileXToLargeMaxIsY": "Die Datei '{X}' ist zu groß. Maximalgröße ist {Y}.",
+    "fileTypeOfXNotSupportedY": "Dateityp von '{X}' wird nicht unterstützt. Erlaubt sind: {Y}.",
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
     "loginFailed": "Anmeldung fehlgeschlagen!",
