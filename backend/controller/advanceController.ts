@@ -127,7 +127,6 @@ export class AdvanceApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { appliedFor: { date: new Date(), editor: request.user._id } }
       setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
@@ -225,7 +224,7 @@ export class AdvanceBookableController extends Controller {
       query,
       filter,
       projection: { history: 0, historic: 0 },
-      sort: { [`log.${AdvanceState.APPLIED_FOR}.date`]: -1 }
+      sort: { [`log.${State.BOOKABLE}.on`]: -1 }
     })
   }
 

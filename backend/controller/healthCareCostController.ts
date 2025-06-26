@@ -302,7 +302,6 @@ export class HealthCareCostExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { [HealthCareCostState.IN_WORK]: { date: new Date(), editor: request.user._id } }
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`

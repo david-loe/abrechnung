@@ -288,7 +288,6 @@ export class ExpenseReportExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { [ExpenseReportState.IN_WORK]: { date: new Date(), editor: request.user._id } }
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`

@@ -121,7 +121,7 @@ schema.pre('save', async function () {
 
 schema.methods.isActive = async function (this: UserDoc) {
   if (this.access.user) {
-    if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= new Date().valueOf())) {
+    if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= Date.now())) {
       return true
     }
     for (const access of accesses) {

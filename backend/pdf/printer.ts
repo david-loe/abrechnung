@@ -6,6 +6,7 @@ import { getAddUpTableData, getTotalBalance, hexToRGB } from '../../common/scrip
 import {
   _id,
   Advance,
+  AdvanceState,
   baseCurrency,
   Comment,
   Cost,
@@ -34,7 +35,8 @@ import {
   Travel,
   TravelDay,
   TravelExpense,
-  TravelSettings
+  TravelSettings,
+  TravelState
 } from '../../common/types.js'
 
 interface PrintSettings extends PrintSettingsBase {
@@ -360,18 +362,34 @@ class ReportPrint {
     })
 
     const summary = []
-    if (reportIsTravel(this.report) || reportIsAdvance(this.report)) {
-      summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.createdAt })
-      summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[State.APPLIED_FOR]?.date })
+    if (reportIsAdvance(this.report)) {
+      summary.push({
+        reference: this.t('labels.appliedForOn'),
+        value: this.report.log[AdvanceState.APPLIED_FOR]?.on || this.report.createdAt
+      })
+      summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[AdvanceState.APPROVED]?.on })
       summary.push({
         reference: this.t('labels.approvedBy'),
-        value: `${this.drawer.formatter.name(this.report.log[State.APPLIED_FOR]?.editor.name)}`
+        value: `${this.drawer.formatter.name(this.report.log[AdvanceState.APPROVED]?.by.name)}`
       })
-    }
-    if (!reportIsAdvance(this.report)) {
-      summary.push({ reference: this.t('labels.submittedOn'), value: this.report.log[State.EDITABLE_BY_OWNER]?.date })
-      summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log[State.IN_REVIEW]?.date })
-      summary.push({ reference: this.t('labels.examinedBy'), value: `${this.drawer.formatter.name(this.report.editor.name)}` })
+    } else {
+      if (reportIsTravel(this.report)) {
+        summary.push({
+          reference: this.t('labels.appliedForOn'),
+          value: this.report.log[TravelState.APPLIED_FOR]?.on || this.report.createdAt
+        })
+        summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[TravelState.APPROVED]?.on })
+        summary.push({
+          reference: this.t('labels.approvedBy'),
+          value: `${this.drawer.formatter.name(this.report.log[TravelState.APPROVED]?.by.name)}`
+        })
+      }
+      summary.push({ reference: this.t('labels.submittedOn'), value: this.report.log[State.IN_REVIEW]?.on })
+      summary.push({ reference: this.t('labels.examinedOn'), value: this.report.log[State.BOOKABLE]?.on })
+      summary.push({
+        reference: this.t('labels.examinedBy'),
+        value: `${this.drawer.formatter.name(this.report.log[State.BOOKABLE]?.by.name)}`
+      })
     }
 
     const tabelOptions: TableOptions = options

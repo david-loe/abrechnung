@@ -379,7 +379,7 @@ export interface TravelDay {
 }
 
 export type Log<S extends AnyState = AnyState> = {
-  [key in S]?: { date: Date | string; editor: UserSimple }
+  [key in S]?: { on: Date | string; by: UserSimple }
 }
 
 export interface ReportSimple<S extends AnyState = AnyState> {

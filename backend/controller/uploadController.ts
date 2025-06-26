@@ -49,7 +49,7 @@ export class UploadController extends Controller {
       }
       url.searchParams.append('ownerId', ownerId)
     }
-    const secondsLeft = Math.round((new Date(user.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
+    const secondsLeft = Math.round((new Date(user.token.expireAt).valueOf() - Date.now()) / 1000)
     const maxFileSize = Number.parseInt(process.env.VITE_MAX_FILE_SIZE)
     const text = {
       tapToUpload: i18n.t('labels.tapToUpload', { lng: user?.settings.language }),

@@ -202,6 +202,38 @@ export async function checkForMigrations() {
 
       await mongoose.connection.collection('displaysettings').updateOne({}, { $set: { nameDisplayFormat: 'givenNameFirst' } })
     }
+    if (semver.lte(migrateFrom, '2.1.2')) {
+      logger.info('Apply migration from v2.1.2: rewrite log')
+
+      const advanceMap = { 0: 30, 30: 40, 40: 40 } as const
+      const otherMap = { 0: 10, 10: 20, 20: 30, 30: 40, 40: 40 } as const
+
+      function rewriteLog(
+        oldLog: {
+          [key in number]?: { date: Date; editor: mongoose.Types.ObjectId }
+        },
+        map: { [key in number]: number }
+      ) {
+        const newLog: { [key in number]?: { on: Date; by: mongoose.Types.ObjectId } } = {}
+        for (const key in oldLog) {
+          if (oldLog[key] && map[key]) {
+            newLog[map[key]] = { on: oldLog[key].date, by: oldLog[key].editor }
+          }
+        }
+        return newLog
+      }
+      async function bulkRewriteLog(collectionName: string) {
+        const docs = mongoose.connection.collection(collectionName).find({})
+        const map = collectionName === 'advances' ? advanceMap : otherMap
+        for await (const doc of docs) {
+          await mongoose.connection.collection(collectionName).updateOne({ _id: doc._id }, { $set: { log: rewriteLog(doc.log, map) } })
+        }
+      }
+      await bulkRewriteLog('travels')
+      await bulkRewriteLog('expensereports')
+      await bulkRewriteLog('healthcarecosts')
+      await bulkRewriteLog('advances')
+    }
 
     if (settings) {
       settings.migrateFrom = undefined
