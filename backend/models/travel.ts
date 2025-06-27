@@ -14,7 +14,7 @@ import {
 import { travelCalculator } from '../factory.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema } from './helper.js'
+import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import User from './user.js'
 
 function place(required = false, withPlace = true) {
@@ -123,7 +123,7 @@ const populates = {
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
-  log: travelStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  log: travelStates.map((state) => ({ path: `log.${state}.by`, select: { name: 1, email: 1 } })),
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 
@@ -156,7 +156,6 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
   const old = await model('Travel').create([doc], { timestamps: false })
   this.history.push(old[0]._id)
   this.markModified('history')
-  this.log[this.state] = { date: new Date(), editor: this.editor }
 
   if (this.state === TravelState.APPROVED) {
     // move vehicle registration of owner as receipt to 'ownCar' stages
@@ -212,6 +211,10 @@ schema.pre('validate', async function (this: TravelDoc) {
   await this.calculateExchangeRates()
   this.addUp = addUp(this) as AddUp<Travel>[]
   await populateAll(this, populates)
+})
+
+schema.pre('save', async function (this: TravelDoc) {
+  setLog(this)
 })
 
 schema.post('save', async function (this: TravelDoc) {

@@ -46,7 +46,7 @@
         class="mb-5"
         table-class-name="small-table"
         endpoint="book/advance"
-        :columns-to-hide="['balance', 'log.0.date', 'state']"
+        :columns-to-hide="['balance', 'log.30.on', 'state']"
         make-name-no-link
         :stateFilter="show"
         :rows-per-page="10"

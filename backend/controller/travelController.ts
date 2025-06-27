@@ -281,7 +281,6 @@ export class TravelApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      ;(extendedBody as any).log = { appliedFor: { date: new Date(), editor: request.user._id } }
       const travelApplication = extendedBody as TravelApplication
       ;(travelApplication as any).lastPlaceOfWork = { country: travelApplication.destinationPlace?.country, place: '' }
       if (!travelApplication.name && travelApplication.startDate) {

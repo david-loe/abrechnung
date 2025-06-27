@@ -11,7 +11,7 @@ const schema = tokenSchema()
 schema.pre('save', async function (this: HydratedDocument<any>) {
   if (this.isNew) {
     const settings = await getSettings()
-    this.expireAt = new Date(new Date().valueOf() + settings.uploadTokenExpireAfterSeconds * 1000)
+    this.expireAt = new Date(Date.now() + settings.uploadTokenExpireAfterSeconds * 1000)
   }
 })
 

@@ -78,17 +78,17 @@
         </div>
       </div>
     </template>
-    <template #header-log.0.date="header">
+    <template #header-log.30.on="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ header.text }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('log.0.date', e)">
-            <i v-if="showFilter['log.0.date']" class="bi bi-funnel-fill mx-1"></i>
+          <span style="cursor: pointer" @click="(e) => clickFilter('log.30.on', e)">
+            <i v-if="showFilter['log.30.on']" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
         </div>
-        <div v-if="showFilter['log.0.date']" @click.stop>
-          <DateInput v-model="(filter['log.0.date'] as any).$gt" :max="new Date()" with-time></DateInput>
+        <div v-if="showFilter['log.30.on']" @click.stop>
+          <DateInput v-model="(filter['log.30.on'] as any).$gt" :max="new Date()" with-time></DateInput>
         </div>
       </div>
     </template>
@@ -104,29 +104,29 @@
         {{ advance.name }}
       </a>
     </template>
-    <template #item-editor="{ editor }">
+    <template #item-editor="{ editor }: AdvanceSimple">
       <span :title="formatter.name(editor.name)">
         {{ formatter.name(editor.name, 'short') }}
       </span>
     </template>
-    <template #item-owner="{ owner }">
+    <template #item-owner="{ owner }: AdvanceSimple">
       <span :title="formatter.name(owner.name)">
         {{ formatter.name(owner.name, 'short') }}
       </span>
     </template>
-    <template #item-state="{ state }">
+    <template #item-state="{ state }: AdvanceSimple">
       <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block"></StateBadge>
     </template>
-    <template #item-organisation="{ project }">
+    <template #item-organisation="{ project }: AdvanceSimple">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-budget="{ budget }">
+    <template #item-budget="{ budget }: AdvanceSimple">
       {{ formatter.money(budget) }}
     </template>
-    <template #item-balance="{ balance }">
+    <template #item-balance="{ balance }: AdvanceSimple">
       {{ formatter.money(balance) }}
     </template>
-    <template #item-report="{ _id, name }">
+    <template #item-report="{ _id, name }: AdvanceSimple">
       <button
         class="btn btn-primary btn-sm"
         @click="showFile({ endpoint: `${props.endpoint}/report`, _id, filename: `${name}.pdf`, isDownloading: isDownloadingFn() })"
@@ -139,10 +139,10 @@
     <template #item-updatedAt="{ updatedAt }">
       {{ formatter.dateTime(updatedAt) }}
     </template>
-    <template #item-log.0.date="{ log }">
-      {{ formatter.dateTime(log[0].date) }}
+    <template #item-log.30.on="{ log }: AdvanceSimple">
+      {{ log[30] ? formatter.dateTime(log[30].on) : '' }}
     </template>
-    <template #item-bookingRemark="{ bookingRemark }">
+    <template #item-bookingRemark="{ bookingRemark }: AdvanceSimple">
       <span v-if="bookingRemark">
         <TooltipElement :text="bookingRemark">
           <i class="bi bi-chat-left-text"></i>
@@ -217,7 +217,7 @@ if (window.innerWidth > bp.md) {
     { text: t('labels.owner'), value: 'owner' },
     { text: t('labels.editor'), value: 'editor' },
     { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.approvedOn'), value: 'log.0.date', sortable: true },
+    { text: t('labels.approvedOn'), value: 'log.30.on', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )
@@ -236,7 +236,7 @@ const getEmptyFilter = () =>
     owner: undefined,
     state: undefined,
     project: { $in: [undefined] },
-    'log.0.date': { $gt: undefined }
+    'log.30.on': { $gt: undefined }
   }) as Filter
 
 const filter = ref(getEmptyFilter())
@@ -245,7 +245,7 @@ if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 
-const showFilter = ref({ name: false, owner: false, state: false, project: false, 'project.organisation': false, 'log.0.date': false })
+const showFilter = ref({ name: false, owner: false, state: false, project: false, 'project.organisation': false, 'log.30.on': false })
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()

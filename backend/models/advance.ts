@@ -15,7 +15,7 @@ import {
 } from '../../common/types.js'
 import { setAdvanceBalance } from '../helper.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema } from './helper.js'
+import { costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
@@ -59,7 +59,7 @@ const populates = {
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
-  log: advanceStates.map((state) => ({ path: `log.${state}.editor`, select: { name: 1, email: 1 } })),
+  log: advanceStates.map((state) => ({ path: `log.${state}.by`, select: { name: 1, email: 1 } })),
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance, Advance>) {
@@ -80,7 +80,6 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
   const old = await model('Advance').create([doc], { timestamps: false, session })
   this.history.push(old[0]._id)
   this.markModified('history')
-  this.log[this.state] = { date: new Date(), editor: this.editor }
   if (this.state === AdvanceState.APPLIED_FOR) {
     setAdvanceBalance(this)
   }
@@ -163,6 +162,7 @@ schema.pre('validate', function (this: AdvanceDoc) {
 schema.pre('save', async function (this: AdvanceDoc) {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
+  setLog(this)
 })
 
 export default model<Advance, AdvanceModel>('Advance', schema)

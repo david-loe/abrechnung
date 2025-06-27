@@ -8,9 +8,11 @@ import {
   hexColorRegex,
   IdDocument,
   idDocumentToId,
+  Log,
   Project,
   ReportModelName,
-  textColors
+  textColors,
+  UserSimple
 } from '../../common/types.js'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
@@ -32,7 +34,7 @@ export function costObject(
     type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }] }
     type.date = {
       type: Date,
-      validate: { validator: (v: Date | string | number) => new Date().valueOf() >= new Date(v).valueOf(), message: 'futureNotAllowed' },
+      validate: { validator: (v: Date | string | number) => Date.now() >= new Date(v).valueOf(), message: 'futureNotAllowed' },
       required: required
     }
   }
@@ -40,7 +42,7 @@ export function costObject(
 }
 
 export function logObject<T extends AnyState>(states: readonly T[]) {
-  const logEntry = { type: { date: { type: Date, required: true }, editor: { type: Schema.Types.ObjectId, ref: 'User', required: true } } }
+  const logEntry = { type: { on: { type: Date, required: true }, by: { type: Schema.Types.ObjectId, ref: 'User', required: true } } }
   const log: { type: { [key in T]?: typeof logEntry }; required: true; default: () => {} } = {
     type: {},
     required: true,
@@ -50,6 +52,12 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
     log.type[state] = logEntry
   }
   return log
+}
+
+export function setLog(doc: HydratedDocument<{ state: AnyState; log: Log; editor: UserSimple }>) {
+  if (doc.isModified('state')) {
+    doc.log[doc.state] = { on: new Date(), by: doc.editor }
+  }
 }
 
 export function colorSchema(label?: string, required = true) {

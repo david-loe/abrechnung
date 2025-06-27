@@ -168,7 +168,7 @@ export default defineComponent({
     },
     async getTokenFiles() {
       if (this.token) {
-        this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - new Date().valueOf()) / 1000)
+        this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - Date.now()) / 1000)
       }
       const result = (await API.getter<Token>('user/token')).ok
       if (result?.data) {

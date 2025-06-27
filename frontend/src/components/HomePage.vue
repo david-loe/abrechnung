@@ -128,7 +128,7 @@
         <AdvanceList
           ref="advanceList"
           endpoint="advance"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.0.date']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
           @clicked="(t) => showModal('view', 'advance', t)"></AdvanceList>
       </template>
     </div>

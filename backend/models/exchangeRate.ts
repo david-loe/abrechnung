@@ -33,7 +33,7 @@ export async function convertCurrency(
     return null
   }
   let conversionDate = new Date(date)
-  if (conversionDate.valueOf() - new Date().valueOf() > 0) {
+  if (conversionDate.valueOf() - Date.now() > 0) {
     conversionDate = new Date()
   }
   const month = conversionDate.getUTCMonth() + 1
