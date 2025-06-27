@@ -17,7 +17,7 @@ export const settingsSchema = () => {
       type: NumberConstructor
       min: number
       required: true
-      validate: { validator: any; message: string }
+      validate: { validator: (arg0: number) => boolean; message: string }
       description: string
     }
   }

@@ -7,6 +7,7 @@ import {
   _id,
   Advance,
   AdvanceState,
+  AnyState,
   baseCurrency,
   Comment,
   Cost,
@@ -61,14 +62,18 @@ export interface TableOptions extends Options {
   firstRow?: boolean
 }
 
-export interface Column {
-  key: string
+// biome-ignore lint/suspicious/noExplicitAny: typing to complex
+export interface Column<Type extends {} = any> {
+  key: keyof Type
   width: number
   alignment: pdf_lib.TextAlignment
   title: string
-  fn?: (p: any) => string | undefined
+  // biome-ignore lint/suspicious/noExplicitAny: typing to complex
+  fn?: (p: any) => string
+  // biome-ignore lint/suspicious/noExplicitAny: typing to complex
   countryCodeForFlag?: (p: any) => CountryCode
 }
+
 interface ReceiptMapEntry extends DocumentFile {
   number: number
   date: Date
@@ -97,13 +102,13 @@ export class ReportPrinter {
   settings: PrinterSettings
   getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById']
   getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
-  translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
+  translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
 
   constructor(
     settings: PrinterSettings,
     distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
-    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
   ) {
@@ -142,13 +147,13 @@ class ReportPrint {
   drawer: PDFDrawer
   report: Travel | ExpenseReport | HealthCareCost | Advance
   distanceRefunds: TravelSettings['distanceRefunds']
-  translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
+  translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
 
   constructor(
     report: Travel | ExpenseReport | HealthCareCost | Advance,
     drawer: PDFDrawer,
     distanceRefunds: TravelSettings['distanceRefunds'],
-    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
   ) {
     this.report = report
     this.drawer = drawer
@@ -163,7 +168,7 @@ class ReportPrint {
     getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
     distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
-    translateFunc: (textIdentifier: string, language: Locale, interpolation?: any) => string,
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     language: Locale
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
@@ -419,7 +424,7 @@ class ReportPrint {
     const tabelOptions: TableOptions = options
     tabelOptions.firstRow = false
 
-    return await this.drawer.drawTable(this.report.comments, columns, tabelOptions)
+    return await this.drawer.drawTable<Comment<AnyState>>(this.report.comments, columns, tabelOptions)
   }
 
   async drawStages(receiptMap: ReceiptMap, options: Options) {
@@ -473,7 +478,7 @@ class ReportPrint {
       width: 65,
       alignment: pdf_lib.TextAlignment.Right,
       title: this.t('labels.distance'),
-      fn: (t: Transport) => (t.type === 'ownCar' ? String(t.distance) : undefined)
+      fn: (t: Transport) => (t.type === 'ownCar' ? String(t.distance) : EMPTY_CELL)
     })
     columns.push({
       key: 'purpose',
@@ -653,13 +658,13 @@ class ReportPrint {
 
     return await this.drawer.drawTable(this.report.offsetAgainst, columns, options)
   }
-  t(textIdentifier: string, interpolation: any = {}) {
-    return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation) as string
+  t(textIdentifier: string, interpolation: Record<string, string> = {}) {
+    return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation)
   }
 }
 
 // From https://github.com/Hopding/pdf-lib
-// biome-ignore lint/suspicious/noControlCharactersInRegex: <explanation>
+// biome-ignore lint/suspicious/noControlCharactersInRegex: Vertical Tab (VT)
 const lineSplit = (text: string) => text.split(/[\n\f\r\u000B]/)
 const cleanText = (text: string) => text.replace(/\t|\u0085|\u2028|\u2029/g, '    ').replace(/[\b\v]/g, '')
 const lastIndexOfWhitespace = (line: string) => {
@@ -844,7 +849,7 @@ class PDFDrawer {
     textWithPlace += place.country.name[this.settings.language]
     textWithPlace += FLAG_PSEUDO_SUFFIX
 
-    const multiLineText = layoutMultilineText(text, {
+    const multiLineText = layoutMultilineText(textWithPlace, {
       alignment: opts.alignment,
       font: this.font,
       fontSize: opts.fontSize,
@@ -1041,7 +1046,7 @@ class PDFDrawer {
     this.currentPage.node.set(PDFName.of('Annots'), this.doc.context.obj([linkAnnotationRef]))
   }
 
-  async drawTable(data: any[], columns: Column[], options: TableOptions) {
+  async drawTable<Type extends {}>(data: Type[], columns: Column<Type>[], options: TableOptions) {
     if (data.length === 0) {
       return options.yStart
     }
@@ -1076,18 +1081,19 @@ class PDFDrawer {
       }[] = []
       for (const column of columns) {
         const datum = data[i][column.key]
-        let cell = datum
+        let cell: string
+        cell = String(datum)
         if (column.fn) {
-          cell = column.fn(cell)
+          cell = column.fn(datum)
         }
         if (opts.firstRow) {
           cell = column.title
         }
-        if (cell === undefined) {
+        if (datum === undefined) {
           cell = EMPTY_CELL
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
-        const multiText = layoutMultilineText(cell.toString() + (column.countryCodeForFlag && !opts.firstRow ? FLAG_PSEUDO_SUFFIX : ''), {
+        const multiText = layoutMultilineText(cell + (column.countryCodeForFlag && !opts.firstRow ? FLAG_PSEUDO_SUFFIX : ''), {
           alignment: opts.firstRow ? pdf_lib.TextAlignment.Center : column.alignment,
           font: this.font,
           fontSize: fontSize,

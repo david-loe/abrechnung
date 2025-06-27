@@ -23,8 +23,9 @@ export function costObject(
   required = false,
   defaultCurrency: string | null = null,
   defaultAmount: number | null = null,
-  min: number | null = 0
+  min: number | undefined = 0
 ) {
+  // biome-ignore lint/suspicious/noExplicitAny: typing to complex
   const type: any = { amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount } }
   if (exchangeRate) {
     type.exchangeRate = { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min } }
@@ -43,7 +44,7 @@ export function costObject(
 
 export function logObject<T extends AnyState>(states: readonly T[]) {
   const logEntry = { type: { on: { type: Date, required: true }, by: { type: Schema.Types.ObjectId, ref: 'User', required: true } } }
-  const log: { type: { [key in T]?: typeof logEntry }; required: true; default: () => {} } = {
+  const log: { type: { [key in T]?: typeof logEntry }; required: true; default: () => Record<string, never> } = {
     type: {},
     required: true,
     default: () => ({})
@@ -60,7 +61,7 @@ export function setLog(doc: HydratedDocument<{ state: AnyState; log: Log; editor
   }
 }
 
-export function colorSchema(label?: string, required = true) {
+export function colorSchema<L extends string | undefined>(label: L, required = true) {
   return {
     type: {
       color: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
@@ -130,7 +131,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
   return schemaWithAdvances
 }
 
-export function populateSelected<DocType extends Record<string, any>>(
+export function populateSelected<DocType extends {}>(
   query: Query<DocType, DocType>,
   projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
 ) {
@@ -139,7 +140,8 @@ export function populateSelected<DocType extends Record<string, any>>(
   const isExclusiv = query.selectedExclusively()
   const isInclusiv = query.selectedInclusively()
   const populates = []
-  for (const [key, value] of Object.entries(projectionPopulateMap)) {
+  for (const key of Object.keys(projectionPopulateMap)) {
+    const value = projectionPopulateMap[key as keyof DocType]
     if (!value) continue
     if (runAll || (isExclusiv && projection[key] !== 0) || (isInclusiv && projection[key] === 1)) {
       for (const populate of value) {
@@ -150,12 +152,13 @@ export function populateSelected<DocType extends Record<string, any>>(
   return Promise.allSettled(populates)
 }
 
-export function populateAll<DocType extends Record<string, any>>(
+export function populateAll<DocType extends {}>(
   doc: HydratedDocument<DocType>,
   projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
 ) {
-  const populates: Promise<any>[] = []
-  for (const value of Object.values(projectionPopulateMap)) {
+  const populates: Promise<unknown>[] = []
+  for (const key of Object.keys(projectionPopulateMap)) {
+    const value = projectionPopulateMap[key as keyof DocType]
     if (!value) continue
     for (const populate of value) {
       populates.push(doc.populate(populate))

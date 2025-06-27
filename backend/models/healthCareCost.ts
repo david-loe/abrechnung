@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
@@ -10,6 +10,7 @@ interface Methods {
   addComment(): void
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
 
 const healthCareCostSchema = () =>
@@ -65,8 +66,11 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Health
 })
 
 schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
-  const doc: any = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
-  doc._id = undefined
+  const doc = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
+  if (!doc) {
+    throw new Error('Health Care Cost not found')
+  }
+  doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('HealthCareCost').create([doc], { timestamps: false })

@@ -9,41 +9,22 @@ import { _id, BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as I
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 
-export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', '): string {
-  let keys: string[] = []
-  for (const obj of objects) {
-    const oKeys = Object.keys(obj)
-    if (keys.length < oKeys.length) {
-      keys = oKeys
-    }
-  }
-  let str = `${keys.join(separator)}\n`
-  for (const obj of objects) {
-    const col: string[] = []
-    for (const key of keys) {
-      if (!(key in obj)) {
-        col.push('')
-      } else if (Array.isArray(obj[key])) {
-        col.push(`[${obj[key].join(arraySeparator)}]`)
-      } else if (obj[key] === null) {
-        col.push('null')
-      } else {
-        col.push(obj[key])
-      }
-    }
-    str += `${col.join(separator)}\n`
-  }
-  return str
+interface ReqDocument extends Omit<IDocumentFile, 'data'> {
+  data?: Buffer<ArrayBufferLike>
 }
-
 type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean }
 export function documentFileHandler(pathToFiles: string[], options: FileHandleOptions = {}) {
   const opts = Object.assign({ checkOwner: true, multiple: true }, options)
-  return async (req: Request, res?: Response, next?: NextFunction) => {
-    const fileOwner = opts.owner ? opts.owner : req.user?._id
-    if (!fileOwner) {
+  return async (req: Request, _res?: Response, next?: NextFunction) => {
+    let fileOwner: Types.ObjectId
+    if (opts.owner) {
+      fileOwner = new Types.ObjectId(opts.owner)
+    } else if (req.user) {
+      fileOwner = req.user._id
+    } else {
       throw new Error('No owner for uploaded files')
     }
+
     let pathExists = true
     let tmpCheckObj = req.body
     for (const prop of pathToFiles) {
@@ -55,7 +36,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       }
     }
     if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
-      const reqDocuments = tmpCheckObj
+      const reqDocuments: ReqDocument[] | ReqDocument = tmpCheckObj
       function multerFileName(i: number) {
         let str = pathToFiles.length > 0 ? pathToFiles[0] : ''
         for (let j = 1; j < pathToFiles.length; j++) {
@@ -64,7 +45,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
         str += `[${i}][data]`
         return str
       }
-      async function handleFile(reqDoc: any, i: number) {
+      async function handleFile(reqDoc: ReqDocument, i: number) {
         if (!reqDoc._id) {
           let buffer = null
           if (opts.multiple) {
@@ -95,12 +76,13 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
         }
         return reqDoc._id
       }
-      if (opts.multiple) {
+      if (opts.multiple && Array.isArray(reqDocuments)) {
         let iR = 0 // index reduction
         for (let i = 0; i < reqDocuments.length; i++) {
           const resultId = await handleFile(reqDocuments[i], i + iR)
           if (resultId) {
-            reqDocuments[i] = resultId
+            // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
+            ;(reqDocuments[i] as any) = resultId
           } else {
             reqDocuments.splice(i, 1)
             i -= 1
@@ -108,7 +90,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           }
         }
       } else {
-        await handleFile(reqDocuments, 0)
+        await handleFile(reqDocuments as ReqDocument, 0)
       }
     }
     if (next) {
@@ -124,7 +106,7 @@ export async function writeToDisk(
 ): Promise<void> {
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true })
-  } catch (dirError: any) {
+  } catch (dirError: unknown) {
     logger.error(`Fehler beim Erstellen des Verzeichnisses: ${dirError}`)
   }
 
@@ -133,8 +115,8 @@ export async function writeToDisk(
       await fs.writeFile(filePath, data)
       logger.debug(`Wrote to file ${filePath}`)
       return
-    } catch (err: any) {
-      if (err.code === 'EAGAIN' && attempt < retries) {
+    } catch (err: unknown) {
+      if ((err as { code?: unknown }).code === 'EAGAIN' && attempt < retries) {
         logger.warn(`EAGAIN-Fehler beim Versuch ${attempt}. Neuer Versuch in 1 Sekunde...`)
         await new Promise((resolve) => setTimeout(resolve, 1000))
       } else {

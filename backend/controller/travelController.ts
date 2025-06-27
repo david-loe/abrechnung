@@ -70,6 +70,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -99,6 +100,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -116,6 +118,7 @@ export class TravelController extends Controller {
       arrayElementKey: 'expenses',
       checkOldObject: async (oldObject: TravelDoc) => {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -132,6 +135,7 @@ export class TravelController extends Controller {
       arrayElementKey: 'stages',
       checkOldObject: async (oldObject: TravelDoc) => {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -173,7 +177,7 @@ export class TravelController extends Controller {
   @Post('approved')
   public async postOwnApproved(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
     let extendedBody: SetterBody<ITravel> = requestBody
-    let cb = (travel: ITravel) => {}
+    let cb: ((travel: ITravel) => unknown) | undefined
     if (!extendedBody._id) {
       if (!request.user.access['approved:travel']) {
         throw new AuthorizationError()
@@ -282,7 +286,10 @@ export class TravelApproveController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       const travelApplication = extendedBody as TravelApplication
-      ;(travelApplication as any).lastPlaceOfWork = { country: travelApplication.destinationPlace?.country, place: '' }
+      ;(travelApplication as unknown as ITravel).lastPlaceOfWork = {
+        country: travelApplication.destinationPlace?.country as ITravel['destinationPlace']['country'],
+        place: ''
+      }
       if (!travelApplication.name && travelApplication.startDate) {
         const date = new Date(travelApplication.startDate as string)
         travelApplication.name = `${travelApplication.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -391,6 +398,7 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -424,6 +432,7 @@ export class TravelExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -445,6 +454,7 @@ export class TravelExamineController extends Controller {
           (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -465,6 +475,7 @@ export class TravelExamineController extends Controller {
           (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }

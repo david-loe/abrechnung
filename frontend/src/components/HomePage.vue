@@ -204,7 +204,7 @@ function resetAndHide() {
 
 async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Partial<AdvanceSimple>) {
   modalFormIsLoading.value = true
-  let result: any
+  let result: { _id: string } | undefined
 
   if (modalObjectType.value === 'travel') {
     const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'

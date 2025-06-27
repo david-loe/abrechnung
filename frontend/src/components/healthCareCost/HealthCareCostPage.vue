@@ -419,7 +419,7 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setHealthCareCost(result)
+    setHealthCareCost(result as HealthCareCost)
     resetAndHide()
   }
 }
@@ -440,7 +440,7 @@ async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) 
 }
 
 async function getHealthCareCost() {
-  const params: any = { _id: props._id, additionalFields: ['expenses'] }
+  const params = { _id: props._id, additionalFields: ['expenses'] }
   const result = (await API.getter<HealthCareCost>(`${props.endpointPrefix}healthCareCost`, params)).ok
   if (result) {
     setHealthCareCost(result.data)

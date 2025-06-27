@@ -20,7 +20,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 
-interface RequestError {
+export interface RequestError {
   message: string
 }
 

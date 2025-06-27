@@ -15,7 +15,7 @@ export const reportPrinter = new ReportPrinter(
   await getPrinterSettings(),
   (await getTravelSettings()).distanceRefunds,
   formatter,
-  (textIdentifier: string, language: Locale, interpolation?: any) => {
+  (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
   },
   async (id: _id) => {

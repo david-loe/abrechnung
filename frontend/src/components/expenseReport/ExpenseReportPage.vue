@@ -454,7 +454,7 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setExpenseReport(result)
+    setExpenseReport(result as ExpenseReport)
     resetAndHide()
   }
 }
@@ -475,7 +475,7 @@ async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
 }
 
 async function getExpenseReport() {
-  const params: any = { _id: props._id, additionalFields: ['expenses'] }
+  const params = { _id: props._id, additionalFields: ['expenses'] }
   const response = await API.getter<ExpenseReport>(`${props.endpointPrefix}expenseReport`, params)
   const result = response.ok
   if (result) {
@@ -540,7 +540,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload)
 })
 
-onBeforeRouteLeave((to, from, next) => {
+onBeforeRouteLeave((to, _from, next) => {
   if (to.hash === '#skip') {
     to.hash = ''
     next()

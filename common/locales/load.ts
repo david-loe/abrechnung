@@ -7,6 +7,7 @@ export function loadLocales(overwrite: { [key in Locale]: { [key: string]: strin
   for (const lang of locales) {
     for (const identifier in overwrite[lang]) {
       let pathExists = false
+      // biome-ignore lint/suspicious/noExplicitAny: deep object typing to complex
       let tmpCheckObj: any = messages[lang]
       if (tmpCheckObj) {
         const pathToMessage = identifier.split('.')

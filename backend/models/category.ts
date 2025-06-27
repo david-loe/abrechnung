@@ -6,7 +6,7 @@ export const categorySchema = () =>
   new Schema<Category>({
     name: { type: String, trim: true, required: true, index: true },
     isDefault: { type: Boolean, default: false },
-    style: colorSchema()
+    style: colorSchema(undefined)
   })
 
 const schema = categorySchema()

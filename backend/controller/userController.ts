@@ -155,7 +155,7 @@ export class UserAdminController extends Controller {
 
   @Post()
   public async post(@Body() requestBody: SetterBodyUser) {
-    let cb: ((data: IUser) => any) | undefined
+    let cb: ((data: IUser) => unknown) | undefined
 
     if (!requestBody._id && requestBody.fk && requestBody.fk.magiclogin) {
       cb = sendNewMagicloginMail

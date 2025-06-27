@@ -92,7 +92,7 @@ async function networkFirstWithDBFallback({ request }: { request: Request }) {
  * Open IndexedDB and create `urls` store if needed.
  */
 interface MyDB extends DBSchema {
-  urls: { key: string; value: { data: GETResponse<any>; timestamp: number } }
+  urls: { key: string; value: { data: GETResponse<unknown>; timestamp: number } }
 }
 const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
   upgrade(db) {
@@ -102,7 +102,7 @@ const dbPromise = openDB<MyDB>(INDEX_DB_NAME, INDEX_DB_VERSION, {
   }
 })
 
-async function storeToDB(storeName: StoreNames<MyDB>, value: GETResponse<any>, key: string) {
+async function storeToDB(storeName: StoreNames<MyDB>, value: GETResponse<unknown>, key: string) {
   const entry = { data: value, timestamp: Date.now() }
   await (await dbPromise).put(storeName, entry, key)
 }

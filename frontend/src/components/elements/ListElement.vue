@@ -37,7 +37,7 @@ export type Filter = {
     | undefined
     | null
     | { $regex: string | undefined; $options: string }
-    | { $in: Array<any> | [undefined] | [null] }
+    | { $in: Array<unknown> | [undefined] | [null] }
     | { $gt: Date | string | number | undefined }
     | { $gte: Date | string | number | undefined }
     | { $lt: Date | string | number | undefined }
@@ -78,7 +78,7 @@ const loadFromServer = async () => {
   const params = Object.assign({}, props.params, { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage })
 
   if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
-    const sortObj = {} as any
+    const sortObj: Record<string, SortType | SortType[]> = {}
     sortObj[serverOptions.value.sortBy] = serverOptions.value.sortType
     params.sortJSON = Base64.encode(JSON.stringify(sortObj))
   }

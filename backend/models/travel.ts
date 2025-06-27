@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import {
   AddUp,
@@ -17,13 +17,14 @@ import { addExchangeRate } from './exchangeRate.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import User from './user.js'
 
-function place(required = false, withPlace = true) {
-  const obj: any = { country: { type: String, ref: 'Country', required: required }, special: { type: String } }
-  if (withPlace) {
-    obj.place = { type: String, required: required }
-  }
-  return obj
-}
+const place = (required = false, withPlace = true) => ({
+  type: {
+    country: { type: String, ref: 'Country', required: required },
+    special: { type: String },
+    ...(withPlace ? { place: { type: String, required: required } } : {})
+  },
+  required
+})
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -31,6 +32,7 @@ interface Methods {
   addComment(): void
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type TravelModel = Model<Travel, {}, Methods>
 
 const travelSchema = () =>
@@ -149,8 +151,11 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 })
 
 schema.methods.saveToHistory = async function (this: TravelDoc) {
-  const doc: any = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
-  doc._id = undefined
+  const doc = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
+  if (!doc) {
+    throw new Error('Travel not found')
+  }
+  doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('Travel').create([doc], { timestamps: false })
@@ -166,8 +171,9 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
           const owner = await User.findOne({ _id: this.owner._id }).lean()
           if (owner?.vehicleRegistration) {
             for (const vr of owner.vehicleRegistration) {
-              const doc: any = await DocumentFile.findOne({ _id: vr._id }).lean()
-              doc._id = undefined
+              const doc = await DocumentFile.findOne({ _id: vr._id }).lean()
+              if (!doc) continue
+              doc._id = new mongoose.Types.ObjectId()
               receipts.push(await DocumentFile.create(doc))
             }
           }

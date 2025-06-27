@@ -474,13 +474,14 @@ export class Base64 {
  *
  * DOESN'T MAKE mongoose ObjectId AN OBJECT
  */
-function isObject(item: any) {
+function isObject(item: unknown) {
   return item && typeof item === 'object' && !Array.isArray(item) && !(item instanceof Date) && !('_bsontype' in item)
 }
 
 /**
  * Deep merge two objects.
  */
+// biome-ignore lint/suspicious/noExplicitAny: generic function
 export function mergeDeep(target: any, ...sources: any[]) {
   if (!sources.length) return target
   const source = sources.shift()
@@ -530,42 +531,45 @@ function csvToArray(text: string, separator = ',', escapeChar = '"') {
   return ret
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: generic function
+type ValueType = any
 export function csvToObjects(
   csv: string,
-  transformer: { [key: string]: (val: string | undefined) => any } = {},
+  transformer: { [key: string]: (val: string | undefined) => ValueType } = {},
   separator = ',',
   arraySeparator = ',',
   pathSeparator = '.',
   escapeChar = '"'
 ) {
   const lines = csvToArray(csv, separator, escapeChar)
-  const result: any[] = []
+  const result = []
   if (lines.length > 1) {
     const headers = lines[0]
     for (let i = 1; i < lines.length; i++) {
-      const obj: any = {}
+      const obj: Record<string, ValueType> = {}
       const currentline = lines[i]
       for (let j = 0; j < headers.length; j++) {
         let object = obj
-        let val: string | string[] | undefined = currentline[j] !== '' ? currentline[j] : undefined
+        const valStr = currentline[j] !== '' ? currentline[j] : undefined
+        let val: ValueType = valStr
         const pathParts = headers[j].split(pathSeparator)
         for (let k = 0; k < pathParts.length - 1; k++) {
           if (!isObject(object[pathParts[k]])) {
             object[pathParts[k]] = {}
           }
-          object = object[pathParts[k]]
+          object = object[pathParts[k]] as Record<string, ValueType>
         }
         const key = pathParts[pathParts.length - 1]
         // search for [] to identify arrays
         const match = currentline[j].match(/^\[(.*)\]$/)
         if (match === null) {
           if (transformer[headers[j]]) {
-            val = transformer[headers[j]](val)
+            val = transformer[headers[j]](valStr)
           }
         } else {
-          val = match[1].split(arraySeparator)
+          const split = match[1].split(arraySeparator)
           if (transformer[headers[j]]) {
-            val = val.map(transformer[headers[j]])
+            val = split.map(transformer[headers[j]])
           }
         }
         object[key] = val
@@ -618,24 +622,31 @@ export function convertGermanDateToHTMLDate(val: string | undefined) {
   return val
 }
 
-export function objectsToCSV(objects: any[], separator = '\t', arraySeparator = ', ') {
-  const array = [Object.keys(objects[0])].concat(objects)
-
-  return array
-    .map((it) => {
-      return Object.values(it)
-        .map((item) => {
-          if (Array.isArray(item)) {
-            return `[${item.join(arraySeparator)}]`
-          }
-          if (item === null) {
-            return 'null'
-          }
-          return item
-        })
-        .join(separator)
-    })
-    .join('\n')
+export function objectsToCSV(objects: Record<string, unknown>[], separator = '\t', arraySeparator = ', '): string {
+  let keys: string[] = []
+  for (const obj of objects) {
+    const oKeys = Object.keys(obj)
+    if (keys.length < oKeys.length) {
+      keys = oKeys
+    }
+  }
+  let str = `${keys.join(separator)}\n`
+  for (const obj of objects) {
+    const col: string[] = []
+    for (const key of keys) {
+      if (!(key in obj)) {
+        col.push('')
+      } else if (Array.isArray(obj[key])) {
+        col.push(`[${obj[key].join(arraySeparator)}]`)
+      } else if (obj[key] === null) {
+        col.push('null')
+      } else {
+        col.push(String(obj[key]))
+      }
+    }
+    str += `${col.join(separator)}\n`
+  }
+  return str
 }
 
 export function download(file: File) {

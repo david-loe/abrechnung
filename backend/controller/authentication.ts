@@ -4,18 +4,19 @@ import { Access } from '../../common/types.js'
 import httpBearerStrategy from '../authStrategies/http-bearer.js'
 import { AuthorizationError } from './error.js'
 
-export async function expressAuthentication(req: Request, securityName: string, scopes?: string[]): Promise<any> {
+export async function expressAuthentication(req: Request, securityName: string, scopes?: string[]): Promise<Express.User> {
   if (securityName === 'cookieAuth') {
     if (req.isAuthenticated() && (await isUserAllowedToAccess(req.user, scopes as Access[] | undefined))) {
       return req.user
     }
   } else if (securityName === 'httpBearer') {
     return new Promise((resolve, reject) => {
-      const authenticateCallback: AuthenticateCallback = async (err, user, info, status) => {
+      const authenticateCallback: AuthenticateCallback = async (err, user, _info, _status) => {
         if (err || !user || !(await isUserAllowedToAccess(user as Express.User, scopes as Access[] | undefined))) {
           reject(new AuthorizationError())
+        } else {
+          resolve(user)
         }
-        resolve(user)
       }
       passport.authenticate(httpBearerStrategy, { session: false }, authenticateCallback)(req)
     })

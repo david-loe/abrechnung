@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: to complex typing */
+
 import { Schema, SchemaDefinition, SchemaTypeOptions } from 'mongoose'
 import { Locale } from '../../common/types.js'
 import i18n from '../i18n.js'
@@ -173,10 +175,6 @@ function translate(str: string, language: Locale | readonly Locale[]) {
     translation[lng] = i18n.t(str, { lng })
   }
   return translation
-}
-
-function isCheckboxGroup(mongooseSchema: SchemaDefinition | any) {
-  return !Object.keys(mongooseSchema).some((path) => (mongooseSchema[path] as SchemaTypeOptions<any>).type !== Boolean)
 }
 
 function isNotNestedObject(mongooseSchema: SchemaDefinition | any) {

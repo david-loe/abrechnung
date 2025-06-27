@@ -41,8 +41,8 @@ export default async function () {
         limit: Number.parseInt(process.env.RATE_LIMIT),
         standardHeaders: 'draft-7',
         legacyHeaders: false,
-        skip: (req, res) => req.method !== 'POST',
-        handler: (req, res, next) => next(new RateLimitExceededError())
+        skip: (req, _res) => req.method !== 'POST',
+        handler: (_req, _res, next) => next(new RateLimitExceededError())
       })
     )
   }
@@ -68,7 +68,7 @@ export default async function () {
   app.use(auth)
 
   // Request-Logging
-  app.use((req, res, next) => {
+  app.use((req, _res, next) => {
     logger.debug(`${req.user?.email || 'Guest'} -> ${req.method} ${req.url}`)
     if (req.body && Object.keys(req.body).length > 0) {
       logger.debug('Body:', req.body)

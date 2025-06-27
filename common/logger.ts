@@ -17,25 +17,25 @@ export class Logger {
       }
     }
   }
-  error(message?: any, ...optionalParams: any[]) {
+  error(message?: unknown, ...optionalParams: unknown[]) {
     if (this.logLevel > LogLevel.ERROR) {
       return
     }
     console.error(message, ...optionalParams)
   }
-  warn(message?: any, ...optionalParams: any[]) {
+  warn(message?: unknown, ...optionalParams: unknown[]) {
     if (this.logLevel > LogLevel.WARN) {
       return
     }
     console.warn(message, ...optionalParams)
   }
-  info(message?: any, ...optionalParams: any[]) {
+  info(message?: unknown, ...optionalParams: unknown[]) {
     if (this.logLevel > LogLevel.INFO) {
       return
     }
     console.info(message, ...optionalParams)
   }
-  debug(message?: any, ...optionalParams: any[]) {
+  debug(message?: unknown, ...optionalParams: unknown[]) {
     if (this.logLevel > LogLevel.DEBUG) {
       return
     }

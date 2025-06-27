@@ -25,6 +25,7 @@ export default defineComponent({
     buttonStyle: { type: String, default: 'outline-secondary' },
     templateFileName: { type: String, default: 'CSV Template' },
     templateFields: { type: Array as PropType<Array<string>>, required: true },
+    // biome-ignore-start lint/suspicious/noExplicitAny: generic function
     transformers: {
       type: Array as PropType<
         (
@@ -34,6 +35,7 @@ export default defineComponent({
       >,
       default: () => []
     }
+    // biome-ignore-end lint/suspicious/noExplicitAny: generic function
   },
   methods: {
     readFile(event: Event) {
@@ -53,7 +55,8 @@ export default defineComponent({
       if (csvWithoutComment.startsWith('#') || csvWithoutComment.startsWith('"#')) {
         csvWithoutComment = csvWithoutComment.slice(csv.indexOf('\n') + 1)
       }
-      const transformer = {} as any
+      // biome-ignore lint/suspicious/noExplicitAny: generic function
+      const transformer: { [key: string]: (val: string | undefined) => any } = {}
       for (const entry of this.transformers) {
         if ('fn' in entry) {
           transformer[entry.path] = entry.fn
@@ -74,9 +77,9 @@ export default defineComponent({
       const separator = detectSeparator(csvWithoutComment)
       return csvToObjects(csvWithoutComment, transformer, separator)
     },
-    async submit(data: any[]) {
+    async submit(data: unknown[]) {
       if (this.endpoint) {
-        const result = await API.setter<any[]>(this.endpoint, data)
+        const result = await API.setter<unknown[]>(this.endpoint, data)
         if (result.ok) {
           this.$emit('submitted', data)
         }

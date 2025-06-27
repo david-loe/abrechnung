@@ -58,7 +58,7 @@ export class DocumentFileAdminController extends Controller {
   }
 
   @Delete()
-  public async deleteAny(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteAny(@Query() _id: _id) {
     return await this.deleter(DocumentFile, { _id: _id })
   }
 }
