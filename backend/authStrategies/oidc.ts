@@ -26,8 +26,10 @@ export class CustomStrategy extends OidcStrategy {
         params.delete('state')
         url.search = params.toString()
       }
+      // biome-ignore lint/suspicious/noExplicitAny: need access to prototype method
       ;(OidcStrategy as any).prototype.authorizationCodeGrant.call(this, req, url, options)
     } else {
+      // biome-ignore lint/suspicious/noExplicitAny: need access to prototype method
       ;(OidcStrategy as any).prototype.authorizationRequest.call(this, req, options)
     }
   }

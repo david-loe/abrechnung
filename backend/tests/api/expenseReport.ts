@@ -181,6 +181,6 @@ test.after.always('DELETE /expenseReport', async (t) => {
   }
 })
 
-test.serial.after.always('Drop DB Connection', async (t) => {
+test.serial.after.always('Drop DB Connection', async () => {
   await disconnectDB()
 })

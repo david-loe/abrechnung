@@ -40,7 +40,7 @@ export async function getMicrosoftStrategy() {
       tenant: config.tenant,
       scope: ['user.read']
     },
-    async (accessToken: string, refreshToken: string, profile: msProfile, verified: (error: any, user?: Express.User) => void) => {
+    async (_accessToken: string, _refreshToken: string, profile: msProfile, verified: (error: unknown, user?: Express.User) => void) => {
       const nameSplit = displayNameSplit(profile._json.displayName)
       await findOrCreateUser(
         { microsoft: profile._json.id },

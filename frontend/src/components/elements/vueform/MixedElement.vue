@@ -15,12 +15,5 @@
 import { defineElement } from '@vueform/vueform'
 import JsonEditorVue from 'json-editor-vue'
 
-export default defineElement({
-  name: 'MixedElement',
-  components: { JsonEditorVue },
-  props: {},
-  setup(props, { element }) {
-    // ...
-  }
-})
+export default defineElement({ name: 'MixedElement', components: { JsonEditorVue } })
 </script>

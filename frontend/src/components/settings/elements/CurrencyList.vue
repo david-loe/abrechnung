@@ -61,6 +61,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -136,7 +137,7 @@ async function deleteCurrency(currency: Currency) {
   }
 }
 
-const schema = Object.assign({}, (await API.getter<any>('admin/currency/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/currency/form')).ok?.data, {
   buttons: {
     type: 'group',
     schema: {

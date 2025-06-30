@@ -36,8 +36,8 @@ export interface GetterOptions<ModelType> {
   query: GetterQuery<ModelType>
   filter?: FilterQuery<ModelType>
   projection?: ProjectionType<ModelType>
-  sort?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null
-  cb?: (data: ModelType | ModelType[]) => any
+  sort?: string | { [key: string]: SortOrder } | [string, SortOrder][] | undefined | null
+  cb?: (data: ModelType | ModelType[]) => unknown
   allowedAdditionalFields?: (keyof ModelType)[]
 }
 
@@ -133,9 +133,10 @@ type _SetterPartial1<T, U extends string> = T extends object
 export type NoPost = 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor' | 'exchangeRate' | 'state'
 export type SetterBody<ModelType> = SetterPartial<ModelType, NoPost>
 
+// biome-ignore lint/suspicious/noExplicitAny: to complex typing
 export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = any> {
   requestBody: SetterBody<ModelType>
-  cb?: (data: CheckType) => any
+  cb?: (data: CheckType) => unknown
   allowNew?: boolean
   checkOldObject?: (oldObject: HydratedDocument<CheckType> & ModelMethods) => Promise<boolean>
 }
@@ -150,10 +151,12 @@ export interface DeleterQuery {
   _id: _id
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: to complex typing
 export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQuery {
+  // biome-ignore lint/suspicious/noExplicitAny: to complex typing
   referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
   minDocumentCount?: number
-  cb?: (data: DeleteResult) => any
+  cb?: (data: DeleteResult) => unknown
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
 
@@ -161,11 +164,9 @@ export interface DeleterForArrayElemetQuery extends DeleterQuery {
   parentId: _id
 }
 
-export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType = any>
-  extends DeleterOptions<ModelType>,
-    DeleterForArrayElemetQuery {
+export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType> extends DeleterOptions<ModelType>, DeleterForArrayElemetQuery {
   arrayElementKey: keyof ModelType
-  beforeDelete?(element: ArrayElementType): Promise<any>
+  beforeDelete?(element: ArrayElementType): Promise<unknown>
 }
 
 export class Controller extends TsoaController {
@@ -193,7 +194,7 @@ export class Controller extends TsoaController {
     }
     // find by ID
     if (options.query._id) {
-      const conditions: any = Object.assign({ _id: options.query._id }, options.filter)
+      const conditions = Object.assign({ _id: options.query._id }, options.filter)
       const result = (await model.findOne(conditions, options.projection).lean()) as ModelType
       if (result === null) {
         throw new NotFoundError(`No ${model.modelName} for _id: '${options.query._id}' found.`)
@@ -206,12 +207,12 @@ export class Controller extends TsoaController {
 
     // find all
     // conditions
-    let conditions: any = {}
+    let conditions: FilterQuery<ModelType> = {}
     if (options.query.filterJSON) {
       conditions = JSON.parse(Base64.decode(options.query.filterJSON))
     }
     if (Object.keys(options.filter).length > 0) {
-      if (!('$and' in conditions)) {
+      if (!('$and' in conditions) || !Array.isArray(conditions.$and)) {
         conditions.$and = []
       }
       conditions.$and.push(options.filter)
@@ -297,7 +298,7 @@ export class Controller extends TsoaController {
         throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options.requestBody._id}' found.`)
       }
     } else if (options.allowNew) {
-      ;(arr as Array<any>).push(options.requestBody)
+      arr.push(options.requestBody as ArrayElementType)
     } else {
       throw new NotAllowedError(`Not allowed to create a new ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
@@ -328,9 +329,10 @@ export class Controller extends TsoaController {
     }
     if (options.referenceChecks) {
       for (const referenceCheck of options.referenceChecks) {
-        const filter = { $or: [] as { [key: string]: any }[] }
+        const filter: FilterQuery<unknown> = {}
+        filter.$or = []
         for (const path of referenceCheck.paths) {
-          const conditions: { [key: string]: any } = structuredClone(referenceCheck.conditions) || {}
+          const conditions = structuredClone(referenceCheck.conditions) || {}
           conditions[path] = options._id
           filter.$or.push(conditions)
         }
@@ -348,7 +350,10 @@ export class Controller extends TsoaController {
     return result
   }
 
-  async deleterForArrayElement<ModelType>(model: Model<ModelType>, options: DeleterForArrayElemetOptions<ModelType>) {
+  async deleterForArrayElement<ModelType, ArrayElementType extends { _id: _id }>(
+    model: Model<ModelType>,
+    options: DeleterForArrayElemetOptions<ModelType, ArrayElementType>
+  ) {
     const parentObject = await model.findOne({ _id: options.parentId })
     if (!parentObject) {
       throw new NotFoundError(`No ${model.modelName} for _id: '${options.parentId}' found.`)
@@ -357,7 +362,7 @@ export class Controller extends TsoaController {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
     let found = false
-    const arr = parentObject[options.arrayElementKey] as Array<{ _id: _id }>
+    const arr = parentObject[options.arrayElementKey] as Array<ArrayElementType>
     for (let i = 0; i < arr.length; i++) {
       if (arr[i]._id.equals(options._id)) {
         found = true
@@ -381,7 +386,7 @@ export class Controller extends TsoaController {
 
   async insertMany<ModelType extends { _id?: Types.ObjectId | string }>(
     model: Model<ModelType>,
-    options: { requestBody: SetterBody<ModelType>[]; cb?: (data: ModelType[]) => any }
+    options: { requestBody: SetterBody<ModelType>[]; cb?: (data: ModelType[]) => unknown }
   ) {
     const result = (await model.insertMany(options.requestBody)) as unknown as ModelType[]
     if (options.cb) {

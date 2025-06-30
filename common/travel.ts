@@ -351,8 +351,8 @@ export class TravelCalculator {
   }
 }
 
-type Invalid = { path: string; err: string | Error; val?: any }
-type Warning = { name: string; val?: any; limit?: any }
+type Invalid = { path: string; err: string | Error; val?: unknown }
+type Warning = { name: string; val?: unknown; limit?: unknown }
 export class TravelValidator {
   travelSettings!: TravelSettings
 

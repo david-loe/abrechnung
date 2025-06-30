@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useTemplateRef } from 'vue'
+import { ComponentPublicInstance, MaybeRefOrGetter, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
 import { HealthCareCostSimple, HealthCareCostState, State } from '@/../../common/types'
@@ -106,7 +106,7 @@ function hideExpandColumn() {
 }
 
 const { handlePrint } = useVueToPrint({
-  content: tableRef as any,
+  content: tableRef as MaybeRefOrGetter<HTMLElement | ComponentPublicInstance>,
   documentTitle: 'List',
   removeAfterPrint: true,
   onBeforeGetContent() {

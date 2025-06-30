@@ -24,7 +24,7 @@ export function generateBearerToken(userId: string | Types.ObjectId, length = 48
  */
 export function hashToken(token: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const [userId, rawToken] = token.split(':') // UserID & Token trennen
+    const [_userId, rawToken] = token.split(':') // UserID & Token trennen
     if (!rawToken) return reject(new Error('Ungültiges Token-Format'))
 
     const salt = randomBytes(SALT_LENGTH).toString('base64')
@@ -43,7 +43,7 @@ export function hashToken(token: string): Promise<string> {
  */
 function verifyToken(token: string, storedHash: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const [userId, rawToken] = token.split(':') // UserID extrahieren
+    const [_userId, rawToken] = token.split(':') // UserID extrahieren
     if (!rawToken) return reject(new Error('Ungültiges Token-Format'))
 
     const [salt, hash] = storedHash.split(':')

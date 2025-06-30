@@ -102,6 +102,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -163,9 +164,9 @@ const userToEdit: Ref<User | undefined> = ref(undefined)
 const _showForm = ref(false)
 
 function showForm(user?: User) {
+  // biome-ignore lint/suspicious/noExplicitAny: reduce arrays of objects to arrays of _ids for vueform select elements
   let formUser: any = user
   if (formUser) {
-    // reduce arrays of objects to arrays of _ids for vueform select elements
     const formUserSettings = Object.assign({}, formUser.settings)
     const formUserProjects = Object.assign({}, formUser.projects)
     formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
@@ -195,7 +196,7 @@ async function deleteUser(user: User) {
   }
 }
 
-const schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/user/form')).ok?.data, {
   buttons: {
     type: 'group',
     schema: {
@@ -205,7 +206,9 @@ const schema = Object.assign({}, (await API.getter<any>('admin/user/form')).ok?.
   },
   _id: { type: 'hidden', meta: true }
 })
-Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
+if (schema.fk?.schema) {
+  Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
+}
 </script>
 
 <style></style>

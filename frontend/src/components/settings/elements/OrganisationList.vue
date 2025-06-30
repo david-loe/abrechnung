@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -114,7 +115,7 @@ async function deleteOrganisation(organisation: Organisation) {
   }
 }
 
-const schema = Object.assign({}, (await API.getter<any>('admin/organisation/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/organisation/form')).ok?.data, {
   buttons: {
     type: 'group',
     schema: {

@@ -163,7 +163,6 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
 import { defineComponent } from 'vue'
 import { getFlagEmoji } from '@/../../common/scripts.js'
 import { accesses, CountrySimple, Currency, Locale, locales } from '@/../../common/types.js'
@@ -174,7 +173,6 @@ import Installation from '@/components/elements/Installation.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import OfflineBanner from '@/components/elements/OfflineBanner.vue'
 import { clearingDB, subscribeToPush } from '@/helper.js'
-import { logger } from '@/logger.js'
 
 export default defineComponent({
   data() {
@@ -192,16 +190,11 @@ export default defineComponent({
   components: { OfflineBanner, Installation, ModalComponent, ApiKeyForm },
   methods: {
     async logout() {
-      try {
-        const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, { withCredentials: true })
-        if (res.status === 204) {
-          this.APP_DATA = null
-          clearingDB()
-          this.$router.push({ path: '/login' })
-        }
-      } catch (error: any) {
-        API.addAlert({ message: error.response.data.message, title: 'ERROR', type: 'danger' })
-        logger.error(error.response.data)
+      const success = await API.deleter('auth/logout', {}, false, { success: false, error: true })
+      if (success) {
+        this.APP_DATA = null
+        clearingDB()
+        this.$router.push({ path: '/login' })
       }
     },
     async updateLanguage() {

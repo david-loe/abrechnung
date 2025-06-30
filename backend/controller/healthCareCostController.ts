@@ -64,6 +64,7 @@ export class HealthCareCostController extends Controller {
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
           await documentFileHandler(['cost', 'receipts'])(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -81,6 +82,7 @@ export class HealthCareCostController extends Controller {
       arrayElementKey: 'expenses',
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -233,6 +235,7 @@ export class HealthCareCostExamineController extends Controller {
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
           await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }
@@ -254,6 +257,7 @@ export class HealthCareCostExamineController extends Controller {
           (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
+          // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
         }

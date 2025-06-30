@@ -15,7 +15,7 @@ import { AuthenticatedExpressRequest } from './types.js'
 
 const disabledMessage = 'This Authentication Method has been disabled by display settings.'
 
-const NotImplementedMiddleware = (req: ExRequest, res: ExResponse, next: NextFunction) => {
+const NotImplementedMiddleware = (_req: ExRequest, _res: ExResponse, _next: NextFunction) => {
   throw new NotImplementedError(disabledMessage)
 }
 
@@ -80,7 +80,7 @@ const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFu
 }
 
 const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  let redirect: any
+  let redirect = ''
   let tokenAdmin = false
   if (req.query.token) {
     const token = jwt.decode(req.query.token as string) as jwt.JwtPayload
@@ -99,7 +99,7 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
   }
 }
 
-const logoutMiddleware = async (req: AuthenticatedExpressRequest, res: ExResponse, next: NextFunction) => {
+const logoutMiddleware = async (req: AuthenticatedExpressRequest, _res: ExResponse, next: NextFunction) => {
   req.logout((err) => {
     next(err)
   })
@@ -115,7 +115,7 @@ export class AuthController extends Controller {
   @Post('ldapauth')
   @Middlewares(ldapauthHandler)
   @Response(501, disabledMessage)
-  public ldapauth(@Body() requestBody: { username: string; password: string }) {}
+  public ldapauth(@Body() _requestBody: { username: string; password: string }) {}
 
   /**
    * @summary Redirecting to Microsoft login
@@ -124,7 +124,7 @@ export class AuthController extends Controller {
   @Middlewares(microsoftHandler)
   @SuccessResponse(302, 'Redirecting to Microsoft')
   @Response(501, disabledMessage)
-  public microsoft(@Query() redirect?: string) {}
+  public microsoft(@Query('redirect') _redirect?: string) {}
 
   /**
    * Provides the authentication cookie.
@@ -144,7 +144,7 @@ export class AuthController extends Controller {
   @Middlewares(magicloginHandler)
   @SuccessResponse(200)
   @Response(501, disabledMessage)
-  public magiclogin(@Body() requestBody: { destination: string; redirect?: string }) {}
+  public magiclogin(@Body() _requestBody: { destination: string; redirect?: string }) {}
 
   /**
    * Provides the authentication cookie.
@@ -154,7 +154,7 @@ export class AuthController extends Controller {
   @Middlewares(magicloginCallbackHandler)
   @SuccessResponse(302, 'Redirecting to Frontend')
   @Response(501, disabledMessage)
-  public magicloginCallback(@Query() token: string, @Request() req: ExRequest) {
+  public magicloginCallback(@Query('token') _token: string, @Request() req: ExRequest) {
     this.redirectToFrontend(req.authInfo?.redirect)
   }
 
@@ -165,7 +165,7 @@ export class AuthController extends Controller {
   @Middlewares(oidcHandler)
   @SuccessResponse(302, 'Redirecting to OIDC Provider')
   @Response(501, disabledMessage)
-  public oidc(@Query() redirect?: string) {}
+  public oidc(@Query('redirect') _redirect?: string) {}
 
   /**
    * @summary OIDC login callback endpoint

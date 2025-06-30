@@ -21,7 +21,16 @@ export const displaySettingsSchema = () => {
     overwrites[locale] = { type: Schema.Types.Mixed, required: true, default: () => ({}) }
   }
 
-  const stateColors = {} as { [key in AnyState]: ReturnType<typeof colorSchema> }
+  const stateColors = {} as {
+    [key in AnyState]: {
+      type: {
+        color: { type: StringConstructor; required: boolean; validate: RegExp; description: string }
+        text: { type: StringConstructor; enum: readonly string[]; required: boolean }
+      }
+      required: boolean
+      label: string
+    }
+  }
   for (const state of anyStates) {
     const stateLabel = TravelState[state]
     stateColors[state] = colorSchema(`states.${stateLabel}`)
@@ -94,4 +103,4 @@ export const displaySettingsSchema = () => {
   )
 }
 
-export default model<DisplaySettings>('DisplaySettings', displaySettingsSchema())
+export default model('DisplaySettings', displaySettingsSchema())

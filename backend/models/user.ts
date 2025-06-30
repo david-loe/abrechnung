@@ -19,6 +19,7 @@ interface Methods {
   addProjects(projects: { assigned?: _id[]; supervised?: _id[] }): Promise<void>
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type UserModel = Model<User, {}, Methods>
 
 export const userSchema = async () => {
@@ -132,20 +133,21 @@ schema.methods.isActive = async function (this: UserDoc) {
   return false
 }
 
+type StringIdMap = Record<string, Types.ObjectId>
 schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
-    const filter: any = {}
+    const filter: StringIdMap = {}
     filter[path] = userIdToOverwrite
     return filter
   }
   const update = (path: string) => {
-    const update = { $set: {} as any }
+    const update = { $set: {} as StringIdMap }
     update.$set[path] = this._id
     return update
   }
   const arrayFilter = (path: string) => {
-    const arrayFilter = { arrayFilters: [] as any[] }
-    const filter: any = {}
+    const arrayFilter = { arrayFilters: [] as StringIdMap[] }
+    const filter: StringIdMap = {}
     if (path === '') {
       filter.elem = userIdToOverwrite
     } else {
@@ -206,6 +208,7 @@ schema.methods.addProjects = async function addProjects(projects: { assigned?: _
     for (const newProjectId of projects.assigned) {
       if (!this.projects.assigned.some((p) => p._id.equals(newProjectId))) {
         changed = true
+        // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
         this.projects.assigned.push(newProjectId as any)
       }
     }

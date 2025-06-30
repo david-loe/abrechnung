@@ -10,12 +10,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
           working-dir: backend
       - name: Run Biome
-        run: biome ci --changed --no-errors-on-unmatched .
+        run: biome ci --changed --error-on-warnings --no-errors-on-unmatched .
 
   production-build:
     name: Production Build

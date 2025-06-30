@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
@@ -10,6 +10,7 @@ interface Methods {
   addComment(): void
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
 
 const expenseReportSchema = () =>
@@ -64,8 +65,11 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Expens
 })
 
 schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
-  const doc: any = await model<ExpenseReport, ExpenseReportModel>('ExpenseReport').findOne({ _id: this._id }, { history: 0 }).lean()
-  doc._id = undefined
+  const doc = await model<ExpenseReport, ExpenseReportModel>('ExpenseReport').findOne({ _id: this._id }, { history: 0 }).lean()
+  if (!doc) {
+    throw new Error('Expense Report not found')
+  }
+  doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('ExpenseReport').create([doc], { timestamps: false })

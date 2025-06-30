@@ -615,6 +615,7 @@ export type UserReplaceReferencesResult = {
 
 export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Travel
 export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is TravelSimple
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsTravel(report: any): report is { startDate: Date | string } {
   return typeof report.startDate === 'string' || report.startDate instanceof Date
 }
@@ -623,12 +624,14 @@ export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCa
 export function reportIsHealthCareCost(
   report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
 ): report is HealthCareCostSimple
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsHealthCareCost(report: any): report is { patientName: string } {
   return typeof report.patientName === 'string'
 }
 
 export function reportIsAdvance(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Advance
 export function reportIsAdvance(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is Advance
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsAdvance(report: any): report is { startDate: Exclude<unknown, Date | string>; reason: string } {
   return !reportIsTravel(report) && typeof report.reason === 'string'
 }
@@ -637,6 +640,7 @@ export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCar
 export function reportIsExpenseReport(
   report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
 ): report is ExpenseReportSimple
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
@@ -649,11 +653,14 @@ type AddUpBase = {
   expenses: BaseCurrencyMoneyNotNull
   advanceOverflow: boolean
 }
-export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
+
+export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = Travel | ExpenseReport | HealthCareCost> = T extends Travel
   ? AddUpBase & { lumpSums: BaseCurrencyMoneyNotNull }
   : AddUpBase
 
-export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = any> = AddUp<T> | (Omit<AddUp<T>, 'project'> & { project: _id })
+export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = Travel | HealthCareCost | ExpenseReport> =
+  | AddUp<T>
+  | (Omit<AddUp<T>, 'project'> & { project: _id })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

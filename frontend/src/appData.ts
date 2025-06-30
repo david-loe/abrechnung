@@ -85,43 +85,43 @@ export class APP_DATA {
     this.setUsers(users)
   }
 
-  setAny(endpoint: APP_DATA_ENDPOINTS, data: any) {
+  setAny(endpoint: APP_DATA_ENDPOINTS, data: unknown) {
     switch (endpoint) {
       case 'currency':
-        this.setCurrencies(data)
+        this.setCurrencies(data as Currency[])
         break
       case 'country':
-        this.setCountries(data)
+        this.setCountries(data as Country[])
         break
       case 'user':
-        this.setUser(data)
+        this.setUser(data as User)
         break
       case 'settings':
-        this.setSettings(data)
+        this.setSettings(data as Settings)
         break
       case 'travelSettings':
-        this.setTravelSettings(data)
+        this.setTravelSettings(data as TravelSettings)
         break
       case 'healthInsurance':
-        this.setHealthInsurances(data)
+        this.setHealthInsurances(data as HealthInsurance[])
         break
       case 'organisation':
-        this.setOrganisations(data)
+        this.setOrganisations(data as OrganisationSimple[])
         break
       case 'category':
-        this.setCategories(data)
+        this.setCategories(data as Category[])
         break
       case 'specialLumpSums':
-        this.setSpecialLumpSums(data)
+        this.setSpecialLumpSums(data as Record<string, string[]>)
         break
       case 'displaySettings':
-        this.setDisplaySettings(data)
+        this.setDisplaySettings(data as DisplaySettings)
         break
       case 'project':
-        this.setProjects(data)
+        this.setProjects(data as ProjectSimpleWithName[])
         break
       case 'users':
-        this.setUsers(data)
+        this.setUsers(data as UserWithNameAndProject[])
         break
     }
   }

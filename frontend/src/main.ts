@@ -64,7 +64,7 @@ app.component('vSelect', vSelect)
 app.use(i18n)
 app.use(formatter)
 app.use(router)
-app.use(Vueform as any, vueformConfig)
+app.use(Vueform, vueformConfig)
 app.mount('#app')
 
 export const vueform = app.config.globalProperties.$vueform

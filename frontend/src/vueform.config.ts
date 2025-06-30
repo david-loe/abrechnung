@@ -1,4 +1,4 @@
-import { defineConfig } from '@vueform/vueform'
+import { defineConfig, VueformElement } from '@vueform/vueform'
 import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
@@ -18,6 +18,7 @@ de.vueform.elements.list.add = '+ Hinzufügen'
 
 const keysToExclude = new Set(['loseAccessAt'])
 
+// biome-ignore lint/suspicious/noExplicitAny: to complex typing
 function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set<string> = new Set()) {
   for (const key in obj) {
     if (!keysToExclude.has(key) && obj[key] === search) {
@@ -46,7 +47,7 @@ export default defineConfig({
   displayErrors: false,
   displayMessages: false,
   endpoints: {},
-  beforeSend(form$: any) {
+  beforeSend(form$: VueformElement) {
     deepReplace(form$.data, null, undefined, keysToExclude)
     deepReplace(form$.data, '', undefined, keysToExclude)
   }

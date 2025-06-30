@@ -3,6 +3,7 @@ import vSelect from 'vue-select'
 
 // Set the components prop default to return our fresh components
 
+// biome-ignore lint/suspicious/noExplicitAny: bad typing from vue-select
 ;(vSelect as unknown as any).props.components.default = () => ({
   Deselect: {
     render: () =>

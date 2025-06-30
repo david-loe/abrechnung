@@ -91,6 +91,6 @@ test('POST /user/vehicleRegistration', async (t) => {
   t.is(res2.status, 200, 'GET /documentFile')
 })
 
-test.serial.after.always('Drop DB Connection', async (t) => {
+test.serial.after.always('Drop DB Connection', async () => {
   await disconnectDB()
 })

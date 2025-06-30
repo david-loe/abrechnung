@@ -374,6 +374,7 @@
 </template>
 
 <script lang="ts" setup>
+import { AxiosHeaders } from 'axios'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -396,7 +397,7 @@ import {
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
-import ErrorBanner from '@/components/elements/ErrorBanner.vue'
+import ErrorBanner, { RequestError } from '@/components/elements/ErrorBanner.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
@@ -436,7 +437,7 @@ const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('stage')
 const table = ref<Table>([])
-const error = ref<any>(undefined)
+const error = ref<RequestError | undefined>(undefined)
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
 
@@ -568,7 +569,7 @@ async function completeReview() {
 }
 
 async function postStage(stage: Stage) {
-  let headers: any = {}
+  let headers: { 'Content-Type'?: string } = {}
   if (stage.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
@@ -582,7 +583,9 @@ async function postStage(stage: Stage) {
     setTravel(result.ok)
     resetAndHide()
   } else if (result.error) {
-    error.value = result.error
+    if (typeof result.error === 'object' && 'message' in result.error && typeof result.error.message === 'string') {
+      error.value = { ...result.error, message: result.error.message }
+    }
     const modalEl = document.getElementById('modal')
     if (modalEl) {
       modalEl.scrollTo({ top: 0, behavior: 'smooth' })
@@ -594,15 +597,14 @@ async function deleteStage(_id: string) {
   modalFormIsLoading.value = true
   const result = await API.deleter(`${props.endpointPrefix}travel/stage`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
-
   if (result) {
-    setTravel(result)
+    setTravel(result as Travel)
     resetAndHide()
   }
 }
 
 async function postExpense(expense: TravelExpense) {
-  let headers: any = {}
+  let headers: { 'Content-Type'?: string } = {}
   if (expense.cost.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
@@ -623,7 +625,7 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}travel/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setTravel(result)
+    setTravel(result as Travel)
     resetAndHide()
   }
 }
@@ -702,7 +704,7 @@ function renderTable() {
 }
 
 async function getTravel() {
-  const params: any = { _id: props._id, additionalFields: ['stages', 'expenses', 'days'] }
+  const params = { _id: props._id, additionalFields: ['stages', 'expenses', 'days'] }
   const res = (await API.getter<Travel>(`${props.endpointPrefix}travel`, params)).ok
   if (res) {
     setTravel(res.data)

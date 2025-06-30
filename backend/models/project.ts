@@ -6,6 +6,7 @@ interface Methods {
   addToBalance(reportTotal: number, session?: mongoose.ClientSession | null): Promise<void>
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type ProjectModel = Model<Project, {}, Methods>
 
 export const projectSchema = () =>

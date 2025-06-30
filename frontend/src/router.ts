@@ -119,8 +119,8 @@ export async function auth() {
   try {
     const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/authenticated`, { withCredentials: true })
     auth = res.status === 204
-  } catch (error: any) {
-    if (error.response && error.response.status !== 401) {
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response && error.response.status !== 401) {
       logger.error(error)
     }
   }

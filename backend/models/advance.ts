@@ -29,6 +29,7 @@ interface Methods {
   ): Promise<number>
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type AdvanceModel = Model<Advance, {}, Methods>
 
 const advanceSchema = () =>
@@ -73,8 +74,11 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
 })
 
 schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
-  const doc: any = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).session(session).lean()
-  doc._id = undefined
+  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).session(session).lean()
+  if (!doc) {
+    throw new Error('Advance not found')
+  }
+  doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
   const old = await model('Advance').create([doc], { timestamps: false, session })

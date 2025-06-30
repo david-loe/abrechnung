@@ -191,7 +191,7 @@ export default defineComponent({
         clearInterval(this.fetchTokenInterval)
       }
       if (this.token) {
-        API.deleter('user/token', { _id: '' }, false, false)
+        API.deleter('user/token', { _id: '' }, false, { success: false, error: false })
       }
       this.token = undefined
       this.qr = undefined
