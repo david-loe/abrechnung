@@ -653,13 +653,14 @@ type AddUpBase = {
   expenses: BaseCurrencyMoneyNotNull
   advanceOverflow: boolean
 }
-// biome-ignore lint/suspicious/noExplicitAny: generic type needs any
-export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = any> = T extends Travel
+
+export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = Travel | ExpenseReport | HealthCareCost> = T extends Travel
   ? AddUpBase & { lumpSums: BaseCurrencyMoneyNotNull }
   : AddUpBase
 
-// biome-ignore lint/suspicious/noExplicitAny: generic type needs any
-export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = any> = AddUp<T> | (Omit<AddUp<T>, 'project'> & { project: _id })
+export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = Travel | HealthCareCost | ExpenseReport> =
+  | AddUp<T>
+  | (Omit<AddUp<T>, 'project'> & { project: _id })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/
