@@ -15,7 +15,7 @@ jobs:
         with:
           working-dir: backend
       - name: Run Biome
-        run: biome ci --changed --no-errors-on-unmatched .
+        run: biome ci --changed --error-on-warnings --no-errors-on-unmatched .
 
   production-build:
     name: Production Build
