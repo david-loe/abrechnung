@@ -70,9 +70,8 @@ async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number
 }
 
 async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: schemaNames) {
-  let result: any
   for (let i = 0; i < reports.length; i++) {
-    result = await model(schema).deleteOne({ _id: reports[i]._id })
+    const result = await model(schema).deleteOne({ _id: reports[i]._id })
     if (result && result.deletedCount === 1) {
       logger.info(`Deleted ${schema} from owner ${formatter.name(reports[i].owner.name)} with name ${reports[i].name}.`)
     }

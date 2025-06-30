@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -112,7 +113,7 @@ async function deleteCategory(category: Category) {
   }
 }
 
-const schema = Object.assign({}, (await API.getter<any>('admin/category/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/category/form')).ok?.data, {
   buttons: {
     type: 'group',
     schema: {

@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { defineComponent } from 'vue'
 import { PrinterSettings } from '@/../../common/types.js'
 import API from '@/api.js'
@@ -22,13 +23,13 @@ export default defineComponent({
       const result = await API.setter<PrinterSettings>('admin/printerSettings', printerSettings)
       if (result.ok) {
         this.printerSettings = result.ok
-        ;(this.$refs.form$ as any).load(this.printerSettings)
+        ;(this.$refs.form$ as VueformElement).load(this.printerSettings, false)
       }
     }
   },
 
   async mounted() {
-    this.schema = Object.assign({}, (await API.getter<any>('admin/printerSettings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/printerSettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
@@ -36,7 +37,7 @@ export default defineComponent({
       _id: { type: 'hidden', meta: true }
     })
     this.printerSettings = (await API.getter<PrinterSettings>('admin/printerSettings')).ok?.data
-    queueMicrotask(() => (this.$refs.form$ as any).load(this.printerSettings))
+    queueMicrotask(() => (this.$refs.form$ as VueformElement).load(this.printerSettings, false))
   }
 })
 </script>

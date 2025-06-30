@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { defineComponent } from 'vue'
 import { ConnectionSettings } from '@/../../common/types.js'
 import API from '@/api.js'
@@ -51,12 +52,12 @@ export default defineComponent({
           connectionSettings.auth.oidc = undefined
         }
       }
-      queueMicrotask(() => (this.$refs.form$ as any).load(connectionSettings))
+      queueMicrotask(() => (this.$refs.form$ as VueformElement).load(connectionSettings, false))
     }
   },
 
   async mounted() {
-    this.schema = Object.assign({}, (await API.getter<any>('admin/connectionSettings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/connectionSettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }

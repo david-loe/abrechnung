@@ -17,6 +17,6 @@ test('GET /users', async (t) => {
   t.is(res.status, 200)
 })
 
-test.serial.after.always('Drop DB Connection', async (t) => {
+test.serial.after.always('Drop DB Connection', async () => {
   await disconnectDB()
 })

@@ -18,9 +18,6 @@ import FileUpload from '@/components/elements/FileUpload.vue'
 export default defineElement({
   name: 'DocumentfileElement',
   components: { FileUpload },
-  props: { multiple: { type: Boolean, default: false }, accept: { type: String, default: null } },
-  setup(props, { element }) {
-    // ...
-  }
+  props: { multiple: { type: Boolean, default: false }, accept: { type: String, default: null } }
 })
 </script>

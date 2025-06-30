@@ -3,6 +3,7 @@ interface FormField {
   val: string | boolean | number
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: generic function
 export function objectToFormFields(object: any, fieldPrefix = '', formFields: FormField[] = []): FormField[] {
   for (const key in object) {
     const field = fieldPrefix ? `${fieldPrefix}[${key}]` : key

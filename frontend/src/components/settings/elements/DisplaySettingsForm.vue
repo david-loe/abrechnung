@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { defineComponent } from 'vue'
 import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
@@ -24,20 +25,20 @@ export default defineComponent({
       const result = await API.setter<DisplaySettings>('admin/displaySettings', displaySettings)
       if (result.ok && APP_DATA.value) {
         APP_DATA.value?.setDisplaySettings(result.ok)
-        ;(this.$refs.form$ as any).load(APP_DATA.value?.displaySettings)
+        ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.displaySettings, false)
       }
     }
   },
   async created() {
     await APP_LOADER.loadData()
-    this.schema = Object.assign({}, (await API.getter<any>('admin/displaySettings/form')).ok?.data, {
+    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/displaySettings/form')).ok?.data, {
       buttons: {
         type: 'group',
         schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
       },
       _id: { type: 'hidden', meta: true }
     })
-    queueMicrotask(() => (this.$refs.form$ as any).load(APP_DATA.value?.displaySettings))
+    queueMicrotask(() => (this.$refs.form$ as VueformElement).load(APP_DATA.value?.displaySettings, false))
   }
 })
 </script>

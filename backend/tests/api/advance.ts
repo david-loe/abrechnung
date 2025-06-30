@@ -6,8 +6,11 @@ import createAgent, { loginUser } from './_agent.js'
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-//@ts-ignore
-let advance: Advance = { name: 'Advance for next trip', reason: 'Traveling is expensive', budget: { amount: 1000, currency: 'USD' as any } }
+let advance: Partial<Advance> = {
+  name: 'Advance for next trip',
+  reason: 'Traveling is expensive', // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
+  budget: { amount: 1000, currency: 'USD' as any }
+}
 
 test.serial('GET /project', async (t) => {
   const res = await agent.get('/project')
@@ -79,6 +82,6 @@ test.after.always('DELETE /advance 40X', async (t) => {
   t.not(res.status, 200)
 })
 
-test.serial.after.always('Drop DB Connection', async (t) => {
+test.serial.after.always('Drop DB Connection', async () => {
   await disconnectDB()
 })

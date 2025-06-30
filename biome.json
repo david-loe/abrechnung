@@ -36,12 +36,6 @@
       "style": {
         "useImportType": "off"
       },
-      "suspicious": {
-        "noExplicitAny": "warn"
-      },
-      "complexity": {
-        "noBannedTypes": "warn"
-      },
       "performance": {
         "noDelete": "info"
       }
@@ -73,6 +67,10 @@
       "includes": ["**/*.vue"],
       "linter": {
         "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
           "correctness": {
             "noUnusedImports": {
               "level": "off",
