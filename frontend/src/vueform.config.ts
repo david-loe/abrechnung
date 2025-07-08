@@ -2,8 +2,6 @@ import { defineConfig, VueformElement } from '@vueform/vueform'
 import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
-
-import { defaultLocale } from '../../common/types'
 import CountryElement from './components/elements/vueform/CountryElement.vue'
 import CurrencyElement from './components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from './components/elements/vueform/DocumentfileElement.vue'
@@ -12,6 +10,7 @@ import MixedElement from './components/elements/vueform/MixedElement.vue'
 import OrganisationElement from './components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from './components/elements/vueform/ProjectElement.vue'
 import UserElement from './components/elements/vueform/UserElement.vue'
+import { getLanguageFromNavigator } from './i18n'
 
 en.vueform.elements.list.add = '+ Add'
 de.vueform.elements.list.add = '+ Hinzufügen'
@@ -42,7 +41,7 @@ export default defineConfig({
     MixedElement
   ],
   locales: { de, en },
-  locale: defaultLocale,
+  locale: getLanguageFromNavigator(),
   env: import.meta.env.MODE,
   displayErrors: false,
   displayMessages: false,

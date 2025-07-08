@@ -5,10 +5,13 @@ import { defaultLocale, Locale, locales } from '../../common/types.js'
 
 const defaultMessages = { de, en }
 
-function getLanguageFromNavigator() {
-  let language = navigator.language.split('-')[0] // language code without region
+export function getLanguageFromNavigator() {
+  // language code without region
+  let language = navigator.language.split('-')[0] || defaultLocale
+
   if (locales.indexOf(language as Locale) === -1) {
-    language = 'en' // default to English if the language is not supported
+    // default to English if the language is not supported
+    language = 'en'
   }
   return language as Locale
 }
