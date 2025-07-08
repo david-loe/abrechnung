@@ -118,7 +118,7 @@ export default defineComponent({
     async dontShowAgain() {
       if (APP_DATA.value) {
         APP_DATA.value.user.settings.showInstallBanner = false
-        await API.setter('user/settings', { showInstallBanner: false } as User['settings'], {}, false)
+        await API.setter('user/settings', { showInstallBanner: false } as Partial<User['settings']>, {}, false)
       }
       this.hideBanner()
     },

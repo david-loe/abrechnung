@@ -78,7 +78,7 @@ function changeOrganisation(newOrga: OrganisationSimple) {
   getProjects(newOrga._id)
   if (props.updateUserOrg && APP_DATA.value) {
     APP_DATA.value.user.settings.organisation = newOrga
-    API.setter('user/settings', { organisation: newOrga } as User['settings'], {}, false)
+    API.setter('user/settings', { organisation: newOrga } as Partial<User['settings']>, {}, false)
   }
 }
 

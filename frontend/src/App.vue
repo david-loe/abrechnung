@@ -203,7 +203,7 @@ export default defineComponent({
       if (this.APP_DATA) {
         this.APP_DATA.user.settings.language = this.$i18n.locale as Locale
         this.APP_DATA.user.settings.hasUserSetLanguage = true
-        await API.setter('user/settings', { language: this.$i18n.locale, hasUserSetLanguage: true } as User['settings'], {}, false)
+        await API.setter('user/settings', { language: this.$i18n.locale, hasUserSetLanguage: true } as Partial<User['settings']>, {}, false)
       }
     },
     setLastCurrency(currency: Currency) {

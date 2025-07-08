@@ -48,7 +48,7 @@ export default defineComponent({
     updateInsurance(insurance: HealthInsurance) {
       if (this.updateUserInsurance && this.APP_DATA) {
         this.APP_DATA.user.settings.insurance = insurance
-        API.setter('user/settings', { insurance } as User['settings'], {}, false)
+        API.setter('user/settings', { insurance } as Partial<User['settings']>, {}, false)
       }
       this.$emit('update:modelValue', insurance)
     }

@@ -137,7 +137,7 @@ export class APP_DATA {
     if (this.user.settings.hasUserSetLanguage) {
       setLanguage(this.user.settings.language)
     } else if (this.user.settings.language !== navLang) {
-      API.setter('user/settings', { language: navLang } as User['settings'], {}, false)
+      API.setter('user/settings', { language: navLang } as Partial<User['settings']>, {}, false)
     }
     //@ts-ignore
     logger.info(`${i18n.global.t('labels.user')}:`)
