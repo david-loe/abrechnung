@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { getById } from '@/../../common/scripts.js'
-import { OrganisationSimple, ProjectSimple } from '@/../../common/types.js'
+import { OrganisationSimple, ProjectSimple, User } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -78,7 +78,7 @@ function changeOrganisation(newOrga: OrganisationSimple) {
   getProjects(newOrga._id)
   if (props.updateUserOrg && APP_DATA.value) {
     APP_DATA.value.user.settings.organisation = newOrga
-    API.setter('user/settings', APP_DATA.value.user.settings, {}, false)
+    API.setter('user/settings', { organisation: newOrga } as User['settings'], {}, false)
   }
 }
 

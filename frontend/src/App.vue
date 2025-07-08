@@ -165,7 +165,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { getFlagEmoji } from '@/../../common/scripts.js'
-import { accesses, CountrySimple, Currency, Locale, locales } from '@/../../common/types.js'
+import { accesses, CountrySimple, Currency, Locale, locales, User } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
@@ -203,19 +203,19 @@ export default defineComponent({
       if (this.APP_DATA) {
         this.APP_DATA.user.settings.language = this.$i18n.locale as Locale
         this.APP_DATA.user.settings.hasUserSetLanguage = true
-        await API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+        await API.setter('user/settings', { language: this.$i18n.locale, hasUserSetLanguage: true } as User['settings'], {}, false)
       }
     },
     setLastCurrency(currency: Currency) {
       if (this.APP_DATA) {
         this.setLast(currency, this.APP_DATA.user.settings.lastCurrencies)
-        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+        API.setter('user/settings', { lastCurrencies: this.APP_DATA.user.settings.lastCurrencies.map((c) => c._id) }, {}, false)
       }
     },
     setLastCountry(country: CountrySimple) {
       if (this.APP_DATA) {
         this.setLast(country, this.APP_DATA.user.settings.lastCountries)
-        API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
+        API.setter('user/settings', { lastCountries: this.APP_DATA.user.settings.lastCountries.map((c) => c._id) }, {}, false)
       }
     },
     setLast<T>(item: T, list: T[], limit = 3) {

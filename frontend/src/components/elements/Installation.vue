@@ -82,6 +82,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { User } from '@/../../common/types'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -117,7 +118,7 @@ export default defineComponent({
     async dontShowAgain() {
       if (APP_DATA.value) {
         APP_DATA.value.user.settings.showInstallBanner = false
-        await API.setter('user/settings', APP_DATA.value.user.settings, {}, false)
+        await API.setter('user/settings', { showInstallBanner: false } as User['settings'], {}, false)
       }
       this.hideBanner()
     },
