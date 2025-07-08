@@ -84,12 +84,13 @@ export const userSchema = async () => {
 
     settings: {
       type: {
-        language: { type: String, default: displaySettings.locale.default, enum: locales },
-        lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true },
-        lastCountries: { type: [{ type: String, ref: 'Country' }], required: true },
-        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance' },
+        language: { type: String, default: displaySettings.locale.default, enum: locales, required: true },
+        hasUserSetLanguage: { type: Boolean, required: true, default: false, hide: true },
+        lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, hide: true },
+        lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, hide: true },
+        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', hide: settings.disableReportType.healthCareCost },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
-        showInstallBanner: { type: Boolean, required: true, default: true }
+        showInstallBanner: { type: Boolean, required: true, default: true, hide: true }
       },
       required: true,
       default: () => ({})

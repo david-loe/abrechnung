@@ -133,7 +133,9 @@ export class APP_DATA {
   }
   setUser(user: User) {
     this.user = user
-    setLanguage(this.user.settings.language)
+    if (this.user.settings.hasUserSetLanguage) {
+      setLanguage(this.user.settings.language)
+    }
     //@ts-ignore
     logger.info(`${i18n.global.t('labels.user')}:`)
     logger.info(user)

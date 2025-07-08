@@ -202,6 +202,7 @@ export default defineComponent({
       this.$formatter.setLocale(this.$i18n.locale as Locale)
       if (this.APP_DATA) {
         this.APP_DATA.user.settings.language = this.$i18n.locale as Locale
+        this.APP_DATA.user.settings.hasUserSetLanguage = true
         await API.setter('user/settings', this.APP_DATA.user.settings, {}, false)
       }
     },

@@ -268,6 +268,7 @@ export interface User extends UserSimple {
   loseAccessAt?: null | Date | string
   settings: {
     language: Locale
+    hasUserSetLanguage: boolean
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
     insurance?: HealthInsurance | null
