@@ -21,7 +21,7 @@ export class SettingsController extends Controller {
 @Security('httpBearer', ['admin'])
 export class SettingsAdminController extends Controller {
   @Post()
-  public async post(@Body() requestBody: SetterBody<ISettings>) {
+  public async post(@Body() requestBody: SetterBody<Omit<ISettings, 'version' | 'migrateFrom'>>) {
     return await this.setter(Settings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')

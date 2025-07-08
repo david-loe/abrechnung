@@ -1,8 +1,8 @@
 import { App, Plugin } from 'vue'
 import Formatter from '../../common/formatter'
-import { defaultLocale } from '../../common/types'
+import { getLanguageFromNavigator } from './i18n'
 
-export const formatter = new Formatter(defaultLocale, 'givenNameFirst')
+export const formatter = new Formatter(getLanguageFromNavigator(), 'givenNameFirst')
 
 const FormatterPlugin: Plugin = {
   install(app: App, _options: unknown) {

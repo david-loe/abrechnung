@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { HealthInsurance } from '@/../../common/types.js'
+import { HealthInsurance, User } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -48,7 +48,7 @@ export default defineComponent({
     updateInsurance(insurance: HealthInsurance) {
       if (this.updateUserInsurance && this.APP_DATA) {
         this.APP_DATA.user.settings.insurance = insurance
-        API.setter('user/settings', this.APP_DATA?.user.settings, {}, false)
+        API.setter('user/settings', { insurance } as Partial<User['settings']>, {}, false)
       }
       this.$emit('update:modelValue', insurance)
     }

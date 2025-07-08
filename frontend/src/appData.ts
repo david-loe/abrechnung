@@ -19,7 +19,7 @@ import {
 } from '../../common/types'
 import API from './api.js'
 import { formatter } from './formatter'
-import i18n from './i18n'
+import i18n, { getLanguageFromNavigator } from './i18n'
 import { logger } from './logger'
 import { vueform } from './main'
 
@@ -133,7 +133,12 @@ export class APP_DATA {
   }
   setUser(user: User) {
     this.user = user
-    setLanguage(this.user.settings.language)
+    const navLang = getLanguageFromNavigator()
+    if (this.user.settings.hasUserSetLanguage) {
+      setLanguage(this.user.settings.language)
+    } else if (this.user.settings.language !== navLang) {
+      API.setter('user/settings', { language: navLang } as Partial<User['settings']>, {}, false)
+    }
     //@ts-ignore
     logger.info(`${i18n.global.t('labels.user')}:`)
     logger.info(user)
