@@ -36,7 +36,7 @@ export class TravelCalculator {
     const conflicts = this.validator.validate(travel)
     if (conflicts.length === 0) {
       travel.progress = this.getProgress(travel)
-      travel.days = await this.calculateDays(travel.stages, travel.lastPlaceOfWork, travel.days)
+      travel.days = await this.calculateDays(travel.stages, travel.lastPlaceOfWork, travel.destinationPlace, travel.days)
       travel.professionalShare = this.getProfessionalShare(travel.days)
       this.addRefundsForOwnCar(travel.stages)
       await this.addCateringRefunds(travel.days, travel.stages, Boolean(travel.claimSpouseRefund))
@@ -66,6 +66,19 @@ export class TravelCalculator {
       return Math.round((stageLength / approvedLength) * 100)
     }
     return 0
+  }
+
+  getDefaultLastPlaceOfWork(stages: Stage[], destinationPlace: Travel['destinationPlace']): Travel['lastPlaceOfWork'] {
+    if (this.travelSettings.defaultLastPlaceOfWork === 'destinationPlace') {
+      return { country: destinationPlace.country }
+    } else if (this.travelSettings.defaultLastPlaceOfWork === 'lastEndLocation' && stages.length > 0) {
+      const lpow: Travel['lastPlaceOfWork'] = { country: stages[stages.length - 1].endLocation.country }
+      if (stages[stages.length - 1].endLocation.special) {
+        lpow.special = stages[stages.length - 1].endLocation.special
+      }
+      return lpow
+    }
+    return null
   }
 
   getDays(stages: Stage[], oldDays: TravelDay[]) {
@@ -132,33 +145,45 @@ export class TravelCalculator {
     return borderCrossings
   }
 
-  getDateOfLastPlaceOfWork(stages: Stage[], lastPlaceOfWork: Place) {
+  getDateOfLastPlaceOfWork(stages: Stage[], lastPlaceOfWork: Travel['lastPlaceOfWork'], destinationPlace: Travel['destinationPlace']) {
     let date: Date | null = null
     let sameCountryDate: Date | null = null
-    for (let i = stages.length - 1; i >= 0; i--) {
-      if (stages[i].endLocation.country._id === lastPlaceOfWork.country._id) {
-        if (!sameCountryDate) {
-          sameCountryDate = datetimeToDate(stages[i].arrival)
+    const lpow = lastPlaceOfWork ?? this.getDefaultLastPlaceOfWork(stages, destinationPlace)
+    if (lpow) {
+      for (let i = stages.length - 1; i >= 0; i--) {
+        if (stages[i].endLocation.country._id === lpow.country._id) {
+          if (!sameCountryDate) {
+            sameCountryDate = datetimeToDate(stages[i].arrival)
+          }
+          if (stages[i].endLocation.special === lpow.special) {
+            date = datetimeToDate(stages[i].arrival)
+            break
+          }
         }
-        if (stages[i].endLocation.special === lastPlaceOfWork.special) {
-          date = datetimeToDate(stages[i].arrival)
-          break
-        }
-      }
-      if (stages[i].startLocation.country._id === lastPlaceOfWork.country._id) {
-        if (!sameCountryDate) {
-          sameCountryDate = datetimeToDate(stages[i].departure)
-        }
-        if (stages[i].startLocation.special === lastPlaceOfWork.special) {
-          date = datetimeToDate(stages[i].departure)
-          break
+        if (stages[i].startLocation.country._id === lpow.country._id) {
+          if (!sameCountryDate) {
+            sameCountryDate = datetimeToDate(stages[i].departure)
+          }
+          if (stages[i].startLocation.special === lpow.special) {
+            date = datetimeToDate(stages[i].departure)
+            break
+          }
         }
       }
     }
-    return date ?? sameCountryDate
+    date = date ?? sameCountryDate
+    if (date) {
+      return { date, lastPlaceOfWork: lpow as Omit<Place, 'place'> }
+    }
+    return null
   }
 
-  async calculateDays(stages: Stage[], lastPlaceOfWork: Place, oldDays: TravelDay[]) {
+  async calculateDays(
+    stages: Stage[],
+    lastPlaceOfWork: Travel['lastPlaceOfWork'],
+    destinationPlace: Travel['destinationPlace'],
+    oldDays: TravelDay[]
+  ) {
     const borderCrossings: { date: Date; country: Country; special?: string }[] = []
 
     for (const borderX of this.getBorderCrossings(stages)) {
@@ -178,13 +203,13 @@ export class TravelCalculator {
     }
 
     // change days according to last place of work
-    const dateOfLastPlaceOfWork = this.getDateOfLastPlaceOfWork(stages, lastPlaceOfWork)
+    const dateOfLastPlaceOfWork = this.getDateOfLastPlaceOfWork(stages, lastPlaceOfWork, destinationPlace)
 
     if (dateOfLastPlaceOfWork) {
       for (const day of days) {
-        if (day.date.valueOf() >= dateOfLastPlaceOfWork.valueOf()) {
-          ;(day as Partial<TravelDayFullCountry>).country = await this.getCountryById(lastPlaceOfWork.country._id)
-          ;(day as Partial<TravelDayFullCountry>).special = lastPlaceOfWork.special
+        if (day.date.valueOf() >= dateOfLastPlaceOfWork.date.valueOf()) {
+          ;(day as Partial<TravelDayFullCountry>).country = await this.getCountryById(dateOfLastPlaceOfWork.lastPlaceOfWork.country._id)
+          ;(day as Partial<TravelDayFullCountry>).special = dateOfLastPlaceOfWork.lastPlaceOfWork.special
         }
       }
     }

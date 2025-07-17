@@ -483,7 +483,7 @@ function resetAndHide() {
   hideModal()
 }
 
-async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>) {
+async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlaceOfWork']) {
   const travelObj = { _id: travel.value._id, lastPlaceOfWork, days }
   modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)

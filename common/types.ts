@@ -39,6 +39,7 @@ export interface TravelSettings {
   toleranceStageDatesToApprovedTravelDates: number
   distanceRefunds: { [key in DistanceRefundType]: number }
   vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none'
+  defaultLastPlaceOfWork: DefaultLastPlaceOfWorkSetting
   lumpSumCut: { [key in Meal]: number }
   factorCateringLumpSum: number
   factorCateringLumpSumExceptions: CountryCode[]
@@ -422,7 +423,7 @@ export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
 
 export interface TravelSimple extends ReportSimple<TravelState> {
   reason: string
-  destinationPlace: Place
+  destinationPlace: Omit<Place, 'special'> // special is not used in the frontend
   startDate: Date | string
   endDate: Date | string
   progress: number
@@ -435,7 +436,7 @@ export interface TravelSimple extends ReportSimple<TravelState> {
 }
 
 export interface Travel extends TravelSimple, Report<TravelState> {
-  lastPlaceOfWork: Place
+  lastPlaceOfWork?: Omit<Place, 'place'> | null
   professionalShare: number | null
   stages: Stage[]
   expenses: TravelExpense[]
@@ -528,6 +529,9 @@ export type ReportType = (typeof reportTypes)[number]
 
 export const nameDisplayFormats = ['givenNameFirst', 'familyNameFirst'] as const
 export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
+
+export const defaultLastPlaceOfWorkSettings = ['destinationPlace', 'lastEndLocation'] as const
+export type DefaultLastPlaceOfWorkSetting = (typeof defaultLastPlaceOfWorkSettings)[number]
 
 export function getReportTypeFromModelName(modelName: ReportModelName) {
   switch (modelName) {
