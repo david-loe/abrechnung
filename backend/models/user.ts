@@ -42,6 +42,7 @@ export const userSchema = async () => {
           unique: true,
           sparse: true,
           validate: emailRegex,
+          trim: true,
           label: 'Magic Login Email',
           hide: !displaySettings.auth.magiclogin
         },
@@ -49,7 +50,7 @@ export const userSchema = async () => {
       },
       required: true
     },
-    email: { type: String, unique: true, index: true, required: true, validate: emailRegex },
+    email: { type: String, unique: true, index: true, required: true, validate: emailRegex, trim: true },
     name: {
       type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
       required: true
