@@ -153,7 +153,7 @@
           <div v-if="expenseReport.expenses.length == 0" class="alert alert-light" role="alert">
             {{ t('alerts.noData.expense') }}
           </div>
-          <table v-else class="table">
+          <table v-if="allExpenses.length > 0" class="table">
             <thead>
               <tr>
                 <th scope="col">{{ t('labels.date') }}</th>
@@ -163,7 +163,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="expense of [...expenseReport.expenses, ...(expenseReport.drafts ? expenseReport.drafts : [])]"
+                v-for="expense of allExpenses"
                 :key="(expense as Expense)._id || (expense as ExpenseDraft).id"
                 style="cursor: pointer"
                 @click="showModal('edit', 'expense', expense)"
@@ -350,6 +350,8 @@ const isReadOnly = computed(() => {
     isReadOnlySwitchOn.value
   )
 })
+
+const allExpenses = computed(() => [...expenseReport.value.expenses, ...(expenseReport.value.drafts ?? [])])
 
 const modalCompRef = useTemplateRef('modalComp')
 
