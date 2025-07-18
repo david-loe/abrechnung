@@ -1,11 +1,31 @@
-import { model, Query, Schema } from 'mongoose'
-import { ApprovedTravel } from '../../common/types.js'
-import { populateSelected } from './helper.js'
-import { travelBaseSchema } from './travel.js'
+import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import { ApprovedTravel, Travel, TravelState } from '../../common/types.js'
+import { formatter } from '../factory.js'
+import { populateSelected, travelBaseSchema } from './helper.js'
+
+interface ApprovedTravelModelType extends Model<ApprovedTravel> {
+  addOrUpdate(travel: Travel): Promise<HydratedDocument<ApprovedTravel>>
+}
+
+function convert(travel: Travel): ApprovedTravel {
+  return {
+    startDate: travel.startDate,
+    endDate: travel.endDate,
+    reason: travel.reason,
+    destinationPlace: travel.destinationPlace,
+    claimSpouseRefund: travel.claimSpouseRefund,
+    fellowTravelersNames: travel.fellowTravelersNames,
+    traveler: formatter.name(travel.owner.name),
+    approvedBy: formatter.name(travel.log[TravelState.APPROVED]?.by.name),
+    approvedOn: travel.log[TravelState.APPROVED]?.on as Date,
+    appliedForOn: travel.log[TravelState.APPLIED_FOR]?.on || travel.createdAt,
+    reportId: travel._id
+  }
+}
 
 const approvedTravelSchema = () =>
-  new Schema<ApprovedTravel>(
-    Object.assign(travelBaseSchema, {
+  new Schema<ApprovedTravel, ApprovedTravelModelType>(
+    Object.assign(travelBaseSchema(), {
       traveler: { type: String, required: true },
       approvedBy: { type: String, required: true },
       appliedForOn: { type: Date, required: true },
@@ -25,4 +45,17 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<ApprovedTravel, A
   await populateSelected(this, populates)
 })
 
-export default model<ApprovedTravel>('Travel', schema)
+schema.statics.addOrUpdate = async function (travel: Travel): Promise<HydratedDocument<ApprovedTravel>> {
+  const alreadyExsists = await this.findOne({ reportId: travel._id })
+  if (alreadyExsists) {
+    alreadyExsists.set(convert(travel))
+    await alreadyExsists.save()
+    return alreadyExsists
+  } else {
+    const newOne = new this(convert(travel))
+    await newOne.save()
+    return newOne
+  }
+}
+
+export default model<ApprovedTravel, ApprovedTravelModelType>('ApprovedTravel', schema)

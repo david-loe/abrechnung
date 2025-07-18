@@ -130,6 +130,26 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 
   return schemaWithAdvances
 }
+export function place(required = true, withPlace = true, withSpecial = true) {
+  return {
+    type: {
+      country: { type: String, ref: 'Country', required: required },
+      ...(withPlace ? { place: { type: String, required: required } } : {}),
+      ...(withSpecial ? { special: { type: String } } : {})
+    },
+    required
+  }
+}
+export function travelBaseSchema() {
+  return {
+    reason: { type: String, required: true },
+    destinationPlace: place(true, true, false),
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    claimSpouseRefund: { type: Boolean },
+    fellowTravelersNames: { type: String }
+  }
+}
 
 export function populateSelected<DocType extends {}>(
   query: Query<DocType, DocType>,
