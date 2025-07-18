@@ -1,5 +1,5 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
-import { DistanceRefundType, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
+import { DistanceRefundType, defaultLastPlaceOfWorkSettings, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
 import { reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {
@@ -22,6 +22,7 @@ export const travelSettingsSchema = () => {
     minProfessionalShare: { type: Number, min: 0, max: 1, required: true },
     distanceRefunds: { type: distanceRefunds, required: true },
     vehicleRegistrationWhenUsingOwnCar: { type: String, enum: ['required', 'optional', 'none'], required: true },
+    defaultLastPlaceOfWork: { type: String, enum: defaultLastPlaceOfWorkSettings, required: true },
     lumpSumCut: { type: lumpSumCut, required: true },
     factorCateringLumpSum: { type: Number, min: 0, max: 1, required: true },
     factorCateringLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },

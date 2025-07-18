@@ -72,7 +72,7 @@
             <td v-for="meal in lumpSums" :key="meal"></td>
           </template>
           <td>
-            <select class="form-select form-select-sm" v-model="day.purpose" :disabled="disabled" required>
+            <select class="form-select form-select-sm" v-model="day.purpose" :disabled="disabled">
               <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
                 {{ t('labels.' + purpose) }}
               </option>
@@ -132,7 +132,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
-const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Omit<Place, 'place'>]; cancel: [] }>()
+const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Travel['lastPlaceOfWork']]; cancel: [] }>()
 
 const lastPlaceOfWorkList = ref<Omit<Place, 'place'>[]>([])
 const localLastPlaceOfWork = ref(props.travel.lastPlaceOfWork)
@@ -145,7 +145,11 @@ setup(props.travel)
 function setup(travel: Travel) {
   setLocalDays(travel.days)
   lastPlaceOfWorkList.value = getLastPaceOfWorkList(travel)
-  localLastPlaceOfWork.value = props.travel.lastPlaceOfWork
+  if (props.travel.lastPlaceOfWork) {
+    localLastPlaceOfWork.value = lastPlaceOfWorkList.value.find(
+      (lpow) => lpow.country._id === props.travel.lastPlaceOfWork?.country._id && lpow.special === props.travel.lastPlaceOfWork?.special
+    )
+  }
 }
 function setLocalDays(days: TravelDay[]) {
   const newDays: TravelDay[] = []
@@ -205,7 +209,9 @@ watch(
 )
 
 watch(localLastPlaceOfWork, async (newLastPlace) => {
-  setLocalDays(await APP_DATA.value.travelCalculator.calculateDays(props.travel.stages, newLastPlace, localDays.value))
+  setLocalDays(
+    await APP_DATA.value.travelCalculator.calculateDays(props.travel.stages, newLastPlace, props.travel.destinationPlace, localDays.value)
+  )
 })
 
 watch(
@@ -216,6 +222,7 @@ watch(
       const newCalculatedDays = await APP_DATA.value.travelCalculator.calculateDays(
         props.travel.stages,
         localLastPlaceOfWork.value,
+        props.travel.destinationPlace,
         newLocalDays
       )
       await APP_DATA.value.travelCalculator.addCateringRefunds(

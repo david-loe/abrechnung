@@ -17,11 +17,11 @@ import { addExchangeRate } from './exchangeRate.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import User from './user.js'
 
-const place = (required = false, withPlace = true) => ({
+const place = (required = true, withPlace = true, withSpecial = true) => ({
   type: {
     country: { type: String, ref: 'Country', required: required },
-    special: { type: String },
-    ...(withPlace ? { place: { type: String, required: required } } : {})
+    ...(withPlace ? { place: { type: String, required: required } } : {}),
+    ...(withSpecial ? { special: { type: String } } : {})
   },
   required
 })
@@ -39,7 +39,7 @@ const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
     Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), {
       reason: { type: String, required: true },
-      destinationPlace: place(true),
+      destinationPlace: place(true, true, false),
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
       startDate: { type: Date, required: true },
@@ -47,14 +47,14 @@ const travelSchema = () =>
       claimSpouseRefund: { type: Boolean },
       fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
-      lastPlaceOfWork: place(true, false),
+      lastPlaceOfWork: place(false, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
       stages: [
         {
           departure: { type: Date, required: true },
           arrival: { type: Date, required: true },
-          startLocation: place(true),
-          endLocation: place(true),
+          startLocation: place(),
+          endLocation: place(),
           midnightCountries: [{ date: { type: Date, required: true }, country: { type: String, ref: 'Country' } }],
           transport: {
             distance: { type: Number, min: 0 },

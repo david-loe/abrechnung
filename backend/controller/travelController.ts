@@ -146,11 +146,7 @@ export class TravelController extends Controller {
 
   @Post('appliedFor')
   public async postOwnInWork(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
-    const extendedBody = Object.assign(requestBody, {
-      state: TravelState.APPLIED_FOR,
-      editor: request.user._id,
-      lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
-    })
+    const extendedBody = Object.assign(requestBody, { state: TravelState.APPLIED_FOR, editor: request.user._id })
 
     if (!extendedBody._id) {
       if (!request.user.access['appliedFor:travel']) {
@@ -191,12 +187,7 @@ export class TravelController extends Controller {
           sendA1Notification(travel)
         }
       }
-      Object.assign(extendedBody, {
-        state: TravelState.APPROVED,
-        editor: request.user._id,
-        owner: request.user._id,
-        lastPlaceOfWork: { country: requestBody.destinationPlace?.country, place: '' }
-      })
+      Object.assign(extendedBody, { state: TravelState.APPROVED, editor: request.user._id, owner: request.user._id })
     } else {
       extendedBody = Object.assign({ _id: extendedBody._id }, { state: TravelState.APPROVED, editor: request.user._id })
     }
@@ -286,10 +277,6 @@ export class TravelApproveController extends Controller {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       const travelApplication = extendedBody as TravelApplication
-      ;(travelApplication as unknown as ITravel).lastPlaceOfWork = {
-        country: travelApplication.destinationPlace?.country as ITravel['destinationPlace']['country'],
-        place: ''
-      }
       if (!travelApplication.name && travelApplication.startDate) {
         const date = new Date(travelApplication.startDate as string)
         travelApplication.name = `${travelApplication.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
