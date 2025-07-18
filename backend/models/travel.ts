@@ -17,14 +17,16 @@ import { addExchangeRate } from './exchangeRate.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import User from './user.js'
 
-const place = (required = true, withPlace = true, withSpecial = true) => ({
-  type: {
-    country: { type: String, ref: 'Country', required: required },
-    ...(withPlace ? { place: { type: String, required: required } } : {}),
-    ...(withSpecial ? { special: { type: String } } : {})
-  },
-  required
-})
+function place(required = true, withPlace = true, withSpecial = true) {
+  return {
+    type: {
+      country: { type: String, ref: 'Country', required: required },
+      ...(withPlace ? { place: { type: String, required: required } } : {}),
+      ...(withSpecial ? { special: { type: String } } : {})
+    },
+    required
+  }
+}
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -35,17 +37,20 @@ interface Methods {
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
 type TravelModel = Model<Travel, {}, Methods>
 
+export const travelBaseSchema = {
+  reason: { type: String, required: true },
+  destinationPlace: place(true, true, false),
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  claimSpouseRefund: { type: Boolean },
+  fellowTravelersNames: { type: String }
+}
+
 const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
-    Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), {
-      reason: { type: String, required: true },
-      destinationPlace: place(true, true, false),
+    Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), travelBaseSchema, {
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
-      startDate: { type: Date, required: true },
-      endDate: { type: Date, required: true },
-      claimSpouseRefund: { type: Boolean },
-      fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
       lastPlaceOfWork: place(false, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
