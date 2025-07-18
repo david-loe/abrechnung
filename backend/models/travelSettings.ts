@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from 'mongoose'
 import { DistanceRefundType, defaultLastPlaceOfWorkSettings, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
-import { reportPrinter, travelCalculator } from '../factory.js'
+import { approvedTravelsPrinter, reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {
   const distanceRefunds = {} as { [key in DistanceRefundType]: { type: NumberConstructor; min: 0; required: true; label: string } }
@@ -39,6 +39,7 @@ const schema = travelSettingsSchema()
 schema.post('save', function (this: HydratedDocument<TravelSettings>) {
   travelCalculator.updateSettings(this)
   reportPrinter.setDistanceRefunds(this.distanceRefunds)
+  approvedTravelsPrinter.setAllowSpouseRefund(this.allowSpouseRefund)
 })
 
 export default model('TravelSettings', schema)
