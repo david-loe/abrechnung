@@ -2,7 +2,6 @@ import pdf_lib from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { getAddUpTableData, getTotalBalance } from '../../common/scripts.js'
 import {
-  _id,
   Advance,
   AdvanceState,
   AnyState,
