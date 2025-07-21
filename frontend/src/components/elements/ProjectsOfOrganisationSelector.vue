@@ -1,24 +1,24 @@
 <template>
-  <select
+  <OrganisationSelector
     v-if="APP_DATA"
     :class="'form-select' + (APP_DATA.organisations.length > 1 ? '' : ' d-none')"
     id="healthCareCostFormProject"
-    v-model="selectedOrg"
+    :modelValue="initialOrg"
     :disabled="disabled"
     :required="required"
-    @change="onChange">
+    @update:modelValue="(o) => getProjects(o._id)">
     <option v-for="organisation in APP_DATA.organisations" :value="organisation" :key="organisation._id">
       {{ organisation.name }}
     </option>
-  </select>
+  </OrganisationSelector>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { getById } from '@/../../common/scripts.js'
-import { OrganisationSimple, ProjectSimple, User } from '@/../../common/types.js'
-import API from '@/api.js'
+import { OrganisationSimple, ProjectSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
+import OrganisationSelector from './OrganisationSelector.vue'
 
 const props = defineProps<{
   modelValue: ProjectSimple[] | string[] | [undefined] | [null]
@@ -29,23 +29,20 @@ const props = defineProps<{
   loadProjectsOnInit?: boolean
 }>()
 
-// Emits definieren
 const emit = defineEmits<{ 'update:modelValue': [projects: ProjectSimple[] | string[]] }>()
 
-// Reaktive Variablen
-const selectedOrg = ref<OrganisationSimple | null>(null)
+const initialOrg = ref<OrganisationSimple | null>(null)
 const APP_DATA = APP_LOADER.data
 
 function getProjects(orgaId?: string) {
   const projects: ProjectSimple[] = []
   if (APP_DATA.value) {
-    // Projekte aus den zugewiesenen Projekten des Users
     for (const project of APP_DATA.value.user.projects.assigned) {
       if (!orgaId || project.organisation === orgaId) {
         projects.push(project)
       }
     }
-    // Weitere Projekte aus APP_DATA.projects, falls noch nicht enthalten
+
     if (APP_DATA.value.projects) {
       for (const project of APP_DATA.value.projects) {
         let alreadyIn = false
@@ -63,29 +60,14 @@ function getProjects(orgaId?: string) {
       }
     }
   }
-  // Wenn reduceToId true ist, nur die IDs der Projekte zurückgeben
+
   if (props.reduceToId) {
     const projectIds = projects.map((project) => project._id)
     emit('update:modelValue', projectIds)
     return
   }
-  // Andernfalls die vollständigen Projektobjekte zurückgeben
 
   emit('update:modelValue', projects)
-}
-
-function changeOrganisation(newOrga: OrganisationSimple) {
-  getProjects(newOrga._id)
-  if (props.updateUserOrg && APP_DATA.value) {
-    APP_DATA.value.user.settings.organisation = newOrga
-    API.setter('user/settings', { organisation: newOrga } as Partial<User['settings']>, {}, false)
-  }
-}
-
-function onChange() {
-  if (selectedOrg.value) {
-    changeOrganisation(selectedOrg.value)
-  }
 }
 
 onMounted(async () => {
@@ -99,16 +81,16 @@ onMounted(async () => {
       project = getById(props.modelValue[0], APP_DATA.value.projects)
     }
     if (project && APP_DATA.value) {
-      selectedOrg.value = getById(project.organisation, APP_DATA.value.organisations)
+      initialOrg.value = getById(project.organisation, APP_DATA.value.organisations)
       return
     }
   }
   if (props.updateUserOrg && APP_DATA.value?.user.settings.organisation) {
-    selectedOrg.value = APP_DATA.value.user.settings.organisation
+    initialOrg.value = APP_DATA.value.user.settings.organisation
   }
 
   if (props.loadProjectsOnInit) {
-    getProjects(selectedOrg.value?._id)
+    getProjects(initialOrg.value?._id)
   }
 })
 </script>
