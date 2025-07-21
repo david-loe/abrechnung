@@ -1,6 +1,7 @@
 {
   "allowSpouseRefund": false,
   "allowTravelApplicationForThePast": false,
+  "defaultLastPlaceOfWork": "destinationPlace",
   "distanceRefunds": {
     "car": 0.3,
     "halfCar": 0.15,

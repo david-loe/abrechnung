@@ -239,6 +239,8 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '2.1.3')) {
       logger.info('Apply migration from v2.1.3: add approved travels')
 
+      await mongoose.connection.collection('travelsettings').updateOne({}, { $set: { defaultLastPlaceOfWork: 'destinationPlace' } })
+
       const travels = await mongoose.connection
         .model('Travel')
         .find({ historic: false, state: { $gte: 10 } })
