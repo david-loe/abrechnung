@@ -2,7 +2,6 @@
   <select
     v-if="APP_DATA"
     :class="'form-select' + (APP_DATA.organisations.length > 1 ? '' : ' d-none')"
-    id="healthCareCostFormProject"
     v-model="selectedOrg"
     :disabled="disabled"
     :required="required"

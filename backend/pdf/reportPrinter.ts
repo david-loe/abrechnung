@@ -2,6 +2,7 @@ import pdf_lib from 'pdf-lib'
 import Formatter from '../../common/formatter.js'
 import { getAddUpTableData, getTotalBalance } from '../../common/scripts.js'
 import {
+  _id,
   Advance,
   AdvanceState,
   AnyState,
@@ -230,9 +231,12 @@ class ReportPrint {
         `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}    ${this.t('labels.category')}: ${this.report.category.name}`,
         { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
-      // Dates
-      const text = `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
-      y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
+
+      if (this.report.expenses.length > 0) {
+        // Dates
+        const text = `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
+        y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
+      }
     }
     return y
   }
@@ -334,10 +338,10 @@ class ReportPrint {
       })
     }
 
-    const tabelOptions: TableOptions = options
-    tabelOptions.firstRow = false
+    const tableOptions: TableOptions = options
+    tableOptions.firstRow = false
 
-    return await this.drawer.drawTable(summary, columns, tabelOptions)
+    return await this.drawer.drawTable(summary, columns, tableOptions)
   }
 
   async drawComments(options: Options) {
@@ -358,10 +362,10 @@ class ReportPrint {
     this.drawer.drawText(this.t('labels.comments'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
-    const tabelOptions: TableOptions = options
-    tabelOptions.firstRow = false
+    const tableOptions: TableOptions = options
+    tableOptions.firstRow = false
 
-    return await this.drawer.drawTable<Comment<AnyState>>(this.report.comments, columns, tabelOptions)
+    return await this.drawer.drawTable<Comment<AnyState>>(this.report.comments, columns, tableOptions)
   }
 
   async drawStages(receiptMap: ReceiptMap, options: Options) {
@@ -438,7 +442,7 @@ class ReportPrint {
       width: 45,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id?.toString()].number).join(', ')
+      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', ') // receipts always have an _id in backend
     })
 
     const fontSize = options.fontSize + 2
@@ -485,7 +489,7 @@ class ReportPrint {
       width: 45,
       alignment: pdf_lib.TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[r._id?.toString()].number).join(', ')
+      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', ') // receipts always have an _id in backend
     })
 
     const fontSize = options.fontSize + 2
