@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
+import { formatter } from './factory.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
 
@@ -233,6 +234,35 @@ export async function checkForMigrations() {
       await bulkRewriteLog('expensereports')
       await bulkRewriteLog('healthcarecosts')
       await bulkRewriteLog('advances')
+    }
+
+    if (semver.lte(migrateFrom, '2.1.3')) {
+      logger.info('Apply migration from v2.1.3: add approved travels')
+
+      const travels = await mongoose.connection
+        .model('Travel')
+        .find({ historic: false, state: { $gte: 10 } })
+        .lean() //APPROVED or higher
+      const approvedTravels = []
+      for (const travel of travels) {
+        approvedTravels.push({
+          startDate: travel.startDate,
+          endDate: travel.endDate,
+          reason: travel.reason,
+          destinationPlace: travel.destinationPlace,
+          claimSpouseRefund: travel.claimSpouseRefund,
+          fellowTravelersNames: travel.fellowTravelersNames,
+          traveler: formatter.name(travel.owner.name),
+          approvedBy: formatter.name(travel.log[10]?.by.name), //APPROVED
+          approvedOn: travel.log[10]?.on as Date, //APPROVED
+          appliedForOn: travel.log[0]?.on || travel.createdAt, //APPLIED_FOR
+          reportId: travel._id,
+          organisationId: travel.project.organisation
+        })
+      }
+      if (approvedTravels.length > 0) {
+        await mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
+      }
     }
 
     if (settings) {

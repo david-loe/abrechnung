@@ -3,6 +3,7 @@
  * checking permission and asking for it if needed
  */
 
+import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from '@/api'
 
@@ -108,15 +109,17 @@ export function expandCollapseComments() {
   }
 }
 
-export async function showFile(file: { endpoint: string; _id: string; filename: string; isDownloading?: Ref<string> } | Blob | File) {
+export async function showFile(
+  file: { endpoint: string; params: AxiosRequestConfig['params']; filename: string; isDownloading?: Ref<string> } | Blob | File
+) {
   let fileObj: File | Blob
   if (file instanceof Blob) {
     fileObj = file
   } else {
     if (file.isDownloading) {
-      file.isDownloading.value = file._id
+      file.isDownloading.value = file.params._id || true
     }
-    const result = (await API.getter<Blob>(file.endpoint, { _id: file._id }, { responseType: 'blob' })).ok
+    const result = (await API.getter<Blob>(file.endpoint, file.params, { responseType: 'blob' })).ok
     if (file.isDownloading) {
       file.isDownloading.value = ''
     }

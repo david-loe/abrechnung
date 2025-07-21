@@ -421,18 +421,21 @@ export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
 
 export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
 
-export interface TravelSimple extends ReportSimple<TravelState> {
+interface TravelBase {
   reason: string
-  destinationPlace: Omit<Place, 'special'> // special is not used in the frontend
+  destinationPlace: Omit<Place, 'special'>
   startDate: Date | string
   endDate: Date | string
+  claimSpouseRefund?: boolean | null //travelSettings.allowSpouseRefund
+  fellowTravelersNames?: string | null //travelSettings.allowSpouseRefund
+}
+
+export interface TravelSimple extends TravelBase, ReportSimple<TravelState> {
   progress: number
   addUp: AddUp<Travel>[]
   advances: AdvanceBase[]
   isCrossBorder?: boolean | null
   a1Certificate?: { exactAddress: string; destinationName: string } | null
-  claimSpouseRefund?: boolean | null //settings.allowSpouseRefund
-  fellowTravelersNames?: string | null //settings.allowSpouseRefund
 }
 
 export interface Travel extends TravelSimple, Report<TravelState> {
@@ -460,6 +463,15 @@ export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> 
 }
 export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
   expenses: Expense[]
+}
+
+export interface ApprovedTravel extends TravelBase {
+  traveler: string
+  reportId?: _id
+  organisationId: _id
+  appliedForOn: Date | string
+  approvedBy: string
+  approvedOn: Date | string
 }
 
 export const State = { REJECTED: -10, APPLIED_FOR: 0, EDITABLE_BY_OWNER: 10, IN_REVIEW: 20, BOOKABLE: 30, BOOKED: 40 } as const

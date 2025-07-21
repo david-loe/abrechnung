@@ -352,7 +352,7 @@
                     @click="
                       showFile({
                         endpoint: `${props.endpointPrefix}travel/report`,
-                        _id: travel._id,
+                        params: { _id: travel._id },
                         filename: `${travel.name}.pdf`,
                         isDownloading: isDownloadingFn()
                       })

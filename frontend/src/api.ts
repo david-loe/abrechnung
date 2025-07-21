@@ -43,6 +43,15 @@ class API {
       }
       return { ok: res.data }
     } catch (error: unknown) {
+      if (
+        config.responseType === 'blob' &&
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.data instanceof Blob &&
+        error.response.data.type === 'application/json'
+      ) {
+        error.response.data = JSON.parse(await error.response.data.text())
+      }
       return this.#handleError(error, showAlert)
     }
   }

@@ -129,7 +129,9 @@
     <template #item-report="{ _id, name }: AdvanceSimple">
       <button
         class="btn btn-primary btn-sm"
-        @click="showFile({ endpoint: `${props.endpoint}/report`, _id, filename: `${name}.pdf`, isDownloading: isDownloadingFn() })"
+        @click="
+          showFile({ endpoint: `${props.endpoint}/report`, params: { _id }, filename: `${name}.pdf`, isDownloading: isDownloadingFn() })
+        "
         :title="t('labels.report')"
         :disabled="isDownloading === _id">
         <span v-if="isDownloading === _id" class="spinner-border spinner-border-sm"></span>

@@ -12,19 +12,21 @@ import {
   travelStates
 } from '../../common/types.js'
 import { travelCalculator } from '../factory.js'
+import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
 import { addExchangeRate } from './exchangeRate.js'
-import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import {
+  addToProjectBalance,
+  costObject,
+  offsetAdvance,
+  place,
+  populateAll,
+  populateSelected,
+  requestBaseSchema,
+  setLog,
+  travelBaseSchema
+} from './helper.js'
 import User from './user.js'
-
-const place = (required = true, withPlace = true, withSpecial = true) => ({
-  type: {
-    country: { type: String, ref: 'Country', required: required },
-    ...(withPlace ? { place: { type: String, required: required } } : {}),
-    ...(withSpecial ? { special: { type: String } } : {})
-  },
-  required
-})
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -37,15 +39,9 @@ type TravelModel = Model<Travel, {}, Methods>
 
 const travelSchema = () =>
   new Schema<Travel, TravelModel, Methods>(
-    Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), {
-      reason: { type: String, required: true },
-      destinationPlace: place(true, true, false),
+    Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), travelBaseSchema(), {
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
-      startDate: { type: Date, required: true },
-      endDate: { type: Date, required: true },
-      claimSpouseRefund: { type: Boolean },
-      fellowTravelersNames: { type: String },
       professionalShare: { type: Number, min: 0, max: 1 },
       lastPlaceOfWork: place(false, false),
       progress: { type: Number, min: 0, max: 100, default: 0 },
@@ -227,6 +223,8 @@ schema.post('save', async function (this: TravelDoc) {
   if (this.state === TravelState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'Travel')
+  } else if (this.state === TravelState.APPROVED) {
+    await ApprovedTravel.addOrUpdate(this)
   }
 })
 
