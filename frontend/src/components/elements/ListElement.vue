@@ -3,7 +3,7 @@
     :rows-items="rowsItems"
     v-model:server-options="serverOptions"
     :items-selected="itemsSelected"
-    @update:items-selected="(v) => emits('update:itemsSelected', v)"
+    @update:items-selected="(s: Item[]) => emits('update:itemsSelected', s)"
     :server-items-length="serverItemsLength"
     :loading="loading"
     :items="items"
