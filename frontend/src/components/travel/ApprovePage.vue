@@ -35,7 +35,7 @@
             </div>
             <div class="col-auto">
               <label for="toDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
-              <DateInput id="toDateInput" v-model="approvedTravelsReportForm.to" :required="true" />
+              <DateInput id="toDateInput" v-model="approvedTravelsReportForm.to" :required="true" :min="approvedTravelsReportForm.from" />
             </div>
             <div v-if="APP_DATA && APP_DATA.organisations.length > 1" class="col-auto">
               <label for="organisationInput" class="form-label">{{ $t('labels.organisation') }}</label>
