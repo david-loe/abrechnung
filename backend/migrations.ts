@@ -260,7 +260,9 @@ export async function checkForMigrations() {
           organisationId: travel.project.organisation
         })
       }
-      mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
+      if (approvedTravels.length > 0) {
+        mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
+      }
     }
 
     if (settings) {
