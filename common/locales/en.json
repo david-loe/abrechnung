@@ -28,8 +28,8 @@
     "draftsWillBeLost": "All drafts will be lost once you leave this page! Add receipts and save them so they are retained.",
     "errorDeleting": "Error while deleting",
     "errorSaving": "Error while saving",
-    "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
     "fileTypeOfXNotSupportedY": "File type of '{X}' not supported. Supported file types are: {Y}.",
+    "fileXToLargeMaxIsY": "File '{X}' too large. Maximum allowed size is {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
     "loginFailed": "Failed to log in!",
@@ -170,9 +170,6 @@
     }
   },
   "labels": {
-    "nameDisplayFormat": "Name display format",
-    "givenNameFirst": "Given name first",
-    "familyNameFirst": "Family name first",
     "a1Certificate": "A1 Certificate",
     "a1CertificateEmail": "Email address for A1 certificate notifications",
     "access": "Access",
@@ -196,6 +193,7 @@
     "approve": "Approve",
     "approvedBy": "Approved by",
     "approvedOn": "Approved on",
+    "approvedTravelReport": "Approved Travels Report",
     "arrival": "Arrival",
     "assignedProjects": "Assigned Projects",
     "auth": "Authentication",
@@ -294,6 +292,7 @@
     "fallback": "Fallback",
     "fallBackLumpSumCountry": "Fall back country for lump sums",
     "familyName": "Family name",
+    "familyNameFirst": "Family name first",
     "fellowTravelersNames": "Name of all fellow travelers",
     "filter": "Filter",
     "fk": "Authentication",
@@ -301,6 +300,7 @@
     "fontSizes": "Font sizes",
     "from": "From",
     "givenName": "Given name",
+    "givenNameFirst": "Given name first",
     "healthCareCost": "Health care cost",
     "healthCareCostName": "Health care cost name",
     "healthCareCosts": "Health care costs",
@@ -349,6 +349,7 @@
     "model": "Model",
     "models": "Models",
     "name": "Name",
+    "nameDisplayFormat": "Name display format",
     "needsA1Certificate": "Needs A1 certificate",
     "new": "New",
     "newX": "New {X}",
@@ -560,10 +561,6 @@
     },
     "hi": "Hi there,",
     "hiX": "Hi {X},",
-    "toInsurance": {
-      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
-      "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
-    },
     "magiclogin": {
       "buttonText": "Jump to @:{'headlines.title'}@:{'headlines.emoji'}",
       "paragraph": "Click here to get access.",
@@ -576,6 +573,10 @@
       "subject": "Welcome to @:{'headlines.title'}@:{'headlines.emoji'}"
     },
     "regards": "Best Regards",
+    "toInsurance": {
+      "body": "Good day {insuranceName},\n\nIn the attachment is a summary of benefits ({amount}) advanced by {owner}.\nI request reimbursement for these:\n{bankDetails}\n\n{organisationName}",
+      "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
+    },
     "travel": {
       "a1": {
         "paragraph": "A new business trip requires an A1 certificate:",

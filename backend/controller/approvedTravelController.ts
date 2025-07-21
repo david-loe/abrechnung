@@ -1,5 +1,6 @@
 import { Readable } from 'node:stream'
 import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { datetimeToDateString } from '../../common/scripts.js'
 import { _id, ApprovedTravel as IApprovedTravel } from '../../common/types.js'
 import { approvedTravelsPrinter } from '../factory.js'
 import i18n from '../i18n.js'
@@ -37,7 +38,7 @@ export class ApprovedTravelController extends Controller {
     const report = await approvedTravelsPrinter.print(travels, request.user.settings.language, from, to)
     this.setHeader(
       'Content-disposition',
-      `attachment; filename*=UTF-8''${encodeURIComponent(`${i18n.t('labels.travels')} ${from.toISOString().split('T')[0]} - ${to.toISOString().split('T')[0]}`)}.pdf`
+      `attachment; filename*=UTF-8''${encodeURIComponent(`${i18n.t('labels.travels')} ${datetimeToDateString(from)} - ${datetimeToDateString(to)}`)}.pdf`
     )
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
