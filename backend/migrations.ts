@@ -261,7 +261,7 @@ export async function checkForMigrations() {
         })
       }
       if (approvedTravels.length > 0) {
-        mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
+        await mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
       }
     }
 
