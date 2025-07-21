@@ -19,7 +19,8 @@ function convert(travel: Travel): ApprovedTravel {
     approvedBy: formatter.name(travel.log[TravelState.APPROVED]?.by.name),
     approvedOn: travel.log[TravelState.APPROVED]?.on as Date,
     appliedForOn: travel.log[TravelState.APPLIED_FOR]?.on || travel.createdAt,
-    reportId: travel._id
+    reportId: travel._id,
+    organisationId: travel.project.organisation
   }
 }
 
@@ -30,7 +31,8 @@ const approvedTravelSchema = () =>
       approvedBy: { type: String, required: true },
       appliedForOn: { type: Date, required: true },
       approvedOn: { type: Date, required: true },
-      reportId: { type: Schema.Types.ObjectId, ref: 'Travel', required: true }
+      reportId: { type: Schema.Types.ObjectId, ref: 'Travel', required: true },
+      organisationId: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true }
     }),
     { timestamps: true }
   )

@@ -467,7 +467,8 @@ export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareC
 
 export interface ApprovedTravel extends TravelBase {
   traveler: string
-  reportId: _id
+  reportId?: _id
+  organisationId: _id
   appliedForOn: Date | string
   approvedBy: string
   approvedOn: Date | string

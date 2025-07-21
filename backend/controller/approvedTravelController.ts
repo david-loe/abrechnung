@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { ApprovedTravel as IApprovedTravel } from '../../common/types.js'
+import { _id, ApprovedTravel as IApprovedTravel } from '../../common/types.js'
 import { approvedTravelsPrinter } from '../factory.js'
 import i18n from '../i18n.js'
 import ApprovedTravel from '../models/approvedTravel.js'
@@ -20,9 +20,17 @@ export class ApprovedTravelController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() from: Date, @Query() to: Date, @Request() request: AuthenticatedExpressRequest) {
-    console.log(from, to)
-    const travels = await ApprovedTravel.find({ startDate: { $lte: to }, endDate: { $gte: from } }).lean()
+  public async getReport(
+    @Query() from: Date,
+    @Query() to: Date,
+    @Query() organisationId: _id | undefined | null,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const travels = await ApprovedTravel.find({
+      startDate: { $lte: to },
+      endDate: { $gte: from },
+      ...(organisationId ? { organisationId } : {})
+    }).lean()
     if (travels.length === 0) {
       throw new NotFoundError(`No travels found`)
     }
