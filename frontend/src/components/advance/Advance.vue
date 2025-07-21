@@ -67,7 +67,7 @@
     @click="
       showFile({
         endpoint: `${props.endpointPrefix}advance/report`,
-        _id: advance._id,
+        params: { _id: advance._id },
         filename: `${advance.name}.pdf`,
         isDownloading: isDownloadingFn()
       })

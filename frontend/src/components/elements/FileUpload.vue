@@ -94,7 +94,7 @@ export default defineComponent({
       if (file.data) {
         await showFile(file.data as File)
       } else if (file._id) {
-        await showFile({ _id: file._id, endpoint: `${this.endpointPrefix}documentFile`, filename: file.name as string })
+        await showFile({ params: { _id: file._id }, endpoint: `${this.endpointPrefix}documentFile`, filename: file.name as string })
       }
     },
     async deleteFile(file: Partial<DocumentFile>, index?: number) {

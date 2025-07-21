@@ -235,7 +235,7 @@
                       @click="
                         showFile({
                           endpoint: `${props.endpointPrefix}healthCareCost/report`,
-                          _id: healthCareCost._id,
+                          params: { _id: healthCareCost._id },
                           filename: `${healthCareCost.name}.pdf`,
                           isDownloading: isDownloadingFn()
                         })
