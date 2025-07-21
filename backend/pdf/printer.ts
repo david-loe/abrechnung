@@ -503,15 +503,16 @@ export class PDFDrawer {
       for (const column of columns) {
         const datum = data[i][column.key]
         let cell: string
-        cell = String(datum)
-        if (column.fn) {
-          cell = column.fn(datum)
-        }
         if (opts.firstRow) {
           cell = column.title
-        }
-        if (datum === undefined) {
-          cell = EMPTY_CELL
+        } else {
+          cell = String(datum)
+          if (column.fn) {
+            cell = column.fn(datum)
+          }
+          if (datum === undefined) {
+            cell = EMPTY_CELL
+          }
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
         const multiText = layoutMultilineText(cell + (column.countryCodeForFlag && !opts.firstRow ? FLAG_PSEUDO_SUFFIX : ''), {
