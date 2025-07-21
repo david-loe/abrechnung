@@ -2608,26 +2608,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Pick_Place.Exclude_keyofPlace.special__": {
-				"properties": {
-					"place": {
-						"type": "string"
-					},
-					"country": {
-						"$ref": "#/components/schemas/CountrySimple"
-					}
-				},
-				"required": [
-					"place",
-					"country"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_Place.special_": {
-				"$ref": "#/components/schemas/Pick_Place.Exclude_keyofPlace.special__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
 			"AddUpBase": {
 				"properties": {
 					"advanceOverflow": {
@@ -2781,6 +2761,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Pick_Place.Exclude_keyofPlace.special__": {
+				"properties": {
+					"place": {
+						"type": "string"
+					},
+					"country": {
+						"$ref": "#/components/schemas/CountrySimple"
+					}
+				},
+				"required": [
+					"place",
+					"country"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_Place.special_": {
+				"$ref": "#/components/schemas/Pick_Place.Exclude_keyofPlace.special__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
 			"UserSimple": {
 				"properties": {
 					"email": {
@@ -2842,6 +2842,42 @@
 			},
 			"Travel": {
 				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
 					"name": {
 						"type": "string"
 					},
@@ -2899,34 +2935,6 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
@@ -2961,14 +2969,6 @@
 							"exactAddress"
 						],
 						"type": "object",
-						"nullable": true
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
 						"nullable": true
 					},
 					"history": {
@@ -3013,6 +3013,10 @@
 					}
 				},
 				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
 					"name",
 					"owner",
 					"editor",
@@ -3023,10 +3027,6 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
 					"progress",
 					"addUp",
 					"advances",
@@ -3068,6 +3068,42 @@
 			},
 			"ITravel": {
 				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
 					"name": {
 						"type": "string"
 					},
@@ -3125,34 +3161,6 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
@@ -3187,14 +3195,6 @@
 							"exactAddress"
 						],
 						"type": "object",
-						"nullable": true
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
 						"nullable": true
 					},
 					"history": {
@@ -3239,6 +3239,10 @@
 					}
 				},
 				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
 					"name",
 					"owner",
 					"editor",
@@ -3249,10 +3253,6 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
 					"progress",
 					"addUp",
 					"advances",
@@ -3287,6 +3287,12 @@
 						"items": {
 							"type": "string",
 							"enum": [
+								"reason",
+								"destinationPlace",
+								"startDate",
+								"endDate",
+								"claimSpouseRefund",
+								"fellowTravelersNames",
 								"name",
 								"owner",
 								"editor",
@@ -3299,17 +3305,11 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
-								"reason",
-								"destinationPlace",
-								"startDate",
-								"endDate",
 								"progress",
 								"addUp",
 								"advances",
 								"isCrossBorder",
 								"a1Certificate",
-								"claimSpouseRefund",
-								"fellowTravelersNames",
 								"name",
 								"owner",
 								"editor",
@@ -3748,6 +3748,42 @@
 			},
 			"TravelSimple": {
 				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
 					"name": {
 						"type": "string"
 					},
@@ -3805,34 +3841,6 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
 					"progress": {
 						"type": "number",
 						"format": "double"
@@ -3868,17 +3876,13 @@
 						],
 						"type": "object",
 						"nullable": true
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
-						"nullable": true
 					}
 				},
 				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
 					"name",
 					"owner",
 					"editor",
@@ -3889,10 +3893,6 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
 					"progress",
 					"addUp",
 					"advances"
@@ -4539,6 +4539,49 @@
 					"claimSpouseRefund": {
 						"type": "boolean"
 					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"destinationPlace": {
+						"properties": {
+							"country": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/CountrySimple"
+									},
+									{
+										"$ref": "#/components/schemas/IdDocument_string_"
+									}
+								]
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"reason": {
+						"type": "string"
+					},
 					"a1Certificate": {
 						"properties": {
 							"destinationName": {
@@ -4628,49 +4671,6 @@
 								"type": "array"
 							}
 						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"destinationPlace": {
-						"properties": {
-							"country": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/CountrySimple"
-									},
-									{
-										"$ref": "#/components/schemas/IdDocument_string_"
-									}
-								]
-							},
-							"place": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"reason": {
-						"type": "string"
 					},
 					"name": {
 						"type": "string"
@@ -4702,6 +4702,49 @@
 					"claimSpouseRefund": {
 						"type": "boolean"
 					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"destinationPlace": {
+						"properties": {
+							"country": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/CountrySimple"
+									},
+									{
+										"$ref": "#/components/schemas/IdDocument_string_"
+									}
+								]
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"reason": {
+						"type": "string"
+					},
 					"a1Certificate": {
 						"properties": {
 							"destinationName": {
@@ -4791,49 +4834,6 @@
 								"type": "array"
 							}
 						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"destinationPlace": {
-						"properties": {
-							"country": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/CountrySimple"
-									},
-									{
-										"$ref": "#/components/schemas/IdDocument_string_"
-									}
-								]
-							},
-							"place": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"reason": {
-						"type": "string"
 					},
 					"name": {
 						"type": "string"
@@ -4869,6 +4869,49 @@
 					"claimSpouseRefund": {
 						"type": "boolean"
 					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "string",
+								"format": "date-time"
+							}
+						]
+					},
+					"destinationPlace": {
+						"properties": {
+							"country": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/CountrySimple"
+									},
+									{
+										"$ref": "#/components/schemas/IdDocument_string_"
+									}
+								]
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"reason": {
+						"type": "string"
+					},
 					"a1Certificate": {
 						"properties": {
 							"destinationName": {
@@ -4958,49 +5001,6 @@
 								"type": "array"
 							}
 						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "string",
-								"format": "date-time"
-							}
-						]
-					},
-					"destinationPlace": {
-						"properties": {
-							"country": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/CountrySimple"
-									},
-									{
-										"$ref": "#/components/schemas/IdDocument_string_"
-									}
-								]
-							},
-							"place": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"reason": {
-						"type": "string"
 					},
 					"days": {
 						"items": {
@@ -8497,6 +8497,256 @@
 			"SetterBody_ICategory_": {
 				"$ref": "#/components/schemas/SetterPartial_ICategory.NoPost_"
 			},
+			"ApprovedTravel": {
+				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"traveler": {
+						"type": "string"
+					},
+					"reportId": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"organisationId": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"appliedForOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"approvedBy": {
+						"type": "string"
+					},
+					"approvedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
+					"traveler",
+					"organisationId",
+					"appliedForOn",
+					"approvedBy",
+					"approvedOn"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_ApprovedTravel-or-ApprovedTravel-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ApprovedTravel"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/ApprovedTravel"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IApprovedTravel": {
+				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"traveler": {
+						"type": "string"
+					},
+					"reportId": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"organisationId": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"appliedForOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"approvedBy": {
+						"type": "string"
+					},
+					"approvedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
+					"traveler",
+					"organisationId",
+					"appliedForOn",
+					"approvedBy",
+					"approvedOn"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_IApprovedTravel_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"minimum": 0
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1,
+						"minimum": 1
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"reason",
+								"destinationPlace",
+								"startDate",
+								"endDate",
+								"claimSpouseRefund",
+								"fellowTravelersNames",
+								"traveler",
+								"reportId",
+								"organisationId",
+								"appliedForOn",
+								"approvedBy",
+								"approvedOn"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GETResponse_Advance-or-Advance-Array_": {
 				"properties": {
 					"data": {
@@ -10178,6 +10428,12 @@
 							"items": {
 								"type": "string",
 								"enum": [
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -10190,17 +10446,11 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"reason",
-									"destinationPlace",
-									"startDate",
-									"endDate",
 									"progress",
 									"addUp",
 									"advances",
 									"isCrossBorder",
 									"a1Certificate",
-									"claimSpouseRefund",
-									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -10933,6 +11183,12 @@
 							"items": {
 								"type": "string",
 								"enum": [
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -10945,17 +11201,11 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"reason",
-									"destinationPlace",
-									"startDate",
-									"endDate",
 									"progress",
 									"addUp",
 									"advances",
 									"isCrossBorder",
 									"a1Certificate",
-									"claimSpouseRefund",
-									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -11245,6 +11495,12 @@
 							"items": {
 								"type": "string",
 								"enum": [
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -11257,17 +11513,11 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"reason",
-									"destinationPlace",
-									"startDate",
-									"endDate",
 									"progress",
 									"addUp",
 									"advances",
 									"isCrossBorder",
 									"a1Certificate",
-									"claimSpouseRefund",
-									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -11980,6 +12230,12 @@
 							"items": {
 								"type": "string",
 								"enum": [
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -11992,17 +12248,11 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
-									"reason",
-									"destinationPlace",
-									"startDate",
-									"endDate",
 									"progress",
 									"addUp",
 									"advances",
 									"isCrossBorder",
 									"a1Certificate",
-									"claimSpouseRefund",
-									"fellowTravelersNames",
 									"name",
 									"owner",
 									"editor",
@@ -18076,6 +18326,173 @@
 					}
 				],
 				"parameters": []
+			}
+		},
+		"/approvedTravel": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_ApprovedTravel-or-ApprovedTravel-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel",
+					"Approved Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/_id"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"reason",
+									"destinationPlace",
+									"startDate",
+									"endDate",
+									"claimSpouseRefund",
+									"fellowTravelersNames",
+									"traveler",
+									"reportId",
+									"organisationId",
+									"appliedForOn",
+									"approvedBy",
+									"approvedOn"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/approvedTravel/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel",
+					"Approved Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"format": "date-time",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"format": "date-time",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "organisationId",
+						"required": true,
+						"schema": {}
+					}
+				]
 			}
 		},
 		"/advance": {
