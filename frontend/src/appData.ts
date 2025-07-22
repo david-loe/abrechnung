@@ -21,7 +21,7 @@ import API from './api.js'
 import { formatter } from './formatter'
 import i18n, { getLanguageFromNavigator } from './i18n'
 import { logger } from './logger'
-import { vueform } from './main'
+import { app } from './main'
 
 type APP_DATA_REQUIRED_ENDPOINTS =
   | 'user'
@@ -328,7 +328,9 @@ function updateLocales(displaySettings: DisplaySettings) {
 
 function setLanguage(locale: Locale) {
   ;(i18n.global.locale as unknown as Ref<Locale>).value = locale
-  vueform.i18n.locale = locale
+  if (app.config.globalProperties.$vueform) {
+    app.config.globalProperties.$vueform.i18n.locale = locale
+  }
   formatter.setLocale(locale)
 }
 

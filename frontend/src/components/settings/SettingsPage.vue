@@ -131,6 +131,8 @@ import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
 import TravelSettingsForm from '@/components/settings/elements/TravelSettingsForm.vue'
 import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
+import '@vueform/vueform/dist/vueform.css'
+import '@/vueform.css'
 
 const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
 

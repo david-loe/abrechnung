@@ -198,7 +198,9 @@ export default defineComponent({
       }
     },
     async updateLanguage() {
-      this.$vueform.i18n.locale = this.$i18n.locale as Locale
+      if (this.$vueform) {
+        this.$vueform.i18n.locale = this.$i18n.locale as Locale
+      }
       this.$formatter.setLocale(this.$i18n.locale as Locale)
       if (this.APP_DATA) {
         this.APP_DATA.user.settings.language = this.$i18n.locale as Locale

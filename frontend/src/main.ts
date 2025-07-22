@@ -13,11 +13,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './bootstrap.css'
 
-import Vueform from '@vueform/vueform'
-import '@vueform/vueform/dist/vueform.css'
-import vueformConfig from './vueform.config.js'
-import './vueform.css'
-
 import Formatter from '../../common/formatter'
 import { CountrySimple, Currency, Locale } from '../../common/types.js'
 import formatter from './formatter.js'
@@ -59,12 +54,9 @@ declare module 'vue' {
   }
 }
 
-const app = createApp(App)
+export const app = createApp(App)
 app.component('vSelect', vSelect)
 app.use(i18n)
 app.use(formatter)
 app.use(router)
-app.use(Vueform, vueformConfig)
 app.mount('#app')
-
-export const vueform = app.config.globalProperties.$vueform

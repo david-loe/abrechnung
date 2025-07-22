@@ -1,21 +1,21 @@
 import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
-import AdvanceApprovePage from './components/advance/ApprovePage.vue'
-import BookAdvancePage from './components/advance/BookPage.vue'
-import BookExpenseReportPage from './components/expenseReport/BookPage.vue'
-import ExamineExpenseReportPage from './components/expenseReport/ExaminePage.vue'
-import ExpenseReportPage from './components/expenseReport/ExpenseReportPage.vue'
-import HomePage from './components/HomePage.vue'
-import BookHealthCareCostPage from './components/healthCareCost/BookPage.vue'
-import ExamineHealthCareCostPage from './components/healthCareCost/ExaminePage.vue'
-import HealthCareCostPage from './components/healthCareCost/HealthCareCostPage.vue'
-import LoginPage from './components/LoginPage.vue'
-import SettingsPage from './components/settings/SettingsPage.vue'
-import TravelApprovePage from './components/travel/ApprovePage.vue'
-import BookTravelPage from './components/travel/BookPage.vue'
-import ExamineTravelPage from './components/travel/ExaminePage.vue'
-import TravelPage from './components/travel/TravelPage.vue'
-import { logger } from './logger.js'
+import AdvanceApprovePage from '@/components/advance/ApprovePage.vue'
+import BookAdvancePage from '@/components/advance/BookPage.vue'
+import BookExpenseReportPage from '@/components/expenseReport/BookPage.vue'
+import ExamineExpenseReportPage from '@/components/expenseReport/ExaminePage.vue'
+import ExpenseReportPage from '@/components/expenseReport/ExpenseReportPage.vue'
+import HomePage from '@/components/HomePage.vue'
+import BookHealthCareCostPage from '@/components/healthCareCost/BookPage.vue'
+import ExamineHealthCareCostPage from '@/components/healthCareCost/ExaminePage.vue'
+import HealthCareCostPage from '@/components/healthCareCost/HealthCareCostPage.vue'
+import LoginPage from '@/components/LoginPage.vue'
+import TravelApprovePage from '@/components/travel/ApprovePage.vue'
+import BookTravelPage from '@/components/travel/BookPage.vue'
+import ExamineTravelPage from '@/components/travel/ExaminePage.vue'
+import TravelPage from '@/components/travel/TravelPage.vue'
+import { logger } from '@/logger.js'
+import { app } from '@/main.js'
 
 const routes = [
   {
@@ -29,7 +29,11 @@ const routes = [
       return true
     }
   },
-  { path: '/admin', component: SettingsPage, meta: { requiresAuth: true } },
+  {
+    path: '/admin',
+    component: () => import('@/components/settings/SettingsPage.vue'),
+    meta: { requiresAuth: true, requiresVueform: true }
+  },
   {
     path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
     component: AdvanceApprovePage,
@@ -127,10 +131,21 @@ export async function auth() {
   return auth
 }
 
-router.beforeEach(async (to) => {
+let vueformLoaded = false
+
+router.beforeEach(async (to, _from, next) => {
   if (to.meta.requiresAuth && !(await auth())) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }
+  if (to.meta.requiresVueform && !vueformLoaded) {
+    const [{ default: Vueform }, { default: vueformConfig }] = await Promise.all([
+      import('@vueform/vueform'),
+      import('@/vueform.config.js')
+    ])
+    app.use(Vueform, vueformConfig)
+    vueformLoaded = true
+  }
+  next()
 })
 
 export default router
