@@ -1,14 +1,13 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
-import { formatBytes } from '../../common/scripts.js'
 import { _id } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
-import { getUploadTemplate } from '../templates/cache.js'
+import { getFileUtilsContent, getUploadTemplate } from '../templates/cache.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { File } from './types.js'
 
@@ -56,7 +55,8 @@ export class UploadController extends Controller {
       uploading: i18n.t('labels.uploading', { lng: user?.settings.language }),
       success: i18n.t('labels.success', { lng: user?.settings.language }),
       error: i18n.t('labels.error', { lng: user?.settings.language }),
-      alert: i18n.t('alerts.fileXToLargeMaxIsY', { X: '', Y: formatBytes(maxFileSize), lng: user?.settings.language })
+      fileXToLargeMaxIsY: i18n.t('alerts.fileXToLargeMaxIsY', { X: 'X', Y: 'Y', lng: user?.settings.language }),
+      fileTypeOfXNotSupportedY: i18n.t('alerts.fileTypeOfXNotSupportedY', { X: 'X', Y: 'Y', lng: user?.settings.language })
     }
     const renderedHTML = ejs.render(template, {
       url: url.href,
@@ -64,10 +64,10 @@ export class UploadController extends Controller {
       secondsLeft,
       text,
       maxFileSize,
-      language: user?.settings.language
+      language: user?.settings.language,
+      fileUtilsContent: await getFileUtilsContent()
     })
-    this.setHeader('Content-Type', 'text/html; charset=utf-8')
-    req.res?.send(renderedHTML)
+    req.res?.header('Content-Type', 'text/html; charset=utf-8').send(renderedHTML)
   }
 
   @Post('new')

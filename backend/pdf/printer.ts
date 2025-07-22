@@ -177,7 +177,7 @@ export class PDFDrawer {
   formatter: Formatter
   settings: PrintSettingsWithColorObjects
   currentPage!: pdf_lib.PDFPage
-  getDocumentFileBufferById: (id: _id) => Promise<{ buffer: Uint8Array<ArrayBufferLike>; type: DocumentFileType } | null>
+  getDocumentFileBufferById: (id: _id) => Promise<{ buffer: ArrayBuffer; type: DocumentFileType } | null>
   getOrganisationLogoIdById: (id: _id) => Promise<{ logoId: _id; website?: string | null } | null>
 
   constructor(
