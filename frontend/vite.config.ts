@@ -15,7 +15,11 @@ export default {
       injectRegister: false,
       manifest: false,
       devOptions: { enabled: true, navigateFallback: 'index.html', type: 'module' },
-      injectManifest: { maximumFileSizeToCacheInBytes: 4000000 }
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 4000000,
+        // only precache the main app.js file and not all JS files
+        manifestTransforms: [(m) => ({ manifest: m.filter(({ url }) => !url.endsWith('.js') || url.startsWith('app-')) })]
+      }
     })
   ],
   server: {
@@ -26,5 +30,6 @@ export default {
     fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
   },
   preview: { port: 80, host: '0.0.0.0' },
-  resolve: { alias: { '@': resolve(__dirname, './src') } }
+  resolve: { alias: { '@': resolve(__dirname, './src') } },
+  build: { rollupOptions: { output: { entryFileNames: 'app-[hash].js' } } }
 }
