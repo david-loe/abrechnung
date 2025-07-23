@@ -31,5 +31,5 @@
   },
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
-  "version": "2.1.4"
+  "version": "2.1.5"
 }
