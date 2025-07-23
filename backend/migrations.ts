@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import semver from 'semver'
+import { detectImageType } from '../common/utils/file.js'
 import { formatter } from './factory.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
@@ -264,6 +265,29 @@ export async function checkForMigrations() {
       }
       if (approvedTravels.length > 0) {
         await mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
+      }
+    }
+    if (semver.lte(migrateFrom, '2.1.4')) {
+      logger.info('Apply migration from v2.1.4: fix wrong file types in document files')
+      const documentFilesCursor = await mongoose.connection
+        .model('DocumentFile')
+        .find({ type: { $in: ['image/jpeg', 'image/png'] } })
+        .lean()
+        .batchSize(50)
+        .cursor()
+      const bulkOps = []
+      for await (const file of documentFilesCursor) {
+        const detectedType = detectImageType(file.data.buffer)
+        if (detectedType && detectedType !== file.type) {
+          bulkOps.push({ updateOne: { filter: { _id: file._id }, update: { $set: { type: detectedType } } } })
+        }
+        if (bulkOps.length >= 100) {
+          await mongoose.connection.model('DocumentFile').bulkWrite(bulkOps)
+          bulkOps.length = 0
+        }
+      }
+      if (bulkOps.length) {
+        await mongoose.connection.model('DocumentFile').bulkWrite(bulkOps)
       }
     }
 

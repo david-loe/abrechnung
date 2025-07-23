@@ -1,4 +1,7 @@
 import { mongo, Types } from 'mongoose'
+import { DocumentFileType, documentFileTypes, ImageType, imageTypes } from './utils/file.js'
+export { documentFileTypes, imageTypes }
+export type { DocumentFileType, ImageType }
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$
@@ -527,12 +530,6 @@ export type TransportType = (typeof transportTypes)[number]
 
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
-
-export const imageTypes = ['image/jpeg', 'image/png'] as const
-export type ImageType = (typeof imageTypes)[number]
-
-export const documentFileTypes = ['application/pdf', ...imageTypes] as const
-export type DocumentFileType = (typeof documentFileTypes)[number]
 
 export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
 

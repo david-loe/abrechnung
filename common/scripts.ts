@@ -308,38 +308,6 @@ export function sanitizeFilename(filename: string) {
   return finalName
 }
 
-// From https://stackoverflow.com/a/52983833/13582326
-export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
-  return new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = function (this: FileReader) {
-      // We create an image to receive the Data URI
-      const img = document.createElement('img')
-      // When the img "onload" is triggered we can resize the image.
-      img.onload = function (this: GlobalEventHandlers) {
-        // We create a canvas and get its context.
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        // We set the dimensions to the wanted size.
-        const max: 'width' | 'height' = img.height < img.width ? 'width' : 'height'
-        const min: 'width' | 'height' = max === 'width' ? 'height' : 'width'
-        if (img[max] > longestSide) {
-          canvas[max] = longestSide
-          canvas[min] = img[min] * (longestSide / img[max])
-        } else {
-          return resolve(file)
-        }
-        // We resize the image with the canvas method drawImage();
-        ;(ctx as CanvasRenderingContext2D).drawImage(this as CanvasImageSource, 0, 0, canvas.width, canvas.height)
-        canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.85)
-      }
-      // We put the Data URI in the image's src attribute
-      img.src = this.result as string
-    }
-  })
-}
-
 // biome-ignore lint/complexity/noStaticOnlyClass: This class is intentionally static-only to provide utility methods without requiring instantiation
 export class Base64 {
   static #keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
@@ -687,16 +655,4 @@ export function hexToRGB(hex: HexColor): [number, number, number] {
   const blue = Number.parseInt(hexChars.slice(4, 6), 16)
 
   return [red, green, blue]
-}
-
-export function formatBytes(bytes: number): string {
-  if (bytes >= 1024 * 1024) {
-    const mb = bytes / (1024 * 1024)
-    return `${mb.toFixed(2)} MB`
-  }
-  if (bytes >= 1024) {
-    const kb = bytes / 1024
-    return `${kb.toFixed(2)} KB`
-  }
-  return `${bytes} B`
 }
