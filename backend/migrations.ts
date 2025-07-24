@@ -248,20 +248,24 @@ export async function checkForMigrations() {
         .lean() //APPROVED or higher
       const approvedTravels = []
       for (const travel of travels) {
-        approvedTravels.push({
-          startDate: travel.startDate,
-          endDate: travel.endDate,
-          reason: travel.reason,
-          destinationPlace: travel.destinationPlace,
-          claimSpouseRefund: travel.claimSpouseRefund,
-          fellowTravelersNames: travel.fellowTravelersNames,
-          traveler: formatter.name(travel.owner.name),
-          approvedBy: formatter.name(travel.log[10]?.by.name), //APPROVED
-          approvedOn: travel.log[10]?.on as Date, //APPROVED
-          appliedForOn: travel.log[0]?.on || travel.createdAt, //APPLIED_FOR
-          reportId: travel._id,
-          organisationId: travel.project.organisation
-        })
+        try {
+          approvedTravels.push({
+            startDate: travel.startDate,
+            endDate: travel.endDate,
+            reason: travel.reason,
+            destinationPlace: travel.destinationPlace,
+            claimSpouseRefund: travel.claimSpouseRefund,
+            fellowTravelersNames: travel.fellowTravelersNames,
+            traveler: formatter.name(travel.owner.name),
+            approvedBy: formatter.name(travel.log[10]?.by.name), //APPROVED
+            approvedOn: travel.log[10]?.on as Date, //APPROVED
+            appliedForOn: travel.log[0]?.on || travel.createdAt, //APPLIED_FOR
+            reportId: travel._id,
+            organisationId: travel.project.organisation
+          })
+        } catch (e) {
+          logger.error(`Unable to convert travel (${travel._id}) to approvedTravel: ${e}`)
+        }
       }
       if (approvedTravels.length > 0) {
         await mongoose.connection.collection('approvedtravels').insertMany(approvedTravels)
