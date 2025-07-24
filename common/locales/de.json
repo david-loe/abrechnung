@@ -24,6 +24,7 @@
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
+    "defaultLastPlaceOfWork": "Standard Wert für den letzten Tätigkeitsort",
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "draftsWillBeLost": "Alle Entwürfe gehen verloren sobald du diese Seite verlässt! Füge Belege hinzu und speichere sie, damit sie erhalten bleiben.",
     "errorDeleting": "Beim Löschen ist ein Fehler aufgetreten",
@@ -32,6 +33,7 @@
     "fileXToLargeMaxIsY": "Die Datei '{X}' ist zu groß. Maximalgröße ist {Y}.",
     "fillOut": "Bitte gib folgende Daten an, damit wir deine Abrechnungen besser zuordnen können.",
     "futureNotAllowed": "Datum darf nicht in der Zukunft liegen",
+    "lastEndLocation": "Letzter Ort der Reise",
     "loginFailed": "Anmeldung fehlgeschlagen!",
     "mailSend": "E-Mail wurde versandt.",
     "noData": {

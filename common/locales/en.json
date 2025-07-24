@@ -24,6 +24,7 @@
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
+    "defaultLastPlaceOfWork": "Default value for last place of work",
     "departureAndArrivalOnDifferentDaysX": "Are you sure you were sitting in '{X}' for several days?",
     "draftsWillBeLost": "All drafts will be lost once you leave this page! Add receipts and save them so they are retained.",
     "errorDeleting": "Error while deleting",
@@ -32,6 +33,7 @@
     "fileXToLargeMaxIsY": "File '{X}' is too large. Maximum allowed size is {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
+    "lastEndLocation": "Last location of travel",
     "loginFailed": "Failed to log in!",
     "mailSend": "Email was sent.",
     "noData": {
