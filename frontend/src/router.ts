@@ -135,7 +135,7 @@ let vueformLoaded = false
 
 router.beforeEach(async (to, _from, next) => {
   if (to.meta.requiresAuth && !(await auth())) {
-    return { path: '/login', query: { redirect: to.fullPath } }
+    next({ path: '/login', query: { redirect: to.fullPath } })
   }
   if (to.meta.requiresVueform && !vueformLoaded) {
     const [{ default: Vueform }, { default: vueformConfig }] = await Promise.all([
