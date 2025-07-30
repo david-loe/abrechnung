@@ -50,7 +50,7 @@ export async function readRequestFromDB(
   if (!entry) return null
   const age = Date.now() - entry.timestamp
   if (age > ttlMillis) {
-    await (await dbPromise).delete('urls', key)
+    await deleteFromDB('urls', key)
     return null
   }
   return entry.data
