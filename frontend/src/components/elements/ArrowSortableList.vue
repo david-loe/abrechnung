@@ -11,9 +11,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-type Item = string | Record<string, unknown>
-
-const props = defineProps<{ modelValue: Item[]; labelFn?: (c: Item) => string }>()
+const props = defineProps<{
+  modelValue: string[] | Record<string, unknown>[]
+  labelFn?: ((c: string) => string) | ((c: Record<string, unknown>) => string)
+}>()
 const emit = defineEmits(['update:modelValue'])
 
 const items = ref([...props.modelValue])
