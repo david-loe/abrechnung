@@ -33,6 +33,9 @@ export async function readFromDB<Name extends StoreNames<IndexedDB>>(storeName: 
 export async function deleteFromDB<Name extends StoreNames<IndexedDB>>(storeName: Name, key: StoreKey<IndexedDB, Name> | IDBKeyRange) {
   return (await dbPromise).delete(storeName, key)
 }
+export async function clearStore(storeName: StoreNames<IndexedDB>) {
+  return await (await dbPromise).clear(storeName)
+}
 
 export async function storeRequestToDB(data: GETResponse<unknown>, key: string) {
   const entry = { data, timestamp: Date.now() }

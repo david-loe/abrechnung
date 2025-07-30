@@ -48,39 +48,6 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray
 }
 
-/**
- * Opens a connection to an IndexedDB database named 'myDatabase' and sets up an object store called 'urls' with an id key if the database is newly created or upgraded.
- */
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('myDatabase', 1)
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      db.createObjectStore('urls', { keyPath: 'id' })
-    }
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBOpenDBRequest).result)
-    }
-    request.onerror = (event) => {
-      reject((event.target as IDBOpenDBRequest).error)
-    }
-  })
-}
-/**
- * Clears all entries in the 'urls' object store in the IndexedDB database.
- */
-export async function clearingDB() {
-  const db = await openDatabase()
-
-  const transaction = db.transaction(['urls'], 'readwrite')
-  const store = transaction.objectStore('urls')
-
-  const clearRequest = store.clear()
-  clearRequest.onsuccess = () => {
-    return
-  }
-}
-
 export const bp = { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 } as const
 
 export function hideExpandColumn(colDeleted: boolean, colIndex = 0) {
