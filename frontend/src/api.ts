@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
-import { Router, useRoute, useRouter } from 'vue-router'
 import { GETResponse, SETResponse } from '../../common/types'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
@@ -130,7 +129,7 @@ class API {
     }, alertWithId.ttl || 5000)
   }
   redirectToLogin() {
-    this.router.push({ path: '/login', query: { redirect: useRoute().path } })
+    this.router.push({ path: '/login', query: { redirect: router.currentRoute.value.path } })
   }
 }
 
