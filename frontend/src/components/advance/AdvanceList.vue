@@ -2,20 +2,21 @@
   <ListElement
     class="mb-3"
     ref="list"
-    :endpoint="endpoint"
+    :endpoint="props.endpoint"
     :filter="filter"
     :headers="headers"
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
-    :items-selected="itemsSelected"
+    :items-selected="props.itemsSelected"
+    :dbKeyPrefix="props.dbKeyPrefix"
     @update:items-selected="(v) => emits('update:itemsSelected',(v as AdvanceSimple[]))"
     @loaded="emits('loaded')"
     :sort-by="sortBy"
     :sort-type="sortType">
     <template #header-name="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -27,7 +28,7 @@
     </template>
     <template #header-state="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('state', e)">
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -42,7 +43,7 @@
     </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('project', e)">
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -54,7 +55,7 @@
     </template>
     <template #header-organisation="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('project.organisation', e)">
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -67,7 +68,7 @@
     <template #header-owner="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('owner', e)">
             <i v-if="showFilter.owner" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
@@ -81,7 +82,7 @@
     <template #header-log.30.on="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('log.30.on', e)">
             <i v-if="showFilter['log.30.on']" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
@@ -188,6 +189,7 @@ const props = defineProps<{
   sortBy?: string
   sortType?: SortType
   itemsSelected?: AdvanceSimple[]
+  dbKeyPrefix?: string
 }>()
 
 const emits = defineEmits<{ loaded: []; clicked: [AdvanceSimple]; 'update:itemsSelected': [AdvanceSimple[]] }>()
@@ -207,19 +209,19 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
-  { text: t('labels.name'), value: 'name' },
-  { text: t('labels.state'), value: 'state' }
+  { text: 'labels.name', value: 'name' },
+  { text: 'labels.state', value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
   headers.push(
-    { text: t('labels.project'), value: 'project.identifier' },
-    { text: t('labels.organisation'), value: 'organisation' },
-    { text: t('labels.budget'), value: 'budget' },
-    { text: t('labels.balance'), value: 'balance' },
-    { text: t('labels.owner'), value: 'owner' },
-    { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
-    { text: t('labels.approvedOn'), value: 'log.30.on', sortable: true },
+    { text: 'labels.project', value: 'project.identifier' },
+    { text: 'labels.organisation', value: 'organisation' },
+    { text: 'labels.budget', value: 'budget' },
+    { text: 'labels.balance', value: 'balance' },
+    { text: 'labels.owner', value: 'owner' },
+    { text: 'labels.editor', value: 'editor' },
+    { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },
+    { text: 'labels.approvedOn', value: 'log.30.on', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )

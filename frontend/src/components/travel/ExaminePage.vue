@@ -6,7 +6,8 @@
       ref="travelListRef"
       endpoint="examine/travel"
       :stateFilter="TravelState.IN_REVIEW"
-      :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
+      :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
+      dbKeyPrefix="examine">
     </TravelList>
     <template v-if="!show">
       <button type="button" class="btn btn-light me-2" @click="show = TravelState.APPROVED">
@@ -26,7 +27,8 @@
       <TravelList
         endpoint="examine/travel"
         :stateFilter="show === TravelState.APPROVED ? show : { $gte: show }"
-        :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']">
+        :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']"
+        dbKeyPrefix="examined">
       </TravelList>
     </template>
   </div>

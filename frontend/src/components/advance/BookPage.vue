@@ -26,7 +26,8 @@
       :rows-items="[10, 20, 50]"
       :stateFilter="State.BOOKABLE"
       v-model:items-selected="selected"
-      @loaded="hideExpandColumn">
+      @loaded="hideExpandColumn"
+      dbKeyPrefix="book">
       <template #expand="{ bookingRemark }">
         <div v-if="bookingRemark" class="px-3 pb-1 border-bottom border-4">
           <small style="white-space: pre-wrap">{{ bookingRemark }}</small>
@@ -50,7 +51,8 @@
         make-name-no-link
         :stateFilter="show"
         :rows-per-page="10"
-        :rows-items="[10, 20, 50]">
+        :rows-items="[10, 20, 50]"
+        dbKeyPrefix="booked">
       </AdvanceList>
     </template>
   </div>

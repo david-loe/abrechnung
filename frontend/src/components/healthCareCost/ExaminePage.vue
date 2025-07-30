@@ -32,7 +32,8 @@
         class="mb-5"
         endpoint="examine/healthCareCost"
         :stateFilter="HealthCareCostState.IN_REVIEW"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']"
+        dbKeyPrefix="examine">
       </HealthCareCostList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = HealthCareCostState.IN_WORK">
@@ -53,7 +54,8 @@
         <HealthCareCostList
           endpoint="examine/healthCareCost"
           :stateFilter="show === HealthCareCostState.IN_WORK ? show : { $gte: show }"
-          :columns-to-hide="['report', 'organisation']">
+          :columns-to-hide="['report', 'organisation']"
+          dbKeyPrefix="examined">
         </HealthCareCostList>
       </template>
     </div>

@@ -75,7 +75,8 @@
         endpoint="approve/advance"
         :stateFilter="AdvanceState.APPLIED_FOR"
         @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
-        :columns-to-hide="['balance', 'state', 'editor', 'report', 'organisation', 'bookingRemark', 'log.30.on']"></AdvanceList>
+        :columns-to-hide="['balance', 'state', 'editor', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
+        dbKeyPrefix="approve"></AdvanceList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = AdvanceState.APPROVED">
         {{ t('labels.show') }} <StateBadge :state="AdvanceState.APPROVED" :StateEnum="AdvanceState"></StateBadge>
         <i class="bi bi-chevron-down"></i>
@@ -92,7 +93,8 @@
           :columns-to-hide="['updatedAt', 'report', 'organisation']"
           @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
           sort-by="log.30.on"
-          sort-type="desc">
+          sort-type="desc"
+          dbKeyPrefix="approved">
         </AdvanceList>
       </template>
     </div>
