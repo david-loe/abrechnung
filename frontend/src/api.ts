@@ -4,6 +4,7 @@ import { Router, useRoute, useRouter } from 'vue-router'
 import { GETResponse, SETResponse } from '../../common/types'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
+import router from './router'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -20,11 +21,10 @@ export interface APICallOptions {
 
 class API {
   alerts: Reactive<Alert[]>
-  router: Router
+  router = router
 
   constructor() {
     this.alerts = reactive([])
-    this.router = useRouter()
   }
 
   async getter<T>(
