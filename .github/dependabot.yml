@@ -1,21 +1,47 @@
 version: 2
+
 updates:
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: daily
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      actions-deps:
+        patterns:
+          - "*"
 
-  - package-ecosystem: npm
-    directory: /backend
+  - package-ecosystem: "npm"
+    directories:
+      - "/backend"
+      - "/common"
+      - "/frontend"
     schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /common
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /frontend
-    schedule:
-      interval: daily
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      patch-deps:
+        update-types:
+          - "patch"
+      minor-deps:
+        update-types:
+          - "minor"
+      major-deps:
+        update-types:
+          - "major"
