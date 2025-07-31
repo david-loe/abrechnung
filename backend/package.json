@@ -14,7 +14,7 @@
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.2",
     "i18next": "^25.3.2",
-    "mongoose": "^8.16.4",
+    "mongoose": "^8.17.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
     "openid-client": "^6.6.2",
