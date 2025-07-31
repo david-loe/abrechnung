@@ -8,19 +8,28 @@
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
           <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
-          <div v-if="modalObject.state !== undefined && modalObject.state <= State.APPLIED_FOR" class="mb-1">
-            <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
-              {{ t('labels.edit') }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger me-2"
-              @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
-              {{ t('labels.delete') }}
-            </button>
-            <button type="button" class="btn btn-light" @click="resetAndHide()">
-              {{ t('labels.cancel') }}
-            </button>
+          <div v-if="modalObject.state !== undefined" class="mb-1">
+            <template v-if="modalObject.state <= State.APPLIED_FOR">
+              <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
+                {{ t('labels.edit') }}
+              </button>
+            </template>
+            <template
+              v-if="
+                modalObject.state <= State.APPLIED_FOR ||
+                (modalObject.state === State.BOOKED &&
+                  (modalObjectType === 'travel' || (modalObjectType === 'advance' && Boolean(modalObject.settledOn))))
+              ">
+              <button
+                type="button"
+                class="btn btn-danger me-2"
+                @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
+                {{ t('labels.delete') }}
+              </button>
+              <button type="button" class="btn btn-light" @click="resetAndHide()">
+                {{ t('labels.cancel') }}
+              </button>
+            </template>
           </div>
         </template>
         <template v-else>

@@ -39,7 +39,9 @@ export class AdvanceController extends Controller {
   public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(Advance, {
       _id: _id,
-      checkOldObject: async (oldObject: AdvanceDoc) => request.user._id.equals(oldObject.owner._id) && oldObject.state < State.BOOKABLE
+      checkOldObject: async (oldObject: AdvanceDoc) =>
+        request.user._id.equals(oldObject.owner._id) &&
+        (oldObject.state < State.BOOKABLE || (oldObject.state === State.BOOKED && Boolean(oldObject.settledOn)))
     })
   }
 

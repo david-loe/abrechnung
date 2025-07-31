@@ -1,6 +1,6 @@
 <template>
   <StatePipeline class="mb-4" :state="advance.state" :StateEnum="AdvanceState"></StatePipeline>
-  <table class="table mb-4">
+  <table class="table mb-2">
     <tbody>
       <tr>
         <th scope="row">{{ t('labels.owner') }}</th>
@@ -63,7 +63,7 @@
   </table>
   <button
     v-if="advance.state >= State.BOOKABLE"
-    class="btn btn-primary"
+    class="btn btn-primary mb-2"
     @click="
       showFile({
         endpoint: `${props.endpointPrefix}advance/report`,
