@@ -1,9 +1,9 @@
 <template>
   <div>
-    <ListElement class="mb-3" ref="list" endpoint="category" :filter="filter" :headers="headers">
+    <ListElement class="mb-3" ref="list" endpoint="category" :filter="filter" :headers="headers" dbKeyPrefix="admin">
       <template #header-name="header">
         <div class="filter-column">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
@@ -61,7 +61,7 @@ import ListElement from '@/components/elements/ListElement.vue'
 const { t } = useI18n()
 
 const headers: Header[] = [
-  { text: t('labels.name'), value: 'name' },
+  { text: 'labels.name', value: 'name' },
   { text: '', value: 'buttons', width: 80 }
 ]
 

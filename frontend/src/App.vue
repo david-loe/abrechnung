@@ -172,7 +172,8 @@ import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import Installation from '@/components/elements/Installation.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import OfflineBanner from '@/components/elements/OfflineBanner.vue'
-import { clearingDB, subscribeToPush } from '@/helper.js'
+import { subscribeToPush } from '@/helper.js'
+import { clearStore } from './indexedDB'
 
 export default defineComponent({
   data() {
@@ -193,7 +194,7 @@ export default defineComponent({
       const success = await API.deleter('auth/logout', {}, false, { success: false, error: true })
       if (success) {
         this.APP_DATA = null
-        clearingDB()
+        clearStore('urls')
         this.$router.push({ path: '/login' })
       }
     },

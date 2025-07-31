@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
-import { Router, useRoute, useRouter } from 'vue-router'
 import { GETResponse, SETResponse } from '../../common/types'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
+import router from './router'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -20,11 +20,10 @@ export interface APICallOptions {
 
 class API {
   alerts: Reactive<Alert[]>
-  router: Router
+  router = router
 
   constructor() {
     this.alerts = reactive([])
-    this.router = useRouter()
   }
 
   async getter<T>(
@@ -130,7 +129,7 @@ class API {
     }, alertWithId.ttl || 5000)
   }
   redirectToLogin() {
-    this.router.push({ path: '/login', query: { redirect: useRoute().path } })
+    this.router.push({ path: '/login', query: { redirect: router.currentRoute.value.path } })
   }
 }
 

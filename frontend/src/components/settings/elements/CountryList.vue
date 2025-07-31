@@ -1,9 +1,9 @@
 <template>
   <div>
-    <ListElement class="mb-3" ref="list" endpoint="country" :filter="filter" :headers="headers">
+    <ListElement class="mb-3" ref="list" endpoint="country" :filter="filter" :headers="headers" dbKeyPrefix="admin">
       <template #header-name="header">
         <div class="filter-column">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="clickFilter(nameFilterKey)">
             <i v-if="showFilter[nameFilterKey]" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
@@ -16,7 +16,7 @@
 
       <template #header-_id="header">
         <div class="filter-column">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('_id', e)">
             <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
@@ -73,10 +73,10 @@ import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 const { t } = useI18n()
 
 const headers: Header[] = [
-  { text: t('labels.name'), value: 'name' },
-  { text: t('labels.code'), value: '_id' },
-  { text: t('labels.flag'), value: 'flag' },
-  { text: t('labels.currency'), value: 'currency' },
+  { text: 'labels.name', value: 'name' },
+  { text: 'labels.code', value: '_id' },
+  { text: 'labels.flag', value: 'flag' },
+  { text: 'labels.currency', value: 'currency' },
   { text: '', value: 'buttons', width: 80 }
 ]
 

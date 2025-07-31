@@ -106,7 +106,8 @@
           ref="travelList"
           endpoint="travel"
           :columns-to-hide="COMMON_HIDDEN_COLUMNS"
-          @clicked-applied="(t) => showModal('view', 'travel', t)"></TravelList>
+          @clicked-applied="(t) => showModal('view', 'travel', t)"
+          dbKeyPrefix="home"></TravelList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
         <h3>{{ t('labels.expenses') }}</h3>
@@ -114,14 +115,16 @@
           class="mb-4"
           ref="expenseReportList"
           endpoint="expenseReport"
-          :columns-to-hide="COMMON_HIDDEN_COLUMNS"></ExpenseReportList>
+          :columns-to-hide="COMMON_HIDDEN_COLUMNS"
+          dbKeyPrefix="home"></ExpenseReportList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ t('labels.healthCareCost') }}</h3>
         <HealthCareCostList
           ref="healthCareCostList"
           endpoint="healthCareCost"
-          :columns-to-hide="COMMON_HIDDEN_COLUMNS"></HealthCareCostList>
+          :columns-to-hide="COMMON_HIDDEN_COLUMNS"
+          dbKeyPrefix="home"></HealthCareCostList>
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
         <h3>{{ t('labels.advance') }}</h3>
@@ -129,7 +132,8 @@
           ref="advanceList"
           endpoint="advance"
           :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
-          @clicked="(t) => showModal('view', 'advance', t)"></AdvanceList>
+          @clicked="(t) => showModal('view', 'advance', t)"
+          dbKeyPrefix="home"></AdvanceList>
       </template>
     </div>
   </div>

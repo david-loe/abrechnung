@@ -30,7 +30,8 @@
         class="mb-5"
         endpoint="examine/expenseReport"
         :stateFilter="ExpenseReportState.IN_REVIEW"
-        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']">
+        :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
+        dbKeyPrefix="examine">
       </ExpenseReportList>
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = ExpenseReportState.IN_WORK">
@@ -50,7 +51,8 @@
         <ExpenseReportList
           endpoint="examine/expenseReport"
           :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
-          :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']">
+          :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']"
+          dbKeyPrefix="examined">
         </ExpenseReportList>
       </template>
     </div>

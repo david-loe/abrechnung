@@ -2,18 +2,19 @@
   <ListElement
     class="mb-3"
     ref="list"
-    :endpoint="endpoint"
+    :endpoint="props.endpoint"
     :filter="filter"
     :headers="headers"
     :columns-to-hide="props.columnsToHide"
     :rowsItems="props.rowsItems"
     :rowsPerPage="props.rowsPerPage"
-    :items-selected="itemsSelected"
+    :items-selected="props.itemsSelected"
+    :dbKeyPrefix="props.dbKeyPrefix"
     @update:items-selected="(v) => emits('update:itemsSelected',(v as TravelSimple[]))"
     @loaded="emits('loaded')">
     <template #header-name="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -25,7 +26,7 @@
     </template>
     <template #header-state="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('state', e)">
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -40,7 +41,7 @@
     </template>
     <template #header-destinationPlace="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('destinationPlace.country', e)">
           <i v-if="showFilter['destinationPlace.country']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -52,7 +53,7 @@
     </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('project', e)">
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -64,7 +65,7 @@
     </template>
     <template #header-organisation="header">
       <div class="filter-column">
-        {{ header.text }}
+        {{ t(header.text) }}
         <span style="cursor: pointer" @click="(e) => clickFilter('project.organisation', e)">
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
@@ -77,7 +78,7 @@
     <template #header-owner="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('owner', e)">
             <i v-if="showFilter.owner" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
@@ -91,7 +92,7 @@
     <template #header-updatedAt="header">
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
-          {{ header.text }}
+          {{ t(header.text) }}
           <span style="cursor: pointer" @click="(e) => clickFilter('updatedAt', e)">
             <i v-if="showFilter.updatedAt" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
@@ -223,6 +224,7 @@ const props = defineProps<{
   rowsItems?: number[]
   rowsPerPage?: number
   itemsSelected?: TravelSimple[]
+  dbKeyPrefix?: string
 }>()
 
 const emits = defineEmits<{ clickedApplied: [travel: TravelSimple]; loaded: []; 'update:itemsSelected': [TravelSimple[]] }>()
@@ -242,21 +244,21 @@ const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
   //@ts-ignore
-  { text: t('labels.name'), value: 'name' },
-  { text: t('labels.state'), value: 'state' }
+  { text: 'labels.name', value: 'name' },
+  { text: 'labels.state', value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
   headers.push(
     //@ts-ignore
-    { text: t('labels.destinationPlace'), value: 'destinationPlace' },
-    { text: t('labels.startDate'), value: 'startDate', sortable: true },
-    { text: t('labels.project'), value: 'project.identifier' },
-    { text: t('labels.organisation'), value: 'organisation' },
-    { text: t('labels.total'), value: 'addUp.totalTotal' },
-    { text: t('labels.balance'), value: 'addUp.totalBalance' },
-    { text: t('labels.owner'), value: 'owner' },
-    { text: t('labels.editor'), value: 'editor' },
-    { text: t('labels.updatedAt'), value: 'updatedAt', sortable: true },
+    { text: 'labels.destinationPlace', value: 'destinationPlace' },
+    { text: 'labels.startDate', value: 'startDate', sortable: true },
+    { text: 'labels.project', value: 'project.identifier' },
+    { text: 'labels.organisation', value: 'organisation' },
+    { text: 'labels.total', value: 'addUp.totalTotal' },
+    { text: 'labels.balance', value: 'addUp.totalBalance' },
+    { text: 'labels.owner', value: 'owner' },
+    { text: 'labels.editor', value: 'editor' },
+    { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },
     { text: '', value: 'report', width: 40 },
     { text: '', value: 'bookingRemark', width: 25 }
   )

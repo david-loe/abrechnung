@@ -96,7 +96,8 @@
           'report',
           'organisation',
           'bookingRemark'
-        ]"></TravelList>
+        ]"
+        dbKeyPrefix="approve"></TravelList>
       <button v-if="!show" type="button" class="btn btn-light" @click="show = TravelState.APPROVED">
         {{ t('labels.show') }} <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState"></StateBadge>
         <i class="bi bi-chevron-down"></i>
@@ -113,7 +114,8 @@
         <TravelList
           endpoint="approve/travel"
           :stateFilter="show"
-          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark']">
+          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark']"
+          dbKeyPrefix="approved">
         </TravelList>
       </template>
     </div>
