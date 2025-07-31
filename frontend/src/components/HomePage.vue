@@ -18,7 +18,7 @@
               v-if="
                 modalObject.state <= State.APPLIED_FOR ||
                 (modalObject.state === State.BOOKED &&
-                  (modalObjectType === 'travel' || (modalObjectType === 'advance' && Boolean(modalObject.settledOn))))
+                  (modalObjectType === 'travel' || (modalObjectType === 'advance' && Boolean((modalObject as AdvanceSimple).settledOn))))
               ">
               <button
                 type="button"
