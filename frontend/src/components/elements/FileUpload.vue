@@ -37,7 +37,7 @@
               <i class="bi bi-x-lg" style="cursor: pointer" @click="clear()"></i>
             </div>
           </div>
-          <img class="m-1" :src="qr" />
+            <img class="m-1 border border-5 rounded border-white" :src="qr" />
         </div>
       </div>
     </div>
