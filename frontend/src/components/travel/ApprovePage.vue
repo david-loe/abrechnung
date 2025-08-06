@@ -63,6 +63,7 @@
           :mode="modalMode"
           :travel="modalTravel"
           minStartDate=""
+          createNotApply
           :loading="modalFormIsLoading"
           endpoint-prefix="examine/"
           @cancel="resetAndHide()"

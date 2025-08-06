@@ -49,7 +49,6 @@
           :mode="modalMode"
           @cancel="resetAndHide()"
           :advance="modalAdvance"
-          minStartDate=""
           askOwner
           askBookingRemark
           :loading="modalFormIsLoading"

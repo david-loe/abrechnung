@@ -113,7 +113,7 @@
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
         {{
-          mode === 'add' && owner
+          mode === 'add' && !createNotApply
             ? $t('labels.applyForX', { X: $t('labels.travel') })
             : travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
@@ -151,7 +151,8 @@ export default defineComponent({
     owner: { type: Object as PropType<UserWithName> },
     updateUserOrg: { type: Boolean, default: false },
     endpointPrefix: { type: String, default: '' },
-    loading: { type: Boolean, default: false }
+    loading: { type: Boolean, default: false },
+    createNotApply: { type: Boolean, default: false }
   },
   data() {
     return { APP_DATA: APP_LOADER.data, formTravel: this.default(), TravelState }

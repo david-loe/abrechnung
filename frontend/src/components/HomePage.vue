@@ -39,6 +39,8 @@
             :travel="(modalObject as Partial<TravelSimple>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
+            :minStartDate="APP_DATA?.user.access['approved:travel'] ? '' : undefined"
+            :createNotApply="APP_DATA?.user.access['approved:travel']"
             update-user-org
             @cancel="resetAndHide()"
             @add="handleSubmit"
