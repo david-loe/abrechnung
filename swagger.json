@@ -2019,7 +2019,7 @@
 						},
 						"type": "array"
 					},
-					"fallBackLumpSumCountry": {
+					"fallbackLumpSumCountry": {
 						"$ref": "#/components/schemas/CountryCode"
 					},
 					"secondNightOnAirplaneLumpSumCountry": {
@@ -2053,7 +2053,7 @@
 					"factorCateringLumpSumExceptions",
 					"factorOvernightLumpSum",
 					"factorOvernightLumpSumExceptions",
-					"fallBackLumpSumCountry",
+					"fallbackLumpSumCountry",
 					"secondNightOnAirplaneLumpSumCountry",
 					"secondNightOnShipOrFerryLumpSumCountry",
 					"minHoursOfTravel",
@@ -2079,7 +2079,7 @@
 					"secondNightOnAirplaneLumpSumCountry": {
 						"type": "string"
 					},
-					"fallBackLumpSumCountry": {
+					"fallbackLumpSumCountry": {
 						"type": "string"
 					},
 					"factorOvernightLumpSumExceptions": {
