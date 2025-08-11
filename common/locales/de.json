@@ -202,6 +202,7 @@
     "backToApplicant": "Zurück zum Antragsteller",
     "balance": "Saldo",
     "bankDetails": "Bankverbindung",
+    "black": "Schwarz",
     "bookingRemark": "Buchungsvermerk",
     "borderColor": "Rahmenfarbe",
     "borderThickness": "Rahmenstärke",
@@ -469,6 +470,7 @@
     "version": "Version",
     "viewX": "{X} ansehen",
     "website": "Website",
+    "white": "Weiß",
     "width": "Breite",
     "XDetails": "{X}details"
   },

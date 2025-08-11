@@ -202,6 +202,7 @@
     "backToApplicant": "Back to applicant",
     "balance": "Balance",
     "bankDetails": "Bank details",
+    "black": "Black",
     "bookingRemark": "Booking remark",
     "borderColor": "Border color",
     "borderThickness": "Border Thickness",
@@ -470,6 +471,7 @@
     "viewX": "View {X}",
     "website": "Website",
     "width": "Width",
+    "white": "White",
     "XDetails": "{X} details"
   },
   "login": {
