@@ -28,7 +28,7 @@ export const travelSettingsSchema = () => {
     factorCateringLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
     factorOvernightLumpSum: { type: Number, min: 0, max: 1, required: true },
     factorOvernightLumpSumExceptions: { type: [{ type: String, ref: 'Country' }], required: true },
-    fallBackLumpSumCountry: { type: String, ref: 'Country', required: true },
+    fallbackLumpSumCountry: { type: String, ref: 'Country', required: true },
     secondNightOnAirplaneLumpSumCountry: { type: String, ref: 'Country', required: true },
     secondNightOnShipOrFerryLumpSumCountry: { type: String, ref: 'Country', required: true }
   })

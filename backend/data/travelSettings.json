@@ -11,7 +11,7 @@
   "factorCateringLumpSumExceptions": [],
   "factorOvernightLumpSum": 1,
   "factorOvernightLumpSumExceptions": [],
-  "fallBackLumpSumCountry": "LU",
+  "fallbackLumpSumCountry": "LU",
   "lumpSumCut": {
     "breakfast": 0.2,
     "dinner": 0.4,

@@ -45,7 +45,7 @@
     },
     "notAllowed": "Nicht erlaubt!",
     "notFound": "Nichts gefunden!",
-    "NotImplemented": "Nicht implementiert!",
+    "notImplemented": "Nicht implementiert!",
     "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "reloadRequired": "Neuladen erforderlich",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
@@ -293,7 +293,7 @@
     "factorOvernightLumpSum": "Faktor für die Übernachtungspauschalen",
     "factorOvernightLumpSumExceptions": "Ausnahmen der Faktorisierung für die Übernachtungspauschalen",
     "fallback": "Ersatz",
-    "fallBackLumpSumCountry": "Ausweichland für die Pauschalen",
+    "fallbackLumpSumCountry": "Ausweichland für die Pauschalen",
     "familyName": "Nachname",
     "familyNameFirst": "Nachnamen zuerst",
     "fellowTravelersNames": "Namen aller Mitreisenden",
@@ -449,8 +449,8 @@
     "traveler": "Reisender",
     "travelInsideOfEU": "Grenzüberschreitende Reise innerhalb der EU",
     "travelName": "Name der Reise",
-    "travels": "Reisen",
     "travelSettings": "Reisekostenabrechnungseinstellungen",
+    "travels": "Reisen",
     "type": "Art",
     "typeToSearch": "Tippe um zu Suchen...",
     "updatedAt": "Aktualisiert am",
@@ -478,10 +478,10 @@
     "signIn": "Bitte anmelden"
   },
   "lumpSums": {
-    "catering24": "Verpflegungspauschale",
-    "catering24\n": "Verpflegungs\npauschale",
     "catering8": "Verpflegungspauschale (gekürzt)",
     "catering8\n": "Verpflegungs\npauschale (gekürzt)",
+    "catering24": "Verpflegungspauschale",
+    "catering24\n": "Verpflegungs\npauschale",
     "overnight": "Übernachtungspauschale",
     "overnight\n": "Übernachtungs\npauschale"
   },
@@ -582,10 +582,6 @@
       "subject": "Erstattung Krankenkosten BN:{companyNumber}"
     },
     "travel": {
-      "a1": {
-        "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",
-        "subject": "🗂️ A1 Bescheinigung nötig"
-      },
       "APPLIED_FOR": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Reiseantrag von {owner} kam gerade rein.",
@@ -599,6 +595,10 @@
       "APPROVED_getsDeletedSoon": {
         "paragraph": "Deine genehmigte Reise '{reportName}' wird in {days} Tagen automatisch gelöscht, weil sie länger nicht bearbeitet wurde.",
         "subject": "Automatische Löschung steht bevor"
+      },
+      "a1": {
+        "paragraph": "Eine neue Dienstreise benötigt eine A1 Bescheinigung:",
+        "subject": "🗂️ A1 Bescheinigung nötig"
       },
       "BACK_TO_APPROVED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

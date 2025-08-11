@@ -48,7 +48,7 @@ export interface TravelSettings {
   factorCateringLumpSumExceptions: CountryCode[]
   factorOvernightLumpSum: number
   factorOvernightLumpSumExceptions: CountryCode[]
-  fallBackLumpSumCountry: CountryCode
+  fallbackLumpSumCountry: CountryCode
   secondNightOnAirplaneLumpSumCountry: CountryCode
   secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number

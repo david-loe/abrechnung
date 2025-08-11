@@ -77,6 +77,14 @@
           }
         }
       }
+    },
+    {
+      "includes": ["common/locales/*.json"],
+      "assist": {
+        "actions": {
+          "source": { "useSortedKeys": "on" }
+        }
+      }
     }
   ]
 }

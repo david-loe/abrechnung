@@ -294,6 +294,12 @@ export async function checkForMigrations() {
         await mongoose.connection.model('DocumentFile').bulkWrite(bulkOps)
       }
     }
+    if (semver.lte(migrateFrom, '2.1.7')) {
+      logger.info('Apply migration from v2.1.7: fix typo fallBack to fallback')
+      await mongoose.connection
+        .collection('travelsettings')
+        .updateMany({}, { $rename: { fallBackLumpSumCountry: 'fallbackLumpSumCountry' } })
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

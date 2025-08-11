@@ -26,7 +26,7 @@ export class TravelCalculator {
 
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: TravelSettings) {
     this.getCountryById = getCountryById
-    this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallBackLumpSumCountry)
+    this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallbackLumpSumCountry)
     this.validator = new TravelValidator(travelSettings)
     this.updateSettings(travelSettings)
   }
@@ -48,7 +48,7 @@ export class TravelCalculator {
   updateSettings(travelSettings: TravelSettings) {
     this.travelSettings = travelSettings
     this.validator.updateSettings(travelSettings)
-    this.lumpSumCalculator.setFallBackLumpSumCountry(travelSettings.fallBackLumpSumCountry)
+    this.lumpSumCalculator.setFallBackLumpSumCountry(travelSettings.fallbackLumpSumCountry)
   }
 
   sort(travel: Travel) {
@@ -470,16 +470,16 @@ export class TravelValidator {
 }
 
 export default class LumpSumCalculator {
-  fallBackLumpSumCountry!: CountryCode
+  fallbackLumpSumCountry!: CountryCode
   getCountryById: (id: CountryCode) => Promise<Country>
 
-  constructor(getCountryById: (id: CountryCode) => Promise<Country>, fallBackLumpSumCountry: CountryCode) {
+  constructor(getCountryById: (id: CountryCode) => Promise<Country>, fallbackLumpSumCountry: CountryCode) {
     this.getCountryById = getCountryById
-    this.setFallBackLumpSumCountry(fallBackLumpSumCountry)
+    this.setFallBackLumpSumCountry(fallbackLumpSumCountry)
   }
 
-  setFallBackLumpSumCountry(fallBackLumpSumCountry: CountryCode) {
-    this.fallBackLumpSumCountry = fallBackLumpSumCountry
+  setFallBackLumpSumCountry(fallbackLumpSumCountry: CountryCode) {
+    this.fallbackLumpSumCountry = fallbackLumpSumCountry
   }
 
   async getLumpSum(country: Country, date: Date, special: string | undefined = undefined): Promise<LumpSum> {
@@ -488,8 +488,8 @@ export default class LumpSumCalculator {
       return this.getLumpSum(lumpSumFrom, date)
     }
     if (country.lumpSums.length === 0) {
-      const fallBackLumpSumCountry = await this.getCountryById(this.fallBackLumpSumCountry)
-      return this.getLumpSum(fallBackLumpSumCountry, date)
+      const fallbackLumpSumCountry = await this.getCountryById(this.fallbackLumpSumCountry)
+      return this.getLumpSum(fallbackLumpSumCountry, date)
     }
     let nearest = 0
     for (let i = 0; i < country.lumpSums.length; i++) {
