@@ -24,7 +24,8 @@ export const reportPrinter = new ReportPrinter(
   async (id: _id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
-      return { buffer: doc.data.buffer, type: doc.type }
+      // Wrong type in mongodb BSON Binary, so need assertion here
+      return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
     }
     return null
   },
@@ -46,7 +47,8 @@ export const approvedTravelsPrinter = new ApprovedTravelsPrinter(
   async (id: _id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
-      return { buffer: doc.data.buffer, type: doc.type }
+      // Wrong type in mongodb BSON Binary, so need assertion here
+      return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
     }
     return null
   },
