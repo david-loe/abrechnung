@@ -14,7 +14,8 @@ const schema = fileSchema()
 
 schema.pre('save', function (next) {
   if (this.isNew && this.type.startsWith('image/') && this.data) {
-    const detectedType = detectImageType(this.data.buffer)
+    // Wrong type in mongodb BSON Binary, so need assertion here
+    const detectedType = detectImageType(this.data.buffer as unknown as ArrayBuffer)
     if (detectedType) {
       this.type = detectedType
     }
