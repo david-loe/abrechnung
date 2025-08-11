@@ -45,7 +45,7 @@
     },
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
-    "NotImplemented": "Not implemented!",
+    "notImplemented": "Not implemented!",
     "rateLimitExceeded": "Rate Limit Exceeded!",
     "reloadRequired": "Reload required",
     "stagesOverlapping": "Stages are overlapping",
@@ -202,6 +202,7 @@
     "backToApplicant": "Back to applicant",
     "balance": "Balance",
     "bankDetails": "Bank details",
+    "black": "Black",
     "bookingRemark": "Booking remark",
     "borderColor": "Border color",
     "borderThickness": "Border Thickness",
@@ -292,7 +293,7 @@
     "factorOvernightLumpSum": "Factor for the overnight lump sums",
     "factorOvernightLumpSumExceptions": "Exceptions to the factorization of the overnight lump sums",
     "fallback": "Fallback",
-    "fallBackLumpSumCountry": "Fall back country for lump sums",
+    "fallbackLumpSumCountry": "Fall back country for lump sums",
     "familyName": "Family name",
     "familyNameFirst": "Family name first",
     "fellowTravelersNames": "Name of all fellow travelers",
@@ -448,8 +449,8 @@
     "traveler": "Traveler",
     "travelInsideOfEU": "Travel inside of the EU",
     "travelName": "Travel name",
-    "travels": "Travels",
     "travelSettings": "Travel Settings",
+    "travels": "Travels",
     "type": "Type",
     "typeToSearch": "Type to search...",
     "updatedAt": "Updated at",
@@ -469,6 +470,7 @@
     "version": "Version",
     "viewX": "View {X}",
     "website": "Website",
+    "white": "White",
     "width": "Width",
     "XDetails": "{X} details"
   },
@@ -476,10 +478,10 @@
     "signIn": "Please sign in"
   },
   "lumpSums": {
-    "catering24": "Catering lump sum",
-    "catering24\n": "Catering lump sum",
     "catering8": "Catering lump sum (cut)",
     "catering8\n": "Catering lump sum (cut)",
+    "catering24": "Catering lump sum",
+    "catering24\n": "Catering lump sum",
     "overnight": "Overnight lump sum",
     "overnight\n": "Overnight lump sum"
   },
@@ -580,10 +582,6 @@
       "subject": "Reimbursement Health Care Costs BN:{companyNumber}"
     },
     "travel": {
-      "a1": {
-        "paragraph": "A new business trip requires an A1 certificate:",
-        "subject": "🗂️ A1 certificate required"
-      },
       "APPLIED_FOR": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new travel application from {owner} just came in.",
@@ -597,6 +595,10 @@
       "APPROVED_getsDeletedSoon": {
         "paragraph": "Your approved travel '{reportName}' will be automatically deleted in {days} days due to inactivity.",
         "subject": "Automatic deletion soon"
+      },
+      "a1": {
+        "paragraph": "A new business trip requires an A1 certificate:",
+        "subject": "🗂️ A1 certificate required"
       },
       "BACK_TO_APPROVED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
