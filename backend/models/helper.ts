@@ -1,4 +1,3 @@
-import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import {
   AddUp,
   AdvanceBase,
@@ -12,7 +11,8 @@ import {
   ReportModelName,
   textColors,
   UserSimple
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 

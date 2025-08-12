@@ -26,8 +26,8 @@ export default {
     port: 80,
     strictPort: true,
     host: '0.0.0.0',
-    allowedHosts: [process.env.VITE_FRONTEND_URL?.replace(/^https?:\/\//, '')],
-    fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
+    allowedHosts: [process.env.VITE_FRONTEND_URL?.replace(/^https?:\/\//, '')]
+    // fs: { allow: [searchForWorkspaceRoot(process.cwd()), 'abrechnung-common'] }
   },
   preview: { port: 80, host: '0.0.0.0' },
   resolve: { alias: { '@': resolve(__dirname, './src') } },

@@ -25,8 +25,8 @@
 </template>
 
 <script lang="ts">
+import { DocumentFile } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { DocumentFile } from '@/../../common/types.js'
 
 export default defineComponent({
   name: 'FileUploadFileElement',

@@ -1,7 +1,6 @@
-import { Ref, ref } from 'vue'
-import { loadLocales } from '../../common/locales/load'
-import { getById } from '../../common/scripts'
-import { TravelCalculator } from '../../common/travel'
+import { loadLocales } from 'abrechnung-common/locales/load.js'
+import { getById } from 'abrechnung-common/scripts.js'
+import { TravelCalculator } from 'abrechnung-common/travel.js'
 import {
   Category,
   Country,
@@ -16,7 +15,8 @@ import {
   TravelSettings,
   User,
   UserWithNameAndProject
-} from '../../common/types'
+} from 'abrechnung-common/types.js'
+import { Ref, ref } from 'vue'
 import API from './api.js'
 import { formatter } from './formatter'
 import i18n, { getLanguageFromNavigator } from './i18n'

@@ -1,5 +1,5 @@
+import { Token } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, mongo, Schema, Types } from 'mongoose'
-import { Token } from '../../common/types.js'
 import { getSettings } from '../db.js'
 
 const tokenSchema = () =>

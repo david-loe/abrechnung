@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts" setup>
+import { UserWithNameAndProject } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
-import { UserWithNameAndProject } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import { formatter } from '@/formatter.js'
 

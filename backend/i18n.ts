@@ -1,6 +1,6 @@
+import { loadLocales } from 'abrechnung-common/locales/load.js'
+import { Locale } from 'abrechnung-common/types.js'
 import i18next, { Resource } from 'i18next'
-import { loadLocales } from '../common/locales/load.js'
-import { Locale } from '../common/types.js'
 import { getDisplaySettings } from './db.js'
 
 async function loadLocaleMessages() {

@@ -1,5 +1,5 @@
+import { Expense, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { Expense, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 import { objectToFormFields } from './_helper.js'

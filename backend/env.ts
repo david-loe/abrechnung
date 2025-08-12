@@ -1,4 +1,4 @@
-import { cleanBackendEnv } from 'abrechnung-common/utils/env'
+import { cleanBackendEnv } from 'abrechnung-common/utils/env.js'
 
 const ENV = cleanBackendEnv(process.env)
 

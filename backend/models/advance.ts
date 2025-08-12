@@ -1,4 +1,3 @@
-import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import {
   Advance,
   AdvanceBase,
@@ -11,7 +10,8 @@ import {
   ReportModelName,
   State,
   Travel
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { setAdvanceBalance } from '../helper.js'
 import { addExchangeRate } from './exchangeRate.js'
 import { costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'

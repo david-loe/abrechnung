@@ -1,5 +1,5 @@
+import { _id, Project, ProjectSimple, ProjectUsers } from 'abrechnung-common/types.js'
 import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema, Types } from 'mongoose'
-import { _id, Project, ProjectSimple, ProjectUsers } from '../../common/types.js'
 import { costObject } from './helper.js'
 
 interface Methods {

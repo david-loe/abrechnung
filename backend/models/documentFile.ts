@@ -1,6 +1,6 @@
+import { DocumentFile, documentFileTypes } from 'abrechnung-common/types.js'
+import { detectImageType } from 'abrechnung-common/utils/file.js'
 import { model, mongo, Schema, Types } from 'mongoose'
-import { DocumentFile, documentFileTypes } from '../../common/types.js'
-import { detectImageType } from '../../common/utils/file.js'
 
 const fileSchema = () =>
   new Schema<DocumentFile<Types.ObjectId, mongo.Binary>>({

@@ -1,4 +1,3 @@
-import { model } from 'mongoose'
 import {
   AnyState,
   ExpenseReportState,
@@ -14,7 +13,8 @@ import {
   State,
   schemaNames,
   TravelState
-} from '../common/types.js'
+} from 'abrechnung-common/types.js'
+import { model } from 'mongoose'
 import { getSettings } from './db.js'
 import ENV from './env.js'
 import { formatter } from './factory.js'

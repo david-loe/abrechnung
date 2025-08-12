@@ -1,6 +1,4 @@
 import { Readable } from 'node:stream'
-import { Condition, mongo, Types } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import {
   Expense,
   HealthCareCostState,
@@ -10,7 +8,9 @@ import {
   idDocumentToId,
   Locale,
   State
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { Condition, mongo, Types } from 'mongoose'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'

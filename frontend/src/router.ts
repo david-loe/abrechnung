@@ -14,7 +14,7 @@ import TravelApprovePage from '@/components/travel/ApprovePage.vue'
 import BookTravelPage from '@/components/travel/BookPage.vue'
 import ExamineTravelPage from '@/components/travel/ExaminePage.vue'
 import TravelPage from '@/components/travel/TravelPage.vue'
-import ENV from '@/env'
+import ENV from '@/env.js'
 import { logger } from '@/logger.js'
 import { app } from '@/main.js'
 

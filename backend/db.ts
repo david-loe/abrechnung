@@ -1,7 +1,4 @@
-import axios from 'axios'
-import MongoStore from 'connect-mongo'
-import mongoose, { Connection, Model, Types } from 'mongoose'
-import { mergeDeep } from '../common/scripts.js'
+import { mergeDeep } from 'abrechnung-common/scripts.js'
 import {
   CountryLumpSum,
   ConnectionSettings as IConnectionSettings,
@@ -10,7 +7,10 @@ import {
   Settings as ISettings,
   TravelSettings as ITravelSettings,
   tokenAdminUser
-} from '../common/types.js'
+} from 'abrechnung-common/types.js'
+import axios from 'axios'
+import MongoStore from 'connect-mongo'
+import mongoose, { Connection, Model, Types } from 'mongoose'
 import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
 import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
 import countries from './data/countries.json' with { type: 'json' }

@@ -1,5 +1,5 @@
+import { ConnectionSettings, defaultLocale, emailRegex, locales } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
-import { ConnectionSettings, defaultLocale, emailRegex, locales } from '../../common/types.js'
 import ENV from '../env.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 

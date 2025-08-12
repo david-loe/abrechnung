@@ -60,8 +60,8 @@
 </template>
 
 <script lang="ts">
+import { ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { ExpenseReportSimple, ExpenseReportState } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'

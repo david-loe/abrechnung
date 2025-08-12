@@ -374,11 +374,6 @@
 </template>
 
 <script lang="ts" setup>
-import { AxiosHeaders } from 'axios'
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import {
   DocumentFile,
   Place,
@@ -393,7 +388,12 @@ import {
   TravelState,
   User,
   UserSimple
-} from '@/../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { AxiosHeaders } from 'axios'
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'

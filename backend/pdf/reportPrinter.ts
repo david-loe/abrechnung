@@ -1,6 +1,5 @@
-import pdf_lib from 'pdf-lib'
-import Formatter from '../../common/formatter.js'
-import { getAddUpTableData, getTotalBalance } from '../../common/scripts.js'
+import Formatter from 'abrechnung-common/formatter.js'
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
 import {
   _id,
   Advance,
@@ -31,7 +30,8 @@ import {
   TravelExpense,
   TravelSettings,
   TravelState
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import pdf_lib from 'pdf-lib'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
 function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], number = 1) {

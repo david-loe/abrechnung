@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { VueformElement, VueformSchema } from '@vueform/vueform'
+import { ConnectionSettings } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { ConnectionSettings } from '@/../../common/types.js'
 import API from '@/api.js'
 
 export default defineComponent({

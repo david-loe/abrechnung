@@ -1,5 +1,5 @@
+import { ldapauthSettings } from 'abrechnung-common/types.js'
 import LdapStrategy from 'passport-ldapauth'
-import { ldapauthSettings } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import { mapLdapauthConfig } from '../settingsValidator.js'
 import { findOrCreateUser } from './index.js'

@@ -1,4 +1,3 @@
-import { model, Schema, Types } from 'mongoose'
 import {
   Access,
   AnyState,
@@ -12,7 +11,8 @@ import {
   ReportType,
   reportTypes,
   TravelState
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { model, Schema, Types } from 'mongoose'
 import { colorSchema } from './helper.js'
 
 export const displaySettingsSchema = () => {

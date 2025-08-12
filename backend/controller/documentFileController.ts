@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
+import { _id, documentFileTypes } from 'abrechnung-common/types.js'
 import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
-import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
 import { Controller, checkOwner } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'

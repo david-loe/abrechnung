@@ -1,8 +1,16 @@
+import {
+  DocumentFile,
+  IdDocument,
+  Token as IToken,
+  User as IUser,
+  idDocumentToId,
+  locales,
+  tokenAdminUser
+} from 'abrechnung-common/types.js'
 import { DeleteResult } from 'mongodb'
 import { mongo, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PushSubscription } from 'web-push'
-import { DocumentFile, IdDocument, Token as IToken, User as IUser, idDocumentToId, locales, tokenAdminUser } from '../../common/types.js'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'

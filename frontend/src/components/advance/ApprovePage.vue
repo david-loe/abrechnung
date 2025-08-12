@@ -101,10 +101,10 @@
 </template>
 
 <script lang="ts" setup>
+import { AdvanceSimple, AdvanceState } from 'abrechnung-common/types.js'
 import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { AdvanceSimple, AdvanceState } from '@/../../common/types.js'
 import API from '@/api.js'
 import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'

@@ -1,7 +1,7 @@
+import { User as IUser } from 'abrechnung-common/types.js'
 import express from 'express'
 import { Types } from 'mongoose'
 import passport from 'passport'
-import { User as IUser } from '../common/types.js'
 import User from './models/user.js'
 
 const router = express.Router()

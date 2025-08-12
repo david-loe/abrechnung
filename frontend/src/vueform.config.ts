@@ -10,7 +10,7 @@ import MixedElement from '@/components/elements/vueform/MixedElement.vue'
 import OrganisationElement from '@/components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from '@/components/elements/vueform/ProjectElement.vue'
 import UserElement from '@/components/elements/vueform/UserElement.vue'
-import ENV from '@/env'
+import ENV from '@/env.js'
 import { getLanguageFromNavigator } from '@/i18n'
 
 en.vueform.elements.list.add = '+ Add'

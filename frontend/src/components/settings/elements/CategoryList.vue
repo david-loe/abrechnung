@@ -49,10 +49,10 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
+import { Category } from 'abrechnung-common/types.js'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import { Category } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'

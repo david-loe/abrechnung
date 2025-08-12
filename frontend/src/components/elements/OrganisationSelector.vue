@@ -13,8 +13,8 @@
 </template>
 
 <script lang="ts" setup>
+import { OrganisationSimple } from 'abrechnung-common/types.js'
 import { ref } from 'vue'
-import { OrganisationSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 

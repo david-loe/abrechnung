@@ -61,9 +61,9 @@
 </template>
 
 <script lang="ts" setup>
+import { AdvanceSimple, baseCurrency, Project, UserWithNameAndProject } from 'abrechnung-common/types.js'
 import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AdvanceSimple, baseCurrency, Project, UserWithNameAndProject } from '@/../../common/types.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'

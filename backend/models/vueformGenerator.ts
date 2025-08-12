@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: to complex typing */
 
+import { Locale } from 'abrechnung-common/types.js'
 import { Schema, SchemaDefinition, SchemaTypeOptions } from 'mongoose'
-import { Locale } from '../../common/types.js'
 import i18n from '../i18n.js'
 
 export function mongooseSchemaToVueformSchema(

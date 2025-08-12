@@ -1,6 +1,6 @@
+import { DisplaySettings as IDisplaySettings, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
-import { DisplaySettings as IDisplaySettings, locales } from '../../common/types.js'
 import DisplaySettings, { displaySettingsSchema } from '../models/displaySettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'

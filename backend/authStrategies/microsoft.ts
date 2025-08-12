@@ -1,5 +1,5 @@
+import { microsoftSettings } from 'abrechnung-common/types.js'
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
-import { microsoftSettings } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import ENV from '../env.js'
 import { displayNameSplit, findOrCreateUser } from './index.js'

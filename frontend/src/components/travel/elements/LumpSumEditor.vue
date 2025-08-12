@@ -114,10 +114,10 @@
   </form>
 </template>
 <script lang="ts" setup>
+import { getLumpSumsSum, mergeDeep } from 'abrechnung-common/scripts.js'
+import { meals, Place, Travel, TravelDay } from 'abrechnung-common/types.js'
 import { computed, PropType, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getLumpSumsSum, mergeDeep } from '@/../../common/scripts'
-import { meals, Place, Travel, TravelDay } from '@/../../common/types.js'
 import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'

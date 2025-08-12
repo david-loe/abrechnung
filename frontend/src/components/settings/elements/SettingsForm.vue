@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { VueformElement, VueformSchema } from '@vueform/vueform'
+import { Settings } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { Settings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 

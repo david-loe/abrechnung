@@ -63,8 +63,8 @@
 </template>
 
 <script lang="ts">
+import { HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { HealthCareCostSimple, HealthCareCostState } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ModalComponent from '@/components/elements/ModalComponent.vue'

@@ -1,5 +1,4 @@
-import { Types } from 'mongoose'
-import { getTotalBalance, sanitizeFilename } from '../../common/scripts.js'
+import { getTotalBalance, sanitizeFilename } from 'abrechnung-common/scripts.js'
 import {
   Advance,
   ExpenseReport,
@@ -9,7 +8,8 @@ import {
   reportIsHealthCareCost,
   reportIsTravel,
   Travel
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import { getConnectionSettings } from '../db.js'
 import { formatter, reportPrinter } from '../factory.js'
 import i18n from '../i18n.js'

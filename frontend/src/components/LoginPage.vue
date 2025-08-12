@@ -86,12 +86,12 @@
 </template>
 
 <script lang="ts">
+import { DisplaySettings } from 'abrechnung-common/types.js'
 import axios from 'axios'
 import { defineComponent } from 'vue'
-import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
-import ENV from '@/env'
+import ENV from '@/env.js'
 
 type Strategy = 'ldapauth' | 'magiclogin'
 

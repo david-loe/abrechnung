@@ -1,5 +1,5 @@
+import { Category } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
-import { Category } from '../../common/types.js'
 import { colorSchema } from './helper.js'
 
 export const categorySchema = () =>

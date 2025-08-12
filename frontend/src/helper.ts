@@ -6,7 +6,7 @@
 import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from '@/api'
-import ENV from '@/env'
+import ENV from '@/env.js'
 
 export async function subscribeToPush() {
   if (!('PushManager' in window) || !ENV.VITE_PUBLIC_VAPID_KEY) {

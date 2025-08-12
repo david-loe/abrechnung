@@ -1,5 +1,5 @@
+import { GETResponse } from 'abrechnung-common/types.js'
 import { DBSchema, openDB, StoreKey, StoreNames, StoreValue } from 'idb'
-import { GETResponse } from '@/../../common/types'
 
 const CACHE_PREFIX = 'abrechnung' as const
 const INDEXED_DB_NAME = `${CACHE_PREFIX}-db`

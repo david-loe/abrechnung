@@ -69,10 +69,10 @@
 </template>
 
 <script lang="ts" setup>
+import { ExpenseReportSimple, ExpenseReportState, State } from 'abrechnung-common/types.js'
 import { ComponentPublicInstance, MaybeRefOrGetter, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
-import { ExpenseReportSimple, ExpenseReportState, State } from '@/../../common/types'
 import API from '@/api'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'

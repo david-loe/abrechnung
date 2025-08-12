@@ -161,11 +161,11 @@
 </template>
 
 <script lang="ts" setup>
+import { getById } from 'abrechnung-common/scripts.js'
+import { AdvanceSimple, AdvanceState, advanceStates } from 'abrechnung-common/types.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header, SortType } from 'vue3-easy-data-table'
-import { getById } from '@/../../common/scripts.js'
-import { AdvanceSimple, AdvanceState, advanceStates } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'

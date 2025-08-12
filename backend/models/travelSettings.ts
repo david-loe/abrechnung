@@ -1,5 +1,12 @@
+import {
+  DistanceRefundType,
+  defaultLastPlaceOfWorkSettings,
+  distanceRefundTypes,
+  Meal,
+  meals,
+  TravelSettings
+} from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
-import { DistanceRefundType, defaultLastPlaceOfWorkSettings, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
 import { approvedTravelsPrinter, reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {

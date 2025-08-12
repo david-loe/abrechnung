@@ -42,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
+import { AddUp, Project } from 'abrechnung-common/types.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
-import { AddUp, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import { formatter } from '@/formatter.js'
 

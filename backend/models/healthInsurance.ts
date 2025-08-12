@@ -1,5 +1,5 @@
+import { emailRegex, HealthInsurance } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
-import { emailRegex, HealthInsurance } from '../../common/types.js'
 
 export const healthInsuranceSchema = () =>
   new Schema<HealthInsurance<Types.ObjectId>>({

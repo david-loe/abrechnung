@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts">
+import { HealthInsurance, User } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { HealthInsurance, User } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 

@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts" setup>
+import { getById } from 'abrechnung-common/scripts.js'
+import { OrganisationSimple, ProjectSimple } from 'abrechnung-common/types.js'
 import { onMounted, ref } from 'vue'
-import { getById } from '@/../../common/scripts.js'
-import { OrganisationSimple, ProjectSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import OrganisationSelector from './OrganisationSelector.vue'
 

@@ -1,6 +1,6 @@
+import { Contact, User as IUser, Locale } from 'abrechnung-common/types.js'
 import ejs from 'ejs'
 import nodemailer from 'nodemailer'
-import { Contact, User as IUser, Locale } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
 import ENV from '../env.js'
 import { genAuthenticatedLink } from '../helper.js'

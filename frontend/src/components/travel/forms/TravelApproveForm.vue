@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
+import { TravelSimple } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { TravelSimple } from '@/../../common/types.js'
 import TextArea from '@/components/elements/TextArea.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 export default defineComponent({

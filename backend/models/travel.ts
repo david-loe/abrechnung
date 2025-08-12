@@ -1,5 +1,4 @@
-import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { addUp } from '../../common/scripts.js'
+import { addUp } from 'abrechnung-common/scripts.js'
 import {
   AddUp,
   Comment,
@@ -10,7 +9,8 @@ import {
   TravelState,
   transportTypes,
   travelStates
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'

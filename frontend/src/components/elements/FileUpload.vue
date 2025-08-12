@@ -54,14 +54,14 @@
 </template>
 
 <script lang="ts">
+import { DocumentFile, Token } from 'abrechnung-common/types.js'
+import { fileEventToDocumentFiles } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
-import { DocumentFile, Token } from '@/../../common/types.js'
-import { fileEventToDocumentFiles } from '@/../../common/utils/file.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
-import ENV from '@/env'
+import ENV from '@/env.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 

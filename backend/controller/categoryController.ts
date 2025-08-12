@@ -1,6 +1,6 @@
+import { Category as ICategory, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { Category as ICategory, locales } from '../../common/types.js'
 import Category, { categorySchema } from '../models/category.js'
 import ExpenseReport from '../models/expenseReport.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'

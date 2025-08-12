@@ -249,9 +249,9 @@
 </template>
 
 <script lang="ts">
+import { datetimeToDate, datetimeToDateString, getDayList } from 'abrechnung-common/scripts.js'
+import { baseCurrency, DocumentFile, distanceRefundTypes, Place, Stage, transportTypes } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { datetimeToDate, datetimeToDateString, getDayList } from '@/../../common/scripts.js'
-import { baseCurrency, DocumentFile, distanceRefundTypes, Place, Stage, transportTypes } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'

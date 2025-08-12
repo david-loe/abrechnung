@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./dist/*.js"
+    "./*": "./dist/*"
   },
   "dependencies": {
     "envalid": "^8.1.0"

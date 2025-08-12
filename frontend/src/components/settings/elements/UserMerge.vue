@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
+import { idDocumentToId, objectIdRegex, User, UserReplaceReferencesResult, UserWithNameAndProject } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { idDocumentToId, objectIdRegex, User, UserReplaceReferencesResult, UserWithNameAndProject } from '@/../../common/types.js'
 import API from '@/api.js'
 import UserSelector from '@/components/elements/UserSelector.vue'
 

@@ -151,10 +151,16 @@
 </template>
 
 <script setup lang="ts">
+import {
+  type AdvanceSimple,
+  type ExpenseReportSimple,
+  type HealthCareCostSimple,
+  State,
+  type TravelSimple
+} from 'abrechnung-common/types.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { type AdvanceSimple, type ExpenseReportSimple, type HealthCareCostSimple, State, type TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Advance from '@/components/advance/Advance.vue'

@@ -1,5 +1,5 @@
+import { emailRegex, Organisation } from 'abrechnung-common/types.js'
 import { model, mongo, Query, Schema, Types } from 'mongoose'
-import { emailRegex, Organisation } from '../../common/types.js'
 import { populateSelected } from './helper.js'
 
 export const organisationSchema = () =>

@@ -279,10 +279,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { convertGermanDateToHTMLDate, getById } from '@/../../common/scripts.js'
+import { convertGermanDateToHTMLDate, getById } from 'abrechnung-common/scripts.js'
 import {
   Currency,
   DocumentFile,
@@ -292,7 +289,10 @@ import {
   ExpenseReportState,
   State,
   UserSimple
-} from '@/../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'

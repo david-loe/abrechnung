@@ -1,7 +1,7 @@
+import { User } from 'abrechnung-common/types.js'
 import { SessionData } from 'express-session'
 import { Types } from 'mongoose'
 import webpush, { WebPushError } from 'web-push'
-import { User } from './../../common/types.js'
 import { sessionStore } from '../db.js'
 import ENV from '../env.js'
 import { logger } from '../logger.js'

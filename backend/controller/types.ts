@@ -1,5 +1,3 @@
-import { Request as ExRequest } from 'express'
-import { Types } from 'mongoose'
 import {
   Currency,
   CurrencyCode,
@@ -10,7 +8,9 @@ import {
   Travel,
   TravelDay,
   TravelSimple
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { Request as ExRequest } from 'express'
+import { Types } from 'mongoose'
 import { SetterBody } from './controller.js'
 
 export interface AuthenticatedExpressRequest extends ExRequest {

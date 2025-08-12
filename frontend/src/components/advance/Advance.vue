@@ -80,9 +80,9 @@
   </button>
 </template>
 <script setup lang="ts">
+import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from 'abrechnung-common/types.js'
 import { PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from '@/../../common/types'
 import APP_LOADER from '@/appData.js'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { formatter } from '@/formatter.js'

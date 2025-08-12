@@ -1,4 +1,4 @@
-import ENV from '@/env'
+import ENV from '@/env.js'
 
 if ('serviceWorker' in navigator) {
   const isProductionMode = ENV.MODE === 'production'

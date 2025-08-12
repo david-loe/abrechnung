@@ -1,6 +1,6 @@
+import { _id, Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, Project as IProject, locales, ProjectSimple, ProjectWithUsers } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'

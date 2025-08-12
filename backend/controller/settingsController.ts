@@ -1,6 +1,6 @@
+import { Settings as ISettings, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
-import { Settings as ISettings, locales } from '../../common/types.js'
 import Settings, { settingsSchema } from '../models/settings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'

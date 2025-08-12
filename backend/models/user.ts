@@ -1,5 +1,13 @@
+import {
+  Access,
+  accesses,
+  emailRegex,
+  locales,
+  User,
+  UserReplaceReferencesResult,
+  userReplaceCollections
+} from 'abrechnung-common/types.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { Access, accesses, emailRegex, locales, User, UserReplaceReferencesResult, userReplaceCollections } from '../../common/types.js'
 import { getDisplaySettings, getSettings } from '../db.js'
 import { populateAll, populateSelected } from './helper.js'
 

@@ -1,7 +1,7 @@
+import de from 'abrechnung-common/locales/de.json' with { type: 'json' }
+import en from 'abrechnung-common/locales/en.json' with { type: 'json' }
+import { defaultLocale, Locale, locales } from 'abrechnung-common/types.js'
 import { createI18n, DefaultLocaleMessageSchema } from 'vue-i18n'
-import de from '../../common/locales/de.json' with { type: 'json' }
-import en from '../../common/locales/en.json' with { type: 'json' }
-import { defaultLocale, Locale, locales } from '../../common/types.js'
 
 const defaultMessages = { de, en }
 

@@ -37,10 +37,10 @@
 </template>
 
 <script lang="ts" setup>
+import { Base64 } from 'abrechnung-common/scripts.js'
 import { PropType, ref, watch } from 'vue'
 import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
-import { Base64 } from '@/../../common/scripts.js'
 import API from '@/api.js'
 import 'vue3-easy-data-table/dist/style.css'
 import { useI18n } from 'vue-i18n'

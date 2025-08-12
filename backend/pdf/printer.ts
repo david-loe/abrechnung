@@ -1,8 +1,6 @@
 import fs from 'node:fs/promises'
-import pdf_fontkit from 'pdf-fontkit'
-import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
-import Formatter from '../../common/formatter.js'
-import { hexToRGB } from '../../common/scripts.js'
+import Formatter from 'abrechnung-common/formatter.js'
+import { hexToRGB } from 'abrechnung-common/scripts.js'
 import {
   _id,
   CountryCode,
@@ -12,7 +10,9 @@ import {
   PageOrientation,
   PrinterSettings,
   PrintSettingsBase
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import pdf_fontkit from 'pdf-fontkit'
+import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 
 export interface PrintSettings extends PrintSettingsBase {
   language: Locale

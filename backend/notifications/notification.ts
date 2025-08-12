@@ -1,5 +1,4 @@
-import { RootFilterQuery } from 'mongoose'
-import { getDiffInDays, PlaceToString } from '../../common/scripts.js'
+import { getDiffInDays, PlaceToString } from 'abrechnung-common/scripts.js'
 import {
   Advance,
   AdvanceState,
@@ -16,7 +15,8 @@ import {
   State,
   TravelSimple,
   TravelState
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { RootFilterQuery } from 'mongoose'
 import { getDisplaySettings } from '../db.js'
 import ENV from '../env.js'
 import { formatter } from '../factory.js'

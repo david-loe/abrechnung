@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
+import { Project, ProjectSimple } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { Project, ProjectSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 

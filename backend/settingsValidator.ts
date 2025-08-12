@@ -1,8 +1,8 @@
+import { ldapauthSettings, smtpSettings } from 'abrechnung-common/types.js'
 import ldap from 'ldapjs'
 import nodemailer from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
 import LdapStrategy from 'passport-ldapauth'
-import { ldapauthSettings, smtpSettings } from '../common/types.js'
 
 export function verifyLdapauthConfig(config: ldapauthSettings) {
   return new Promise<true>((resolve, reject) => {

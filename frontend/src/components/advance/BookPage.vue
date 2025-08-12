@@ -59,10 +59,10 @@
 </template>
 
 <script lang="ts" setup>
+import { AdvanceSimple, AdvanceState, State } from 'abrechnung-common/types.js'
 import { ComponentPublicInstance, MaybeRefOrGetter, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVueToPrint } from 'vue-to-print'
-import { AdvanceSimple, AdvanceState, State } from '@/../../common/types'
 import API from '@/api'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'

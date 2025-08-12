@@ -1,6 +1,6 @@
+import { Organisation as IOrganisation, locales } from 'abrechnung-common/types.js'
 import { mongo, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { Organisation as IOrganisation, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import Organisation, { organisationSchema } from '../models/organisation.js'
 import Project from '../models/project.js'

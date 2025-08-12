@@ -1,5 +1,5 @@
+import { ApprovedTravel, Travel, TravelState } from 'abrechnung-common/types.js'
 import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { ApprovedTravel, Travel, TravelState } from '../../common/types.js'
 import { formatter } from '../factory.js'
 import { populateSelected, travelBaseSchema } from './helper.js'
 

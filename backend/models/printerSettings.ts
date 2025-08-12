@@ -1,5 +1,5 @@
+import { hexColorRegex, PrinterSettings } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
-import { hexColorRegex, PrinterSettings } from '../../common/types.js'
 import { reportPrinter } from '../factory.js'
 
 export const printerSettingsSchema = () =>

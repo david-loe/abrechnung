@@ -1,5 +1,5 @@
+import { Country } from 'abrechnung-common/types.js'
 import { model, Schema } from 'mongoose'
-import { Country } from '../../common/types.js'
 
 export const countrySchema = () =>
   new Schema<Country>({

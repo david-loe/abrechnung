@@ -1,13 +1,13 @@
 /// <reference lib="webworker" />
 
+import { escapeRegExp } from 'abrechnung-common/scripts.js'
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
-import ENV from '@/env'
+import ENV from '@/env.js'
 import { readRequestFromDB, storeRequestToDB } from '@/indexedDB'
 import { logger } from '@/logger.js'
-import { escapeRegExp } from '../common/scripts'
 
 declare let self: ServiceWorkerGlobalScope
 

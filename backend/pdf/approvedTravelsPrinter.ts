@@ -1,5 +1,5 @@
+import { _id, ApprovedTravel, Locale, Place } from 'abrechnung-common/types.js'
 import pdf_lib from 'pdf-lib'
-import { _id, ApprovedTravel, Locale, Place } from '../../common/types.js'
 import { Column, PDFDrawer, Printer } from './printer.js'
 
 export class ApprovedTravelsPrinter<idType extends _id> extends Printer<idType> {
