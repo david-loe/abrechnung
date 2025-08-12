@@ -63,7 +63,8 @@ export class UploadController extends Controller {
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
       text,
-      maxFileSize: ENV.VITE_MAX_FILE_SIZE,
+      maxFileSizeInBytes: ENV.VITE_MAX_FILE_SIZE,
+      imageCompressionThresholdInPx: ENV.VITE_IMAGE_COMPRESSION_THRESHOLD_PX,
       language: user?.settings.language,
       fileUtilsContent: await getFileUtilsContent()
     })

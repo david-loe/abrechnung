@@ -39,7 +39,7 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
 export async function fileEventToDocumentFiles(
   event: Event,
   maxFileSizeInBytes: number,
-  longestImageSideInPixels: number,
+  imageCompressionThresholdInPx: number,
   t: (key: string, interpolation: Record<string, string>) => string
 ) {
   const files: { data: Blob; type: DocumentFileType; name: string }[] = []
@@ -52,7 +52,7 @@ export async function fileEventToDocumentFiles(
       }
       let newFile: { data: Blob; type: DocumentFileType } = { data: file, type: file.type as DocumentFileType }
       if (file.type.indexOf('image') > -1) {
-        const resizedImage = await resizeImage(file, longestImageSideInPixels)
+        const resizedImage = await resizeImage(file, imageCompressionThresholdInPx)
         newFile = { data: resizedImage, type: resizedImage.type as DocumentFileType }
       }
       if (newFile.data.size > maxFileSizeInBytes) {
