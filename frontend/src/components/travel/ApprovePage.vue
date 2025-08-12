@@ -151,7 +151,7 @@ const modalTravel = ref<Partial<TravelSimple>>({})
 const approvedTravelsReportForm = ref({
   from: new Date(Date.UTC(new Date().getUTCFullYear(), 0, 1)),
   to: new Date(Date.UTC(new Date().getUTCFullYear(), 11, 31)),
-  organisation: null as null | OrganisationSimple
+  organisation: null as null | OrganisationSimple<string>
 })
 const modalMode = ref<ModalMode>('view')
 const show = ref<null | TravelState.APPROVED>(null)

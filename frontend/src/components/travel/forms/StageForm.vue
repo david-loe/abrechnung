@@ -125,7 +125,7 @@
         <FileUpload
           ref="fileUpload"
           id="stageFormVehicleRegistration"
-          v-model="APP_DATA.user.vehicleRegistration as DocumentFile[] | undefined"
+          v-model="APP_DATA.user.vehicleRegistration as DocumentFile<string,Blob>[] | undefined"
           @update:model-value="vehicleRegistrationChanged = true"
           :disabled="disabled"
           :required="APP_DATA.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'"

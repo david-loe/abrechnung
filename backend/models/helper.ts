@@ -1,6 +1,5 @@
 import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import {
-  _id,
   AddUp,
   AdvanceBase,
   AnyState,
@@ -55,7 +54,7 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
   return log
 }
 
-export function setLog(doc: HydratedDocument<{ state: AnyState; log: Log; editor: UserSimple }>) {
+export function setLog(doc: HydratedDocument<{ state: AnyState; log: Log<Types.ObjectId>; editor: UserSimple<Types.ObjectId> }>) {
   if (doc.isModified('state')) {
     doc.log[doc.state] = { on: new Date(), by: doc.editor }
   }
@@ -187,7 +186,10 @@ export function populateAll<DocType extends {}>(
   return Promise.allSettled(populates)
 }
 
-export async function offsetAdvance(report: { addUp: FlatAddUp[]; advances: AdvanceBase[]; _id: _id }, modelName: ReportModelName) {
+export async function offsetAdvance(
+  report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId },
+  modelName: ReportModelName
+) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {

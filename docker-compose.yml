@@ -38,6 +38,14 @@ services:
     env_file:
       - .env
 
+  # Watch build in development mode
+  common:
+    build:
+      context: ./common
+      dockerfile: Dockerfile.${NODE_ENV}
+    volumes:
+      - ./common:/app
+
   # Test LDAP only in development mode
   ldap:
     build:

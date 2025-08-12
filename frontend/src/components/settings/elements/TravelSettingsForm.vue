@@ -23,7 +23,7 @@ export default defineComponent({
   },
   methods: {
     async postTravelSettings(travelSettings: TravelSettings) {
-      const result = await API.setter<TravelSettings>('admin/travelSettings', travelSettings)
+      const result = await API.setter<TravelSettings<string>>('admin/travelSettings', travelSettings)
       if (result.ok && APP_DATA.value) {
         APP_DATA.value?.setTravelSettings(result.ok)
         ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.travelSettings, false)

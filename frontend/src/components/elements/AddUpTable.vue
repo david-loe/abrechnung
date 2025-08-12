@@ -53,7 +53,7 @@ const { t } = useI18n()
 
 const props = defineProps({
   noBootstrapTable: { type: Boolean, default: false },
-  addUp: { type: Array as PropType<AddUp[]>, required: true },
+  addUp: { type: Array as PropType<AddUp<string>[]>, required: true },
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },

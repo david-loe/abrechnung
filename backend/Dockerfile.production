@@ -8,13 +8,15 @@ RUN mkdir /reports
 
 WORKDIR /build
 
+COPY common ../common
+RUN npm install --prefix ../common
+RUN npm run --prefix ../common build
+
 COPY backend/package*.json ./
 
 RUN npm install
 
 COPY backend/ .
-
-COPY common /common
 
 RUN npm run build
 

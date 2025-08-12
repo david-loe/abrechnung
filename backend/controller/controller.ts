@@ -20,7 +20,7 @@ export interface GetterQuery<ModelType> {
    * @default 1
    */
   page?: number
-  _id?: _id
+  _id?: string
   additionalFields?: (keyof ModelType)[]
   /**
    * @format byte
@@ -55,22 +55,24 @@ type SetterPartial<T, U extends string> = T extends object
         | boolean
         | null
         | undefined
-        | Types.ObjectId
         | string[]
         | number[]
         | Date[]
         | boolean[]
-        | Types.ObjectId[]
         ? T[P] | undefined | null
-        : T[P] extends mongo.Binary | null | undefined
-          ? Data | mongo.Binary | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial2<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : _SetterPartial2<T[P], U> | undefined
+        : T[P] extends Types.ObjectId
+          ? T[P] | string | undefined | null
+          : T[P] extends Types.ObjectId[]
+            ? T[P] | string[] | undefined | null
+            : T[P] extends mongo.Binary | null | undefined
+              ? Data | mongo.Binary | undefined
+              : T[P] extends (infer ElementType)[] | null | undefined
+                ? ElementType extends { _id: infer idType extends _id | string }
+                  ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+                  : _SetterPartial2<ElementType, U>[] | null | undefined
+                : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+                  ? T[P] | IdDocument<idType> | null | undefined
+                  : _SetterPartial2<T[P], U> | undefined
     }
   : T
 
@@ -83,22 +85,24 @@ type _SetterPartial2<T, U extends string> = T extends object
         | boolean
         | null
         | undefined
-        | Types.ObjectId
         | string[]
         | number[]
         | Date[]
         | boolean[]
-        | Types.ObjectId[]
         ? T[P] | undefined | null
-        : T[P] extends mongo.Binary | null | undefined
-          ? Data | mongo.Binary | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial2<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : _SetterPartial1<T[P], U> | undefined
+        : T[P] extends Types.ObjectId
+          ? T[P] | string | undefined | null
+          : T[P] extends Types.ObjectId[]
+            ? T[P] | string[] | undefined | null
+            : T[P] extends mongo.Binary | null | undefined
+              ? Data | mongo.Binary | undefined
+              : T[P] extends (infer ElementType)[] | null | undefined
+                ? ElementType extends { _id: infer idType extends _id | string }
+                  ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+                  : _SetterPartial2<ElementType, U>[] | null | undefined
+                : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+                  ? T[P] | IdDocument<idType> | null | undefined
+                  : _SetterPartial1<T[P], U> | undefined
     }
   : T
 
@@ -111,22 +115,24 @@ type _SetterPartial1<T, U extends string> = T extends object
         | boolean
         | null
         | undefined
-        | Types.ObjectId
         | string[]
         | number[]
         | Date[]
         | boolean[]
-        | Types.ObjectId[]
         ? T[P] | undefined | null
-        : T[P] extends mongo.Binary | null | undefined
-          ? Data | mongo.Binary | undefined
-          : T[P] extends (infer ElementType)[] | null | undefined
-            ? ElementType extends { _id: infer idType extends _id | string }
-              ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
-              : _SetterPartial2<ElementType, U>[] | null | undefined
-            : T[P] extends { _id: infer idType extends _id | string } | null | undefined
-              ? T[P] | IdDocument<idType> | null | undefined
-              : T[P]
+        : T[P] extends Types.ObjectId
+          ? T[P] | string | undefined | null
+          : T[P] extends Types.ObjectId[]
+            ? T[P] | string[] | undefined | null
+            : T[P] extends mongo.Binary | null | undefined
+              ? Data | mongo.Binary | undefined
+              : T[P] extends (infer ElementType)[] | null | undefined
+                ? ElementType extends { _id: infer idType extends _id | string }
+                  ? _SetterPartial2<ElementType, U>[] | IdDocument<idType>[] | null | undefined
+                  : _SetterPartial2<ElementType, U>[] | null | undefined
+                : T[P] extends { _id: infer idType extends _id | string } | null | undefined
+                  ? T[P] | IdDocument<idType> | null | undefined
+                  : T[P]
     }
   : T
 
@@ -143,12 +149,12 @@ export interface SetterOptions<ModelType, CheckType = ModelType, ModelMethods = 
 
 export interface SetterForArrayElementOptions<ModelType, ArrayElementType> extends SetterOptions<ArrayElementType, ModelType> {
   arrayElementKey: keyof ModelType
-  parentId: _id
+  parentId: string
   sortFn?: (a: ArrayElementType, b: ArrayElementType) => number
 }
 
 export interface DeleterQuery {
-  _id: _id
+  _id: string
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing
@@ -161,7 +167,7 @@ export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQu
 }
 
 export interface DeleterForArrayElemetQuery extends DeleterQuery {
-  parentId: _id
+  parentId: string
 }
 
 export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType> extends DeleterOptions<ModelType>, DeleterForArrayElemetQuery {
@@ -350,7 +356,7 @@ export class Controller extends TsoaController {
     return result
   }
 
-  async deleterForArrayElement<ModelType, ArrayElementType extends { _id: _id }>(
+  async deleterForArrayElement<ModelType, ArrayElementType extends { _id: Types.ObjectId }>(
     model: Model<ModelType>,
     options: DeleterForArrayElemetOptions<ModelType, ArrayElementType>
   ) {
@@ -395,6 +401,6 @@ export class Controller extends TsoaController {
     return { message: 'alerts.successSaving', result }
   }
 }
-export function checkOwner(requestUser: User) {
+export function checkOwner(requestUser: User<Types.ObjectId>) {
   return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
 }

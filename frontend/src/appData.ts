@@ -38,37 +38,37 @@ type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
 type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
 
 export class APP_DATA {
-  user!: User
+  user!: User<string>
   currencies!: Currency[]
   countries!: Country[]
-  settings!: Settings
-  travelSettings!: TravelSettings
-  displaySettings!: DisplaySettings
-  healthInsurances!: HealthInsurance[]
-  organisations!: OrganisationSimple[]
-  categories!: Category[]
-  defaultCategory: Category | undefined
+  settings!: Settings<string>
+  travelSettings!: TravelSettings<string>
+  displaySettings!: DisplaySettings<string>
+  healthInsurances!: HealthInsurance<string>[]
+  organisations!: OrganisationSimple<string>[]
+  categories!: Category<string>[]
+  defaultCategory: Category<string> | undefined
   specialLumpSums!: Record<string, string[]>
 
-  projects?: ProjectSimpleWithName[]
-  users?: UserWithNameAndProject[]
+  projects?: ProjectSimpleWithName<string>[]
+  users?: UserWithNameAndProject<string>[]
 
   travelCalculator!: TravelCalculator
 
   constructor(
     currencies: Currency[],
     countries: Country[],
-    user: User,
-    settings: Settings,
-    travelSettings: TravelSettings,
-    displaySettings: DisplaySettings,
-    healthInsurances: HealthInsurance[],
-    organisations: OrganisationSimple[],
-    categories: Category[],
+    user: User<string>,
+    settings: Settings<string>,
+    travelSettings: TravelSettings<string>,
+    displaySettings: DisplaySettings<string>,
+    healthInsurances: HealthInsurance<string>[],
+    organisations: OrganisationSimple<string>[],
+    categories: Category<string>[],
 
     specialLumpSums: Record<string, string[]>,
-    projects?: ProjectSimpleWithName[],
-    users?: UserWithNameAndProject[]
+    projects?: ProjectSimpleWithName<string>[],
+    users?: UserWithNameAndProject<string>[]
   ) {
     this.setUser(user)
     this.setCurrencies(currencies)
@@ -94,34 +94,34 @@ export class APP_DATA {
         this.setCountries(data as Country[])
         break
       case 'user':
-        this.setUser(data as User)
+        this.setUser(data as User<string>)
         break
       case 'settings':
-        this.setSettings(data as Settings)
+        this.setSettings(data as Settings<string>)
         break
       case 'travelSettings':
-        this.setTravelSettings(data as TravelSettings)
+        this.setTravelSettings(data as TravelSettings<string>)
         break
       case 'healthInsurance':
-        this.setHealthInsurances(data as HealthInsurance[])
+        this.setHealthInsurances(data as HealthInsurance<string>[])
         break
       case 'organisation':
-        this.setOrganisations(data as OrganisationSimple[])
+        this.setOrganisations(data as OrganisationSimple<string>[])
         break
       case 'category':
-        this.setCategories(data as Category[])
+        this.setCategories(data as Category<string>[])
         break
       case 'specialLumpSums':
         this.setSpecialLumpSums(data as Record<string, string[]>)
         break
       case 'displaySettings':
-        this.setDisplaySettings(data as DisplaySettings)
+        this.setDisplaySettings(data as DisplaySettings<string>)
         break
       case 'project':
-        this.setProjects(data as ProjectSimpleWithName[])
+        this.setProjects(data as ProjectSimpleWithName<string>[])
         break
       case 'users':
-        this.setUsers(data as UserWithNameAndProject[])
+        this.setUsers(data as UserWithNameAndProject<string>[])
         break
     }
   }
@@ -131,7 +131,7 @@ export class APP_DATA {
   setCountries(countries: Country[]) {
     this.countries = countries
   }
-  setUser(user: User) {
+  setUser(user: User<string>) {
     this.user = user
     const navLang = getLanguageFromNavigator()
     if (this.user.settings.hasUserSetLanguage) {
@@ -143,10 +143,10 @@ export class APP_DATA {
     logger.info(`${i18n.global.t('labels.user')}:`)
     logger.info(user)
   }
-  setSettings(settings: Settings) {
+  setSettings(settings: Settings<string>) {
     this.settings = settings
   }
-  setTravelSettings(travelSettings: TravelSettings) {
+  setTravelSettings(travelSettings: TravelSettings<string>) {
     this.travelSettings = travelSettings
     if (this.travelCalculator) {
       this.travelCalculator.updateSettings(travelSettings)
@@ -160,30 +160,30 @@ export class APP_DATA {
       }, this.travelSettings)
     }
   }
-  setDisplaySettings(displaySettings: DisplaySettings) {
+  setDisplaySettings(displaySettings: DisplaySettings<string>) {
     this.displaySettings = displaySettings
     formatter.setNameDisplayFormat(displaySettings.nameDisplayFormat)
     updateLocales(displaySettings)
   }
-  setHealthInsurances(healthInsurances: HealthInsurance[]) {
+  setHealthInsurances(healthInsurances: HealthInsurance<string>[]) {
     this.healthInsurances = healthInsurances
   }
-  setOrganisations(organisations: OrganisationSimple[]) {
+  setOrganisations(organisations: OrganisationSimple<string>[]) {
     this.organisations = organisations
   }
-  setCategories(categories: Category[]) {
+  setCategories(categories: Category<string>[]) {
     this.categories = categories
     this.defaultCategory = categories.length === 1 ? categories[0] : categories.find((category) => category.isDefault)
   }
   setSpecialLumpSums(specialLumpSums: Record<string, string[]>) {
     this.specialLumpSums = specialLumpSums
   }
-  setProjects(projects?: ProjectSimpleWithName[]) {
+  setProjects(projects?: ProjectSimpleWithName<string>[]) {
     if (projects) {
       this.projects = projects
     }
   }
-  setUsers(users?: UserWithNameAndProject[]) {
+  setUsers(users?: UserWithNameAndProject<string>[]) {
     if (users) {
       this.users = users
     }
@@ -227,20 +227,20 @@ class APP_LOADER {
       this.dataPromise = new Promise((resolve, reject) => {
         Promise.allSettled([
           Promise.all([
-            this.withProgress(this.loadRequired<User>('user')),
+            this.withProgress(this.loadRequired<User<string>>('user')),
             this.withProgress(this.loadRequired<Currency[]>('currency')),
             this.withProgress(this.loadRequired<Country[]>('country')),
-            this.withProgress(this.loadRequired<Settings>('settings')),
-            this.withProgress(this.loadRequired<TravelSettings>('travelSettings')),
-            this.withProgress(this.loadRequired<HealthInsurance[]>('healthInsurance')),
-            this.withProgress(this.loadRequired<OrganisationSimple[]>('organisation')),
-            this.withProgress(this.loadRequired<Category[]>('category')),
+            this.withProgress(this.loadRequired<Settings<string>>('settings')),
+            this.withProgress(this.loadRequired<TravelSettings<string>>('travelSettings')),
+            this.withProgress(this.loadRequired<HealthInsurance<string>[]>('healthInsurance')),
+            this.withProgress(this.loadRequired<OrganisationSimple<string>[]>('organisation')),
+            this.withProgress(this.loadRequired<Category<string>[]>('category')),
             this.withProgress(this.loadRequired<Record<string, string[]>>('specialLumpSums')),
-            this.withProgress(this.loadRequired<DisplaySettings>('displaySettings'))
+            this.withProgress(this.loadRequired<DisplaySettings<string>>('displaySettings'))
           ]),
           Promise.allSettled([
-            this.withProgress(this.loadOptional<ProjectSimpleWithName[]>('project')),
-            this.withProgress(this.loadOptional<UserWithNameAndProject[]>('users'))
+            this.withProgress(this.loadOptional<ProjectSimpleWithName<string>[]>('project')),
+            this.withProgress(this.loadOptional<UserWithNameAndProject<string>[]>('users'))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
@@ -259,8 +259,8 @@ class APP_LOADER {
               displaySettings
             ] = result[0].value
 
-            let projects: ProjectSimpleWithName[] | undefined
-            let users: UserWithNameAndProject[] | undefined
+            let projects: ProjectSimpleWithName<string>[] | undefined
+            let users: UserWithNameAndProject<string>[] | undefined
             if (result[1].status === 'fulfilled') {
               projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
               users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined

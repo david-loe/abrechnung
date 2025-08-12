@@ -91,7 +91,7 @@ import { showFile } from '@/helper.js'
 const { t } = useI18n()
 
 const props = defineProps({
-  advance: { type: Object as PropType<AdvanceSimple>, required: true },
+  advance: { type: Object as PropType<AdvanceSimple<string>>, required: true },
   endpointPrefix: { type: String, default: '' }
 })
 

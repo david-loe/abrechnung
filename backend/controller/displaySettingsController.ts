@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import { DisplaySettings as IDisplaySettings, locales } from '../../common/types.js'
 import DisplaySettings, { displaySettingsSchema } from '../models/displaySettings.js'
@@ -19,7 +20,7 @@ export class DisplaySettingsController extends Controller {
 @Security('httpBearer', ['admin'])
 export class DisplaySettingsAdminController extends Controller {
   @Post()
-  public async post(@Body() requestBody: SetterBody<IDisplaySettings>) {
+  public async post(@Body() requestBody: SetterBody<IDisplaySettings<Types.ObjectId>>) {
     return await this.setter(DisplaySettings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')

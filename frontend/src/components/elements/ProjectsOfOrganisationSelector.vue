@@ -21,7 +21,7 @@ import APP_LOADER from '@/appData.js'
 import OrganisationSelector from './OrganisationSelector.vue'
 
 const props = defineProps<{
-  modelValue: ProjectSimple[] | string[] | [undefined] | [null]
+  modelValue: ProjectSimple<string>[] | string[] | [undefined] | [null]
   required?: boolean
   disabled?: boolean
   updateUserOrg?: boolean
@@ -31,11 +31,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{ 'update:modelValue': [projects: ProjectSimple[] | string[]] }>()
 
-const initialOrg = ref<OrganisationSimple | null>(null)
+const initialOrg = ref<OrganisationSimple<string> | null>(null)
 const APP_DATA = APP_LOADER.data
 
 function getProjects(orgaId?: string) {
-  const projects: ProjectSimple[] = []
+  const projects: ProjectSimple<string>[] = []
   if (APP_DATA.value) {
     for (const project of APP_DATA.value.user.projects.assigned) {
       if (!orgaId || project.organisation === orgaId) {
@@ -73,7 +73,7 @@ function getProjects(orgaId?: string) {
 onMounted(async () => {
   await APP_LOADER.loadData()
   if (props.modelValue && props.modelValue.length > 0 && props.modelValue[0]) {
-    let project: ProjectSimple | null = null
+    let project: ProjectSimple<string> | null = null
     if (typeof props.modelValue[0] === 'object') {
       project = props.modelValue[0]
     }

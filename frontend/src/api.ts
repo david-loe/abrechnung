@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
-import { GETResponse, SETResponse } from '../../common/types'
-import i18n from './i18n.js'
-import { logger } from './logger.js'
-import router from './router'
+import { GETResponse, SETResponse } from '@/../../common/types'
+import ENV from '@/env'
+import i18n from '@/i18n.js'
+import { logger } from '@/logger.js'
+import router from '@/router'
 
 export interface Alert {
   type: 'danger' | 'success'
@@ -33,10 +34,7 @@ class API {
     showAlert = true
   ): Promise<{ ok?: GETResponse<T>; error?: unknown }> {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
-        Object.assign({ params: params, withCredentials: true }, config)
-      )
+      const res = await axios.get(`${ENV.VITE_BACKEND_URL}/${endpoint}`, Object.assign({ params: params, withCredentials: true }, config))
       if (config.responseType === 'blob') {
         return { ok: { data: res.data, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } }
       }
@@ -61,11 +59,7 @@ class API {
     showAlert = true
   ): Promise<{ ok?: T; error?: unknown }> {
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`,
-        data,
-        Object.assign({ withCredentials: true }, config)
-      )
+      const res = await axios.post(`${ENV.VITE_BACKEND_URL}/${endpoint}`, data, Object.assign({ withCredentials: true }, config))
       if (showAlert) this.addAlert({ title: i18n.global.t(res.data.message), type: 'success' })
       return { ok: (res.data as SETResponse<T>).result }
     } catch (error: unknown) {
@@ -84,7 +78,7 @@ class API {
       }
     }
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/${endpoint}`, { params: params, withCredentials: true })
+      const res = await axios.delete(`${ENV.VITE_BACKEND_URL}/${endpoint}`, { params: params, withCredentials: true })
       if (showAlert.success) this.addAlert({ message: '', title: i18n.global.t('alerts.successDeleting'), type: 'success' })
       if (res.data.result) {
         return res.data.result

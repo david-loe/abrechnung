@@ -1,0 +1,16 @@
+FROM node:22-alpine
+
+LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
+LABEL org.opencontainers.image.description="abrechnung🧾 common DEVELOPMENT"
+LABEL org.opencontainers.image.licenses=AGPL-3.0-only
+
+
+WORKDIR /npm_cache
+COPY package*.json ./
+RUN npm install
+
+WORKDIR /app
+
+ENTRYPOINT [ "/bin/sh", "-c", "cp -r /npm_cache/node_modules/. /app/node_modules && exec \"$0\" \"$@\"" ]
+
+CMD ["npm", "run", "dev"]

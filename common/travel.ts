@@ -1,6 +1,8 @@
 import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
 import {
+  _id,
   baseCurrency,
+  binary,
   CateringType,
   Country,
   CountryCode,
@@ -20,18 +22,19 @@ export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>
   lumpSumCalculator!: LumpSumCalculator
   validator: TravelValidator
-  travelSettings!: TravelSettings
-  stagesCompareFn = (a: Stage, b: Stage) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
-  expensesCompareFn = (a: TravelExpense, b: TravelExpense) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+  travelSettings!: TravelSettings<_id>
+  stagesCompareFn = (a: Stage<_id, binary>, b: Stage<_id, binary>) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
+  expensesCompareFn = (a: TravelExpense<_id, binary>, b: TravelExpense<_id, binary>) =>
+    new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
 
-  constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: TravelSettings) {
+  constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: TravelSettings<_id>) {
     this.getCountryById = getCountryById
     this.lumpSumCalculator = new LumpSumCalculator(this.getCountryById, travelSettings.fallbackLumpSumCountry)
     this.validator = new TravelValidator(travelSettings)
     this.updateSettings(travelSettings)
   }
 
-  async calc(travel: Travel): Promise<Invalid[]> {
+  async calc(travel: Travel<_id, binary>): Promise<Invalid[]> {
     this.sort(travel)
     const conflicts = this.validator.validate(travel)
     if (conflicts.length === 0) {
@@ -45,18 +48,18 @@ export class TravelCalculator {
     return conflicts
   }
 
-  updateSettings(travelSettings: TravelSettings) {
+  updateSettings(travelSettings: TravelSettings<_id>) {
     this.travelSettings = travelSettings
     this.validator.updateSettings(travelSettings)
     this.lumpSumCalculator.setFallBackLumpSumCountry(travelSettings.fallbackLumpSumCountry)
   }
 
-  sort(travel: Travel) {
+  sort(travel: Travel<_id, binary>) {
     travel.stages.sort(this.stagesCompareFn)
     travel.expenses.sort(this.expensesCompareFn)
   }
 
-  getProgress(travel: Travel) {
+  getProgress(travel: Travel<_id, binary>) {
     if (travel.stages.length > 0) {
       const approvedLength = getDiffInDays(travel.startDate, travel.endDate) + 1
       const stageLength = getDiffInDays(travel.stages[0].departure, travel.stages[travel.stages.length - 1].arrival) + 1
@@ -68,11 +71,14 @@ export class TravelCalculator {
     return 0
   }
 
-  getDefaultLastPlaceOfWork(stages: Stage[], destinationPlace: Travel['destinationPlace']): Travel['lastPlaceOfWork'] {
+  getDefaultLastPlaceOfWork(
+    stages: Stage<_id, binary>[],
+    destinationPlace: Travel<_id, binary>['destinationPlace']
+  ): Travel<_id, binary>['lastPlaceOfWork'] {
     if (this.travelSettings.defaultLastPlaceOfWork === 'destinationPlace') {
       return { country: destinationPlace.country }
     } else if (this.travelSettings.defaultLastPlaceOfWork === 'lastEndLocation' && stages.length > 0) {
-      const lpow: Travel['lastPlaceOfWork'] = { country: stages[stages.length - 1].endLocation.country }
+      const lpow: Travel<_id, binary>['lastPlaceOfWork'] = { country: stages[stages.length - 1].endLocation.country }
       if (stages[stages.length - 1].endLocation.special) {
         lpow.special = stages[stages.length - 1].endLocation.special
       }
@@ -81,15 +87,15 @@ export class TravelCalculator {
     return null
   }
 
-  getDays(stages: Stage[], oldDays: TravelDay[]) {
+  getDays(stages: Stage<_id, binary>[], oldDays: TravelDay<_id>[]) {
     if (stages.length > 0) {
       const days = getDayList(stages[0].departure, stages[stages.length - 1].arrival)
       const newDays: {
         date: Date
-        lumpSums: TravelDay['lumpSums']
-        cateringRefund?: TravelDay['cateringRefund']
-        purpose?: TravelDay['purpose']
-        overnightRefund?: TravelDay['overnightRefund']
+        lumpSums: TravelDay<_id>['lumpSums']
+        cateringRefund?: TravelDay<_id>['cateringRefund']
+        purpose?: TravelDay<_id>['purpose']
+        overnightRefund?: TravelDay<_id>['overnightRefund']
       }[] = days.map((d) => {
         return { date: d, lumpSums: { overnight: { refund: { amount: 0 } }, catering: { refund: { amount: 0 }, type: 'catering8' } } }
       })
@@ -108,7 +114,7 @@ export class TravelCalculator {
     return []
   }
 
-  getBorderCrossings(stages: Stage[]) {
+  getBorderCrossings(stages: Stage<_id, binary>[]) {
     const borderCrossings: { date: Date; country: { _id: CountryCode }; special?: string }[] = []
     if (stages.length > 0) {
       const startCountry = stages[0].startLocation.country
@@ -145,7 +151,11 @@ export class TravelCalculator {
     return borderCrossings
   }
 
-  getDateOfLastPlaceOfWork(stages: Stage[], lastPlaceOfWork: Travel['lastPlaceOfWork'], destinationPlace: Travel['destinationPlace']) {
+  getDateOfLastPlaceOfWork(
+    stages: Stage<_id, binary>[],
+    lastPlaceOfWork: Travel<_id, binary>['lastPlaceOfWork'],
+    destinationPlace: Travel<_id, binary>['destinationPlace']
+  ) {
     let date: Date | null = null
     let sameCountryDate: Date | null = null
     const lpow = lastPlaceOfWork ?? this.getDefaultLastPlaceOfWork(stages, destinationPlace)
@@ -179,10 +189,10 @@ export class TravelCalculator {
   }
 
   async calculateDays(
-    stages: Stage[],
-    lastPlaceOfWork: Travel['lastPlaceOfWork'],
-    destinationPlace: Travel['destinationPlace'],
-    oldDays: TravelDay[]
+    stages: Stage<_id, binary>[],
+    lastPlaceOfWork: Travel<_id, binary>['lastPlaceOfWork'],
+    destinationPlace: Travel<_id, binary>['destinationPlace'],
+    oldDays: TravelDay<_id>[]
   ) {
     const borderCrossings: { date: Date; country: Country; special?: string }[] = []
 
@@ -198,8 +208,8 @@ export class TravelCalculator {
       ) {
         bXIndex++
       }
-      ;(day as Partial<TravelDayFullCountry>).country = borderCrossings[bXIndex].country
-      ;(day as Partial<TravelDayFullCountry>).special = borderCrossings[bXIndex].special
+      ;(day as Partial<TravelDayFullCountry<_id>>).country = borderCrossings[bXIndex].country
+      ;(day as Partial<TravelDayFullCountry<_id>>).special = borderCrossings[bXIndex].special
     }
 
     // change days according to last place of work
@@ -208,17 +218,19 @@ export class TravelCalculator {
     if (dateOfLastPlaceOfWork) {
       for (const day of days) {
         if (day.date.valueOf() >= dateOfLastPlaceOfWork.date.valueOf()) {
-          ;(day as Partial<TravelDayFullCountry>).country = await this.getCountryById(dateOfLastPlaceOfWork.lastPlaceOfWork.country._id)
-          ;(day as Partial<TravelDayFullCountry>).special = dateOfLastPlaceOfWork.lastPlaceOfWork.special
+          ;(day as Partial<TravelDayFullCountry<_id>>).country = await this.getCountryById(
+            dateOfLastPlaceOfWork.lastPlaceOfWork.country._id
+          )
+          ;(day as Partial<TravelDayFullCountry<_id>>).special = dateOfLastPlaceOfWork.lastPlaceOfWork.special
         }
       }
     }
 
-    return days as TravelDayFullCountry[]
+    return days as TravelDayFullCountry<_id>[]
   }
 
-  async getCateringRefund(day: TravelDayFullCountry, type: CateringType, claimSpouseRefund: boolean) {
-    const result: TravelDay['lumpSums']['catering'] = { type, refund: { amount: 0 } }
+  async getCateringRefund(day: TravelDayFullCountry<_id>, type: CateringType, claimSpouseRefund: boolean) {
+    const result: TravelDay<_id>['lumpSums']['catering'] = { type, refund: { amount: 0 } }
     const amount = (await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special))[result.type]
     let leftover = 1
     if (!day.cateringRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
@@ -241,7 +253,7 @@ export class TravelCalculator {
     return result
   }
 
-  getTotalTravelLengthMS(stages: Stage[]) {
+  getTotalTravelLengthMS(stages: Stage<_id, binary>[]) {
     let totalTravelLength = 0
     if (stages.length > 0) {
       totalTravelLength = new Date(stages[stages.length - 1].arrival).valueOf() - new Date(stages[0].departure).valueOf()
@@ -249,13 +261,13 @@ export class TravelCalculator {
     return totalTravelLength
   }
 
-  async addCateringRefunds(days: TravelDay[], stages: Stage[], claimSpouseRefund: boolean) {
+  async addCateringRefunds(days: TravelDay<_id>[], stages: Stage<_id, binary>[], claimSpouseRefund: boolean) {
     const totalTravelLength = this.getTotalTravelLengthMS(stages)
     const h = 60 * 60 * 1000
     // Mehrtägige Reise
     if (totalTravelLength > 24 * h) {
       for (let i = 0; i < days.length; i++) {
-        const day = days[i] as TravelDayFullCountry
+        const day = days[i] as TravelDayFullCountry<_id>
         if (day.purpose === 'professional') {
           let refundType: LumpsumType | null = 'catering24'
           if (i === 0 || i === days.length - 1) {
@@ -273,42 +285,42 @@ export class TravelCalculator {
         const day2Length = new Date(stages[stages.length - 1].arrival).valueOf() - new Date(days[1].date).valueOf()
         if (day1Length > 8 * h && day2Length > 8 * h) {
           if (days[0].purpose === 'professional') {
-            days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+            days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
           if (days[1].purpose === 'professional') {
-            days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+            days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
         } else if (day1Length > 8 * h) {
           if (days[0].purpose === 'professional') {
-            days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+            days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
         } else if (day2Length > 8 * h) {
           if (days[1].purpose === 'professional') {
-            days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+            days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
         } else {
           if (day1Length >= day2Length) {
             if (days[0].purpose === 'professional') {
-              days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+              days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
             }
           } else {
             if (days[1].purpose === 'professional') {
-              days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+              days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
             }
           }
         }
       } else if (days.length === 1) {
         if (days[0].purpose === 'professional') {
-          days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry, 'catering8', claimSpouseRefund)
+          days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
         }
       }
     }
   }
 
-  async addOvernightRefunds(days: TravelDay[], stages: Stage[], claimSpouseRefund: boolean) {
+  async addOvernightRefunds(days: TravelDay<_id>[], stages: Stage<_id, binary>[], claimSpouseRefund: boolean) {
     let stageIndex = 0
     for (let i = 0; i < days.length; i++) {
-      const day = days[i] as TravelDayFullCountry
+      const day = days[i] as TravelDayFullCountry<_id>
       if (day.overnightRefund && day.purpose === 'professional') {
         if (i === days.length - 1) {
           break
@@ -342,7 +354,7 @@ export class TravelCalculator {
     }
   }
 
-  getProfessionalShare(days: TravelDay[]) {
+  getProfessionalShare(days: TravelDay<_id>[]) {
     if (days.length > 0) {
       let professionalDays = 0
       let calc = false
@@ -361,7 +373,7 @@ export class TravelCalculator {
     return null
   }
 
-  addRefundsForOwnCar(stages: Stage[]) {
+  addRefundsForOwnCar(stages: Stage<_id, binary>[]) {
     for (const stage of stages) {
       if (stage.transport.type === 'ownCar') {
         if (stage.transport.distance && stage.transport.distanceRefundType) {
@@ -379,28 +391,28 @@ export class TravelCalculator {
 type Invalid = { path: string; err: string | Error; val?: unknown }
 type Warning = { name: string; val?: unknown; limit?: unknown }
 export class TravelValidator {
-  travelSettings!: TravelSettings
+  travelSettings!: TravelSettings<_id>
 
-  constructor(travelSettings: TravelSettings) {
+  constructor(travelSettings: TravelSettings<_id>) {
     this.updateSettings(travelSettings)
   }
 
-  updateSettings(travelSettings: TravelSettings) {
+  updateSettings(travelSettings: TravelSettings<_id>) {
     this.travelSettings = travelSettings
   }
 
-  validate(travel: Travel): Invalid[] {
+  validate(travel: Travel<_id, binary>): Invalid[] {
     return this.validateDates(travel).concat(this.validateCountries(travel))
   }
 
   /**
    * checks a travel for warnings
    */
-  check(travel: Travel): Warning[] {
+  check(travel: Travel<_id, binary>): Warning[] {
     return this.checkProfessionalShare(travel).concat(this.checkTravelLength(travel))
   }
 
-  validateDates(travel: Travel): Invalid[] {
+  validateDates(travel: Travel<_id, binary>): Invalid[] {
     const conflicts = new Set<Invalid>()
     for (let i = 0; i < travel.stages.length; i++) {
       for (let j = 0; j < travel.stages.length; j++) {
@@ -436,7 +448,7 @@ export class TravelValidator {
     return Array.from(conflicts)
   }
 
-  validateCountries(travel: Travel): Invalid[] {
+  validateCountries(travel: Travel<_id, binary>): Invalid[] {
     const conflicts: Invalid[] = []
     for (let i = 1; i < travel.stages.length; i++) {
       if (travel.stages[i - 1].endLocation.country._id !== travel.stages[i].startLocation.country._id) {
@@ -447,7 +459,7 @@ export class TravelValidator {
     return conflicts
   }
 
-  checkTravelLength(travel: Travel): Warning[] {
+  checkTravelLength(travel: Travel<_id, binary>): Warning[] {
     const warnings: Warning[] = []
     const cs = travel.stages.length
     if (cs > 0) {
@@ -460,7 +472,7 @@ export class TravelValidator {
     return warnings
   }
 
-  checkProfessionalShare(travel: Travel): Warning[] {
+  checkProfessionalShare(travel: Travel<_id, binary>): Warning[] {
     const warnings: Warning[] = []
     if (travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare) {
       warnings.push({ name: 'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare })

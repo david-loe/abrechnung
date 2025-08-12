@@ -1,8 +1,9 @@
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
+import { Types } from 'mongoose'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
-import { _id } from '../../common/types.js'
 import { getSettings } from '../db.js'
+import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import Token from '../models/token.js'
@@ -38,7 +39,7 @@ export class UploadController extends Controller {
       throw new NotFoundError(`No user with token found for userId: ${userId}`)
     }
     const template = await getUploadTemplate()
-    const url = new URL(`${process.env.VITE_BACKEND_URL}/upload/new`)
+    const url = new URL(`${ENV.VITE_BACKEND_URL}/upload/new`)
     url.searchParams.append('userId', userId)
     url.searchParams.append('tokenId', tokenId)
     if (ownerId) {
@@ -49,7 +50,6 @@ export class UploadController extends Controller {
       url.searchParams.append('ownerId', ownerId)
     }
     const secondsLeft = Math.round((new Date(user.token.expireAt).valueOf() - Date.now()) / 1000)
-    const maxFileSize = Number.parseInt(process.env.VITE_MAX_FILE_SIZE)
     const text = {
       tapToUpload: i18n.t('labels.tapToUpload', { lng: user?.settings.language }),
       uploading: i18n.t('labels.uploading', { lng: user?.settings.language }),
@@ -63,7 +63,7 @@ export class UploadController extends Controller {
       expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
       text,
-      maxFileSize,
+      maxFileSize: ENV.VITE_MAX_FILE_SIZE,
       language: user?.settings.language,
       fileUtilsContent: await getFileUtilsContent()
     })
@@ -83,7 +83,7 @@ export class UploadController extends Controller {
     const token = await Token.findOne({ _id: tokenId })
     if (token) {
       await documentFileHandler(['files'], { owner: ownerId || userId })(req)
-      token.files = token.files.concat(requestBody.files as unknown as _id[])
+      token.files = token.files.concat(requestBody.files as unknown as Types.ObjectId[])
       token.markModified('files')
       await token.save()
     }

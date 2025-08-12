@@ -1,5 +1,6 @@
+import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { _id, HealthInsurance as IHealthInsurance, locales } from '../../common/types.js'
+import { HealthInsurance as IHealthInsurance, locales } from '../../common/types.js'
 import HealthInsurance, { healthInsuranceSchema } from '../models/healthInsurance.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
@@ -21,15 +22,15 @@ export class HealthInsuranceController extends Controller {
 @Security('httpBearer', ['admin'])
 export class HealthInsuranceAdminController extends Controller {
   @Post()
-  public async post(@Body() requestBody: SetterBody<IHealthInsurance>) {
+  public async post(@Body() requestBody: SetterBody<IHealthInsurance<Types.ObjectId>>) {
     return await this.setter(HealthInsurance, { requestBody: requestBody, allowNew: true })
   }
   @Post('bulk')
-  public async postMany(@Body() requestBody: SetterBody<IHealthInsurance>[]) {
+  public async postMany(@Body() requestBody: SetterBody<IHealthInsurance<Types.ObjectId>>[]) {
     return await this.insertMany(HealthInsurance, { requestBody })
   }
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(HealthInsurance, { _id: _id })
   }
   @Get('form')

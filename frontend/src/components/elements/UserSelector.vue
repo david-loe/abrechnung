@@ -4,10 +4,10 @@
     :options="APP_DATA.users"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(u: UserWithNameAndProject) => $emit('update:modelValue', u)"
+    @update:modelValue="(u: UserWithNameAndProject<string>) => $emit('update:modelValue', u)"
     :filter="filter"
-    :getOptionKey="(option: UserWithNameAndProject) => option._id"
-    :getOptionLabel="(option: UserWithNameAndProject) => `${formatter.name(option.name)}`"
+    :getOptionKey="(option: UserWithNameAndProject<string>) => option._id"
+    :getOptionLabel="(option: UserWithNameAndProject<string>) => `${formatter.name(option.name)}`"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name }">
@@ -29,18 +29,18 @@ import APP_LOADER from '@/appData.js'
 import { formatter } from '@/formatter.js'
 
 defineProps({
-  modelValue: { type: Object as PropType<UserWithNameAndProject> },
+  modelValue: { type: Object as PropType<UserWithNameAndProject<string>> },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' }
 })
 
-defineEmits<{ 'update:modelValue': [UserWithNameAndProject] }>()
+defineEmits<{ 'update:modelValue': [UserWithNameAndProject<string>] }>()
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
-function filter(options: UserWithNameAndProject[], search: string): UserWithNameAndProject[] {
+function filter(options: UserWithNameAndProject<string>[], search: string): UserWithNameAndProject<string>[] {
   return options.filter((option) => {
     const givenName = option.name.givenName.toLowerCase().indexOf(search.toLowerCase()) > -1
     if (givenName) {

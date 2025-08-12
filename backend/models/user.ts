@@ -1,26 +1,17 @@
-import mongoose, { HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
-import {
-  _id,
-  Access,
-  accesses,
-  emailRegex,
-  locales,
-  User,
-  UserReplaceReferencesResult,
-  userReplaceCollections
-} from '../../common/types.js'
+import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
+import { Access, accesses, emailRegex, locales, User, UserReplaceReferencesResult, userReplaceCollections } from '../../common/types.js'
 import { getDisplaySettings, getSettings } from '../db.js'
 import { populateAll, populateSelected } from './helper.js'
 
 interface Methods {
   isActive(): Promise<boolean>
   replaceReferences(userIdToOverwrite: Types.ObjectId): Promise<UserReplaceReferencesResult>
-  merge(userToOverwrite: User, mergeFk: boolean): Promise<User>
-  addProjects(projects: { assigned?: _id[]; supervised?: _id[] }): Promise<void>
+  merge(userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean): Promise<User<Types.ObjectId, mongo.Binary>>
+  addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }): Promise<void>
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type UserModel = Model<User, {}, Methods>
+type UserModel = Model<User<Types.ObjectId, mongo.Binary>, {}, Methods>
 
 export const userSchema = async () => {
   const settings = await getSettings()
@@ -30,7 +21,7 @@ export const userSchema = async () => {
   for (const access of accesses) {
     accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: `accesses.${access}` }
   }
-  return new Schema<User, UserModel, Methods>({
+  return new Schema<User<Types.ObjectId, mongo.Binary>, UserModel, Methods>({
     fk: {
       type: {
         microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
@@ -114,7 +105,7 @@ const populates = {
   vehicleRegistration: [{ path: 'vehicleRegistration', select: { name: 1, type: 1 } }],
   token: [{ path: 'token', populate: { path: 'files', select: { name: 1, type: 1 } } }]
 }
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<User, User>) {
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<User<Types.ObjectId, mongo.Binary>, User<Types.ObjectId, mongo.Binary>>) {
   await populateSelected(this, populates)
 })
 
@@ -170,11 +161,11 @@ schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwr
   return result
 }
 
-schema.methods.merge = async function (this: UserDoc, userToOverwrite: User, mergeFk: boolean) {
+schema.methods.merge = async function (this: UserDoc, userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean) {
   const thisPojo = this.toObject()
   if (mergeFk) {
     Object.assign(this.fk, userToOverwrite.fk, thisPojo.fk)
-    ;(userToOverwrite as Partial<User>).fk = undefined
+    ;(userToOverwrite as Partial<User<Types.ObjectId, mongo.Binary>>).fk = undefined
   }
 
   for (const access in userToOverwrite.access) {
@@ -182,7 +173,7 @@ schema.methods.merge = async function (this: UserDoc, userToOverwrite: User, mer
       this.access[access as Access] = true
     }
   }
-  ;(userToOverwrite as Partial<User>).access = undefined
+  ;(userToOverwrite as Partial<User<Types.ObjectId, mongo.Binary>>).access = undefined
 
   for (const p of userToOverwrite.projects.assigned) {
     if (!this.projects.assigned.some((tp) => tp._id.equals(p._id))) {
@@ -197,14 +188,14 @@ schema.methods.merge = async function (this: UserDoc, userToOverwrite: User, mer
   }
 
   Object.assign(this.settings, userToOverwrite.settings, thisPojo.settings)
-  ;(userToOverwrite as Partial<User>).settings = undefined
+  ;(userToOverwrite as Partial<User<Types.ObjectId, mongo.Binary>>).settings = undefined
 
   Object.assign(this, userToOverwrite, this.toObject())
   await this.save()
   return this.toObject()
 }
 
-schema.methods.addProjects = async function addProjects(projects: { assigned?: _id[]; supervised?: _id[] }) {
+schema.methods.addProjects = async function addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }) {
   let changed = false
   if (projects.assigned) {
     for (const newProjectId of projects.assigned) {
@@ -228,6 +219,6 @@ schema.methods.addProjects = async function addProjects(projects: { assigned?: _
   }
 }
 
-export default model<User, UserModel>('User', schema)
+export default model<User<Types.ObjectId, mongo.Binary>, UserModel>('User', schema)
 
-export interface UserDoc extends Methods, HydratedDocument<User> {}
+export interface UserDoc extends Methods, HydratedDocument<User<Types.ObjectId, mongo.Binary>> {}

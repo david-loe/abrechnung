@@ -1,6 +1,5 @@
-import mongoose, { Document, HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import {
-  _id,
   Advance,
   AdvanceBase,
   AdvanceState,
@@ -24,16 +23,16 @@ interface Methods {
   offset(
     reportTotal: number,
     reportModelName: ReportModelName,
-    reportId: _id | null,
+    reportId: Types.ObjectId | null,
     session?: mongoose.ClientSession | null
   ): Promise<number>
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type AdvanceModel = Model<Advance, {}, Methods>
+type AdvanceModel = Model<Advance<Types.ObjectId>, {}, Methods>
 
 const advanceSchema = () =>
-  new Schema<Advance, AdvanceModel, Methods>(
+  new Schema<Advance<Types.ObjectId>, AdvanceModel, Methods>(
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject(true, false, true, baseCurrency._id),
@@ -63,7 +62,7 @@ const populates = {
   log: advanceStates.map((state) => ({ path: `log.${state}.by`, select: { name: 1, email: 1 } })),
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance, Advance>) {
+schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance<Types.ObjectId>, Advance<Types.ObjectId>>) {
   await populateSelected(this, populates)
 })
 
@@ -74,7 +73,10 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
 })
 
 schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
-  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }, { history: 0 }).session(session).lean()
+  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance')
+    .findOne({ _id: this._id }, { history: 0 })
+    .session(session)
+    .lean()
   if (!doc) {
     throw new Error('Advance not found')
   }
@@ -96,7 +98,7 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
   await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
-async function recalcAllAssociatedReports(advanceId: _id, session: mongoose.ClientSession | null = null) {
+async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
   const reports: Document[] = []
   reports.push(
     ...(await model<Travel>('Travel')
@@ -125,13 +127,13 @@ schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
   reportModelName: ReportModelName,
-  reportId: _id | null,
+  reportId: Types.ObjectId | null,
   session: mongoose.ClientSession | null = null
 ) {
   if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal <= 0) {
     return reportTotal
   }
-  const doc = await model<Advance, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
+  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
   if (!doc) {
     return reportTotal
   }
@@ -145,7 +147,7 @@ schema.methods.offset = async function (
     doc.balance.amount = -difference
     difference = 0
   }
-  doc.offsetAgainst.push({ type: reportModelName, report: reportId as unknown as { _id: _id; name: string }, amount })
+  doc.offsetAgainst.push({ type: reportModelName, report: reportId as unknown as { _id: Types.ObjectId; name: string }, amount })
   doc.markModified('offsetAgainst')
   await doc.save({ session })
   await recalcAllAssociatedReports(doc._id, session)
@@ -154,7 +156,7 @@ schema.methods.offset = async function (
 
 schema.methods.addComment = function (this: AdvanceDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<AdvanceState>)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, AdvanceState>)
     this.comment = undefined
   }
 }
@@ -169,6 +171,6 @@ schema.pre('save', async function (this: AdvanceDoc) {
   setLog(this)
 })
 
-export default model<Advance, AdvanceModel>('Advance', schema)
+export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)
 
-export interface AdvanceDoc extends Methods, HydratedDocument<Advance> {}
+export interface AdvanceDoc extends Methods, HydratedDocument<Advance<Types.ObjectId>> {}

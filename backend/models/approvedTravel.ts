@@ -1,13 +1,13 @@
-import { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { ApprovedTravel, Travel, TravelState } from '../../common/types.js'
 import { formatter } from '../factory.js'
 import { populateSelected, travelBaseSchema } from './helper.js'
 
-interface ApprovedTravelModelType extends Model<ApprovedTravel> {
-  addOrUpdate(travel: Travel): Promise<HydratedDocument<ApprovedTravel>>
+interface ApprovedTravelModelType extends Model<ApprovedTravel<Types.ObjectId>> {
+  addOrUpdate(travel: Travel): Promise<HydratedDocument<ApprovedTravel<Types.ObjectId>>>
 }
 
-function convert(travel: Travel): ApprovedTravel {
+function convert(travel: Travel<Types.ObjectId, mongo.Binary>): ApprovedTravel<Types.ObjectId> {
   return {
     startDate: travel.startDate,
     endDate: travel.endDate,
@@ -47,7 +47,7 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<ApprovedTravel, A
   await populateSelected(this, populates)
 })
 
-schema.statics.addOrUpdate = async function (travel: Travel): Promise<HydratedDocument<ApprovedTravel>> {
+schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<HydratedDocument<ApprovedTravel>> {
   const alreadyExsists = await this.findOne({ reportId: travel._id })
   if (alreadyExsists) {
     alreadyExsists.set(convert(travel))

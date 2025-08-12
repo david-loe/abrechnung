@@ -105,7 +105,7 @@ async function postCategory(category: Category) {
   }
   categoryToEdit.value = undefined
 }
-async function deleteCategory(category: Category) {
+async function deleteCategory(category: Category<string>) {
   const result = await API.deleter('admin/category', { _id: category._id })
   if (result) {
     loadFromServer()

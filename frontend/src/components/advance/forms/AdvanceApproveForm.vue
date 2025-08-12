@@ -33,7 +33,7 @@ import TextArea from '@/components/elements/TextArea.vue'
 
 const { t } = useI18n()
 
-const props = defineProps<{ advance: AdvanceSimple; loading: boolean }>()
+const props = defineProps<{ advance: AdvanceSimple<string>; loading: boolean }>()
 const comment = ref(undefined as string | null | undefined)
 const bookingRemark = ref(undefined as string | null | undefined)
 

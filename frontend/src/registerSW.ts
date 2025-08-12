@@ -1,5 +1,7 @@
+import ENV from '@/env'
+
 if ('serviceWorker' in navigator) {
-  const isProductionMode = import.meta.env.MODE === 'production'
+  const isProductionMode = ENV.MODE === 'production'
   const swUrl = isProductionMode ? '/sw.js' : '/dev-sw.js?dev-sw'
   const swType = isProductionMode ? 'classic' : 'module'
 

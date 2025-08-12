@@ -16,6 +16,7 @@ import {
   TravelState
 } from '../common/types.js'
 import { getSettings } from './db.js'
+import ENV from './env.js'
 import { formatter } from './factory.js'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
@@ -131,7 +132,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 
       const button = { text: '', link: '' }
 
-      button.link = `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
+      button.link = `${ENV.VITE_FRONTEND_URL}/${reportType}/${report._id}`
 
       button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
 

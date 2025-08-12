@@ -1,5 +1,6 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
+import { HydratedDocument, model, Schema, Types } from 'mongoose'
 import { ConnectionSettings, defaultLocale, emailRegex, locales } from '../../common/types.js'
+import ENV from '../env.js'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
 function requiredIf(ifPath: string) {
@@ -7,7 +8,7 @@ function requiredIf(ifPath: string) {
 }
 
 export const connectionSettingsSchema = () =>
-  new Schema<ConnectionSettings>({
+  new Schema<ConnectionSettings<Types.ObjectId>>({
     PDFReportsViaEmail: {
       type: {
         sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
@@ -57,7 +58,7 @@ export const connectionSettingsSchema = () =>
             }
           },
           label: 'Microsoft',
-          description: `https://portal.azure.com > Azure Active Directory > App registration - Callback URL: ${process.env.VITE_BACKEND_URL}/auth/microsoft/callback`
+          description: `https://portal.azure.com > Azure Active Directory > App registration - Callback URL: ${ENV.VITE_BACKEND_URL}/auth/microsoft/callback`
         },
         ldapauth: {
           type: {
@@ -119,7 +120,7 @@ export const connectionSettingsSchema = () =>
             clientSecret: { type: String, trim: true, required: true, label: 'Client Secret', rules: requiredIf('auth.oidc.server') }
           },
           label: 'OIDC',
-          description: `scope: 'openid email profile' - Callback URL: ${process.env.VITE_BACKEND_URL}/auth/oidc/callback`
+          description: `scope: 'openid email profile' - Callback URL: ${ENV.VITE_BACKEND_URL}/auth/oidc/callback`
         }
       },
 
@@ -130,7 +131,7 @@ export const connectionSettingsSchema = () =>
 
 const schema = connectionSettingsSchema()
 
-schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings>) {
+schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings<Types.ObjectId>>) {
   if (this.auth.ldapauth?.url) {
     await verifyLdapauthConfig(this.auth.ldapauth)
   }
@@ -139,4 +140,4 @@ schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings
   }
 })
 
-export default model<ConnectionSettings>('ConnectionSettings', schema)
+export default model<ConnectionSettings<Types.ObjectId>>('ConnectionSettings', schema)

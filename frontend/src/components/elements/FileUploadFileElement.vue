@@ -30,7 +30,7 @@ import { DocumentFile } from '@/../../common/types.js'
 
 export default defineComponent({
   name: 'FileUploadFileElement',
-  props: { file: { type: Object as PropType<DocumentFile>, required: true }, disabled: { type: Boolean, default: false } },
+  props: { file: { type: Object as PropType<DocumentFile<string, Blob>>, required: true }, disabled: { type: Boolean, default: false } },
   emits: ['show', 'deleted']
 })
 </script>

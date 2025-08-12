@@ -1,9 +1,9 @@
-import { model, Query, Schema } from 'mongoose'
+import { model, mongo, Query, Schema, Types } from 'mongoose'
 import { emailRegex, Organisation } from '../../common/types.js'
 import { populateSelected } from './helper.js'
 
 export const organisationSchema = () =>
-  new Schema<Organisation>({
+  new Schema<Organisation<Types.ObjectId, mongo.Binary>>({
     name: { type: String, trim: true, required: true },
     reportEmail: { type: String, validate: emailRegex },
     a1CertificateEmail: { type: String, validate: emailRegex },
@@ -18,8 +18,11 @@ const schema = organisationSchema()
 
 const populates = { logo: [{ path: 'logo', select: { name: 1, type: 1 } }] }
 
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<Organisation, Organisation>) {
-  await populateSelected(this, populates)
-})
+schema.pre(
+  /^find((?!Update).)*$/,
+  async function (this: Query<Organisation<Types.ObjectId, mongo.Binary>, Organisation<Types.ObjectId, mongo.Binary>>) {
+    await populateSelected(this, populates)
+  }
+)
 
-export default model<Organisation>('Organisation', schema)
+export default model<Organisation<Types.ObjectId, mongo.Binary>>('Organisation', schema)

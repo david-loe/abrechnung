@@ -1,3 +1,4 @@
 import { Logger } from '../common/logger.js'
+import ENV from './env.js'
 
-export const logger = new Logger(process.env.LOG_LEVEL)
+export const logger = new Logger(ENV.LOG_LEVEL)

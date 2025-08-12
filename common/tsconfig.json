@@ -1,7 +1,6 @@
 {
   "include": ["**/*"],
   "compilerOptions": {
-    // "sourceMap": true,
     "outDir": "dist",
     "strict": true,
     "module": "NodeNext",
@@ -9,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "declaration": true,
+    "declarationMap": true
   }
 }

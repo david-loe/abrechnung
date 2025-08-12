@@ -39,26 +39,27 @@ export function resizeImage(file: Blob, longestSide: number): Promise<Blob> {
 export async function fileEventToDocumentFiles(
   event: Event,
   maxFileSizeInBytes: number,
+  longestImageSideInPixels: number,
   t: (key: string, interpolation: Record<string, string>) => string
 ) {
   const files: { data: Blob; type: DocumentFileType; name: string }[] = []
   const target = event.target as HTMLInputElement
   if (target.files) {
     for (const file of target.files) {
-      if (file.size > maxFileSizeInBytes) {
-        alert(t('alerts.fileXToLargeMaxIsY', { X: file.name, Y: formatBytes(maxFileSizeInBytes) }))
-        continue
-      }
       if (!documentFileTypes.includes(file.type as DocumentFileType)) {
         alert(t('alerts.fileTypeOfXNotSupportedY', { X: file.name, Y: documentFileTypes.join(', ') }))
         continue
       }
+      let newFile: { data: Blob; type: DocumentFileType } = { data: file, type: file.type as DocumentFileType }
       if (file.type.indexOf('image') > -1) {
-        const resizedImage = await resizeImage(file, 1400)
-        files.push({ data: resizedImage, type: resizedImage.type as DocumentFileType, name: file.name })
-      } else {
-        files.push({ data: file, type: file.type as DocumentFileType, name: file.name })
+        const resizedImage = await resizeImage(file, longestImageSideInPixels)
+        newFile = { data: resizedImage, type: resizedImage.type as DocumentFileType }
       }
+      if (newFile.data.size > maxFileSizeInBytes) {
+        alert(t('alerts.fileXToLargeMaxIsY', { X: file.name, Y: formatBytes(maxFileSizeInBytes) }))
+        continue
+      }
+      files.push({ data: newFile.data, type: newFile.type, name: file.name })
     }
     target.value = ''
     return files

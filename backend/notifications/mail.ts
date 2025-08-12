@@ -2,6 +2,7 @@ import ejs from 'ejs'
 import nodemailer from 'nodemailer'
 import { Contact, User as IUser, Locale } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
+import ENV from '../env.js'
 import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import { logger } from '../logger.js'
@@ -30,10 +31,10 @@ export async function sendMail(
     let recipientButton: { text: string; link: string } | undefined
     if (button) {
       recipientButton = { ...button }
-      if (authenticateLink && recipient.fk.magiclogin && recipientButton.link.startsWith(process.env.VITE_FRONTEND_URL)) {
+      if (authenticateLink && recipient.fk.magiclogin && recipientButton.link.startsWith(ENV.VITE_FRONTEND_URL)) {
         recipientButton.link = await genAuthenticatedLink({
           destination: recipient.fk.magiclogin,
-          redirect: recipientButton.link.substring(process.env.VITE_FRONTEND_URL.length)
+          redirect: recipientButton.link.substring(ENV.VITE_FRONTEND_URL.length)
         })
       }
     }
@@ -55,7 +56,7 @@ async function _sendMail(
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
     name: `${i18n.t('headlines.title', { lng: language })} ${i18n.t('headlines.emoji', { lng: language })}`,
-    url: process.env.VITE_FRONTEND_URL
+    url: ENV.VITE_FRONTEND_URL
   }
 
   const template = await getMailTemplate()

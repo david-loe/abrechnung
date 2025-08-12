@@ -122,7 +122,7 @@ async function postProject(project: Project) {
     APP_LOADER.loadOptional('project')
   }
 }
-async function deleteProject(project: Project) {
+async function deleteProject(project: Project<string>) {
   const result = await API.deleter('admin/project', { _id: project._id })
   if (result) {
     loadFromServer()

@@ -9,12 +9,12 @@
           <template v-if="modalAdvance._id">
             <AdvanceApproveForm
               v-if="modalAdvance.state === AdvanceState.APPLIED_FOR"
-              :advance="(modalAdvance as AdvanceSimple)"
+              :advance="(modalAdvance as AdvanceSimple<string>)"
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
-              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple), d, c, br)"></AdvanceApproveForm>
+              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple<string>), d, c, br)"></AdvanceApproveForm>
             <template v-else>
-              <Advance :advance="(modalAdvance as AdvanceSimple)" endpointPrefix="approve/"></Advance>
+              <Advance :advance="(modalAdvance as AdvanceSimple<string>)" endpointPrefix="approve/"></Advance>
               <template v-if="!modalAdvance.settledOn">
                 <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
                   <div class="row">
@@ -117,7 +117,7 @@ const props = defineProps<{ _id?: string }>()
 const router = useRouter()
 const { t } = useI18n()
 
-const modalAdvance = ref<Partial<AdvanceSimple>>({})
+const modalAdvance = ref<Partial<AdvanceSimple<string>>>({})
 const modalMode = ref<'view' | 'add'>('view')
 const show = ref<null | AdvanceState.APPROVED>(null)
 const modalFormIsLoading = ref(false)
@@ -128,7 +128,7 @@ const modalComp = useTemplateRef('modalComp')
 const advanceList = useTemplateRef('advanceList')
 const approvedAdvanceList = useTemplateRef('approvedAdvanceList')
 
-function showModal(mode: 'view' | 'add', advance?: Partial<AdvanceSimple>) {
+function showModal(mode: 'view' | 'add', advance?: Partial<AdvanceSimple<string>>) {
   if (advance) {
     modalAdvance.value = advance
   }
@@ -177,7 +177,7 @@ async function approveAdvance(
 async function offsetAdvance(advanceId: string, amount: number) {
   if (advanceId && amount) {
     modalFormIsLoading.value = true
-    const result = await API.setter<AdvanceSimple>('approve/advance/offset', { advanceId, amount })
+    const result = await API.setter<AdvanceSimple<string>>('approve/advance/offset', { advanceId, amount })
     modalFormIsLoading.value = false
     if (result.ok) {
       showModal('view', result.ok)
@@ -187,7 +187,7 @@ async function offsetAdvance(advanceId: string, amount: number) {
 }
 
 async function showAdvance(_id: string) {
-  const result = await API.getter<AdvanceSimple>('approve/advance', { _id })
+  const result = await API.getter<AdvanceSimple<string>>('approve/advance', { _id })
   if (result.ok) {
     showModal('view', result.ok.data)
   }

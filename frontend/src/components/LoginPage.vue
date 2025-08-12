@@ -91,6 +91,7 @@ import { defineComponent } from 'vue'
 import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
+import ENV from '@/env'
 
 type Strategy = 'ldapauth' | 'magiclogin'
 
@@ -110,7 +111,7 @@ export default defineComponent({
     async login() {
       try {
         const res = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/auth/ldapauth`,
+          `${ENV.VITE_BACKEND_URL}/auth/ldapauth`,
           { username: this.usernameLDAP, password: this.passwordLDAP },
           { withCredentials: true }
         )
@@ -125,7 +126,7 @@ export default defineComponent({
     },
     async requestMagicLogin() {
       try {
-        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/magiclogin`, {
+        const res = await axios.post(`${ENV.VITE_BACKEND_URL}/auth/magiclogin`, {
           destination: this.magicLoginMail,
           redirect: this.$route.query.redirect
         })
@@ -139,14 +140,12 @@ export default defineComponent({
       }
     },
     microsoftLink() {
-      return `${import.meta.env.VITE_BACKEND_URL}/auth/microsoft${
+      return `${ENV.VITE_BACKEND_URL}/auth/microsoft${
         this.$route.query.redirect ? `?redirect=${this.$route.query.redirect as string}` : ''
       }`
     },
     oidcLink() {
-      return `${import.meta.env.VITE_BACKEND_URL}/auth/oidc${
-        this.$route.query.redirect ? `?redirect=${this.$route.query.redirect as string}` : ''
-      }`
+      return `${ENV.VITE_BACKEND_URL}/auth/oidc${this.$route.query.redirect ? `?redirect=${this.$route.query.redirect as string}` : ''}`
     }
   },
   async beforeMount() {

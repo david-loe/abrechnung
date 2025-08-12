@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { addUp } from '../../common/scripts.js'
 import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from '../../common/types.js'
 import { addExchangeRate } from './exchangeRate.js'
@@ -11,10 +11,10 @@ interface Methods {
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type ExpenseReportModel = Model<ExpenseReport, {}, Methods>
+type ExpenseReportModel = Model<ExpenseReport<Types.ObjectId, mongo.Binary>, {}, Methods>
 
 const expenseReportSchema = () =>
-  new Schema<ExpenseReport, ExpenseReportModel, Methods>(
+  new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
       category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
       expenses: [
@@ -47,9 +47,12 @@ const populates = {
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<ExpenseReport, ExpenseReport>) {
-  await populateSelected(this, populates)
-})
+schema.pre(
+  /^find((?!Update).)*$/,
+  async function (this: Query<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReport<Types.ObjectId, mongo.Binary>>) {
+    await populateSelected(this, populates)
+  }
+)
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {
   for (const historyId of this.history) {
@@ -65,7 +68,9 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Expens
 })
 
 schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
-  const doc = await model<ExpenseReport, ExpenseReportModel>('ExpenseReport').findOne({ _id: this._id }, { history: 0 }).lean()
+  const doc = await model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport')
+    .findOne({ _id: this._id }, { history: 0 })
+    .lean()
   if (!doc) {
     throw new Error('Expense Report not found')
   }
@@ -88,7 +93,7 @@ schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) 
 
 schema.methods.addComment = function (this: ExpenseReportDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<ExpenseReportState>)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, ExpenseReportState>)
     this.comment = undefined
   }
 }
@@ -101,7 +106,7 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this) as AddUp<ExpenseReport>[]
+  this.addUp = addUp(this) as AddUp<Types.ObjectId, ExpenseReport<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)
 })
@@ -113,6 +118,6 @@ schema.post('save', async function (this: ExpenseReportDoc) {
   }
 })
 
-export default model<ExpenseReport, ExpenseReportModel>('ExpenseReport', schema)
+export default model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport', schema)
 
-export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport> {}
+export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport<Types.ObjectId, mongo.Binary>> {}

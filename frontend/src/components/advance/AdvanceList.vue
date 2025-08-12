@@ -118,7 +118,7 @@
     <template #item-state="{ state }: AdvanceSimple">
       <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block"></StateBadge>
     </template>
-    <template #item-organisation="{ project }: AdvanceSimple">
+    <template #item-organisation="{ project }: AdvanceSimple<string>">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
     <template #item-budget="{ budget }: AdvanceSimple">

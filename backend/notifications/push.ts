@@ -1,16 +1,22 @@
 import { SessionData } from 'express-session'
+import { Types } from 'mongoose'
 import webpush, { WebPushError } from 'web-push'
 import { User } from './../../common/types.js'
 import { sessionStore } from '../db.js'
+import ENV from '../env.js'
 import { logger } from '../logger.js'
 
 interface SessionWithSubscription extends SessionData {
   subscription: NonNullable<SessionData['subscription']>
 }
 
-export async function sendPushNotification(title: string, body: string, users: User[], url: string) {
-  if (!process.env.VITE_FRONTEND_URL.startsWith('https')) {
+export async function sendPushNotification(title: string, body: string, users: User<Types.ObjectId>[], url: string) {
+  if (!ENV.VITE_FRONTEND_URL.startsWith('https')) {
     logger.debug('Frontend-URL is not HTTPS, Push-Notification sending stopped.')
+    return
+  }
+  if (!ENV.PRIVATE_VAPID_KEY || !ENV.VITE_PUBLIC_VAPID_KEY) {
+    logger.debug('VAPID keys are not set, Push-Notification sending stopped.')
     return
   }
   const payload = JSON.stringify({ title, body, url })
@@ -23,11 +29,7 @@ export async function sendPushNotification(title: string, body: string, users: U
     const latest = userSessions.reduce((max, session) => ((session.cookie.expires || 0) > (max.cookie.expires || 0) ? session : max))
     try {
       await webpush.sendNotification(latest.subscription, payload, {
-        vapidDetails: {
-          subject: process.env.VITE_FRONTEND_URL,
-          publicKey: process.env.VITE_PUBLIC_VAPID_KEY,
-          privateKey: process.env.PRIVATE_VAPID_KEY
-        }
+        vapidDetails: { subject: ENV.VITE_FRONTEND_URL, publicKey: ENV.VITE_PUBLIC_VAPID_KEY, privateKey: ENV.PRIVATE_VAPID_KEY }
       })
       logger.debug(`Send push notification to ${user.email}`)
     } catch (err) {

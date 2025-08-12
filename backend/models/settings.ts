@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from '../../common/types.js'
 
 export const settingsSchema = () => {
@@ -30,7 +30,7 @@ export const settingsSchema = () => {
       description: `description.${policy}`
     }
   }
-  return new Schema<Settings>({
+  return new Schema<Settings<Types.ObjectId>>({
     userCanSeeAllProjects: { type: Boolean, required: true },
     defaultAccess: { type: defaultAccess, required: true },
     disableReportType: { type: disableReportType, required: true },

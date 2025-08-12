@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema } from 'mongoose'
+import mongoose, { HydratedDocument, InferSchemaType, Model, model, Schema, Types } from 'mongoose'
 import { _id, Project, ProjectSimple, ProjectUsers } from '../../common/types.js'
 import { costObject } from './helper.js'
 
@@ -7,10 +7,10 @@ interface Methods {
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type ProjectModel = Model<Project, {}, Methods>
+type ProjectModel = Model<Project<Types.ObjectId>, {}, Methods>
 
 export const projectSchema = () =>
-  new Schema<Project, ProjectModel, Methods>({
+  new Schema<Project<Types.ObjectId>, ProjectModel, Methods>({
     identifier: { type: String, trim: true, required: true, unique: true, index: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
     name: { type: String, trim: true },
@@ -27,7 +27,7 @@ schema.methods.addToBalance = async function (this: ProjectSimpleDoc, reportTota
   if (reportTotal <= 0) {
     return
   }
-  const doc = await model<Project, ProjectModel>('Project').findOne({ _id: this._id }).session(session)
+  const doc = await model<Project<Types.ObjectId>, ProjectModel>('Project').findOne({ _id: this._id }).session(session)
   if (!doc) {
     return
   }
@@ -38,11 +38,11 @@ schema.methods.addToBalance = async function (this: ProjectSimpleDoc, reportTota
 export type ProjectSchema = InferSchemaType<typeof schema>
 export type IProject = ProjectSchema & { _id: _id }
 
-export default model<Project, ProjectModel>('Project', schema)
+export default model<Project<Types.ObjectId>, ProjectModel>('Project', schema)
 
-export interface ProjectDoc extends Methods, HydratedDocument<Project> {}
+export interface ProjectDoc extends Methods, HydratedDocument<Project<Types.ObjectId>> {}
 
-export const projectUsersSchema = new Schema<ProjectUsers>({
+export const projectUsersSchema = new Schema<ProjectUsers<Types.ObjectId>>({
   assignees: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], required: true, label: 'labels.addAssignees' },
   supervisors: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], required: true, label: 'labels.addSupervisors' }
 })

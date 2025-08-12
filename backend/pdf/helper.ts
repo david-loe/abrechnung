@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { getTotalBalance, sanitizeFilename } from '../../common/scripts.js'
 import {
   Advance,
@@ -15,7 +16,9 @@ import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 import { getClient } from '../notifications/mail.js'
 
-export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost | Advance): Promise<string> {
+export async function writeToDiskFilePath(
+  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+): Promise<string> {
   let path = '/reports/'
   let totalSum = ''
   formatter.setLocale(i18n.language as Locale)
@@ -41,7 +44,9 @@ export async function writeToDiskFilePath(report: Travel | ExpenseReport | Healt
   return path
 }
 
-export async function sendViaMail(report: Travel | ExpenseReport | HealthCareCost | Advance) {
+export async function sendViaMail(
+  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+) {
   const connectionSettings = await getConnectionSettings()
   if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
     const org = await Organisation.findOne({ _id: report.project.organisation._id })

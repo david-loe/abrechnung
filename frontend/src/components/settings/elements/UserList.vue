@@ -188,7 +188,7 @@ async function postUser(user: User) {
     APP_LOADER.loadOptional('users')
   }
 }
-async function deleteUser(user: User) {
+async function deleteUser(user: User<string>) {
   const result = await API.deleter('admin/user', { _id: user._id })
   if (result) {
     loadFromServer()

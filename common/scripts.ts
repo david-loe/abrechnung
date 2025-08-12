@@ -4,6 +4,7 @@ import {
   AddUp,
   BaseCurrencyMoney,
   baseCurrency,
+  binary,
   ExpenseReport,
   FlatAddUp,
   HealthCareCost,
@@ -136,7 +137,7 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
 }
 
-export function getLumpSumsSum(days: TravelDay[]) {
+export function getLumpSumsSum(days: TravelDay<_id>[]) {
   let sum = 0
   for (const day of days) {
     sum += day.lumpSums.overnight.refund.amount
@@ -145,15 +146,15 @@ export function getLumpSumsSum(days: TravelDay[]) {
   return { amount: sum }
 }
 
-export function getTotalBalance(addUps: FlatAddUp[]) {
+export function getTotalBalance(addUps: FlatAddUp<_id>[]) {
   return addUps.reduce((sum, a) => sum + a.balance.amount, 0)
 }
 
-export function getTotalTotal(addUps: FlatAddUp[]) {
+export function getTotalTotal(addUps: FlatAddUp<_id>[]) {
   return addUps.reduce((sum, a) => sum + a.total.amount, 0)
 }
 
-export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLumpSums = false) {
+export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], withLumpSums = false) {
   const hasAdvance = addUps.some((addUp) => addUp.advance.amount > 0)
   const showExpenses = withLumpSums || hasAdvance
   const summary: string[][] = []
@@ -179,7 +180,7 @@ export function getAddUpTableData(formatter: Formatter, addUps: AddUp[], withLum
       summary[j++].push(formatter.baseCurrency(addUps[i].expenses.amount))
     }
     if (withLumpSums) {
-      summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<Travel>).lumpSums.amount))
+      summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<_id, Travel<_id, binary>>).lumpSums.amount))
     }
     if (hasAdvance) {
       summary[j++].push(
@@ -206,10 +207,13 @@ export function getBaseCurrencyAmount(a: Money): number {
   return amount
 }
 
-function defaultAddUp(projectId: _id, withLumpSums: true): FlatAddUp<Travel>
-function defaultAddUp(projectId: _id, withLumpSums: false): FlatAddUp<ExpenseReport | HealthCareCost>
-function defaultAddUp(projectId: _id, withLumpSums: boolean): FlatAddUp
-function defaultAddUp(projectId: _id, withLumpSums = false): FlatAddUp {
+function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums: true): FlatAddUp<idType, Travel<idType, binary>>
+function defaultAddUp<idType extends _id>(
+  projectId: idType,
+  withLumpSums: false
+): FlatAddUp<idType, ExpenseReport<idType, binary> | HealthCareCost<idType, binary>>
+function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums: boolean): FlatAddUp<idType>
+function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums = false): FlatAddUp<idType> {
   return {
     project: projectId,
     balance: { amount: 0 },
@@ -221,35 +225,35 @@ function defaultAddUp(projectId: _id, withLumpSums = false): FlatAddUp {
   }
 }
 
-function addToAddUps(
-  addUps: FlatAddUp[],
+function addToAddUps<idType extends _id>(
+  addUps: FlatAddUp<idType>[],
   add: number,
   key: 'balance' | 'total' | 'advance' | 'expenses' | 'lumpSums',
-  project: ProjectSimple | undefined | null,
+  project: ProjectSimple<idType> | undefined | null,
   isTravel = false
 ): void {
   if (project) {
     const projectId = idDocumentToId(project)
-    const addUp = addUps.find((addUp) => idDocumentToId(addUp.project).toString() === projectId.toString())
+    const addUp = addUps.find((addUp) => idDocumentToId<idType>(addUp.project).toString() === projectId.toString())
     if (addUp) {
       if (key in addUp) {
-        ;(addUp as FlatAddUp<Travel>)[key].amount += add
+        ;(addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
       }
     } else {
       const newAddUp = defaultAddUp(projectId, isTravel)
       if (key in newAddUp) {
-        ;(newAddUp as FlatAddUp<Travel>)[key].amount += add
+        ;(newAddUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
       }
       addUps.push(newAddUp)
     }
   } else {
     if (key in addUps[0]) {
-      ;(addUps[0] as FlatAddUp<Travel>)[key].amount += add
+      ;(addUps[0] as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
     }
   }
 }
 
-function addTravelExpensesSum(travel: Travel, addUps: FlatAddUp<Travel>[]) {
+function addTravelExpensesSum<idType extends _id>(travel: Travel<idType, binary>, addUps: FlatAddUp<idType, Travel<idType, binary>>[]) {
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount !== null) {
       let add = getBaseCurrencyAmount(stage.cost)
@@ -270,12 +274,15 @@ function addTravelExpensesSum(travel: Travel, addUps: FlatAddUp<Travel>[]) {
   }
 }
 
-export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report: T): FlatAddUp<T>[] {
+export function addUp<
+  idType extends _id,
+  T extends Travel<idType, binary> | ExpenseReport<idType, binary> | HealthCareCost<idType, binary>
+>(report: T): FlatAddUp<idType, T>[] {
   const isTravel = reportIsTravel(report)
-  const addUps = [defaultAddUp(idDocumentToId(report.project), isTravel) as FlatAddUp<T>]
+  const addUps = [defaultAddUp(idDocumentToId(report.project), isTravel) as FlatAddUp<idType, T>]
   if (reportIsTravel(report)) {
-    ;(addUps[0] as FlatAddUp<Travel>).lumpSums = getLumpSumsSum(report.days)
-    addTravelExpensesSum(report, addUps as FlatAddUp<Travel>[])
+    ;(addUps[0] as FlatAddUp<idType, Travel<_id, binary>>).lumpSums = getLumpSumsSum(report.days)
+    addTravelExpensesSum(report, addUps as FlatAddUp<idType, Travel<_id, binary>>[])
   } else {
     for (const expense of report.expenses) {
       addToAddUps(addUps, getBaseCurrencyAmount(expense.cost), 'expenses', expense.project, isTravel)
@@ -285,7 +292,7 @@ export function addUp<T extends Travel | ExpenseReport | HealthCareCost>(report:
     addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project, isTravel)
   }
   for (const addUp of addUps) {
-    addUp.total.amount = addUp.expenses.amount + ((addUp as FlatAddUp<Travel>).lumpSums?.amount || 0)
+    addUp.total.amount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
     let balanceAmount = addUp.total.amount - addUp.advance.amount
     if (balanceAmount < 0) {
       addUp.advanceOverflow = true

@@ -24,7 +24,7 @@ export class ApprovedTravelController extends Controller {
   public async getReport(
     @Query() from: Date,
     @Query() to: Date,
-    @Query() organisationId: _id | undefined | null,
+    @Query() organisationId: string | undefined | null,
     @Request() request: AuthenticatedExpressRequest
   ) {
     const travels = await ApprovedTravel.find({

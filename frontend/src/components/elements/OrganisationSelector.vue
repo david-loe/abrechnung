@@ -18,11 +18,16 @@ import { OrganisationSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
-const props = defineProps<{ modelValue: OrganisationSimple | null; required?: boolean; disabled?: boolean; updateUserOrg?: boolean }>()
+const props = defineProps<{
+  modelValue: OrganisationSimple<string> | null
+  required?: boolean
+  disabled?: boolean
+  updateUserOrg?: boolean
+}>()
 
 const selectedOrg = ref(props.modelValue)
 
-const emit = defineEmits<{ 'update:modelValue': [OrganisationSimple] }>()
+const emit = defineEmits<{ 'update:modelValue': [OrganisationSimple<string>] }>()
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data

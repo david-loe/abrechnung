@@ -11,13 +11,15 @@ COPY frontend/nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /app
 
+COPY common ../common
+RUN npm install --prefix ../common
+RUN npm run --prefix ../common build
+
 COPY frontend/package*.json ./
 
 RUN npm install
 
 COPY frontend/ .
-
-COPY common /common
 
 ENTRYPOINT [ "/bin/sh", "-c" ]
 

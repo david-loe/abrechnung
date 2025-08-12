@@ -1,8 +1,7 @@
 import { Readable } from 'node:stream'
-import { Condition } from 'mongoose'
+import { Condition, mongo, Types } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import {
-  _id,
   Expense,
   ExpenseReportState,
   IdDocument,
@@ -11,6 +10,7 @@ import {
   Locale,
   State
 } from '../../common/types.js'
+import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -38,15 +38,15 @@ export class ExpenseReportController extends Controller {
     })
   }
   @Delete()
-  public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(ExpenseReport, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToOwn(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Expense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -55,7 +55,7 @@ export class ExpenseReportController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(ExpenseReport, {
-      requestBody,
+      requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -73,7 +73,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpenseFromOwn(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
@@ -91,7 +91,13 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument; _id?: _id; name?: string; advances?: IdDocument[]; category?: IdDocument },
+    @Body() requestBody: {
+      project?: IdDocument<Types.ObjectId>
+      _id?: string
+      name?: string
+      advances?: IdDocument<Types.ObjectId>[]
+      category?: IdDocument<Types.ObjectId>
+    },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
@@ -126,7 +132,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('underExamination')
   public async postOwnUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_REVIEW, editor: request.user._id })
@@ -147,7 +153,7 @@ export class ExpenseReportController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReportForOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReportForOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const expenseReport = await ExpenseReport.findOne({
       _id: _id,
       owner: request.user._id,
@@ -195,7 +201,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete()
-  public async delete(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async delete(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: ExpenseReportDoc) {
@@ -207,8 +213,8 @@ export class ExpenseReportExamineController extends Controller {
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToAny(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Expense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -217,7 +223,7 @@ export class ExpenseReportExamineController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(ExpenseReport, {
-      requestBody,
+      requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -239,7 +245,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpenseFromAny(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
       _id,
       parentId,
@@ -261,7 +267,13 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post()
   public async postAny(
-    @Body() requestBody: { project?: IdDocument; _id: _id; name?: string; advances?: IdDocument[]; category?: IdDocument },
+    @Body() requestBody: {
+      project?: IdDocument<Types.ObjectId>
+      _id: string
+      name?: string
+      advances?: IdDocument<Types.ObjectId>[]
+      category?: IdDocument<Types.ObjectId>
+    },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
@@ -280,12 +292,12 @@ export class ExpenseReportExamineController extends Controller {
   public async postBackInWork(
     @Body()
     requestBody: {
-      project?: IdDocument
-      _id?: _id
+      project?: IdDocument<Types.ObjectId>
+      _id?: string
       name?: string
-      advances?: IdDocument[]
-      category?: IdDocument
-      owner?: IdDocument
+      advances?: IdDocument<Types.ObjectId>[]
+      category?: IdDocument<Types.ObjectId>
+      owner?: IdDocument<Types.ObjectId>
       comment?: string
     },
     @Request() request: AuthenticatedExpressRequest
@@ -313,15 +325,15 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('reviewCompleted')
   public async postReviewCompleted(
-    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
+    @Body() requestBody: { _id: string; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (expenseReport: IExpenseReport) => {
+    const cb = async (expenseReport: IExpenseReport<Types.ObjectId>) => {
       sendNotification(expenseReport)
       sendViaMail(expenseReport)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
         await writeToDisk(await writeToDiskFilePath(expenseReport), await reportPrinter.print(expenseReport, i18n.language as Locale))
       }
     }
@@ -342,7 +354,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('underExamination')
   public async postAnyUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_REVIEW, editor: request.user._id })
@@ -363,7 +375,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -402,7 +414,7 @@ export class ExpenseReportBookableController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -419,7 +431,7 @@ export class ExpenseReportBookableController extends Controller {
   }
 
   @Post('booked')
-  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+  public async postBooked(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
     const results = await Promise.allSettled(
       requestBody.map((id) => {
         const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }

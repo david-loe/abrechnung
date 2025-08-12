@@ -1,8 +1,8 @@
 import pdf_lib from 'pdf-lib'
-import { ApprovedTravel, Locale, Place } from '../../common/types.js'
+import { _id, ApprovedTravel, Locale, Place } from '../../common/types.js'
 import { Column, PDFDrawer, Printer } from './printer.js'
 
-export class ApprovedTravelsPrinter extends Printer {
+export class ApprovedTravelsPrinter<idType extends _id> extends Printer<idType> {
   allowSpouseRefund?: boolean
 
   setAllowSpouseRefund(allowSpouseRefund: boolean) {

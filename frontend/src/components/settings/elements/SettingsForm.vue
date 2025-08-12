@@ -23,7 +23,7 @@ export default defineComponent({
   },
   methods: {
     async postSettings(settings: Settings) {
-      const result = await API.setter<Settings>('admin/settings', settings)
+      const result = await API.setter<Settings<string>>('admin/settings', settings)
       if (result.ok && APP_DATA.value) {
         APP_DATA.value?.setSettings(result.ok)
         ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.settings, false)

@@ -164,7 +164,7 @@
             <tbody>
               <tr
                 v-for="expense of allExpenses"
-                :key="(expense as Expense)._id || (expense as ExpenseDraft).id"
+                :key="(expense as Expense<string>)._id || (expense as ExpenseDraft).id"
                 style="cursor: pointer"
                 @click="showModal('edit', 'expense', expense)"
                 :class="(expense as Expense)._id ? '' : 'table-warning'">
@@ -328,11 +328,11 @@ type ExpenseDraft = {
   note?: string
   id: number
 }
-interface ExpenseReportWithDrafts extends ExpenseReport {
+interface ExpenseReportWithDrafts extends ExpenseReport<string> {
   drafts?: ExpenseDraft[]
 }
 
-const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport)
+const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport<string>)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
@@ -405,7 +405,7 @@ async function toExamination() {
 }
 
 async function backToInWork() {
-  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/inWork`, {
+  const result = await API.setter<ExpenseReport<string>>(`${props.endpointPrefix}expenseReport/inWork`, {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment
   })
@@ -419,7 +419,7 @@ async function backToInWork() {
 }
 
 async function completeReview() {
-  const result = await API.setter<ExpenseReport>('examine/expenseReport/reviewCompleted', {
+  const result = await API.setter<ExpenseReport<string>>('examine/expenseReport/reviewCompleted', {
     _id: expenseReport.value._id,
     comment: expenseReport.value.comment,
     bookingRemark: expenseReport.value.bookingRemark
@@ -435,7 +435,7 @@ async function postExpense(expense: Expense) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/expense`, expense, {
+  const result = await API.setter<ExpenseReport<string>>(`${props.endpointPrefix}expenseReport/expense`, expense, {
     headers,
     params: { parentId: expenseReport.value._id }
   })
@@ -456,14 +456,14 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setExpenseReport(result as ExpenseReport)
+    setExpenseReport(result as ExpenseReport<string>)
     resetAndHide()
   }
 }
 
 async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
   modalFormIsLoading.value = true
-  const result = await API.setter<ExpenseReport>(
+  const result = await API.setter<ExpenseReport<string>>(
     `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
     updatedExpenseReport
   )
@@ -478,14 +478,14 @@ async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
 
 async function getExpenseReport() {
   const params = { _id: props._id, additionalFields: ['expenses'] }
-  const response = await API.getter<ExpenseReport>(`${props.endpointPrefix}expenseReport`, params)
+  const response = await API.getter<ExpenseReport<string>>(`${props.endpointPrefix}expenseReport`, params)
   const result = response.ok
   if (result) {
     setExpenseReport(result.data)
   }
 }
 
-function setExpenseReport(er: ExpenseReport) {
+function setExpenseReport(er: ExpenseReport<string>) {
   const drafts = expenseReport.value.drafts || []
   expenseReport.value = er
   expenseReport.value.drafts = drafts

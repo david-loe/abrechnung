@@ -115,7 +115,7 @@ async function postHealthInsurance(healthInsurance: HealthInsurance) {
     APP_LOADER.loadRequired('healthInsurance')
   }
 }
-async function deleteHealthInsurance(healthInsurance: HealthInsurance) {
+async function deleteHealthInsurance(healthInsurance: HealthInsurance<string>) {
   const result = await API.deleter('admin/healthInsurance', { _id: healthInsurance._id })
   if (result) {
     loadFromServer()

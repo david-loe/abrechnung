@@ -58,7 +58,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   multiple: { type: Boolean, default: false },
-  owner: { type: Object as PropType<UserWithName> },
+  owner: { type: Object as PropType<UserWithName<string>> },
   endpointPrefix: { type: String, default: '' }
 })
 

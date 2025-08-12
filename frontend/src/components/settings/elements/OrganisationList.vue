@@ -107,7 +107,7 @@ async function postOrganisation(organisation: Organisation) {
     APP_LOADER.loadRequired('organisation')
   }
 }
-async function deleteOrganisation(organisation: Organisation) {
+async function deleteOrganisation(organisation: Organisation<string>) {
   const result = await API.deleter('admin/organisation', { _id: organisation._id })
   if (result) {
     loadFromServer()

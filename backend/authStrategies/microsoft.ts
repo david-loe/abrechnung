@@ -1,6 +1,7 @@
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft'
 import { microsoftSettings } from '../../common/types.js'
 import { getConnectionSettings } from '../db.js'
+import ENV from '../env.js'
 import { displayNameSplit, findOrCreateUser } from './index.js'
 
 interface msProfile {
@@ -36,7 +37,7 @@ export async function getMicrosoftStrategy() {
     {
       clientID: config.clientId,
       clientSecret: config.clientSecret,
-      callbackURL: `${process.env.VITE_BACKEND_URL}/auth/microsoft/callback`,
+      callbackURL: `${ENV.VITE_BACKEND_URL}/auth/microsoft/callback`,
       tenant: config.tenant,
       scope: ['user.read']
     },

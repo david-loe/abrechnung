@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import { TravelSettings as ITravelSettings, locales } from '../../common/types.js'
 import TravelSettings, { travelSettingsSchema } from '../models/travelSettings.js'
@@ -21,7 +22,7 @@ export class TravelSettingsController extends Controller {
 @Security('httpBearer', ['admin'])
 export class TravelSettingsAdminController extends Controller {
   @Post()
-  public async post(@Body() requestBody: SetterBody<ITravelSettings>) {
+  public async post(@Body() requestBody: SetterBody<ITravelSettings<Types.ObjectId>>) {
     return await this.setter(TravelSettings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')

@@ -184,7 +184,7 @@
           <div
             v-for="row of table"
             class="mb-2"
-            :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as TravelRecord | TravelDay)._id">
+            :key="row.type === 'gap' ? (row.data as Gap).departure.toString() : (row.data as TravelRecord<string> | TravelDay<string>)._id">
             <!-- day -->
             <div v-if="row.type === 'day'" class="row align-items-center mt-3">
               <div class="col-auto">
@@ -432,7 +432,7 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 
-const travel = ref<Travel>({} as Travel)
+const travel = ref<Travel<string>>({} as Travel<string>)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('stage')
@@ -486,7 +486,7 @@ function resetAndHide() {
 async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlaceOfWork']) {
   const travelObj = { _id: travel.value._id, lastPlaceOfWork, days }
   modalFormIsLoading.value = true
-  const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, travelObj)
+  const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel`, travelObj)
   modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
@@ -499,7 +499,7 @@ async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlac
 async function editTravelDetails(updatedTravel: Travel) {
   if (props.endpointPrefix === 'examine/') {
     modalFormIsLoading.value = true
-    const result = await API.setter<Travel>(`${props.endpointPrefix}travel`, updatedTravel)
+    const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel`, updatedTravel)
     modalFormIsLoading.value = false
     if (result.ok) {
       setTravel(result.ok)
@@ -544,7 +544,7 @@ async function toExamination() {
 }
 
 async function backToApproved() {
-  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/approved`, {
+  const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel/approved`, {
     _id: travel.value._id,
     comment: travel.value.comment
   })
@@ -558,7 +558,7 @@ async function backToApproved() {
 }
 
 async function completeReview() {
-  const result = await API.setter<Travel>('examine/travel/reviewCompleted', {
+  const result = await API.setter<Travel<string>>('examine/travel/reviewCompleted', {
     _id: travel.value._id,
     comment: travel.value.comment,
     bookingRemark: travel.value.bookingRemark
@@ -577,7 +577,10 @@ async function postStage(stage: Stage) {
     stage.cost.amount = 0
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/stage`, stage, { headers, params: { parentId: travel.value._id } })
+  const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel/stage`, stage, {
+    headers,
+    params: { parentId: travel.value._id }
+  })
   modalFormIsLoading.value = false
   if (result.ok) {
     setTravel(result.ok)
@@ -598,7 +601,7 @@ async function deleteStage(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}travel/stage`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setTravel(result as Travel)
+    setTravel(result as Travel<string>)
     resetAndHide()
   }
 }
@@ -609,7 +612,7 @@ async function postExpense(expense: TravelExpense) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<Travel>(`${props.endpointPrefix}travel/expense`, expense, {
+  const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel/expense`, expense, {
     headers,
     params: { parentId: travel.value._id }
   })
@@ -625,13 +628,13 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}travel/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setTravel(result as Travel)
+    setTravel(result as Travel<string>)
     resetAndHide()
   }
 }
 
 async function postVehicleRegistration(vehicleRegistration: DocumentFile[]) {
-  const result = await API.setter<User>(
+  const result = await API.setter<User<string>>(
     `${props.endpointPrefix}user/vehicleRegistration`,
     { vehicleRegistration },
     { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -705,13 +708,13 @@ function renderTable() {
 
 async function getTravel() {
   const params = { _id: props._id, additionalFields: ['stages', 'expenses', 'days'] }
-  const res = (await API.getter<Travel>(`${props.endpointPrefix}travel`, params)).ok
+  const res = (await API.getter<Travel<string>>(`${props.endpointPrefix}travel`, params)).ok
   if (res) {
     setTravel(res.data)
   }
 }
 
-function setTravel(newTravel: Travel) {
+function setTravel(newTravel: Travel<string>) {
   travel.value = newTravel
   logger.info(`${t('labels.travel')}:`)
   logger.info(travel.value)

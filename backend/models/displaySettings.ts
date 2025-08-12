@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import {
   Access,
   AnyState,
@@ -46,7 +46,7 @@ export const displaySettingsSchema = () => {
     reportTypeIcons[reportType] = { type: [{ type: String, required: true }], required: true }
   }
 
-  return new Schema<DisplaySettings>(
+  return new Schema<DisplaySettings<Types.ObjectId>>(
     {
       auth: {
         type: {

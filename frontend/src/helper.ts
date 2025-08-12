@@ -6,9 +6,10 @@
 import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from '@/api'
+import ENV from '@/env'
 
 export async function subscribeToPush() {
-  if (!('PushManager' in window) || !import.meta.env.VITE_PUBLIC_VAPID_KEY) {
+  if (!('PushManager' in window) || !ENV.VITE_PUBLIC_VAPID_KEY) {
     return
   }
   if (Notification.permission === 'default') {
@@ -17,7 +18,7 @@ export async function subscribeToPush() {
   if (!(Notification.permission === 'granted')) {
     return
   }
-  const options = { userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_PUBLIC_VAPID_KEY) }
+  const options = { userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(ENV.VITE_PUBLIC_VAPID_KEY) }
   const registration = await window.navigator.serviceWorker.getRegistration()
   if (!registration) {
     return
@@ -26,7 +27,7 @@ export async function subscribeToPush() {
   if (!subscription) {
     return
   }
-  await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/subscription`, {
+  await fetch(`${ENV.VITE_BACKEND_URL}/user/subscription`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(subscription),

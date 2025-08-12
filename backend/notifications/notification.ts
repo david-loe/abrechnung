@@ -18,6 +18,7 @@ import {
   TravelState
 } from '../../common/types.js'
 import { getDisplaySettings } from '../db.js'
+import ENV from '../env.js'
 import { formatter } from '../factory.js'
 import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
@@ -49,18 +50,16 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
-    button.link = `${process.env.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
+    button.link = `${ENV.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
   } else if (report.state === State.IN_REVIEW) {
     userFilter[`access.examine/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
-    button.link = `${process.env.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
+    button.link = `${ENV.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
     // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED'
     userFilter._id = report.owner._id
     button.link =
-      report.state === State.REJECTED
-        ? `${process.env.VITE_FRONTEND_URL}/${reportType}`
-        : `${process.env.VITE_FRONTEND_URL}/${reportType}/${report._id}`
+      report.state === State.REJECTED ? `${ENV.VITE_FRONTEND_URL}/${reportType}` : `${ENV.VITE_FRONTEND_URL}/${reportType}/${report._id}`
   }
   recipients = await User.find(userFilter).lean()
   if (recipients.length === 0) {

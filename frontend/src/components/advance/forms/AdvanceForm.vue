@@ -73,7 +73,7 @@ import UserSelector from '@/components/elements/UserSelector.vue'
 const { t } = useI18n()
 
 const props = defineProps({
-  advance: { type: Object as PropType<Partial<AdvanceSimple>>, required: true },
+  advance: { type: Object as PropType<Partial<AdvanceSimple<string>>>, required: true },
   mode: { type: String as PropType<'add' | 'edit'>, required: true },
   disabled: { type: Boolean, default: false },
   askOwner: { type: Boolean, default: false },
@@ -92,8 +92,8 @@ function defaultAdvance() {
     name: undefined as string | undefined,
     reason: undefined as string | undefined,
     budget: { amount: null as number | null, currency: baseCurrency },
-    owner: undefined as UserWithNameAndProject | undefined,
-    project: undefined as Project | undefined,
+    owner: undefined as UserWithNameAndProject<string> | undefined,
+    project: undefined as Project<string> | undefined,
     comment: undefined as string | undefined,
     bookingRemark: undefined as string | undefined
   }
@@ -104,7 +104,7 @@ function input() {
 }
 
 function output() {
-  return formAdvance.value as Partial<AdvanceSimple>
+  return formAdvance.value as Partial<AdvanceSimple<string>>
 }
 
 watch(

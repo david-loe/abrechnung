@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "abrechnung-common": "file:../common",
     "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "connect-mongo": "^5.1.0",
@@ -59,8 +60,8 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
-    "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/app/server.js'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
+    "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/app/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/build/server.js",
     "test": "npm run build && npm run _test:$NODE_ENV",

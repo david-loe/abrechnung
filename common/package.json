@@ -2,5 +2,20 @@
   "name": "abrechnung-common",
   "version": "2.1.7",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    "./*": "./dist/*.js"
+  },
+  "dependencies": {
+    "envalid": "^8.1.0"
+  },
+  "scripts": {
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'npx tsc'",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "mongoose": "^8.17.1",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.9.2"
+  }
 }

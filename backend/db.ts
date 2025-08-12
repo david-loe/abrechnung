@@ -1,6 +1,6 @@
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, Model } from 'mongoose'
+import mongoose, { Connection, Model, Types } from 'mongoose'
 import { mergeDeep } from '../common/scripts.js'
 import {
   CountryLumpSum,
@@ -20,6 +20,7 @@ import healthInsurances from './data/healthInsurances.json' with { type: 'json' 
 import printerSettings from './data/printerSettings.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
 import travelSettings from './data/travelSettings.json' with { type: 'json' }
+import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'
 import Category from './models/category.js'
@@ -38,7 +39,7 @@ export function connectDB() {
     mongoose.connection.on('connected', () => logger.debug('Connected to Database'))
     mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
     connectionPromise = (async () => {
-      const mongoDB = await mongoose.connect(process.env.MONGO_URL)
+      const mongoDB = await mongoose.connect(ENV.MONGO_URL)
       await initDB()
       return mongoDB.connection
     })()
@@ -91,13 +92,13 @@ export async function initDB() {
     await mongoose.connection.collection('printersettings').insertOne(printerSettings)
   }
 
-  if (process.env.NODE_ENV === 'production') {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd as Partial<IConnectionSettings>])
+  if (ENV.NODE_ENV === 'production') {
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd])
   } else {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDev as Partial<IConnectionSettings>], true)
+    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDev as Partial<IConnectionSettings<Types.ObjectId>>], true)
   }
 
-  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings>])
+  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings<Types.ObjectId>>])
 
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
