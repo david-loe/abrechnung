@@ -51,18 +51,19 @@ const frontendEnvConfig = {
 
 const backendEnvConfig = Object.assign({}, frontendEnvConfig, {
   NODE_ENV: str({ choices: ['development', 'production'] }),
+  COOKIE_SECRET: notEmptyString({ desc: "Cookie Secret (use something like: 'openssl rand -base64 30')" }),
+  MAGIC_LOGIN_SECRET: notEmptyString({ desc: "Secret for magic login links (use something like: 'openssl rand -base64 60')" }),
+  MONGO_URL: notEmptyString({ desc: 'MongoDB connection string' }),
+  BACKEND_PORT: port({ desc: 'Port the backend listens on' }),
+
+  COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
+  PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
+  LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),
   TZ: notEmptyString({
     default: 'Etc/UTC',
     desc: 'Timezone - find yours here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones'
   }),
-  COOKIE_SECRET: notEmptyString({ desc: "Cookie Secret (use something like: 'openssl rand -base64 30')" }),
-  COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
   TRUST_PROXY: trustProxy({ default: false }),
-  MAGIC_LOGIN_SECRET: notEmptyString({ desc: "Secret for magic login links (use something like: 'openssl rand -base64 60')" }),
-  PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
-  BACKEND_PORT: port({ default: 8000, desc: 'Port the backend listens on' }),
-  LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),
-  MONGO_URL: notEmptyString({ desc: 'MongoDB connection string' }),
   RATE_LIMIT_WINDOW_MS: int({ default: undefined, desc: 'How long to remember requests for, in milliseconds (empty for no limit)' }),
   RATE_LIMIT: int({ default: undefined, desc: 'How many requests to allow (empty for no limit)' }),
   BACKEND_SAVE_REPORTS_ON_DISK: bool({
