@@ -17,17 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: copy .env file
-        uses: canastro/copy-file-action@ae66602ce7d214dbd2e298c1db67a81388755a0a # master
-        with:
-          source: '.env.example'
-          target: '.env'
-      - name: Set production mode in .env
-        uses: jacobtomlinson/gha-find-replace@2ff30f644d2e0078fc028beb9193f5ff0dcad39e # v3
-        with:
-          find: 'NODE_ENV=development'
-          replace: 'NODE_ENV=production'
-          include: '.env'
+      - uses: ./.github/actions/setup-production-env
       - name: Build
         run: docker compose up -d --build backend
       - name: Copy open api spec

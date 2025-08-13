@@ -81,8 +81,8 @@
   </div>
 </template>
 <script lang="ts">
+import { User } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { User } from '@/../../common/types'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 

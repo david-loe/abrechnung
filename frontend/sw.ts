@@ -1,12 +1,13 @@
 /// <reference lib="webworker" />
 
+import { escapeRegExp } from 'abrechnung-common/scripts.js'
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'
 import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import ENV from '@/env.js'
 import { readRequestFromDB, storeRequestToDB } from '@/indexedDB'
 import { logger } from '@/logger.js'
-import { escapeRegExp } from '../common/scripts'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -14,8 +15,8 @@ declare let self: ServiceWorkerGlobalScope
 // Constants
 // -----------------------------------------------------------------------------
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL
+const BACKEND_URL = ENV.VITE_BACKEND_URL
+const FRONTEND_URL = ENV.VITE_FRONTEND_URL
 
 // Routes denylist for SPA navigation
 const denylist = []
@@ -66,7 +67,7 @@ registerRoute(
  * NetworkFirst strategy with IndexedDB fallback for GET requests.
  */
 async function networkFirstWithDBFallback({ request }: { request: Request }) {
-  const url = request.url.replace(import.meta.env.VITE_BACKEND_URL, '')
+  const url = request.url.replace(ENV.VITE_BACKEND_URL, '')
   try {
     const response = await fetch(request)
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {

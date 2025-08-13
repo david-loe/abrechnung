@@ -4,7 +4,7 @@ import 'vue3-easy-data-table'
 declare module 'vue3-easy-data-table' {
   const component: DefineComponent
   export default component
-  export {
+  export type {
     BodyItemClassNameFunction,
     BodyRowClassNameFunction,
     ClickRowArgument,

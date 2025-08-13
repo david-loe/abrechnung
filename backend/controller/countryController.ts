@@ -1,5 +1,5 @@
+import { CountryCode, Country as ICountry, locales } from 'abrechnung-common/types.js'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { _id, Country as ICountry, locales } from '../../common/types.js'
 import Country, { countrySchema } from '../models/country.js'
 import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
@@ -51,7 +51,7 @@ export class CountryAdminController extends Controller {
     return await this.insertMany(Country, { requestBody })
   }
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: CountryCode) {
     return await this.deleter(Country, {
       _id: _id,
       referenceChecks: [

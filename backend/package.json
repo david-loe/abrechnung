@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "abrechnung-common": "file:../common",
     "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "connect-mongo": "^5.1.0",
@@ -59,16 +60,12 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/app/server.js'",
-    "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --watch '../common/**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/app/server.js'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/server.js'",
+    "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/server.js'",
     "build": "tsoa spec-and-routes && tsc",
-    "start": "node dist/build/server.js",
-    "test": "npm run build && npm run _test:$NODE_ENV",
-    "_test:production": "ava --serial --timeout=1m dist/build/tests/**/* ",
-    "_test:development": "ava --serial --timeout=1m dist/app/tests/**/* ",
-    "test:debug": "ava debug --host 0.0.0.0 --port $BACKEND_DEBUG_PORT --serial dist/app/tests/api/travel.js",
-    "setup": "npm run build && npm run _setup:$NODE_ENV",
-    "_setup:production": "node dist/build/setup.js",
-    "_setup:development": "node dist/app/setup.js"
+    "start": "node dist/server.js",
+    "test": "npm run build && ava --serial --timeout=1m dist/tests/**/* ",
+    "test:debug": "ava debug --host 0.0.0.0 --port $BACKEND_DEBUG_PORT --serial dist/tests/api/travel.js",
+    "setup": "npm run build && node dist/setup.js"
   }
 }

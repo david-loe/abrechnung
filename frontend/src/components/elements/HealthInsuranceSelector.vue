@@ -6,8 +6,8 @@
     :placeholder="placeholder"
     @update:modelValue="updateInsurance"
     :filter="filter"
-    :getOptionKey="(option: HealthInsurance) => option._id"
-    :getOptionLabel="(option: HealthInsurance) => option.name"
+    :getOptionKey="(option: HealthInsurance<string>) => option._id"
+    :getOptionLabel="(option: HealthInsurance<string>) => option.name"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name }">
@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts">
+import { HealthInsurance, User } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { HealthInsurance, User } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -34,7 +34,7 @@ export default defineComponent({
     return { APP_DATA: APP_LOADER.data }
   },
   props: {
-    modelValue: { type: Object as PropType<HealthInsurance> },
+    modelValue: { type: Object as PropType<HealthInsurance<string>> },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     placeholder: { type: String, default: '' },
@@ -42,10 +42,10 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    filter(options: HealthInsurance[], search: string): HealthInsurance[] {
+    filter(options: HealthInsurance<string>[], search: string): HealthInsurance<string>[] {
       return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
     },
-    updateInsurance(insurance: HealthInsurance) {
+    updateInsurance(insurance: HealthInsurance<string>) {
       if (this.updateUserInsurance && this.APP_DATA) {
         this.APP_DATA.user.settings.insurance = insurance
         API.setter('user/settings', { insurance } as Partial<User['settings']>, {}, false)

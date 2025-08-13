@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts">
+import { Currency, Locale } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { Currency, Locale } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 
 export default defineComponent({

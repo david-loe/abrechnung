@@ -264,11 +264,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { getTotalTotal, mailToLink } from '@/../../common/scripts.js'
+import { getTotalTotal, mailToLink } from 'abrechnung-common/scripts.js'
 import {
   DocumentFile,
   Expense,
@@ -278,12 +274,14 @@ import {
   Organisation,
   State,
   UserSimple
-} from '@/../../common/types.js'
+} from 'abrechnung-common/types.js'
+import type { PropType } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
-import FileUpload from '@/components/elements/FileUpload.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
@@ -308,7 +306,7 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 
-const healthCareCost = ref<HealthCareCost>({} as HealthCareCost)
+const healthCareCost = ref<HealthCareCost<string>>({} as HealthCareCost<string>)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
@@ -373,7 +371,7 @@ async function toExamination() {
 }
 
 async function backToInWork() {
-  const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/inWork`, {
+  const result = await API.setter<HealthCareCost<string>>(`${props.endpointPrefix}healthCareCost/inWork`, {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment
   })
@@ -387,7 +385,7 @@ async function backToInWork() {
 }
 
 async function completeReview() {
-  const result = await API.setter<HealthCareCost>('examine/healthCareCost/reviewCompleted', {
+  const result = await API.setter<HealthCareCost<string>>('examine/healthCareCost/reviewCompleted', {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment,
     bookingRemark: healthCareCost.value.bookingRemark
@@ -403,7 +401,7 @@ async function postExpense(expense: Expense) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/expense`, expense, {
+  const result = await API.setter<HealthCareCost<string>>(`${props.endpointPrefix}healthCareCost/expense`, expense, {
     headers,
     params: { parentId: healthCareCost.value._id }
   })
@@ -419,14 +417,14 @@ async function deleteExpense(_id: string) {
   const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
   modalFormIsLoading.value = false
   if (result) {
-    setHealthCareCost(result as HealthCareCost)
+    setHealthCareCost(result as HealthCareCost<string>)
     resetAndHide()
   }
 }
 
 async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) {
   modalFormIsLoading.value = true
-  const result = await API.setter<HealthCareCost>(
+  const result = await API.setter<HealthCareCost<string>>(
     `${props.endpointPrefix}healthCareCost${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
     updatedHealthCareCost
   )
@@ -441,13 +439,13 @@ async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) 
 
 async function getHealthCareCost() {
   const params = { _id: props._id, additionalFields: ['expenses'] }
-  const result = (await API.getter<HealthCareCost>(`${props.endpointPrefix}healthCareCost`, params)).ok
+  const result = (await API.getter<HealthCareCost<string>>(`${props.endpointPrefix}healthCareCost`, params)).ok
   if (result) {
     setHealthCareCost(result.data)
   }
 }
 
-function setHealthCareCost(newHealthCareCost: HealthCareCost) {
+function setHealthCareCost(newHealthCareCost: HealthCareCost<string>) {
   healthCareCost.value = newHealthCareCost
   logger.info(`${t('labels.healthCareCost')}:`)
   logger.info(healthCareCost.value)

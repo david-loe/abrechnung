@@ -1,19 +1,18 @@
 import fs from 'node:fs/promises'
-import pdf_fontkit from 'pdf-fontkit'
-import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
-import Formatter from '../../common/formatter.js'
-import { hexToRGB } from '../../common/scripts.js'
+import Formatter from 'abrechnung-common/formatter.js'
+import { hexToRGB } from 'abrechnung-common/scripts.js'
 import {
   _id,
   CountryCode,
   CountrySimple,
-  DocumentFile,
   DocumentFileType,
   Locale,
   PageOrientation,
   PrinterSettings,
   PrintSettingsBase
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import pdf_fontkit from 'pdf-fontkit'
+import pdf_lib, { PDFName, PDFString } from 'pdf-lib'
 
 export interface PrintSettings extends PrintSettingsBase {
   language: Locale
@@ -49,28 +48,30 @@ export interface Column<Type extends {} = any> {
   countryCodeForFlag?: (p: any) => CountryCode
 }
 
-interface ReceiptMapEntry extends DocumentFile {
+interface ReceiptMapEntry<idType extends _id> {
   number: number
   date: Date
   noNumberPrint?: boolean
+  _id: idType
+  type: DocumentFileType
 }
-export interface ReceiptMap {
-  [key: string]: ReceiptMapEntry
+export interface ReceiptMap<idType extends _id> {
+  [key: string]: ReceiptMapEntry<idType>
 }
 
-export class Printer {
+export class Printer<idType extends _id> {
   formatter: Formatter
   settings: PrinterSettings
-  getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById']
-  getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
+  getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById']
+  getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById']
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
 
   constructor(
     settings: PrinterSettings,
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
-    getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
+    getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById']
   ) {
     this.settings = settings
     this.formatter = formatter
@@ -171,20 +172,20 @@ const layoutMultilineText = (
 const FLAG_PSEUDO_SUFFIX = 'mim'
 export const EMPTY_CELL = '---'
 
-export class PDFDrawer {
+export class PDFDrawer<idType extends _id> {
   font: pdf_lib.PDFFont
   doc: pdf_lib.PDFDocument
   formatter: Formatter
   settings: PrintSettingsWithColorObjects
   currentPage!: pdf_lib.PDFPage
-  getDocumentFileBufferById: (id: _id) => Promise<{ buffer: ArrayBuffer; type: DocumentFileType } | null>
-  getOrganisationLogoIdById: (id: _id) => Promise<{ logoId: _id; website?: string | null } | null>
+  getDocumentFileBufferById: (id: idType) => Promise<{ buffer: ArrayBuffer; type: DocumentFileType } | null>
+  getOrganisationLogoIdById: (id: idType) => Promise<{ logoId: idType; website?: string | null } | null>
 
   constructor(
     settings: PrintSettings,
     doc: pdf_lib.PDFDocument,
-    getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
+    getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
     font: pdf_lib.PDFFont,
     formatter: Formatter
   ) {
@@ -201,10 +202,10 @@ export class PDFDrawer {
     this.newPage()
   }
 
-  static async create(
+  static async create<idType extends _id>(
     settings: PrinterSettings,
-    getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
+    getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
     formatter: Formatter,
     language: Locale,
     defaultPageOrientation: PageOrientation
@@ -304,7 +305,7 @@ export class PDFDrawer {
     })
   }
 
-  drawReceiptNumber(receipt: ReceiptMapEntry) {
+  drawReceiptNumber(receipt: ReceiptMapEntry<idType>) {
     if (receipt.noNumberPrint) {
       return
     }
@@ -325,7 +326,7 @@ export class PDFDrawer {
     })
   }
 
-  async attachReceipts(receiptMap: ReceiptMap) {
+  async attachReceipts(receiptMap: ReceiptMap<idType>) {
     for (const receiptId in receiptMap) {
       const receipt = receiptMap[receiptId]
       const doc = await this.getDocumentFileBufferById(receipt._id)
@@ -420,7 +421,7 @@ export class PDFDrawer {
     this.drawText(title, { xStart: options.xStart + logoSize + options.fontSize / 4, yStart: y, fontSize: options.fontSize })
   }
 
-  async drawOrganisationLogo(organisationId: _id, options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }) {
+  async drawOrganisationLogo(organisationId: idType, options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }) {
     const orga = await this.getOrganisationLogoIdById(organisationId)
     if (!orga) {
       return

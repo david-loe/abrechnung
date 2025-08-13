@@ -114,8 +114,8 @@
 </template>
 
 <script lang="ts">
+import { convertGermanDateToHTMLDate } from 'abrechnung-common/scripts.js'
 import { defineComponent } from 'vue'
-import { convertGermanDateToHTMLDate } from '@/../../common/scripts.js'
 import APP_LOADER from '@/appData.js'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import CategoryList from '@/components/settings/elements/CategoryList.vue'

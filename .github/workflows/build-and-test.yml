@@ -19,6 +19,6 @@ jobs:
           source: '.env.example'
           target: '.env'
       - name: Start dev Environment
-        run: docker compose up -d db ldap inbucket
+        run: docker compose up -d common db ldap inbucket
       - name: Run Tests
         run: docker compose run backend npm run test

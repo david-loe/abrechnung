@@ -8,7 +8,7 @@ services:
       - db
     volumes:
       - ./backend:/app
-      - ./common:/common
+      - ./common:/common:ro
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
       - ${BACKEND_DEBUG_PORT}:${BACKEND_DEBUG_PORT}
@@ -37,6 +37,14 @@ services:
       - ${FRONTEND_PORT}:80
     env_file:
       - .env
+
+  # Watch build in development mode
+  common:
+    build:
+      context: ./common
+      dockerfile: Dockerfile.${NODE_ENV}
+    volumes:
+      - ./common:/app
 
   # Test LDAP only in development mode
   ldap:

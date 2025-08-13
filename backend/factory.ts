@@ -1,6 +1,7 @@
-import Formatter from '../common/formatter.js'
-import { TravelCalculator } from '../common/travel.js'
-import { _id, CountryCode, Country as ICountry, Locale } from '../common/types.js'
+import Formatter from 'abrechnung-common/formatter.js'
+import { TravelCalculator } from 'abrechnung-common/travel.js'
+import { CountryCode, Country as ICountry, Locale } from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import { getDisplaySettings, getPrinterSettings, getTravelSettings } from './db.js'
 import i18n from './i18n.js'
 import Country from './models/country.js'
@@ -14,14 +15,14 @@ export const formatter = new Formatter(displaySettings.locale.default, displaySe
 
 const printerSettings = await getPrinterSettings()
 const travelSettings = await getTravelSettings()
-export const reportPrinter = new ReportPrinter(
+export const reportPrinter = new ReportPrinter<Types.ObjectId>(
   printerSettings,
   travelSettings.distanceRefunds,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
   },
-  async (id: _id) => {
+  async (id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
       // Wrong type in mongodb BSON Binary, so need assertion here
@@ -29,7 +30,7 @@ export const reportPrinter = new ReportPrinter(
     }
     return null
   },
-  async (id: _id) => {
+  async (id) => {
     const orga = await Organisation.findOne({ _id: id }).lean()
     if (orga?.logo?._id) {
       return { logoId: orga.logo._id, website: orga.website }
@@ -38,13 +39,13 @@ export const reportPrinter = new ReportPrinter(
   }
 )
 
-export const approvedTravelsPrinter = new ApprovedTravelsPrinter(
+export const approvedTravelsPrinter = new ApprovedTravelsPrinter<Types.ObjectId>(
   printerSettings,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
   },
-  async (id: _id) => {
+  async (id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
       // Wrong type in mongodb BSON Binary, so need assertion here
@@ -52,7 +53,7 @@ export const approvedTravelsPrinter = new ApprovedTravelsPrinter(
     }
     return null
   },
-  async (id: _id) => {
+  async (id) => {
     const orga = await Organisation.findOne({ _id: id }).lean()
     if (orga?.logo?._id) {
       return { logoId: orga.logo._id, website: orga.website }

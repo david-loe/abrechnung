@@ -1,5 +1,5 @@
+import { Advance, AdvanceSimple, AdvanceState } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { Advance, AdvanceSimple, AdvanceState } from '../../../common/types.js'
 import { disconnectDB } from '../../db.js'
 import createAgent, { loginUser } from './_agent.js'
 

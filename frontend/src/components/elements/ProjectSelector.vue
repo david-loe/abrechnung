@@ -32,19 +32,19 @@
 </template>
 
 <script lang="ts">
+import { Project, ProjectSimple } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { Project, ProjectSimple } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
 
 export default defineComponent({
   name: 'ProjectSelector',
   data() {
-    return { projects: [] as ProjectSimple[], APP_DATA: APP_LOADER.data }
+    return { projects: [] as ProjectSimple<string>[], APP_DATA: APP_LOADER.data }
   },
   components: { ProjectsOfOrganisationSelector },
   props: {
-    modelValue: { type: Object as PropType<ProjectSimple> },
+    modelValue: { type: Object as PropType<ProjectSimple<string>> },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     updateUserOrg: { type: Boolean, default: false },
@@ -52,7 +52,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    filter(options: (ProjectSimple | Project)[], search: string): ProjectSimple[] {
+    filter(options: (ProjectSimple<string> | Project<string>)[], search: string): ProjectSimple<string>[] {
       return options.filter((option) => {
         const identifier = option.identifier.toLowerCase().indexOf(search.toLowerCase()) > -1
         if (identifier) {

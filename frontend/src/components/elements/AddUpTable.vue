@@ -42,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
+import { AddUp, Project } from 'abrechnung-common/types.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getAddUpTableData, getTotalBalance } from '@/../../common/scripts'
-import { AddUp, Project } from '@/../../common/types.js'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'
 import { formatter } from '@/formatter.js'
 
@@ -53,7 +53,7 @@ const { t } = useI18n()
 
 const props = defineProps({
   noBootstrapTable: { type: Boolean, default: false },
-  addUp: { type: Array as PropType<AddUp[]>, required: true },
+  addUp: { type: Array as PropType<AddUp<string>[]>, required: true },
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },

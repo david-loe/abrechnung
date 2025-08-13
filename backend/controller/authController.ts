@@ -1,14 +1,15 @@
+import { escapeRegExp } from 'abrechnung-common/scripts.js'
+import { tokenAdminUser } from 'abrechnung-common/types.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
-import { escapeRegExp } from '../../common/scripts.js'
-import { tokenAdminUser } from '../../common/types.js'
 import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
 import { getOidcStrategy } from '../authStrategies/oidc.js'
 import { getDisplaySettings } from '../db.js'
+import ENV from '../env.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -40,7 +41,7 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
 
 const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.microsoft) {
-    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : process.env.VITE_FRONTEND_URL
+    const successRedirect = req.session.redirect ? ENV.VITE_FRONTEND_URL + req.session.redirect : ENV.VITE_FRONTEND_URL
     passport.authenticate(await getMicrosoftStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -72,7 +73,7 @@ const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) 
 
 const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
   if ((await getDisplaySettings()).auth.oidc) {
-    const successRedirect = req.session.redirect ? process.env.VITE_FRONTEND_URL + req.session.redirect : process.env.VITE_FRONTEND_URL
+    const successRedirect = req.session.redirect ? ENV.VITE_FRONTEND_URL + req.session.redirect : ENV.VITE_FRONTEND_URL
     passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -91,9 +92,11 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
     }
   }
   if ((await getDisplaySettings()).auth.magiclogin || tokenAdmin) {
-    passport.authenticate(magiclogin, {
-      failureRedirect: `${process.env.VITE_FRONTEND_URL}/login${redirect ? `?redirect=${redirect}` : ''}`
-    })(req, res, next)
+    passport.authenticate(magiclogin, { failureRedirect: `${ENV.VITE_FRONTEND_URL}/login${redirect ? `?redirect=${redirect}` : ''}` })(
+      req,
+      res,
+      next
+    )
   } else {
     NotImplementedMiddleware(req, res, next)
   }
@@ -181,7 +184,7 @@ export class AuthController extends Controller {
     if (path?.startsWith('/')) {
       redirect = path
     }
-    this.setHeader('Location', process.env.VITE_FRONTEND_URL + redirect)
+    this.setHeader('Location', ENV.VITE_FRONTEND_URL + redirect)
     this.setStatus(302)
   }
 

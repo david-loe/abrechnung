@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { VueformElement, VueformSchema } from '@vueform/vueform'
+import { Settings } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { Settings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -23,7 +23,7 @@ export default defineComponent({
   },
   methods: {
     async postSettings(settings: Settings) {
-      const result = await API.setter<Settings>('admin/settings', settings)
+      const result = await API.setter<Settings<string>>('admin/settings', settings)
       if (result.ok && APP_DATA.value) {
         APP_DATA.value?.setSettings(result.ok)
         ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.settings, false)

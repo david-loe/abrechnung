@@ -1,6 +1,5 @@
-import pdf_lib from 'pdf-lib'
-import Formatter from '../../common/formatter.js'
-import { getAddUpTableData, getTotalBalance } from '../../common/scripts.js'
+import Formatter from 'abrechnung-common/formatter.js'
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
 import {
   _id,
   Advance,
@@ -31,12 +30,13 @@ import {
   TravelExpense,
   TravelSettings,
   TravelState
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import pdf_lib from 'pdf-lib'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
-function getReceiptMap(costList: { cost: Cost }[], number = 1) {
+function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], number = 1) {
   let counter = number
-  const map: ReceiptMap = {}
+  const map: ReceiptMap<idType> = {}
   for (const cost of costList) {
     if (cost.cost?.receipts) {
       for (const receipt of cost.cost.receipts) {
@@ -47,7 +47,7 @@ function getReceiptMap(costList: { cost: Cost }[], number = 1) {
   return { map, number }
 }
 
-export class ReportPrinter extends Printer {
+export class ReportPrinter<idType extends _id> extends Printer<idType> {
   distanceRefunds: TravelSettings['distanceRefunds']
 
   constructor(
@@ -55,14 +55,14 @@ export class ReportPrinter extends Printer {
     distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
-    getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById']
+    getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById']
   ) {
     super(settings, formatter, translateFunc, getDocumentFileBufferById, getOrganisationLogoIdById)
     this.distanceRefunds = distanceRefunds
   }
 
-  async print(report: Travel | ExpenseReport | HealthCareCost | Advance, language: Locale) {
+  async print(report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>, language: Locale) {
     const print = await ReportPrint.create(
       report,
       this.settings,
@@ -81,15 +81,15 @@ export class ReportPrinter extends Printer {
   }
 }
 
-class ReportPrint {
-  drawer: PDFDrawer
-  report: Travel | ExpenseReport | HealthCareCost | Advance
+class ReportPrint<idType extends _id> {
+  drawer: PDFDrawer<idType>
+  report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>
   distanceRefunds: TravelSettings['distanceRefunds']
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
 
   constructor(
-    report: Travel | ExpenseReport | HealthCareCost | Advance,
-    drawer: PDFDrawer,
+    report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>,
+    drawer: PDFDrawer<idType>,
     distanceRefunds: TravelSettings['distanceRefunds'],
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
   ) {
@@ -99,18 +99,18 @@ class ReportPrint {
     this.translateFunc = translateFunc
   }
 
-  static async create(
-    report: Travel | ExpenseReport | HealthCareCost | Advance,
+  static async create<idType extends _id>(
+    report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>,
     settings: PrinterSettings,
-    getDocumentFileBufferById: PDFDrawer['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer['getOrganisationLogoIdById'],
+    getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
     distanceRefunds: TravelSettings['distanceRefunds'],
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     language: Locale
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
-    return new ReportPrint(report, drawer, distanceRefunds, translateFunc)
+    return new ReportPrint<idType>(report, drawer, distanceRefunds, translateFunc)
   }
 
   async run() {
@@ -365,10 +365,10 @@ class ReportPrint {
     const tableOptions: TableOptions = options
     tableOptions.firstRow = false
 
-    return await this.drawer.drawTable<Comment<AnyState>>(this.report.comments, columns, tableOptions)
+    return await this.drawer.drawTable<Comment<idType, AnyState>>(this.report.comments, columns, tableOptions)
   }
 
-  async drawStages(receiptMap: ReceiptMap, options: Options) {
+  async drawStages(receiptMap: ReceiptMap<idType>, options: Options) {
     if (!reportIsTravel(this.report) || this.report.stages.length === 0) {
       return options.yStart
     }
@@ -452,7 +452,7 @@ class ReportPrint {
     return await this.drawer.drawTable(this.report.stages, columns, options)
   }
 
-  async drawExpenses(receiptMap: ReceiptMap, options: Options) {
+  async drawExpenses(receiptMap: ReceiptMap<idType>, options: Options) {
     if (reportIsAdvance(this.report) || this.report.expenses.length === 0) {
       return options.yStart
     }

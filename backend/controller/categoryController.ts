@@ -1,5 +1,6 @@
+import { Category as ICategory, locales } from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { _id, Category as ICategory, locales } from '../../common/types.js'
 import Category, { categorySchema } from '../models/category.js'
 import ExpenseReport from '../models/expenseReport.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
@@ -22,15 +23,15 @@ export class CategoryController extends Controller {
 @Security('httpBearer', ['admin'])
 export class CategoryAdminController extends Controller {
   @Post()
-  public async post(@Body() requestBody: SetterBody<ICategory>) {
+  public async post(@Body() requestBody: SetterBody<ICategory<Types.ObjectId>>) {
     return await this.setter(Category, { requestBody: requestBody, allowNew: true })
   }
   @Post('bulk')
-  public async postMany(@Body() requestBody: SetterBody<ICategory>[]) {
+  public async postMany(@Body() requestBody: SetterBody<ICategory<Types.ObjectId>>[]) {
     return await this.insertMany(Category, { requestBody })
   }
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(Category, {
       _id: _id,
       referenceChecks: [{ model: ExpenseReport, paths: ['category'], conditions: { historic: false } }],

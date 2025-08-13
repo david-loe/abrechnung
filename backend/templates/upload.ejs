@@ -68,7 +68,7 @@
       }
 
       fileInput.addEventListener('change', async function (event) {
-        const files = await fileEventToDocumentFiles(event, <%= maxFileSize %>, t)
+        const files = await fileEventToDocumentFiles(event, <%= maxFileSizeInBytes %>, <%= imageCompressionThresholdInPx %>, t)
         if (files && files.length > 0) {
           document.getElementById('progress').remove()
           document.getElementById('button').remove()

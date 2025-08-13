@@ -1,5 +1,6 @@
+import { Organisation as IOrganisation, locales } from 'abrechnung-common/types.js'
+import { mongo, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, Organisation as IOrganisation, locales } from '../../common/types.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import Organisation, { organisationSchema } from '../models/organisation.js'
 import Project from '../models/project.js'
@@ -18,7 +19,7 @@ export class OrganisationController extends Controller {
   }
 }
 
-interface PostOrganisation extends Omit<IOrganisation, 'logo'> {
+interface PostOrganisation extends Omit<IOrganisation<Types.ObjectId>, 'logo'> {
   logo: File
 }
 
@@ -37,16 +38,16 @@ export class OrganisationAdminController extends Controller {
   @Consumes('multipart/form-data')
   public async post(@Body() requestBody: SetterBody<PostOrganisation>, @Request() request: AuthenticatedExpressRequest) {
     await documentFileHandler(['logo'], { multiple: false, checkOwner: false })(request)
-    return await this.setter(Organisation, { requestBody: requestBody as IOrganisation, allowNew: true })
+    return await this.setter(Organisation, { requestBody: requestBody as IOrganisation<Types.ObjectId, mongo.Binary>, allowNew: true })
   }
 
   @Post('bulk')
-  public async postMany(@Body() requestBody: SetterBody<Omit<IOrganisation, 'logo'>>[]) {
+  public async postMany(@Body() requestBody: SetterBody<Omit<IOrganisation<Types.ObjectId>, 'logo'>>[]) {
     return await this.insertMany(Organisation, { requestBody })
   }
 
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(Organisation, {
       _id: _id,
       referenceChecks: [{ model: Project, paths: ['organisation'] }],

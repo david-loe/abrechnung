@@ -1,4 +1,3 @@
-import { model, Schema } from 'mongoose'
 import {
   Access,
   AnyState,
@@ -12,7 +11,8 @@ import {
   ReportType,
   reportTypes,
   TravelState
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { model, Schema, Types } from 'mongoose'
 import { colorSchema } from './helper.js'
 
 export const displaySettingsSchema = () => {
@@ -46,7 +46,7 @@ export const displaySettingsSchema = () => {
     reportTypeIcons[reportType] = { type: [{ type: String, required: true }], required: true }
   }
 
-  return new Schema<DisplaySettings>(
+  return new Schema<DisplaySettings<Types.ObjectId>>(
     {
       auth: {
         type: {

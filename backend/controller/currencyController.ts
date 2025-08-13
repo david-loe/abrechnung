@@ -1,5 +1,5 @@
+import { CurrencyCode, Currency as ICurrency, locales } from 'abrechnung-common/types.js'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { _id, Currency as ICurrency, locales } from '../../common/types.js'
 import Advance from '../models/advance.js'
 import Currency, { currencySchema } from '../models/currency.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -33,7 +33,7 @@ export class CurrencyAdminController extends Controller {
     return await this.insertMany(Currency, { requestBody })
   }
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: CurrencyCode) {
     return await this.deleter(Currency, {
       _id: _id,
       referenceChecks: [

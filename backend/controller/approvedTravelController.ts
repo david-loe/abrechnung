@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
+import { datetimeToDateString } from 'abrechnung-common/scripts.js'
+import { ApprovedTravel as IApprovedTravel } from 'abrechnung-common/types.js'
 import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { datetimeToDateString } from '../../common/scripts.js'
-import { _id, ApprovedTravel as IApprovedTravel } from '../../common/types.js'
 import { approvedTravelsPrinter } from '../factory.js'
 import i18n from '../i18n.js'
 import ApprovedTravel from '../models/approvedTravel.js'
@@ -24,7 +24,7 @@ export class ApprovedTravelController extends Controller {
   public async getReport(
     @Query() from: Date,
     @Query() to: Date,
-    @Query() organisationId: _id | undefined | null,
+    @Query() organisationId: string | undefined | null,
     @Request() request: AuthenticatedExpressRequest
   ) {
     const travels = await ApprovedTravel.find({

@@ -1,5 +1,5 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
-import { Token } from '../../common/types.js'
+import { Token } from 'abrechnung-common/types.js'
+import { HydratedDocument, model, mongo, Schema, Types } from 'mongoose'
 import { getSettings } from '../db.js'
 
 const tokenSchema = () =>
@@ -9,7 +9,7 @@ const tokenSchema = () =>
   )
 const schema = tokenSchema()
 
-schema.pre('save', async function (this: HydratedDocument<Token>) {
+schema.pre('save', async function (this: HydratedDocument<Token<Types.ObjectId, mongo.Binary>>) {
   if (this.isNew) {
     const settings = await getSettings()
     this.expireAt = new Date(Date.now() + settings.uploadTokenExpireAfterSeconds * 1000)

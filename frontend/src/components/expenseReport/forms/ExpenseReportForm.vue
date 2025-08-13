@@ -50,8 +50,8 @@
 </template>
 
 <script lang="ts">
+import { Category, ExpenseReportSimple, idDocumentToId, UserWithName } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { Category, ExpenseReportSimple, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import CategorySelector from '@/components/elements/CategorySelector.vue'

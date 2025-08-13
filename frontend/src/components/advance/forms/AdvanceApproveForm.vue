@@ -25,15 +25,15 @@
 </template>
 
 <script lang="ts" setup>
+import { AdvanceSimple } from 'abrechnung-common/types.js'
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AdvanceSimple } from '@/../../common/types.js'
 import Advance from '@/components/advance/Advance.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 
 const { t } = useI18n()
 
-const props = defineProps<{ advance: AdvanceSimple; loading: boolean }>()
+const props = defineProps<{ advance: AdvanceSimple<string>; loading: boolean }>()
 const comment = ref(undefined as string | null | undefined)
 const bookingRemark = ref(undefined as string | null | undefined)
 

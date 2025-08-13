@@ -4,6 +4,7 @@ import * as openidClient from 'openid-client'
 import { Strategy as OidcStrategy } from 'openid-client/passport'
 import passport from 'passport'
 import { getConnectionSettings } from '../db.js'
+import ENV from '../env.js'
 import { displayNameSplit, findOrCreateUser } from './index.js'
 
 const scope = 'openid email profile'
@@ -19,7 +20,7 @@ export class CustomStrategy extends OidcStrategy {
     //check for callback url rather than param count
     if ((req.originalUrl ?? req.url).startsWith(callbackPath)) {
       // rewrite URL so when behind proxy no error is thrown
-      const url = new URL(`${process.env.VITE_BACKEND_URL}${req.originalUrl ?? req.url}`)
+      const url = new URL(`${ENV.VITE_BACKEND_URL}${req.originalUrl ?? req.url}`)
       // fix error from empty state search param david-loe/abrechnung#140
       const params = new URLSearchParams(url.search)
       if (params.has('state') && !params.get('state')) {
@@ -45,7 +46,7 @@ export async function getOidcStrategy() {
 
   const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
 
-  return new CustomStrategy({ callbackURL: `${process.env.VITE_BACKEND_URL}${callbackPath}`, config, scope }, async (tokens, verified) => {
+  return new CustomStrategy({ callbackURL: `${ENV.VITE_BACKEND_URL}${callbackPath}`, config, scope }, async (tokens, verified) => {
     try {
       const claims = tokens.claims()
       if (claims?.email && claims.name) {

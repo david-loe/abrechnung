@@ -1,5 +1,5 @@
-import { model, Schema } from 'mongoose'
-import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from '../../common/types.js'
+import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from 'abrechnung-common/types.js'
+import { model, Schema, Types } from 'mongoose'
 
 export const settingsSchema = () => {
   const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
@@ -30,7 +30,7 @@ export const settingsSchema = () => {
       description: `description.${policy}`
     }
   }
-  return new Schema<Settings>({
+  return new Schema<Settings<Types.ObjectId>>({
     userCanSeeAllProjects: { type: Boolean, required: true },
     defaultAccess: { type: defaultAccess, required: true },
     disableReportType: { type: disableReportType, required: true },

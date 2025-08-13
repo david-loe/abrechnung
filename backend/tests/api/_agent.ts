@@ -1,6 +1,6 @@
+import { Base64 } from 'abrechnung-common/scripts.js'
+import { User } from 'abrechnung-common/types.js'
 import request from 'supertest'
-import { Base64 } from '../../../common/scripts.js'
-import { User } from '../../../common/types.js'
 import APP from '../../app.js'
 
 const users = {

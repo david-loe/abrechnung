@@ -1,9 +1,4 @@
-import { DeleteResult } from 'mongodb'
-import { Types } from 'mongoose'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { PushSubscription } from 'web-push'
 import {
-  _id,
   DocumentFile,
   IdDocument,
   Token as IToken,
@@ -11,8 +6,13 @@ import {
   idDocumentToId,
   locales,
   tokenAdminUser
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { DeleteResult } from 'mongodb'
+import { mongo, Types } from 'mongoose'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { PushSubscription } from 'web-push'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
+import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -50,7 +50,7 @@ export class UserController extends Controller {
   @Post('token')
   public async postUploadToken(@Request() request: AuthenticatedExpressRequest) {
     const token = (await new Token().save()).toObject()
-    request.user.token = token as unknown as IToken
+    request.user.token = token as unknown as IToken<Types.ObjectId, mongo.Binary>
     await request.user.save()
     return { message: 'alerts.successSaving', result: token }
   }
@@ -71,7 +71,7 @@ export class UserController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     await documentFileHandler(['vehicleRegistration'])(request)
-    request.user.vehicleRegistration = requestBody.vehicleRegistration as unknown as DocumentFile[]
+    request.user.vehicleRegistration = requestBody.vehicleRegistration as unknown as DocumentFile<Types.ObjectId, mongo.Binary>[]
     request.user.markModified('vehicleRegistration')
     const result = await request.user.save()
     return { message: 'alerts.successSaving', result: result }
@@ -130,12 +130,12 @@ function sendNewMagicloginMail(user: IUser) {
     [user],
     i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),
     i18n.t('mail.newMagiclogin.paragraph', { lng: user.settings.language }),
-    { text: i18n.t('mail.newMagiclogin.buttonText', { lng: user.settings.language }), link: process.env.VITE_FRONTEND_URL },
+    { text: i18n.t('mail.newMagiclogin.buttonText', { lng: user.settings.language }), link: ENV.VITE_FRONTEND_URL },
     i18n.t('mail.newMagiclogin.lastParagraph', { lng: user.settings.language })
   )
 }
 
-interface SetterBodyUser extends SetterBody<IUser> {
+interface SetterBodyUser extends SetterBody<IUser<Types.ObjectId, mongo.Binary>> {
   loseAccessAt: null | Date | undefined
 }
 
@@ -192,7 +192,7 @@ export class UserAdminController extends Controller {
   }
 
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(User, {
       _id,
       referenceChecks: [

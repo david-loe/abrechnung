@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
+import { documentFileTypes } from 'abrechnung-common/types.js'
 import { Delete, Get, Produces, Query, Request, Route, Security, SuccessResponse, Tags } from 'tsoa'
-import { _id, documentFileTypes } from '../../common/types.js'
 import DocumentFile from '../models/documentFile.js'
 import { Controller, checkOwner } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
@@ -16,7 +16,7 @@ export class DocumentFileController extends Controller {
   @Produces(documentFileTypes[1])
   @Produces(documentFileTypes[2])
   @SuccessResponse(200)
-  public async getOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (!(file && request.user._id.equals(file.owner._id))) {
       throw new NotAllowedError()
@@ -28,7 +28,7 @@ export class DocumentFileController extends Controller {
   }
 
   @Delete()
-  public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(DocumentFile, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 }
@@ -46,7 +46,7 @@ export class DocumentFileAdminController extends Controller {
   @Produces(documentFileTypes[1])
   @Produces(documentFileTypes[2])
   @SuccessResponse(200)
-  public async getAny(@Query() _id: _id) {
+  public async getAny(@Query() _id: string) {
     const file = await DocumentFile.findOne({ _id: _id }).lean()
     if (!file) {
       throw new NotFoundError('No file found')
@@ -58,7 +58,7 @@ export class DocumentFileAdminController extends Controller {
   }
 
   @Delete()
-  public async deleteAny(@Query() _id: _id) {
+  public async deleteAny(@Query() _id: string) {
     return await this.deleter(DocumentFile, { _id: _id })
   }
 }

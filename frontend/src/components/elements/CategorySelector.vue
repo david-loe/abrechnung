@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts">
+import { Category } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { Category } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
 

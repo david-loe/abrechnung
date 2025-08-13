@@ -7,7 +7,7 @@
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
-          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple)"></Advance>
+          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)"></Advance>
           <div v-if="modalObject.state !== undefined" class="mb-1">
             <template v-if="modalObject.state <= State.APPLIED_FOR">
               <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
@@ -69,7 +69,7 @@
           <AdvanceForm
             v-else
             :mode="(modalMode as 'add' | 'edit')"
-            :advance="(modalObject as Partial<AdvanceSimple>)"
+            :advance="(modalObject as Partial<AdvanceSimple<string>>)"
             :loading="modalFormIsLoading"
             @cancel="resetAndHide()"
             @add="handleSubmit"
@@ -151,10 +151,16 @@
 </template>
 
 <script setup lang="ts">
+import {
+  type AdvanceSimple,
+  type ExpenseReportSimple,
+  type HealthCareCostSimple,
+  State,
+  type TravelSimple
+} from 'abrechnung-common/types.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { type AdvanceSimple, type ExpenseReportSimple, type HealthCareCostSimple, State, type TravelSimple } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import Advance from '@/components/advance/Advance.vue'
@@ -223,13 +229,13 @@ async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | Health
 
   if (modalObjectType.value === 'travel') {
     const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'
-    result = (await API.setter<TravelSimple>(path, payload)).ok
+    result = (await API.setter<TravelSimple<string>>(path, payload)).ok
   } else if (modalObjectType.value === 'expenseReport') {
-    result = (await API.setter<ExpenseReportSimple>('expenseReport/inWork', payload)).ok
+    result = (await API.setter<ExpenseReportSimple<string>>('expenseReport/inWork', payload)).ok
   } else if (modalObjectType.value === 'healthCareCost') {
-    result = (await API.setter<HealthCareCostSimple>('healthCareCost/inWork', payload)).ok
+    result = (await API.setter<HealthCareCostSimple<string>>('healthCareCost/inWork', payload)).ok
   } else {
-    result = (await API.setter<AdvanceSimple>('advance/appliedFor', payload)).ok
+    result = (await API.setter<AdvanceSimple<string>>('advance/appliedFor', payload)).ok
   }
 
   modalFormIsLoading.value = false

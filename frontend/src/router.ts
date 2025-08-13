@@ -14,6 +14,7 @@ import TravelApprovePage from '@/components/travel/ApprovePage.vue'
 import BookTravelPage from '@/components/travel/BookPage.vue'
 import ExamineTravelPage from '@/components/travel/ExaminePage.vue'
 import TravelPage from '@/components/travel/TravelPage.vue'
+import ENV from '@/env.js'
 import { logger } from '@/logger.js'
 import { app } from '@/main.js'
 
@@ -121,7 +122,7 @@ export async function auth() {
     return true
   }
   try {
-    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/authenticated`, { withCredentials: true })
+    const res = await axios.get(`${ENV.VITE_BACKEND_URL}/auth/authenticated`, { withCredentials: true })
     auth = res.status === 204
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response && error.response.status !== 401) {

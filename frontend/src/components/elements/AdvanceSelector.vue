@@ -44,10 +44,10 @@
 </template>
 
 <script setup lang="ts">
+import { Base64 } from 'abrechnung-common/scripts.js'
+import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from 'abrechnung-common/types.js'
 import { onMounted, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Base64 } from '@/../../common/scripts'
-import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from '@/../../common/types.js'
 import API from '@/api'
 import { formatter } from '@/formatter.js'
 
@@ -58,7 +58,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   multiple: { type: Boolean, default: false },
-  owner: { type: Object as PropType<UserWithName> },
+  owner: { type: Object as PropType<UserWithName<string>> },
   endpointPrefix: { type: String, default: '' }
 })
 

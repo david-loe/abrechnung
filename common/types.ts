@@ -1,4 +1,4 @@
-import { mongo, Types } from 'mongoose'
+import type { mongo, Types } from 'mongoose'
 import { DocumentFileType, documentFileTypes, ImageType, imageTypes } from './utils/file.js'
 export { documentFileTypes, imageTypes }
 export type { DocumentFileType, ImageType }
@@ -6,7 +6,8 @@ export type { DocumentFileType, ImageType }
 /**
  * @pattern ^[0-9a-fA-F]{24}$
  */
-export type _id = Types.ObjectId
+export type _id = string | Types.ObjectId
+export type binary = mongo.Binary | Blob
 
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
@@ -19,7 +20,7 @@ export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
  */
 export type HexColor = string
 
-export interface Settings {
+export interface Settings<idType extends _id = _id> {
   userCanSeeAllProjects: boolean
   defaultAccess: { [key in Access]: boolean }
   disableReportType: { [key in ReportType]: boolean }
@@ -32,10 +33,10 @@ export interface Settings {
    * @Hidden
    */
   migrateFrom?: string | null
-  _id: _id
+  _id: idType
 }
 
-export interface TravelSettings {
+export interface TravelSettings<idType extends _id = _id> {
   maxTravelDayCount: number
   allowSpouseRefund: boolean
   allowTravelApplicationForThePast: boolean
@@ -53,7 +54,7 @@ export interface TravelSettings {
   secondNightOnShipOrFerryLumpSumCountry: CountryCode
   minHoursOfTravel: number
   minProfessionalShare: number
-  _id: _id
+  _id: idType
 }
 
 export interface ldapauthSettings {
@@ -90,15 +91,15 @@ export interface oidcSettings {
   clientSecret: string // Client Secret
 }
 
-export interface ConnectionSettings {
+export interface ConnectionSettings<idType extends _id = _id> {
   PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: boolean; locale: Locale }
   auth: { microsoft?: microsoftSettings | null; ldapauth?: ldapauthSettings | null; oidc?: oidcSettings | null }
   smtp?: smtpSettings | null
 
-  _id: _id
+  _id: idType
 }
 
-export interface DisplaySettings {
+export interface DisplaySettings<idType extends _id = _id> {
   auth: { magiclogin: boolean; microsoft: boolean; ldapauth: boolean; oidc: boolean }
   oidc: { label: string; icon: string }
   locale: { default: Locale; fallback: Locale; overwrite: { [key in Locale]: { [key: string]: string } } }
@@ -112,12 +113,12 @@ export interface DisplaySettings {
   stateColors: { [key in AnyState]: BadgeStyle }
   accessIcons: { [key in Access]: string[] }
   reportTypeIcons: { [key in ReportType]: string[] }
-  _id: _id
+  _id: idType
 }
 
-export interface PrinterSettings extends PrintSettingsBase {
+export interface PrinterSettings<idType extends _id = _id> extends PrintSettingsBase {
   fontName: FontName
-  _id: _id
+  _id: idType
 }
 
 export interface PrintSettingsBase {
@@ -135,11 +136,11 @@ export interface BadgeStyle {
   text: TextColor
 }
 
-export interface Category {
+export interface Category<idType extends _id = _id> {
   name: string
   style: BadgeStyle
   isDefault: boolean
-  _id: _id
+  _id: idType
 }
 
 /**
@@ -192,18 +193,18 @@ export interface Place {
   special?: string
 }
 
-export interface DocumentFile<T extends DocumentFileType = DocumentFileType> {
-  data: mongo.Binary
-  owner: _id
+export interface DocumentFile<idType extends _id = _id, dataType extends binary = binary, T extends DocumentFileType = DocumentFileType> {
+  data: dataType
+  owner: idType
   type: T
   name: string
-  _id: _id
+  _id: idType
 }
 
-export interface Token {
-  _id: _id
+export interface Token<idType extends _id = _id, dataType extends binary = binary> {
+  _id: idType
   expireAt: Date | string
-  files: DocumentFile[]
+  files: DocumentFile<idType, dataType>[]
 }
 
 export interface Contact {
@@ -216,85 +217,88 @@ export interface Name {
   familyName: string
 }
 
-export interface UserSimple extends Contact {
-  _id: _id
+export interface UserSimple<idType extends _id = _id> extends Contact {
+  _id: idType
 }
 
-export interface HealthInsurance {
+export interface HealthInsurance<idType extends _id = _id> {
   name: string
   email: string
-  _id: _id
+  _id: idType
 }
 
-export interface OrganisationSimple {
+export interface OrganisationSimple<idType extends _id = _id> {
   name: string
-  _id: _id
+  _id: idType
 }
 
-export interface ProjectSimple {
+export interface ProjectSimple<idType extends _id = _id> {
   identifier: string
-  organisation: _id
-  _id: _id
+  organisation: idType
+  _id: idType
 }
 
-export interface ProjectSimpleWithName extends ProjectSimple {
+export interface ProjectSimpleWithName<idType extends _id = _id> extends ProjectSimple<idType> {
   name?: string
 }
 
-export interface Project extends ProjectSimpleWithName {
+export interface Project<idType extends _id = _id> extends ProjectSimpleWithName<idType> {
   balance: BaseCurrencyMoneyNotNull
   budget?: BaseCurrencyMoney
 }
 
-export interface ProjectUsers {
-  assignees: _id[]
-  supervisors: _id[]
+export interface ProjectUsers<idType extends _id = _id> {
+  assignees: idType[]
+  supervisors: idType[]
 }
 
-export interface ProjectWithUsers extends Project, ProjectUsers {}
+export interface ProjectWithUsers<idType extends _id = _id> extends Project<idType>, ProjectUsers<idType> {}
 
-export interface Organisation extends OrganisationSimple {
+export interface Organisation<idType extends _id = _id, dataType extends binary = binary> extends OrganisationSimple<idType> {
   subfolderPath: string
   reportEmail?: string | null
   a1CertificateEmail?: string | null
   bankDetails?: string | null
   companyNumber?: string | null
-  logo?: DocumentFile<ImageType> | null
+  logo?: DocumentFile<idType, dataType, ImageType> | null
   website?: string | null
 }
 
-export interface User extends UserSimple {
+export interface User<idType extends _id = _id, dataType extends binary = binary> extends UserSimple<idType> {
   fk: { microsoft?: string | null; ldapauth?: string | null; magiclogin?: string | null; oidc?: string | null; httpBearer?: string | null }
   access: {
     [key in Access]: boolean
   }
-  projects: { assigned: Project[]; supervised: _id[] }
+  projects: UserProjects<idType>
   loseAccessAt?: null | Date | string
   settings: {
     language: Locale
     hasUserSetLanguage: boolean
     lastCurrencies: Currency[]
     lastCountries: CountrySimple[]
-    insurance?: HealthInsurance | null
-    organisation?: OrganisationSimple | null
+    insurance?: HealthInsurance<idType> | null
+    organisation?: OrganisationSimple<idType> | null
     showInstallBanner: boolean
   }
-  vehicleRegistration?: DocumentFile[] | null
-  token?: Token | null
+  vehicleRegistration?: DocumentFile<idType, dataType>[] | null
+  token?: Token<idType, dataType> | null
 }
 
-export interface UserWithName {
-  _id: _id
+export interface UserWithName<idType extends _id = _id> {
+  _id: idType
   name: Name
 }
 
-export interface UserWithNameAndProject extends UserWithName {
-  projects: User['projects']
+export interface UserWithNameAndProject<idType extends _id = _id> extends UserWithName<idType> {
+  projects: UserProjects<idType>
 }
 
-export const tokenAdminUser: Omit<User, 'access' | 'projects' | 'settings' | '_id'> & {
-  access: { user: User['access']['user']; admin: User['access']['admin'] }
-} = {
+interface UserProjects<idType extends _id = _id> {
+  assigned: Project<idType>[]
+  supervised: idType[]
+}
+
+export const tokenAdminUser = {
   fk: { magiclogin: 'admin@to.ken' },
   email: 'admin@to.ken',
   name: { familyName: 'Token Access', givenName: 'Admin' },
@@ -316,61 +320,63 @@ export interface MoneyNotNull extends Money {
   amount: number
 }
 
-export interface MoneyPlus extends Money {
-  receipts?: DocumentFile[] | null
+export interface MoneyPlus<idType extends _id = _id, dataType extends binary = binary> extends Money {
+  receipts?: DocumentFile<idType, dataType>[] | null
   date?: Date | string | null
 }
 
-export interface Cost extends MoneyPlus {
-  receipts: DocumentFile[]
+export interface Cost<idType extends _id = _id, dataType extends binary = binary> extends MoneyPlus<idType, dataType> {
+  receipts: DocumentFile<idType, dataType>[]
   date: Date | string
 }
 
-export interface Stage {
+export interface Stage<idType extends _id = _id, dataType extends binary = binary> {
   departure: Date | string
   arrival: Date | string
   startLocation: Place
   endLocation: Place
   midnightCountries?: { date: Date | string; country: CountrySimple }[] | null
   transport: Transport
-  cost: Cost
+  cost: Cost<idType, dataType>
   purpose: Purpose
-  project?: ProjectSimple | null
+  project?: ProjectSimple<idType> | null
   note?: string | null
-  _id: _id
+  _id: idType
 }
 
-export interface Expense {
+export interface Expense<idType extends _id = _id, dataType extends binary = binary> {
   description: string
-  cost: Cost
-  project?: ProjectSimple | null
+  cost: Cost<idType, dataType>
+  project?: ProjectSimple<idType> | null
   note?: string | null
-  _id: _id
+  _id: idType
 }
 
-export interface TravelExpense extends Expense {
+export interface TravelExpense<idType extends _id = _id, dataType extends binary = binary> extends Expense<idType, dataType> {
   purpose: 'professional' | 'mixed'
 }
 
 export type TravelRecordType = 'stage' | 'expense'
-export type TravelRecord = Stage | TravelExpense
+export type TravelRecord<idType extends _id = _id, dataType extends binary = binary> =
+  | Stage<idType, dataType>
+  | TravelExpense<idType, dataType>
 
-export interface Comment<State extends AnyState = AnyState> {
+export interface Comment<idType extends _id = _id, State extends AnyState = AnyState> {
   text: string
-  author: UserSimple
+  author: UserSimple<idType>
   toState: State
-  _id: _id
+  _id: idType
 }
 
 export type Transport =
   | { type: (typeof transportTypesButOwnCar)[number] }
   | { type: 'ownCar'; distance: number; distanceRefundType: DistanceRefundType }
 
-export interface TravelDayFullCountry extends Omit<TravelDay, 'country'> {
+export interface TravelDayFullCountry<idType extends _id = _id> extends Omit<TravelDay<idType>, 'country'> {
   country: Country
 }
 
-export interface TravelDay {
+export interface TravelDay<idType extends _id = _id> {
   date: Date | string
   country: CountrySimple
   special?: string
@@ -380,49 +386,49 @@ export interface TravelDay {
   overnightRefund: boolean
   purpose: PurposeSimple
   lumpSums: { overnight: { refund: BaseCurrencyMoneyNotNull }; catering: { refund: BaseCurrencyMoneyNotNull; type: CateringType } }
-  _id: _id
+  _id: idType
 }
 
-export type Log<S extends AnyState = AnyState> = {
-  [key in S]?: { on: Date | string; by: UserSimple }
+export type Log<idType extends _id = _id, S extends AnyState = AnyState> = {
+  [key in S]?: { on: Date | string; by: UserSimple<idType> }
 }
 
-export interface ReportSimple<S extends AnyState = AnyState> {
+export interface ReportSimple<idType extends _id = _id, S extends AnyState = AnyState> {
   name: string
-  owner: UserSimple
-  editor: UserSimple
-  project: Project
+  owner: UserSimple<idType>
+  editor: UserSimple<idType>
+  project: Project<idType>
   comment?: string | null
   bookingRemark?: string | null
-  comments: Comment<S>[]
+  comments: Comment<idType, S>[]
   state: S
-  log: Log<S>
+  log: Log<idType, S>
   createdAt: Date | string
   updatedAt: Date | string
-  _id: _id
+  _id: idType
 }
 
-export interface Report<S extends AnyState = AnyState> extends ReportSimple<S> {
-  history: _id[]
+export interface Report<idType extends _id = _id, S extends AnyState = AnyState> extends ReportSimple<idType, S> {
+  history: idType[]
   historic: boolean
 }
 
-export interface AdvanceBase {
+export interface AdvanceBase<idType extends _id = _id> {
   name: string
   budget: MoneyNotNull
-  project: Project
+  project: Project<idType>
   balance: BaseCurrencyMoneyNotNull
   reason: string
   state: AdvanceState
   settledOn?: Date | string | null
-  _id: _id
+  _id: idType
 }
 
-export interface AdvanceSimple extends ReportSimple<AdvanceState>, AdvanceBase {
-  offsetAgainst: { type: ReportModelName; report: { _id: _id; name: string } | null | undefined; amount: number }[]
+export interface AdvanceSimple<idType extends _id = _id> extends ReportSimple<idType, AdvanceState>, AdvanceBase<idType> {
+  offsetAgainst: { type: ReportModelName; report: { _id: idType; name: string } | null | undefined; amount: number }[]
 }
 
-export interface Advance extends Report<AdvanceState>, AdvanceSimple {}
+export interface Advance<idType extends _id = _id> extends Report<idType, AdvanceState>, AdvanceSimple<idType> {}
 
 interface TravelBase {
   reason: string
@@ -433,45 +439,51 @@ interface TravelBase {
   fellowTravelersNames?: string | null //travelSettings.allowSpouseRefund
 }
 
-export interface TravelSimple extends TravelBase, ReportSimple<TravelState> {
+export interface TravelSimple<idType extends _id = _id> extends TravelBase, ReportSimple<idType, TravelState> {
   progress: number
-  addUp: AddUp<Travel>[]
-  advances: AdvanceBase[]
+  addUp: AddUp<idType, Travel<_id, binary>>[]
+  advances: AdvanceBase<idType>[]
   isCrossBorder?: boolean | null
   a1Certificate?: { exactAddress: string; destinationName: string } | null
 }
 
-export interface Travel extends TravelSimple, Report<TravelState> {
+export interface Travel<idType extends _id = _id, dataType extends binary = binary>
+  extends TravelSimple<idType>,
+    Report<idType, TravelState> {
   lastPlaceOfWork?: Omit<Place, 'place'> | null
   professionalShare: number | null
-  stages: Stage[]
-  expenses: TravelExpense[]
-  days: TravelDay[]
+  stages: Stage<idType, dataType>[]
+  expenses: TravelExpense<idType, dataType>[]
+  days: TravelDay<idType>[]
 }
 
-export interface ExpenseReportSimple extends ReportSimple<ExpenseReportState> {
-  addUp: AddUp<ExpenseReport>[]
-  advances: AdvanceBase[]
-  category: Category
+export interface ExpenseReportSimple<idType extends _id = _id> extends ReportSimple<idType, ExpenseReportState> {
+  addUp: AddUp<idType, ExpenseReport<_id, binary>>[]
+  advances: AdvanceBase<idType>[]
+  category: Category<idType>
 }
-export interface ExpenseReport extends ExpenseReportSimple, Report<ExpenseReportState> {
-  expenses: Expense[]
+export interface ExpenseReport<idType extends _id = _id, dataType extends binary = binary>
+  extends ExpenseReportSimple<idType>,
+    Report<idType, ExpenseReportState> {
+  expenses: Expense<idType, dataType>[]
 }
 
-export interface HealthCareCostSimple extends ReportSimple<HealthCareCostState> {
+export interface HealthCareCostSimple<idType extends _id = _id> extends ReportSimple<idType, HealthCareCostState> {
   patientName: string
-  insurance: HealthInsurance
-  addUp: AddUp<HealthCareCost>[]
-  advances: AdvanceBase[]
+  insurance: HealthInsurance<idType>
+  addUp: AddUp<idType, HealthCareCost<_id, binary>>[]
+  advances: AdvanceBase<idType>[]
 }
-export interface HealthCareCost extends HealthCareCostSimple, Report<HealthCareCostState> {
-  expenses: Expense[]
+export interface HealthCareCost<idType extends _id = _id, dataType extends binary = binary>
+  extends HealthCareCostSimple<idType>,
+    Report<idType, HealthCareCostState> {
+  expenses: Expense<idType, dataType>[]
 }
 
-export interface ApprovedTravel extends TravelBase {
+export interface ApprovedTravel<idType extends _id = _id> extends TravelBase {
   traveler: string
-  reportId?: _id
-  organisationId: _id
+  reportId?: idType
+  organisationId: idType
   appliedForOn: Date | string
   approvedBy: string
   approvedOn: Date | string
@@ -627,40 +639,52 @@ export type UserReplaceReferencesResult = {
   [key in (typeof userReplaceCollections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number }
 }
 
-export function reportIsTravel(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Travel
-export function reportIsTravel(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is TravelSimple
+export function reportIsTravel(
+  report: Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> | Advance<_id>
+): report is Travel<_id, binary>
+export function reportIsTravel(
+  report: TravelSimple<_id> | ExpenseReportSimple<_id> | HealthCareCostSimple<_id> | Advance<_id>
+): report is TravelSimple<_id>
 // biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsTravel(report: any): report is { startDate: Date | string } {
   return typeof report.startDate === 'string' || report.startDate instanceof Date
 }
 
-export function reportIsHealthCareCost(report: Travel | ExpenseReport | HealthCareCost | Advance): report is HealthCareCost
 export function reportIsHealthCareCost(
-  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
-): report is HealthCareCostSimple
+  report: Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> | Advance<_id>
+): report is HealthCareCost<_id, binary>
+export function reportIsHealthCareCost(
+  report: TravelSimple<_id> | ExpenseReportSimple<_id> | HealthCareCostSimple<_id> | Advance<_id>
+): report is HealthCareCostSimple<_id>
 // biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsHealthCareCost(report: any): report is { patientName: string } {
   return typeof report.patientName === 'string'
 }
 
-export function reportIsAdvance(report: Travel | ExpenseReport | HealthCareCost | Advance): report is Advance
-export function reportIsAdvance(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance): report is Advance
+export function reportIsAdvance(
+  report: Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> | Advance<_id>
+): report is Advance<_id>
+export function reportIsAdvance(
+  report: TravelSimple<_id> | ExpenseReportSimple<_id> | HealthCareCostSimple<_id> | Advance<_id>
+): report is Advance<_id>
 // biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsAdvance(report: any): report is { startDate: Exclude<unknown, Date | string>; reason: string } {
   return !reportIsTravel(report) && typeof report.reason === 'string'
 }
 
-export function reportIsExpenseReport(report: Travel | ExpenseReport | HealthCareCost | Advance): report is ExpenseReport
 export function reportIsExpenseReport(
-  report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance
-): report is ExpenseReportSimple
+  report: Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> | Advance<_id>
+): report is ExpenseReport<_id, binary>
+export function reportIsExpenseReport(
+  report: TravelSimple<_id> | ExpenseReportSimple<_id> | HealthCareCostSimple<_id> | Advance<_id>
+): report is ExpenseReportSimple<_id>
 // biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsExpenseReport(report: any): report is any {
   return !reportIsTravel(report) && !reportIsAdvance(report) && !reportIsHealthCareCost(report)
 }
 
-type AddUpBase = {
-  project: ProjectSimple
+type AddUpBase<idType extends _id = _id> = {
+  project: ProjectSimple<idType>
   balance: BaseCurrencyMoneyNotNull
   total: BaseCurrencyMoneyNotNull
   advance: BaseCurrencyMoneyNotNull
@@ -668,13 +692,21 @@ type AddUpBase = {
   advanceOverflow: boolean
 }
 
-export type AddUp<T extends Travel | ExpenseReport | HealthCareCost = Travel | ExpenseReport | HealthCareCost> = T extends Travel
-  ? AddUpBase & { lumpSums: BaseCurrencyMoneyNotNull }
-  : AddUpBase
+export type AddUp<
+  idType extends _id = _id,
+  T extends Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> =
+    | Travel<_id, binary>
+    | ExpenseReport<_id, binary>
+    | HealthCareCost<_id, binary>
+> = T extends Travel<_id, binary> ? AddUpBase<idType> & { lumpSums: BaseCurrencyMoneyNotNull } : AddUpBase<idType>
 
-export type FlatAddUp<T extends Travel | HealthCareCost | ExpenseReport = Travel | HealthCareCost | ExpenseReport> =
-  | AddUp<T>
-  | (Omit<AddUp<T>, 'project'> & { project: _id })
+export type FlatAddUp<
+  idType extends _id = _id,
+  T extends Travel<_id, binary> | HealthCareCost<_id, binary> | ExpenseReport<_id, binary> =
+    | Travel<_id, binary>
+    | HealthCareCost<_id, binary>
+    | ExpenseReport<_id, binary>
+> = AddUp<idType, T> | (Omit<AddUp<idType, T>, 'project'> & { project: idType })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

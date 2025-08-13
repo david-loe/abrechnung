@@ -1,8 +1,5 @@
 import { Readable } from 'node:stream'
-import { Condition } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import {
-  _id,
   Expense,
   HealthCareCostState,
   IdDocument,
@@ -11,7 +8,10 @@ import {
   idDocumentToId,
   Locale,
   State
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import { Condition, mongo, Types } from 'mongoose'
+import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -40,15 +40,15 @@ export class HealthCareCostController extends Controller {
     })
   }
   @Delete()
-  public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(HealthCareCost, { _id: _id, checkOldObject: checkOwner(request.user) })
   }
 
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToOwn(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Expense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -57,7 +57,7 @@ export class HealthCareCostController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(HealthCareCost, {
-      requestBody,
+      requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -75,7 +75,7 @@ export class HealthCareCostController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpeneseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpeneseFromOwn(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(HealthCareCost, {
       _id,
       parentId,
@@ -94,12 +94,12 @@ export class HealthCareCostController extends Controller {
   @Post('inWork')
   public async postOwnInWork(
     @Body() requestBody: {
-      project?: IdDocument
-      insurance?: IdDocument
+      project?: IdDocument<Types.ObjectId>
+      insurance?: IdDocument<Types.ObjectId>
       patientName?: string
-      _id?: _id
+      _id?: string
       name?: string
-      advances?: IdDocument[]
+      advances?: IdDocument<Types.ObjectId>[]
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -136,7 +136,7 @@ export class HealthCareCostController extends Controller {
 
   @Post('underExamination')
   public async postOwnUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_REVIEW, editor: request.user._id })
@@ -157,7 +157,7 @@ export class HealthCareCostController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReportFromOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReportFromOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const healthCareCost = await HealthCareCost.findOne({
       $and: [{ _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }]
     }).lean()
@@ -202,7 +202,7 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteAny(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteAny(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(HealthCareCost, {
       _id: _id,
       async checkOldObject(oldObject: HealthCareCostDoc) {
@@ -214,8 +214,8 @@ export class HealthCareCostExamineController extends Controller {
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToAny(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Expense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -224,7 +224,7 @@ export class HealthCareCostExamineController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(HealthCareCost, {
-      requestBody,
+      requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -246,7 +246,7 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpenseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpenseFromAny(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(HealthCareCost, {
       _id,
       parentId,
@@ -268,12 +268,12 @@ export class HealthCareCostExamineController extends Controller {
   @Post()
   public async postAny(
     @Body() requestBody: {
-      project?: IdDocument
-      insurance?: IdDocument
+      project?: IdDocument<Types.ObjectId>
+      insurance?: IdDocument<Types.ObjectId>
       patientName?: string
-      _id: _id
+      _id: string
       name?: string
-      advances?: IdDocument[]
+      advances?: IdDocument<Types.ObjectId>[]
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -293,14 +293,14 @@ export class HealthCareCostExamineController extends Controller {
   public async postBackInWork(
     @Body()
     requestBody: {
-      project?: IdDocument
-      insurance?: IdDocument
+      project?: IdDocument<Types.ObjectId>
+      insurance?: IdDocument<Types.ObjectId>
       patientName?: string
-      _id?: _id
+      _id?: string
       name?: string
-      owner?: IdDocument
+      owner?: IdDocument<Types.ObjectId>
       comment?: string
-      advances?: IdDocument[]
+      advances?: IdDocument<Types.ObjectId>[]
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -327,16 +327,16 @@ export class HealthCareCostExamineController extends Controller {
 
   @Post('reviewCompleted')
   public async postReviewCompleted(
-    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
+    @Body() requestBody: { _id: string; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (expenseReport: IHealthCareCost) => {
-      sendNotification(expenseReport)
-      sendViaMail(expenseReport)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
-        await writeToDisk(await writeToDiskFilePath(expenseReport), await reportPrinter.print(expenseReport, i18n.language as Locale))
+    const cb = async (healthCareCost: IHealthCareCost<Types.ObjectId>) => {
+      sendNotification(healthCareCost)
+      sendViaMail(healthCareCost)
+      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
+        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
       }
     }
 
@@ -356,7 +356,7 @@ export class HealthCareCostExamineController extends Controller {
 
   @Post('underExamination')
   public async postOwnUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_REVIEW, editor: request.user._id })
@@ -377,7 +377,7 @@ export class HealthCareCostExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -422,7 +422,7 @@ export class HealthCareCostBookableController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
 
     if (request.user.projects.supervised.length > 0) {
@@ -440,7 +440,7 @@ export class HealthCareCostBookableController extends Controller {
   }
 
   @Post('booked')
-  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+  public async postBooked(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
     const results = await Promise.allSettled(
       requestBody.map((id) => {
         const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }

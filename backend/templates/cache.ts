@@ -1,6 +1,4 @@
 import fs from 'node:fs/promises'
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 let mail: string | null = null
 let upload: string | null = null
@@ -22,8 +20,8 @@ export async function getUploadTemplate() {
 
 export async function getFileUtilsContent() {
   if (!fileUtils) {
-    const __dirname = dirname(fileURLToPath(import.meta.url))
-    fileUtils = await fs.readFile(`${__dirname}/../../common/utils/file.js`, { encoding: 'utf-8' })
+    const fileURL = await import.meta.resolve('abrechnung-common/utils/file.js')
+    fileUtils = await fs.readFile(new URL(fileURL), { encoding: 'utf-8' })
   }
   return fileUtils
 }

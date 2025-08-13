@@ -1,5 +1,5 @@
+import { Contact, User as IUser, tokenAdminUser } from 'abrechnung-common/types.js'
 import { HydratedDocument } from 'mongoose'
-import { Contact, User as IUser, tokenAdminUser } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import User from '../models/user.js'
 

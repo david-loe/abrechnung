@@ -1,5 +1,6 @@
+import { PrinterSettings as IPrinterSettings, locales } from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
-import { PrinterSettings as IPrinterSettings, locales } from '../../common/types.js'
 import PrinterSettings, { printerSettingsSchema } from '../models/printerSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'
@@ -14,7 +15,7 @@ export class PrinterSettingsController extends Controller {
     return { data: (await PrinterSettings.findOne({}, { __v: 0 }).lean()) as IPrinterSettings }
   }
   @Post()
-  public async post(@Body() requestBody: SetterBody<IPrinterSettings>) {
+  public async post(@Body() requestBody: SetterBody<IPrinterSettings<Types.ObjectId>>) {
     return await this.setter(PrinterSettings, { requestBody: requestBody, allowNew: false })
   }
   @Get('form')

@@ -1,7 +1,8 @@
 import { Readable } from 'node:stream'
-import { Condition } from 'mongoose'
+import { IdDocument, Travel as ITravel, idDocumentToId, Locale, Stage, State, TravelExpense, TravelState } from 'abrechnung-common/types.js'
+import { Condition, mongo, Types } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, IdDocument, Travel as ITravel, idDocumentToId, Locale, Stage, State, TravelExpense, TravelState } from '../../common/types.js'
+import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
 import i18n from '../i18n.js'
@@ -29,7 +30,7 @@ export class TravelController extends Controller {
     })
   }
   @Delete()
-  public async deleteOwn(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(Travel, {
       _id: _id,
       checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.owner._id.equals(request.user._id)
@@ -53,8 +54,8 @@ export class TravelController extends Controller {
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToOwn(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<TravelExpense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -63,7 +64,7 @@ export class TravelController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(Travel, {
-      requestBody,
+      requestBody: requestBody as TravelExpense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -83,8 +84,8 @@ export class TravelController extends Controller {
   @Post('stage')
   @Middlewares(fileHandler.any())
   public async postStageToOwn(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Stage>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -93,7 +94,7 @@ export class TravelController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(Travel, {
-      requestBody,
+      requestBody: requestBody as Stage,
       parentId,
       arrayElementKey: 'stages',
       allowNew: true,
@@ -111,7 +112,7 @@ export class TravelController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpeneseFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpeneseFromOwn(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -128,7 +129,7 @@ export class TravelController extends Controller {
   }
 
   @Delete('stage')
-  public async deleteStageFromOwn(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteStageFromOwn(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -172,8 +173,8 @@ export class TravelController extends Controller {
 
   @Post('approved')
   public async postOwnApproved(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
-    let extendedBody: SetterBody<ITravel> = requestBody
-    let cb: ((travel: ITravel) => unknown) | undefined
+    let extendedBody: SetterBody<ITravel<Types.ObjectId, mongo.Binary>> = requestBody
+    let cb: ((travel: ITravel<Types.ObjectId>) => unknown) | undefined
     if (!extendedBody._id) {
       if (!request.user.access['approved:travel']) {
         throw new AuthorizationError()
@@ -211,7 +212,7 @@ export class TravelController extends Controller {
 
   @Post('underExamination')
   public async postOwnUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.IN_REVIEW, editor: request.user._id })
@@ -232,7 +233,7 @@ export class TravelController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getOwnReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getOwnReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const travel = await Travel.findOne({ _id: _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }).lean()
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
@@ -271,7 +272,7 @@ export class TravelApproveController extends Controller {
 
   @Post('approved')
   public async postAnyBackApproved(
-    @Body() requestBody: ((TravelApplication & { owner: IdDocument }) | { _id: _id }) & { comment?: string },
+    @Body() requestBody: ((TravelApplication & { owner: IdDocument }) | { _id: string }) & { comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
@@ -304,7 +305,7 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('rejected')
-  public async postAnyRejected(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+  public async postAnyRejected(@Body() requestBody: { _id: string; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.REJECTED, editor: request.user._id })
 
     return await this.setter(Travel, {
@@ -352,7 +353,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete()
-  public async deleteAny(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteAny(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleter(Travel, {
       _id: _id,
       async checkOldObject(oldObject: TravelDoc) {
@@ -364,8 +365,8 @@ export class TravelExamineController extends Controller {
   @Post('expense')
   @Middlewares(fileHandler.any())
   public async postExpenseToAny(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<TravelExpense>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -374,7 +375,7 @@ export class TravelExamineController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(Travel, {
-      requestBody,
+      requestBody: requestBody as TravelExpense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
@@ -398,8 +399,8 @@ export class TravelExamineController extends Controller {
   @Post('stage')
   @Middlewares(fileHandler.any())
   public async postStageToAny(
-    @Query('parentId') parentId: _id,
-    @Body() requestBody: SetterBody<Stage>,
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
     // multipart/form-data does not send null values
@@ -408,7 +409,7 @@ export class TravelExamineController extends Controller {
       requestBody.project = null
     }
     return await this.setterForArrayElement(Travel, {
-      requestBody,
+      requestBody: requestBody as Stage,
       parentId,
       arrayElementKey: 'stages',
       allowNew: true,
@@ -430,7 +431,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete('expense')
-  public async deleteExpeneseFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteExpeneseFromAny(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -451,7 +452,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Delete('stage')
-  public async deleteStageFromAny(@Query() _id: _id, @Query() parentId: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async deleteStageFromAny(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(Travel, {
       _id,
       parentId,
@@ -473,15 +474,15 @@ export class TravelExamineController extends Controller {
 
   @Post('reviewCompleted')
   public async postReviewCompleted(
-    @Body() requestBody: { _id: _id; comment?: string; bookingRemark?: string | null },
+    @Body() requestBody: { _id: string; comment?: string; bookingRemark?: string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (travel: ITravel) => {
+    const cb = async (travel: ITravel<Types.ObjectId>) => {
       sendNotification(travel)
       sendViaMail(travel)
-      if (process.env.BACKEND_SAVE_REPORTS_ON_DISK.toLowerCase() === 'true') {
+      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
         await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
       }
     }
@@ -505,7 +506,7 @@ export class TravelExamineController extends Controller {
   }
 
   @Post('approved')
-  public async postAnyApproved(@Body() requestBody: { _id: _id; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+  public async postAnyApproved(@Body() requestBody: { _id: string; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
 
     return await this.setter(Travel, {
@@ -524,7 +525,7 @@ export class TravelExamineController extends Controller {
 
   @Post('underExamination')
   public async postAnyUnderExamination(
-    @Body() requestBody: { _id: _id; comment?: string },
+    @Body() requestBody: { _id: string; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.IN_REVIEW, editor: request.user._id })
@@ -545,7 +546,7 @@ export class TravelExamineController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -584,7 +585,7 @@ export class TravelBookableController extends Controller {
 
   @Get('report')
   @Produces('application/pdf')
-  public async getBookableReport(@Query() _id: _id, @Request() request: AuthenticatedExpressRequest) {
+  public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
       filter.project = { $in: request.user.projects.supervised }
@@ -601,7 +602,7 @@ export class TravelBookableController extends Controller {
   }
 
   @Post('booked')
-  public async postBooked(@Body() requestBody: IdDocument[], @Request() request: AuthenticatedExpressRequest) {
+  public async postBooked(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
     const results = await Promise.allSettled(
       requestBody.map((id) => {
         const doc = { _id: idDocumentToId(id), state: State.BOOKED, editor: request.user._id }

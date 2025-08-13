@@ -26,8 +26,8 @@
 </template>
 
 <script lang="ts" setup>
+import { AnyState, AnyStateEnum, State } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
-import { AnyState, AnyStateEnum, State } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import StateBadge from '@/components/elements/StateBadge.vue'
 

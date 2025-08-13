@@ -1,6 +1,6 @@
+import { Access } from 'abrechnung-common/types.js'
 import { Request } from 'express'
 import passport, { AuthenticateCallback } from 'passport'
-import { Access } from '../../common/types.js'
 import httpBearerStrategy from '../authStrategies/http-bearer.js'
 import { AuthorizationError } from './error.js'
 

@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { VueformElement, VueformSchema } from '@vueform/vueform'
+import { DisplaySettings } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { DisplaySettings } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 
@@ -22,7 +22,7 @@ export default defineComponent({
   },
   methods: {
     async postDisplaySettings(displaySettings: DisplaySettings) {
-      const result = await API.setter<DisplaySettings>('admin/displaySettings', displaySettings)
+      const result = await API.setter<DisplaySettings<string>>('admin/displaySettings', displaySettings)
       if (result.ok && APP_DATA.value) {
         APP_DATA.value?.setDisplaySettings(result.ok)
         ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.displaySettings, false)

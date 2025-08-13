@@ -1,5 +1,6 @@
+import { Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { _id, Project as IProject, locales, ProjectSimple, ProjectWithUsers } from '../../common/types.js'
 import { getSettings } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -51,8 +52,8 @@ export class ProjectAdminController extends Controller {
     return await this.getter(Project, { query, sort: { identifier: 1 } })
   }
   @Post()
-  public async post(@Body() requestBody: SetterBody<ProjectWithUsers>) {
-    async function cb(project: IProject) {
+  public async post(@Body() requestBody: SetterBody<ProjectWithUsers<Types.ObjectId>>) {
+    async function cb(project: IProject<Types.ObjectId>) {
       if (requestBody.assignees) {
         for (const userId of requestBody.assignees) {
           await (await User.findOne({ _id: userId }))?.addProjects({ assigned: [project._id] })
@@ -67,11 +68,11 @@ export class ProjectAdminController extends Controller {
     return await this.setter(Project, { requestBody: requestBody, allowNew: true, cb })
   }
   @Post('bulk')
-  public async postMany(@Body() requestBody: SetterBody<IProject>[]) {
+  public async postMany(@Body() requestBody: SetterBody<IProject<Types.ObjectId>>[]) {
     return await this.insertMany(Project, { requestBody })
   }
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(Project, {
       _id: _id,
       referenceChecks: [

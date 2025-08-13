@@ -1,6 +1,6 @@
+import { detectImageType } from 'abrechnung-common/utils/file.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
-import { detectImageType } from '../common/utils/file.js'
 import { formatter } from './factory.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'

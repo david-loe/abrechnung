@@ -8,6 +8,7 @@ import { errorHandler, RateLimitExceededError } from './controller/error.js'
 import { connectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
+import ENV from './env.js'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
@@ -17,14 +18,9 @@ export default async function () {
   await checkForMigrations()
 
   const app = express()
-  if (process.env.TRUST_PROXY) {
-    if (process.env.TRUST_PROXY.toLowerCase() === 'true') {
-      app.set('trust proxy', true)
-    } else if (process.env.TRUST_PROXY.match(/^\d+$/)) {
-      app.set('trust proxy', Number.parseInt(process.env.TRUST_PROXY))
-    } else {
-      app.set('trust proxy', process.env.TRUST_PROXY)
-    }
+
+  if (ENV.TRUST_PROXY) {
+    app.set('trust proxy', ENV.TRUST_PROXY)
     app.get('/ip', (request, response) => {
       response.send(request.ip)
     })
@@ -32,13 +28,13 @@ export default async function () {
 
   app.use(express.json({ limit: '2mb' }))
   app.use(express.urlencoded({ limit: '2mb', extended: true }))
-  app.use(cors({ credentials: true, origin: [process.env.VITE_FRONTEND_URL, process.env.VITE_BACKEND_URL] }))
+  app.use(cors({ credentials: true, origin: [ENV.VITE_FRONTEND_URL, ENV.VITE_BACKEND_URL] }))
 
-  if (process.env.RATE_LIMIT_WINDOW_MS && process.env.RATE_LIMIT) {
+  if (ENV.RATE_LIMIT_WINDOW_MS || ENV.RATE_LIMIT) {
     app.use(
       rateLimit({
-        windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS),
-        limit: Number.parseInt(process.env.RATE_LIMIT),
+        windowMs: ENV.RATE_LIMIT_WINDOW_MS,
+        limit: ENV.RATE_LIMIT,
         standardHeaders: 'draft-7',
         legacyHeaders: false,
         skip: (req, _res) => req.method !== 'POST',
@@ -48,14 +44,14 @@ export default async function () {
   }
 
   // only use secure cookie with https and trust proxy setup
-  const useSecureCookie = process.env.VITE_BACKEND_URL.startsWith('https') && Boolean(process.env.TRUST_PROXY)
+  const useSecureCookie = ENV.VITE_BACKEND_URL.startsWith('https') && Boolean(ENV.TRUST_PROXY)
 
   app.use(
     session({
       store: await sessionStore(),
-      secret: process.env.COOKIE_SECRET,
+      secret: ENV.COOKIE_SECRET,
       cookie: {
-        maxAge: (Number.parseInt(process.env.COOKIE_MAX_AGE_DAYS) || 30) * 24 * 60 * 60 * 1000,
+        maxAge: ENV.COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
         secure: useSecureCookie,
         sameSite: useSecureCookie ? 'none' : 'lax'
       },
@@ -76,7 +72,7 @@ export default async function () {
     next()
   })
 
-  if (process.env.NODE_ENV === 'development') {
+  if (ENV.NODE_ENV === 'development') {
     app.use(
       '/docs',
       // fix path when behind proxy https://github.com/scottie1984/swagger-ui-express/issues/183

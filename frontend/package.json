@@ -10,6 +10,7 @@
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {
+    "abrechnung-common": "file:../common",
     "@popperjs/core": "^2.11.8",
     "@vueform/vueform": "^1.13.0",
     "axios": "^1.11.0",

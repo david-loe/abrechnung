@@ -1,9 +1,9 @@
-import { model, Schema } from 'mongoose'
-import { Category } from '../../common/types.js'
+import { Category } from 'abrechnung-common/types.js'
+import { model, Schema, Types } from 'mongoose'
 import { colorSchema } from './helper.js'
 
 export const categorySchema = () =>
-  new Schema<Category>({
+  new Schema<Category<Types.ObjectId>>({
     name: { type: String, trim: true, required: true, index: true },
     isDefault: { type: Boolean, default: false },
     style: colorSchema(undefined)
@@ -11,4 +11,4 @@ export const categorySchema = () =>
 
 const schema = categorySchema()
 
-export default model<Category>('Category', schema)
+export default model<Category<Types.ObjectId>>('Category', schema)

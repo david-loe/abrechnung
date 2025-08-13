@@ -172,11 +172,11 @@
 </template>
 
 <script lang="ts" setup>
+import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/scripts.js'
+import { HealthCareCostSimple, HealthCareCostState, healthCareCostStates, Log } from 'abrechnung-common/types.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import { getById, getTotalBalance, getTotalTotal } from '@/../../common/scripts.js'
-import { HealthCareCostSimple, HealthCareCostState, healthCareCostStates, Log } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import DateInput from '@/components/elements/DateInput.vue'

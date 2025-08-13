@@ -1,6 +1,6 @@
-import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
-import { addUp } from '../../common/scripts.js'
-import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from '../../common/types.js'
+import { addUp } from 'abrechnung-common/scripts.js'
+import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from 'abrechnung-common/types.js'
+import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { addExchangeRate } from './exchangeRate.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
@@ -11,10 +11,10 @@ interface Methods {
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type HealthCareCostModel = Model<HealthCareCost, {}, Methods>
+type HealthCareCostModel = Model<HealthCareCost<Types.ObjectId, mongo.Binary>, {}, Methods>
 
 const healthCareCostSchema = () =>
-  new Schema<HealthCareCost, HealthCareCostModel, Methods>(
+  new Schema<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel, Methods>(
     Object.assign(requestBaseSchema(healthCareCostStates, HealthCareCostState.IN_WORK, 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
@@ -48,9 +48,12 @@ const populates = {
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<HealthCareCost, HealthCareCost>) {
-  await populateSelected(this, populates)
-})
+schema.pre(
+  /^find((?!Update).)*$/,
+  async function (this: Query<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCost<Types.ObjectId, mongo.Binary>>) {
+    await populateSelected(this, populates)
+  }
+)
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: HealthCareCostDoc) {
   for (const historyId of this.history) {
@@ -66,7 +69,9 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Health
 })
 
 schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
-  const doc = await model<HealthCareCost, HealthCareCostModel>('HealthCareCost').findOne({ _id: this._id }, { history: 0 }).lean()
+  const doc = await model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost')
+    .findOne({ _id: this._id }, { history: 0 })
+    .lean()
   if (!doc) {
     throw new Error('Health Care Cost not found')
   }
@@ -89,7 +94,7 @@ schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc)
 
 schema.methods.addComment = function (this: HealthCareCostDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<HealthCareCostState>)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, HealthCareCostState>)
     this.comment = undefined
   }
 }
@@ -102,7 +107,7 @@ schema.pre('save', async function (this: HealthCareCostDoc) {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this) as AddUp<HealthCareCost>[]
+  this.addUp = addUp(this) as AddUp<Types.ObjectId, HealthCareCost<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)
 })
@@ -114,6 +119,6 @@ schema.post('save', async function (this: HealthCareCostDoc) {
   }
 })
 
-export default model<HealthCareCost, HealthCareCostModel>('HealthCareCost', schema)
+export default model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost', schema)
 
-export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost> {}
+export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost<Types.ObjectId, mongo.Binary>> {}

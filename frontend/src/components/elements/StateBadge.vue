@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts" setup>
+import { AnyState, AnyStateEnum } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
-import { AnyState, AnyStateEnum } from '@/../../common/types.js'
 import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
 

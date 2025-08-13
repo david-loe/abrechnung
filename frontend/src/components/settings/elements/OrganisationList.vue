@@ -46,10 +46,10 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
+import { Organisation } from 'abrechnung-common/types.js'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import { Organisation } from '@/../../common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import ListElement from '@/components/elements/ListElement.vue'
@@ -107,7 +107,7 @@ async function postOrganisation(organisation: Organisation) {
     APP_LOADER.loadRequired('organisation')
   }
 }
-async function deleteOrganisation(organisation: Organisation) {
+async function deleteOrganisation(organisation: Organisation<string>) {
   const result = await API.deleter('admin/organisation', { _id: organisation._id })
   if (result) {
     loadFromServer()

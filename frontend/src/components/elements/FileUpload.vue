@@ -7,16 +7,16 @@
             v-for="(file, index) of modelValue"
             :file="file"
             :disabled="disabled"
-            :key="(file as DocumentFile).name"
+            :key="(file as DocumentFile<string, Blob>).name"
             @show="showFile(file)"
             @deleted="deleteFile(file, index)" />
         </template>
         <FileUploadFileElement
           v-else
-          :file="modelValue as DocumentFile"
+          :file="modelValue as DocumentFile<string, Blob>"
           :disabled="disabled"
-          @show="showFile(modelValue as Partial<DocumentFile>)"
-          @deleted="deleteFile(modelValue as Partial<DocumentFile>)" />
+          @show="showFile(modelValue as Partial<DocumentFile<string, Blob>>)"
+          @deleted="deleteFile(modelValue as Partial<DocumentFile<string, Blob>>)" />
       </template>
 
       <div v-if="!disabled" class="ms-auto col-auto d-none d-md-block">
@@ -47,20 +47,21 @@
       :id="id"
       :accept="accept"
       @change="changeFile"
-      :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile>[]).length === 0"
+      :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile<string, Blob>>[]).length === 0"
       :multiple="multiple"
       :disabled="disabled" />
   </div>
 </template>
 
 <script lang="ts">
+import { DocumentFile, Token } from 'abrechnung-common/types.js'
+import { fileEventToDocumentFiles } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
 import { defineComponent, PropType } from 'vue'
-import { DocumentFile, Token } from '@/../../common/types.js'
-import { fileEventToDocumentFiles } from '@/../../common/utils/file.js'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'
 import FileUploadFileElement from '@/components/elements/FileUploadFileElement.vue'
+import ENV from '@/env.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 
@@ -70,7 +71,10 @@ export default defineComponent({
   name: 'FileUpload',
   components: { FileUploadFileElement },
   props: {
-    modelValue: { type: [Array, Object] as PropType<Partial<DocumentFile>[] | Partial<DocumentFile> | null>, default: () => null },
+    modelValue: {
+      type: [Array, Object] as PropType<Partial<DocumentFile<string, Blob>>[] | Partial<DocumentFile<string, Blob>> | null>,
+      default: () => null
+    },
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     id: { type: String },
@@ -81,7 +85,7 @@ export default defineComponent({
   },
   data() {
     return {
-      token: undefined as Token | undefined,
+      token: undefined as Token<string, Blob> | undefined,
       qr: undefined as string | undefined,
       fetchTokenInterval: undefined as NodeJS.Timeout | undefined,
       secondsLeft: 1,
@@ -90,14 +94,14 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
-    async showFile(file: Partial<DocumentFile>): Promise<void> {
+    async showFile(file: Partial<DocumentFile<string, Blob>>): Promise<void> {
       if (file.data) {
         await showFile(file.data as File)
       } else if (file._id) {
         await showFile({ params: { _id: file._id }, endpoint: `${this.endpointPrefix}documentFile`, filename: file.name as string })
       }
     },
-    async deleteFile(file: Partial<DocumentFile>, index?: number) {
+    async deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
       if (confirm(this.$t('alerts.areYouSureDelete'))) {
         if (file._id) {
           const result = await API.deleter(`${this.endpointPrefix}documentFile`, { _id: file._id }, false)
@@ -115,7 +119,7 @@ export default defineComponent({
       }
     },
     async changeFile(event: Event) {
-      const newFiles = await fileEventToDocumentFiles(event, Number.parseInt(import.meta.env.VITE_MAX_FILE_SIZE), this.$t)
+      const newFiles = await fileEventToDocumentFiles(event, ENV.VITE_MAX_FILE_SIZE, ENV.VITE_IMAGE_COMPRESSION_THRESHOLD_PX, this.$t)
       if (newFiles) {
         if (this.multiple) {
           const files = Array.isArray(this.modelValue) ? this.modelValue : []
@@ -126,9 +130,9 @@ export default defineComponent({
       }
     },
     async generateToken() {
-      this.token = (await API.setter<Token>('user/token', {}, undefined, false)).ok
+      this.token = (await API.setter<Token<string, Blob>>('user/token', {}, undefined, false)).ok
       if (this.token && APP_DATA.value) {
-        const url = new URL(`${import.meta.env.VITE_BACKEND_URL}/upload/new`)
+        const url = new URL(`${ENV.VITE_BACKEND_URL}/upload/new`)
         url.searchParams.append('userId', APP_DATA.value.user._id)
         url.searchParams.append('tokenId', this.token._id)
         if (this.ownerId) {
@@ -144,9 +148,9 @@ export default defineComponent({
       if (this.token) {
         this.secondsLeft = Math.round((new Date(this.token.expireAt).valueOf() - Date.now()) / 1000)
       }
-      const result = (await API.getter<Token>('user/token')).ok
+      const result = (await API.getter<Token<string, Blob>>('user/token')).ok
       if (result?.data) {
-        const token: Token = result.data
+        const token: Token<string, Blob> = result.data
         if (token.files.length > 0) {
           if (this.multiple) {
             const files = Array.isArray(this.modelValue) ? this.modelValue : []

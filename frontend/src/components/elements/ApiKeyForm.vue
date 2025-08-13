@@ -38,8 +38,8 @@
 </template>
 
 <script lang="ts" setup>
+import { User } from 'abrechnung-common/types.js'
 import { PropType, ref } from 'vue'
-import { User } from '@/../../common/types.js'
 import API from '@/api.js'
 import { logger } from '@/logger.js'
 

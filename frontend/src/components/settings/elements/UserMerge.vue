@@ -10,7 +10,7 @@
       </div>
       <div class="col">
         <label>{{ $t('labels.userToOverwrite') }}</label>
-        <UserSelector @update:model-value="(u: UserWithNameAndProject) => (userIdToOverwrite = idDocumentToId(u))"></UserSelector>
+        <UserSelector @update:model-value="(u: UserWithNameAndProject<string>) => (userIdToOverwrite = idDocumentToId(u))"></UserSelector>
         <input
           class="form-control form-control-sm"
           type="text"
@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
+import { idDocumentToId, objectIdRegex, User, UserReplaceReferencesResult, UserWithNameAndProject } from 'abrechnung-common/types.js'
 import { defineComponent } from 'vue'
-import { idDocumentToId, objectIdRegex, User, UserReplaceReferencesResult, UserWithNameAndProject } from '@/../../common/types.js'
 import API from '@/api.js'
 import UserSelector from '@/components/elements/UserSelector.vue'
 
@@ -69,7 +69,7 @@ export default defineComponent({
   components: { UserSelector },
   data() {
     return {
-      user: undefined as UserWithNameAndProject | undefined,
+      user: undefined as UserWithNameAndProject<string> | undefined,
       userIdToOverwrite: null as string | null,
       delOverwritten: false,
       result: undefined as MergeResult | undefined,

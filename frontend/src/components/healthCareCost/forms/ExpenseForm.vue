@@ -97,8 +97,8 @@
 </template>
 
 <script lang="ts">
+import { baseCurrency, Expense } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
-import { baseCurrency, Expense } from '@/../../common/types.js'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'

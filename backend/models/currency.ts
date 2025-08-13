@@ -1,5 +1,5 @@
+import { Currency } from 'abrechnung-common/types.js'
 import { model, Schema } from 'mongoose'
-import { Currency } from '../../common/types.js'
 
 export const currencySchema = () =>
   new Schema<Currency>({

@@ -1,9 +1,9 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
-import { hexColorRegex, PrinterSettings } from '../../common/types.js'
+import { hexColorRegex, PrinterSettings } from 'abrechnung-common/types.js'
+import { HydratedDocument, model, Schema, Types } from 'mongoose'
 import { reportPrinter } from '../factory.js'
 
 export const printerSettingsSchema = () =>
-  new Schema<PrinterSettings>({
+  new Schema<PrinterSettings<Types.ObjectId>>({
     pageSize: {
       type: { width: { type: Number, min: 0, required: true }, height: { type: Number, min: 0, required: true } },
       required: true,
@@ -29,7 +29,7 @@ export const printerSettingsSchema = () =>
 
 const schema = printerSettingsSchema()
 
-schema.post('save', function (this: HydratedDocument<PrinterSettings>) {
+schema.post('save', function (this: HydratedDocument<PrinterSettings<Types.ObjectId>>) {
   reportPrinter.setSettings(this)
 })
 

@@ -1,0 +1,14 @@
+{
+  "include": ["**/*"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "strict": true,
+    "module": "NodeNext",
+    "target": "ES2022",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true
+  }
+}

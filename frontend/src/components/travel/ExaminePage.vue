@@ -35,8 +35,8 @@
 </template>
 
 <script lang="ts" setup>
+import { TravelState } from 'abrechnung-common/types.js'
 import { Ref, ref } from 'vue'
-import { TravelState } from '@/../../common/types'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
 

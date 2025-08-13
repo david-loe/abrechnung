@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { getBaseCurrencyAmount } from 'abrechnung-common/scripts.js'
+import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
-import { getBaseCurrencyAmount } from '../common/scripts.js'
-import { _id, BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from '../common/types.js'
+import ENV from './env.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 
@@ -126,21 +127,21 @@ export async function writeToDisk(
   }
 }
 
-export function checkIfUserIsProjectSupervisor(user: IUser, projectId: _id): boolean {
+export function checkIfUserIsProjectSupervisor(user: IUser<Types.ObjectId>, projectId: Types.ObjectId): boolean {
   if (user.projects.supervised.length === 0) {
     return true
   }
   return user.projects.supervised.some((p) => p._id.equals(projectId))
 }
 
-export const fileHandler = multer({ limits: { fileSize: Number.parseInt(process.env.VITE_MAX_FILE_SIZE) } })
+export const fileHandler = multer({ limits: { fileSize: ENV.VITE_MAX_FILE_SIZE } })
 
 export function genAuthenticatedLink(
   payload: { destination: string; redirect: string },
   jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }
 ) {
-  const secret = process.env.MAGIC_LOGIN_SECRET
-  const callbackUrl = `${process.env.VITE_BACKEND_URL}/auth/magiclogin/callback`
+  const secret = ENV.MAGIC_LOGIN_SECRET
+  const callbackUrl = `${ENV.VITE_BACKEND_URL}/auth/magiclogin/callback`
   return new Promise<string>((resolve, reject) => {
     const code = `${Math.floor(Math.random() * 90000) + 10000}`
     jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {

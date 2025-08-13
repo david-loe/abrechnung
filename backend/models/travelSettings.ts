@@ -1,5 +1,12 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
-import { DistanceRefundType, defaultLastPlaceOfWorkSettings, distanceRefundTypes, Meal, meals, TravelSettings } from '../../common/types.js'
+import {
+  DistanceRefundType,
+  defaultLastPlaceOfWorkSettings,
+  distanceRefundTypes,
+  Meal,
+  meals,
+  TravelSettings
+} from 'abrechnung-common/types.js'
+import { HydratedDocument, model, Schema, Types } from 'mongoose'
 import { approvedTravelsPrinter, reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {
@@ -13,7 +20,7 @@ export const travelSettingsSchema = () => {
     lumpSumCut[meal] = { type: Number, required: true }
   }
 
-  return new Schema<TravelSettings>({
+  return new Schema<TravelSettings<Types.ObjectId>>({
     allowTravelApplicationForThePast: { type: Boolean, required: true },
     allowSpouseRefund: { type: Boolean, required: true },
     maxTravelDayCount: { type: Number, min: 0, required: true },
@@ -36,7 +43,7 @@ export const travelSettingsSchema = () => {
 
 const schema = travelSettingsSchema()
 
-schema.post('save', function (this: HydratedDocument<TravelSettings>) {
+schema.post('save', function (this: HydratedDocument<TravelSettings<Types.ObjectId>>) {
   travelCalculator.updateSettings(this)
   reportPrinter.setDistanceRefunds(this.distanceRefunds)
   approvedTravelsPrinter.setAllowSpouseRefund(this.allowSpouseRefund)

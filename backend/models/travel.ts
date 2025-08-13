@@ -1,5 +1,4 @@
-import mongoose, { HydratedDocument, Model, model, Query, Schema } from 'mongoose'
-import { addUp } from '../../common/scripts.js'
+import { addUp } from 'abrechnung-common/scripts.js'
 import {
   AddUp,
   Comment,
@@ -10,7 +9,8 @@ import {
   TravelState,
   transportTypes,
   travelStates
-} from '../../common/types.js'
+} from 'abrechnung-common/types.js'
+import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
@@ -35,10 +35,10 @@ interface Methods {
 }
 
 // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type TravelModel = Model<Travel, {}, Methods>
+type TravelModel = Model<Travel<Types.ObjectId, mongo.Binary>, {}, Methods>
 
 const travelSchema = () =>
-  new Schema<Travel, TravelModel, Methods>(
+  new Schema<Travel<Types.ObjectId, mongo.Binary>, TravelModel, Methods>(
     Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), travelBaseSchema(), {
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
@@ -125,9 +125,12 @@ const populates = {
   comments: [{ path: 'comments.author', select: { name: 1, email: 1 } }]
 }
 
-schema.pre(/^find((?!Update).)*$/, async function (this: Query<Travel, Travel>) {
-  await populateSelected(this, populates)
-})
+schema.pre(
+  /^find((?!Update).)*$/,
+  async function (this: Query<Travel<Types.ObjectId, mongo.Binary>, Travel<Types.ObjectId, mongo.Binary>>) {
+    await populateSelected(this, populates)
+  }
+)
 
 schema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
   for (const historyId of this.history) {
@@ -147,7 +150,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 })
 
 schema.methods.saveToHistory = async function (this: TravelDoc) {
-  const doc = await model<Travel, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
+  const doc = await model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
   if (!doc) {
     throw new Error('Travel not found')
   }
@@ -194,7 +197,7 @@ schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
 
 schema.methods.addComment = function (this: TravelDoc) {
   if (this.comment) {
-    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<TravelState>)
+    this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, TravelState>)
     this.comment = undefined
   }
 }
@@ -211,7 +214,7 @@ schema.pre('validate', async function (this: TravelDoc) {
   }
 
   await this.calculateExchangeRates()
-  this.addUp = addUp(this) as AddUp<Travel>[]
+  this.addUp = addUp(this) as AddUp<Types.ObjectId, Travel>[]
   await populateAll(this, populates)
 })
 
@@ -228,6 +231,6 @@ schema.post('save', async function (this: TravelDoc) {
   }
 })
 
-export default model<Travel, TravelModel>('Travel', schema)
+export default model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel', schema)
 
-export interface TravelDoc extends Methods, HydratedDocument<Travel> {}
+export interface TravelDoc extends Methods, HydratedDocument<Travel<Types.ObjectId, mongo.Binary>> {}
