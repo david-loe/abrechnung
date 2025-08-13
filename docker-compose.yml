@@ -8,7 +8,7 @@ services:
       - db
     volumes:
       - ./backend:/app
-      - ./common:/common
+      - ./common:/common:ro
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
       - ${BACKEND_DEBUG_PORT}:${BACKEND_DEBUG_PORT}
