@@ -6,7 +6,6 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
       - name: copy .env file
         uses: canastro/copy-file-action@ae66602ce7d214dbd2e298c1db67a81388755a0a
         with:
