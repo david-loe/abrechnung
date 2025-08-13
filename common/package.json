@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./dist/*"
+    "./*": "./dist/*",
+    "./fonts/*": "./fonts/*"
   },
   "dependencies": {
     "envalid": "^8.1.0"

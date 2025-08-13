@@ -13,6 +13,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './bootstrap.css'
 
+import 'abrechnung-common/fonts/twemoji-flags.css'
+
 import Formatter from 'abrechnung-common/formatter.js'
 import { CountrySimple, Currency, Locale } from 'abrechnung-common/types.js'
 import formatter from './formatter.js'
