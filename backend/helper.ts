@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { getBaseCurrencyAmount } from 'abrechnung-common/scripts.js'
-import { _id, BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
+import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'

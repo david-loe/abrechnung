@@ -1,14 +1,4 @@
-import {
-  Currency,
-  CurrencyCode,
-  DocumentFile,
-  DocumentFileType,
-  IdDocument,
-  Money,
-  Travel,
-  TravelDay,
-  TravelSimple
-} from 'abrechnung-common/types.js'
+import { Currency, CurrencyCode, DocumentFileType, IdDocument, Money, Travel, TravelDay, TravelSimple } from 'abrechnung-common/types.js'
 import { Request as ExRequest } from 'express'
 import { Types } from 'mongoose'
 import { SetterBody } from './controller.js'

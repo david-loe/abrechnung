@@ -1,4 +1,4 @@
-import { _id, Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
+import { Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { getSettings } from '../db.js'
