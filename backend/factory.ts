@@ -25,7 +25,7 @@ export const reportPrinter = new ReportPrinter<Types.ObjectId>(
   async (id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
-      // Wrong type in mongodb BSON Binary, so need assertion here
+      // inconsistent type in mongoose for Buffer, so need assertion here https://github.com/Automattic/mongoose/pull/15518
       return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
     }
     return null
@@ -48,7 +48,7 @@ export const approvedTravelsPrinter = new ApprovedTravelsPrinter<Types.ObjectId>
   async (id) => {
     const doc = await DocumentFile.findOne({ _id: id }).lean()
     if (doc) {
-      // Wrong type in mongodb BSON Binary, so need assertion here
+      // inconsistent type in mongoose for Buffer, so need assertion here https://github.com/Automattic/mongoose/pull/15518
       return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
     }
     return null
