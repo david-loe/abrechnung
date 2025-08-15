@@ -2,12 +2,16 @@
   <div class="table-wrapper" :class="{ 'settings-open': showSettings }">
     <div v-if="USE_DB_SETTINGS" class="overlay">
       <div v-if="!showSettings" class="settings-icon">
-        <i class="bi bi-gear clickable m-1" @click="showSettings = true"></i>
+        <button type="button" class="btn p-0 m-1" @click="showSettings = true"><i class="bi bi-gear"></i></button>
       </div>
       <div v-else class="d-flex align-items-center">
-        <ArrowSortableList v-model="columnOrder" :labelFn="(c: {text: string, value: string}) => t(c.text)"></ArrowSortableList>
-        <i class="bi bi-check-lg clickable m-2 text-success" :title="t('labels.save')" @click="applyOrder"></i>
-        <i class="bi bi-arrow-counterclockwise clickable m-2 text-danger" @click="resetOrder"></i>
+        <ArrowSortableList
+          v-model="columnOrder"
+          :labelFn="(c: {text: string, value: string}) => c.text ? t(c.text) : c.value"></ArrowSortableList>
+        <button type="button" class="btn p-0 m-2" :title="t('labels.save')" @click="applyOrder">
+          <i class="bi bi-check-lg text-success"></i>
+        </button>
+        <button type="button" class="btn p-0 m-2" @click="resetOrder"><i class="bi bi-arrow-counterclockwise text-danger"></i></button>
       </div>
     </div>
     <Vue3EasyDataTable
@@ -32,7 +36,7 @@
       body-item-class-name="text-truncate"
       :style="{ filter: showSettings ? 'blur(3px)' : 'none', transition: 'filter 0.2s ease-in-out' }">
       <template #header="header">
-        {{ t(header.text) }}
+        {{ header.text ? t(header.text) : '' }}
       </template>
       <!-- Standard-Slot weiterleiten -->
       <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
