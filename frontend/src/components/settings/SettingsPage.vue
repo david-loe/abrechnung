@@ -4,19 +4,13 @@
       <div class="offcanvas-body flex-column pt-lg-3 overflow-y-auto">
         <ul class="nav nav-pills flex-column">
           <li v-for="_entry in items" class="nav-item">
-            <span
-              style="cursor: pointer"
-              :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
-              @click="entry = _entry">
+            <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
               {{ $t('labels.' + _entry) }}
             </span>
           </li>
           <li class="border-top my-3"></li>
           <li v-for="_entry in settings" class="nav-item">
-            <span
-              style="cursor: pointer"
-              :class="'nav-link ' + (_entry === entry ? 'active' : 'link-body-emphasis')"
-              @click="entry = _entry">
+            <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
               {{ $t('labels.' + _entry) }}
             </span>
           </li>

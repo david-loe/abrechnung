@@ -149,7 +149,7 @@
               <tr
                 v-for="expense of healthCareCost.expenses"
                 :key="expense._id"
-                style="cursor: pointer"
+                class="clickable"
                 @click="showModal('edit', 'expense', expense)">
                 <td>
                   {{

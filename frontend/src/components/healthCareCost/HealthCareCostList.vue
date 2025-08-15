@@ -15,7 +15,7 @@
     <template #header-name="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
+        <span class="clickable" @click="(e) => clickFilter('name', e)">
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -27,7 +27,7 @@
     <template #header-state="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span style="cursor: pointer" @click="(e) => clickFilter('state', e)">
+        <span class="clickable" @click="(e) => clickFilter('state', e)">
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -42,7 +42,7 @@
     <template #header-insurance.name="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span style="cursor: pointer" @click="(e) => clickFilter('insurance', e)">
+        <span class="clickable" @click="(e) => clickFilter('insurance', e)">
           <i v-if="showFilter.insurance" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -54,7 +54,7 @@
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span style="cursor: pointer" @click="(e) => clickFilter('project', e)">
+        <span class="clickable" @click="(e) => clickFilter('project', e)">
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -66,7 +66,7 @@
     <template #header-organisation="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span style="cursor: pointer" @click="(e) => clickFilter('project.organisation', e)">
+        <span class="clickable" @click="(e) => clickFilter('project.organisation', e)">
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
         </span>
@@ -79,7 +79,7 @@
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ t(header.text) }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('owner', e)">
+          <span class="clickable" @click="(e) => clickFilter('owner', e)">
             <i v-if="showFilter.owner" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>
@@ -93,7 +93,7 @@
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ t(header.text) }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('updatedAt', e)">
+          <span class="clickable" @click="(e) => clickFilter('updatedAt', e)">
             <i v-if="showFilter.updatedAt" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
           </span>

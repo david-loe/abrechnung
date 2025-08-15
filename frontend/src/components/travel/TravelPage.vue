@@ -232,8 +232,7 @@
             <!-- Stage -->
             <div
               v-else-if="row.type === 'stage'"
-              class="row align-items-center ps-lg-4 mb-1"
-              style="cursor: pointer"
+              class="row align-items-center clickable ps-lg-4 mb-1"
               @click="showModal('edit', 'stage', row.data as Stage)">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i :class="getStageIcon(row.data as Stage)"></i>
@@ -255,8 +254,7 @@
             <!-- expense -->
             <div
               v-else-if="row.type === 'expense'"
-              class="row align-items-center ps-lg-4 mb-1"
-              style="cursor: pointer"
+              class="row align-items-center clickable ps-lg-4 mb-1"
               @click="showModal('edit', 'expense', row.data as TravelExpense)">
               <div class="col-auto fs-3 d-none d-md-block">
                 <i class="bi bi-coin"></i>

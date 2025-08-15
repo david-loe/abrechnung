@@ -4,7 +4,7 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span style="cursor: pointer" @click="clickFilter(nameFilterKey)">
+          <span class="clickable" @click="clickFilter(nameFilterKey)">
             <i v-if="showFilter[nameFilterKey]" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>
@@ -17,7 +17,7 @@
       <template #header-_id="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('_id', e)">
+          <span class="clickable" @click="(e) => clickFilter('_id', e)">
             <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>

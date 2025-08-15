@@ -34,10 +34,10 @@
           <td></td>
           <td class="py-0 px-2 text-nowrap" v-for="meal in lumpSums" :key="meal">
             <span v-if="!disabled" class="d-sm-inline d-none">
-              <span class="text-primary" style="cursor: pointer" @click="setAll(meal, true)">
+              <span class="clickable text-primary" @click="setAll(meal, true)">
                 <i class="bi bi-check-square"></i>
               </span>
-              <span class="ms-2 text-danger" style="cursor: pointer" @click="setAll(meal, false)">
+              <span class="ms-2 clickable text-danger" @click="setAll(meal, false)">
                 <i class="bi bi-x-square"></i>
               </span>
             </span>

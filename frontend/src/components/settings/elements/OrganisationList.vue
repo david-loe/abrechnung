@@ -4,7 +4,7 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span style="cursor: pointer" @click="(e) => clickFilter('name', e)">
+          <span class="clickable" @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
           </span>

@@ -18,7 +18,7 @@ import { getById } from 'abrechnung-common/scripts.js'
 import { OrganisationSimple, ProjectSimple } from 'abrechnung-common/types.js'
 import { onMounted, ref } from 'vue'
 import APP_LOADER from '@/appData.js'
-import OrganisationSelector from './OrganisationSelector.vue'
+import OrganisationSelector from '@/components/elements/OrganisationSelector.vue'
 
 const props = defineProps<{
   modelValue: ProjectSimple<string>[] | string[] | [undefined] | [null]
