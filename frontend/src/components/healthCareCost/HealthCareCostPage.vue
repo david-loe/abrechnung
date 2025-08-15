@@ -124,8 +124,8 @@
       <StatePipeline class="mb-3" :state="healthCareCost.state" :StateEnum="HealthCareCostState"></StatePipeline>
 
       <div class="row row justify-content-between">
-        <div class="col-lg-auto col-12">
-          <div class="row g-1 mb-3">
+        <div class="col-lg-8 col-12">
+          <div class="row mb-3">
             <div class="col-auto">
               <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
@@ -134,35 +134,32 @@
               </button>
             </div>
           </div>
-          <div v-if="healthCareCost.expenses.length == 0" class="alert alert-light" role="alert">
-            {{ t('alerts.noData.healthCareCost') }}
-          </div>
-          <table v-else class="table">
-            <thead>
-              <tr>
-                <th scope="col">{{ t('labels.date') }}</th>
-                <th scope="col">{{ t('labels.description') }}</th>
-                <th scope="col">{{ t('labels.amount') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="expense of healthCareCost.expenses"
-                :key="expense._id"
-                class="clickable"
-                @click="showModal('edit', 'expense', expense)">
-                <td>
-                  {{
-                    new Date(expense.cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                      ? formatter.simpleDate(expense.cost.date)
-                      : formatter.date(expense.cost.date)
-                  }}
-                </td>
-                <td>{{ expense.description }}</td>
-                <td>{{ formatter.money(expense.cost) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <TableElement
+            :rows-items="[12, 50, 100]"
+            :rows-per-page="50"
+            db-key="expenseTableHealthCareCost"
+            :empty-message="t('alerts.noData.healthCareCost')"
+            :headers="[
+              { text: 'labels.date', value: 'cost.date', sortable: true },
+              { text: 'labels.description', value: 'description', sortable: true },
+              { text: 'labels.amount', value: 'cost' }
+            ]"
+            :items="healthCareCost.expenses"
+            body-row-class-name="clickable"
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
+            <template #item-cost.date="{ cost }: Expense">
+              {{
+                new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+                  ? formatter.simpleDate(cost.date)
+                  : formatter.date(cost.date)
+              }}
+            </template>
+            <template #item-cost="{ cost }: Expense">
+              <div class="text-end">
+                {{ formatter.money(cost) }}
+              </div>
+            </template>
+          </TableElement>
         </div>
         <div class="col-lg-4 col">
           <div class="card">
@@ -266,7 +263,6 @@
 <script lang="ts" setup>
 import { getTotalTotal, mailToLink } from 'abrechnung-common/scripts.js'
 import {
-  DocumentFile,
   Expense,
   HealthCareCost,
   HealthCareCostSimple,
@@ -285,6 +281,7 @@ import AddUpTable from '@/components/elements/AddUpTable.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TableElement from '@/components/elements/TableElement.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
