@@ -100,7 +100,7 @@ export class AdvanceController extends Controller {
 export class AdvanceExamineController extends Controller {
   @Get()
   public async getForExamineReport(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: AdvanceState.APPROVED }] }
+    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: { $gte: AdvanceState.APPROVED } }] }
     if (request.user.projects.supervised.length > 0) {
       filter.$and.push({ project: { $in: request.user.projects.supervised } })
     }
