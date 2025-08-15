@@ -1,9 +1,13 @@
 <template>
   <ul class="list-group list-group-horizontal">
     <li v-for="(text, idx) in items" :key="idx" class="list-group-item d-flex align-items-center px-2 py-1">
-      <i @click="move(idx, idx - 1)" v-if="idx > 0" class="bi bi-arrow-left-square" style="cursor: pointer"></i>
+      <button type="button" class="btn p-0" v-if="idx > 0" @click="move(idx, idx - 1)">
+        <i class="bi bi-arrow-left-square"></i>
+      </button>
       <span class="mx-2">{{ props.labelFn !== undefined ? props.labelFn(text) : text }}</span>
-      <i @click="move(idx, idx + 1)" v-if="idx < items.length - 1" class="bi bi-arrow-right-square" style="cursor: pointer"></i>
+      <button type="button" class="btn p-0" v-if="idx < items.length - 1" @click="move(idx, idx + 1)">
+        <i class="bi bi-arrow-right-square"></i>
+      </button>
     </li>
   </ul>
 </template>

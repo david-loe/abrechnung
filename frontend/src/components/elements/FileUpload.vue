@@ -34,7 +34,7 @@
               </div>
             </div>
             <div class="col-auto">
-              <i class="bi bi-x-lg" style="cursor: pointer" @click="clear()"></i>
+              <button type="button" class="btn p-0" @click="clear()"><i class="bi bi-x-lg"></i></button>
             </div>
           </div>
           <img class="border border-5 rounded border-white" :src="qr" />

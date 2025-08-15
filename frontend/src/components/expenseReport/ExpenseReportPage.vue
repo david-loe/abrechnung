@@ -150,36 +150,38 @@
                 @submitted="(d) => (isReadOnly ? null : addDrafts(d))" />
             </div>
           </div>
-          <div v-if="expenseReport.expenses.length == 0" class="alert alert-light" role="alert">
-            {{ t('alerts.noData.expense') }}
-          </div>
-          <table v-if="allExpenses.length > 0" class="table">
-            <thead>
-              <tr>
-                <th scope="col">{{ t('labels.date') }}</th>
-                <th scope="col">{{ t('labels.description') }}</th>
-                <th scope="col">{{ t('labels.amount') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="expense of allExpenses"
-                :key="(expense as Expense<string>)._id || (expense as ExpenseDraft).id"
-                style="cursor: pointer"
-                @click="showModal('edit', 'expense', expense)"
-                :class="(expense as Expense)._id ? '' : 'table-warning'">
-                <td>
-                  {{
-                    new Date(expense.cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                      ? formatter.simpleDate(expense.cost.date)
-                      : formatter.date(expense.cost.date)
-                  }}
-                </td>
-                <td>{{ expense.description }}</td>
-                <td class="text-end">{{ formatter.money(expense.cost) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <TableElement
+            :rows-items="[12, 50, 100]"
+            :rows-per-page="50"
+            db-key="expenseTableExpenseReport"
+            :empty-message="t('alerts.noData.expense')"
+            :headers="[
+              { text: '', value: 'warning', width: 25 },
+              { text: 'labels.date', value: 'cost.date', sortable: true },
+              { text: 'labels.description', value: 'description', sortable: true },
+              { text: 'labels.amount', value: 'cost' }
+            ]"
+            :items="allExpenses"
+            :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
+            <template #item-cost.date="{ cost }: Expense">
+              {{
+                new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+                  ? formatter.simpleDate(cost.date)
+                  : formatter.date(cost.date)
+              }}
+            </template>
+            <template #item-cost="{ cost }: Expense">
+              <div class="text-end">
+                {{ formatter.money(cost) }}
+              </div>
+            </template>
+            <template #item-warning="expense: Expense">
+              <span v-if="!(expense as Expense)._id" class="text-warning" :title="t('labels.draft')">
+                <i class="bi bi-exclamation-triangle"></i>
+              </span>
+            </template>
+          </TableElement>
           <div v-if="expenseReport.drafts && expenseReport.drafts.length > 0" class="row g-2 text-danger">
             <div class="col-auto">
               <i class="bi bi-exclamation-triangle"></i>
@@ -301,6 +303,7 @@ import CSVImport from '@/components/elements/CSVImport.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
+import TableElement from '@/components/elements/TableElement.vue'
 import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
