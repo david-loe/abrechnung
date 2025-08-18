@@ -12,7 +12,7 @@
   "dependencies": {
     "abrechnung-common": "file:../common",
     "@popperjs/core": "^2.11.8",
-    "@vueform/vueform": "^1.13.0",
+    "@vueform/vueform": "^1.13.1",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.17.1",
+    "@types/node": "^22.17.2",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.14.0",
     "@types/vue-select": "^3.16.8",
@@ -37,7 +37,7 @@
     "eslint": "^9.33.0",
     "eslint-plugin-vue": "^10.4.0",
     "typescript": "^5.9.2",
-    "vite": "^7.1.1",
+    "vite": "^7.1.2",
     "vite-plugin-pwa": "^1.0.2",
     "vue-tsc": "^3.0.5"
   },
