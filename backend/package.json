@@ -44,7 +44,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.17.1",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "^7.0.0",
     "@types/passport": "^1.0.17",
     "@types/passport-http-bearer": "^1.0.41",
     "@types/passport-microsoft": "^2.1.0",
