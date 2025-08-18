@@ -1,5 +1,6 @@
 import { resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
+import { searchForWorkspaceRoot } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
@@ -21,7 +22,13 @@ export default {
       }
     })
   ],
-  server: { port: 80, strictPort: true, host: '0.0.0.0', allowedHosts: [process.env.VITE_FRONTEND_URL?.replace(/^https?:\/\//, '')] },
+  server: {
+    port: 80,
+    strictPort: true,
+    host: '0.0.0.0',
+    allowedHosts: [process.env.VITE_FRONTEND_URL?.replace(/^https?:\/\//, '')],
+    fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
+  },
   preview: { port: 80, host: '0.0.0.0' },
   resolve: { alias: { '@': resolve(__dirname, './src') } },
   build: { rollupOptions: { output: { entryFileNames: 'app-[hash].js' } } }
