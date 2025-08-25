@@ -12,7 +12,7 @@
   "dependencies": {
     "abrechnung-common": "file:../common",
     "@popperjs/core": "^2.11.8",
-    "@vueform/vueform": "^1.13.1",
+    "@vueform/vueform": "^1.13.2",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
@@ -20,7 +20,7 @@
     "json-editor-vue": "^0.18.1",
     "qrcode": "^1.5.4",
     "qs": "^6.14.0",
-    "vue": "^3.5.14",
+    "vue": "^3.5.19",
     "vue-i18n": "^11.1.11",
     "vue-router": "^4.5.1",
     "vue-select": "^4.0.0-beta.6",
@@ -37,9 +37,9 @@
     "eslint": "^9.34.0",
     "eslint-plugin-vue": "^10.4.0",
     "typescript": "^5.9.2",
-    "vite": "^7.1.2",
-    "vite-plugin-pwa": "^1.0.2",
-    "vue-tsc": "^3.0.5"
+    "vite": "^7.1.3",
+    "vite-plugin-pwa": "^1.0.3",
+    "vue-tsc": "^3.0.6"
   },
   "eslintConfig": {
     "root": true,
