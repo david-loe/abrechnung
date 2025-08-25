@@ -790,352 +790,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Project_mongoose.Types.ObjectId_": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"name": {
-						"type": "string"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/BaseCurrencyMoney"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id",
-					"balance"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserProjects_mongoose.Types.ObjectId_": {
-				"properties": {
-					"assigned": {
-						"items": {
-							"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					},
-					"supervised": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"assigned",
-					"supervised"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"HealthInsurance_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"email",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"OrganisationSimple_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"DocumentFile_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"data": {
-						"$ref": "#/components/schemas/Binary"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"type": {
-						"$ref": "#/components/schemas/DocumentFileType"
-					},
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"data",
-					"owner",
-					"type",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Token_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"expireAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"files": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"_id",
-					"expireAt",
-					"files"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"User_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"email": {
-						"type": "string"
-					},
-					"name": {
-						"$ref": "#/components/schemas/Name"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"fk": {
-						"properties": {
-							"httpBearer": {
-								"type": "string",
-								"nullable": true
-							},
-							"oidc": {
-								"type": "string",
-								"nullable": true
-							},
-							"magiclogin": {
-								"type": "string",
-								"nullable": true
-							},
-							"ldapauth": {
-								"type": "string",
-								"nullable": true
-							},
-							"microsoft": {
-								"type": "string",
-								"nullable": true
-							}
-						},
-						"type": "object"
-					},
-					"access": {
-						"properties": {
-							"user": {
-								"type": "boolean"
-							},
-							"inWork:expenseReport": {
-								"type": "boolean"
-							},
-							"inWork:healthCareCost": {
-								"type": "boolean"
-							},
-							"appliedFor:advance": {
-								"type": "boolean"
-							},
-							"appliedFor:travel": {
-								"type": "boolean"
-							},
-							"approved:travel": {
-								"type": "boolean"
-							},
-							"approve/advance": {
-								"type": "boolean"
-							},
-							"approve/travel": {
-								"type": "boolean"
-							},
-							"examine/travel": {
-								"type": "boolean"
-							},
-							"examine/expenseReport": {
-								"type": "boolean"
-							},
-							"examine/healthCareCost": {
-								"type": "boolean"
-							},
-							"book/advance": {
-								"type": "boolean"
-							},
-							"book/travel": {
-								"type": "boolean"
-							},
-							"book/expenseReport": {
-								"type": "boolean"
-							},
-							"book/healthCareCost": {
-								"type": "boolean"
-							},
-							"admin": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:advance",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/advance",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"book/advance",
-							"book/travel",
-							"book/expenseReport",
-							"book/healthCareCost",
-							"admin"
-						],
-						"type": "object"
-					},
-					"projects": {
-						"$ref": "#/components/schemas/UserProjects_mongoose.Types.ObjectId_"
-					},
-					"loseAccessAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
-					"settings": {
-						"properties": {
-							"showInstallBanner": {
-								"type": "boolean"
-							},
-							"organisation": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/OrganisationSimple_mongoose.Types.ObjectId_"
-									}
-								],
-								"nullable": true
-							},
-							"insurance": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/HealthInsurance_mongoose.Types.ObjectId_"
-									}
-								],
-								"nullable": true
-							},
-							"lastCountries": {
-								"items": {
-									"$ref": "#/components/schemas/CountrySimple"
-								},
-								"type": "array"
-							},
-							"lastCurrencies": {
-								"items": {
-									"$ref": "#/components/schemas/Currency"
-								},
-								"type": "array"
-							},
-							"hasUserSetLanguage": {
-								"type": "boolean"
-							},
-							"language": {
-								"$ref": "#/components/schemas/Locale"
-							}
-						},
-						"required": [
-							"showInstallBanner",
-							"lastCountries",
-							"lastCurrencies",
-							"hasUserSetLanguage",
-							"language"
-						],
-						"type": "object"
-					},
-					"vehicleRegistration": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array",
-						"nullable": true
-					},
-					"token": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/Token_mongoose.Types.ObjectId.Binary_"
-							}
-						],
-						"nullable": true
-					}
-				},
-				"required": [
-					"email",
-					"name",
-					"_id",
-					"fk",
-					"access",
-					"projects",
-					"settings"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Meta": {
 				"properties": {
 					"count": {
@@ -1164,16 +818,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_": {
+			"GETResponse_User__id.binary_-or-User__id.binary_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/User_mongoose.Types.ObjectId.Binary_"
+								"$ref": "#/components/schemas/User__id.binary_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/User_mongoose.Types.ObjectId.Binary_"
+									"$ref": "#/components/schemas/User__id.binary_"
 								},
 								"type": "array"
 							}
@@ -1437,6 +1091,65 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"DocumentFile_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Binary"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"type": {
+						"$ref": "#/components/schemas/DocumentFileType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Token_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"expireAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"files": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"_id",
+					"expireAt",
+					"files"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"IdDocument_mongoose.Types.ObjectId_": {
 				"anyOf": [
 					{
@@ -1454,6 +1167,42 @@
 						"type": "object"
 					}
 				]
+			},
+			"HealthInsurance_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"email",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"OrganisationSimple_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"SetterPartial_IUser_mongoose.Types.ObjectId.Binary_.NoPost_": {
 				"properties": {
@@ -2829,808 +2578,6 @@
 					}
 				]
 			},
-			"Cost_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					},
-					"date": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					}
-				},
-				"required": [
-					"amount",
-					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"PurposeSimple": {
-				"type": "string",
-				"enum": [
-					"professional",
-					"private"
-				]
-			},
-			"Purpose": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/PurposeSimple"
-					},
-					{
-						"type": "string",
-						"enum": [
-							"mixed"
-						]
-					}
-				]
-			},
-			"ProjectSimple_mongoose.Types.ObjectId_": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Stage_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"departure": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"arrival": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"startLocation": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"endLocation": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"midnightCountries": {
-						"items": {
-							"properties": {
-								"country": {
-									"$ref": "#/components/schemas/CountrySimple"
-								},
-								"date": {
-									"anyOf": [
-										{
-											"type": "string",
-											"format": "date-time"
-										},
-										{
-											"type": "string"
-										}
-									]
-								}
-							},
-							"required": [
-								"country",
-								"date"
-							],
-							"type": "object"
-						},
-						"type": "array",
-						"nullable": true
-					},
-					"transport": {
-						"$ref": "#/components/schemas/Transport"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
-					},
-					"purpose": {
-						"$ref": "#/components/schemas/Purpose"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
-					"note": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"departure",
-					"arrival",
-					"startLocation",
-					"endLocation",
-					"transport",
-					"cost",
-					"purpose",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"TravelExpense_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"description": {
-						"type": "string"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
-					"note": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"purpose": {
-						"type": "string",
-						"enum": [
-							"professional",
-							"mixed"
-						]
-					}
-				},
-				"required": [
-					"description",
-					"cost",
-					"_id",
-					"purpose"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CateringType": {
-				"type": "string",
-				"enum": [
-					"catering8",
-					"catering24"
-				]
-			},
-			"TravelDay_mongoose.Types.ObjectId_": {
-				"properties": {
-					"date": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"country": {
-						"$ref": "#/components/schemas/CountrySimple"
-					},
-					"special": {
-						"type": "string"
-					},
-					"cateringRefund": {
-						"properties": {
-							"breakfast": {
-								"type": "boolean"
-							},
-							"lunch": {
-								"type": "boolean"
-							},
-							"dinner": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"breakfast",
-							"lunch",
-							"dinner"
-						],
-						"type": "object"
-					},
-					"overnightRefund": {
-						"type": "boolean"
-					},
-					"purpose": {
-						"$ref": "#/components/schemas/PurposeSimple"
-					},
-					"lumpSums": {
-						"properties": {
-							"catering": {
-								"properties": {
-									"type": {
-										"$ref": "#/components/schemas/CateringType"
-									},
-									"refund": {
-										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-									}
-								},
-								"required": [
-									"type",
-									"refund"
-								],
-								"type": "object"
-							},
-							"overnight": {
-								"properties": {
-									"refund": {
-										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-									}
-								},
-								"required": [
-									"refund"
-								],
-								"type": "object"
-							}
-						},
-						"required": [
-							"catering",
-							"overnight"
-						],
-						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"date",
-					"country",
-					"cateringRefund",
-					"overnightRefund",
-					"purpose",
-					"lumpSums",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AddUpBase_mongoose.Types.ObjectId_": {
-				"properties": {
-					"advanceOverflow": {
-						"type": "boolean"
-					},
-					"expenses": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"advance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"total": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"project": {
-						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-					}
-				},
-				"required": [
-					"advanceOverflow",
-					"expenses",
-					"advance",
-					"total",
-					"balance",
-					"project"
-				],
-				"type": "object"
-			},
-			"AddUp_mongoose.Types.ObjectId.Travel__id.binary__": {
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
-					},
-					{
-						"properties": {
-							"lumpSums": {
-								"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-							}
-						},
-						"required": [
-							"lumpSums"
-						],
-						"type": "object"
-					}
-				]
-			},
-			"MoneyNotNull": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double"
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					}
-				},
-				"required": [
-					"amount",
-					"currency"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AdvanceState": {
-				"enum": [
-					-10,
-					0,
-					30,
-					40
-				],
-				"type": "number"
-			},
-			"AdvanceBase_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/MoneyNotNull"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"reason": {
-						"type": "string"
-					},
-					"state": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"settledOn": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"budget",
-					"project",
-					"balance",
-					"reason",
-					"state",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Pick_Place.Exclude_keyofPlace.special__": {
-				"properties": {
-					"place": {
-						"type": "string"
-					},
-					"country": {
-						"$ref": "#/components/schemas/CountrySimple"
-					}
-				},
-				"required": [
-					"place",
-					"country"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_Place.special_": {
-				"$ref": "#/components/schemas/Pick_Place.Exclude_keyofPlace.special__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"UserSimple_mongoose.Types.ObjectId_": {
-				"properties": {
-					"email": {
-						"type": "string"
-					},
-					"name": {
-						"$ref": "#/components/schemas/Name"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"email",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"TravelState": {
-				"enum": [
-					-10,
-					0,
-					10,
-					20,
-					30,
-					40
-				],
-				"type": "number"
-			},
-			"Comment_mongoose.Types.ObjectId.TravelState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/TravelState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.TravelState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"Travel_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
-						"nullable": true
-					},
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.TravelState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/TravelState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.TravelState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"progress": {
-						"type": "number",
-						"format": "double"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.Travel__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					},
-					"isCrossBorder": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"a1Certificate": {
-						"properties": {
-							"destinationName": {
-								"type": "string"
-							},
-							"exactAddress": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"destinationName",
-							"exactAddress"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"lastPlaceOfWork": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/Omit_Place.place_"
-							}
-						],
-						"nullable": true
-					},
-					"professionalShare": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"stages": {
-						"items": {
-							"$ref": "#/components/schemas/Stage_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/TravelExpense_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					},
-					"days": {
-						"items": {
-							"$ref": "#/components/schemas/TravelDay_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
-					"name",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"progress",
-					"addUp",
-					"advances",
-					"history",
-					"historic",
-					"professionalShare",
-					"stages",
-					"expenses",
-					"days"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_Travel_mongoose.Types.ObjectId.Binary_-or-Travel_mongoose.Types.ObjectId.Binary_-Array_": {
-				"properties": {
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"meta": {
-						"$ref": "#/components/schemas/Meta"
-					}
-				},
-				"required": [
-					"data",
-					"meta"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Cost__id.binary_": {
 				"properties": {
 					"amount": {
@@ -3697,6 +2644,26 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"PurposeSimple": {
+				"type": "string",
+				"enum": [
+					"professional",
+					"private"
+				]
+			},
+			"Purpose": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/PurposeSimple"
+					},
+					{
+						"type": "string",
+						"enum": [
+							"mixed"
+						]
+					}
+				]
 			},
 			"ProjectSimple__id_": {
 				"properties": {
@@ -3853,6 +2820,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CateringType": {
+				"type": "string",
+				"enum": [
+					"catering8",
+					"catering24"
+				]
+			},
 			"TravelDay__id_": {
 				"properties": {
 					"date": {
@@ -3997,6 +2971,62 @@
 					}
 				]
 			},
+			"MoneyNotNull": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					}
+				},
+				"required": [
+					"amount",
+					"currency"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AdvanceState": {
+				"enum": [
+					-10,
+					0,
+					30,
+					40
+				],
+				"type": "number"
+			},
 			"AdvanceBase__id_": {
 				"properties": {
 					"name": {
@@ -4045,6 +3075,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Pick_Place.Exclude_keyofPlace.special__": {
+				"properties": {
+					"place": {
+						"type": "string"
+					},
+					"country": {
+						"$ref": "#/components/schemas/CountrySimple"
+					}
+				},
+				"required": [
+					"place",
+					"country"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_Place.special_": {
+				"$ref": "#/components/schemas/Pick_Place.Exclude_keyofPlace.special__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
 			"UserSimple__id_": {
 				"properties": {
 					"email": {
@@ -4064,6 +3114,17 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"TravelState": {
+				"enum": [
+					-10,
+					0,
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
 			},
 			"Comment__id.TravelState_": {
 				"properties": {
@@ -4092,6 +3153,232 @@
 			"Log__id.TravelState_": {
 				"properties": {},
 				"type": "object"
+			},
+			"Travel__id.binary_": {
+				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project__id_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment__id.TravelState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log__id.TravelState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"progress": {
+						"type": "number",
+						"format": "double"
+					},
+					"addUp": {
+						"items": {
+							"$ref": "#/components/schemas/AddUp__id.Travel__id.binary__"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase__id_"
+						},
+						"type": "array"
+					},
+					"isCrossBorder": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"destinationName",
+							"exactAddress"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Omit_Place.place_"
+							}
+						],
+						"nullable": true
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"stages": {
+						"items": {
+							"$ref": "#/components/schemas/Stage__id.binary_"
+						},
+						"type": "array"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/TravelExpense__id.binary_"
+						},
+						"type": "array"
+					},
+					"days": {
+						"items": {
+							"$ref": "#/components/schemas/TravelDay__id_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"progress",
+					"addUp",
+					"advances",
+					"history",
+					"historic",
+					"professionalShare",
+					"stages",
+					"expenses",
+					"days"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_Travel__id.binary_-or-Travel__id.binary_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Travel__id.binary_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Travel__id.binary_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"ITravel": {
 				"properties": {
@@ -4370,6 +3657,698 @@
 						"format": "byte"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Cost_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary_"
+						},
+						"type": "array"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ProjectSimple_mongoose.Types.ObjectId_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Stage_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"departure": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"arrival": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"startLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"endLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"midnightCountries": {
+						"items": {
+							"properties": {
+								"country": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"date": {
+									"anyOf": [
+										{
+											"type": "string",
+											"format": "date-time"
+										},
+										{
+											"type": "string"
+										}
+									]
+								}
+							},
+							"required": [
+								"country",
+								"date"
+							],
+							"type": "object"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"transport": {
+						"$ref": "#/components/schemas/Transport"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
+					},
+					"purpose": {
+						"$ref": "#/components/schemas/Purpose"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"departure",
+					"arrival",
+					"startLocation",
+					"endLocation",
+					"transport",
+					"cost",
+					"purpose",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelExpense_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"purpose": {
+						"type": "string",
+						"enum": [
+							"professional",
+							"mixed"
+						]
+					}
+				},
+				"required": [
+					"description",
+					"cost",
+					"_id",
+					"purpose"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelDay_mongoose.Types.ObjectId_": {
+				"properties": {
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"country": {
+						"$ref": "#/components/schemas/CountrySimple"
+					},
+					"special": {
+						"type": "string"
+					},
+					"cateringRefund": {
+						"properties": {
+							"breakfast": {
+								"type": "boolean"
+							},
+							"lunch": {
+								"type": "boolean"
+							},
+							"dinner": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"breakfast",
+							"lunch",
+							"dinner"
+						],
+						"type": "object"
+					},
+					"overnightRefund": {
+						"type": "boolean"
+					},
+					"purpose": {
+						"$ref": "#/components/schemas/PurposeSimple"
+					},
+					"lumpSums": {
+						"properties": {
+							"catering": {
+								"properties": {
+									"type": {
+										"$ref": "#/components/schemas/CateringType"
+									},
+									"refund": {
+										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+									}
+								},
+								"required": [
+									"type",
+									"refund"
+								],
+								"type": "object"
+							},
+							"overnight": {
+								"properties": {
+									"refund": {
+										"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+									}
+								},
+								"required": [
+									"refund"
+								],
+								"type": "object"
+							}
+						},
+						"required": [
+							"catering",
+							"overnight"
+						],
+						"type": "object"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"date",
+					"country",
+					"cateringRefund",
+					"overnightRefund",
+					"purpose",
+					"lumpSums",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddUpBase_mongoose.Types.ObjectId_": {
+				"properties": {
+					"advanceOverflow": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"advance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"total": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+					}
+				},
+				"required": [
+					"advanceOverflow",
+					"expenses",
+					"advance",
+					"total",
+					"balance",
+					"project"
+				],
+				"type": "object"
+			},
+			"AddUp_mongoose.Types.ObjectId.Travel__id.binary__": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
+					},
+					{
+						"properties": {
+							"lumpSums": {
+								"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+							}
+						},
+						"required": [
+							"lumpSums"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"Project_mongoose.Types.ObjectId_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"name": {
+						"type": "string"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/BaseCurrencyMoney"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id",
+					"balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AdvanceBase_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"budget",
+					"project",
+					"balance",
+					"reason",
+					"state",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserSimple_mongoose.Types.ObjectId_": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"$ref": "#/components/schemas/Name"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment_mongoose.Types.ObjectId.TravelState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.TravelState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"Travel_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"fellowTravelersNames": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.TravelState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/TravelState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.TravelState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"progress": {
+						"type": "number",
+						"format": "double"
+					},
+					"addUp": {
+						"items": {
+							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.Travel__id.binary__"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"isCrossBorder": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"destinationName",
+							"exactAddress"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Omit_Place.place_"
+							}
+						],
+						"nullable": true
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"stages": {
+						"items": {
+							"$ref": "#/components/schemas/Stage_mongoose.Types.ObjectId.Binary_"
+						},
+						"type": "array"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/TravelExpense_mongoose.Types.ObjectId.Binary_"
+						},
+						"type": "array"
+					},
+					"days": {
+						"items": {
+							"$ref": "#/components/schemas/TravelDay_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate",
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"progress",
+					"addUp",
+					"advances",
+					"history",
+					"historic",
+					"professionalShare",
+					"stages",
+					"expenses",
+					"days"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -6368,202 +6347,44 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Travel__id.binary_": {
+			"UserWithName__id_": {
 				"properties": {
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
-						"nullable": true
-					},
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project__id_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment__id.TravelState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/TravelState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log__id.TravelState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
-					"progress": {
-						"type": "number",
-						"format": "double"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp__id.Travel__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
-						},
-						"type": "array"
-					},
-					"isCrossBorder": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"a1Certificate": {
-						"properties": {
-							"destinationName": {
-								"type": "string"
-							},
-							"exactAddress": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"destinationName",
-							"exactAddress"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/_id"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"lastPlaceOfWork": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/Omit_Place.place_"
-							}
-						],
-						"nullable": true
-					},
-					"professionalShare": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"stages": {
-						"items": {
-							"$ref": "#/components/schemas/Stage__id.binary_"
-						},
-						"type": "array"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/TravelExpense__id.binary_"
-						},
-						"type": "array"
-					},
-					"days": {
-						"items": {
-							"$ref": "#/components/schemas/TravelDay__id_"
-						},
-						"type": "array"
+					"name": {
+						"$ref": "#/components/schemas/Name"
 					}
 				},
 				"required": [
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
-					"name",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
 					"_id",
-					"progress",
-					"addUp",
-					"advances",
-					"history",
-					"historic",
-					"professionalShare",
-					"stages",
-					"expenses",
-					"days"
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_UserWithName__id_-or-UserWithName__id_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserWithName__id_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/UserWithName__id_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -6803,6 +6624,9 @@
 					"userCanSeeAllProjects": {
 						"type": "boolean"
 					},
+					"onlyShowProjectNamesOnAssigned": {
+						"type": "boolean"
+					},
 					"defaultAccess": {
 						"properties": {
 							"user": {
@@ -6941,6 +6765,7 @@
 				},
 				"required": [
 					"userCanSeeAllProjects",
+					"onlyShowProjectNamesOnAssigned",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -6954,6 +6779,9 @@
 			"Settings_mongoose.Types.ObjectId_": {
 				"properties": {
 					"userCanSeeAllProjects": {
+						"type": "boolean"
+					},
+					"onlyShowProjectNamesOnAssigned": {
 						"type": "boolean"
 					},
 					"defaultAccess": {
@@ -7094,6 +6922,7 @@
 				},
 				"required": [
 					"userCanSeeAllProjects",
+					"onlyShowProjectNamesOnAssigned",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -7201,6 +7030,9 @@
 						},
 						"type": "object"
 					},
+					"onlyShowProjectNamesOnAssigned": {
+						"type": "boolean"
+					},
 					"userCanSeeAllProjects": {
 						"type": "boolean"
 					},
@@ -7220,16 +7052,39 @@
 			"SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom__": {
 				"$ref": "#/components/schemas/SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom_.NoPost_"
 			},
-			"GETResponse_Project_mongoose.Types.ObjectId_-or-Project_mongoose.Types.ObjectId_-Array_": {
+			"ProjectSimpleWithName__id_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_ProjectSimpleWithName__id_-or-ProjectSimpleWithName__id_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/ProjectSimpleWithName__id_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+									"$ref": "#/components/schemas/ProjectSimpleWithName__id_"
 								},
 								"type": "array"
 							}
@@ -7304,6 +7159,32 @@
 						"format": "byte"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_Project__id_-or-Project__id_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Project__id_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Project__id_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -7799,108 +7680,6 @@
 					"image/png"
 				]
 			},
-			"DocumentFile_mongoose.Types.ObjectId.Binary.ImageType_": {
-				"properties": {
-					"data": {
-						"$ref": "#/components/schemas/Binary"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"type": {
-						"$ref": "#/components/schemas/ImageType"
-					},
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"data",
-					"owner",
-					"type",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Organisation_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"subfolderPath": {
-						"type": "string"
-					},
-					"reportEmail": {
-						"type": "string",
-						"nullable": true
-					},
-					"a1CertificateEmail": {
-						"type": "string",
-						"nullable": true
-					},
-					"bankDetails": {
-						"type": "string",
-						"nullable": true
-					},
-					"companyNumber": {
-						"type": "string",
-						"nullable": true
-					},
-					"logo": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary.ImageType_"
-							}
-						],
-						"nullable": true
-					},
-					"website": {
-						"type": "string",
-						"nullable": true
-					}
-				},
-				"required": [
-					"name",
-					"_id",
-					"subfolderPath"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_Organisation_mongoose.Types.ObjectId.Binary_-or-Organisation_mongoose.Types.ObjectId.Binary_-Array_": {
-				"properties": {
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Organisation_mongoose.Types.ObjectId.Binary_"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/Organisation_mongoose.Types.ObjectId.Binary_"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"meta": {
-						"$ref": "#/components/schemas/Meta"
-					}
-				},
-				"required": [
-					"data",
-					"meta"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"DocumentFile__id.binary.ImageType_": {
 				"properties": {
 					"data": {
@@ -7925,6 +7704,80 @@
 					"type",
 					"name",
 					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Organisation__id.binary_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"subfolderPath": {
+						"type": "string"
+					},
+					"reportEmail": {
+						"type": "string",
+						"nullable": true
+					},
+					"a1CertificateEmail": {
+						"type": "string",
+						"nullable": true
+					},
+					"bankDetails": {
+						"type": "string",
+						"nullable": true
+					},
+					"companyNumber": {
+						"type": "string",
+						"nullable": true
+					},
+					"logo": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DocumentFile__id.binary.ImageType_"
+							}
+						],
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id",
+					"subfolderPath"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_Organisation__id.binary_-or-Organisation__id.binary_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Organisation__id.binary_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Organisation__id.binary_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -8021,6 +7874,82 @@
 						"format": "byte"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DocumentFile_mongoose.Types.ObjectId.Binary.ImageType_": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Binary"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"type": {
+						"$ref": "#/components/schemas/ImageType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Organisation_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"subfolderPath": {
+						"type": "string"
+					},
+					"reportEmail": {
+						"type": "string",
+						"nullable": true
+					},
+					"a1CertificateEmail": {
+						"type": "string",
+						"nullable": true
+					},
+					"bankDetails": {
+						"type": "string",
+						"nullable": true
+					},
+					"companyNumber": {
+						"type": "string",
+						"nullable": true
+					},
+					"logo": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.Binary.ImageType_"
+							}
+						],
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"name",
+					"_id",
+					"subfolderPath"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -8121,16 +8050,16 @@
 			"SetterBody_Omit_IOrganisation_mongoose.Types.ObjectId_.logo__": {
 				"$ref": "#/components/schemas/SetterPartial_Omit_IOrganisation_mongoose.Types.ObjectId_.logo_.NoPost_"
 			},
-			"GETResponse_HealthInsurance_mongoose.Types.ObjectId_-or-HealthInsurance_mongoose.Types.ObjectId_-Array_": {
+			"GETResponse_HealthInsurance__id_-or-HealthInsurance__id_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/HealthInsurance_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/HealthInsurance__id_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/HealthInsurance_mongoose.Types.ObjectId_"
+									"$ref": "#/components/schemas/HealthInsurance__id_"
 								},
 								"type": "array"
 							}
@@ -8232,210 +8161,6 @@
 			"SetterBody_IHealthInsurance_mongoose.Types.ObjectId__": {
 				"$ref": "#/components/schemas/SetterPartial_IHealthInsurance_mongoose.Types.ObjectId_.NoPost_"
 			},
-			"Expense_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"description": {
-						"type": "string"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
-					"note": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"description",
-					"cost",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AddUp_mongoose.Types.ObjectId.HealthCareCost__id.binary__": {
-				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
-			},
-			"Comment_mongoose.Types.ObjectId.HealthCareCostState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.HealthCareCostState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"HealthCareCost_mongoose.Types.ObjectId.Binary_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.HealthCareCostState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.HealthCareCostState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"patientName": {
-						"type": "string"
-					},
-					"insurance": {
-						"$ref": "#/components/schemas/HealthInsurance_mongoose.Types.ObjectId_"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.HealthCareCost__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"patientName",
-					"insurance",
-					"addUp",
-					"advances",
-					"history",
-					"historic",
-					"expenses"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_HealthCareCost_mongoose.Types.ObjectId.Binary_-or-HealthCareCost_mongoose.Types.ObjectId.Binary_-Array_": {
-				"properties": {
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
-								},
-								"type": "array"
-							}
-						]
-					},
-					"meta": {
-						"$ref": "#/components/schemas/Meta"
-					}
-				},
-				"required": [
-					"data",
-					"meta"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Expense__id.binary_": {
 				"properties": {
 					"description": {
@@ -8464,6 +8189,147 @@
 					"description",
 					"cost",
 					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HealthCareCost__id.binary_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project__id_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment__id.HealthCareCostState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log__id.HealthCareCostState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"patientName": {
+						"type": "string"
+					},
+					"insurance": {
+						"$ref": "#/components/schemas/HealthInsurance__id_"
+					},
+					"addUp": {
+						"items": {
+							"$ref": "#/components/schemas/AddUp__id.HealthCareCost__id.binary__"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase__id_"
+						},
+						"type": "array"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense__id.binary_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"patientName",
+					"insurance",
+					"addUp",
+					"advances",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_HealthCareCost__id.binary_-or-HealthCareCost__id.binary_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/HealthCareCost__id.binary_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/HealthCareCost__id.binary_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -8652,6 +8518,184 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Expense_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"description",
+					"cost",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddUp_mongoose.Types.ObjectId.HealthCareCost__id.binary__": {
+				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
+			},
+			"Comment_mongoose.Types.ObjectId.HealthCareCostState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.HealthCareCostState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"HealthCareCost_mongoose.Types.ObjectId.Binary_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.HealthCareCostState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.HealthCareCostState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"patientName": {
+						"type": "string"
+					},
+					"insurance": {
+						"$ref": "#/components/schemas/HealthInsurance_mongoose.Types.ObjectId_"
+					},
+					"addUp": {
+						"items": {
+							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.HealthCareCost__id.binary__"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.Binary_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"patientName",
+					"insurance",
+					"addUp",
+					"advances",
+					"history",
+					"historic",
+					"expenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SetterPartial_Expense_mongoose.Types.ObjectId.Binary_.NoPost_": {
 				"properties": {
 					"note": {
@@ -8764,121 +8808,6 @@
 			},
 			"SetterBody_Expense_mongoose.Types.ObjectId.Binary__": {
 				"$ref": "#/components/schemas/SetterPartial_Expense_mongoose.Types.ObjectId.Binary_.NoPost_"
-			},
-			"HealthCareCost__id.binary_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project__id_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment__id.HealthCareCostState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log__id.HealthCareCostState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"patientName": {
-						"type": "string"
-					},
-					"insurance": {
-						"$ref": "#/components/schemas/HealthInsurance__id_"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp__id.HealthCareCost__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
-						},
-						"type": "array"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/_id"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/Expense__id.binary_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"patientName",
-					"insurance",
-					"addUp",
-					"advances",
-					"history",
-					"historic",
-					"expenses"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"Expense_mongoose.Types.ObjectId.binary_": {
 				"properties": {
@@ -9027,74 +8956,19 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__": {
-				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
-			},
-			"Category_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"style": {
-						"$ref": "#/components/schemas/BadgeStyle"
-					},
-					"isDefault": {
-						"type": "boolean"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"style",
-					"isDefault",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Comment_mongoose.Types.ObjectId.ExpenseReportState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.ExpenseReportState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"ExpenseReport_mongoose.Types.ObjectId.Binary_": {
+			"ExpenseReport__id.binary_": {
 				"properties": {
 					"name": {
 						"type": "string"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/UserSimple__id_"
 					},
 					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/UserSimple__id_"
 					},
 					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/Project__id_"
 					},
 					"comment": {
 						"type": "string",
@@ -9106,7 +8980,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.ExpenseReportState_"
+							"$ref": "#/components/schemas/Comment__id.ExpenseReportState_"
 						},
 						"type": "array"
 					},
@@ -9114,7 +8988,7 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.ExpenseReportState_"
+						"$ref": "#/components/schemas/Log__id.ExpenseReportState_"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -9139,26 +9013,26 @@
 						]
 					},
 					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						"$ref": "#/components/schemas/_id"
 					},
 					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__"
+							"$ref": "#/components/schemas/AddUp__id.ExpenseReport__id.binary__"
 						},
 						"type": "array"
 					},
 					"advances": {
 						"items": {
-							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
+							"$ref": "#/components/schemas/AdvanceBase__id_"
 						},
 						"type": "array"
 					},
 					"category": {
-						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/Category__id_"
 					},
 					"history": {
 						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							"$ref": "#/components/schemas/_id"
 						},
 						"type": "array"
 					},
@@ -9167,7 +9041,7 @@
 					},
 					"expenses": {
 						"items": {
-							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.Binary_"
+							"$ref": "#/components/schemas/Expense__id.binary_"
 						},
 						"type": "array"
 					}
@@ -9193,16 +9067,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GETResponse_ExpenseReport_mongoose.Types.ObjectId.Binary_-or-ExpenseReport_mongoose.Types.ObjectId.Binary_-Array_": {
+			"GETResponse_ExpenseReport__id.binary_-or-ExpenseReport__id.binary_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+								"$ref": "#/components/schemas/ExpenseReport__id.binary_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+									"$ref": "#/components/schemas/ExpenseReport__id.binary_"
 								},
 								"type": "array"
 							}
@@ -9398,19 +9272,74 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ExpenseReport__id.binary_": {
+			"AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__": {
+				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
+			},
+			"Category_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"isDefault",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment_mongoose.Types.ObjectId.ExpenseReportState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.ExpenseReportState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"ExpenseReport_mongoose.Types.ObjectId.Binary_": {
 				"properties": {
 					"name": {
 						"type": "string"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
 					},
 					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
 					},
 					"project": {
-						"$ref": "#/components/schemas/Project__id_"
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
 					},
 					"comment": {
 						"type": "string",
@@ -9422,7 +9351,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/Comment__id.ExpenseReportState_"
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.ExpenseReportState_"
 						},
 						"type": "array"
 					},
@@ -9430,7 +9359,7 @@
 						"$ref": "#/components/schemas/ExpenseReportState"
 					},
 					"log": {
-						"$ref": "#/components/schemas/Log__id.ExpenseReportState_"
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.ExpenseReportState_"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -9455,26 +9384,26 @@
 						]
 					},
 					"_id": {
-						"$ref": "#/components/schemas/_id"
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					},
 					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/AddUp__id.ExpenseReport__id.binary__"
+							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__"
 						},
 						"type": "array"
 					},
 					"advances": {
 						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
+							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
 						},
 						"type": "array"
 					},
 					"category": {
-						"$ref": "#/components/schemas/Category__id_"
+						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
 					},
 					"history": {
 						"items": {
-							"$ref": "#/components/schemas/_id"
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 						},
 						"type": "array"
 					},
@@ -9483,7 +9412,7 @@
 					},
 					"expenses": {
 						"items": {
-							"$ref": "#/components/schemas/Expense__id.binary_"
+							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.Binary_"
 						},
 						"type": "array"
 					}
@@ -11500,16 +11429,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GETResponse_Category_mongoose.Types.ObjectId_-or-Category_mongoose.Types.ObjectId_-Array_": {
+			"GETResponse_Category__id_-or-Category__id_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Category__id_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+									"$ref": "#/components/schemas/Category__id_"
 								},
 								"type": "array"
 							}
@@ -11631,7 +11560,7 @@
 			"SetterBody_ICategory_mongoose.Types.ObjectId__": {
 				"$ref": "#/components/schemas/SetterPartial_ICategory_mongoose.Types.ObjectId_.NoPost_"
 			},
-			"ApprovedTravel_mongoose.Types.ObjectId_": {
+			"ApprovedTravel__id_": {
 				"properties": {
 					"reason": {
 						"type": "string"
@@ -11673,10 +11602,10 @@
 						"type": "string"
 					},
 					"reportId": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						"$ref": "#/components/schemas/_id"
 					},
 					"organisationId": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						"$ref": "#/components/schemas/_id"
 					},
 					"appliedForOn": {
 						"anyOf": [
@@ -11718,16 +11647,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GETResponse_ApprovedTravel_mongoose.Types.ObjectId_-or-ApprovedTravel_mongoose.Types.ObjectId_-Array_": {
+			"GETResponse_ApprovedTravel__id_-or-ApprovedTravel__id_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/ApprovedTravel_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/ApprovedTravel__id_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/ApprovedTravel_mongoose.Types.ObjectId_"
+									"$ref": "#/components/schemas/ApprovedTravel__id_"
 								},
 								"type": "array"
 							}
@@ -11881,190 +11810,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Comment_mongoose.Types.ObjectId.AdvanceState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.AdvanceState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"Advance_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.AdvanceState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.AdvanceState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/MoneyNotNull"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"reason": {
-						"type": "string"
-					},
-					"settledOn": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
-					"offsetAgainst": {
-						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
-								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"required": [
-										"name",
-										"_id"
-									],
-									"type": "object",
-									"nullable": true
-								},
-								"type": {
-									"$ref": "#/components/schemas/ReportModelName"
-								}
-							},
-							"required": [
-								"amount",
-								"type"
-							],
-							"type": "object"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"history",
-					"historic",
-					"budget",
-					"balance",
-					"reason",
-					"offsetAgainst"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GETResponse_Advance_mongoose.Types.ObjectId_-or-Advance_mongoose.Types.ObjectId_-Array_": {
+			"GETResponse_Advance__id_-or-Advance__id_-Array_": {
 				"properties": {
 					"data": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+								"$ref": "#/components/schemas/Advance__id_"
 							},
 							{
 								"items": {
-									"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+									"$ref": "#/components/schemas/Advance__id_"
 								},
 								"type": "array"
 							}
@@ -12323,6 +12078,180 @@
 				},
 				"required": [
 					"reason"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment_mongoose.Types.ObjectId.AdvanceState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.AdvanceState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"Advance_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.AdvanceState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.AdvanceState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"offsetAgainst": {
+						"items": {
+							"properties": {
+								"amount": {
+									"type": "number",
+									"format": "double"
+								},
+								"report": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"required": [
+										"name",
+										"_id"
+									],
+									"type": "object",
+									"nullable": true
+								},
+								"type": {
+									"$ref": "#/components/schemas/ReportModelName"
+								}
+							},
+							"required": [
+								"amount",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"history",
+					"historic",
+					"budget",
+					"balance",
+					"reason",
+					"offsetAgainst"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -12775,7 +12704,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_User__id.binary_-or-User__id.binary_-Array_"
 								}
 							}
 						}
@@ -12989,7 +12918,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_User__id.binary_-or-User__id.binary_-Array_"
 								}
 							}
 						}
@@ -13675,7 +13604,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Travel_mongoose.Types.ObjectId.Binary_-or-Travel_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Travel__id.binary_-or-Travel__id.binary_-Array_"
 								}
 							}
 						}
@@ -14397,7 +14326,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_UserWithName__id_-or-UserWithName__id_-Array_"
 								}
 							}
 						}
@@ -14430,7 +14359,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Travel_mongoose.Types.ObjectId.Binary_-or-Travel_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Travel__id.binary_-or-Travel__id.binary_-Array_"
 								}
 							}
 						}
@@ -14742,7 +14671,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Travel_mongoose.Types.ObjectId.Binary_-or-Travel_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Travel__id.binary_-or-Travel__id.binary_-Array_"
 								}
 							}
 						}
@@ -15477,7 +15406,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Travel_mongoose.Types.ObjectId.Binary_-or-Travel_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Travel__id.binary_-or-Travel__id.binary_-Array_"
 								}
 							}
 						}
@@ -15866,7 +15795,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Project_mongoose.Types.ObjectId_-or-Project_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_ProjectSimpleWithName__id_-or-ProjectSimpleWithName__id_-Array_"
 								}
 							}
 						}
@@ -15963,7 +15892,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Project_mongoose.Types.ObjectId_-or-Project_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Project__id_-or-Project__id_-Array_"
 								}
 							}
 						}
@@ -16389,7 +16318,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Organisation_mongoose.Types.ObjectId.Binary_-or-Organisation_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Organisation__id.binary_-or-Organisation__id.binary_-Array_"
 								}
 							}
 						}
@@ -16492,7 +16421,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Organisation_mongoose.Types.ObjectId.Binary_-or-Organisation_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Organisation__id.binary_-or-Organisation__id.binary_-Array_"
 								}
 							}
 						}
@@ -16788,7 +16717,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_HealthInsurance_mongoose.Types.ObjectId_-or-HealthInsurance_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_HealthInsurance__id_-or-HealthInsurance__id_-Array_"
 								}
 							}
 						}
@@ -17080,7 +17009,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_HealthCareCost_mongoose.Types.ObjectId.Binary_-or-HealthCareCost_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost__id.binary_-or-HealthCareCost__id.binary_-Array_"
 								}
 							}
 						}
@@ -17569,7 +17498,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_UserWithName__id_-or-UserWithName__id_-Array_"
 								}
 							}
 						}
@@ -17602,7 +17531,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_HealthCareCost_mongoose.Types.ObjectId.Binary_-or-HealthCareCost_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost__id.binary_-or-HealthCareCost__id.binary_-Array_"
 								}
 							}
 						}
@@ -18246,7 +18175,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Organisation_mongoose.Types.ObjectId.Binary_-or-Organisation_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Organisation__id.binary_-or-Organisation__id.binary_-Array_"
 								}
 							}
 						}
@@ -18349,7 +18278,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_HealthCareCost_mongoose.Types.ObjectId.Binary_-or-HealthCareCost_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_HealthCareCost__id.binary_-or-HealthCareCost__id.binary_-Array_"
 								}
 							}
 						}
@@ -18592,7 +18521,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_ExpenseReport_mongoose.Types.ObjectId.Binary_-or-ExpenseReport_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport__id.binary_-or-ExpenseReport__id.binary_-Array_"
 								}
 							}
 						}
@@ -19077,7 +19006,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_User_mongoose.Types.ObjectId.Binary_-or-User_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_UserWithName__id_-or-UserWithName__id_-Array_"
 								}
 							}
 						}
@@ -19110,7 +19039,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_ExpenseReport_mongoose.Types.ObjectId.Binary_-or-ExpenseReport_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport__id.binary_-or-ExpenseReport__id.binary_-Array_"
 								}
 							}
 						}
@@ -19747,7 +19676,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_ExpenseReport_mongoose.Types.ObjectId.Binary_-or-ExpenseReport_mongoose.Types.ObjectId.Binary_-Array_"
+									"$ref": "#/components/schemas/GETResponse_ExpenseReport__id.binary_-or-ExpenseReport__id.binary_-Array_"
 								}
 							}
 						}
@@ -21097,7 +21026,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Category_mongoose.Types.ObjectId_-or-Category_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Category__id_-or-Category__id_-Array_"
 								}
 							}
 						}
@@ -21645,7 +21574,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_ApprovedTravel_mongoose.Types.ObjectId_-or-ApprovedTravel_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_ApprovedTravel__id_-or-ApprovedTravel__id_-Array_"
 								}
 							}
 						}
@@ -21814,7 +21743,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Advance_mongoose.Types.ObjectId_-or-Advance_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Advance__id_-or-Advance__id_-Array_"
 								}
 							}
 						}
@@ -22094,7 +22023,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Advance_mongoose.Types.ObjectId_-or-Advance_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Advance__id_-or-Advance__id_-Array_"
 								}
 							}
 						}
@@ -22261,7 +22190,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Advance_mongoose.Types.ObjectId_-or-Advance_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Advance__id_-or-Advance__id_-Array_"
 								}
 							}
 						}
@@ -22676,7 +22605,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GETResponse_Advance_mongoose.Types.ObjectId_-or-Advance_mongoose.Types.ObjectId_-Array_"
+									"$ref": "#/components/schemas/GETResponse_Advance__id_-or-Advance__id_-Array_"
 								}
 							}
 						}
