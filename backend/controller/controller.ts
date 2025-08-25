@@ -176,7 +176,10 @@ export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType> exten
 }
 
 export class Controller extends TsoaController {
-  async getter<ModelType>(model: Model<ModelType>, options: GetterOptions<ModelType>): Promise<GETResponse<ModelType | ModelType[]>> {
+  async getter<Type, ModelType extends Type = Type>(
+    model: Model<ModelType>,
+    options: GetterOptions<Type>
+  ): Promise<GETResponse<Type | Type[]>> {
     options.query.limit ||= 0
     options.query.page ||= 1
     options.filter ||= {}
@@ -187,12 +190,12 @@ export class Controller extends TsoaController {
     if (Object.keys(options.projection).length > 0 && options.query.additionalFields && options.allowedAdditionalFields) {
       for (const additionalField of options.query.additionalFields) {
         if (options.allowedAdditionalFields.indexOf(additionalField) !== -1) {
-          //@ts-ignore
+          //@ts-expect-error
           if (options.projection[additionalField] === 0) {
-            //@ts-ignore
+            //@ts-expect-error
             delete options.projection[additionalField]
           } else {
-            //@ts-ignore
+            //@ts-expect-error
             options.projection[additionalField] = 1
           }
         }

@@ -1,4 +1,4 @@
-import { Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
+import { Project as IProject, locales, ProjectSimple, ProjectSimpleWithName, ProjectWithUsers } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { getSettings } from '../db.js'
@@ -36,7 +36,7 @@ export class ProjectController extends Controller {
     if (!settings.userCanSeeAllProjects && !userHasExtendedAccess) {
       throw new AuthorizationError()
     }
-    return await this.getter(Project, {
+    return await this.getter<ProjectSimpleWithName, IProject<Types.ObjectId>>(Project, {
       query,
       projection: {
         identifier: 1,

@@ -1,5 +1,16 @@
 import { Readable } from 'node:stream'
-import { IdDocument, Travel as ITravel, idDocumentToId, Locale, Stage, State, TravelExpense, TravelState } from 'abrechnung-common/types.js'
+import {
+  IdDocument,
+  Travel as ITravel,
+  User as IUser,
+  idDocumentToId,
+  Locale,
+  Stage,
+  State,
+  TravelExpense,
+  TravelState,
+  UserWithName
+} from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import ENV from '../env.js'
@@ -247,7 +258,11 @@ export class TravelController extends Controller {
 
   @Get('examiner')
   public async getExaminer() {
-    return await this.getter(User, { query: { limit: 5 }, filter: { 'access.examine/travel': true }, projection: { name: 1, email: 1 } })
+    return await this.getter<UserWithName, IUser<Types.ObjectId, mongo.Binary>>(User, {
+      query: { limit: 5 },
+      filter: { 'access.examine/travel': true },
+      projection: { name: 1, email: 1 }
+    })
   }
 }
 
