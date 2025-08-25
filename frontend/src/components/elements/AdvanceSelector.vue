@@ -103,6 +103,7 @@ async function getAdvances(ownerId: string | undefined) {
 
 function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
   if (
+    props.setDefault &&
     !setByUser &&
     props.owner &&
     props.project &&
@@ -129,7 +130,7 @@ onMounted(async () => {
 watch(
   () => props.owner,
   async (value, oldValue) => {
-    if (value && oldValue && idDocumentToId(value) !== idDocumentToId(oldValue)) {
+    if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
       emit('update:modelValue', [])
     }
     advances.value = await getAdvances(idDocumentToId(props.owner))
@@ -139,7 +140,7 @@ watch(
 watch(
   () => props.project,
   async (value, oldValue) => {
-    if (value && oldValue && idDocumentToId(value) !== idDocumentToId(oldValue)) {
+    if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
       emit('update:modelValue', [])
     }
     advances.value = await getAdvances(idDocumentToId(props.owner))
