@@ -1,4 +1,4 @@
-import { Project as IProject, locales, ProjectSimple, ProjectWithUsers } from 'abrechnung-common/types.js'
+import { Project as IProject, locales, ProjectSimple, ProjectSimpleWithName, ProjectWithUsers } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { getSettings } from '../db.js'
@@ -21,24 +21,30 @@ export class ProjectController extends Controller {
   @Get()
   public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: AuthenticatedExpressRequest) {
     const settings = await getSettings()
-    if (
-      !settings.userCanSeeAllProjects &&
-      !(await isUserAllowedToAccess(request.user, [
-        'admin',
-        'approve/advance',
-        'approve/travel',
-        'examine/travel',
-        'examine/expenseReport',
-        'examine/healthCareCost',
-        'book/advance',
-        'book/expenseReport',
-        'book/travel',
-        'book/healthCareCost'
-      ]))
-    ) {
+    const userHasExtendedAccess = await isUserAllowedToAccess(request.user, [
+      'admin',
+      'approve/advance',
+      'approve/travel',
+      'examine/travel',
+      'examine/expenseReport',
+      'examine/healthCareCost',
+      'book/advance',
+      'book/expenseReport',
+      'book/travel',
+      'book/healthCareCost'
+    ])
+    if (!settings.userCanSeeAllProjects && !userHasExtendedAccess) {
       throw new AuthorizationError()
     }
-    return await this.getter(Project, { query, projection: { identifier: 1, organisation: 1, name: 1 }, sort: { identifier: 1 } })
+    return await this.getter<ProjectSimpleWithName, IProject<Types.ObjectId>>(Project, {
+      query,
+      projection: {
+        identifier: 1,
+        organisation: 1,
+        ...(!userHasExtendedAccess && settings.onlyShowProjectNamesOnAssigned ? {} : { name: 1 })
+      },
+      sort: { identifier: 1 }
+    })
   }
 }
 

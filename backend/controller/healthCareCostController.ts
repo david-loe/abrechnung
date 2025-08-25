@@ -5,9 +5,11 @@ import {
   IdDocument,
   HealthCareCost as IHealthCareCost,
   Organisation as IOrganisation,
+  User as IUser,
   idDocumentToId,
   Locale,
-  State
+  State,
+  UserWithName
 } from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
 import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
@@ -173,7 +175,7 @@ export class HealthCareCostController extends Controller {
 
   @Get('examiner')
   public async getExaminer() {
-    return await this.getter(User, {
+    return await this.getter<UserWithName, IUser<Types.ObjectId, mongo.Binary>>(User, {
       query: { limit: 5 },
       filter: { 'access.examine/healthCareCost': true },
       projection: { name: 1, email: 1 }

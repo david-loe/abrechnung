@@ -25,12 +25,13 @@ export async function expressAuthentication(req: Request, securityName: string, 
 }
 
 export async function isUserAllowedToAccess(user: Express.User, scopes?: Access[]) {
-  if (await user.isActive()) {
-    if (scopes) {
-      for (const access of scopes) {
-        if (!user.access[access]) {
-          return false
-        }
+  if (!(await user.isActive())) {
+    return false
+  }
+  if (scopes) {
+    for (const access of scopes) {
+      if (!user.access[access]) {
+        return false
       }
     }
   }
