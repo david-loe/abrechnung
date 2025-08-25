@@ -364,6 +364,7 @@
     "offset": "Verrechnen",
     "offsetAgainst": "Verrechnet mit",
     "on": "am",
+    "onlyShowProjektNamesOnAssigned": "Projektnamen nur bei zugewiesenen Projekten anzeigen",
     "optional": "optional",
     "organisation": "Organisation",
     "organisations": "Organisationen",

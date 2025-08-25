@@ -364,6 +364,7 @@
     "offset": "Offset",
     "offsetAgainst": "Offset against",
     "on": "on",
+    "onlyShowProjektNamesOnAssigned": "Show project names only on assigned projects",
     "optional": "optional",
     "organisation": "Organisation",
     "organisations": "Organisations",

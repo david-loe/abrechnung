@@ -31,5 +31,6 @@
   },
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
+  "onlyShowProjektNamesOnAssigned": false,
   "version": "2.1.9"
 }
