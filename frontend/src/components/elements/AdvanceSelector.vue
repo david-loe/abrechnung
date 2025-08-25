@@ -131,7 +131,7 @@ watch(
   () => props.owner,
   async (value, oldValue) => {
     if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
-      emit('update:modelValue', [])
+      emit('update:modelValue', props.multiple ? [] : null)
     }
     advances.value = await getAdvances(idDocumentToId(props.owner))
     setDefaultAdvances(advances.value)
@@ -141,9 +141,8 @@ watch(
   () => props.project,
   async (value, oldValue) => {
     if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
-      emit('update:modelValue', [])
+      emit('update:modelValue', props.multiple ? [] : null)
     }
-    advances.value = await getAdvances(idDocumentToId(props.owner))
     setDefaultAdvances(advances.value)
   }
 )

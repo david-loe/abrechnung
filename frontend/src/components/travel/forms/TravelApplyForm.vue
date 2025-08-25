@@ -108,6 +108,7 @@
       </label>
       <InfoPoint :text="$t('info.advance')" />
       <AdvanceSelector
+        id="travelFormAdvance"
         v-model="formTravel.advances"
         :owner="formTravel.owner"
         :project="formTravel.project"
