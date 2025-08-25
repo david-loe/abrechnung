@@ -107,7 +107,13 @@
         {{ $t('labels.advanceFromEmployer') }}
       </label>
       <InfoPoint :text="$t('info.advance')" />
-      <AdvanceSelector v-model="formTravel.advances" :owner="formTravel.owner" :endpoint-prefix="endpointPrefix" multiple></AdvanceSelector>
+      <AdvanceSelector
+        v-model="formTravel.advances"
+        :owner="formTravel.owner"
+        :project="formTravel.project"
+        :endpoint-prefix="endpointPrefix"
+        :setDefault="APP_DATA.settings.autoSelectAvailableAdvances"
+        multiple></AdvanceSelector>
     </div>
 
     <div class="mb-1 d-flex align-items-center">

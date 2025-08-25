@@ -33,6 +33,8 @@
         id="expenseReportFormAdvance"
         v-model="formExpenseReport.advances"
         :owner="formExpenseReport.owner"
+        :project="formExpenseReport.project"
+        :setDefault="APP_DATA.settings.autoSelectAvailableAdvances"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>
@@ -50,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Category, ExpenseReportSimple, idDocumentToId, UserWithName } from 'abrechnung-common/types.js'
+import { ExpenseReportSimple, idDocumentToId, UserWithName } from 'abrechnung-common/types.js'
 import { defineComponent, PropType } from 'vue'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'

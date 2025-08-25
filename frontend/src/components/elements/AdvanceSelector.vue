@@ -3,7 +3,7 @@
     :options="advances"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => emit('update:modelValue', v)"
+    @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => {setByUser = true; emit('update:modelValue', v)}"
     :filter="filter"
     :getOptionKey="(option: AdvanceSimple) => option._id"
     :getOptionLabel="(option: AdvanceSimple) => option.name"
@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { Base64 } from 'abrechnung-common/scripts.js'
-import { AdvanceSimple, AdvanceState, idDocumentToId, UserWithName } from 'abrechnung-common/types.js'
+import { AdvanceSimple, AdvanceState, idDocumentToId, ProjectSimple, UserWithName } from 'abrechnung-common/types.js'
 import { onMounted, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import API from '@/api'
@@ -59,8 +59,13 @@ const props = defineProps({
   placeholder: { type: String, default: '' },
   multiple: { type: Boolean, default: false },
   owner: { type: Object as PropType<UserWithName<string>> },
-  endpointPrefix: { type: String, default: '' }
+  project: { type: Object as PropType<ProjectSimple<string>> },
+  endpointPrefix: { type: String, default: '' },
+  setDefault: { type: Boolean, default: true }
 })
+
+let setByUser = props.modelValue && (!props.multiple || (Array.isArray(props.modelValue) && props.modelValue.length > 0))
+let defaultFor = { userId: null as null | string, projectId: null as null | string }
 
 // Emits
 const emit = defineEmits<(e: 'update:modelValue', value: AdvanceSimple | AdvanceSimple[] | null) => void>()
@@ -96,14 +101,49 @@ async function getAdvances(ownerId: string | undefined) {
   return []
 }
 
+function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
+  if (
+    !setByUser &&
+    props.owner &&
+    props.project &&
+    availableAdvances.length > 0 &&
+    (defaultFor.userId !== idDocumentToId(props.owner) || defaultFor.projectId !== idDocumentToId(props.project))
+  ) {
+    const advancesForProject = availableAdvances.filter((a) => a.project._id === idDocumentToId(props.project))
+    if (advancesForProject.length > 0) {
+      if (props.multiple) {
+        emit('update:modelValue', advancesForProject)
+      } else {
+        emit('update:modelValue', advancesForProject[0])
+      }
+      defaultFor = { userId: idDocumentToId(props.owner), projectId: idDocumentToId(props.project) }
+    }
+  }
+}
+
 onMounted(async () => {
   advances.value = await getAdvances(idDocumentToId(props.owner))
+  setDefaultAdvances(advances.value)
 })
 
 watch(
   () => props.owner,
-  async () => {
+  async (value, oldValue) => {
+    if (value && oldValue && idDocumentToId(value) !== idDocumentToId(oldValue)) {
+      emit('update:modelValue', [])
+    }
     advances.value = await getAdvances(idDocumentToId(props.owner))
+    setDefaultAdvances(advances.value)
+  }
+)
+watch(
+  () => props.project,
+  async (value, oldValue) => {
+    if (value && oldValue && idDocumentToId(value) !== idDocumentToId(oldValue)) {
+      emit('update:modelValue', [])
+    }
+    advances.value = await getAdvances(idDocumentToId(props.owner))
+    setDefaultAdvances(advances.value)
   }
 )
 </script>
