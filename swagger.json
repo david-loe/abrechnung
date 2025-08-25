@@ -6627,6 +6627,9 @@
 					"onlyShowProjectNamesOnAssigned": {
 						"type": "boolean"
 					},
+					"autoSelectAvailableAdvances": {
+						"type": "boolean"
+					},
 					"defaultAccess": {
 						"properties": {
 							"user": {
@@ -6766,6 +6769,7 @@
 				"required": [
 					"userCanSeeAllProjects",
 					"onlyShowProjectNamesOnAssigned",
+					"autoSelectAvailableAdvances",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -6782,6 +6786,9 @@
 						"type": "boolean"
 					},
 					"onlyShowProjectNamesOnAssigned": {
+						"type": "boolean"
+					},
+					"autoSelectAvailableAdvances": {
 						"type": "boolean"
 					},
 					"defaultAccess": {
@@ -6923,6 +6930,7 @@
 				"required": [
 					"userCanSeeAllProjects",
 					"onlyShowProjectNamesOnAssigned",
+					"autoSelectAvailableAdvances",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -7029,6 +7037,9 @@
 							}
 						},
 						"type": "object"
+					},
+					"autoSelectAvailableAdvances": {
+						"type": "boolean"
 					},
 					"onlyShowProjectNamesOnAssigned": {
 						"type": "boolean"
@@ -12271,7 +12282,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "2.1.9",
+		"version": "2.1.10",
 		"contact": {}
 	},
 	"paths": {
