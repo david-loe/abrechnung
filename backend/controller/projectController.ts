@@ -41,7 +41,7 @@ export class ProjectController extends Controller {
       projection: {
         identifier: 1,
         organisation: 1,
-        ...(!userHasExtendedAccess && settings.onlyShowProjektNamesOnAssigned ? {} : { name: 1 })
+        ...(!userHasExtendedAccess && settings.onlyShowProjectNamesOnAssigned ? {} : { name: 1 })
       },
       sort: { identifier: 1 }
     })
