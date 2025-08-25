@@ -41,6 +41,8 @@
         id="healthCareCostFormAdvance"
         v-model="formHealthCareCost.advances"
         :owner="formHealthCareCost.owner"
+        :project="formHealthCareCost.project"
+        :setDefault="APP_DATA.settings.autoSelectAvailableAdvances"
         :endpoint-prefix="endpointPrefix"
         multiple></AdvanceSelector>
     </div>

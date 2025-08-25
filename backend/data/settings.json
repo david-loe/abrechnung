@@ -32,5 +32,6 @@
   "uploadTokenExpireAfterSeconds": 600,
   "userCanSeeAllProjects": true,
   "onlyShowProjectNamesOnAssigned": false,
+  "autoSelectAvailableAdvances": true,
   "version": "2.1.9"
 }
