@@ -1,24 +1,24 @@
 import test from 'ava'
 import {
-  PlaceToString,
-  getById,
-  mailToLink,
-  msTeamsToLink,
-  getFlagEmoji,
-  isValidDate,
+  convertGermanDateToHTMLDate,
   datetimeToDateString,
   datetimeToDatetimeString,
-  htmlInputStringToDateTime,
   detectSeparator,
-  convertGermanDateToHTMLDate,
-  objectsToCSV,
   escapeRegExp,
-  hexToRGB
+  getById,
+  getFlagEmoji,
+  hexToRGB,
+  htmlInputStringToDateTime,
+  isValidDate,
+  mailToLink,
+  msTeamsToLink,
+  objectsToCSV,
+  PlaceToString
 } from './scripts.js'
 
-const sampleCountry = { _id: 'DE', name: { de: 'Deutschland', en: 'Germany' }, flag: '🇩🇪' }
+const DE = { _id: 'DE', name: { de: 'Deutschland', en: 'Germany' }, flag: '🇩🇪' }
 
-const place = { place: 'Berlin', country: sampleCountry }
+const place = { place: 'Berlin', country: DE }
 
 test('PlaceToString formats place', (t) => {
   t.is(PlaceToString(place), 'Berlin, DE 🇩🇪')
@@ -40,6 +40,7 @@ test('mailToLink and msTeamsToLink build urls', (t) => {
 
 test('getFlagEmoji returns emoji or null', (t) => {
   t.is(getFlagEmoji('DE'), '🇩🇪')
+  t.is(getFlagEmoji('EUR'), '🇪🇺')
   t.is(getFlagEmoji('XAF'), null)
 })
 
@@ -51,19 +52,30 @@ test('date helpers', (t) => {
   t.is(htmlInputStringToDateTime('2023-01-02T10:05')?.toISOString(), '2023-01-02T10:05:00.000Z')
 })
 
-test('detectSeparator and convertGermanDateToHTMLDate', (t) => {
+test('detectSeparator', (t) => {
   t.is(detectSeparator('a;b;c\n1;2;3'), ';')
   t.is(detectSeparator('a,b,c\n1,2,3'), ',')
+})
+
+test('convertGermanDateToHTMLDate', (t) => {
   t.is(convertGermanDateToHTMLDate('1.2.2023'), '2023-02-01')
+  t.is(convertGermanDateToHTMLDate('2023-02-01'), '2023-02-01')
 })
 
 test('objectsToCSV converts arrays', (t) => {
-  const csv = objectsToCSV([{ a: 1, b: [1, 2] }, { a: 2, b: [3] }])
+  const csv = objectsToCSV([
+    { a: 1, b: [1, 2] },
+    { a: 2, b: [3] }
+  ])
   t.is(csv, 'a\tb\n1\t[1, 2]\n2\t[3]\n')
 })
 
-test('escapeRegExp and hexToRGB', (t) => {
+test('escapeRegExp', (t) => {
   t.is(escapeRegExp('a.b?c'), 'a\\.b\\?c')
+  t.is(escapeRegExp('test.email@domain.com'), 'test\\.email@domain\\.com')
+})
+
+test('hexToRGB', (t) => {
   t.deepEqual(hexToRGB('#ffaa00'), [255, 170, 0])
   t.deepEqual(hexToRGB('#0f0'), [0, 255, 0])
   t.throws(() => hexToRGB('#abcd'))
