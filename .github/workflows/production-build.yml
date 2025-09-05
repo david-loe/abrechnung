@@ -26,7 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/setup-production-env
-      - name: Build Backend
-        run: docker compose build
-      - name: Build Frontend
-        run: docker run abrechnung-frontend "npm run build"
+      - name: Build common
+        run: docker compose build common
+      - name: Build backend
+        run: docker compose build backend
+      - name: Build frontend
+        run: docker compose build frontend && docker run abrechnung-frontend "npm run build"
