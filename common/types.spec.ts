@@ -1,5 +1,5 @@
 import test from 'ava'
-import { emailRegex, objectIdRegex, hexColorRegex } from './types.js'
+import { emailRegex, hexColorRegex, objectIdRegex } from './types.js'
 
 test('emailRegex validates emails', (t) => {
   t.true(emailRegex.test('user@example.com'))

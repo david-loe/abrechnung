@@ -25,7 +25,7 @@ const trustProxy = makeValidator<string | boolean | number>((input: string) => {
   if (input.toLowerCase() === 'true') {
     return true
   } else if (input.match(/^\d+$/)) {
-    return Number.parseInt(input)
+    return Number.parseInt(input, 10)
   } else {
     return input
   }
