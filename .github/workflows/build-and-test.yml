@@ -7,8 +7,8 @@ jobs:
   build:
     uses: ./.github/workflows/production-build.yml
 
-  backend-test:
-    name: Backend Tests
+  tests:
+    name: Tests
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -20,5 +20,7 @@ jobs:
           target: '.env'
       - name: Start dev Environment
         run: docker compose up -d common db ldap inbucket
-      - name: Run Tests
+      - name: Run common tests
+        run: docker compose run common npm run test
+      - name: Run backend tests
         run: docker compose run backend npm run test

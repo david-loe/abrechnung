@@ -11,10 +11,12 @@
     "envalid": "^8.1.0"
   },
   "scripts": {
+    "test": "npm run build && ava",
     "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'npx tsc'",
     "build": "tsc"
   },
   "devDependencies": {
+    "ava": "^6.4.1",
     "mongoose": "^8.18.0",
     "nodemon": "^3.1.10",
     "typescript": "^5.9.2"

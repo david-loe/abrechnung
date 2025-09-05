@@ -1,4 +1,4 @@
-import { bool, cleanEnv, EnvError, makeValidator, port, str } from 'envalid'
+import { bool, CleanOptions, cleanEnv, EnvError, makeValidator, port, str } from 'envalid'
 
 const int = makeValidator<number>((input: string) => {
   const coerced = Number.parseInt(input, 10)
@@ -25,7 +25,7 @@ const trustProxy = makeValidator<string | boolean | number>((input: string) => {
   if (input.toLowerCase() === 'true') {
     return true
   } else if (input.match(/^\d+$/)) {
-    return Number.parseInt(input)
+    return Number.parseInt(input, 10)
   } else {
     return input
   }
@@ -38,7 +38,7 @@ const notEmptyString = makeValidator<string>((input: string) => {
   return input
 })
 
-const frontendEnvConfig = {
+const baseEnvConfig = {
   VITE_FRONTEND_URL: url({ desc: 'URL to reach the frontend (without trailing slash)' }),
   VITE_BACKEND_URL: url({ desc: 'URL to reach the backend (without trailing slash)' }),
   VITE_PUBLIC_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Public VAPID Key for WebPush Notifications' }),
@@ -48,8 +48,9 @@ const frontendEnvConfig = {
     desc: 'Longest side of an image in pixels before client side compression is applied'
   })
 }
+const frontendEnvConfig = Object.assign({ MODE: str({ choices: ['development', 'production'] }) }, baseEnvConfig)
 
-const backendEnvConfig = Object.assign({}, frontendEnvConfig, {
+const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   NODE_ENV: str({ choices: ['development', 'production'] }),
   COOKIE_SECRET: notEmptyString({ desc: "Cookie Secret (use something like: 'openssl rand -base64 30')" }),
   MAGIC_LOGIN_SECRET: notEmptyString({ desc: "Secret for magic login links (use something like: 'openssl rand -base64 60')" }),
@@ -72,10 +73,10 @@ const backendEnvConfig = Object.assign({}, frontendEnvConfig, {
   })
 })
 
-export function cleanFrontendEnv(env: Record<string, unknown>) {
-  return cleanEnv(env, Object.assign({ MODE: str({ choices: ['development', 'production'] }) }, frontendEnvConfig))
+export function cleanFrontendEnv(env: Record<string, unknown>, options?: CleanOptions<typeof frontendEnvConfig>) {
+  return cleanEnv(env, frontendEnvConfig, options)
 }
 
-export function cleanBackendEnv(env: Record<string, unknown>) {
-  return cleanEnv(env, backendEnvConfig)
+export function cleanBackendEnv(env: Record<string, unknown>, options?: CleanOptions<typeof backendEnvConfig>) {
+  return cleanEnv(env, backendEnvConfig, options)
 }
