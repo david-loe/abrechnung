@@ -182,14 +182,6 @@ const travels = [
         }
       ]
     },
-    computed: {
-      currency: EUR,
-      sumStages: 427.5,
-      sumExpenses: 95.0,
-      sumLumpSumsCatering: 84.0,
-      sumLumpSumsOvernight: 120.0,
-      totalForTravel: 726.5
-    },
     expectedResult: { expenses: 522.5, lumpSums: 195.8 },
     edgeCasesCovered: [
       'A1-Pflichtland mit a1Certificate',
