@@ -17,7 +17,7 @@
     "i18next": "^25.4.2",
     "mongoose": "^8.17.0",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.5",
+    "nodemailer": "^7.0.6",
     "openid-client": "^6.6.4",
     "passport": "^0.7.0",
     "passport-http-bearer": "^1.0.1",
@@ -36,7 +36,7 @@
     "ldapjs": "^3.0.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.2",
+    "@biomejs/biome": "2.2.3",
     "@types/cors": "^2.8.19",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.3",
@@ -48,7 +48,7 @@
     "@types/passport": "^1.0.17",
     "@types/passport-http-bearer": "^1.0.41",
     "@types/passport-microsoft": "^2.1.0",
-    "@types/semver": "^7.7.0",
+    "@types/semver": "^7.7.1",
     "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/web-push": "^3.6.4",
