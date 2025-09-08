@@ -231,16 +231,17 @@ export class TravelCalculator {
 
   async getCateringRefund(day: TravelDayFullCountry<_id>, type: CateringType, claimSpouseRefund: boolean) {
     const result: TravelDay<_id>['lumpSums']['catering'] = { type, refund: { amount: 0 } }
-    const amount = (await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special))[result.type]
-    let leftover = 1
-    if (!day.cateringRefund.breakfast) leftover -= this.travelSettings.lumpSumCut.breakfast
-    if (!day.cateringRefund.lunch) leftover -= this.travelSettings.lumpSumCut.lunch
-    if (!day.cateringRefund.dinner) leftover -= this.travelSettings.lumpSumCut.dinner
+    const lumpSum = await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)
+    const amount = lumpSum[result.type]
+    let cut = 1
+    if (!day.cateringRefund.breakfast) cut += this.travelSettings.lumpSumCut.breakfast
+    if (!day.cateringRefund.lunch) cut += this.travelSettings.lumpSumCut.lunch
+    if (!day.cateringRefund.dinner) cut += this.travelSettings.lumpSumCut.dinner
 
+    const afterCut = Math.max(0, amount - Math.round(lumpSum.catering24 * cut * 100) / 100)
     result.refund.amount =
       Math.round(
-        amount *
-          leftover *
+        afterCut *
           ((this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) === -1
             ? this.travelSettings.factorCateringLumpSum
             : 1) *
