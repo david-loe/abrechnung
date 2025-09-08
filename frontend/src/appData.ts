@@ -139,7 +139,6 @@ export class APP_DATA {
     } else if (this.user.settings.language !== navLang) {
       API.setter('user/settings', { language: navLang } as Partial<User['settings']>, {}, false)
     }
-    //@ts-expect-error
     logger.info(`${i18n.global.t('labels.user')}:`)
     logger.info(user)
   }
@@ -322,7 +321,6 @@ function updateLocales(displaySettings: DisplaySettings) {
     i18n.global.setLocaleMessage(locale, messages[locale as Locale])
   }
   ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
-  //@ts-expect-error
   document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
 }
 

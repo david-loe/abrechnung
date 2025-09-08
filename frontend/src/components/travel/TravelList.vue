@@ -242,13 +242,11 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
-  //@ts-expect-error
   { text: 'labels.name', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
   headers.push(
-    //@ts-expect-error
     { text: 'labels.destinationPlace', value: 'destinationPlace' },
     { text: 'labels.startDate', value: 'startDate', sortable: true },
     { text: 'labels.project', value: 'project.identifier' },
