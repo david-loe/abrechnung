@@ -207,7 +207,7 @@ schema.pre('validate', async function (this: TravelDoc) {
 
   await populateAll(this, populates)
 
-  const conflicts = await travelCalculator.calc(this)
+  const { conflicts } = await travelCalculator.calc(this)
 
   for (const conflict of conflicts) {
     this.invalidate(conflict.path, conflict.err, conflict.val)
