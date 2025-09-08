@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
 import { AddUp, Project } from 'abrechnung-common/types.js'
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProgressCircle from '@/components/elements/ProgressCircle.vue'

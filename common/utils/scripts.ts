@@ -1,4 +1,3 @@
-import Formatter from './formatter.js'
 import {
   _id,
   AddUp,
@@ -17,7 +16,8 @@ import {
   reportIsTravel,
   Travel,
   TravelDay
-} from './types.js'
+} from '../types.js'
+import Formatter from './formatter.js'
 
 export function PlaceToString(place: Place, language?: Locale) {
   return `${place.place}, ${language ? place.country.name[language] : place.country._id}${place.country.flag ? ` ${place.country.flag}` : ''}`

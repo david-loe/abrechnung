@@ -1,5 +1,5 @@
-import { addUp } from 'abrechnung-common/scripts.js'
 import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from 'abrechnung-common/types.js'
+import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { addExchangeRate } from './exchangeRate.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'

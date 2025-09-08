@@ -163,8 +163,8 @@
 </template>
 
 <script lang="ts">
-import { getFlagEmoji } from 'abrechnung-common/scripts.js'
 import { accesses, CountrySimple, Currency, Locale, locales, User } from 'abrechnung-common/types.js'
+import { getFlagEmoji } from 'abrechnung-common/utils/scripts.js'
 import { defineComponent } from 'vue'
 import API from '@/api.js'
 import APP_LOADER from '@/appData.js'

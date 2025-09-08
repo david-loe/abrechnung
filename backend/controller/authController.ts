@@ -1,5 +1,5 @@
-import { escapeRegExp } from 'abrechnung-common/scripts.js'
 import { tokenAdminUser } from 'abrechnung-common/types.js'
+import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'

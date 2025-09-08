@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts">
-import { getDiffInDays } from 'abrechnung-common/scripts.js'
 import { TravelSimple, TravelState } from 'abrechnung-common/types.js'
+import { getDiffInDays } from 'abrechnung-common/utils/scripts.js'
 import { defineComponent, PropType } from 'vue'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'

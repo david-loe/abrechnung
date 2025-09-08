@@ -1,4 +1,4 @@
-import { escapeRegExp } from 'abrechnung-common/scripts.js'
+import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import MagicLoginStrategy from 'passport-magic-login'
 import { NotAllowedError } from '../controller/error.js'
 import ENV from '../env.js'

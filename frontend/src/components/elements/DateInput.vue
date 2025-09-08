@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from 'abrechnung-common/scripts.js'
+import { datetimeToDateString, datetimeToDatetimeString, htmlInputStringToDateTime } from 'abrechnung-common/utils/scripts.js'
 import { defineComponent, PropType } from 'vue'
 export default defineComponent({
   name: 'DateInput',

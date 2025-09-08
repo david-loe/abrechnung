@@ -1,4 +1,3 @@
-import { addUp } from 'abrechnung-common/scripts.js'
 import {
   AddUp,
   Comment,
@@ -10,6 +9,7 @@ import {
   transportTypes,
   travelStates
 } from 'abrechnung-common/types.js'
+import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'

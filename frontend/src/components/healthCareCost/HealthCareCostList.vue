@@ -172,8 +172,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/scripts.js'
 import { HealthCareCostSimple, HealthCareCostState, healthCareCostStates, Log } from 'abrechnung-common/types.js'
+import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -219,13 +219,13 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
-  //@ts-ignore
+  //@ts-expect-error
   { text: 'labels.name', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
   headers.push(
-    //@ts-ignore
+    //@ts-expect-error
     { text: 'labels.healthInsurance', value: 'insurance.name' },
     { text: 'labels.project', value: 'project.identifier' },
     { text: 'labels.organisation', value: 'organisation' },

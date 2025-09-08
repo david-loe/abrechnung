@@ -1,4 +1,4 @@
-import Formatter from 'abrechnung-common/formatter.js'
+import Formatter from 'abrechnung-common/utils/formatter.js'
 import { App, Plugin } from 'vue'
 import { getLanguageFromNavigator } from './i18n'
 

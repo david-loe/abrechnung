@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { csvToObjects, detectSeparator, download } from 'abrechnung-common/scripts.js'
+import { csvToObjects, detectSeparator, download } from 'abrechnung-common/utils/scripts.js'
 import { defineComponent, PropType } from 'vue'
 import API from '@/api.js'
 

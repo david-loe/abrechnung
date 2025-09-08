@@ -1,6 +1,6 @@
 import test from 'ava'
-import { TravelCalculator } from './travel.js'
-import { baseCurrency, Country, CountryCode, Stage, Travel, TravelDay, TravelSettings, TravelState } from './types.js'
+import { baseCurrency, Country, CountryCode, Stage, Travel, TravelDay, TravelSettings, TravelState } from '../types.js'
+import { TravelCalculator } from './calculator.js'
 
 function createSetup() {
   const countryDE: Country = {
@@ -16,7 +16,7 @@ function createSetup() {
   }
 
   const travelSettings: TravelSettings<string> = {
-    maxTravelDayCount: 365,
+    maxTravelDayCount: 90,
     allowSpouseRefund: false,
     allowTravelApplicationForThePast: true,
     toleranceStageDatesToApprovedTravelDates: 0,

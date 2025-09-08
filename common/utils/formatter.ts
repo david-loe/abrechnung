@@ -1,5 +1,5 @@
+import { BaseCurrencyMoney, baseCurrency, idDocumentToId, Locale, Money, Name, NameDisplayFormat } from '../types.js'
 import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
-import { BaseCurrencyMoney, baseCurrency, idDocumentToId, Locale, Money, Name, NameDisplayFormat } from './types.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 

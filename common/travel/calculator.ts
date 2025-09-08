@@ -1,4 +1,3 @@
-import { datetimeToDate, getDayList, getDiffInDays } from './scripts.js'
 import {
   _id,
   baseCurrency,
@@ -16,7 +15,8 @@ import {
   TravelDayFullCountry,
   TravelExpense,
   TravelSettings
-} from './types.js'
+} from '../types.js'
+import { datetimeToDate, getDayList, getDiffInDays } from '../utils/scripts.js'
 
 export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>

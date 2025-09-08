@@ -1,6 +1,5 @@
 import { loadLocales } from 'abrechnung-common/locales/load.js'
-import { getById } from 'abrechnung-common/scripts.js'
-import { TravelCalculator } from 'abrechnung-common/travel.js'
+import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
 import {
   Category,
   Country,
@@ -16,6 +15,7 @@ import {
   User,
   UserWithNameAndProject
 } from 'abrechnung-common/types.js'
+import { getById } from 'abrechnung-common/utils/scripts.js'
 import { Ref, ref } from 'vue'
 import API from './api.js'
 import { formatter } from './formatter'
@@ -139,7 +139,7 @@ export class APP_DATA {
     } else if (this.user.settings.language !== navLang) {
       API.setter('user/settings', { language: navLang } as Partial<User['settings']>, {}, false)
     }
-    //@ts-ignore
+    //@ts-expect-error
     logger.info(`${i18n.global.t('labels.user')}:`)
     logger.info(user)
   }
@@ -322,7 +322,7 @@ function updateLocales(displaySettings: DisplaySettings) {
     i18n.global.setLocaleMessage(locale, messages[locale as Locale])
   }
   ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
-  //@ts-ignore
+  //@ts-expect-error
   document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
 }
 

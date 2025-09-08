@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
-import { datetimeToDateString } from 'abrechnung-common/scripts.js'
 import { ApprovedTravel as IApprovedTravel } from 'abrechnung-common/types.js'
+import { datetimeToDateString } from 'abrechnung-common/utils/scripts.js'
 import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { approvedTravelsPrinter } from '../factory.js'
 import i18n from '../i18n.js'

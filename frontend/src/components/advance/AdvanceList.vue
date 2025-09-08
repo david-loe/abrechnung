@@ -160,8 +160,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getById } from 'abrechnung-common/scripts.js'
 import { AdvanceSimple, AdvanceState, advanceStates } from 'abrechnung-common/types.js'
+import { getById } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header, SortType } from 'vue3-easy-data-table'

@@ -281,7 +281,6 @@
 </template>
 
 <script lang="ts" setup>
-import { convertGermanDateToHTMLDate, getById } from 'abrechnung-common/scripts.js'
 import {
   Currency,
   DocumentFile,
@@ -292,6 +291,7 @@ import {
   State,
   UserSimple
 } from 'abrechnung-common/types.js'
+import { convertGermanDateToHTMLDate, getById } from 'abrechnung-common/utils/scripts.js'
 import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
