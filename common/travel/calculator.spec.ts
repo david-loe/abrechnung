@@ -1,6 +1,7 @@
 import test from 'ava'
 import { baseCurrency, Country, CountryCode, Stage, Travel, TravelDay, TravelSettings, TravelState } from '../types.js'
 import { TravelCalculator } from './calculator.js'
+import travelSettings from './travelSettings.json' with { type: 'json' }
 
 function createSetup() {
   const countryDE: Country = {
@@ -15,31 +16,10 @@ function createSetup() {
     lumpSums: [{ validFrom: new Date('2020-01-01'), catering8: 12, catering24: 24, overnight: 40 }]
   }
 
-  const travelSettings: TravelSettings<string> = {
-    maxTravelDayCount: 90,
-    allowSpouseRefund: false,
-    allowTravelApplicationForThePast: true,
-    toleranceStageDatesToApprovedTravelDates: 0,
-    distanceRefunds: { car: 0.3, motorcycle: 0.2, halfCar: 0.15 },
-    vehicleRegistrationWhenUsingOwnCar: 'optional',
-    defaultLastPlaceOfWork: 'destinationPlace',
-    lumpSumCut: { breakfast: 0.2, lunch: 0.4, dinner: 0.4 },
-    factorCateringLumpSum: 1,
-    factorCateringLumpSumExceptions: [],
-    factorOvernightLumpSum: 1,
-    factorOvernightLumpSumExceptions: [],
-    fallbackLumpSumCountry: 'DE',
-    secondNightOnAirplaneLumpSumCountry: 'DE',
-    secondNightOnShipOrFerryLumpSumCountry: 'DE',
-    minHoursOfTravel: 0,
-    minProfessionalShare: 0,
-    _id: 'settings'
-  }
-
   const countries: Record<CountryCode, Country> = { DE: countryDE, FR: countryFR }
   const getCountryById = async (id: CountryCode) => countries[id]
 
-  const tc = new TravelCalculator(getCountryById, travelSettings)
+  const tc = new TravelCalculator(getCountryById, Object.assign(travelSettings, { _id: 'settings' }) as TravelSettings)
 
   const stages: Stage<string>[] = [
     {
