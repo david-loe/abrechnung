@@ -175,8 +175,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/scripts.js'
 import { ExpenseReportSimple, ExpenseReportState, expenseReportStates } from 'abrechnung-common/types.js'
+import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'

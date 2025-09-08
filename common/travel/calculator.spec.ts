@@ -1,6 +1,7 @@
 import test from 'ava'
-import { TravelCalculator } from './travel.js'
-import { baseCurrency, Country, CountryCode, Stage, Travel, TravelDay, TravelSettings, TravelState } from './types.js'
+import { baseCurrency, Country, CountryCode, Stage, TravelSettings, TravelState } from '../types.js'
+import { TravelCalculator } from './calculator.js'
+import travelSettings from './travelSettings.json' with { type: 'json' }
 
 function createSetup() {
   const countryDE: Country = {
@@ -15,31 +16,10 @@ function createSetup() {
     lumpSums: [{ validFrom: new Date('2020-01-01'), catering8: 12, catering24: 24, overnight: 40 }]
   }
 
-  const travelSettings: TravelSettings<string> = {
-    maxTravelDayCount: 365,
-    allowSpouseRefund: false,
-    allowTravelApplicationForThePast: true,
-    toleranceStageDatesToApprovedTravelDates: 0,
-    distanceRefunds: { car: 0.3, motorcycle: 0.2, halfCar: 0.15 },
-    vehicleRegistrationWhenUsingOwnCar: 'optional',
-    defaultLastPlaceOfWork: 'destinationPlace',
-    lumpSumCut: { breakfast: 0.2, lunch: 0.4, dinner: 0.4 },
-    factorCateringLumpSum: 1,
-    factorCateringLumpSumExceptions: [],
-    factorOvernightLumpSum: 1,
-    factorOvernightLumpSumExceptions: [],
-    fallbackLumpSumCountry: 'DE',
-    secondNightOnAirplaneLumpSumCountry: 'DE',
-    secondNightOnShipOrFerryLumpSumCountry: 'DE',
-    minHoursOfTravel: 0,
-    minProfessionalShare: 0,
-    _id: 'settings'
-  }
-
   const countries: Record<CountryCode, Country> = { DE: countryDE, FR: countryFR }
   const getCountryById = async (id: CountryCode) => countries[id]
 
-  const tc = new TravelCalculator(getCountryById, travelSettings)
+  const tc = new TravelCalculator(getCountryById, Object.assign(travelSettings, { _id: 'settings' }) as TravelSettings)
 
   const stages: Stage<string>[] = [
     {
@@ -47,9 +27,9 @@ function createSetup() {
       arrival: new Date('2023-01-01T18:00:00Z'),
       startLocation: { place: 'Berlin', country: countryDE },
       endLocation: { place: 'Paris', country: countryFR },
-      transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
+      transport: { type: 'ownCar' as const, distance: 100, distanceRefundType: 'car' as const },
       cost: { amount: 0, currency: baseCurrency, date: new Date('2023-01-01'), receipts: [] },
-      purpose: 'professional',
+      purpose: 'professional' as const,
       _id: 's1'
     },
     {
@@ -57,35 +37,31 @@ function createSetup() {
       arrival: new Date('2023-01-02T18:00:00Z'),
       startLocation: { place: 'Paris', country: countryFR },
       endLocation: { place: 'Berlin', country: countryDE },
-      transport: { type: 'ownCar', distance: 200, distanceRefundType: 'car' },
+      transport: { type: 'ownCar' as const, distance: 200, distanceRefundType: 'car' as const },
       cost: { amount: 0, currency: baseCurrency, date: new Date('2023-01-02'), receipts: [] },
-      purpose: 'professional',
+      purpose: 'professional' as const,
       _id: 's2'
     }
   ]
 
-  const days: TravelDay<string>[] = [
+  const days = [
     {
       date: new Date('2023-01-01'),
-      country: countryDE,
-      cateringRefund: { breakfast: true, lunch: true, dinner: true },
+      cateringRefund: { breakfast: true, lunch: true, dinner: false },
       overnightRefund: true,
-      purpose: 'professional',
-      lumpSums: { overnight: { refund: { amount: 0 } }, catering: { refund: { amount: 0 }, type: 'catering8' } },
+      purpose: 'professional' as const,
       _id: 'd1'
     },
     {
       date: new Date('2023-01-02'),
-      country: countryDE,
       cateringRefund: { breakfast: true, lunch: true, dinner: true },
       overnightRefund: false,
-      purpose: 'private',
-      lumpSums: { overnight: { refund: { amount: 0 } }, catering: { refund: { amount: 0 }, type: 'catering8' } },
+      purpose: 'private' as const,
       _id: 'd2'
     }
   ]
 
-  const travel: Travel<string> = {
+  const travel = {
     startDate: new Date('2023-01-01'),
     endDate: new Date('2023-01-02'),
     destinationPlace: { place: 'Paris', country: countryFR },
@@ -148,15 +124,15 @@ test('calculateDays assigns countries per day', async (t) => {
 })
 
 test('calc computes refunds and costs', async (t) => {
-  const { tc, travel, stages } = createSetup()
-  const conflicts = await tc.calc(travel)
+  const { tc, travel } = createSetup()
+  const { result, conflicts } = await tc.calc(travel)
   t.is(conflicts.length, 0)
-  t.is(stages[0].cost.amount, 30)
-  t.is(stages[1].cost.amount, 60)
-  t.is(travel.days[0].lumpSums.catering.refund.amount, 12)
-  t.is(travel.days[1].lumpSums.catering.refund.amount, 0)
-  t.is(travel.days[0].lumpSums.overnight.refund.amount, 40)
-  t.is(travel.progress, 100)
+  t.is(result?.stages[0].cost.amount, 30)
+  t.is(result?.stages[1].cost.amount, 60)
+  t.is(result?.days[0].lumpSums.catering.refund.amount, 2.4)
+  t.is(result?.days[1].lumpSums.catering.refund.amount, 0)
+  t.is(result?.days[0].lumpSums.overnight.refund.amount, 40)
+  t.is(result?.progress, 100)
 })
 
 test('calc reports conflicts for overlapping stages', async (t) => {
@@ -166,6 +142,6 @@ test('calc reports conflicts for overlapping stages', async (t) => {
     { ...stages[0], _id: 's3', departure: new Date('2023-01-01T10:00:00Z'), arrival: new Date('2023-01-01T19:00:00Z') }
   ]
   const badTravel = { ...travel, stages: badStages }
-  const conflicts = await tc.calc(badTravel)
+  const { conflicts } = await tc.calc(badTravel)
   t.true(conflicts.length > 0)
 })

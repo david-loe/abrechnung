@@ -61,8 +61,8 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
-import { getById } from 'abrechnung-common/scripts.js'
 import { Project } from 'abrechnung-common/types.js'
+import { getById } from 'abrechnung-common/utils/scripts.js'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'

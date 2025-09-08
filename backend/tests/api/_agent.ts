@@ -1,5 +1,5 @@
-import { Base64 } from 'abrechnung-common/scripts.js'
 import { User } from 'abrechnung-common/types.js'
+import { Base64 } from 'abrechnung-common/utils/scripts.js'
 import request from 'supertest'
 import APP from '../../app.js'
 

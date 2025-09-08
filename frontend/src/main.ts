@@ -15,8 +15,8 @@ import './bootstrap.css'
 
 import 'abrechnung-common/fonts/twemoji-flags.css'
 
-import Formatter from 'abrechnung-common/formatter.js'
 import { CountrySimple, Currency, Locale } from 'abrechnung-common/types.js'
+import Formatter from 'abrechnung-common/utils/formatter.js'
 import formatter from './formatter.js'
 import i18n from './i18n.js'
 

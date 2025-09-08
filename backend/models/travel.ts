@@ -1,4 +1,3 @@
-import { addUp } from 'abrechnung-common/scripts.js'
 import {
   AddUp,
   Comment,
@@ -10,6 +9,7 @@ import {
   transportTypes,
   travelStates
 } from 'abrechnung-common/types.js'
+import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
@@ -207,7 +207,7 @@ schema.pre('validate', async function (this: TravelDoc) {
 
   await populateAll(this, populates)
 
-  const conflicts = await travelCalculator.calc(this)
+  const { conflicts } = await travelCalculator.calc(this)
 
   for (const conflict of conflicts) {
     this.invalidate(conflict.path, conflict.err, conflict.val)

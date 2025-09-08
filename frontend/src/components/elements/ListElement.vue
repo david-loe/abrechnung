@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Base64 } from 'abrechnung-common/scripts.js'
+import { Base64 } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, watch } from 'vue'
 import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import API from '@/api.js'

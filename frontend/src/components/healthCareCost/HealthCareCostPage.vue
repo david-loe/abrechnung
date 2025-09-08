@@ -261,7 +261,6 @@
 </template>
 
 <script lang="ts" setup>
-import { getTotalTotal, mailToLink } from 'abrechnung-common/scripts.js'
 import {
   Expense,
   HealthCareCost,
@@ -271,6 +270,7 @@ import {
   State,
   UserSimple
 } from 'abrechnung-common/types.js'
+import { getTotalTotal, mailToLink } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'

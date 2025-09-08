@@ -1,5 +1,3 @@
-import Formatter from 'abrechnung-common/formatter.js'
-import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/scripts.js'
 import {
   _id,
   Advance,
@@ -31,6 +29,8 @@ import {
   TravelSettings,
   TravelState
 } from 'abrechnung-common/types.js'
+import Formatter from 'abrechnung-common/utils/formatter.js'
+import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import pdf_lib from 'pdf-lib'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 

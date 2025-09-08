@@ -1,4 +1,3 @@
-import { getTotalBalance, sanitizeFilename } from 'abrechnung-common/scripts.js'
 import {
   Advance,
   ExpenseReport,
@@ -9,6 +8,7 @@ import {
   reportIsTravel,
   Travel
 } from 'abrechnung-common/types.js'
+import { getTotalBalance, sanitizeFilename } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
 import { getConnectionSettings } from '../db.js'
 import { formatter, reportPrinter } from '../factory.js'

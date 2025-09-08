@@ -647,6 +647,7 @@ export function reportIsTravel(
 export function reportIsTravel(
   report: TravelSimple<_id> | ExpenseReportSimple<_id> | HealthCareCostSimple<_id> | Advance<_id>
 ): report is TravelSimple<_id>
+export function reportIsTravel(report: AddUpTravel | AddUpReport): report is AddUpTravel
 // biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
 export function reportIsTravel(report: any): report is { startDate: Date | string } {
   return typeof report.startDate === 'string' || report.startDate instanceof Date
@@ -694,21 +695,28 @@ type AddUpBase<idType extends _id = _id> = {
   advanceOverflow: boolean
 }
 
-export type AddUp<
-  idType extends _id = _id,
-  T extends Travel<_id, binary> | ExpenseReport<_id, binary> | HealthCareCost<_id, binary> =
-    | Travel<_id, binary>
-    | ExpenseReport<_id, binary>
-    | HealthCareCost<_id, binary>
-> = T extends Travel<_id, binary> ? AddUpBase<idType> & { lumpSums: BaseCurrencyMoneyNotNull } : AddUpBase<idType>
+export interface AddUpTravel {
+  expenses: Travel['expenses']
+  stages: Travel['stages']
+  days: Travel['days']
+  professionalShare: Travel['professionalShare']
+  project: (ExpenseReport | HealthCareCost)['project']
+  advances: Travel['advances']
+  startDate: Travel['startDate']
+}
+export interface AddUpReport {
+  expenses: (ExpenseReport | HealthCareCost)['expenses']
+  advances: (ExpenseReport | HealthCareCost)['advances']
+  project: (ExpenseReport | HealthCareCost)['project']
+}
 
-export type FlatAddUp<
-  idType extends _id = _id,
-  T extends Travel<_id, binary> | HealthCareCost<_id, binary> | ExpenseReport<_id, binary> =
-    | Travel<_id, binary>
-    | HealthCareCost<_id, binary>
-    | ExpenseReport<_id, binary>
-> = AddUp<idType, T> | (Omit<AddUp<idType, T>, 'project'> & { project: idType })
+export type AddUp<idType extends _id = _id, T extends AddUpTravel | AddUpReport = AddUpTravel | AddUpReport> = T extends AddUpTravel
+  ? AddUpBase<idType> & { lumpSums: BaseCurrencyMoneyNotNull }
+  : AddUpBase<idType>
+
+export type FlatAddUp<idType extends _id = _id, T extends AddUpTravel | AddUpReport = AddUpTravel | AddUpReport> =
+  | AddUp<idType, T>
+  | (Omit<AddUp<idType, T>, 'project'> & { project: idType })
 
 export const emailRegex =
   /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"(!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/

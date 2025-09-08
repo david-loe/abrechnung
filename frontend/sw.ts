@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { escapeRegExp } from 'abrechnung-common/scripts.js'
+import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setDefaultHandler } from 'workbox-routing'

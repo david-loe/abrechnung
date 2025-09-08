@@ -124,8 +124,8 @@
 </template>
 
 <script lang="ts" setup>
-import { datetimeToDateString } from 'abrechnung-common/scripts.js'
 import { OrganisationSimple, TravelSimple, TravelState } from 'abrechnung-common/types.js'
+import { datetimeToDateString } from 'abrechnung-common/utils/scripts.js'
 import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

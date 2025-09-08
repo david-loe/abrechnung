@@ -1,4 +1,4 @@
-import { mergeDeep } from 'abrechnung-common/scripts.js'
+import travelSettings from 'abrechnung-common/travel/travelSettings.json' with { type: 'json' }
 import {
   CountryLumpSum,
   ConnectionSettings as IConnectionSettings,
@@ -8,6 +8,7 @@ import {
   TravelSettings as ITravelSettings,
   tokenAdminUser
 } from 'abrechnung-common/types.js'
+import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
 import mongoose, { Connection, Model, Types } from 'mongoose'
@@ -19,7 +20,6 @@ import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
 import printerSettings from './data/printerSettings.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
-import travelSettings from './data/travelSettings.json' with { type: 'json' }
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'

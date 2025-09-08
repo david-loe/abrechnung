@@ -136,8 +136,8 @@
 </template>
 
 <script lang="ts">
-import { datetimeToDateString, isValidDate } from 'abrechnung-common/scripts.js'
 import { idDocumentToId, TravelSimple, TravelState, UserWithName } from 'abrechnung-common/types.js'
+import { datetimeToDateString, isValidDate } from 'abrechnung-common/utils/scripts.js'
 import { defineComponent, PropType } from 'vue'
 import APP_LOADER from '@/appData.js'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
