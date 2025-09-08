@@ -1,5 +1,5 @@
 import test from 'ava'
-import { AddUpTravel, baseCurrency, Country, CountryCode, DocumentFile, Travel, TravelSettings } from '../types.js'
+import { AddUpTravel, baseCurrency, Country, CountryCode, DocumentFile, TravelSettings } from '../types.js'
 import { addUp } from '../utils/scripts.js'
 import { TravelCalculator } from './calculator.js'
 import travelSettings from './travelSettings.json' with { type: 'json' }
