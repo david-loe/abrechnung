@@ -1,6 +1,8 @@
 import {
   _id,
   AddUp,
+  AddUpReport,
+  AddUpTravel,
   BaseCurrencyMoney,
   baseCurrency,
   binary,
@@ -253,7 +255,7 @@ function addToAddUps<idType extends _id>(
   }
 }
 
-function addTravelExpensesSum<idType extends _id>(travel: Travel<idType, binary>, addUps: FlatAddUp<idType, Travel<idType, binary>>[]) {
+function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: FlatAddUp<idType, AddUpTravel>[]) {
   for (const stage of travel.stages) {
     if (stage.cost && stage.cost.amount !== null) {
       let add = getBaseCurrencyAmount(stage.cost)
@@ -274,13 +276,10 @@ function addTravelExpensesSum<idType extends _id>(travel: Travel<idType, binary>
   }
 }
 
-export function addUp<
-  idType extends _id,
-  T extends Travel<idType, binary> | ExpenseReport<idType, binary> | HealthCareCost<idType, binary>
->(report: T): FlatAddUp<idType, T>[] {
+export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(report: T): FlatAddUp<idType, T>[] {
   const isTravel = reportIsTravel(report)
   const addUps = [defaultAddUp(idDocumentToId(report.project), isTravel) as FlatAddUp<idType, T>]
-  if (reportIsTravel(report)) {
+  if (isTravel) {
     ;(addUps[0] as FlatAddUp<idType, Travel<_id, binary>>).lumpSums = getLumpSumsSum(report.days)
     addTravelExpensesSum(report, addUps as FlatAddUp<idType, Travel<_id, binary>>[])
   } else {
