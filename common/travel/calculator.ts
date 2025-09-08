@@ -233,7 +233,7 @@ export class TravelCalculator {
     const result: TravelDay<_id>['lumpSums']['catering'] = { type, refund: { amount: 0 } }
     const lumpSum = await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)
     const amount = lumpSum[result.type]
-    let cut = 1
+    let cut = 0
     if (!day.cateringRefund.breakfast) cut += this.travelSettings.lumpSumCut.breakfast
     if (!day.cateringRefund.lunch) cut += this.travelSettings.lumpSumCut.lunch
     if (!day.cateringRefund.dinner) cut += this.travelSettings.lumpSumCut.dinner
