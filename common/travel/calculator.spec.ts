@@ -47,7 +47,7 @@ function createSetup() {
   const days = [
     {
       date: new Date('2023-01-01'),
-      cateringRefund: { breakfast: true, lunch: true, dinner: true },
+      cateringRefund: { breakfast: true, lunch: true, dinner: false },
       overnightRefund: true,
       purpose: 'professional' as const,
       _id: 'd1'
@@ -129,7 +129,7 @@ test('calc computes refunds and costs', async (t) => {
   t.is(conflicts.length, 0)
   t.is(result?.stages[0].cost.amount, 30)
   t.is(result?.stages[1].cost.amount, 60)
-  t.is(result?.days[0].lumpSums.catering.refund.amount, 12)
+  t.is(result?.days[0].lumpSums.catering.refund.amount, 2.4)
   t.is(result?.days[1].lumpSums.catering.refund.amount, 0)
   t.is(result?.days[0].lumpSums.overnight.refund.amount, 40)
   t.is(result?.progress, 100)
