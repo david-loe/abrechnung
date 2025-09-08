@@ -47,6 +47,12 @@ interface InputTravel
   professionalShare?: Travel<_id, binary>['professionalShare']
 }
 
+interface CalcedTravel {
+  days: TravelDay<_id>[]
+  progress?: Travel<_id, binary>['progress']
+  professionalShare?: Travel<_id, binary>['professionalShare']
+}
+
 export class TravelCalculator {
   getCountryById: (id: CountryCode) => Promise<Country>
   lumpSumCalculator!: LumpSumCalculator
@@ -63,7 +69,7 @@ export class TravelCalculator {
     this.updateSettings(travelSettings)
   }
 
-  async calc(travel: InputTravel): Promise<Invalid[]> {
+  async calc<T extends InputTravel = InputTravel>(travel: T) {
     this.sort(travel)
     const conflicts = this.validator.validate(travel)
     if (conflicts.length === 0) {
@@ -71,12 +77,13 @@ export class TravelCalculator {
       travel.days = await this.calculateDays(travel.stages, travel.lastPlaceOfWork, travel.destinationPlace, travel.days)
       travel.professionalShare = this.getProfessionalShare(travel.days)
 
-      const outTravel = travel as Travel<_id, binary>
+      const outTravel = travel as T & CalcedTravel
       this.addRefundsForOwnCar(outTravel.stages)
       await this.addCateringRefunds(outTravel.days, travel.stages, Boolean(travel.claimSpouseRefund))
       await this.addOvernightRefunds(outTravel.days, travel.stages, Boolean(travel.claimSpouseRefund))
+      return { result: outTravel, conflicts }
     }
-    return conflicts
+    return { conflicts }
   }
 
   updateSettings(travelSettings: TravelSettings<_id>) {

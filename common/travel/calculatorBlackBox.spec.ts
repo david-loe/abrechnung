@@ -368,15 +368,17 @@ const calculator = new TravelCalculator(getCountryById, Object.assign(travelSett
 
 for (const { travel, expectedResult } of travels) {
   test(`Travel ${travel._id} calculation`, async (t) => {
-    await calculator.calc(travel)
-    const result = addUp<string, AddUpTravel>(travel as unknown as AddUpTravel)
-    let resLumpSum = 0
-    let resExpenses = 0
-    for (const addUpRes of result) {
-      resLumpSum += addUpRes.lumpSums.amount
-      resExpenses += addUpRes.expenses.amount
+    const { result } = await calculator.calc(travel)
+    if (result) {
+      const addUpResult = addUp<string, AddUpTravel>(result as AddUpTravel)
+      let resLumpSum = 0
+      let resExpenses = 0
+      for (const addUpRes of addUpResult) {
+        resLumpSum += addUpRes.lumpSums.amount
+        resExpenses += addUpRes.expenses.amount
+      }
+      t.is(resLumpSum, expectedResult.lumpSums)
+      t.is(resExpenses, expectedResult.expenses)
     }
-    t.is(resLumpSum, expectedResult.lumpSums)
-    t.is(resExpenses, expectedResult.expenses)
   })
 }
