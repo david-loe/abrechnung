@@ -11,7 +11,7 @@ import {
   UserWithName
 } from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
@@ -46,6 +46,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postExpenseToOwn(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
@@ -214,6 +215,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postExpenseToAny(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,

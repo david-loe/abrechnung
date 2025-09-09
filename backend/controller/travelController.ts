@@ -12,7 +12,7 @@ import {
   UserWithName
 } from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
-import { Body, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
@@ -64,6 +64,7 @@ export class TravelController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postExpenseToOwn(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
@@ -94,6 +95,7 @@ export class TravelController extends Controller {
 
   @Post('stage')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postStageToOwn(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
@@ -379,6 +381,7 @@ export class TravelExamineController extends Controller {
 
   @Post('expense')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postExpenseToAny(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
@@ -413,6 +416,7 @@ export class TravelExamineController extends Controller {
 
   @Post('stage')
   @Middlewares(fileHandler.any())
+  @Consumes('multipart/form-data')
   public async postStageToAny(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
