@@ -6,40 +6,46 @@ export enum LogLevel {
 }
 
 export class Logger {
-  logLevel: LogLevel = LogLevel.INFO
+  #logLevel: LogLevel = LogLevel.INFO
 
   constructor(logLevel?: LogLevel | string) {
-    if (logLevel) {
-      if (typeof logLevel === 'string') {
-        this.logLevel = Logger.getLogLevelFromString(logLevel)
-      } else {
-        this.logLevel = logLevel
-      }
-    }
+    this.setLogLevel(logLevel)
   }
   error(message?: unknown, ...optionalParams: unknown[]) {
-    if (this.logLevel > LogLevel.ERROR) {
+    if (this.#logLevel > LogLevel.ERROR) {
       return
     }
     console.error(message, ...optionalParams)
   }
   warn(message?: unknown, ...optionalParams: unknown[]) {
-    if (this.logLevel > LogLevel.WARN) {
+    if (this.#logLevel > LogLevel.WARN) {
       return
     }
     console.warn(message, ...optionalParams)
   }
   info(message?: unknown, ...optionalParams: unknown[]) {
-    if (this.logLevel > LogLevel.INFO) {
+    if (this.#logLevel > LogLevel.INFO) {
       return
     }
     console.info(message, ...optionalParams)
   }
   debug(message?: unknown, ...optionalParams: unknown[]) {
-    if (this.logLevel > LogLevel.DEBUG) {
+    if (this.#logLevel > LogLevel.DEBUG) {
       return
     }
     console.debug(message, ...optionalParams)
+  }
+  setLogLevel(logLevel?: LogLevel | string) {
+    if (logLevel !== undefined) {
+      if (typeof logLevel === 'string') {
+        this.#logLevel = Logger.getLogLevelFromString(logLevel)
+      } else {
+        this.#logLevel = logLevel
+      }
+    }
+  }
+  getLogLevel() {
+    return this.#logLevel
   }
 
   static getLogLevelFromString(logLevel: string): LogLevel {
