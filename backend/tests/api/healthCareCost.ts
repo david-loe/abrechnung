@@ -1,13 +1,13 @@
 import { Expense, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { disconnectDB } from '../../db.js'
-import createAgent, { loginUser } from './_agent.js'
-import { objectToFormFields } from './_helper.js'
+import createAgent, { loginUser } from '../_agent.js'
+import { objectToFormFields } from '../_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-//@ts-ignore
+//@ts-expect-error
 let healthCareCost: HealthCareCostSimple = { name: 'Broken leg', patientName: 'Ben Logas' }
 
 test.serial('GET /healthInsurance', async (t) => {
@@ -74,7 +74,7 @@ const expenses: Expense[] = [
       amount: 480.62, //@ts-ignore
       currency: { _id: 'USD' },
       receipts: [
-        //@ts-ignore
+        //@ts-expect-error
         { name: 'Photo.jpg', type: 'image/png', data: 'tests/files/dummy.png' }, //@ts-ignore
         { name: 'Photo2.jpg', type: 'image/png', data: 'tests/files/small-dummy.png' }
       ],
@@ -177,6 +177,20 @@ test.serial('GET /healthCareCost/report', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+// BOOK
+
+test.serial('POST /book/healthCareCost/booked', async (t) => {
+  await loginUser(agent, 'healthCareCost')
+  t.plan(2)
+  const res = await agent.post('/book/healthCareCost/booked').send([healthCareCost._id])
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is(res.body.result[0].status, 'fulfilled')
 })
 
 test.after.always('DELETE /healthCareCost', async (t) => {

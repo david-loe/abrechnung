@@ -1,13 +1,13 @@
 import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { disconnectDB } from '../../db.js'
-import createAgent, { loginUser } from './_agent.js'
-import { objectToFormFields } from './_helper.js'
+import createAgent, { loginUser } from '../_agent.js'
+import { objectToFormFields } from '../_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-//@ts-ignore
+//@ts-expect-error
 let expenseReport: ExpenseReportSimple = { name: 'Expenses from last Month' }
 
 test.serial('GET /project', async (t) => {
@@ -74,7 +74,7 @@ const expenses: Expense[] = [
       amount: 700, //@ts-ignore
       currency: { _id: 'CNY' },
       receipts: [
-        //@ts-ignore
+        //@ts-expect-error
         { name: 'Photo.jpg', type: 'image/jpeg', data: 'tests/files/dummy.jpg' }, //@ts-ignore
         { name: 'Photo2.jpg', type: 'image/jpeg', data: 'tests/files/small-dummy.jpg' }
       ],
@@ -169,6 +169,20 @@ test.serial('GET /expenseReport/report', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+// BOOK
+
+test.serial('POST /book/expenseReport/booked', async (t) => {
+  await loginUser(agent, 'expenseReport')
+  t.plan(2)
+  const res = await agent.post('/book/expenseReport/booked').send([expenseReport._id])
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is(res.body.result[0].status, 'fulfilled')
 })
 
 test.after.always('DELETE /expenseReport', async (t) => {

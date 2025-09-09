@@ -1,8 +1,8 @@
 import { Stage, Travel, TravelExpense, TravelSimple, TravelState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { disconnectDB } from '../../db.js'
-import createAgent, { loginUser } from './_agent.js'
-import { objectToFormFields } from './_helper.js'
+import createAgent, { loginUser } from '../_agent.js'
+import { objectToFormFields } from '../_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -11,7 +11,7 @@ let travel: TravelSimple = {
   name: 'Ankara Aug 2023',
   reason: 'Fortbildung',
   destinationPlace: {
-    //@ts-ignore
+    //@ts-expect-error
     country: { _id: 'TR' },
     place: 'Ankara'
   },
@@ -95,12 +95,12 @@ const stages: Stage[] = [
     departure: new Date('2023-08-24T14:05:00.000Z'),
     arrival: new Date('2023-08-24T19:30:00.000Z'),
     startLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'DE' },
       place: 'Frankfurt'
     },
     endLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'TR' },
       place: 'Ankara'
     },
@@ -118,12 +118,12 @@ const stages: Stage[] = [
     departure: new Date('2023-08-29T11:30:00.000Z'),
     arrival: new Date('2023-08-29T14:05:00.000Z'),
     startLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'TR' },
       place: 'Ankara'
     },
     endLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'BG' },
       place: 'Sofia'
     },
@@ -139,12 +139,12 @@ const stages: Stage[] = [
     departure: new Date('2023-09-01T14:05:00.000Z'),
     arrival: new Date('2023-09-01T18:34:00.000Z'),
     startLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'BG' },
       place: 'Sofia'
     },
     endLocation: {
-      //@ts-ignore
+      //@ts-expect-error
       country: { _id: 'DE' },
       place: 'Frankfurt'
     },
@@ -180,7 +180,6 @@ test.serial('POST /travel/stage', async (t) => {
 })
 
 const expenses: TravelExpense[] = [
-  //@ts-ignore
   {
     description: 'Konferenzkosten',
     cost: {
@@ -278,6 +277,20 @@ test.serial('GET /travel/report', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+// BOOK
+
+test.serial('POST /book/travel/booked', async (t) => {
+  await loginUser(agent, 'travel')
+  t.plan(2)
+  const res = await agent.post('/book/travel/booked').send([travel._id])
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is(res.body.result[0].status, 'fulfilled')
 })
 
 test.after.always('DELETE /travel', async (t) => {
