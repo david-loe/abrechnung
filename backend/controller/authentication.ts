@@ -24,16 +24,26 @@ export async function expressAuthentication(req: Request, securityName: string, 
   throw new AuthorizationError()
 }
 
-export async function isUserAllowedToAccess(user: Express.User, scopes?: Access[]) {
+export async function isUserAllowedToAccess(user: Express.User, scopes?: Access[], condition: 'all' | 'one' = 'all') {
   if (!(await user.isActive())) {
     return false
   }
-  if (scopes) {
+  if (!scopes) {
+    return true
+  }
+  if (condition === 'all') {
     for (const access of scopes) {
       if (!user.access[access]) {
         return false
       }
     }
+    return true
+  } else if (condition === 'one') {
+    for (const access of scopes) {
+      if (user.access[access]) {
+        return true
+      }
+    }
+    return false
   }
-  return true
 }

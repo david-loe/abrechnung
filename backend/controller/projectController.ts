@@ -21,18 +21,22 @@ export class ProjectController extends Controller {
   @Get()
   public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: AuthenticatedExpressRequest) {
     const settings = await getSettings()
-    const userHasExtendedAccess = await isUserAllowedToAccess(request.user, [
-      'admin',
-      'approve/advance',
-      'approve/travel',
-      'examine/travel',
-      'examine/expenseReport',
-      'examine/healthCareCost',
-      'book/advance',
-      'book/expenseReport',
-      'book/travel',
-      'book/healthCareCost'
-    ])
+    const userHasExtendedAccess = await isUserAllowedToAccess(
+      request.user,
+      [
+        'admin',
+        'approve/advance',
+        'approve/travel',
+        'examine/travel',
+        'examine/expenseReport',
+        'examine/healthCareCost',
+        'book/advance',
+        'book/expenseReport',
+        'book/travel',
+        'book/healthCareCost'
+      ],
+      'one'
+    )
     if (!settings.userCanSeeAllProjects && !userHasExtendedAccess) {
       throw new AuthorizationError()
     }
