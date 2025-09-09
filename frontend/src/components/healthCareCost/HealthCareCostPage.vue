@@ -207,7 +207,7 @@
                   </button>
                 </div>
                 <template v-else-if="healthCareCost.state === State.IN_REVIEW">
-                  <div v-if="endpointPrefix === 'examine/'" class="mb-2">
+                  <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                     <a class="btn btn-primary" :href="mailToInsuranceLink" @click="completeReview()">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.completeReview') }}</span>
@@ -382,13 +382,15 @@ async function backToInWork() {
 }
 
 async function completeReview() {
-  const result = await API.setter<HealthCareCost<string>>('examine/healthCareCost/reviewCompleted', {
-    _id: healthCareCost.value._id,
-    comment: healthCareCost.value.comment,
-    bookingRemark: healthCareCost.value.bookingRemark
-  })
-  if (result.ok) {
-    setHealthCareCost(result.ok)
+  if (confirm(t('alerts.areYouSureCompleteReview'))) {
+    const result = await API.setter<HealthCareCost<string>>('examine/healthCareCost/reviewCompleted', {
+      _id: healthCareCost.value._id,
+      comment: healthCareCost.value.comment,
+      bookingRemark: healthCareCost.value.bookingRemark
+    })
+    if (result.ok) {
+      setHealthCareCost(result.ok)
+    }
   }
 }
 

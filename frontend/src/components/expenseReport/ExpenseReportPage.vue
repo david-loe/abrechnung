@@ -237,7 +237,7 @@
                   </button>
                 </div>
                 <template v-else-if="expenseReport.state === State.IN_REVIEW">
-                  <div class="mb-2" v-if="endpointPrefix === 'examine/'">
+                  <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                     <button class="btn btn-success" @click="completeReview()">
                       <i class="bi bi-check2-square"></i>
                       <span class="ms-1">{{ t('labels.completeReview') }}</span>
@@ -422,13 +422,15 @@ async function backToInWork() {
 }
 
 async function completeReview() {
-  const result = await API.setter<ExpenseReport<string>>('examine/expenseReport/reviewCompleted', {
-    _id: expenseReport.value._id,
-    comment: expenseReport.value.comment,
-    bookingRemark: expenseReport.value.bookingRemark
-  })
-  if (result.ok) {
-    setExpenseReport(result.ok)
+  if (confirm(t('alerts.areYouSureCompleteReview'))) {
+    const result = await API.setter<ExpenseReport<string>>('examine/expenseReport/reviewCompleted', {
+      _id: expenseReport.value._id,
+      comment: expenseReport.value.comment,
+      bookingRemark: expenseReport.value.bookingRemark
+    })
+    if (result.ok) {
+      setExpenseReport(result.ok)
+    }
   }
 }
 

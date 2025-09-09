@@ -327,7 +327,7 @@
                     </button>
                   </div>
                   <template v-else-if="travel.state === State.IN_REVIEW">
-                    <div v-if="endpointPrefix === 'examine/'" class="mb-2">
+                    <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                       <button class="btn btn-success" @click="completeReview()">
                         <i class="bi bi-check2-square"></i>
                         <span class="ms-1">{{ t('labels.completeReview') }}</span>
@@ -556,13 +556,15 @@ async function backToApproved() {
 }
 
 async function completeReview() {
-  const result = await API.setter<Travel<string>>('examine/travel/reviewCompleted', {
-    _id: travel.value._id,
-    comment: travel.value.comment,
-    bookingRemark: travel.value.bookingRemark
-  })
-  if (result.ok) {
-    setTravel(result.ok)
+  if (confirm(t('alerts.areYouSureCompleteReview'))) {
+    const result = await API.setter<Travel<string>>('examine/travel/reviewCompleted', {
+      _id: travel.value._id,
+      comment: travel.value.comment,
+      bookingRemark: travel.value.bookingRemark
+    })
+    if (result.ok) {
+      setTravel(result.ok)
+    }
   }
 }
 

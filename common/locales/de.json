@@ -20,6 +20,7 @@
   "alerts": {
     "apiKeyAlreadyExists": "Ein API-Schlüssel ist bereits vorhanden. Durch diese Aktion wird er unwiderruflich überschrieben.",
     "apiKeyShownOnlyOnce": "Dieser API Key wird nur einmal angezeigt. Bitte speichere ihn jetzt sicher, da er später nicht mehr abrufbar ist.",
+    "areYouSureCompleteReview": "Bist du dir sicher, dass du die Prüfung abschließen möchtest?",
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst?",
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "conflict": "Konflikt!",
