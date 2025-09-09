@@ -137,6 +137,9 @@ schema.methods.offset = async function (
   if (!doc) {
     return reportTotal
   }
+  if (reportId && doc.offsetAgainst.some((o) => o.report?._id.equals(reportId))) {
+    throw new Error('This report has already been used to offset this advance')
+  }
   let amount = reportTotal
   let difference = reportTotal - doc.balance.amount
   if (difference >= 0) {

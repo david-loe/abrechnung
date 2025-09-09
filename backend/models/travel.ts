@@ -150,15 +150,18 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 })
 
 schema.methods.saveToHistory = async function (this: TravelDoc) {
-  const doc = await model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel').findOne({ _id: this._id }, { history: 0 }).lean()
+  const m = model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel')
+  const doc = await m.findOne({ _id: this._id }, { history: 0 }).lean()
   if (!doc) {
     throw new Error('Travel not found')
   }
   doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('Travel').create([doc], { timestamps: false })
-  this.history.push(old[0]._id)
+  const old = new m(doc)
+  old.$locals.SKIP_POST_SAFE_HOOK = true
+  await old.save({ timestamps: false })
+  this.history.push(old._id)
   this.markModified('history')
 
   if (this.state === TravelState.APPROVED) {
@@ -181,7 +184,9 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
       }
     }
   }
+  this.$locals.SKIP_POST_SAFE_HOOK = true
   await this.save()
+  this.$locals.SKIP_POST_SAFE_HOOK = false
 }
 
 schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
@@ -223,6 +228,9 @@ schema.pre('save', async function (this: TravelDoc) {
 })
 
 schema.post('save', async function (this: TravelDoc) {
+  if (this.$locals.SKIP_POST_SAFE_HOOK) {
+    return
+  }
   if (this.state === TravelState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'Travel')

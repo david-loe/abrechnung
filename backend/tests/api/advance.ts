@@ -1,7 +1,7 @@
 import { Advance, AdvanceSimple, AdvanceState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { disconnectDB } from '../../db.js'
-import createAgent, { loginUser } from './_agent.js'
+import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -50,7 +50,7 @@ test.serial('GET /advance', async (t) => {
 
 // APPROVE
 
-test.serial('POST /examine/advance/approved', async (t) => {
+test.serial('POST /approve/advance/approved', async (t) => {
   await loginUser(agent, 'advance')
   t.plan(3)
   const bookingRemark = 'My Booking Remark'
@@ -76,7 +76,21 @@ test.serial('GET /advance/report', async (t) => {
   }
 })
 
-test.after.always('DELETE /advance 40X', async (t) => {
+// BOOK
+
+test.serial('POST /book/advance/booked', async (t) => {
+  await loginUser(agent, 'advance')
+  t.plan(2)
+  const res = await agent.post('/book/advance/booked').send([advance._id])
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is(res.body.result[0].status, 'fulfilled')
+})
+
+test.serial('DELETE /advance 40X', async (t) => {
   await loginUser(agent, 'user')
   const res = await agent.delete('/advance').query({ _id: advance._id })
   t.not(res.status, 200)

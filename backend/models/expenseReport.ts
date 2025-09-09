@@ -68,19 +68,22 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Expens
 })
 
 schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
-  const doc = await model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport')
-    .findOne({ _id: this._id }, { history: 0 })
-    .lean()
+  const m = model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport')
+  const doc = await m.findOne({ _id: this._id }, { history: 0 }).lean()
   if (!doc) {
     throw new Error('Expense Report not found')
   }
   doc._id = new mongoose.Types.ObjectId()
   doc.updatedAt = new Date()
   doc.historic = true
-  const old = await model('ExpenseReport').create([doc], { timestamps: false })
-  this.history.push(old[0]._id)
+  const old = new m(doc)
+  old.$locals.SKIP_POST_SAFE_HOOK = true
+  await old.save({ timestamps: false })
+  this.history.push(old._id)
   this.markModified('history')
+  this.$locals.SKIP_POST_SAFE_HOOK = true
   await this.save()
+  this.$locals.SKIP_POST_SAFE_HOOK = false
 }
 
 schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
@@ -112,6 +115,9 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
 })
 
 schema.post('save', async function (this: ExpenseReportDoc) {
+  if (this.$locals.SKIP_POST_SAFE_HOOK) {
+    return
+  }
   if (this.state === ExpenseReportState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'ExpenseReport')

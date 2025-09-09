@@ -1,7 +1,7 @@
 import { User } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/scripts.js'
 import request from 'supertest'
-import APP from '../../app.js'
+import APP from '../app.js'
 
 const users = {
   user: {
@@ -16,14 +16,26 @@ const users = {
     }
   },
   admin: { username: 'professor', password: 'professor', access: { user: true, admin: true } },
-  travel: { username: 'zoidberg', password: 'zoidberg', access: { user: true, 'examine/travel': true, 'approve/travel': true } },
-  expenseReport: { username: 'leela', password: 'leela', access: { user: true, 'examine/expenseReport': true } },
+  travel: {
+    username: 'zoidberg',
+    password: 'zoidberg',
+    access: { user: true, 'examine/travel': true, 'approve/travel': true, 'book/travel': true }
+  },
+  expenseReport: {
+    username: 'leela',
+    password: 'leela',
+    access: { user: true, 'examine/expenseReport': true, 'book/expenseReport': true }
+  },
   healthCareCost: {
     username: 'bender',
     password: 'bender',
-    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true }
+    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true, 'book/healthCareCost': true, 'book/advance': true }
   },
-  advance: { username: 'bender', password: 'bender', access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true } }
+  advance: {
+    username: 'bender',
+    password: 'bender',
+    access: { user: true, 'examine/healthCareCost': true, 'approve/advance': true, 'book/healthCareCost': true, 'book/advance': true }
+  }
 }
 
 async function createUser(agent: request.Agent, userKey: keyof typeof users) {
