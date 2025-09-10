@@ -747,6 +747,9 @@
 					},
 					"name": {
 						"type": "string"
+					},
+					"_id": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -7981,6 +7984,9 @@
 									"image/jpeg",
 									"image/png"
 								]
+							},
+							"_id": {
+								"type": "string"
 							}
 						},
 						"type": "object"
@@ -13890,7 +13896,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_TravelExpense_mongoose.Types.ObjectId.Binary__"
 							}
@@ -14014,7 +14020,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Stage_mongoose.Types.ObjectId.Binary__"
 							}
@@ -14957,7 +14963,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_TravelExpense_mongoose.Types.ObjectId.Binary__"
 							}
@@ -15081,7 +15087,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Stage_mongoose.Types.ObjectId.Binary__"
 							}
@@ -17231,7 +17237,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
 							}
@@ -17832,7 +17838,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
 							}
@@ -18742,7 +18748,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
 							}
@@ -19336,7 +19342,7 @@
 				"requestBody": {
 					"required": true,
 					"content": {
-						"application/json": {
+						"multipart/form-data": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
 							}
