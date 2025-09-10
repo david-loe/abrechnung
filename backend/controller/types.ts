@@ -14,6 +14,7 @@ export interface File {
   data?: string
   type: DocumentFileType
   name: string
+  _id?: string
 }
 
 export interface MoneyPost extends Omit<Money, 'currency'> {
