@@ -13,7 +13,7 @@
     "abrechnung-common": "file:../common",
     "@popperjs/core": "^2.11.8",
     "@vueform/vueform": "^1.13.2",
-    "axios": "^1.11.0",
+    "axios": "^1.12.1",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "idb": "^8.0.3",
