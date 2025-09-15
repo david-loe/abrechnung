@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: '🙋 Questions and Help'
+    url: https://github.com/david-loe/abrechnung/discussions/categories/q-a
+    about: 'Stelle allgemeine Fragen oder erhalte Unterstützung'
+  - name: '🚀 Feature Request'
+    url: https://github.com/david-loe/abrechnung/discussions/categories/ideas
+    about: 'Feature-Wünsche bitte hier posten oder vorhandene hochvoten'

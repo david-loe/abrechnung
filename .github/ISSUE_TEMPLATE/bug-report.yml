@@ -1,0 +1,60 @@
+name: '🐞 Bug Report'
+description: 'Melde einen Fehler in diesem Projekt'
+title: '[BUG] '
+labels: ['bug', 'unconfirmed']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ Bitte beachten: Issues sind nur für *Bugs*
+        Ein Bug ist ein Problem, das **jeden Nutzer** betrifft, nicht nur deine spezielle Umgebung.  
+        Wenn du unsicher bist, starte lieber in den [Discussions](https://github.com/david-loe/abrechnung/discussions).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+      description: Eine klare und präzise Beschreibung des Fehlers. Falls möglich, füge Screenshots hinzu, um das Problem zu verdeutlichen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Reproduzieren
+      description: Welche Schritte führen zuverlässig zum Fehler?
+      placeholder: |
+        1. 
+        2. 
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version von abrechnung🧾
+      placeholder: z. B. v1.2.3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installationsvariante
+      options:
+        - Docker - official image
+        - Docker - self-build image
+        - Bare metal
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Welchen Browser du verwendest, falls relevant.
+      options:
+        - Chrome
+        - Firefox
+        - Edge
+        - Safari
+        - Andere
