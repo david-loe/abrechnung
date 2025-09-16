@@ -53,6 +53,7 @@
           :mode="modalMode"
           :travel="(modalObject as TravelSimple)"
           :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
+          :createNotApply="APP_DATA?.user.access['approved:travel']"
           :loading="modalFormIsLoading"
           :owner="travel.owner"
           :update-user-org="endpointPrefix !== 'examine/'"

@@ -122,7 +122,7 @@
         {{
           mode === 'add' && !createNotApply
             ? $t('labels.applyForX', { X: $t('labels.travel') })
-            : travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED
+            : (travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED) && !createNotApply
             ? $t('labels.reapplyForX', { X: $t('labels.travel') })
             : $t('labels.save')
         }}
