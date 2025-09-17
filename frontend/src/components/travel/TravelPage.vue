@@ -52,7 +52,7 @@
           v-else-if="modalObjectType === 'travel'"
           :mode="modalMode"
           :travel="(modalObject as TravelSimple)"
-          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
+          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : APP_DATA?.user.access['approved:travel'] ? '' : undefined"
           :createNotApply="APP_DATA?.user.access['approved:travel']"
           :loading="modalFormIsLoading"
           :owner="travel.owner"
@@ -507,9 +507,10 @@ async function editTravelDetails(updatedTravel: Travel) {
       await getTravel()
     }
   } else {
-    if (confirm(t('alerts.warningReapply'))) {
+    if (confirm(t(APP_DATA.value?.user.access['approved:travel'] ? 'alerts.warningSave' : 'alerts.warningReapply'))) {
       modalFormIsLoading.value = true
-      const result = await API.setter<Travel>('travel/appliedFor', updatedTravel)
+      const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'
+      const result = await API.setter<Travel>(path, updatedTravel)
       modalFormIsLoading.value = false
       if (result.ok) {
         resetAndHide()

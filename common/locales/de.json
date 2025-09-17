@@ -56,6 +56,7 @@
     "unsavedChanges": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du die Seite verlassen willst?",
     "ValidationError": "Validierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubeantragten Zeitfensters liegen.",
+    "warningSave": "Durch das Speichern gehen eventuell Einträge verloren, die außerhalb des neuen Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort"
   },
   "description": {
