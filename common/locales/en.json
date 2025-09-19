@@ -56,7 +56,6 @@
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
-    "warningSave": "By saving, entries may get lost which then lie outside the new time window.",
     "wrongPassword": "Wrong Password"
   },
   "description": {

@@ -496,9 +496,10 @@ async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlac
 }
 
 async function editTravelDetails(updatedTravel: Travel) {
-  if (props.endpointPrefix === 'examine/') {
+  if (props.endpointPrefix === 'examine/' || APP_DATA.value?.user.access['approved:travel']) {
     modalFormIsLoading.value = true
-    const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel`, updatedTravel)
+    const path = props.endpointPrefix === 'examine/' ? 'examine/travel' : 'travel/approved'
+    const result = await API.setter<Travel<string>>(path, updatedTravel)
     modalFormIsLoading.value = false
     if (result.ok) {
       setTravel(result.ok)
@@ -507,10 +508,9 @@ async function editTravelDetails(updatedTravel: Travel) {
       await getTravel()
     }
   } else {
-    if (confirm(t(APP_DATA.value?.user.access['approved:travel'] ? 'alerts.warningSave' : 'alerts.warningReapply'))) {
+    if (confirm(t('alerts.warningReapply'))) {
       modalFormIsLoading.value = true
-      const path = APP_DATA.value?.user.access['approved:travel'] ? 'travel/approved' : 'travel/appliedFor'
-      const result = await API.setter<Travel>(path, updatedTravel)
+      const result = await API.setter<Travel>('travel/appliedFor', updatedTravel)
       modalFormIsLoading.value = false
       if (result.ok) {
         resetAndHide()

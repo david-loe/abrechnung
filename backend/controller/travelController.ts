@@ -213,7 +213,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (
           oldObject.owner._id.equals(request.user._id) &&
-          oldObject.state <= TravelState.IN_REVIEW &&
+          (oldObject.state === TravelState.APPROVED || oldObject.state === TravelState.IN_REVIEW) &&
           oldObject.editor._id.equals(request.user._id)
         ) {
           await oldObject.saveToHistory()
