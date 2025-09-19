@@ -52,7 +52,8 @@
           v-else-if="modalObjectType === 'travel'"
           :mode="modalMode"
           :travel="(modalObject as TravelSimple)"
-          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : undefined"
+          :minStartDate="endpointPrefix === 'examine/' ? travel.startDate : APP_DATA?.user.access['approved:travel'] ? '' : undefined"
+          :createNotApply="APP_DATA?.user.access['approved:travel']"
           :loading="modalFormIsLoading"
           :owner="travel.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
@@ -495,9 +496,10 @@ async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlac
 }
 
 async function editTravelDetails(updatedTravel: Travel) {
-  if (props.endpointPrefix === 'examine/') {
+  if (props.endpointPrefix === 'examine/' || APP_DATA.value?.user.access['approved:travel']) {
     modalFormIsLoading.value = true
-    const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel`, updatedTravel)
+    const path = props.endpointPrefix === 'examine/' ? 'examine/travel' : 'travel/approved'
+    const result = await API.setter<Travel<string>>(path, updatedTravel)
     modalFormIsLoading.value = false
     if (result.ok) {
       setTravel(result.ok)

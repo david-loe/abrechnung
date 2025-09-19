@@ -188,10 +188,13 @@ export class TravelController extends Controller {
   public async postOwnApproved(@Body() requestBody: TravelApplication, @Request() request: AuthenticatedExpressRequest) {
     let extendedBody: SetterBody<ITravel<Types.ObjectId, mongo.Binary>> = requestBody
     let cb: ((travel: ITravel<Types.ObjectId>) => unknown) | undefined
-    if (!extendedBody._id) {
-      if (!request.user.access['approved:travel']) {
+    if (!request.user.access['approved:travel']) {
+      if (!extendedBody._id) {
         throw new AuthorizationError()
+      } else {
+        extendedBody = Object.assign({ _id: extendedBody._id }, { state: TravelState.APPROVED, editor: request.user._id })
       }
+    } else {
       if (!extendedBody.name && extendedBody.startDate) {
         const date = new Date(extendedBody.startDate)
         extendedBody.name = `${extendedBody.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -202,8 +205,6 @@ export class TravelController extends Controller {
         }
       }
       Object.assign(extendedBody, { state: TravelState.APPROVED, editor: request.user._id, owner: request.user._id })
-    } else {
-      extendedBody = Object.assign({ _id: extendedBody._id }, { state: TravelState.APPROVED, editor: request.user._id })
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -212,7 +213,7 @@ export class TravelController extends Controller {
       async checkOldObject(oldObject: TravelDoc) {
         if (
           oldObject.owner._id.equals(request.user._id) &&
-          oldObject.state === TravelState.IN_REVIEW &&
+          (oldObject.state === TravelState.APPROVED || oldObject.state === TravelState.IN_REVIEW) &&
           oldObject.editor._id.equals(request.user._id)
         ) {
           await oldObject.saveToHistory()
