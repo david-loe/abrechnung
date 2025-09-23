@@ -37,9 +37,9 @@
     "eslint": "^9.36.0",
     "eslint-plugin-vue": "^10.4.0",
     "typescript": "^5.9.2",
-    "vite": "^7.1.6",
+    "vite": "^7.1.7",
     "vite-plugin-pwa": "^1.0.3",
-    "vue-tsc": "^3.0.7"
+    "vue-tsc": "^3.0.8"
   },
   "eslintConfig": {
     "root": true,
