@@ -5,7 +5,7 @@ import { PushSubscription } from 'web-push'
 declare module 'express-session' {
   interface SessionData {
     subscription?: PushSubscription
-    passport: { user: { _id: Types.ObjectId } }
+    passport: { user?: { _id: Types.ObjectId } }
     redirect?: string
   }
 }
