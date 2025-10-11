@@ -17,7 +17,7 @@
     "i18next": "^25.5.2",
     "mongoose": "^8.17.0",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.6",
+    "nodemailer": "^7.0.7",
     "openid-client": "^6.8.0",
     "passport": "^0.7.0",
     "passport-http-bearer": "^1.0.1",
