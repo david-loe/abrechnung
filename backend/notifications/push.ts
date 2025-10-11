@@ -23,7 +23,7 @@ export async function sendPushNotification(title: string, body: string, users: U
   const allSessions = await getAllSessions()
 
   for (const user of users) {
-    const userSessions = allSessions.filter((s) => s.subscription && user._id.equals(s.passport.user._id)) as SessionWithSubscription[]
+    const userSessions = allSessions.filter((s) => s.subscription && user._id.equals(s.passport.user?._id)) as SessionWithSubscription[]
     if (userSessions.length === 0) continue
 
     const latest = userSessions.reduce((max, session) => ((session.cookie.expires || 0) > (max.cookie.expires || 0) ? session : max))
