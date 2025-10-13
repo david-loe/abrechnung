@@ -12,7 +12,7 @@
   "dependencies": {
     "abrechnung-common": "file:../common",
     "@popperjs/core": "^2.11.8",
-    "@vueform/vueform": "^1.13.2",
+    "@vueform/vueform": "^1.13.3",
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.18.8",
+    "@types/node": "^22.18.10",
     "@types/qrcode": "^1.5.5",
     "@types/qs": "^6.14.0",
     "@types/vue-select": "^3.16.8",
