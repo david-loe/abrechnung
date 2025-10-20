@@ -22,7 +22,7 @@
     "qs": "^6.14.0",
     "vue": "^3.5.22",
     "vue-i18n": "^11.1.12",
-    "vue-router": "^4.5.1",
+    "vue-router": "^4.6.3",
     "vue-select": "^4.0.0-beta.6",
     "vue-to-print": "^1.5.1",
     "vue3-easy-data-table": "^1.5.47"
@@ -34,12 +34,12 @@
     "@types/qs": "^6.14.0",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^6.0.1",
-    "eslint": "^9.36.0",
-    "eslint-plugin-vue": "^10.4.0",
+    "eslint": "^9.38.0",
+    "eslint-plugin-vue": "^10.5.1",
     "typescript": "^5.9.2",
     "vite": "^7.1.9",
-    "vite-plugin-pwa": "^1.0.3",
-    "vue-tsc": "^3.0.7"
+    "vite-plugin-pwa": "^1.1.0",
+    "vue-tsc": "^3.1.1"
   },
   "eslintConfig": {
     "root": true,
