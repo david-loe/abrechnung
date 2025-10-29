@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-common",
-  "version": "2.1.13",
+  "version": "2.1.14",
   "private": true,
   "type": "module",
   "exports": {
