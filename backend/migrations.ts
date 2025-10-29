@@ -25,21 +25,23 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '2.0.4')) {
       logger.info('Apply migration from v2.0.4: rewrite states')
 
-      await mongoose.connection.collection('displaysettings').updateOne(
-        {},
-        {
-          $set: {
-            stateColors: {
-              '-10': { color: '#E8998D', text: 'black' },
-              '0': { color: '#cae5ff', text: 'black' },
-              '10': { color: '#89BBFE', text: 'black' },
-              '20': { color: '#6f8ab7', text: 'white' },
-              '30': { color: '#615d6c', text: 'white' },
-              '40': { color: '#5E8C61', text: 'white' }
+      await mongoose.connection
+        .collection('displaysettings')
+        .updateOne(
+          {},
+          {
+            $set: {
+              stateColors: {
+                '-10': { color: '#E8998D', text: 'black' },
+                '0': { color: '#cae5ff', text: 'black' },
+                '10': { color: '#89BBFE', text: 'black' },
+                '20': { color: '#6f8ab7', text: 'white' },
+                '30': { color: '#615d6c', text: 'white' },
+                '40': { color: '#5E8C61', text: 'white' }
+              }
             }
           }
-        }
-      )
+        )
       // biome-ignore-start lint/suspicious/noThenProperty: mongodb uses then
       const switchTravelStates = (field: string) => ({
         $switch: {
@@ -53,20 +55,22 @@ export async function checkForMigrations() {
           default: field
         }
       })
-      await mongoose.connection.collection('travels').updateMany({}, [
-        {
-          $set: {
-            state: switchTravelStates('$state'),
-            comments: {
-              $map: {
-                input: '$comments',
-                as: 'comment',
-                in: { $mergeObjects: ['$$comment', { toState: switchTravelStates('$$comment.toState') }] }
+      await mongoose.connection
+        .collection('travels')
+        .updateMany({}, [
+          {
+            $set: {
+              state: switchTravelStates('$state'),
+              comments: {
+                $map: {
+                  input: '$comments',
+                  as: 'comment',
+                  in: { $mergeObjects: ['$$comment', { toState: switchTravelStates('$$comment.toState') }] }
+                }
               }
             }
           }
-        }
-      ])
+        ])
       const switchExpenseReportStates = (field: string) => ({
         $switch: {
           branches: [
@@ -77,20 +81,22 @@ export async function checkForMigrations() {
           default: field
         }
       })
-      await mongoose.connection.collection('expensereports').updateMany({}, [
-        {
-          $set: {
-            state: switchExpenseReportStates('$state'),
-            comments: {
-              $map: {
-                input: '$comments',
-                as: 'comment',
-                in: { $mergeObjects: ['$$comment', { toState: switchExpenseReportStates('$$comment.toState') }] }
+      await mongoose.connection
+        .collection('expensereports')
+        .updateMany({}, [
+          {
+            $set: {
+              state: switchExpenseReportStates('$state'),
+              comments: {
+                $map: {
+                  input: '$comments',
+                  as: 'comment',
+                  in: { $mergeObjects: ['$$comment', { toState: switchExpenseReportStates('$$comment.toState') }] }
+                }
               }
             }
           }
-        }
-      ])
+        ])
       const switchHealthCareCostStates = (field: string) => ({
         $switch: {
           branches: [
@@ -102,20 +108,22 @@ export async function checkForMigrations() {
           default: field
         }
       })
-      await mongoose.connection.collection('healthcarecosts').updateMany({}, [
-        {
-          $set: {
-            state: switchHealthCareCostStates('$state'),
-            comments: {
-              $map: {
-                input: '$comments',
-                as: 'comment',
-                in: { $mergeObjects: ['$$comment', { toState: switchHealthCareCostStates('$$comment.toState') }] }
+      await mongoose.connection
+        .collection('healthcarecosts')
+        .updateMany({}, [
+          {
+            $set: {
+              state: switchHealthCareCostStates('$state'),
+              comments: {
+                $map: {
+                  input: '$comments',
+                  as: 'comment',
+                  in: { $mergeObjects: ['$$comment', { toState: switchHealthCareCostStates('$$comment.toState') }] }
+                }
               }
             }
           }
-        }
-      ])
+        ])
       const switchAdvancesStates = (field: string) => ({
         $switch: {
           branches: [
@@ -127,21 +135,23 @@ export async function checkForMigrations() {
           default: field
         }
       })
-      await mongoose.connection.collection('advances').updateMany({}, [
-        {
-          $set: {
-            state: switchAdvancesStates('$state'),
-            comments: {
-              $map: {
-                input: '$comments',
-                as: 'comment',
-                in: { $mergeObjects: ['$$comment', { toState: switchAdvancesStates('$$comment.toState') }] }
-              }
-            },
-            settledOn: '$log.approved.date'
+      await mongoose.connection
+        .collection('advances')
+        .updateMany({}, [
+          {
+            $set: {
+              state: switchAdvancesStates('$state'),
+              comments: {
+                $map: {
+                  input: '$comments',
+                  as: 'comment',
+                  in: { $mergeObjects: ['$$comment', { toState: switchAdvancesStates('$$comment.toState') }] }
+                }
+              },
+              settledOn: '$log.approved.date'
+            }
           }
-        }
-      ])
+        ])
       // biome-ignore-end lint/suspicious/noThenProperty: mongodb uses then
       const logRenameTraAdv = (approvedState = 10) => ({
         $rename: {
@@ -162,28 +172,32 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('expensereports').updateMany({}, logRenameExpHea)
       await mongoose.connection.collection('healthcarecosts').updateMany({}, logRenameExpHea)
       await mongoose.connection.collection('advances').updateMany({}, logRenameTraAdv(30))
-      await mongoose.connection.collection('users').updateMany(
-        {},
-        {
-          $rename: {
-            'access.approved/advance': 'access.book/advance',
-            'access.refunded/travel': 'access.book/travel',
-            'access.refunded/expenseReport': 'access.book/expenseReport',
-            'access.refunded/healthCareCost': 'access.book/healthCareCost'
+      await mongoose.connection
+        .collection('users')
+        .updateMany(
+          {},
+          {
+            $rename: {
+              'access.approved/advance': 'access.book/advance',
+              'access.refunded/travel': 'access.book/travel',
+              'access.refunded/expenseReport': 'access.book/expenseReport',
+              'access.refunded/healthCareCost': 'access.book/healthCareCost'
+            }
           }
-        }
-      )
-      await mongoose.connection.collection('displaysettings').updateMany(
-        {},
-        {
-          $rename: {
-            'accessIcons.approved/advance': 'accessIcons.book/advance',
-            'accessIcons.refunded/travel': 'accessIcons.book/travel',
-            'accessIcons.refunded/expenseReport': 'accessIcons.book/expenseReport',
-            'accessIcons.refunded/healthCareCost': 'accessIcons.book/healthCareCost'
+        )
+      await mongoose.connection
+        .collection('displaysettings')
+        .updateMany(
+          {},
+          {
+            $rename: {
+              'accessIcons.approved/advance': 'accessIcons.book/advance',
+              'accessIcons.refunded/travel': 'accessIcons.book/travel',
+              'accessIcons.refunded/expenseReport': 'accessIcons.book/expenseReport',
+              'accessIcons.refunded/healthCareCost': 'accessIcons.book/healthCareCost'
+            }
           }
-        }
-      )
+        )
     }
     if (semver.lte(migrateFrom, '2.1.0')) {
       logger.info('Apply migration from v2.1.0: add name display format setting')
