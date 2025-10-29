@@ -17,16 +17,7 @@
     "source.organizeImports.biome": "explicit",
     "source.fixAll.biome": "explicit"
   },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
+  "editor.defaultFormatter": "biomejs.biome",
   "biome.lsp.bin": {
     "linux-arm64": "./backend/node_modules/@biomejs/cli-linux-arm64-musl/biome",
     "linux-x64": "./backend/node_modules/@biomejs/cli-linux-x64-musl/biome",

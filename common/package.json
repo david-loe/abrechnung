@@ -23,6 +23,6 @@
     "mongoose": "^8.18.1",
     "nodemon": "^3.1.10",
     "typescript": "^5.9.2",
-    "@types/node": "^22.18.1"
+    "@types/node": "^24.9.2"
   }
 }
