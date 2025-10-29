@@ -9,29 +9,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps, onMounted, ref, watch } from 'vue'
 
-export default defineComponent({
-  name: 'ProgressCircle',
-  props: { progress: { type: Number, required: true } },
-  data() {
-    return { dashoffset: 50 }
-  },
-  methods: {
-    calc(): void {
-      this.dashoffset = 100 - this.progress
-    }
-  },
-  created() {
-    this.calc()
-  },
-  watch: {
-    progress: function () {
-      this.calc()
-    }
-  }
-})
+const props = defineProps({ progress: { type: Number, required: true } })
+const dashoffset = ref(50)
+
+function calc(): void {
+  dashoffset.value = 100 - props.progress
+}
+onMounted(calc)
+
+watch(() => props.progress, calc)
 </script>
 
 <style scoped>

@@ -44,32 +44,40 @@
 </template>
 
 <script setup lang="ts">
-import { AdvanceSimple, AdvanceState, idDocumentToId, ProjectSimple, UserWithName } from 'abrechnung-common/types.js'
+import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId, ProjectSimple } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/scripts.js'
-import { onMounted, PropType, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import API from '@/api'
 import { formatter } from '@/formatter.js'
 
-// Props
-const props = defineProps({
-  modelValue: { type: [Object, Array] as PropType<AdvanceSimple | AdvanceSimple[]> },
-  required: { type: Boolean, default: false },
-  disabled: { type: Boolean, default: false },
-  placeholder: { type: String, default: '' },
-  multiple: { type: Boolean, default: false },
-  owner: { type: Object as PropType<UserWithName<string>> },
-  project: { type: Object as PropType<ProjectSimple<string>> },
-  endpointPrefix: { type: String, default: '' },
-  setDefault: { type: Boolean, default: true }
+type BaseProps = {
+  required?: boolean
+  disabled?: boolean
+  placeholder?: string
+  owner?: IdDocument<string>
+  project?: ProjectSimple<string>
+  endpointPrefix?: string
+  setDefault?: boolean
+}
+
+type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceSimple | null }
+type MultiProps = BaseProps & { multiple: true; modelValue: AdvanceSimple[] }
+type Props = SingleProps | MultiProps
+
+const props = withDefaults(defineProps<Props>(), {
+  required: false,
+  disabled: false,
+  placeholder: '',
+  endpointPrefix: '',
+  setDefault: true,
+  multiple: false
 })
+
+const emit = defineEmits<{ (e: 'update:modelValue', v: AdvanceSimple | null): void; (e: 'update:modelValue', v: AdvanceSimple[]): void }>()
 
 let setByUser = props.modelValue && (!props.multiple || (Array.isArray(props.modelValue) && props.modelValue.length > 0))
 let defaultFor = { userId: null as null | string, projectId: null as null | string }
-
-// Emits
-const emit = defineEmits<(e: 'update:modelValue', value: AdvanceSimple | AdvanceSimple[] | null) => void>()
-
 const { t } = useI18n()
 
 const advances = ref([] as AdvanceSimple[])
@@ -131,7 +139,11 @@ watch(
   () => props.owner,
   async (value, oldValue) => {
     if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
-      emit('update:modelValue', props.multiple ? [] : null)
+      if (props.multiple) {
+        emit('update:modelValue', [])
+      } else {
+        emit('update:modelValue', null)
+      }
     }
     advances.value = await getAdvances(idDocumentToId(props.owner))
     setDefaultAdvances(advances.value)
@@ -141,7 +153,11 @@ watch(
   () => props.project,
   async (value, oldValue) => {
     if (value && oldValue && !setByUser && idDocumentToId(value) !== idDocumentToId(oldValue)) {
-      emit('update:modelValue', props.multiple ? [] : null)
+      if (props.multiple) {
+        emit('update:modelValue', [])
+      } else {
+        emit('update:modelValue', null)
+      }
     }
     setDefaultAdvances(advances.value)
   }

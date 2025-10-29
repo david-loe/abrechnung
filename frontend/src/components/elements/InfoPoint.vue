@@ -1,14 +1,14 @@
 <template>
-  <TooltipElement :text="text">
+  <TooltipElement :text="props.text">
     <i class="bi bi-info-circle-fill text-primary"></i>
   </TooltipElement>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import TooltipElement from '@/components/elements/TooltipElement.vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
+import TooltipElement from './TooltipElement.vue'
 
-export default defineComponent({ name: 'InfoPoint', components: { TooltipElement }, props: { text: { type: String, required: true } } })
+const props = defineProps({ text: { type: String, required: true } })
 </script>
 
 <style></style>

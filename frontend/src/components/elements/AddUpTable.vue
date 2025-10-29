@@ -46,8 +46,8 @@ import { AddUp, Project } from 'abrechnung-common/types.js'
 import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ProgressCircle from '@/components/elements/ProgressCircle.vue'
-import { formatter } from '@/formatter.js'
+import { formatter } from '../../formatter.js'
+import ProgressCircle from './ProgressCircle.vue'
 
 const { t } = useI18n()
 
@@ -57,8 +57,9 @@ const props = defineProps({
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },
-  showAdvanceOverflow: { type: Boolean, default: true }
+  showAdvanceOverflow: { type: Boolean, default: true },
+  withLumpSums: { type: Boolean, default: false }
 })
 
-const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
+const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.withLumpSums))
 </script>

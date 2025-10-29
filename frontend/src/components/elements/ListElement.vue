@@ -13,7 +13,7 @@
     :sort-type="sortType"
     :db-key="dbKey">
     <template #header="header">
-      {{ t(header.text) }}
+      {{ header.text ? t(header.text) : '' }}
     </template>
     <!-- Standard-Slot weiterleiten -->
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">

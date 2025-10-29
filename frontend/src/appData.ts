@@ -4,149 +4,132 @@ import {
   Category,
   Country,
   CountryCode,
+  CountrySimple,
   Currency,
   DisplaySettings,
   HealthInsurance,
   Locale,
   OrganisationSimple,
+  PrinterSettings,
+  Project,
   ProjectSimpleWithName,
   Settings,
   TravelSettings,
   User,
-  UserWithNameAndProject
+  UserSimpleWithProject
 } from 'abrechnung-common/types.js'
+import Formatter from 'abrechnung-common/utils/formatter.js'
 import { getById } from 'abrechnung-common/utils/scripts.js'
-import { Ref, ref } from 'vue'
-import API from './api.js'
-import { formatter } from './formatter'
-import i18n, { getLanguageFromNavigator } from './i18n'
-import { logger } from './logger'
-import { app } from './main'
+import { isRef } from 'vue'
+import { Composer } from 'vue-i18n'
+import { getLanguageFromNavigator } from './i18n.js'
 
-type APP_DATA_REQUIRED_ENDPOINTS =
-  | 'user'
-  | 'currency'
-  | 'country'
-  | 'settings'
-  | 'travelSettings'
-  | 'healthInsurance'
-  | 'organisation'
-  | 'category'
-  | 'specialLumpSums'
-  | 'displaySettings'
-type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
-type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
+export class LOGIN_APP_DATA {
+  private _displaySettings!: DisplaySettings<string>
+  private _language!: Locale
+  i18n: Composer<{}, {}, {}, Locale>
+  formatter: Formatter
+  private _languageChangeCB: (locale: Locale) => void
 
-export class APP_DATA {
-  user!: User<string>
-  currencies!: Currency[]
-  countries!: Country[]
-  settings!: Settings<string>
-  travelSettings!: TravelSettings<string>
-  displaySettings!: DisplaySettings<string>
-  healthInsurances!: HealthInsurance<string>[]
-  organisations!: OrganisationSimple<string>[]
-  categories!: Category<string>[]
-  defaultCategory: Category<string> | undefined
+  constructor(
+    displaySettings: DisplaySettings<string>,
+    i18n: Composer<{}, {}, {}, Locale>,
+    formatter: Formatter,
+    languageChangeCB: (locale: Locale) => void
+  ) {
+    this._languageChangeCB = languageChangeCB
+    this.i18n = i18n
+    this.formatter = formatter
+    this.language = getLanguageFromNavigator()
+    this.displaySettings = displaySettings
+  }
+  get displaySettings() {
+    return this._displaySettings
+  }
+  set displaySettings(displaySettings: DisplaySettings<string>) {
+    this._displaySettings = displaySettings
+    this.formatter.setNameDisplayFormat(displaySettings.nameDisplayFormat)
+    this.updateLocales(displaySettings)
+  }
+
+  get language() {
+    return this._language
+  }
+  set language(locale: Locale) {
+    this._language = locale
+
+    // fix wired change in composer structure - sometimes Ref and sometimes not
+    if (isRef(this.i18n.locale)) {
+      this.i18n.locale.value = locale
+    } else {
+      ;(this.i18n.locale as Locale) = locale
+    }
+
+    this.formatter.setLocale(locale)
+    this._languageChangeCB(locale)
+  }
+  updateLocales(displaySettings: DisplaySettings) {
+    const messages = loadLocales(displaySettings.locale.overwrite)
+    for (const locale in messages) {
+      this.i18n.setLocaleMessage(locale, messages[locale as Locale])
+    }
+    this.i18n.fallbackLocale.value = displaySettings.locale.fallback
+    document.title = `${this.i18n.t('headlines.title')} ${this.i18n.t('headlines.emoji')}`
+  }
+}
+
+export class TRAVEL_APP_DATA extends LOGIN_APP_DATA {
+  currencies: Currency[]
+  countries: Country[]
+  settings: { version: string; uploadTokenExpireAfterSeconds: number }
+  printerSettings: PrinterSettings<string>
+  private _travelSettings!: TravelSettings<string>
+  private _categories!: Category<string>[]
   specialLumpSums!: Record<string, string[]>
 
+  organisations = [] as OrganisationSimple<string>[]
   projects?: ProjectSimpleWithName<string>[]
-  users?: UserWithNameAndProject<string>[]
 
+  private _userSimple = {
+    _id: '',
+    projects: { assigned: [] as Project<string>[] },
+    settings: { lastCurrencies: [] as Currency[], lastCountries: [] as CountrySimple[] }
+  }
+
+  defaultCategory: Category<string> | undefined
   travelCalculator!: TravelCalculator
 
   constructor(
-    currencies: Currency[],
-    countries: Country[],
-    user: User<string>,
-    settings: Settings<string>,
-    travelSettings: TravelSettings<string>,
-    displaySettings: DisplaySettings<string>,
-    healthInsurances: HealthInsurance<string>[],
-    organisations: OrganisationSimple<string>[],
-    categories: Category<string>[],
+    data: {
+      currencies: Currency[]
+      countries: Country[]
+      settings: { version: string; uploadTokenExpireAfterSeconds: number }
+      travelSettings: TravelSettings<string>
+      displaySettings: DisplaySettings<string>
+      categories: Category<string>[]
+      printerSettings: PrinterSettings<string>
 
-    specialLumpSums: Record<string, string[]>,
-    projects?: ProjectSimpleWithName<string>[],
-    users?: UserWithNameAndProject<string>[]
+      specialLumpSums: Record<string, string[]>
+    },
+    i18n: Composer<{}, {}, {}, Locale>,
+    formatter: Formatter,
+    languageChangeCB: (locale: Locale) => void
   ) {
-    this.setUser(user)
-    this.setCurrencies(currencies)
-    this.setCountries(countries)
-    this.setSettings(settings)
-    this.setTravelSettings(travelSettings) // needs countries to be set first
-    this.setDisplaySettings(displaySettings)
-    this.setHealthInsurances(healthInsurances)
-    this.setOrganisations(organisations)
-    this.setCategories(categories)
-    this.setSpecialLumpSums(specialLumpSums)
-
-    this.setProjects(projects)
-    this.setUsers(users)
+    super(data.displaySettings, i18n, formatter, languageChangeCB)
+    this.currencies = data.currencies
+    this.countries = data.countries
+    this.settings = data.settings
+    this.travelSettings = data.travelSettings // needs countries to be set first
+    this.categories = data.categories
+    this.printerSettings = data.printerSettings // needs travelSettings to be set first
+    this.specialLumpSums = data.specialLumpSums
   }
 
-  setAny(endpoint: APP_DATA_ENDPOINTS, data: unknown) {
-    switch (endpoint) {
-      case 'currency':
-        this.setCurrencies(data as Currency[])
-        break
-      case 'country':
-        this.setCountries(data as Country[])
-        break
-      case 'user':
-        this.setUser(data as User<string>)
-        break
-      case 'settings':
-        this.setSettings(data as Settings<string>)
-        break
-      case 'travelSettings':
-        this.setTravelSettings(data as TravelSettings<string>)
-        break
-      case 'healthInsurance':
-        this.setHealthInsurances(data as HealthInsurance<string>[])
-        break
-      case 'organisation':
-        this.setOrganisations(data as OrganisationSimple<string>[])
-        break
-      case 'category':
-        this.setCategories(data as Category<string>[])
-        break
-      case 'specialLumpSums':
-        this.setSpecialLumpSums(data as Record<string, string[]>)
-        break
-      case 'displaySettings':
-        this.setDisplaySettings(data as DisplaySettings<string>)
-        break
-      case 'project':
-        this.setProjects(data as ProjectSimpleWithName<string>[])
-        break
-      case 'users':
-        this.setUsers(data as UserWithNameAndProject<string>[])
-        break
-    }
+  get travelSettings() {
+    return this._travelSettings
   }
-  setCurrencies(currencies: Currency[]) {
-    this.currencies = currencies
-  }
-  setCountries(countries: Country[]) {
-    this.countries = countries
-  }
-  setUser(user: User<string>) {
-    this.user = user
-    const navLang = getLanguageFromNavigator()
-    if (this.user.settings.hasUserSetLanguage) {
-      setLanguage(this.user.settings.language)
-    } else if (this.user.settings.language !== navLang) {
-      API.setter('user/settings', { language: navLang } as Partial<User['settings']>, {}, false)
-    }
-    logger.info(`${i18n.global.t('labels.user')}:`)
-    logger.info(user)
-  }
-  setSettings(settings: Settings<string>) {
-    this.settings = settings
-  }
-  setTravelSettings(travelSettings: TravelSettings<string>) {
-    this.travelSettings = travelSettings
+  set travelSettings(travelSettings: TravelSettings<string>) {
+    this._travelSettings = travelSettings
     if (this.travelCalculator) {
       this.travelCalculator.updateSettings(travelSettings)
     } else {
@@ -156,180 +139,73 @@ export class APP_DATA {
           throw new Error(`No Country found for code ${code}`)
         }
         return country
-      }, this.travelSettings)
+      }, travelSettings)
     }
   }
-  setDisplaySettings(displaySettings: DisplaySettings<string>) {
-    this.displaySettings = displaySettings
-    formatter.setNameDisplayFormat(displaySettings.nameDisplayFormat)
-    updateLocales(displaySettings)
+
+  get categories() {
+    return this._categories
   }
-  setHealthInsurances(healthInsurances: HealthInsurance<string>[]) {
-    this.healthInsurances = healthInsurances
-  }
-  setOrganisations(organisations: OrganisationSimple<string>[]) {
-    this.organisations = organisations
-  }
-  setCategories(categories: Category<string>[]) {
-    this.categories = categories
+  set categories(categories: Category<string>[]) {
+    this._categories = categories
     this.defaultCategory = categories.length === 1 ? categories[0] : categories.find((category) => category.isDefault)
   }
-  setSpecialLumpSums(specialLumpSums: Record<string, string[]>) {
-    this.specialLumpSums = specialLumpSums
+
+  get user() {
+    return this._userSimple
   }
-  setProjects(projects?: ProjectSimpleWithName<string>[]) {
-    if (projects) {
-      this.projects = projects
-    }
-  }
-  setUsers(users?: UserWithNameAndProject<string>[]) {
-    if (users) {
-      this.users = users
-    }
+  set user(userSimple: typeof this._userSimple) {
+    this._userSimple = userSimple
   }
 }
 
-class APP_LOADER {
-  data: Ref<APP_DATA | null> = ref(null)
-  dataPromise?: Promise<APP_DATA>
-  displaySettingsPromise?: Promise<DisplaySettings>
-  state: Ref<'UNLOADED' | 'LOADING' | 'LOADED'> = ref('UNLOADED')
-  progress = ref(0)
-  progressIncrement = 10 // 10 * 10 = 100
+export class APP_DATA extends TRAVEL_APP_DATA {
+  private _user!: User<string>
+  settings: Settings<string>
+  healthInsurances: HealthInsurance<string>[]
+  // organisations: OrganisationSimple<string>[]
 
-  async loadRequired<T>(endpoint: APP_DATA_REQUIRED_ENDPOINTS) {
-    const res = await API.getter<T>(endpoint)
-    if (!res.ok) {
-      throw new Error(`Failed to load ${endpoint} data`)
-    }
-    if (this.data.value) {
-      this.data.value.setAny(endpoint, res.ok.data)
-    }
-    return res.ok.data
+  // projects?: ProjectSimpleWithName<string>[]
+  users?: UserSimpleWithProject<string>[]
+
+  constructor(
+    data: {
+      currencies: Currency[]
+      countries: Country[]
+      user: User<string>
+      settings: Settings<string>
+      travelSettings: TravelSettings<string>
+      displaySettings: DisplaySettings<string>
+      healthInsurances: HealthInsurance<string>[]
+      organisations: OrganisationSimple<string>[]
+      categories: Category<string>[]
+      printerSettings: PrinterSettings<string>
+
+      specialLumpSums: Record<string, string[]>
+      projects?: ProjectSimpleWithName<string>[]
+      users?: UserSimpleWithProject<string>[]
+    },
+    i18n: Composer<{}, {}, {}, Locale>,
+    formatter: Formatter,
+    languageChangeCB: (locale: Locale) => void
+  ) {
+    super(data, i18n, formatter, languageChangeCB)
+    this.user = data.user
+    this.settings = data.settings
+    this.healthInsurances = data.healthInsurances
+    this.organisations = data.organisations
+
+    this.projects = data.projects
+    this.users = data.users
   }
 
-  async loadOptional<T>(endpoint: APP_DATA_OPTIONAL_ENDPOINTS) {
-    const res = await API.getter<T>(endpoint, {}, {}, false)
-    if (res.ok) {
-      if (this.data.value) {
-        this.data.value.setAny(endpoint, res.ok.data)
-      }
-      return res.ok.data
-    }
-    return undefined
+  get user() {
+    return this._user
   }
-
-  loadData(reload = false) {
-    if (this.dataPromise === undefined || reload) {
-      this.state.value = 'LOADING'
-      this.progress.value = 0
-      this.dataPromise = new Promise((resolve, reject) => {
-        Promise.allSettled([
-          Promise.all([
-            this.withProgress(this.loadRequired<User<string>>('user')),
-            this.withProgress(this.loadRequired<Currency[]>('currency')),
-            this.withProgress(this.loadRequired<Country[]>('country')),
-            this.withProgress(this.loadRequired<Settings<string>>('settings')),
-            this.withProgress(this.loadRequired<TravelSettings<string>>('travelSettings')),
-            this.withProgress(this.loadRequired<HealthInsurance<string>[]>('healthInsurance')),
-            this.withProgress(this.loadRequired<OrganisationSimple<string>[]>('organisation')),
-            this.withProgress(this.loadRequired<Category<string>[]>('category')),
-            this.withProgress(this.loadRequired<Record<string, string[]>>('specialLumpSums')),
-            this.withProgress(this.loadRequired<DisplaySettings<string>>('displaySettings'))
-          ]),
-          Promise.allSettled([
-            this.withProgress(this.loadOptional<ProjectSimpleWithName<string>[]>('project')),
-            this.withProgress(this.loadOptional<UserWithNameAndProject<string>[]>('users'))
-          ])
-        ]).then((result) => {
-          if (result[0].status === 'rejected') {
-            reject(result[0].reason)
-          } else {
-            const [
-              user,
-              currencies,
-              countries,
-              settings,
-              travelSettings,
-              healthInsurances,
-              organisations,
-              categories,
-              specialLumpSums,
-              displaySettings
-            ] = result[0].value
-
-            let projects: ProjectSimpleWithName<string>[] | undefined
-            let users: UserWithNameAndProject<string>[] | undefined
-            if (result[1].status === 'fulfilled') {
-              projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
-              users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
-            }
-
-            const data = new APP_DATA(
-              currencies,
-              countries,
-              user,
-              settings,
-              travelSettings,
-              displaySettings,
-              healthInsurances,
-              organisations,
-              categories,
-              specialLumpSums,
-              projects,
-              users
-            )
-            resolve(data)
-            this.data.value = data
-            this.state.value = 'LOADED'
-          }
-        })
-      })
+  set user(user: User<string>) {
+    this._user = user
+    if (user.settings.hasUserSetLanguage) {
+      this.language = user.settings.language
     }
-    return this.dataPromise
-  }
-
-  loadDisplaySettings(reload = false) {
-    if (this.displaySettingsPromise === undefined || reload) {
-      this.state.value = 'LOADING'
-      this.displaySettingsPromise = new Promise((resolve, reject) => {
-        API.getter<DisplaySettings>('displaySettings').then((result) => {
-          if (result.ok) {
-            resolve(result.ok.data)
-            this.state.value = 'LOADED'
-            updateLocales(result.ok.data)
-          } else {
-            reject(result.error)
-          }
-        })
-      })
-    }
-    return this.displaySettingsPromise
-  }
-
-  private withProgress<T>(promise: Promise<T>): Promise<T> {
-    return promise.then((result) => {
-      this.progress.value += this.progressIncrement
-      return result
-    })
   }
 }
-
-function updateLocales(displaySettings: DisplaySettings) {
-  const messages = loadLocales(displaySettings.locale.overwrite)
-  for (const locale in messages) {
-    i18n.global.setLocaleMessage(locale, messages[locale as Locale])
-  }
-  ;(i18n.global.fallbackLocale as unknown as Ref<Locale>).value = displaySettings.locale.fallback
-  document.title = `${i18n.global.t('headlines.title')} ${i18n.global.t('headlines.emoji')}`
-}
-
-function setLanguage(locale: Locale) {
-  ;(i18n.global.locale as unknown as Ref<Locale>).value = locale
-  if (app.config.globalProperties.$vueform) {
-    app.config.globalProperties.$vueform.i18n.locale = locale
-  }
-  formatter.setLocale(locale)
-}
-
-export default new APP_LOADER()

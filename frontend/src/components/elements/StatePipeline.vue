@@ -28,8 +28,8 @@
 <script lang="ts" setup>
 import { AnyState, AnyStateEnum, State } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
-import APP_LOADER from '@/appData.js'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 const props = defineProps({
   state: { type: Number as PropType<AnyState>, required: true },

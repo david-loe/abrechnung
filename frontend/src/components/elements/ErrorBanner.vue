@@ -1,14 +1,14 @@
 <template>
-  <div v-if="isValidationError(error)" class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>{{ $t('alerts.' + error.name) + ':' }}</strong>
-    <span v-for="e in error.errors">
+  <div v-if="isValidationError(props.error)" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ t('alerts.' + props.error.name) + ':' }}</strong>
+    <span v-for="e in props.error.errors">
       <br />
-      {{ $t('alerts.' + e.message) }}
+      {{ t('alerts.' + e.message) }}
       <small>
         (
         <span v-for="(part, index) of e.path.split('.')">
           <span v-if="index !== 0"> ➡ </span>
-          {{ /^\d+$/.test(part) ? '#' + (Number(part) + 1) : $t('labels.' + part) }}
+          {{ /^\d+$/.test(part) ? '#' + (Number(part) + 1) : t('labels.' + part) }}
         </span>
         )
       </small>
@@ -17,8 +17,11 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue'
+<script lang="ts" setup>
+import { PropType } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 export interface RequestError {
   message: string
@@ -30,15 +33,11 @@ interface ValidationError extends RequestError {
   errors: { [path: string]: { path: string; message: string; kind: string; name: string } }
 }
 
-export default defineComponent({
-  name: 'ErrorBanner',
-  props: { error: { type: Object as PropType<RequestError> } },
-  methods: {
-    isValidationError(error: RequestError | undefined): error is ValidationError {
-      return Boolean(error) && (error as ValidationError).name === 'ValidationError'
-    }
-  }
-})
+const props = defineProps({ error: { type: Object as PropType<RequestError> } })
+
+function isValidationError(error: RequestError | undefined): error is ValidationError {
+  return Boolean(error) && (error as ValidationError).name === 'ValidationError'
+}
 </script>
 
 <style></style>

@@ -198,7 +198,6 @@ import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -210,6 +209,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { bp, showFile } from '@/helper.js'
 

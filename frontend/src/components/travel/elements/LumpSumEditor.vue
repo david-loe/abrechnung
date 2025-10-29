@@ -27,7 +27,7 @@
             {{ t('labels.purpose') }}
             <InfoPoint
               class="ms-1"
-              :text="t('info.professionalShareX%', { X: Math.round(APP_DATA.travelSettings.minProfessionalShare * 100) })" />
+              :text="t('info.professionalShareX%', { X: Math.round(props.travelSettings.minProfessionalShare * 100) })" />
           </th>
         </tr>
         <tr>
@@ -47,8 +47,7 @@
               <span class="d-lg-inline d-none">
                 {{ t('labels.professionalShare') + ': ' }}
               </span>
-              <span
-                :class="'d-sm-inline d-none' + (professionalShare <= APP_DATA.travelSettings.minProfessionalShare ? ' text-danger' : '')">
+              <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
                 {{ Math.round(professionalShare * 100) + '%' }}
               </span>
             </small>
@@ -114,35 +113,37 @@
   </form>
 </template>
 <script lang="ts" setup>
-import { meals, Place, Travel, TravelDay } from 'abrechnung-common/types.js'
+import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
+import { meals, Place, Travel, TravelDay, TravelSettings } from 'abrechnung-common/types.js'
 import { getLumpSumsSum, mergeDeep } from 'abrechnung-common/utils/scripts.js'
-import { computed, PropType, Ref, ref, watch } from 'vue'
+import { computed, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import APP_LOADER, { APP_DATA as IAPP_DATA } from '@/appData.js'
-import InfoPoint from '@/components/elements/InfoPoint.vue'
-import PlaceElement from '@/components/elements/PlaceElement.vue'
-import { formatter } from '@/formatter.js'
+import { formatter } from '../../../formatter.js'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import PlaceElement from '../../elements/PlaceElement.vue'
 
 const emojis = { breakfast: '🥐', lunch: '🥪', dinner: '🍽️', overnight: '🛏️' } as const
 
 const { t } = useI18n()
 
 const props = defineProps({
-  travel: { type: Object as PropType<Travel>, required: true },
+  travel: { type: Object as PropType<Travel<string>>, required: true },
   disabled: { type: Boolean, default: false },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  travelSettings: { type: Object as PropType<TravelSettings>, required: true },
+  travelCalculator: { type: Object as PropType<TravelCalculator>, required: true }
 })
-const emit = defineEmits<{ save: [days: TravelDay[], lastPlaceOfWork: Travel['lastPlaceOfWork']]; cancel: [] }>()
+const emit = defineEmits<{ save: [days: TravelDay<string>[], lastPlaceOfWork: Travel['lastPlaceOfWork']]; cancel: [] }>()
 
 const lastPlaceOfWorkList = ref<Omit<Place, 'place'>[]>([])
 const localLastPlaceOfWork = ref(props.travel.lastPlaceOfWork)
 const lumpSumsSum = ref(getLumpSumsSum(props.travel.days))
 const isCalculatingLumpSumsSum = ref(false)
-const localDays = ref<TravelDay[]>([])
+const localDays = ref<TravelDay<string>[]>([])
 
 setup(props.travel)
 
-function setup(travel: Travel) {
+function setup(travel: Travel<string>) {
   setLocalDays(travel.days)
   lastPlaceOfWorkList.value = getLastPaceOfWorkList(travel)
   if (props.travel.lastPlaceOfWork) {
@@ -151,8 +152,8 @@ function setup(travel: Travel) {
     )
   }
 }
-function setLocalDays(days: TravelDay[]) {
-  const newDays: TravelDay[] = []
+function setLocalDays(days: TravelDay<string>[]) {
+  const newDays: TravelDay<string>[] = []
   for (const day of days) {
     newDays.push(mergeDeep({}, day))
   }
@@ -184,13 +185,10 @@ function getLastPaceOfWorkList(travelObj: Travel) {
   return list
 }
 
-await APP_LOADER.loadData()
-const APP_DATA = APP_LOADER.data as Ref<IAPP_DATA>
-
 const lumpSums = [...meals, 'overnight'] as const
 type LumpSums = (typeof lumpSums)[number]
 
-const professionalShare = computed(() => APP_DATA.value.travelCalculator.getProfessionalShare(localDays.value))
+const professionalShare = computed(() => props.travelCalculator.getProfessionalShare(localDays.value))
 
 function setAll(type: LumpSums, value: boolean) {
   if (type === 'overnight') {
@@ -210,7 +208,7 @@ watch(
 
 watch(localLastPlaceOfWork, async (newLastPlace) => {
   setLocalDays(
-    await APP_DATA.value.travelCalculator.calculateDays(props.travel.stages, newLastPlace, props.travel.destinationPlace, localDays.value)
+    await props.travelCalculator.calculateDays(props.travel.stages, newLastPlace, props.travel.destinationPlace, localDays.value)
   )
 })
 
@@ -219,22 +217,14 @@ watch(
   async (newLocalDays) => {
     isCalculatingLumpSumsSum.value = true
     try {
-      const newCalculatedDays = await APP_DATA.value.travelCalculator.calculateDays(
+      const newCalculatedDays = await props.travelCalculator.calculateDays(
         props.travel.stages,
         localLastPlaceOfWork.value,
         props.travel.destinationPlace,
         newLocalDays
       )
-      await APP_DATA.value.travelCalculator.addCateringRefunds(
-        newCalculatedDays,
-        props.travel.stages,
-        Boolean(props.travel.claimSpouseRefund)
-      )
-      await APP_DATA.value.travelCalculator.addOvernightRefunds(
-        newCalculatedDays,
-        props.travel.stages,
-        Boolean(props.travel.claimSpouseRefund)
-      )
+      await props.travelCalculator.addCateringRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
+      await props.travelCalculator.addOvernightRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
       lumpSumsSum.value = getLumpSumsSum(newCalculatedDays)
     } finally {
       isCalculatingLumpSumsSum.value = false

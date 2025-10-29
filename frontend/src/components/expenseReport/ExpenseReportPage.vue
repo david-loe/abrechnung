@@ -17,19 +17,19 @@
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => {const next = getNext(modalObject as Expense); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalObject as Expense); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
+          @next="() => {const next = getNext(modalObject as Expense<string>); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev(modalObject as Expense<string>); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
         </ExpenseForm>
         <ExpenseReportForm
           v-else
           :mode="modalMode"
-          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+          :expenseReport="(modalObject as Partial<ExpenseReportSimple<string>>)"
           :loading="modalFormIsLoading"
           :owner="expenseReport.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
@@ -147,7 +147,7 @@
                   { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
                   { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
                 ]"
-                @submitted="(d) => (isReadOnly ? null : addDrafts(d))" />
+                @submitted="(d) => (isReadOnly ? null : addDrafts(d as ExpenseDraft[]))" />
             </div>
           </div>
           <TableElement
@@ -163,7 +163,7 @@
             ]"
             :items="allExpenses"
             :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)">
             <template #item-cost.date="{ cost }: Expense">
               {{
                 new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
@@ -296,7 +296,6 @@ import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } f
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
@@ -308,11 +307,12 @@ import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 
-type ModalObject = Partial<Expense> | ExpenseReportSimple
+type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
 type ModalMode = 'add' | 'edit'
 
@@ -434,9 +434,9 @@ async function completeReview() {
   }
 }
 
-async function postExpense(expense: Expense) {
+async function postExpense(expense: Partial<Expense>) {
   let headers: Record<string, string> = {}
-  if (expense.cost.receipts) {
+  if (expense.cost?.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
@@ -456,17 +456,19 @@ async function postExpense(expense: Expense) {
   }
 }
 
-async function deleteExpense(_id: string) {
-  modalFormIsLoading.value = true
-  const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
-  modalFormIsLoading.value = false
-  if (result) {
-    setExpenseReport(result as ExpenseReport<string>)
-    resetAndHide()
+async function deleteExpense(_id?: string) {
+  if (_id) {
+    modalFormIsLoading.value = true
+    const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
+    modalFormIsLoading.value = false
+    if (result) {
+      setExpenseReport(result as ExpenseReport<string>)
+      resetAndHide()
+    }
   }
 }
 
-async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
+async function editExpenseReportDetails(updatedExpenseReport: Partial<ExpenseReport>) {
   modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport<string>>(
     `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
@@ -507,7 +509,7 @@ async function getExaminerMails(): Promise<string[]> {
   return []
 }
 
-function getNext(expense: Expense): Expense | undefined {
+function getNext(expense: Expense<string>): Expense<string> | undefined {
   const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
   if (index === -1 || index + 1 === expenseReport.value.expenses.length) {
     return undefined
@@ -515,7 +517,7 @@ function getNext(expense: Expense): Expense | undefined {
   return expenseReport.value.expenses[index + 1]
 }
 
-function getPrev(expense: Expense): Expense | undefined {
+function getPrev(expense: Expense<string>): Expense<string> | undefined {
   const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
   if (index === -1 || index === 0) {
     return undefined

@@ -15,8 +15,8 @@
 <script lang="ts" setup>
 import { OrganisationSimple } from 'abrechnung-common/types.js'
 import { ref } from 'vue'
-import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
+import API from '../../api.js'
 
 const props = defineProps<{
   modelValue: OrganisationSimple<string> | null

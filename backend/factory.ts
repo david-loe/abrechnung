@@ -1,14 +1,17 @@
+import { ApprovedTravelsPrinter } from 'abrechnung-common/print/approvedTravelsPrinter.js'
+import { ReportPrinter } from 'abrechnung-common/print/reportPrinter.js'
 import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
-import { CountryCode, Country as ICountry, Locale } from 'abrechnung-common/types.js'
+import { CountryCode, Country as ICountry, ExchangeRate as IExchangeRate, Locale } from 'abrechnung-common/types.js'
+import { CurrencyConverter, ExchangeRateProvider, InforEuroResponse } from 'abrechnung-common/utils/currencyConverter.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
+import axios from 'axios'
 import { Types } from 'mongoose'
 import { getDisplaySettings, getPrinterSettings, getTravelSettings } from './db.js'
 import i18n from './i18n.js'
 import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'
+import ExchangeRate from './models/exchangeRate.js'
 import Organisation from './models/organisation.js'
-import { ApprovedTravelsPrinter } from './pdf/approvedTravelsPrinter.js'
-import { ReportPrinter } from './pdf/reportPrinter.js'
 
 const displaySettings = await getDisplaySettings()
 export const formatter = new Formatter(displaySettings.locale.default, displaySettings.nameDisplayFormat)
@@ -67,3 +70,28 @@ export const travelCalculator = new TravelCalculator(
   (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
   await getTravelSettings()
 )
+
+export const currencyConverter = new CurrencyConverter('InforEuro', [
+  new ExchangeRateProvider('InforEuro', async (date, FROM, TO) => {
+    if (TO !== 'EUR') {
+      return null
+    }
+    const month = date.getUTCMonth() + 1
+    const year = date.getUTCFullYear()
+    let data: IExchangeRate | null | undefined = await ExchangeRate.findOne({ currency: FROM, month: month, year: year }).lean()
+    if (!data && !(await ExchangeRate.findOne({ month: month, year: year }).lean())) {
+      const res = await axios.get(`https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`)
+      if (res.status === 200) {
+        const rates = (res.data as InforEuroResponse).map(
+          (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year }) as IExchangeRate
+        )
+        await ExchangeRate.insertMany(rates)
+        data = rates.find((r) => r.currency === FROM)
+      }
+    }
+    if (!data?.value) {
+      return null
+    }
+    return 1 / data.value
+  })
+])

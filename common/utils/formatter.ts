@@ -4,15 +4,15 @@ import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
 class Formatter {
-  #dateFormat!: Intl.DateTimeFormat
-  #simpleDateFormat!: Intl.DateTimeFormat
-  #dateTimeFormat!: Intl.DateTimeFormat
-  #simpleDateTimeFormat!: Intl.DateTimeFormat
-  #baseCurrencyFormat!: Intl.NumberFormat
-  #floatFormat!: Intl.NumberFormat
-  #dateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric', year: 'numeric' }
-  #simpleDateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric' }
-  #dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  private _dateFormat!: Intl.DateTimeFormat
+  private _simpleDateFormat!: Intl.DateTimeFormat
+  private _dateTimeFormat!: Intl.DateTimeFormat
+  private _simpleDateTimeFormat!: Intl.DateTimeFormat
+  private _baseCurrencyFormat!: Intl.NumberFormat
+  private _floatFormat!: Intl.NumberFormat
+  private _dateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric', year: 'numeric' }
+  private _simpleDateFormatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC', month: 'numeric', day: 'numeric' }
+  private _dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
     timeZone: 'UTC',
     year: 'numeric',
     month: 'numeric',
@@ -20,15 +20,15 @@ class Formatter {
     hour: 'numeric',
     minute: 'numeric'
   }
-  #simpleDateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  private _simpleDateTimeFormatOptions: Intl.DateTimeFormatOptions = {
     timeZone: 'UTC',
     month: 'numeric',
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric'
   }
-  #baseCurrencyFormatOptions: Intl.NumberFormatOptions = { style: 'currency', currency: baseCurrency._id }
-  #floatFormatOptions: Intl.NumberFormatOptions = { maximumFractionDigits: 4 }
+  private _baseCurrencyFormatOptions: Intl.NumberFormatOptions = { style: 'currency', currency: baseCurrency._id }
+  private _floatFormatOptions: Intl.NumberFormatOptions = { maximumFractionDigits: 4 }
   locale!: Locale
   nameDisplayFormat!: NameDisplayFormat
 
@@ -39,12 +39,12 @@ class Formatter {
   setLocale(locale?: Locale) {
     if (locale && locale !== this.locale) {
       this.locale = locale
-      this.#dateFormat = new Intl.DateTimeFormat(locale, this.#dateFormatOptions)
-      this.#simpleDateFormat = new Intl.DateTimeFormat(locale, this.#simpleDateFormatOptions)
-      this.#dateTimeFormat = new Intl.DateTimeFormat(locale, this.#dateTimeFormatOptions)
-      this.#simpleDateTimeFormat = new Intl.DateTimeFormat(locale, this.#simpleDateTimeFormatOptions)
-      this.#baseCurrencyFormat = new Intl.NumberFormat(locale, this.#baseCurrencyFormatOptions)
-      this.#floatFormat = new Intl.NumberFormat(locale, this.#floatFormatOptions)
+      this._dateFormat = new Intl.DateTimeFormat(locale, this._dateFormatOptions)
+      this._simpleDateFormat = new Intl.DateTimeFormat(locale, this._simpleDateFormatOptions)
+      this._dateTimeFormat = new Intl.DateTimeFormat(locale, this._dateTimeFormatOptions)
+      this._simpleDateTimeFormat = new Intl.DateTimeFormat(locale, this._simpleDateTimeFormatOptions)
+      this._baseCurrencyFormat = new Intl.NumberFormat(locale, this._baseCurrencyFormatOptions)
+      this._floatFormat = new Intl.NumberFormat(locale, this._floatFormatOptions)
     }
   }
   setNameDisplayFormat(nameDisplayFormat: NameDisplayFormat) {
@@ -57,7 +57,7 @@ class Formatter {
     this.setLocale(locale)
     const validDate = isValidDate(date)
     if (validDate) {
-      return this.#dateFormat.format(validDate)
+      return this._dateFormat.format(validDate)
     }
     return ''
   }
@@ -68,7 +68,7 @@ class Formatter {
     this.setLocale(locale)
     const validDate = isValidDate(date)
     if (validDate) {
-      return this.#simpleDateFormat.format(validDate)
+      return this._simpleDateFormat.format(validDate)
     }
     return ''
   }
@@ -79,7 +79,7 @@ class Formatter {
     this.setLocale(locale)
     const validDate = isValidDate(date)
     if (validDate) {
-      return this.#dateTimeFormat.format(validDate)
+      return this._dateTimeFormat.format(validDate)
     }
     return ''
   }
@@ -90,12 +90,12 @@ class Formatter {
     this.setLocale(locale)
     const validDate = isValidDate(date)
     if (validDate) {
-      return this.#simpleDateTimeFormat.format(validDate)
+      return this._simpleDateTimeFormat.format(validDate)
     }
     return ''
   }
   baseCurrency(number: number) {
-    return this.#baseCurrencyFormat.format(number)
+    return this._baseCurrencyFormat.format(number)
   }
   currency(number: number, currency: string = baseCurrency._id) {
     if (currency === baseCurrency._id) {
@@ -104,7 +104,7 @@ class Formatter {
     return number.toLocaleString(this.locale, { style: 'currency', currency: currency })
   }
   float(number: number) {
-    return this.#floatFormat.format(number)
+    return this._floatFormat.format(number)
   }
 
   money(baseMoney: BaseCurrencyMoney | Money, options?: MoneyStringOptions): string {
@@ -134,7 +134,7 @@ class Formatter {
     }
     let str = this.currency(money.amount, idDocumentToId(money.currency))
     if (money.exchangeRate?.rate) {
-      str = `${str} / ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
+      str = `${str} * ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
     }
     return str
   }

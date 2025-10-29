@@ -6,7 +6,7 @@
         class="form-control"
         :value="modelValue.place"
         @input="update({ place: ($event.target as HTMLInputElement).value })"
-        :placeholder="$t('labels.place')"
+        :placeholder="t('labels.place')"
         :disabled="disabled"
         :required="required" />
       <CountrySelector
@@ -16,8 +16,8 @@
         :required="required"></CountrySelector>
     </div>
     <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && APP_DATA?.specialLumpSums[modelValue.country._id]">
-      <label class="form-label me-2">{{ $t('labels.city') }}</label>
-      <InfoPoint :text="$t('info.special')" />
+      <label class="form-label me-2">{{ t('labels.city') }}</label>
+      <InfoPoint :text="t('info.special')" />
       <select
         class="form-select form-select-sm"
         @change="update({ special: ($event.target as HTMLInputElement).value })"
@@ -35,64 +35,56 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { Place } from 'abrechnung-common/types.js'
-import { defineComponent, PropType } from 'vue'
-import APP_LOADER from '@/appData.js'
-import CountrySelector from '@/components/elements/CountrySelector.vue'
-import InfoPoint from '@/components/elements/InfoPoint.vue'
+import { PropType, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import APP_LOADER from '@/dataLoader.js'
+import CountrySelector from './CountrySelector.vue'
+import InfoPoint from './InfoPoint.vue'
 
-const defaultPlace = { country: null, place: null, special: undefined }
-export default defineComponent({
-  name: 'PlaceInput',
-  data() {
-    return { APP_DATA: APP_LOADER.data }
-  },
-  components: { CountrySelector, InfoPoint },
-  props: {
-    modelValue: { type: Object as PropType<Place>, default: () => defaultPlace },
-    required: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false },
-    withSpecialLumpSumInput: { type: Boolean, default: false }
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    update(update: Partial<Place>) {
-      this.$emit('update:modelValue', Object.assign({}, this.modelValue, update))
-    },
-    matchSpecials() {
-      if (this.withSpecialLumpSumInput) {
-        if (this.modelValue.country && this.APP_DATA?.specialLumpSums[this.modelValue.country._id]) {
-          if (
-            this.modelValue.special &&
-            this.APP_DATA.specialLumpSums[this.modelValue.country._id].indexOf(this.modelValue.special) === -1
-          ) {
-            this.update({ special: undefined })
+const { t } = useI18n()
+
+const APP_DATA = APP_LOADER.data
+
+const props = defineProps({
+  modelValue: { type: Object as PropType<Place>, default: () => ({ country: null, place: null, special: undefined }) },
+  required: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
+  withSpecialLumpSumInput: { type: Boolean, default: false }
+})
+const emit = defineEmits<{ 'update:modelValue': [Place] }>()
+
+function update(update: Partial<Place>) {
+  emit('update:modelValue', Object.assign({}, props.modelValue, update))
+}
+function matchSpecials() {
+  if (props.withSpecialLumpSumInput) {
+    if (props.modelValue.country && APP_DATA.value?.specialLumpSums[props.modelValue.country._id]) {
+      if (
+        props.modelValue.special &&
+        APP_DATA.value.specialLumpSums[props.modelValue.country._id].indexOf(props.modelValue.special) === -1
+      ) {
+        update({ special: undefined })
+      }
+      if (props.modelValue.place) {
+        for (const special of APP_DATA.value.specialLumpSums[props.modelValue.country._id]) {
+          if (special.toLowerCase() === props.modelValue.place.toLowerCase()) {
+            update({ special: special })
+            break
           }
-          for (const special of this.APP_DATA.specialLumpSums[this.modelValue.country._id]) {
-            if (special === this.modelValue.place) {
-              this.update({ special: special })
-              break
-            }
-          }
-        } else {
-          this.update({ special: undefined })
         }
       }
+    } else {
+      update({ special: undefined })
     }
-  },
-  watch: {
-    'modelValue.country': function () {
-      this.matchSpecials()
-    },
-    'modelValue.place': function () {
-      this.matchSpecials()
-    }
-  },
-  async created() {
-    await APP_LOADER.loadData()
   }
-})
+}
+
+watch(() => props.modelValue.country, matchSpecials)
+watch(() => props.modelValue.place, matchSpecials)
+
+await APP_LOADER.loadData()
 </script>
 
 <style></style>

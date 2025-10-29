@@ -130,7 +130,6 @@ import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import DateInput from '@/components/elements/DateInput.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
@@ -138,6 +137,7 @@ import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { showFile } from '@/helper.js'
 import OrganisationSelector from '../elements/OrganisationSelector.vue'
 
@@ -147,7 +147,7 @@ const { t } = useI18n()
 
 type ModalMode = 'view' | 'add' | 'approvedTravels'
 
-const modalTravel = ref<Partial<TravelSimple>>({})
+const modalTravel = ref<Partial<TravelSimple<string>>>({})
 const approvedTravelsReportForm = ref({
   from: new Date(Date.UTC(new Date().getUTCFullYear(), 0, 1)),
   to: new Date(Date.UTC(new Date().getUTCFullYear(), 11, 31)),
@@ -166,7 +166,7 @@ const isDownloadingFn = () => isDownloading
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
-function showModal(mode: ModalMode, travel?: Partial<TravelSimple>) {
+function showModal(mode: ModalMode, travel?: Partial<TravelSimple<string>>) {
   if (travel) {
     modalTravel.value = travel
   }
@@ -189,7 +189,7 @@ function resetAndHide() {
   hideModal()
 }
 
-async function approveTravel(travel: TravelSimple, decision: 'approved' | 'rejected', comment?: string) {
+async function approveTravel(travel: Partial<TravelSimple>, decision: 'approved' | 'rejected', comment?: string) {
   if (travel) {
     travel.comment = comment
     modalFormIsLoading.value = true
@@ -202,7 +202,7 @@ async function approveTravel(travel: TravelSimple, decision: 'approved' | 'rejec
   }
 }
 async function showTravel(_id: string) {
-  const result = await API.getter<TravelSimple>('approve/travel', { _id })
+  const result = await API.getter<TravelSimple<string>>('approve/travel', { _id })
   if (result.ok) {
     showModal('view', result.ok.data)
   }

@@ -24,8 +24,6 @@
     "passport-ldapauth": "^3.0.1",
     "passport-magic-login": "^1.2.2",
     "passport-microsoft": "^2.1.0",
-    "pdf-fontkit": "^1.8.9",
-    "pdf-lib": "^1.17.1",
     "semver": "^7.7.2",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^6.6.0",

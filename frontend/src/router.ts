@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
+import { app } from '@/app.js'
 import AdvanceApprovePage from '@/components/advance/ApprovePage.vue'
 import BookAdvancePage from '@/components/advance/BookPage.vue'
 import BookExpenseReportPage from '@/components/expenseReport/BookPage.vue'
@@ -16,7 +17,6 @@ import ExamineTravelPage from '@/components/travel/ExaminePage.vue'
 import TravelPage from '@/components/travel/TravelPage.vue'
 import ENV from '@/env.js'
 import { logger } from '@/logger.js'
-import { app } from '@/main.js'
 
 const routes = [
   {

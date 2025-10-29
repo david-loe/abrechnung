@@ -103,15 +103,15 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
-import { accesses, User, UserWithNameAndProject } from 'abrechnung-common/types.js'
+import { accesses, User } from 'abrechnung-common/types.js'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 
 const { t } = useI18n()

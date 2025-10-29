@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import { mailToLink, msTeamsToLink } from 'abrechnung-common/utils/scripts.js'
 import { useI18n } from 'vue-i18n'
-import APP_LOADER from '@/appData'
+import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 

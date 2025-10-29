@@ -11,7 +11,7 @@
       <div v-if="healthCareCost._id">
         <ExpenseForm
           v-if="modalObjectType === 'expense'"
-          :expense="modalObject as Partial<Expense>"
+          :expense="modalObject as Partial<Expense<string>>"
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
@@ -29,7 +29,7 @@
         <HealthCareCostForm
           v-else
           :mode="(modalMode as 'add' | 'edit')"
-          :healthCareCost="modalObject as HealthCareCostSimple"
+          :healthCareCost="modalObject as HealthCareCostSimple<string>"
           :loading="modalFormIsLoading"
           :owner="healthCareCost.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
@@ -276,7 +276,6 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
@@ -286,6 +285,7 @@ import TextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
@@ -394,9 +394,9 @@ async function completeReview() {
   }
 }
 
-async function postExpense(expense: Expense) {
+async function postExpense(expense: Partial<Expense>) {
   let headers: Record<string, string> = {}
-  if (expense.cost.receipts) {
+  if (expense.cost?.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
@@ -411,17 +411,19 @@ async function postExpense(expense: Expense) {
   }
 }
 
-async function deleteExpense(_id: string) {
-  modalFormIsLoading.value = true
-  const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
-  modalFormIsLoading.value = false
-  if (result) {
-    setHealthCareCost(result as HealthCareCost<string>)
-    resetAndHide()
+async function deleteExpense(_id?: string) {
+  if (_id) {
+    modalFormIsLoading.value = true
+    const result = await API.deleter(`${props.endpointPrefix}healthCareCost/expense`, { _id, parentId: props._id })
+    modalFormIsLoading.value = false
+    if (result) {
+      setHealthCareCost(result as HealthCareCost<string>)
+      resetAndHide()
+    }
   }
 }
 
-async function editHealthCareCostDetails(updatedHealthCareCost: HealthCareCost) {
+async function editHealthCareCostDetails(updatedHealthCareCost: Partial<HealthCareCost>) {
   modalFormIsLoading.value = true
   const result = await API.setter<HealthCareCost<string>>(
     `${props.endpointPrefix}healthCareCost${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,

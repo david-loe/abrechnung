@@ -1,7 +1,13 @@
+import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
+import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
+import displaySettings from 'abrechnung-common/data/displaySettings.json' with { type: 'json' }
+import printerSettings from 'abrechnung-common/print/printerSettings.json' with { type: 'json' }
+import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.json' with { type: 'json' }
 import {
-  CountryLumpSum,
+  CountryCode,
   ConnectionSettings as IConnectionSettings,
+  Country as ICountry,
   DisplaySettings as IDisplaySettings,
   PrinterSettings as IPrinterSettings,
   Settings as ISettings,
@@ -11,14 +17,10 @@ import {
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, Model, Types } from 'mongoose'
+import mongoose, { Connection, HydratedDocument, Model, Types } from 'mongoose'
 import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
 import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
-import countries from './data/countries.json' with { type: 'json' }
-import currencies from './data/currencies.json' with { type: 'json' }
-import displaySettings from './data/displaySettings.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
-import printerSettings from './data/printerSettings.json' with { type: 'json' }
 import settings from './data/settings.json' with { type: 'json' }
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
@@ -137,45 +139,18 @@ export async function fetchAndUpdateLumpSums() {
   try {
     const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
     if (res.status === 200) {
-      await addLumpSumsToCountries(res.data)
+      await addLumpSumsToCountries(
+        res.data,
+        (id) => Country.findOne({ _id: id }),
+        async (c) => {
+          ;(c as HydratedDocument<ICountry>).markModified('lumpSums')
+          return (c as HydratedDocument<ICountry>).save()
+        }
+      )
     }
   } catch (error) {
     logger.error(`Unable to fetch lump sums from: ${pauschbetrag_api}`, 'error')
     logger.error(error, 'error')
-  }
-}
-
-type LumpSumsJSON = { data: LumpSumWithCountryCode[]; validFrom: string }[]
-type LumpSumWithCountryCode = Omit<CountryLumpSum, 'validFrom'> & { countryCode: string }
-async function addLumpSumsToCountries(lumpSumsJSON: LumpSumsJSON) {
-  lumpSumsJSON.sort((a, b) => new Date(a.validFrom).valueOf() - new Date(b.validFrom).valueOf())
-  for (const lumpSums of lumpSumsJSON) {
-    const validFrom = new Date(lumpSums.validFrom).valueOf()
-    let count = 0
-    for (const lumpSum of lumpSums.data) {
-      const country = await Country.findOne({ _id: lumpSum.countryCode })
-      if (country) {
-        let newData = true
-        for (const countrylumpSums of country.lumpSums) {
-          if ((countrylumpSums.validFrom as Date).valueOf() >= validFrom) {
-            newData = false
-            break
-          }
-        }
-        if (newData) {
-          const newLumpSum: CountryLumpSum = Object.assign({ validFrom: new Date(lumpSums.validFrom) }, lumpSum)
-          country.lumpSums.push(newLumpSum)
-          country.markModified('lumpSums')
-          await country.save()
-          count++
-        }
-      } else {
-        throw new Error(`No Country with id "${lumpSum.countryCode}" found`)
-      }
-    }
-    if (count > 0) {
-      logger.info(`Added ${count} lump sums for ${new Date(lumpSums.validFrom)}`)
-    }
   }
 }
 

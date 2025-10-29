@@ -3,6 +3,9 @@
   "version": "2.1.13",
   "private": true,
   "type": "module",
+  "exports": {
+    "./*": "./*"
+  },
   "scripts": {
     "dev": "vite & vue-tsc --noEmit --watch",
     "build": "vue-tsc --noEmit && vite build",

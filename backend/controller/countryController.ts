@@ -1,3 +1,4 @@
+import { getSpecialLumpSumsList } from 'abrechnung-common/travel/lumpSums.js'
 import { CountryCode, Country as ICountry, locales } from 'abrechnung-common/types.js'
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import Country, { countrySchema } from '../models/country.js'
@@ -17,23 +18,7 @@ export class CountryController extends Controller {
   @Get('specialLumpSums')
   public async getSpecialLumpSums() {
     const allCountries = await Country.find().lean()
-    const specialCountries: { [key: string]: string[] } = {}
-    for (const c of allCountries) {
-      const specials: string[] = []
-      for (const lumpSum of c.lumpSums) {
-        if (lumpSum.specials) {
-          for (const special of lumpSum.specials) {
-            if (specials.indexOf(special.city) === -1) {
-              specials.push(special.city)
-            }
-          }
-        }
-      }
-      if (specials.length > 0) {
-        specialCountries[c._id] = specials
-      }
-    }
-    return { data: specialCountries }
+    return { data: getSpecialLumpSumsList(allCountries) }
   }
 }
 

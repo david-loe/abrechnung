@@ -1,49 +1,49 @@
 <template>
   <Vueform
     :schema="schema"
-    ref="form$"
+    ref="form"
     :endpoint="false"
     @submit="(form$: any) => postTravelSettings(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postTravelSettings(($refs.form$ as any).data)}"></Vueform>
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postTravelSettings(formRef?.data as any)}"></Vueform>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { TravelSettings } from 'abrechnung-common/types.js'
-import { defineComponent } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
 
 const APP_DATA = APP_LOADER.data
+const { t } = useI18n()
+const schema = ref({})
 
-export default defineComponent({
-  name: 'TravelSettingsForm',
-  data() {
-    return { schema: {} }
-  },
-  methods: {
-    async postTravelSettings(travelSettings: TravelSettings) {
-      const result = await API.setter<TravelSettings<string>>('admin/travelSettings', travelSettings)
-      if (result.ok && APP_DATA.value) {
-        APP_DATA.value?.setTravelSettings(result.ok)
-        ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.travelSettings, false)
-      }
-    }
-  },
-  async created() {
-    await APP_LOADER.loadData()
-    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/travelSettings/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
-      },
-      _id: { type: 'hidden', meta: true }
-    })
-    queueMicrotask(() => {
-      if (APP_DATA.value) {
-        ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.travelSettings, false)
-      }
-    })
+const formRef = useTemplateRef('form')
+
+async function postTravelSettings(travelSettings: TravelSettings) {
+  const result = await API.setter<TravelSettings<string>>('admin/travelSettings', travelSettings)
+  if (result.ok && APP_DATA.value) {
+    APP_DATA.value.travelSettings = result.ok
+    loadTravelSettings(APP_DATA.value?.travelSettings)
+  }
+}
+function loadTravelSettings(travelSettings: TravelSettings) {
+  //@ts-expect-error is wrongly typed as Vueform and not VueformElement
+  queueMicrotask(() => (formRef.value as VueformElement).load(travelSettings, false))
+}
+
+onMounted(async () => {
+  schema.value = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/travelSettings/form')).ok?.data, {
+    buttons: {
+      type: 'group',
+      schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }
+    },
+    _id: { type: 'hidden', meta: true }
+  })
+  await APP_LOADER.loadData()
+  if (APP_DATA.value) {
+    loadTravelSettings(APP_DATA.value?.travelSettings)
   }
 })
 </script>

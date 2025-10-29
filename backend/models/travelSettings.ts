@@ -44,9 +44,10 @@ export const travelSettingsSchema = () => {
 const schema = travelSettingsSchema()
 
 schema.post('save', function (this: HydratedDocument<TravelSettings<Types.ObjectId>>) {
-  travelCalculator.updateSettings(this)
-  reportPrinter.setDistanceRefunds(this.distanceRefunds)
-  approvedTravelsPrinter.setAllowSpouseRefund(this.allowSpouseRefund)
+  const settings = this.toObject()
+  travelCalculator.updateSettings(settings)
+  reportPrinter.setDistanceRefunds(settings.distanceRefunds)
+  approvedTravelsPrinter.setAllowSpouseRefund(settings.allowSpouseRefund)
 })
 
 export default model('TravelSettings', schema)

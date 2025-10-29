@@ -1,13 +1,12 @@
+import { AxiosRequestConfig } from 'axios'
+import { Ref } from 'vue'
+import API from './api'
+import ENV from './env.js'
+
 /**
  * register user for push notifivation if Push Manager and VAPID key avaiable
  * checking permission and asking for it if needed
  */
-
-import { AxiosRequestConfig } from 'axios'
-import { Ref } from 'vue'
-import API from '@/api'
-import ENV from '@/env.js'
-
 export async function subscribeToPush() {
   if (!('PushManager' in window) || !ENV.VITE_PUBLIC_VAPID_KEY) {
     return
@@ -76,6 +75,19 @@ export function expandCollapseComments() {
     td.click()
   }
 }
+
+export function setLast<T>(item: T, list: T[], limit = 3) {
+  const index = list.indexOf(item)
+  if (index !== -1) {
+    list.splice(index, 1)
+  }
+  const length = list.unshift(item)
+  if (length > limit) {
+    list.pop()
+  }
+}
+
+export const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
 export async function showFile(
   file: { endpoint: string; params: AxiosRequestConfig['params']; filename: string; isDownloading?: Ref<string> } | Blob | File

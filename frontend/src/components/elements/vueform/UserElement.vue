@@ -82,7 +82,7 @@ import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
 import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 
 export default defineElement({

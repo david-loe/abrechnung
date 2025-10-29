@@ -1,43 +1,46 @@
 <template>
   <Vueform
     :schema="schema"
-    ref="form$"
+    ref="form"
     :endpoint="false"
     @submit="(form$: any) => postPrinterSettings(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postPrinterSettings(($refs.form$ as any).data)}"></Vueform>
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postPrinterSettings(formRef?.data as any)}"></Vueform>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { PrinterSettings } from 'abrechnung-common/types.js'
-import { defineComponent } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
 
-export default defineComponent({
-  name: 'PrinterSettingsForm',
-  data() {
-    return { schema: {}, printerSettings: undefined as PrinterSettings | undefined }
-  },
-  methods: {
-    async postPrinterSettings(printerSettings: PrinterSettings) {
-      const result = await API.setter<PrinterSettings>('admin/printerSettings', printerSettings)
-      if (result.ok) {
-        this.printerSettings = result.ok
-        ;(this.$refs.form$ as VueformElement).load(this.printerSettings, false)
-      }
-    }
-  },
+const { t } = useI18n()
+const schema = ref({})
 
-  async mounted() {
-    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/printerSettings/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
-      },
-      _id: { type: 'hidden', meta: true }
-    })
-    this.printerSettings = (await API.getter<PrinterSettings>('admin/printerSettings')).ok?.data
-    queueMicrotask(() => (this.$refs.form$ as VueformElement).load(this.printerSettings, false))
+const formRef = useTemplateRef('form')
+
+async function postPrinterSettings(printerSettings: PrinterSettings) {
+  const result = await API.setter<PrinterSettings>('admin/printerSettings', printerSettings)
+  if (result.ok) {
+    loadPrinterSettings(result.ok)
+  }
+}
+function loadPrinterSettings(printerSettings: PrinterSettings) {
+  //@ts-expect-error is wrongly typed as Vueform and not VueformElement
+  queueMicrotask(() => (formRef.value as VueformElement).load(printerSettings, false))
+}
+
+onMounted(async () => {
+  schema.value = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/printerSettings/form')).ok?.data, {
+    buttons: {
+      type: 'group',
+      schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }
+    },
+    _id: { type: 'hidden', meta: true }
+  })
+  const result = await API.getter<PrinterSettings>('admin/printerSettings')
+  if (result.ok) {
+    loadPrinterSettings(result.ok.data)
   }
 })
 </script>

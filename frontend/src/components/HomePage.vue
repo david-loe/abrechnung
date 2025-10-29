@@ -36,7 +36,7 @@
           <TravelApplyForm
             v-if="modalObjectType === 'travel'"
             :mode="modalMode"
-            :travel="(modalObject as Partial<TravelSimple>)"
+            :travel="(modalObject as Partial<TravelSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             :minStartDate="APP_DATA?.user.access['approved:travel'] ? '' : undefined"
@@ -49,7 +49,7 @@
           <ExpenseReportForm
             v-else-if="modalObjectType === 'expenseReport'"
             :mode="(modalMode as 'add' | 'edit')"
-            :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+            :expenseReport="(modalObject as Partial<ExpenseReportSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             update-user-org
@@ -59,7 +59,7 @@
           <HealthCareCostForm
             v-else-if="modalObjectType === 'healthCareCost'"
             :mode="(modalMode as 'add' | 'edit')"
-            :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
+            :healthCareCost="(modalObject as Partial<HealthCareCostSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             update-user-org
@@ -162,7 +162,6 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
@@ -174,6 +173,7 @@ import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.v
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost' | 'advance'
@@ -223,7 +223,9 @@ function resetAndHide() {
   hideModal()
 }
 
-async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Partial<AdvanceSimple>) {
+async function handleSubmit(
+  payload: Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partial<HealthCareCostSimple> | Partial<AdvanceSimple>
+) {
   modalFormIsLoading.value = true
   let result: { _id: string } | undefined
 

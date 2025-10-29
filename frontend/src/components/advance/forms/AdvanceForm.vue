@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="disabled ? null : emit(mode as any, output())">
+  <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div v-if="askOwner" class="mb-3">
       <label for="travelFormOwner" class="form-label"> {{ t('labels.owner') }}<span class="text-danger">*</span> </label>
       <UserSelector v-model="formAdvance.owner" required></UserSelector>
@@ -61,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, baseCurrency, Project, UserWithNameAndProject } from 'abrechnung-common/types.js'
+import { AdvanceSimple, baseCurrency } from 'abrechnung-common/types.js'
 import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
@@ -83,19 +83,17 @@ const props = defineProps({
 
 const emit = defineEmits<{ cancel: []; edit: [Partial<AdvanceSimple>]; add: [Partial<AdvanceSimple>]; deleted: [string] }>()
 
-const formAdvance = ref(defaultAdvance())
-
-formAdvance.value = input() as ReturnType<typeof defaultAdvance>
+const formAdvance = ref(input())
 
 function defaultAdvance() {
   return {
-    name: undefined as string | undefined,
-    reason: undefined as string | undefined,
-    budget: { amount: null as number | null, currency: baseCurrency },
-    owner: undefined as UserWithNameAndProject<string> | undefined,
-    project: undefined as Project<string> | undefined,
-    comment: undefined as string | undefined,
-    bookingRemark: undefined as string | undefined
+    name: undefined,
+    reason: undefined,
+    budget: { amount: null, currency: baseCurrency },
+    owner: undefined,
+    project: undefined,
+    comment: undefined,
+    bookingRemark: undefined
   }
 }
 

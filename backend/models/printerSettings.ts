@@ -1,4 +1,4 @@
-import { hexColorRegex, PrinterSettings } from 'abrechnung-common/types.js'
+import { fontNames, hexColorRegex, PrinterSettings } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
 import { reportPrinter } from '../factory.js'
 
@@ -22,6 +22,7 @@ export const printerSettingsSchema = () =>
       type: { x: { type: Number, min: 0, required: true, label: 'X' }, bottom: { type: Number, min: 0, required: true } },
       required: true
     },
+    fontName: { type: String, required: true, enum: fontNames, translationPrefix: '' },
     textColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
     borderColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
     borderThickness: { type: Number, min: 0, required: true }
@@ -30,7 +31,8 @@ export const printerSettingsSchema = () =>
 const schema = printerSettingsSchema()
 
 schema.post('save', function (this: HydratedDocument<PrinterSettings<Types.ObjectId>>) {
-  reportPrinter.setSettings(this)
+  const settings = this.toObject()
+  reportPrinter.setSettings(settings)
 })
 
 export default model('PrinterSettings', schema)

@@ -291,7 +291,7 @@ export interface UserWithName<idType extends _id = _id> {
   name: Name
 }
 
-export interface UserWithNameAndProject<idType extends _id = _id> extends UserWithName<idType> {
+export interface UserSimpleWithProject<idType extends _id = _id> extends UserSimple<idType> {
   projects: UserProjects<idType>
 }
 
@@ -600,7 +600,7 @@ export type Access = (typeof accesses)[number]
 export const meals = ['breakfast', 'lunch', 'dinner'] as const
 export type Meal = (typeof meals)[number]
 
-export const fontNames = ['NotoSans'] as const
+export const fontNames = ['NotoSans', 'Inter'] as const
 export type FontName = (typeof fontNames)[number]
 
 export type PageOrientation = 'portrait' | 'landscape'
