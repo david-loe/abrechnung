@@ -20,7 +20,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.name" @click.stop>
-          <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+          <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
         </div>
       </div>
     </template>
@@ -47,7 +47,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.insurance" @click.stop>
-          <HealthInsuranceSelector v-model="filter.insurance as any"></HealthInsuranceSelector>
+          <HealthInsuranceSelector v-model="filter.insurance as any" />
         </div>
       </div>
     </template>
@@ -59,7 +59,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.project" @click.stop>
-          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
+          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5" />
         </div>
       </div>
     </template>
@@ -71,7 +71,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter['project.organisation']" @click.stop>
-          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
+          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id />
         </div>
       </div>
     </template>
@@ -85,7 +85,7 @@
           </span>
         </div>
         <div v-if="showFilter.owner" @click.stop>
-          <UserSelector v-model="filter.owner as any"></UserSelector>
+          <UserSelector v-model="filter.owner as any" />
         </div>
       </div>
     </template>
@@ -99,14 +99,12 @@
           </span>
         </div>
         <div v-if="showFilter.updatedAt" @click.stop>
-          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time></DateInput>
+          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time />
         </div>
       </div>
     </template>
     <template #item-name="{ name, _id }">
-      <span v-if="props.makeNameNoLink">
-        {{ name }}
-      </span>
+      <span v-if="props.makeNameNoLink"> {{ name }}</span>
       <router-link
         v-else
         :to="'/' + endpoint + '/' + _id"
@@ -115,29 +113,23 @@
       </router-link>
     </template>
     <template #item-editor="{ editor }">
-      <span :title="formatter.name(editor.name)">
-        {{ formatter.name(editor.name, 'short') }}
-      </span>
+      <span :title="formatter.name(editor.name)"> {{ formatter.name(editor.name, 'short') }}</span>
     </template>
     <template #item-owner="{ owner }">
-      <span :title="formatter.name(owner.name)">
-        {{ formatter.name(owner.name, 'short') }}
-      </span>
+      <span :title="formatter.name(owner.name)"> {{ formatter.name(owner.name, 'short') }}</span>
     </template>
     <template #item-state="{ state }">
-      <StateBadge :state="state" :StateEnum="HealthCareCostState" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="HealthCareCostState" style="display: inline-block" />
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.totalTotal="{ addUp }">
-      {{ formatter.baseCurrency(getTotalTotal(addUp)) }}
-    </template>
+    <template #item-addUp.totalTotal="{ addUp }">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
         {{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}
         <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
-          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false"></AddUpTable>
+          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" />
         </template>
       </TooltipElement>
     </template>
@@ -153,9 +145,7 @@
         <i v-else class="bi bi-file-earmark-pdf"></i>
       </button>
     </template>
-    <template #item-updatedAt="{ updatedAt }">
-      {{ formatter.dateTime(updatedAt) }}
-    </template>
+    <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
         <TooltipElement :text="bookingRemark">

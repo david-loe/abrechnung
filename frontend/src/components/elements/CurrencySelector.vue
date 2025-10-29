@@ -17,15 +17,13 @@
           <span class="fs-2">{{ flag }}</span>
         </div>
         <div class="col p-1 lh-1 text-truncate" :title="name[$i18n.locale as Locale]">
-          <span>{{ _id }}</span
-          ><br />
+          <span>{{ _id }}</span>
+          <br >
           <span class="text-secondary">
             <small>{{ name[$i18n.locale as Locale] }}</small>
           </span>
         </div>
-        <div v-if="symbol" class="col-auto ms-auto ps-0">
-          {{ symbol }}
-        </div>
+        <div v-if="symbol" class="col-auto ms-auto ps-0">{{ symbol }}</div>
       </div>
     </template>
     <template #selected-option="{ name, _id, symbol, flag }: Currency">
@@ -36,7 +34,7 @@
       </div>
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
     </template>
   </v-select>
 </template>

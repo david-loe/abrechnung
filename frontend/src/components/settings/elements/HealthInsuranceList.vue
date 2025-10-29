@@ -9,7 +9,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
           </div>
         </div>
       </template>
@@ -22,7 +22,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.email" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.email as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.email as any).$regex" >
           </div>
         </div>
       </template>
@@ -49,7 +49,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postHealthInsurance(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.healthInsurance') }) }}

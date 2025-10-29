@@ -79,7 +79,9 @@
 
     <!-- Default element slots -->
     <template v-for="(component, slot) in elementSlots" #[slot]>
-      <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
+      <slot :name="slot" :el$="el$">
+        <component :is="component" :el$="el$" />
+      </slot>
     </template>
   </component>
 </template>

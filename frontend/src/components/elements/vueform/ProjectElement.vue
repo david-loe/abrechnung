@@ -49,16 +49,12 @@
         </template>
 
         <template v-slot:singlelabel="{ value }">
-          <span class="text-truncate ms-2 me-auto">
-            {{ value.identifier + (value.name ? ' ' + value.name : '') }}
-          </span>
+          <span class="text-truncate ms-2 me-auto"> {{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
         </template>
 
         <template v-slot:multiplelabel="{ values }">
           <span class="ms-2 mt-1 me-auto">
-            <span v-for="value of values" class="me-3">
-              {{ value.identifier + (value.name ? ' ' + value.name : '') }}
-            </span>
+            <span v-for="value of values" class="me-3"> {{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
           </span>
         </template>
 
@@ -70,7 +66,9 @@
 
     <!-- Default element slots -->
     <template v-for="(component, slot) in elementSlots" #[slot]>
-      <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
+      <slot :name="slot" :el$="el$">
+        <component :is="component" :el$="el$" />
+      </slot>
     </template>
   </component>
 </template>

@@ -1,27 +1,39 @@
 <template>
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div class="mb-2">
-      <label for="travelFormDescription" class="form-label"> {{ t('labels.description') }}<span class="text-danger">*</span> </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required />
+      <label for="travelFormDescription" class="form-label">
+        {{ t('labels.description') }}
+        <span class="text-danger">*</span>
+      </label>
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
     </div>
 
     <div class="row mb-2">
       <div class="col">
-        <label for="expenseFormCost" class="form-label me-2"> {{ t('labels.cost') }}<span class="text-danger">*</span> </label>
+        <label for="expenseFormCost" class="form-label me-2">
+          {{ t('labels.cost') }}
+          <span class="text-danger">*</span>
+        </label>
         <InfoPoint :text="t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
-          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required />
-          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required >
+          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
         </div>
       </div>
       <div class="col">
-        <label for="invoiceDateInput" class="form-label">{{ t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
+        <label for="invoiceDateInput" class="form-label">
+          {{ t('labels.invoiceDate') }}
+          <span class="text-danger">*</span>
+        </label>
         <DateInput id="invoiceDateInput" v-model="formExpense.cost.date" :required="true" :disabled="disabled" :max="new Date()" />
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="expenseFormFile" class="form-label me-2">{{ t('labels.receipts') }}<span class="text-danger">*</span></label>
+      <label for="expenseFormFile" class="form-label me-2">
+        {{ t('labels.receipts') }}
+        <span class="text-danger">*</span>
+      </label>
       <InfoPoint :text="t('info.receipts')" />
       <FileUpload
         ref="fileUpload"
@@ -34,7 +46,10 @@
         :showUploadFromPhone="props.showUploadFromPhone" />
     </div>
 
-    <label for="expenseFormPurpose" class="form-label me-2"> {{ t('labels.purpose') }}<span class="text-danger">*</span> </label>
+    <label for="expenseFormPurpose" class="form-label me-2">
+      {{ t('labels.purpose') }}
+      <span class="text-danger">*</span>
+    </label>
     <InfoPoint :text="t('info.purpose')" />
     <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ t('labels.' + purpose) }}</option>
@@ -42,31 +57,30 @@
 
     <template v-if="props.showProjectSelection">
       <div class="mb-3" v-if="useDifferentProject || formExpense.project">
-      <label for="healthCareCostFormProject" class="form-label me-2"> {{ t('labels.project') }}</label>
-      <InfoPoint :text="t('info.project')" />
-      <button
-        type="button"
-        class="btn btn-sm btn-link ms-3"
-        @click="
+        <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
+        <InfoPoint :text="t('info.project')" />
+        <button
+          type="button"
+          class="btn btn-sm btn-link ms-3"
+          @click="
           //prettier-ignore
           useDifferentProject = false;
           //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
           formExpense.project = ''
         ">
-        {{ t('labels.reset') }}
-      </button>
+          {{ t('labels.reset') }}
+        </button>
 
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project"> </ProjectSelector>
-    </div>
-    <div class="mb-2" v-else>
-      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
-    </div>
+        <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project" />
+      </div>
+      <div class="mb-2" v-else>
+        <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
+      </div>
     </template>
-    
 
     <div class="mb-3">
-      <label for="travelFormDescription" class="form-label"> {{ t('labels.note') }}</label>
-      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled"></TextArea>
+      <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
+      <CTextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled" />
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -82,9 +96,7 @@
         {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="emit('cancel')">
-        {{ t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ t('labels.cancel') }}</button>
       <div class="ms-auto">
         <button
           type="button"
@@ -114,7 +126,7 @@ import DateInput from '../../elements/DateInput.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import ProjectSelector from '../../elements/ProjectSelector.vue'
-import TextArea from '../../elements/TextArea.vue'
+import CTextArea from '../../elements/TextArea.vue'
 
 const { t } = useI18n()
 

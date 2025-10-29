@@ -3,7 +3,10 @@
     <div class="mb-3">
       <div class="row">
         <div class="col">
-          <label for="startDateInput" class="form-label">{{ t('labels.departure') }}<span class="text-danger">*</span></label>
+          <label for="startDateInput" class="form-label">
+            {{ t('labels.departure') }}
+            <span class="text-danger">*</span>
+          </label>
           <DateInput
             id="startDateInput"
             v-model="formStage.departure"
@@ -14,7 +17,10 @@
             required />
         </div>
         <div class="col">
-          <label for="endDateInput" class="form-label"> {{ t('labels.arrival') }}<span class="text-danger">*</span> </label>
+          <label for="endDateInput" class="form-label">
+            {{ t('labels.arrival') }}
+            <span class="text-danger">*</span>
+          </label>
           <DateInput
             id="endDateInput"
             v-model="formStage.arrival"
@@ -27,46 +33,50 @@
       </div>
       <div v-if="showDepartureAndArrivalOnDifferentDaysAlert" class="alert alert-warning d-flex px-2 py-1 mt-1" role="alert">
         <i class="bi bi-exclamation-triangle-fill"></i>
-        <span class="ms-3">
-          {{ t('alerts.departureAndArrivalOnDifferentDaysX', { X: t('labels.' + formStage.transport.type) }) }}
-        </span>
+        <span class="ms-3"> {{ t('alerts.departureAndArrivalOnDifferentDaysX', { X: t('labels.' + formStage.transport.type) }) }}</span>
         <button type="button" class="btn-close ms-auto" @click="showDepartureAndArrivalOnDifferentDaysAlert = false"></button>
       </div>
     </div>
 
     <div class="row mb-3">
       <div class="col">
-        <label for="stageFormStartLocation" class="form-label"> {{ t('labels.startLocation') }}<span class="text-danger">*</span> </label>
+        <label for="stageFormStartLocation" class="form-label">
+          {{ t('labels.startLocation') }}
+          <span class="text-danger">*</span>
+        </label>
         <PlaceInput
           id="stageFormStartLocation"
           v-model="formStage.startLocation"
           :disabled="disabled"
           :required="true"
-          :withSpecialLumpSumInput="true">
-        </PlaceInput>
+          :withSpecialLumpSumInput="true" />
       </div>
       <div class="col">
-        <label for="stageFormEndLocation" class="form-label"> {{ t('labels.endLocation') }}<span class="text-danger">*</span> </label>
+        <label for="stageFormEndLocation" class="form-label">
+          {{ t('labels.endLocation') }}
+          <span class="text-danger">*</span>
+        </label>
         <PlaceInput
           id="stageFormEndLocation"
           v-model="formStage.endLocation"
           :disabled="disabled"
           :required="true"
-          :withSpecialLumpSumInput="true">
-        </PlaceInput>
+          :withSpecialLumpSumInput="true" />
       </div>
     </div>
 
-    <label for="stageFormTransport" class="form-label"> {{ t('labels.transport') }}<span class="text-danger">*</span> </label>
+    <label for="stageFormTransport" class="form-label">
+      {{ t('labels.transport') }}
+      <span class="text-danger">*</span>
+    </label>
     <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required>
-      <option v-for="transport of transportTypes" :value="transport" :key="transport">
-        {{ t('labels.' + transport) }}
-      </option>
+      <option v-for="transport of transportTypes" :value="transport" :key="transport">{{ t('labels.' + transport) }}</option>
     </select>
 
     <template v-if="formStage.midnightCountries && formStage.midnightCountries.length > 0">
       <label for="stageFormMidnightCountries" class="form-label me-2">
-        {{ t('labels.midnightCountries') }}<span class="text-danger">*</span>
+        {{ t('labels.midnightCountries') }}
+        <span class="text-danger">*</span>
       </label>
       <InfoPoint :text="t('info.midnightCountries')" />
       <div class="row mb-3" id="stageFormMidnightCountries">
@@ -75,15 +85,17 @@
             {{ formatter.simpleDate(midnightCountry.date) }}
             {{ t('labels.midnight') }}
           </label>
-          <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled" :required="true">
-          </CountrySelector>
+          <CountrySelector id="stageFormEndLocation" v-model="midnightCountry.country" :disabled="disabled" :required="true" />
         </div>
       </div>
     </template>
 
     <template v-if="formStage.transport.type == 'ownCar'">
       <div class="mb-3">
-        <label for="stageFormTransport" class="form-label"> {{ t('labels.distanceRefundType') }}<span class="text-danger">*</span> </label>
+        <label for="stageFormTransport" class="form-label">
+          {{ t('labels.distanceRefundType') }}
+          <span class="text-danger">*</span>
+        </label>
         <select
           class="form-select mb-3"
           v-model="formStage.transport.distanceRefundType"
@@ -103,7 +115,10 @@
         </select>
       </div>
       <div class="mb-3">
-        <label for="stageFormDistance" class="form-label"> {{ t('labels.distance') }}<span class="text-danger">*</span> </label>
+        <label for="stageFormDistance" class="form-label">
+          {{ t('labels.distance') }}
+          <span class="text-danger">*</span>
+        </label>
         <a class="btn btn-link btn-sm ms-3" v-if="getGoogleMapsLink()" :href="getGoogleMapsLink()" target="_blank">
           {{ t('labels.toX', { X: 'Google Maps' }) }}
           <i class="bi bi-box-arrow-up-right"></i>
@@ -114,7 +129,7 @@
           v-model="formStage.transport.distance"
           id="stageFormDistance"
           :disabled="disabled"
-          required />
+          required >
       </div>
       <div class="mb-3" v-if="props.vehicleRegistration && props.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
@@ -138,18 +153,17 @@
     <template v-if="formStage.transport.type !== 'ownCar'">
       <div class="row mb-2">
         <div class="col">
-          <label for="stageFormCost" class="form-label me-2">
-            {{ t('labels.cost') }}
-          </label>
+          <label for="stageFormCost" class="form-label me-2">{{ t('labels.cost') }}</label>
           <InfoPoint :text="t('info.cost')" />
           <div class="input-group" id="stageFormCost">
-            <input type="number" class="form-control" step="0.01" v-model="formStage.cost.amount" min="0" :disabled="disabled" />
-            <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+            <input type="number" class="form-control" step="0.01" v-model="formStage.cost.amount" min="0" :disabled="disabled" >
+            <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true" />
           </div>
         </div>
         <div class="col">
           <label for="invoiceDateInput" class="form-label">
-            {{ t('labels.invoiceDate') }}<span v-if="formStage.cost.amount" class="text-danger">*</span>
+            {{ t('labels.invoiceDate') }}
+            <span v-if="formStage.cost.amount" class="text-danger">*</span>
           </label>
           <DateInput
             id="invoiceDateInput"
@@ -168,7 +182,8 @@
       ">
       <div class="mb-3">
         <label for="stageFormFile" class="form-label me-2">
-          {{ t('labels.receipts') }}<span v-if="formStage.cost.amount" class="text-danger">*</span>
+          {{ t('labels.receipts') }}
+          <span v-if="formStage.cost.amount" class="text-danger">*</span>
         </label>
         <InfoPoint :text="t('info.receipts')" />
         <FileUpload
@@ -183,7 +198,10 @@
       </div>
     </template>
 
-    <label for="stageFormPurpose" class="form-label me-2"> {{ t('labels.purpose') }}<span class="text-danger">*</span> </label>
+    <label for="stageFormPurpose" class="form-label me-2">
+      {{ t('labels.purpose') }}
+      <span class="text-danger">*</span>
+    </label>
     <InfoPoint :text="t('info.purpose')" />
     <select class="form-select mb-3" v-model="formStage.purpose" id="stageFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ t('labels.' + purpose) }}</option>
@@ -191,30 +209,29 @@
 
     <template v-if="props.showProjectSelection">
       <div class="mb-3" v-if="useDifferentProject || formStage.project">
-      <label for="healthCareCostFormProject" class="form-label me-2"> {{ t('labels.project') }}</label>
-      <InfoPoint :text="t('info.project')" />
-      <button
-        type="button"
-        class="btn btn-sm btn-link ms-3"
-        @click="
+        <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
+        <InfoPoint :text="t('info.project')" />
+        <button
+          type="button"
+          class="btn btn-sm btn-link ms-3"
+          @click="
           //prettier-ignore
           useDifferentProject = false;
           //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
           formStage.project = ''
         ">
-        {{ t('labels.reset') }}
-      </button>
-      <ProjectSelector id="healthCareCostFormProject" v-model="formStage.project"> </ProjectSelector>
-    </div>
-    <div class="mb-2" v-else>
-      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
-    </div>
+          {{ t('labels.reset') }}
+        </button>
+        <ProjectSelector id="healthCareCostFormProject" v-model="formStage.project" />
+      </div>
+      <div class="mb-2" v-else>
+        <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
+      </div>
     </template>
-    
 
     <div class="mb-3">
-      <label for="travelFormDescription" class="form-label"> {{ t('labels.note') }}</label>
-      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formStage.note" :disabled="disabled"></TextArea>
+      <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
+      <CTextArea class="form-control-sm" id="travelFormDescription" v-model="formStage.note" :disabled="disabled" />
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -230,9 +247,7 @@
         {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="$emit('cancel')">
-        {{ t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="$emit('cancel')">{{ t('labels.cancel') }}</button>
       <div class="ms-auto">
         <button
           type="button"
@@ -266,7 +281,7 @@ import {
   transportTypes
 } from 'abrechnung-common/types.js'
 import { datetimeToDate, datetimeToDateString, getDayList } from 'abrechnung-common/utils/scripts.js'
-import { computed, defineProps, PropType, ref, useTemplateRef, watch } from 'vue'
+import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../../formatter'
 import CountrySelector from '../../elements/CountrySelector.vue'
@@ -276,7 +291,7 @@ import FileUpload from '../../elements/FileUpload.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import ProjectSelector from '../../elements/ProjectSelector.vue'
-import TextArea from '../../elements/TextArea.vue'
+import CTextArea from '../../elements/TextArea.vue'
 
 const emit = defineEmits<{
   cancel: []

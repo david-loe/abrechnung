@@ -5,7 +5,7 @@
       :class="'col-' + props.orgSelectSplit"
       :updateUserOrg="props.updateUserOrg"
       :disabled="props.disabled"
-      load-projects-on-init></ProjectsOfOrganisationSelector>
+      load-projects-on-init />
 
     <v-select
       v-if="projects"
@@ -25,7 +25,7 @@
         <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
       <template v-if="props.required" #search="{ attributes, events }">
-        <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" />
+        <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
       </template>
     </v-select>
   </div>
@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { Project, ProjectSimple } from 'abrechnung-common/types.js'
-import { defineProps, PropType, ref } from 'vue'
+import { PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import ProjectsOfOrganisationSelector from './ProjectsOfOrganisationSelector.vue'

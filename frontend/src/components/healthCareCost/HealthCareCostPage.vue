@@ -24,8 +24,7 @@
           @deleted="deleteExpense"
           @cancel="resetAndHide"
           @next="() => { const next = getNext(modalObject as Expense); if (next) { showModal('edit', 'expense', next) } else { hideModal() } }"
-          @prev="() => { const prev = getPrev(modalObject as Expense); if (prev) { showModal('edit', 'expense', prev) } else { hideModal() } }">
-        </ExpenseForm>
+          @prev="() => { const prev = getPrev(modalObject as Expense); if (prev) { showModal('edit', 'expense', prev) } else { hideModal() } }" />
         <HealthCareCostForm
           v-else
           :mode="(modalMode as 'add' | 'edit')"
@@ -35,8 +34,7 @@
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
-          @edit="editHealthCareCostDetails">
-        </HealthCareCostForm>
+          @edit="editHealthCareCostDetails" />
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="healthCareCost._id">
@@ -71,21 +69,18 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          id="editHealthCareCost"
-                          v-model="isReadOnlySwitchOn" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editHealthCareCost">
-                          <span class="me-1"><i class="bi bi-lock"></i></span>
+                          <span class="me-1"
+                            ><i class="bi bi-lock"></i></span
+                          >
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" />
+                    <hr class="dropdown-divider" >
                   </li>
                 </template>
                 <li>
@@ -93,7 +88,9 @@
                     :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
                     href="#"
                     @click="showModal('edit', 'healthCareCost', healthCareCost)">
-                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-pencil"></i></span
+                    >
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.healthCareCost') }) }) }}</span>
                   </a>
                 </li>
@@ -104,7 +101,9 @@
                     "
                     href="#"
                     @click="isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? null : deleteHealthCareCost()">
-                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-trash"></i></span
+                    >
                     <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
@@ -121,7 +120,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="healthCareCost.state" :StateEnum="HealthCareCostState"></StatePipeline>
+      <StatePipeline class="mb-3" :state="healthCareCost.state" :StateEnum="HealthCareCostState" />
 
       <div class="row row justify-content-between">
         <div class="col-lg-8 col-12">
@@ -155,9 +154,7 @@
               }}
             </template>
             <template #item-cost="{ cost }: Expense">
-              <div class="text-end">
-                {{ formatter.money(cost) }}
-              </div>
+              <div class="text-end">{{ formatter.money(cost) }}</div>
             </template>
           </TableElement>
         </div>
@@ -170,7 +167,7 @@
                   <AddUpTable
                     :add-up="healthCareCost.addUp"
                     :project="healthCareCost.project"
-                    :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE"></AddUpTable>
+                    :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />
                 </table>
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
@@ -182,17 +179,17 @@
                 </div>
                 <div v-if="healthCareCost.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="comment"
                     v-model="healthCareCost.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="bookingRemark"
                     v-model="healthCareCost.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="healthCareCost.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -281,7 +278,7 @@ import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'

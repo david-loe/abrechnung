@@ -5,7 +5,6 @@ import printerSettings from 'abrechnung-common/print/printerSettings.json' with 
 import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.json' with { type: 'json' }
 import {
-  CountryCode,
   ConnectionSettings as IConnectionSettings,
   Country as ICountry,
   DisplaySettings as IDisplaySettings,

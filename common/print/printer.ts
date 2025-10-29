@@ -644,17 +644,3 @@ export class PDFDrawer<idType extends _id> {
     return y
   }
 }
-
-async function readFile(url: string) {
-  var fontBytes: ArrayBuffer | Uint8Array<ArrayBufferLike>
-  if (typeof window === 'undefined') {
-    // Node
-    const fs = await import('node:fs/promises')
-    fontBytes = await fs.readFile(url)
-  } else {
-    // Browser
-    const response = await fetch(url)
-    fontBytes = await response.arrayBuffer()
-  }
-  return fontBytes
-}

@@ -16,8 +16,7 @@
               _showForm = false
             }
           "
-          include-user-id-in-request>
-        </ApiKeyForm>
+          include-user-id-in-request />
       </ModalComponent>
     </template>
     <ListElement class="mb-3" ref="list" endpoint="admin/user" :filter="filter" :headers="headers" dbKeyPrefix="admin">
@@ -33,12 +32,12 @@
               type="text"
               class="form-control"
               v-model="(filter['name.givenName'] as any).$regex"
-              :placeholder="t('labels.givenName')" />
+              :placeholder="t('labels.givenName')" >
             <input
               type="text"
               class="form-control"
               v-model="(filter['name.familyName'] as any).$regex"
-              :placeholder="t('labels.familyName')" />
+              :placeholder="t('labels.familyName')" >
           </div>
         </div>
       </template>
@@ -51,14 +50,12 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.email" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.email as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.email as any).$regex" >
           </div>
         </div>
       </template>
 
-      <template #item-name="{ name }">
-        {{ formatter.name(name) }}
-      </template>
+      <template #item-name="{ name }">{{ formatter.name(name) }}</template>
       <template #item-projects.assigned="{ projects }">
         <span class="me-1" v-for="p in projects.assigned">{{ p.identifier }}</span>
       </template>
@@ -93,11 +90,9 @@
         ref="form$"
         @submit="(form$: any) => postUser(form$.data)"
         @reset="_showForm = false"
-        @mounted="(form$:any) => {form$.el$('fk.genApiKey').on('click', () => {($refs.modal as any).modal.show()})}"></Vueform>
+        @mounted="(form$:any) => {form$.el$('fk.genApiKey').on('click', () => {($refs.modal as any).modal.show()})}" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.user') }) }}
-    </button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.user') }) }}</button>
   </div>
 </template>
 

@@ -17,9 +17,7 @@
       <div class="fs-2 text-center">
         <i class="bi bi-file-earmark-text"></i>
       </div>
-      <div class="text-truncate text-center">
-        {{ props.file.name }}
-      </div>
+      <div class="text-truncate text-center">{{ props.file.name }}</div>
     </div>
   </div>
 </template>
@@ -27,7 +25,7 @@
 <script lang="ts" setup>
 import { DocumentFile } from 'abrechnung-common/types.js'
 
-import { defineEmits, defineProps, PropType } from 'vue'
+import { PropType } from 'vue'
 
 const props = defineProps({
   file: { type: Object as PropType<DocumentFile<string, Blob>>, required: true },

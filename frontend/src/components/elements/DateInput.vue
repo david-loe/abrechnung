@@ -8,7 +8,7 @@
     :disabled="props.disabled"
     :required="props.required"
     :min="datetimeToDatetimeString(props.min)"
-    :max="datetimeToDatetimeString(props.max)" />
+    :max="datetimeToDatetimeString(props.max)" >
   <input
     v-else
     type="date"
@@ -18,7 +18,7 @@
     :disabled="props.disabled"
     :required="props.required"
     :min="datetimeToDateString(props.min)"
-    :max="datetimeToDateString(props.max)" />
+    :max="datetimeToDateString(props.max)" >
 </template>
 
 <script lang="ts" setup>

@@ -2,28 +2,38 @@
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div class="mb-2">
       <label for="travelFormDescription" class="form-label">
-        {{ t('labels.preciseServiceDescription') }}<span class="text-danger">*</span>
+        {{ t('labels.preciseServiceDescription') }}
+        <span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required />
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
     </div>
 
     <div class="row mb-2">
       <div class="col">
-        <label for="expenseFormCost" class="form-label me-2"> {{ t('labels.cost') }}<span class="text-danger">*</span> </label>
+        <label for="expenseFormCost" class="form-label me-2">
+          {{ t('labels.cost') }}
+          <span class="text-danger">*</span>
+        </label>
         <InfoPoint :text="t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
-          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required />
-          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required >
+          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
         </div>
       </div>
       <div class="col">
-        <label for="invoiceDateInput" class="form-label">{{ t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
+        <label for="invoiceDateInput" class="form-label">
+          {{ t('labels.invoiceDate') }}
+          <span class="text-danger">*</span>
+        </label>
         <DateInput id="invoiceDateInput" v-model="formExpense.cost.date" :required="true" :disabled="disabled" :max="new Date()" />
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="expenseFormFile" class="form-label me-2">{{ t('labels.receipts') }}<span class="text-danger">*</span></label>
+      <label for="expenseFormFile" class="form-label me-2">
+        {{ t('labels.receipts') }}
+        <span class="text-danger">*</span>
+      </label>
       <InfoPoint :text="t('info.receipts')" />
       <FileUpload
         ref="fileUpload"
@@ -36,7 +46,7 @@
     </div>
 
     <div class="mb-3" v-if="useDifferentProject || formExpense.project">
-      <label for="healthCareCostFormProject" class="form-label me-2"> {{ t('labels.project') }}</label>
+      <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
       <InfoPoint :text="t('info.project')" />
       <button
         type="button"
@@ -50,15 +60,15 @@
         {{ t('labels.reset') }}
       </button>
 
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project"> </ProjectSelector>
+      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project" />
     </div>
     <div class="mb-2" v-else>
       <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
     </div>
 
     <div class="mb-3">
-      <label for="travelFormDescription" class="form-label"> {{ t('labels.note') }}</label>
-      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled"></TextArea>
+      <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
+      <CTextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled" />
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -74,9 +84,7 @@
         {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="emit('cancel')">
-        {{ t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ t('labels.cancel') }}</button>
       <div class="ms-auto">
         <button
           type="button"
@@ -99,14 +107,14 @@
 
 <script lang="ts" setup>
 import { baseCurrency, Expense } from 'abrechnung-common/types.js'
-import { defineProps, PropType, ref, useTemplateRef, watch } from 'vue'
+import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 
 const { t } = useI18n()
 

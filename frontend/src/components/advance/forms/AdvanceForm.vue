@@ -1,43 +1,54 @@
 <template>
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div v-if="askOwner" class="mb-3">
-      <label for="travelFormOwner" class="form-label"> {{ t('labels.owner') }}<span class="text-danger">*</span> </label>
-      <UserSelector v-model="formAdvance.owner" required></UserSelector>
+      <label for="travelFormOwner" class="form-label">
+        {{ t('labels.owner') }}
+        <span class="text-danger">*</span>
+      </label>
+      <UserSelector v-model="formAdvance.owner" required />
     </div>
 
     <div class="mb-2">
-      <label for="advanceFormName" class="form-label"> {{ t('labels.name') }} </label>
-      <input type="text" class="form-control" id="advanceFormName" v-model="formAdvance.name" :disabled="disabled" />
+      <label for="advanceFormName" class="form-label">{{ t('labels.name') }}</label>
+      <input type="text" class="form-control" id="advanceFormName" v-model="formAdvance.name" :disabled="disabled" >
     </div>
 
     <div class="mb-2">
-      <label for="advanceFormReason" class="form-label"> {{ t('labels.reason') }}<span class="text-danger">*</span> </label>
-      <input type="text" class="form-control" id="advanceFormReason" v-model="formAdvance.reason" :disabled="disabled" required />
+      <label for="advanceFormReason" class="form-label">
+        {{ t('labels.reason') }}
+        <span class="text-danger">*</span>
+      </label>
+      <input type="text" class="form-control" id="advanceFormReason" v-model="formAdvance.reason" :disabled="disabled" required >
     </div>
 
     <div class="mb-3">
-      <label for="advanceFormBudget" class="form-label me-2"> {{ t('labels.amount') }}<span class="text-danger">*</span> </label>
+      <label for="advanceFormBudget" class="form-label me-2">
+        {{ t('labels.amount') }}
+        <span class="text-danger">*</span>
+      </label>
       <div class="input-group" id="advanceFormBudget">
-        <input type="number" class="form-control" step="0.01" v-model="formAdvance.budget.amount" min="0" :disabled="disabled" required />
-        <CurrencySelector v-model="formAdvance.budget.currency" :disabled="disabled" :required="true"></CurrencySelector>
+        <input type="number" class="form-control" step="0.01" v-model="formAdvance.budget.amount" min="0" :disabled="disabled" required >
+        <CurrencySelector v-model="formAdvance.budget.currency" :disabled="disabled" :required="true" />
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="advanceFormProject" class="form-label me-2"> {{ t('labels.project') }}<span class="text-danger">*</span> </label>
+      <label for="advanceFormProject" class="form-label me-2">
+        {{ t('labels.project') }}
+        <span class="text-danger">*</span>
+      </label>
       <InfoPoint :text="t('info.project')" />
-      <ProjectSelector id="advanceFormProject" v-model="formAdvance.project" :update-user-org="!askOwner" :disabled="disabled" required>
-      </ProjectSelector>
+      <ProjectSelector id="advanceFormProject" v-model="formAdvance.project" :update-user-org="!askOwner" :disabled="disabled" required />
     </div>
 
     <div class="mb-3" v-if="!disabled">
-      <label class="form-label me-2"> {{ t('labels.comment') }} </label>
-      <TextArea v-model="formAdvance.comment"></TextArea>
+      <label class="form-label me-2">{{ t('labels.comment') }}</label>
+      <CTextArea v-model="formAdvance.comment" />
     </div>
 
     <div v-if="askBookingRemark" class="mb-3">
       <label for="comment" class="form-label">{{ t('labels.bookingRemark') }}</label>
-      <TextArea id="comment" v-model="formAdvance.bookingRemark" :disabled="disabled"></TextArea>
+      <CTextArea id="comment" v-model="formAdvance.bookingRemark" :disabled="disabled" />
     </div>
 
     <div class="mb-1 d-flex align-items-center">
@@ -53,9 +64,7 @@
         {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="emit('cancel')">
-        {{ t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ t('labels.cancel') }}</button>
     </div>
   </form>
 </template>
@@ -67,7 +76,7 @@ import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 
 const { t } = useI18n()

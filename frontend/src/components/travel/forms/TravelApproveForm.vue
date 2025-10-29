@@ -1,9 +1,9 @@
 <template>
   <div>
-    <TravelApply :travel="travel"></TravelApply>
+    <TravelApply :travel="travel" />
     <div class="mb-3">
       <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-      <TextArea id="comment" v-model="comment"></TextArea>
+      <CTextArea id="comment" v-model="comment" />
     </div>
     <div class="mb-2">
       <button type="submit" class="btn btn-success me-2" @click="output('approved')" :disabled="loading.approved || loading.rejected">
@@ -14,18 +14,16 @@
         <span v-if="loading.rejected" class="spinner-border spinner-border-sm"></span>
         {{ t('labels.reject') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">
-        {{ t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">{{ t('labels.cancel') }}</button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { TravelSimple } from 'abrechnung-common/types.js'
-import { defineProps, PropType, ref } from 'vue'
+import { PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 
 const { t } = useI18n()

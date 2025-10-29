@@ -12,8 +12,7 @@
           :loading="modalFormIsLoading"
           endpointPrefix="examine/"
           @cancel="resetAndHide()"
-          @add="addHealthCareCost">
-        </HealthCareCostForm>
+          @add="addHealthCareCost" />
       </div>
     </ModalComponent>
     <div class="container py-3">
@@ -33,30 +32,31 @@
         endpoint="examine/healthCareCost"
         :stateFilter="HealthCareCostState.IN_REVIEW"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'organisation', 'bookingRemark']"
-        dbKeyPrefix="examine">
-      </HealthCareCostList>
+        dbKeyPrefix="examine" />
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = HealthCareCostState.IN_WORK">
-          {{ t('labels.show') }} <StateBadge :state="HealthCareCostState.IN_WORK" :StateEnum="HealthCareCostState"></StateBadge>
+          {{ t('labels.show') }}
+          <StateBadge :state="HealthCareCostState.IN_WORK" :StateEnum="HealthCareCostState" />
           <i class="bi bi-chevron-down"></i>
         </button>
         <button type="button" class="btn btn-light" @click="show = HealthCareCostState.REVIEW_COMPLETED">
           {{ t('labels.show') }}
-          <StateBadge :state="HealthCareCostState.REVIEW_COMPLETED" :StateEnum="HealthCareCostState"></StateBadge>
+          <StateBadge :state="HealthCareCostState.REVIEW_COMPLETED" :StateEnum="HealthCareCostState" />
           <i class="bi bi-chevron-down"></i>
         </button>
       </template>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="HealthCareCostState"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }}
+          <StateBadge :state="show" :StateEnum="HealthCareCostState" />
+          <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" />
+        <hr class="hr" >
         <HealthCareCostList
           endpoint="examine/healthCareCost"
           :stateFilter="show === HealthCareCostState.IN_WORK ? show : { $gte: show }"
           :columns-to-hide="['report', 'organisation']"
-          dbKeyPrefix="examined">
-        </HealthCareCostList>
+          dbKeyPrefix="examined" />
       </template>
     </div>
   </div>

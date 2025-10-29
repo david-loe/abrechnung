@@ -17,14 +17,14 @@
       <span class="text-truncate">{{ name }}</span>
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
     </template>
   </v-select>
 </template>
 
 <script lang="ts" setup>
 import { HealthInsurance, User } from 'abrechnung-common/types.js'
-import { defineEmits, defineProps, onMounted, PropType } from 'vue'
+import { onMounted, PropType } from 'vue'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
 

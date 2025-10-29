@@ -34,10 +34,12 @@
               </div>
             </div>
             <div class="col-auto">
-              <button type="button" class="btn p-0" @click="clear()"><i class="bi bi-x-lg"></i></button>
+              <button type="button" class="btn p-0" @click="clear()">
+                <i class="bi bi-x-lg"></i>
+              </button>
             </div>
           </div>
-          <img class="border border-5 rounded border-white" :src="qrSrc" />
+          <img class="border border-5 rounded border-white" :src="qrSrc" >
         </div>
       </div>
     </div>
@@ -49,7 +51,7 @@
       @change="changeFile"
       :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile<string, Blob>>[]).length === 0"
       :multiple="multiple"
-      :disabled="disabled" />
+      :disabled="disabled" >
   </div>
 </template>
 

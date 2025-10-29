@@ -5,7 +5,9 @@
         <h2>{{ $t('accesses.book/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
+        <button class="btn btn-secondary" @click="handlePrint">
+          <i class="bi bi-printer-fill"></i>
+        </button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
@@ -31,12 +33,7 @@
       <template #expand="report">
         <div class="px-3 pb-1 border-bottom border-4">
           <div v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" class="d-inline-block">
-            <AddUpTable
-              class="table-sm"
-              :add-up="report.addUp"
-              :project="report.project"
-              :showAdvanceOverflow="false"
-              id="addUp"></AddUpTable>
+            <AddUpTable class="table-sm" :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" id="addUp" />
           </div>
           <div v-if="report.bookingRemark">
             <small style="white-space: pre-wrap">{{ report.bookingRemark }}</small>
@@ -45,14 +42,17 @@
       </template>
     </HealthCareCostList>
     <button v-if="!show" type="button" class="btn btn-light" @click="show = HealthCareCostState.BOOKED">
-      {{ t('labels.show') }} <StateBadge :state="HealthCareCostState.BOOKED" :StateEnum="HealthCareCostState"></StateBadge>
+      {{ t('labels.show') }}
+      <StateBadge :state="HealthCareCostState.BOOKED" :StateEnum="HealthCareCostState" />
       <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
       <button type="button" class="btn btn-light" @click="show = null">
-        {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="HealthCareCostState"></StateBadge> <i class="bi bi-chevron-up"></i>
+        {{ t('labels.hide') }}
+        <StateBadge :state="show" :StateEnum="HealthCareCostState" />
+        <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" />
+      <hr class="hr" >
       <HealthCareCostList
         class="mb-5"
         table-class-name="small-table"
@@ -62,8 +62,7 @@
         :stateFilter="show"
         :rows-per-page="10"
         :rows-items="[10, 20, 50]"
-        dbKeyPrefix="booked">
-      </HealthCareCostList>
+        dbKeyPrefix="booked" />
     </template>
   </div>
 </template>
@@ -143,6 +142,7 @@ const { handlePrint } = useVueToPrint({
 }
 
 .vue3-easy-data-table__body td.expand {
+  /* biome-ignore lint/complexity/noImportantStyles: needed */
   padding: 0 !important;
 }
 </style>

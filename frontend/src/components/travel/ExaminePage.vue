@@ -7,29 +7,31 @@
       endpoint="examine/travel"
       :stateFilter="TravelState.IN_REVIEW"
       :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
-      dbKeyPrefix="examine">
-    </TravelList>
+      dbKeyPrefix="examine" />
     <template v-if="!show">
       <button type="button" class="btn btn-light me-2" @click="show = TravelState.APPROVED">
-        {{ $t('labels.show') }} <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState"></StateBadge>
+        {{ $t('labels.show') }}
+        <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState" />
         <i class="bi bi-chevron-down"></i>
       </button>
       <button type="button" class="btn btn-light" @click="show = TravelState.REVIEW_COMPLETED">
-        {{ $t('labels.show') }} <StateBadge :state="TravelState.REVIEW_COMPLETED" :StateEnum="TravelState"></StateBadge>
+        {{ $t('labels.show') }}
+        <StateBadge :state="TravelState.REVIEW_COMPLETED" :StateEnum="TravelState" />
         <i class="bi bi-chevron-down"></i>
       </button>
     </template>
     <template v-else>
       <button type="button" class="btn btn-light" @click="show = null">
-        {{ $t('labels.hide') }} <StateBadge :state="show" :StateEnum="TravelState"></StateBadge> <i class="bi bi-chevron-up"></i>
+        {{ $t('labels.hide') }}
+        <StateBadge :state="show" :StateEnum="TravelState" />
+        <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" />
+      <hr class="hr" >
       <TravelList
         endpoint="examine/travel"
         :stateFilter="show === TravelState.APPROVED ? show : { $gte: show }"
         :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']"
-        dbKeyPrefix="examined">
-      </TravelList>
+        dbKeyPrefix="examined" />
     </template>
   </div>
 </template>

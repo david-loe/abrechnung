@@ -1,17 +1,22 @@
 <template>
   <div v-if="APP_DATA?.displaySettings.helpButton.enabled && hasAny" class="dropdown">
-    <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">
-      {{ t('labels.help') }}
-    </button>
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="dropdown" aria-expanded="false">{{ t('labels.help') }}</button>
     <ul class="dropdown-menu dropdown-menu-end">
       <li v-if="APP_DATA?.displaySettings.helpButton.examinersMail && examinerMails.length > 0">
-        <a class="dropdown-item" :href="mailToLinkVal"><i class="bi bi-envelope-fill me-1"></i>Mail</a>
+        <a class="dropdown-item" :href="mailToLinkVal"
+          ><i class="bi bi-envelope-fill me-1"></i>Mail</a
+        >
       </li>
       <li v-if="APP_DATA?.displaySettings.helpButton.examinersMsTeams && examinerMails.length > 0">
-        <a class="dropdown-item" :href="msTeamsToLinkVal" target="_blank"><i class="bi bi-microsoft-teams me-1"></i>Teams</a>
+        <a class="dropdown-item" :href="msTeamsToLinkVal" target="_blank"
+          ><i class="bi bi-microsoft-teams me-1"></i>Teams</a
+        >
       </li>
       <li v-for="entry of APP_DATA?.displaySettings.helpButton.customOptions">
-        <a class="dropdown-item" :href="entry.link" target="_blank"><i :class="`bi bi-${entry.icon} me-1`"></i>{{ entry.label }}</a>
+        <a class="dropdown-item" :href="entry.link" target="_blank"
+          ><i :class="`bi bi-${entry.icon} me-1`"></i>
+          {{ entry.label }}</a
+        >
       </li>
     </ul>
   </div>

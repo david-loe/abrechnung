@@ -12,25 +12,24 @@
               :advance="(modalAdvance as AdvanceSimple<string>)"
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
-              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple<string>), d, c, br)"></AdvanceApproveForm>
+              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple<string>), d, c, br)" />
             <template v-else>
-              <Advance :advance="(modalAdvance as AdvanceSimple<string>)" endpointPrefix="approve/"></Advance>
+              <Advance :advance="(modalAdvance as AdvanceSimple<string>)" endpointPrefix="approve/" />
               <template v-if="!modalAdvance.settledOn">
                 <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
                   <div class="row">
-                    <label for="amount" class="col-form-label col-auto"> {{ t('labels.amount') }}<span class="text-danger">*</span> </label>
+                    <label for="amount" class="col-form-label col-auto">
+                      {{ t('labels.amount') }}
+                      <span class="text-danger">*</span>
+                    </label>
                     <div class="col-auto">
-                      <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required />
+                      <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required >
                     </div>
                     <div class="col-auto">
                       <div class="mb-1 d-flex align-items-center">
-                        <button type="submit" class="btn btn-primary me-2" :disabled="modalFormIsLoading">
-                          {{ t('labels.offset') }}
-                        </button>
+                        <button type="submit" class="btn btn-primary me-2" :disabled="modalFormIsLoading">{{ t('labels.offset') }}</button>
                         <span v-if="modalFormIsLoading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-                        <button type="button" class="btn btn-light" @click="resetAndHide()">
-                          {{ t('labels.cancel') }}
-                        </button>
+                        <button type="button" class="btn btn-light" @click="resetAndHide()">{{ t('labels.cancel') }}</button>
                       </div>
                     </div>
                   </div>
@@ -52,8 +51,7 @@
           askOwner
           askBookingRemark
           :loading="modalFormIsLoading"
-          @add="(t) => approveAdvance(t as AdvanceSimple, 'approved')">
-        </AdvanceForm>
+          @add="(t) => approveAdvance(t as AdvanceSimple, 'approved')" />
       </div>
     </ModalComponent>
     <div class="container py-3">
@@ -75,16 +73,19 @@
         :stateFilter="AdvanceState.APPLIED_FOR"
         @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
         :columns-to-hide="['balance', 'state', 'editor', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
-        dbKeyPrefix="approve"></AdvanceList>
+        dbKeyPrefix="approve" />
       <button v-if="!show" type="button" class="btn btn-light" @click="show = AdvanceState.APPROVED">
-        {{ t('labels.show') }} <StateBadge :state="AdvanceState.APPROVED" :StateEnum="AdvanceState"></StateBadge>
+        {{ t('labels.show') }}
+        <StateBadge :state="AdvanceState.APPROVED" :StateEnum="AdvanceState" />
         <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="AdvanceState"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }}
+          <StateBadge :state="show" :StateEnum="AdvanceState" />
+          <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" />
+        <hr class="hr" >
         <AdvanceList
           ref="approvedAdvanceList"
           endpoint="approve/advance"
@@ -93,8 +94,7 @@
           @clicked="(a) => router.push(`/approve/advance/${a._id}`)"
           sort-by="log.30.on"
           sort-type="desc"
-          dbKeyPrefix="approved">
-        </AdvanceList>
+          dbKeyPrefix="approved" />
       </template>
     </div>
   </div>

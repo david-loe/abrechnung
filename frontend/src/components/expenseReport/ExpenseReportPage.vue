@@ -24,8 +24,7 @@
           @deleted="deleteExpense"
           @cancel="resetAndHide"
           @next="() => {const next = getNext(modalObject as Expense<string>); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalObject as Expense<string>); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
-        </ExpenseForm>
+          @prev="() => {const prev = getPrev(modalObject as Expense<string>); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}" />
         <ExpenseReportForm
           v-else
           :mode="modalMode"
@@ -35,8 +34,7 @@
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
-          @edit="editExpenseReportDetails">
-        </ExpenseReportForm>
+          @edit="editExpenseReportDetails" />
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="expenseReport._id">
@@ -65,7 +63,7 @@
                 v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1"
                 class="ms-2 fs-6"
                 :text="expenseReport.category.name"
-                :style="expenseReport.category.style"></Badge>
+                :style="expenseReport.category.style" />
             </div>
           </div>
           <div class="col-auto">
@@ -78,16 +76,18 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editExpenseReport">
-                          <span class="me-1"><i class="bi bi-lock"></i></span>
+                          <span class="me-1"
+                            ><i class="bi bi-lock"></i></span
+                          >
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" />
+                    <hr class="dropdown-divider" >
                   </li>
                 </template>
                 <li>
@@ -95,7 +95,9 @@
                     :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
                     href="#"
                     @click="showModal('edit', 'expenseReport', expenseReport)">
-                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-pencil"></i></span
+                    >
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
                   </a>
                 </li>
@@ -109,7 +111,9 @@
                     @click="
                       isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? null : deleteExpenseReport()
                     ">
-                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-trash"></i></span
+                    >
                     <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
@@ -126,7 +130,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState"></StatePipeline>
+      <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState" />
 
       <div class="row justify-content-between">
         <div class="col-lg-8 col-12">
@@ -172,9 +176,7 @@
               }}
             </template>
             <template #item-cost="{ cost }: Expense">
-              <div class="text-end">
-                {{ formatter.money(cost) }}
-              </div>
+              <div class="text-end">{{ formatter.money(cost) }}</div>
             </template>
             <template #item-warning="expense: Expense">
               <span v-if="!(expense as Expense)._id" class="text-warning" :title="t('labels.draft')">
@@ -187,9 +189,7 @@
               <i class="bi bi-exclamation-triangle"></i>
             </div>
             <div class="col">
-              <span>
-                {{ t('alerts.draftsWillBeLost') }}
-              </span>
+              <span> {{ t('alerts.draftsWillBeLost') }}</span>
             </div>
           </div>
         </div>
@@ -201,7 +201,7 @@
                 <AddUpTable
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
-                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE"></AddUpTable>
+                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
@@ -212,17 +212,17 @@
                 </div>
                 <div v-if="expenseReport.state <= State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="comment"
                     v-model="expenseReport.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="bookingRemark"
                     v-model="expenseReport.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="expenseReport.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -303,7 +303,7 @@ import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'

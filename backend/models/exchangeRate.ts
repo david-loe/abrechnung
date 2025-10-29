@@ -1,5 +1,4 @@
-import { baseCurrency, ExchangeRate as IExchangeRate, idDocumentToId, Money } from 'abrechnung-common/types.js'
-import axios from 'axios'
+import { ExchangeRate as IExchangeRate } from 'abrechnung-common/types.js'
 import { model, Schema } from 'mongoose'
 
 const exchangeRateSchema = () =>

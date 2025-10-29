@@ -1,13 +1,13 @@
 <template>
   <div>
     <div v-if="state === State.REJECTED">
-      <StateBadge :state="state" :StateEnum="StateEnum" class="fs-6"></StateBadge>
+      <StateBadge :state="state" :StateEnum="StateEnum" class="fs-6" />
     </div>
     <div v-else class="row align-items-center justify-content-around m-0 flex-nowrap">
       <template v-for="(value, index) of states">
         <template v-if="value !== State.REJECTED">
           <div class="col-auto p-0" :key="value">
-            <StateBadge :state="value" :StateEnum="StateEnum" :class="state === value ? 'fs-6' : 'fw-normal'"></StateBadge>
+            <StateBadge :state="value" :StateEnum="StateEnum" :class="state === value ? 'fs-6' : 'fw-normal'" />
           </div>
           <div v-if="value < State.BOOKED" class="col p-0" :key="value">
             <hr
@@ -17,7 +17,7 @@
                 ', ' +
                 APP_DATA?.displaySettings.stateColors[states[index + 1]].color +
                 '); height: 5px; border: 0px'
-              " />
+              " >
           </div>
         </template>
       </template>

@@ -2,7 +2,7 @@
   <div v-if="isValidationError(props.error)" class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>{{ t('alerts.' + props.error.name) + ':' }}</strong>
     <span v-for="e in props.error.errors">
-      <br />
+      <br >
       {{ t('alerts.' + e.message) }}
       <small>
         (

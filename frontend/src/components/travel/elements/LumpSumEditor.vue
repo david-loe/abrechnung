@@ -5,7 +5,8 @@
         <tr>
           <th class="border-0" scope="col"></th>
           <th class="border-0 p-0 pt-1" scope="col" colspan="3">
-            {{ t('labels.catering') }} <InfoPoint class="ms-1" :text="t('info.cateringRefund')" />
+            {{ t('labels.catering') }}
+            <InfoPoint class="ms-1" :text="t('info.cateringRefund')" />
           </th>
           <th class="border-0" scope="col"></th>
           <th class="border-0" scope="col"></th>
@@ -44,9 +45,7 @@
           </td>
           <td v-if="professionalShare !== null" class="py-0">
             <small>
-              <span class="d-lg-inline d-none">
-                {{ t('labels.professionalShare') + ': ' }}
-              </span>
+              <span class="d-lg-inline d-none"> {{ t('labels.professionalShare') + ': ' }}</span>
               <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
                 {{ Math.round(professionalShare * 100) + '%' }}
               </span>
@@ -57,14 +56,15 @@
       <tbody class="table-group-divider">
         <tr v-for="day of localDays">
           <th scope="row" class="text-nowrap">
-            {{ formatter.simpleDate(day.date) }} <span class="ms-1">{{ day.country.flag || '' }}</span>
+            {{ formatter.simpleDate(day.date) }}
+            <span class="ms-1">{{ day.country.flag || '' }}</span>
           </th>
           <template v-if="day.purpose === 'professional'">
             <td v-for="meal of meals" :key="meal">
-              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.cateringRefund[meal]" :disabled="disabled" />
+              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.cateringRefund[meal]" :disabled="disabled" >
             </td>
             <td>
-              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.overnightRefund" :disabled="disabled" />
+              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.overnightRefund" :disabled="disabled" >
             </td>
           </template>
           <template v-else>
@@ -72,9 +72,7 @@
           </template>
           <td>
             <select class="form-select form-select-sm" v-model="day.purpose" :disabled="disabled">
-              <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">
-                {{ t('labels.' + purpose) }}
-              </option>
+              <option v-for="purpose of ['professional', 'private']" :value="purpose" :key="purpose">{{ t('labels.' + purpose) }}</option>
             </select>
           </td>
         </tr>
@@ -87,7 +85,7 @@
         <div class="d-inline-flex flex-shrink-1 me-2">
           <select class="form-select form-select-sm" v-model="localLastPlaceOfWork" :disabled="disabled">
             <option v-for="place of lastPlaceOfWorkList" :value="place" :key="place.country._id + place.special">
-              <PlaceElement :place="place" :showPlace="false" :showSpecial="true"></PlaceElement>
+              <PlaceElement :place="place" :showPlace="false" :showSpecial="true" />
             </option>
           </select>
         </div>
@@ -95,20 +93,14 @@
       </div>
       <div class="col-auto">
         <span v-if="isCalculatingLumpSumsSum" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-        <span v-else class="text-secondary">
-          {{ formatter.money(lumpSumsSum) }}
-        </span>
+        <span v-else class="text-secondary"> {{ formatter.money(lumpSumsSum) }}</span>
       </div>
     </div>
 
     <div class="mb-1 d-flex align-items-center">
-      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
-        {{ t('labels.save') }}
-      </button>
+      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">{{ t('labels.save') }}</button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="emit('cancel')">
-        {{ $t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ $t('labels.cancel') }}</button>
     </div>
   </form>
 </template>

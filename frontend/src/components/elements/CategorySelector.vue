@@ -11,13 +11,13 @@
     :disabled="props.disabled"
     style="min-width: 160px">
     <template #option="category">
-      <Badge class="m-1" :text="category.name" :style="category.style"></Badge>
+      <Badge class="m-1" :text="category.name" :style="category.style" />
     </template>
     <template #selected-option="category">
-      <Badge :text="category.name" :style="category.style"></Badge>
+      <Badge :text="category.name" :style="category.style" />
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
     </template>
   </v-select>
 </template>

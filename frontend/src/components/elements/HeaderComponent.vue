@@ -44,6 +44,7 @@ const emits = defineEmits<{ 'update:language': [Locale] }>()
 
 <style>
 .router-link-active {
+  /* biome-ignore lint/complexity/noImportantStyles: needed */
   font-weight: bold !important;
 }
 </style>

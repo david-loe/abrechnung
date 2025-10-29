@@ -4,7 +4,7 @@
       <div class="d-flex align-items-center lh-1">
         <i class="fs-4 bi bi-receipt"></i>
         <span class="ps-2 text-secondary">
-          © {{ new Date().getFullYear() }} abrechnung
+          © {{ new Date().getFullYear() }}abrechnung
           <small v-if="props.version"
             ><a
               class="text-decoration-none link-secondary"
@@ -25,6 +25,7 @@ const props = defineProps({ version: { type: String } })
 
 <style>
 body {
+  /* biome-ignore lint/complexity/noImportantStyles: needed */
   margin-bottom: 45px !important;
   /* Margin bottom by footer height */
 }

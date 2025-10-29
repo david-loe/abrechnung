@@ -9,7 +9,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter[nameFilterKey]" @click.stop>
-            <input type="text" class="form-control" v-model="(filter[nameFilterKey] as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter[nameFilterKey] as any).$regex" >
           </div>
         </div>
       </template>
@@ -22,13 +22,11 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter._id" @click.stop>
-            <input type="text" class="form-control" v-model="(filter._id as any).$regex" style="max-width: 80px" />
+            <input type="text" class="form-control" v-model="(filter._id as any).$regex" style="max-width: 80px" >
           </div>
         </div>
       </template>
-      <template #item-name="{ name }">
-        {{ name[$i18n.locale] }}
-      </template>
+      <template #item-name="{ name }">{{ name[$i18n.locale] }}</template>
 
       <template #item-buttons="country">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(country)">
@@ -52,11 +50,9 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCountry(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @reset="_showForm = false" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.country') }) }}
-    </button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.country') }) }}</button>
   </div>
 </template>
 

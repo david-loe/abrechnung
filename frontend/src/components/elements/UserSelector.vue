@@ -17,7 +17,7 @@
       <span class="text-truncate">{{ formatter.name(name) }}</span>
     </template>
     <template v-if="required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" >
     </template>
   </v-select>
 </template>

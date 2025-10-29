@@ -38,6 +38,9 @@
       },
       "performance": {
         "noDelete": "info"
+      },
+      "complexity": {
+        "noBannedTypes": "info"
       }
     }
   },
@@ -48,7 +51,6 @@
       "trailingCommas": "none",
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
-      "bracketSameLine": false,
       "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
@@ -59,7 +61,10 @@
   },
   "html": {
     "experimentalFullSupportEnabled": true,
-    "formatter": { "enabled": true }
+    "formatter": {
+      "enabled": true,
+      "bracketSameLine": true
+    }
   },
   "json": {
     "formatter": {
@@ -77,7 +82,8 @@
           },
           "correctness": {
             "noUnusedImports": "off",
-            "noUnusedVariables": "off"
+            "noUnusedVariables": "off",
+            "noUnknownFunction": "off"
           }
         }
       }
@@ -86,7 +92,9 @@
       "includes": ["common/locales/*.json"],
       "assist": {
         "actions": {
-          "source": { "useSortedKeys": "on" }
+          "source": {
+            "useSortedKeys": "on"
+          }
         }
       }
     }

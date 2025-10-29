@@ -1,5 +1,5 @@
 <template>
-  <StatePipeline class="mb-4" :state="advance.state" :StateEnum="AdvanceState"></StatePipeline>
+  <StatePipeline class="mb-4" :state="advance.state" :StateEnum="AdvanceState" />
   <table class="table mb-2">
     <tbody>
       <tr>
@@ -13,9 +13,7 @@
       <tr>
         <th scope="row">{{ t('labels.budget') }}</th>
         <td>
-          <span>
-            {{ formatter.money(advance.budget) }}
-          </span>
+          <span> {{ formatter.money(advance.budget) }}</span>
           <span v-if="advance.budget.exchangeRate" class="text-secondary">
             &nbsp;-&nbsp;
             {{ formatter.money(advance.budget, { useExchangeRate: false }) }}
@@ -39,9 +37,7 @@
       <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
         <td>
-          <span>
-            {{ formatter.money(advance.balance) }}
-          </span>
+          <span> {{ formatter.money(advance.balance) }}</span>
         </td>
       </tr>
       <tr>

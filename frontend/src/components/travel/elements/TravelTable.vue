@@ -11,8 +11,9 @@
             v-if="(row.data as TravelDay).purpose === 'private'"
             :title="t('labels.private')"
             style="margin-left: -1.25rem; margin-right: 0.156rem">
-            <i class="bi bi-file-person"></i> </small
-          >{{ formatter.simpleDate((row.data as TravelDay).date) }}
+            <i class="bi bi-file-person"></i>
+          </small>
+          {{ formatter.simpleDate((row.data as TravelDay).date) }}
         </h5>
       </div>
       <div class="col">
@@ -56,13 +57,14 @@
         <i :class="getStageIcon(row.data as Stage)"></i>
       </div>
       <div class="col-auto text-truncate">
-        <PlaceElement :place="(row.data as Stage).startLocation"></PlaceElement>
-        <i :class="getStageIcon(row.data as Stage) + ' d-md-none'"></i>&nbsp;<i class="bi bi-arrow-right mx-2"></i>
+        <PlaceElement :place="(row.data as Stage).startLocation" />
+        <i :class="getStageIcon(row.data as Stage) + ' d-md-none me-1'"></i>
+        <i class="bi bi-arrow-right mx-2"></i>
         <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
           <i class="bi bi-coin"></i>
           {{ formatter.money((row.data as Stage).cost) }}
         </div>
-        <PlaceElement :place="(row.data as Stage).endLocation"></PlaceElement>
+        <PlaceElement :place="(row.data as Stage).endLocation" />
       </div>
       <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary d-none d-md-block">
         <i class="bi bi-coin"></i>
@@ -78,14 +80,11 @@
         <i class="bi bi-coin"></i>
       </div>
       <div class="col-auto">
-        <i class="bi bi-coin d-md-none"></i>&nbsp; {{ (row.data as TravelExpense).description }}&nbsp;
-        <div class="text-secondary d-inline d-md-none">
-          {{ formatter.money((row.data as TravelExpense).cost) }}
-        </div>
+        <i class="bi bi-coin d-md-none me-1"></i>
+        {{ (row.data as TravelExpense).description }}
+        <div class="text-secondary d-inline d-md-none ms-1">{{ formatter.money((row.data as TravelExpense).cost) }}</div>
       </div>
-      <div class="col-auto text-secondary d-none d-md-block">
-        {{ formatter.money((row.data as TravelExpense).cost) }}
-      </div>
+      <div class="col-auto text-secondary d-none d-md-block">{{ formatter.money((row.data as TravelExpense).cost) }}</div>
     </div>
     <!-- gap -->
     <div v-else-if="row.type === 'gap'" class="row ps-5">

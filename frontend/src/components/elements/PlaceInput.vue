@@ -8,12 +8,12 @@
         @input="update({ place: ($event.target as HTMLInputElement).value })"
         :placeholder="t('labels.place')"
         :disabled="disabled"
-        :required="required" />
+        :required="required" >
       <CountrySelector
         :modelValue="modelValue.country"
         @update:modelValue="(v) => update({ country: v })"
         :disabled="disabled"
-        :required="required"></CountrySelector>
+        :required="required" />
     </div>
     <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && APP_DATA?.specialLumpSums[modelValue.country._id]">
       <label class="form-label me-2">{{ t('labels.city') }}</label>

@@ -1,5 +1,5 @@
 <template>
-  <Badge :text="$t(`states.${StateEnum[state]}`)" :style="APP_DATA?.displaySettings.stateColors[state]"></Badge>
+  <Badge :text="$t(`states.${StateEnum[state]}`)" :style="APP_DATA?.displaySettings.stateColors[state]" />
 </template>
 
 <script lang="ts" setup>

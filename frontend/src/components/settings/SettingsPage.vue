@@ -30,7 +30,7 @@
             <template #default>
               <UserList class="mb-5" ref="userList" />
             </template>
-            <template #fallback> Loading.. </template>
+            <template #fallback>Loading.. </template>
           </Suspense>
 
           <h3>{{ t('labels.import') }}</h3>
@@ -60,7 +60,7 @@
             <template #default>
               <ProjectList class="mb-5" ref="projectList" />
             </template>
-            <template #fallback> Loading.. </template>
+            <template #fallback>Loading.. </template>
           </Suspense>
 
           <h3>{{ t('labels.import') }}</h3>
@@ -75,31 +75,31 @@
           <template #default>
             <OrganisationList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'categories'">
           <template #default>
             <CategoryList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'currencies'">
           <template #default>
             <CurrencyList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'healthInsurances'">
           <template #default>
             <HealthInsuranceList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
       </div>
     </div>

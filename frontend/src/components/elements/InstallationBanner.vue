@@ -14,41 +14,58 @@
           <div v-if="operationSystem === 'iOS'">
             <div v-if="browser === 'Safari'">
               <div>
-                {{ $t('installation.iosSafari.steps.one.one') }} <i class="bi bi-box-arrow-up"></i>
+                {{ $t('installation.iosSafari.steps.one.one') }}
+                <i class="bi bi-box-arrow-up"></i>
                 {{ $t('installation.iosSafari.steps.one.two') }}
               </div>
-              <div>{{ $t('installation.iosSafari.steps.two') }} <i class="bi bi-plus-square"></i></div>
+              <div>
+                {{ $t('installation.iosSafari.steps.two') }}
+                <i class="bi bi-plus-square"></i>
+              </div>
               <div>{{ $t('installation.iosSafari.steps.three') }}</div>
             </div>
             <div v-else-if="browser === 'Chrome'">
               <div>
-                {{ $t('installation.iosChrome.steps.one.one') }} <i class="bi bi-box-arrow-up"></i>
+                {{ $t('installation.iosChrome.steps.one.one') }}
+                <i class="bi bi-box-arrow-up"></i>
                 {{ $t('installation.iosChrome.steps.one.two') }}
               </div>
-              <div>{{ $t('installation.iosChrome.steps.two') }} <i class="bi bi-plus-square"></i></div>
+              <div>
+                {{ $t('installation.iosChrome.steps.two') }}
+                <i class="bi bi-plus-square"></i>
+              </div>
               <div>{{ $t('installation.iosChrome.steps.three') }}</div>
             </div>
             <div v-else-if="browser === 'Firefox'">
               <div>
-                {{ $t('installation.iosFirefox.steps.one.one') }} <i class="bi bi-list"></i>
+                {{ $t('installation.iosFirefox.steps.one.one') }}
+                <i class="bi bi-list"></i>
                 {{ $t('installation.iosFirefox.steps.one.two') }}
               </div>
-              <div>{{ $t('installation.iosFirefox.steps.two') }} <i class="bi bi-box-arrow-up"></i></div>
-              <div>{{ $t('installation.iosFirefox.steps.three') }} <i class="bi bi-plus-square"></i></div>
+              <div>
+                {{ $t('installation.iosFirefox.steps.two') }}
+                <i class="bi bi-box-arrow-up"></i>
+              </div>
+              <div>
+                {{ $t('installation.iosFirefox.steps.three') }}
+                <i class="bi bi-plus-square"></i>
+              </div>
               <div>{{ $t('installation.iosFirefox.steps.four') }}</div>
             </div>
           </div>
           <div v-else-if="operationSystem === 'Android'">
             <div v-if="browser === 'SamsungInternet'">
               <div>
-                {{ $t('installation.AndroidSamsung.steps.one.one') }} <i class="bi bi-arrow-down-square"></i>
+                {{ $t('installation.AndroidSamsung.steps.one.one') }}
+                <i class="bi bi-arrow-down-square"></i>
                 {{ $t('installation.AndroidSamsung.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidSamsung.steps.two') }}</div>
             </div>
             <div v-else-if="browser === 'Chrome'">
               <div>
-                {{ $t('installation.AndroidChrome.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i>
+                {{ $t('installation.AndroidChrome.steps.one.one') }}
+                <i class="bi bi-three-dots-vertical"></i>
                 {{ $t('installation.AndroidChrome.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidChrome.steps.two') }}</div>
@@ -56,7 +73,8 @@
             </div>
             <div v-else-if="browser === 'Firefox'">
               <div>
-                {{ $t('installation.AndroidFirefox.steps.one.one') }} <i class="bi bi-three-dots-vertical"></i>
+                {{ $t('installation.AndroidFirefox.steps.one.one') }}
+                <i class="bi bi-three-dots-vertical"></i>
                 {{ $t('installation.AndroidFirefox.steps.one.two') }}
               </div>
               <div>{{ $t('installation.AndroidFirefox.steps.two') }}</div>
@@ -64,17 +82,13 @@
             </div>
           </div>
           <div v-else>
-            <div>
-              {{ $t('installation.default.steps.one') }}
-            </div>
+            <div>{{ $t('installation.default.steps.one') }}</div>
             <div>{{ $t('installation.default.steps.two') }}</div>
           </div>
         </div>
       </div>
       <div id="installationFooter" class="mt-auto" style="bottom: 0px">
-        <button type="button" class="btn btn-primary m-1" @click="install()">
-          {{ $t('labels.install') }}
-        </button>
+        <button type="button" class="btn btn-primary m-1" @click="install()">{{ $t('labels.install') }}</button>
         <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ $t('labels.dontShowAgain') }}</button>
       </div>
     </div>

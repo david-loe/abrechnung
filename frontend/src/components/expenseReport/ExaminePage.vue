@@ -11,8 +11,7 @@
         :loading="modalFormIsLoading"
         endpointPrefix="examine/"
         @cancel="resetAndHide()"
-        @add="addExpenseReport">
-      </ExpenseReportForm>
+        @add="addExpenseReport" />
     </ModalComponent>
     <div class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
@@ -31,29 +30,31 @@
         endpoint="examine/expenseReport"
         :stateFilter="ExpenseReportState.IN_REVIEW"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']"
-        dbKeyPrefix="examine">
-      </ExpenseReportList>
+        dbKeyPrefix="examine" />
       <template v-if="!show">
         <button type="button" class="btn btn-light me-2" @click="show = ExpenseReportState.IN_WORK">
-          {{ t('labels.show') }} <StateBadge :state="ExpenseReportState.IN_WORK" :StateEnum="ExpenseReportState"> </StateBadge>
+          {{ t('labels.show') }}
+          <StateBadge :state="ExpenseReportState.IN_WORK" :StateEnum="ExpenseReportState" />
           <i class="bi bi-chevron-down"></i>
         </button>
         <button type="button" class="btn btn-light" @click="show = ExpenseReportState.REVIEW_COMPLETED">
-          {{ t('labels.show') }} <StateBadge :state="ExpenseReportState.REVIEW_COMPLETED" :StateEnum="ExpenseReportState"></StateBadge>
+          {{ t('labels.show') }}
+          <StateBadge :state="ExpenseReportState.REVIEW_COMPLETED" :StateEnum="ExpenseReportState" />
           <i class="bi bi-chevron-down"></i>
         </button>
       </template>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="ExpenseReportState"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }}
+          <StateBadge :state="show" :StateEnum="ExpenseReportState" />
+          <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" />
+        <hr class="hr" >
         <ExpenseReportList
           endpoint="examine/expenseReport"
           :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
           :columns-to-hide="['report', 'addUp.totalTotal', 'organisation']"
-          dbKeyPrefix="examined">
-        </ExpenseReportList>
+          dbKeyPrefix="examined" />
       </template>
     </div>
   </div>

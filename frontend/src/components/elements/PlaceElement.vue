@@ -1,14 +1,16 @@
 <template>
   <div>
-    <span v-if="props.showPlace && props.place.place">{{ props.place.place }}&nbsp;&nbsp;</span
-    ><span v-if="props.showCountry" :title="props.place.country.name[$i18n.locale as Locale]">{{ props.place.country.flag }}</span
+    <span v-if="props.showPlace && props.place.place">{{ props.place.place }}&nbsp;&nbsp;</span><span
+      v-if="props.showCountry"
+      :title="props.place.country.name[$i18n.locale as Locale]"
+      >{{ props.place.country.flag }}</span
     ><span v-if="props.showSpecial && props.place.special">&nbsp;{{ '(' + props.place.special + ')' }}</span>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Locale, Place } from 'abrechnung-common/types.js'
-import { defineProps, PropType } from 'vue'
+import { PropType } from 'vue'
 
 const props = defineProps({
   place: { type: Object as PropType<Omit<Place, 'place'> & { place?: string }>, required: true },

@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue'
 import TooltipElement from './TooltipElement.vue'
 
 const props = defineProps({ text: { type: String, required: true } })

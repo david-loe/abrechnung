@@ -15,7 +15,7 @@
 </template>
 <script lang="ts" setup>
 import { Modal } from 'bootstrap'
-import { defineEmits, defineProps, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
 const emit = defineEmits<{ afterClose: [] }>()
 const modalObj = ref(null as Modal | null)

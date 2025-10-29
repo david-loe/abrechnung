@@ -30,16 +30,22 @@
           ">
           <div class="row mb-4 align-items-end">
             <div class="col-auto">
-              <label for="fromDateInput" class="form-label">{{ $t('labels.from') }}<span class="text-danger">*</span></label>
+              <label for="fromDateInput" class="form-label">
+                {{ $t('labels.from') }}
+                <span class="text-danger">*</span>
+              </label>
               <DateInput id="fromDateInput" v-model="approvedTravelsReportForm.from" :required="true" />
             </div>
             <div class="col-auto">
-              <label for="toDateInput" class="form-label">{{ $t('labels.to') }}<span class="text-danger">*</span></label>
+              <label for="toDateInput" class="form-label">
+                {{ $t('labels.to') }}
+                <span class="text-danger">*</span>
+              </label>
               <DateInput id="toDateInput" v-model="approvedTravelsReportForm.to" :required="true" :min="approvedTravelsReportForm.from" />
             </div>
             <div v-if="APP_DATA && APP_DATA.organisations.length > 1" class="col-auto">
               <label for="organisationInput" class="form-label">{{ $t('labels.organisation') }}</label>
-              <OrganisationSelector id="organisationInput" v-model="approvedTravelsReportForm.organisation"></OrganisationSelector>
+              <OrganisationSelector id="organisationInput" v-model="approvedTravelsReportForm.organisation" />
             </div>
           </div>
 
@@ -56,8 +62,8 @@
           :travel="(modalTravel as TravelSimple)"
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
-          @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)"></TravelApproveForm>
-        <TravelApply v-else-if="modalTravel.state === TravelState.APPROVED" :travel="(modalTravel as TravelSimple)"></TravelApply>
+          @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)" />
+        <TravelApply v-else-if="modalTravel.state === TravelState.APPROVED" :travel="(modalTravel as TravelSimple)" />
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
@@ -67,8 +73,7 @@
           :loading="modalFormIsLoading"
           endpoint-prefix="examine/"
           @cancel="resetAndHide()"
-          @add="(t) => approveTravel(t, 'approved')">
-        </TravelApplyForm>
+          @add="(t) => approveTravel(t, 'approved')" />
       </div>
     </ModalComponent>
     <div class="container py-3">
@@ -98,26 +103,28 @@
           'organisation',
           'bookingRemark'
         ]"
-        dbKeyPrefix="approve"></TravelList>
+        dbKeyPrefix="approve" />
       <button v-if="!show" type="button" class="btn btn-light" @click="show = TravelState.APPROVED">
-        {{ t('labels.show') }} <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState"></StateBadge>
+        {{ t('labels.show') }}
+        <StateBadge :state="TravelState.APPROVED" :StateEnum="TravelState" />
         <i class="bi bi-chevron-down"></i>
       </button>
       <template v-else>
         <button type="button" class="btn btn-light" @click="show = null">
-          {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="TravelState"></StateBadge> <i class="bi bi-chevron-up"></i>
+          {{ t('labels.hide') }}
+          <StateBadge :state="show" :StateEnum="TravelState" />
+          <i class="bi bi-chevron-up"></i>
         </button>
         <button type="button" class="btn btn-light ms-4" @click="showModal('approvedTravels')">
           <i class="bi bi-file-earmark-pdf"></i>
           <span class="ms-1">{{ t('labels.approvedTravelReport') }}</span>
         </button>
-        <hr class="hr" />
+        <hr class="hr" >
         <TravelList
           endpoint="approve/travel"
           :stateFilter="show"
           :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark']"
-          dbKeyPrefix="approved">
-        </TravelList>
+          dbKeyPrefix="approved" />
       </template>
     </div>
   </div>

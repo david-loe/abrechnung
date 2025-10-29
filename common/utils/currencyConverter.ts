@@ -1,7 +1,7 @@
 import { baseCurrency, idDocumentToId, Money } from '../types.js'
 
 const exchangeRateSources = ['InforEuro'] as const
-type ExchangeRateSource = (typeof exchangeRateSources)[number]
+type _ExchangeRateSource = (typeof exchangeRateSources)[number]
 
 export type InforEuroResponse = Array<{
   country: string

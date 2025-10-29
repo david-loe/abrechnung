@@ -12,9 +12,7 @@
     style="min-width: 160px">
     <template #option="{ name, budget, balance, project }">
       <div class="row align-items-center">
-        <div class="col text-truncate">
-          {{ `${name} [${project.identifier}]` }}
-        </div>
+        <div class="col text-truncate">{{ `${name} [${project.identifier}]` }}</div>
         <div class="col-auto px-1">
           <span>{{ formatter.money(balance) }}</span>
         </div>
@@ -25,16 +23,14 @@
     </template>
     <template #selected-option="{ name, balance, project }">
       <div class="row align-items-center">
-        <div class="col-auto text-truncate" style="max-width: 220px">
-          {{ `${name} [${project.identifier}]` }}
-        </div>
+        <div class="col-auto text-truncate" style="max-width: 220px">{{ `${name} [${project.identifier}]` }}</div>
         <div class="col-auto opacity-75">
           <span>{{ formatter.money(balance) }}</span>
         </div>
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" >
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>

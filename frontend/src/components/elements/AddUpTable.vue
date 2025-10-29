@@ -4,14 +4,14 @@
       <tr v-if="progress !== undefined">
         <th>{{ t('labels.progress') }}</th>
         <td class="text-end">
-          <ProgressCircle :progress="progress"></ProgressCircle>
+          <ProgressCircle :progress="progress" />
         </td>
       </tr>
       <tr v-for="row of addUpTableData">
         <th>
           {{ t(row[0]) }}
           <small class="fw-normal" v-if="row[0] === 'labels.lumpSums' && claimSpouseRefund">
-            <br />
+            <br >
             {{ t('labels.includingSpouseRefund') }}
           </small>
         </th>
@@ -19,7 +19,7 @@
           <td v-if="index !== 0" class="text-end">
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
-              <br />
+              <br >
               {{ `(${formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
             </small>
           </td>

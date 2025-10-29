@@ -28,7 +28,7 @@
       </div>
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" />
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
     </template>
   </v-select>
 </template>

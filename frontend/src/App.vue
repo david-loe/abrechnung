@@ -1,8 +1,7 @@
 <template>
-  <OfflineBanner ref="offlineBanner"></OfflineBanner>
+  <OfflineBanner ref="offlineBanner" />
   <ModalComponent v-if="APP_DATA" header="API Key" ref="modalComp" @afterClose=";($refs.apiKeyForm as any).resetForm()">
-    <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm">
-    </ApiKeyForm>
+    <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.modalComp as any).hideModal()" ref="apiKeyForm" />
   </ModalComponent>
   <HeaderComponent :language="APP_LOGIN_DATA?.language" @update:language="updateLanguage">
     <template v-if="APP_DATA">
@@ -30,7 +29,7 @@
           </li>
           <template v-if="isMobile && !alreadyInstalled && !offlineBannerRef?.isOffline">
             <li>
-              <hr class="dropdown-divider" />
+              <hr class="dropdown-divider" >
             </li>
             <li>
               <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
@@ -40,7 +39,7 @@
             </li>
           </template>
           <li>
-            <hr class="dropdown-divider" />
+            <hr class="dropdown-divider" >
           </li>
           <li>
             <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
@@ -78,7 +77,7 @@
           <template #default>
             <component :is="Component"></component>
           </template>
-          <template #fallback> </template>
+          <template #fallback></template>
         </Suspense>
       </template>
     </router-view>
@@ -88,9 +87,9 @@
     <template #default>
       <InstallationBanner
         ref="installBanner"
-        v-if="loadState === 'LOADED' && APP_DATA?.user && !offlineBannerRef?.isOffline && !alreadyInstalled"></InstallationBanner>
+        v-if="loadState === 'LOADED' && APP_DATA?.user && !offlineBannerRef?.isOffline && !alreadyInstalled" />
     </template>
-    <template #fallback> Loading.. </template>
+    <template #fallback>Loading.. </template>
   </Suspense>
 </template>
 

@@ -7,9 +7,7 @@
     :disabled="disabled"
     :required="required"
     @update:modelValue="(o) => getProjects(o._id)">
-    <option v-for="organisation in APP_DATA.organisations" :value="organisation" :key="organisation._id">
-      {{ organisation.name }}
-    </option>
+    <option v-for="organisation in APP_DATA.organisations" :value="organisation" :key="organisation._id">{{ organisation.name }}</option>
   </OrganisationSelector>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <div v-if="props.travel._id">
-    <StatePipeline class="mb-3" :state="props.travel.state" :StateEnum="TravelState"></StatePipeline>
+    <StatePipeline class="mb-3" :state="props.travel.state" :StateEnum="TravelState" />
     <table class="table">
       <tbody>
         <tr v-for="key of keys" :key="key">
@@ -12,7 +12,7 @@
         <tr>
           <th>{{ $t('labels.destinationPlace') }}</th>
           <td>
-            <PlaceElement :place="props.travel.destinationPlace"></PlaceElement>
+            <PlaceElement :place="props.travel.destinationPlace" />
           </td>
         </tr>
       </tbody>
@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { TravelSimple, TravelState } from 'abrechnung-common/types.js'
 import { getDiffInDays } from 'abrechnung-common/utils/scripts.js'
-import { defineProps, PropType } from 'vue'
+import { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'

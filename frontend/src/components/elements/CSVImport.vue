@@ -1,6 +1,6 @@
 <template>
   <div class="d-inline-flex flex-column align-items-center">
-    <input ref="fileInput" class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" style="display: none" />
+    <input ref="fileInput" class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" style="display: none" >
 
     <button :class="`btn btn-${buttonStyle}`" @click="triggerFileDialog">{{ t('labels.csvImport') }}</button>
 

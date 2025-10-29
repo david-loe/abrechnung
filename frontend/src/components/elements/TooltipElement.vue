@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import { Tooltip } from 'bootstrap'
-import { defineProps, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 const props = defineProps({ text: { type: String, default: '' }, html: { type: Boolean, default: false } })
 const tooltipInstance = ref(null as Tooltip | null)

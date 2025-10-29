@@ -3,27 +3,28 @@
     <div class="row align-items-center">
       <div class="col">
         <label>{{ t('labels.user') }}</label>
-        <UserSelector v-model="user" required></UserSelector>
+        <UserSelector v-model="user" required />
       </div>
       <div class="col-auto">
         <i class="bi bi-chevron-double-right fs-2"></i>
       </div>
       <div class="col">
         <label>{{ t('labels.userToOverwrite') }}</label>
-        <UserSelector @update:model-value="(u) => (userIdToOverwrite = idDocumentToId(u))"></UserSelector>
+        <UserSelector @update:model-value="(u) => (userIdToOverwrite = idDocumentToId(u))" />
         <input
           class="form-control form-control-sm"
           type="text"
           v-model="userIdToOverwrite"
           placeholder="User ID"
           :pattern="objectIdRegex.source"
-          required />
+          required >
         <div class="form-check mt-2">
-          <input class="form-check-input" type="checkbox" v-model="delOverwritten" id="delOverwritten" />
+          <input class="form-check-input" type="checkbox" v-model="delOverwritten" id="delOverwritten" >
 
-          <label class="form-check-label" for="delOverwritten"
-            ><i class="bi bi-trash me-1 text-danger"></i>{{ t('labels.delOverwritten') }}</label
-          >
+          <label class="form-check-label" for="delOverwritten">
+            <i class="bi bi-trash me-1 text-danger"></i>
+            {{ t('labels.delOverwritten') }}
+          </label>
         </div>
       </div>
     </div>
@@ -33,17 +34,26 @@
       <span class="ms-3">
         <span v-for="(obj, collection) of mergeResult.replacedReferences" class="me-4">
           <strong class="me-1">{{ collection }}:</strong>
-          <span class="me-3"><i class="bi bi-search"></i> {{ obj?.matchedCount }}</span>
-          <span><i class="bi bi-pencil"></i> {{ obj?.modifiedCount }}</span>
+          <span class="me-3"
+            ><i class="bi bi-search"></i>
+            {{ obj?.matchedCount }}</span
+          >
+          <span
+            ><i class="bi bi-pencil"></i>
+            {{ obj?.modifiedCount }}</span
+          >
         </span>
-        <br />
+        <br >
         <span v-if="mergeResult.deleteResult && mergeResult.deleteResult.deletedCount === 1">
           <i class="bi bi-person-x fs-4"></i>
           {{ t('alerts.successDeleting') }}
         </span>
-        <br />
+        <br >
         <strong>
-          <a href="/admin"><i class="bi bi-arrow-clockwise me-1"></i>{{ t('alerts.reloadRequired') }}</a>
+          <a href="/admin"
+            ><i class="bi bi-arrow-clockwise me-1"></i>
+            {{ t('alerts.reloadRequired') }}</a
+          >
         </strong>
       </span>
       <button type="button" class="btn-close ms-auto" @click="mergeResult = null"></button>

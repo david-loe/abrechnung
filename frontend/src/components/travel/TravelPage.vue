@@ -9,7 +9,7 @@
       "
       @afterClose="modalMode === 'edit' ? resetModal() : null">
       <div v-if="travel._id">
-        <ErrorBanner :error="error"></ErrorBanner>
+        <ErrorBanner :error="error" />
         <StageForm
           v-if="modalObjectType === 'stage'"
           :mode="modalMode"
@@ -32,8 +32,7 @@
           @cancel="resetAndHide"
           @update:vehicleRegistration="postVehicleRegistration"
           @next="() => {const next = tableRef?.getNext((modalObject as Stage), 'stage'); if(next){showModal('edit', next.type, next.data)}else{hideModal()}}"
-          @prev="() => {const prev = tableRef?.getPrev((modalObject as Stage), 'stage'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}">
-        </StageForm>
+          @prev="() => {const prev = tableRef?.getPrev((modalObject as Stage), 'stage'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}" />
         <ExpenseForm
           v-else-if="modalObjectType === 'expense'"
           :expense="(modalObject as Partial<TravelExpense<string>> | undefined)"
@@ -49,8 +48,7 @@
           @deleted="deleteExpense"
           @cancel="resetAndHide"
           @next="() => {const next = tableRef?.getNext((modalObject as TravelExpense), 'expense'); if(next){showModal('edit', next.type, next.data)}else{hideModal()}}"
-          @prev="() => {const prev = tableRef?.getPrev((modalObject as TravelExpense), 'expense'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}">
-        </ExpenseForm>
+          @prev="() => {const prev = tableRef?.getPrev((modalObject as TravelExpense), 'expense'); if(prev){showModal('edit', prev.type, prev.data)}else{hideModal()}}" />
         <TravelApplyForm
           v-else-if="modalObjectType === 'travel'"
           :mode="modalMode"
@@ -62,8 +60,7 @@
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"
-          @edit="editTravelDetails">
-        </TravelApplyForm>
+          @edit="editTravelDetails" />
         <LumpSumEditor
           v-else-if="modalObjectType === 'lumpSums'"
           :travel="travel"
@@ -72,7 +69,7 @@
           :travelSettings="APP_DATA.travelSettings"
           :travelCalculator="APP_DATA.travelCalculator"
           @save="postLumpSums"
-          @cancel="resetAndHide"></LumpSumEditor>
+          @cancel="resetAndHide" />
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="travel._id">
@@ -98,9 +95,7 @@
             <h2 class="m-0">{{ travel.name }}</h2>
           </div>
           <div class="col">
-            <h4 class="text-secondary m-0">
-              {{ formatter.simpleDate(travel.startDate) + ' - ' + formatter.simpleDate(travel.endDate) }}
-            </h4>
+            <h4 class="text-secondary m-0">{{ formatter.simpleDate(travel.startDate) + ' - ' + formatter.simpleDate(travel.endDate) }}</h4>
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -112,21 +107,25 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnlySwitchOn" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editTravel">
-                          <span class="me-1"><i class="bi bi-lock"></i></span>
+                          <span class="me-1"
+                            ><i class="bi bi-lock"></i></span
+                          >
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" />
+                    <hr class="dropdown-divider" >
                   </li>
                 </template>
                 <li>
                   <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', 'travel', travel)">
-                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-pencil"></i></span
+                    >
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
                   </a>
                 </li>
@@ -137,7 +136,9 @@
                     "
                     href="#"
                     @click="isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? null : deleteTravel()">
-                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-trash"></i></span
+                    >
                     <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
@@ -154,7 +155,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="travel.state" :StateEnum="TravelState"></StatePipeline>
+      <StatePipeline class="mb-3" :state="travel.state" :StateEnum="TravelState" />
 
       <div class="row row justify-content-between">
         <div class="col-lg-auto col-12">
@@ -184,9 +185,7 @@
             </div>
           </div>
 
-          <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">
-            {{ t('alerts.noData.stage') }}
-          </div>
+          <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">{{ t('alerts.noData.stage') }}</div>
           <TravelTable :travel="travel" ref="table" @showModal="showModal" />
         </div>
 
@@ -201,7 +200,7 @@
                   :progress="travel.progress"
                   :project="travel.project"
                   withLumpSums
-                  :showAdvanceOverflow="travel.state < State.BOOKABLE"></AddUpTable>
+                  :showAdvanceOverflow="travel.state < State.BOOKABLE" />
                 <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of travel.comments" :key="comment._id">
@@ -212,17 +211,17 @@
                 </div>
                 <div v-if="travel.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="comment"
                     v-model="travel.comment"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="bookingRemark"
                     v-model="travel.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && travel.state === State.IN_REVIEW)" />
                 </div>
                 <template v-if="travel.state < State.BOOKABLE">
                   <div v-if="travel.state === TravelState.APPROVED">
@@ -308,7 +307,7 @@ import ErrorBanner, { RequestError } from '@/components/elements/ErrorBanner.vue
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import LumpSumEditor from '@/components/travel//elements/LumpSumEditor.vue'
 import TravelTable from '@/components/travel//elements/TravelTable.vue'

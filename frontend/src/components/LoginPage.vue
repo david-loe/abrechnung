@@ -13,7 +13,7 @@
             name="usernameLDAP"
             placeholder=""
             v-model="usernameLDAP"
-            required />
+            required >
           <label for="usernameLDAP">{{ $t('labels.username') }}</label>
         </div>
         <div class="form-floating">
@@ -25,7 +25,7 @@
             placeholder=""
             autocomplete="currentPassword"
             v-model="passwordLDAP"
-            required />
+            required >
           <label for="passwordLDAP">{{ $t('labels.password') }}</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
@@ -45,7 +45,7 @@
             name="magicLoginMail"
             placeholder=""
             v-model="magicLoginMail"
-            required />
+            required >
           <label for="magicLoginMail">E-Mail</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
@@ -173,13 +173,13 @@ const LOGIN_APP_DATA = await APP_LOADER.loadLoginData()
   z-index: 2;
 }
 
-.form-signin input[type='usernameLDAP'] {
+.form-signin input[type="usernameLDAP"] {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.form-signin input[type='passwordLDAP'] {
+.form-signin input[type="passwordLDAP"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;

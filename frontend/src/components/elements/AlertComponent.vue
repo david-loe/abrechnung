@@ -10,7 +10,8 @@
         <strong>
           <i v-if="alert.type === 'danger'" class="bi bi-x-octagon-fill"></i>
           <i v-else-if="alert.type === 'success'" class="bi bi-check-circle-fill"></i>
-          {{ alert.title }}{{ alert.title && alert.message ? ': ' : '' }}
+          {{ alert.title }}
+          {{ alert.title && alert.message ? ': ' : '' }}
         </strong>
         {{ alert.message }}
         <div class="progress position-absolute top-0 end-0" style="height: 5px; width: 100%">
