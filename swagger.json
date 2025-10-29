@@ -7415,9 +7415,9 @@
 			"FontName": {
 				"type": "string",
 				"enum": [
-					"NotoSans"
-				],
-				"nullable": false
+					"NotoSans",
+					"Inter"
+				]
 			},
 			"PrinterSettings__id_": {
 				"properties": {
@@ -7667,9 +7667,9 @@
 					"fontName": {
 						"type": "string",
 						"enum": [
-							"NotoSans"
-						],
-						"nullable": false
+							"NotoSans",
+							"Inter"
+						]
 					},
 					"_id": {
 						"anyOf": [
@@ -16187,6 +16187,47 @@
 					{
 						"httpBearer": [
 							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/printerSettings": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/PrinterSettings__id_"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Printer Settings"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
 						]
 					}
 				],
