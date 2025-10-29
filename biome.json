@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -38,6 +38,9 @@
       },
       "performance": {
         "noDelete": "info"
+      },
+      "complexity": {
+        "noBannedTypes": "info"
       }
     }
   },
@@ -48,13 +51,19 @@
       "trailingCommas": "none",
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
-      "bracketSameLine": false,
       "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
     },
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "enabled": true,
+      "bracketSameLine": true
     }
   },
   "json": {
@@ -73,7 +82,8 @@
           },
           "correctness": {
             "noUnusedImports": "off",
-            "noUnusedVariables": "off"
+            "noUnusedVariables": "off",
+            "noUnknownFunction": "off"
           }
         }
       }
@@ -82,7 +92,9 @@
       "includes": ["common/locales/*.json"],
       "assist": {
         "actions": {
-          "source": { "useSortedKeys": "on" }
+          "source": {
+            "useSortedKeys": "on"
+          }
         }
       }
     }

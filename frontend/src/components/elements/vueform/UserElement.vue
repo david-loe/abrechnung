@@ -56,23 +56,21 @@
 
         <template v-slot:multiplelabel="{ values }">
           <span class="ms-2 mt-1 me-auto">
-            <span v-for="value of values" class="me-3">
-              {{ displayName(value.name) }}
-            </span>
+            <span v-for="value of values" class="me-3"> {{ displayName(value.name) }}</span>
           </span>
         </template>
 
         <template v-slot:option="{ option }">
-          <div>
-            {{ displayName(option.name) }}
-          </div>
+          <div>{{ displayName(option.name) }}</div>
         </template>
       </Multiselect>
     </template>
 
     <!-- Default element slots -->
     <template v-for="(component, slot) in elementSlots" #[slot]>
-      <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
+      <slot :name="slot" :el$="el$">
+        <component :is="component" :el$="el$" />
+      </slot>
     </template>
   </component>
 </template>
@@ -82,7 +80,7 @@ import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
 import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 
 export default defineElement({

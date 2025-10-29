@@ -4,14 +4,14 @@
       <tr v-if="progress !== undefined">
         <th>{{ t('labels.progress') }}</th>
         <td class="text-end">
-          <ProgressCircle :progress="progress"></ProgressCircle>
+          <ProgressCircle :progress="progress" />
         </td>
       </tr>
       <tr v-for="row of addUpTableData">
         <th>
           {{ t(row[0]) }}
           <small class="fw-normal" v-if="row[0] === 'labels.lumpSums' && claimSpouseRefund">
-            <br />
+            <br >
             {{ t('labels.includingSpouseRefund') }}
           </small>
         </th>
@@ -19,7 +19,7 @@
           <td v-if="index !== 0" class="text-end">
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
-              <br />
+              <br >
               {{ `(${formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
             </small>
           </td>
@@ -46,8 +46,8 @@ import { AddUp, Project } from 'abrechnung-common/types.js'
 import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ProgressCircle from '@/components/elements/ProgressCircle.vue'
-import { formatter } from '@/formatter.js'
+import { formatter } from '../../formatter.js'
+import ProgressCircle from './ProgressCircle.vue'
 
 const { t } = useI18n()
 
@@ -57,8 +57,9 @@ const props = defineProps({
   claimSpouseRefund: { type: Boolean as PropType<boolean | null | undefined>, default: false },
   progress: { type: Number },
   project: { type: Object as PropType<Project>, required: true },
-  showAdvanceOverflow: { type: Boolean, default: true }
+  showAdvanceOverflow: { type: Boolean, default: true },
+  withLumpSums: { type: Boolean, default: false }
 })
 
-const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.progress !== undefined))
+const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.withLumpSums))
 </script>

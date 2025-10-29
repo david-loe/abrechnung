@@ -11,10 +11,9 @@ import {
 } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { travelCalculator } from '../factory.js'
+import { currencyConverter, travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
-import { addExchangeRate } from './exchangeRate.js'
 import {
   addToProjectBalance,
   costObject,
@@ -192,10 +191,10 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
 schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   const promiseList = []
   for (const stage of this.stages) {
-    promiseList.push(addExchangeRate(stage.cost, stage.cost.date))
+    promiseList.push(currencyConverter.addExchangeRate(stage.cost, stage.cost.date))
   }
   for (const expense of this.expenses) {
-    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
+    promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
   }
   await Promise.allSettled(promiseList)
 }

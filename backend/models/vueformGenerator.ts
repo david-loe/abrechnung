@@ -91,7 +91,7 @@ function mapSchemaTypeToVueformElement(
       const items: any = {}
       for (const value of schemaType.enum) {
         if (value) {
-          items[value] = translate(`labels.${value}`, language)
+          items[value] = translate(`${schemaType.translationPrefix ?? 'labels.'}${value}`, language)
         }
       }
       vueformElement.items = items

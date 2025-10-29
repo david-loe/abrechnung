@@ -119,7 +119,7 @@ export class UsersController extends Controller {
   public async getNamesAndProjects(@Queries() query: GetterQuery<IUser>) {
     return await this.getter(User, {
       query,
-      projection: { name: 1, projects: 1 },
+      projection: { name: 1, projects: 1, email: 1 },
       filter: { 'fk.magiclogin': { $ne: tokenAdminUser.fk.magiclogin } }
     })
   }

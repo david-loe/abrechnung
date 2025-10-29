@@ -79,7 +79,9 @@
 
     <!-- Default element slots -->
     <template v-for="(component, slot) in elementSlots" #[slot]>
-      <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
+      <slot :name="slot" :el$="el$">
+        <component :is="component" :el$="el$" />
+      </slot>
     </template>
   </component>
 </template>
@@ -89,7 +91,7 @@ import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
 import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/vueform'
 import { ref } from 'vue'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
 
 export default defineElement({
   ...SelectElement, // adding props, mixins, emits

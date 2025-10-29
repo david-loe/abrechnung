@@ -1,8 +1,6 @@
 <template>
-  <span v-if="style" :class="'badge text-' + style.text" :style="'background-color: ' + style.color + ';'">{{ text }} </span>
-  <span v-else class="badge text">
-    {{ text }}
-  </span>
+  <span v-if="style" :class="'badge text-' + style.text" :style="'background-color: ' + style.color + ';'">{{ text }}</span>
+  <span v-else class="badge text"> {{ text }}</span>
 </template>
 
 <script setup lang="ts">

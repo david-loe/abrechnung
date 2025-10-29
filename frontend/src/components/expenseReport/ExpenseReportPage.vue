@@ -17,26 +17,24 @@
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => {const next = getNext(modalObject as Expense); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
-          @prev="() => {const prev = getPrev(modalObject as Expense); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}">
-        </ExpenseForm>
+          @next="() => {const next = getNext(modalObject as Expense<string>); if(next){showModal('edit', 'expense', next)}else{hideModal()}}"
+          @prev="() => {const prev = getPrev(modalObject as Expense<string>); if(prev){showModal('edit', 'expense', prev)}else{hideModal()}}" />
         <ExpenseReportForm
           v-else
           :mode="modalMode"
-          :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+          :expenseReport="(modalObject as Partial<ExpenseReportSimple<string>>)"
           :loading="modalFormIsLoading"
           :owner="expenseReport.owner"
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
-          @edit="editExpenseReportDetails">
-        </ExpenseReportForm>
+          @edit="editExpenseReportDetails" />
       </div>
     </ModalComponent>
     <div class="container py-3" v-if="expenseReport._id">
@@ -65,7 +63,7 @@
                 v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1"
                 class="ms-2 fs-6"
                 :text="expenseReport.category.name"
-                :style="expenseReport.category.style"></Badge>
+                :style="expenseReport.category.style" />
             </div>
           </div>
           <div class="col-auto">
@@ -78,16 +76,18 @@
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" />
+                        <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editExpenseReport">
-                          <span class="me-1"><i class="bi bi-lock"></i></span>
+                          <span class="me-1"
+                            ><i class="bi bi-lock"></i></span
+                          >
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" />
+                    <hr class="dropdown-divider" >
                   </li>
                 </template>
                 <li>
@@ -95,7 +95,9 @@
                     :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
                     href="#"
                     @click="showModal('edit', 'expenseReport', expenseReport)">
-                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-pencil"></i></span
+                    >
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
                   </a>
                 </li>
@@ -109,7 +111,9 @@
                     @click="
                       isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? null : deleteExpenseReport()
                     ">
-                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span class="me-1"
+                      ><i class="bi bi-trash"></i></span
+                    >
                     <span>{{ t('labels.delete') }}</span>
                   </a>
                 </li>
@@ -126,7 +130,7 @@
         </div>
       </div>
 
-      <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState"></StatePipeline>
+      <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState" />
 
       <div class="row justify-content-between">
         <div class="col-lg-8 col-12">
@@ -147,7 +151,7 @@
                   { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
                   { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
                 ]"
-                @submitted="(d) => (isReadOnly ? null : addDrafts(d))" />
+                @submitted="(d) => (isReadOnly ? null : addDrafts(d as ExpenseDraft[]))" />
             </div>
           </div>
           <TableElement
@@ -163,7 +167,7 @@
             ]"
             :items="allExpenses"
             :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)">
             <template #item-cost.date="{ cost }: Expense">
               {{
                 new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
@@ -172,9 +176,7 @@
               }}
             </template>
             <template #item-cost="{ cost }: Expense">
-              <div class="text-end">
-                {{ formatter.money(cost) }}
-              </div>
+              <div class="text-end">{{ formatter.money(cost) }}</div>
             </template>
             <template #item-warning="expense: Expense">
               <span v-if="!(expense as Expense)._id" class="text-warning" :title="t('labels.draft')">
@@ -187,9 +189,7 @@
               <i class="bi bi-exclamation-triangle"></i>
             </div>
             <div class="col">
-              <span>
-                {{ t('alerts.draftsWillBeLost') }}
-              </span>
+              <span> {{ t('alerts.draftsWillBeLost') }}</span>
             </div>
           </div>
         </div>
@@ -201,7 +201,7 @@
                 <AddUpTable
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
-                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE"></AddUpTable>
+                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
                   <small>
                     <p v-for="comment of expenseReport.comments" :key="comment._id">
@@ -212,17 +212,17 @@
                 </div>
                 <div v-if="expenseReport.state <= State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="comment"
                     v-model="expenseReport.comment as string | undefined"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                   <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
-                  <TextArea
+                  <CTextArea
                     id="bookingRemark"
                     v-model="expenseReport.bookingRemark"
-                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)"></TextArea>
+                    :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="expenseReport.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
@@ -296,7 +296,6 @@ import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } f
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
@@ -304,15 +303,16 @@ import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 
-type ModalObject = Partial<Expense> | ExpenseReportSimple
+type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
 type ModalMode = 'add' | 'edit'
 
@@ -434,9 +434,9 @@ async function completeReview() {
   }
 }
 
-async function postExpense(expense: Expense) {
+async function postExpense(expense: Partial<Expense>) {
   let headers: Record<string, string> = {}
-  if (expense.cost.receipts) {
+  if (expense.cost?.receipts) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
@@ -456,17 +456,19 @@ async function postExpense(expense: Expense) {
   }
 }
 
-async function deleteExpense(_id: string) {
-  modalFormIsLoading.value = true
-  const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
-  modalFormIsLoading.value = false
-  if (result) {
-    setExpenseReport(result as ExpenseReport<string>)
-    resetAndHide()
+async function deleteExpense(_id?: string) {
+  if (_id) {
+    modalFormIsLoading.value = true
+    const result = await API.deleter(`${props.endpointPrefix}expenseReport/expense`, { _id, parentId: props._id })
+    modalFormIsLoading.value = false
+    if (result) {
+      setExpenseReport(result as ExpenseReport<string>)
+      resetAndHide()
+    }
   }
 }
 
-async function editExpenseReportDetails(updatedExpenseReport: ExpenseReport) {
+async function editExpenseReportDetails(updatedExpenseReport: Partial<ExpenseReport>) {
   modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport<string>>(
     `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
@@ -507,7 +509,7 @@ async function getExaminerMails(): Promise<string[]> {
   return []
 }
 
-function getNext(expense: Expense): Expense | undefined {
+function getNext(expense: Expense<string>): Expense<string> | undefined {
   const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
   if (index === -1 || index + 1 === expenseReport.value.expenses.length) {
     return undefined
@@ -515,7 +517,7 @@ function getNext(expense: Expense): Expense | undefined {
   return expenseReport.value.expenses[index + 1]
 }
 
-function getPrev(expense: Expense): Expense | undefined {
+function getPrev(expense: Expense<string>): Expense<string> | undefined {
   const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
   if (index === -1 || index === 0) {
     return undefined

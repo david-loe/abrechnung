@@ -1,13 +1,15 @@
 <template>
   <ElementLayout>
     <template #element>
-      <FileUpload v-model="model" :disabled="isDisabled" :accept="accept" :multiple="multiple"></FileUpload>
+      <FileUpload v-model="model" :disabled="isDisabled" :accept="accept" :multiple="multiple" />
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]
-      ><slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot
-    ></template>
+    <template v-for="(component, slot) in elementSlots" #[slot]>
+      <slot :name="slot" :el$="el$">
+        <component :is="component" :el$="el$" />
+      </slot>
+    </template>
   </ElementLayout>
 </template>
 

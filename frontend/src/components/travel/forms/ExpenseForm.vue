@@ -1,28 +1,40 @@
 <template>
-  <form @submit.prevent="disabled ? null : $emit(mode, output())">
+  <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div class="mb-2">
-      <label for="travelFormDescription" class="form-label"> {{ $t('labels.description') }}<span class="text-danger">*</span> </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required />
+      <label for="travelFormDescription" class="form-label">
+        {{ t('labels.description') }}
+        <span class="text-danger">*</span>
+      </label>
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
     </div>
 
     <div class="row mb-2">
       <div class="col">
-        <label for="expenseFormCost" class="form-label me-2"> {{ $t('labels.cost') }}<span class="text-danger">*</span> </label>
-        <InfoPoint :text="$t('info.cost')" />
+        <label for="expenseFormCost" class="form-label me-2">
+          {{ t('labels.cost') }}
+          <span class="text-danger">*</span>
+        </label>
+        <InfoPoint :text="t('info.cost')" />
         <div class="input-group" id="expenseFormCost">
-          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required />
-          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true"></CurrencySelector>
+          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" min="0" :disabled="disabled" required >
+          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
         </div>
       </div>
       <div class="col">
-        <label for="invoiceDateInput" class="form-label">{{ $t('labels.invoiceDate') }}<span class="text-danger">*</span></label>
+        <label for="invoiceDateInput" class="form-label">
+          {{ t('labels.invoiceDate') }}
+          <span class="text-danger">*</span>
+        </label>
         <DateInput id="invoiceDateInput" v-model="formExpense.cost.date" :required="true" :disabled="disabled" :max="new Date()" />
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="expenseFormFile" class="form-label me-2">{{ $t('labels.receipts') }}<span class="text-danger">*</span></label>
-      <InfoPoint :text="$t('info.receipts')" />
+      <label for="expenseFormFile" class="form-label me-2">
+        {{ t('labels.receipts') }}
+        <span class="text-danger">*</span>
+      </label>
+      <InfoPoint :text="t('info.receipts')" />
       <FileUpload
         ref="fileUpload"
         id="expenseFormFile"
@@ -30,69 +42,74 @@
         :disabled="disabled"
         :required="true"
         :endpointPrefix="endpointPrefix"
-        :ownerId="ownerId" />
+        :ownerId="ownerId"
+        :showUploadFromPhone="props.showUploadFromPhone" />
     </div>
 
-    <label for="expenseFormPurpose" class="form-label me-2"> {{ $t('labels.purpose') }}<span class="text-danger">*</span> </label>
-    <InfoPoint :text="$t('info.purpose')" />
+    <label for="expenseFormPurpose" class="form-label me-2">
+      {{ t('labels.purpose') }}
+      <span class="text-danger">*</span>
+    </label>
+    <InfoPoint :text="t('info.purpose')" />
     <select class="form-select mb-3" v-model="formExpense.purpose" id="expenseFormPurpose" :disabled="disabled" required>
-      <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ $t('labels.' + purpose) }}</option>
+      <option v-for="purpose of ['professional', 'mixed']" :value="purpose" :key="purpose">{{ t('labels.' + purpose) }}</option>
     </select>
 
-    <div class="mb-3" v-if="useDifferentProject || formExpense.project">
-      <label for="healthCareCostFormProject" class="form-label me-2"> {{ $t('labels.project') }}</label>
-      <InfoPoint :text="$t('info.project')" />
-      <button
-        type="button"
-        class="btn btn-sm btn-link ms-3"
-        @click="
+    <template v-if="props.showProjectSelection">
+      <div class="mb-3" v-if="useDifferentProject || formExpense.project">
+        <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
+        <InfoPoint :text="t('info.project')" />
+        <button
+          type="button"
+          class="btn btn-sm btn-link ms-3"
+          @click="
           //prettier-ignore
           useDifferentProject = false;
+          //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
           formExpense.project = ''
         ">
-        {{ $t('labels.reset') }}
-      </button>
+          {{ t('labels.reset') }}
+        </button>
 
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project"> </ProjectSelector>
-    </div>
-    <div class="mb-2" v-else>
-      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ $t('labels.useDifferentProject') }}</button>
-    </div>
+        <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project" />
+      </div>
+      <div class="mb-2" v-else>
+        <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
+      </div>
+    </template>
 
     <div class="mb-3">
-      <label for="travelFormDescription" class="form-label"> {{ $t('labels.note') }}</label>
-      <TextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled"></TextArea>
+      <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
+      <CTextArea class="form-control-sm" id="travelFormDescription" v-model="formExpense.note" :disabled="disabled" />
     </div>
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
-        {{ mode === 'add' ? $t('labels.addX', { X: $t('labels.expense') }) : $t('labels.save') }}
+        {{ mode === 'add' ? t('labels.addX', { X: t('labels.expense') }) : t('labels.save') }}
       </button>
       <button
         type="button"
         class="btn btn-danger me-2"
         :disabled="loading"
         v-if="mode === 'edit' && !disabled"
-        @click="disabled ? null : $emit('deleted', formExpense._id)">
-        {{ $t('labels.delete') }}
+        @click="disabled ? null : emit('deleted', formExpense._id)">
+        {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="$emit('cancel')">
-        {{ $t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ t('labels.cancel') }}</button>
       <div class="ms-auto">
         <button
           type="button"
           :class="'btn btn-light' + (showPrevButton ? '' : ' invisible')"
-          :title="$t('labels.previous')"
-          @click="$emit('prev')">
+          :title="t('labels.previous')"
+          @click="emit('prev')">
           <i class="bi bi-chevron-left"></i>
         </button>
         <button
           type="button"
           :class="'btn btn-light ms-2' + (showNextButton ? '' : ' invisible')"
-          :title="$t('labels.next')"
-          @click="$emit('next')">
+          :title="t('labels.next')"
+          @click="emit('next')">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
@@ -100,67 +117,73 @@
   </form>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { baseCurrency, TravelExpense } from 'abrechnung-common/types.js'
-import { defineComponent, PropType } from 'vue'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
-import DateInput from '@/components/elements/DateInput.vue'
-import FileUpload from '@/components/elements/FileUpload.vue'
-import InfoPoint from '@/components/elements/InfoPoint.vue'
-import ProjectSelector from '@/components/elements/ProjectSelector.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import { PropType, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
+import DateInput from '../../elements/DateInput.vue'
+import FileUpload from '../../elements/FileUpload.vue'
+import InfoPoint from '../../elements/InfoPoint.vue'
+import ProjectSelector from '../../elements/ProjectSelector.vue'
+import CTextArea from '../../elements/TextArea.vue'
 
-export default defineComponent({
-  name: 'ExpenseForm',
-  components: { InfoPoint, CurrencySelector, FileUpload, DateInput, TextArea, ProjectSelector },
-  emits: ['cancel', 'edit', 'add', 'deleted', 'next', 'prev'],
-  props: {
-    expense: { type: Object as PropType<Partial<TravelExpense>> },
-    mode: { type: String as PropType<'add' | 'edit'>, required: true },
-    disabled: { type: Boolean, default: false },
-    endpointPrefix: { type: String, default: '' },
-    ownerId: { type: String },
-    showPrevButton: { type: Boolean, default: false },
-    showNextButton: { type: Boolean, default: false },
-    loading: { type: Boolean, default: false }
-  },
-  data() {
-    return { formExpense: this.default(), useDifferentProject: false }
-  },
-  methods: {
-    default() {
-      return {
-        description: '',
-        cost: { amount: null, currency: baseCurrency, receipts: [], date: '' },
-        purpose: 'professional',
-        note: undefined,
-        project: undefined
-      }
-    },
-    clear() {
-      if (this.$refs.fileUpload) {
-        ;(this.$refs.fileUpload as typeof FileUpload).clear()
-      }
-      this.formExpense = this.default()
-      this.useDifferentProject = false
-    },
-    output() {
-      return this.formExpense
-    },
-    input() {
-      return Object.assign({}, this.default(), this.expense)
-    }
-  },
-  created() {
-    this.formExpense = this.input()
-  },
-  watch: {
-    expense: function () {
-      this.clear()
-      this.formExpense = this.input()
-    }
-  }
+const { t } = useI18n()
+
+const emit = defineEmits<{
+  cancel: []
+  edit: [Partial<TravelExpense<string>>]
+  add: [Partial<TravelExpense<string>>]
+  deleted: [string | undefined]
+  next: []
+  prev: []
+}>()
+const props = defineProps({
+  expense: { type: Object as PropType<Partial<TravelExpense<string>>> },
+  mode: { type: String as PropType<'add' | 'edit'>, required: true },
+  disabled: { type: Boolean, default: false },
+  endpointPrefix: { type: String, default: '' },
+  ownerId: { type: String },
+  showProjectSelection: { type: Boolean, default: true },
+  showUploadFromPhone: { type: Boolean, default: true },
+  showPrevButton: { type: Boolean, default: false },
+  showNextButton: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false }
 })
+
+const formExpense = ref(input())
+const useDifferentProject = ref(false)
+const fileUploadRef = useTemplateRef('fileUpload')
+
+function defaultExpense() {
+  return {
+    description: '',
+    cost: { amount: null, currency: baseCurrency, receipts: [], date: '' },
+    purpose: 'professional' as TravelExpense['purpose'],
+    note: undefined,
+    project: undefined
+  }
+}
+function clear() {
+  fileUploadRef.value?.clear()
+  formExpense.value = defaultExpense()
+  useDifferentProject.value = false
+}
+
+function input() {
+  return { ...defaultExpense(), ...props.expense }
+}
+function output() {
+  return formExpense.value
+}
+
+watch(
+  () => props.expense,
+  () => {
+    clear()
+    formExpense.value = input()
+  }
+)
 </script>
 
 <style></style>

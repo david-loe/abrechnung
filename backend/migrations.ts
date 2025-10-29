@@ -300,6 +300,10 @@ export async function checkForMigrations() {
         .collection('travelsettings')
         .updateMany({}, { $rename: { fallBackLumpSumCountry: 'fallbackLumpSumCountry' } })
     }
+    if (semver.lte(migrateFrom, '2.1.13')) {
+      logger.info('Apply migration from v2.1.13: set fontName')
+      await mongoose.connection.collection('printersettings').updateOne({}, { $set: { fontName: 'Inter' } })
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

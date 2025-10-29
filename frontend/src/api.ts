@@ -1,10 +1,10 @@
 import { GETResponse, SETResponse } from 'abrechnung-common/types.js'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
-import ENV from '@/env.js'
-import i18n from '@/i18n.js'
-import { logger } from '@/logger.js'
 import router from '@/router'
+import ENV from './env.js'
+import i18n from './i18n.js'
+import { logger } from './logger.js'
 
 export interface Alert {
   type: 'danger' | 'success'

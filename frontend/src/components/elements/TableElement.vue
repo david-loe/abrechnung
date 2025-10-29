@@ -2,16 +2,18 @@
   <div class="table-wrapper" :class="{ 'settings-open': showSettings }">
     <div v-if="USE_DB_SETTINGS" class="overlay">
       <div v-if="!showSettings" class="settings-icon">
-        <button type="button" class="btn p-0 m-1" @click="showSettings = true"><i class="bi bi-gear"></i></button>
+        <button type="button" class="btn p-0 m-1" @click="showSettings = true">
+          <i class="bi bi-gear"></i>
+        </button>
       </div>
       <div v-else class="d-flex align-items-center">
-        <ArrowSortableList
-          v-model="columnOrder"
-          :labelFn="(c: {text: string, value: string}) => c.text ? t(c.text) : c.value"></ArrowSortableList>
+        <ArrowSortableList v-model="columnOrder" :labelFn="(c: {text: string, value: string}) => c.text ? t(c.text) : c.value" />
         <button type="button" class="btn p-0 m-2" :title="t('labels.save')" @click="applyOrder">
           <i class="bi bi-check-lg text-success"></i>
         </button>
-        <button type="button" class="btn p-0 m-2" @click="resetOrder"><i class="bi bi-arrow-counterclockwise text-danger"></i></button>
+        <button type="button" class="btn p-0 m-2" @click="resetOrder">
+          <i class="bi bi-arrow-counterclockwise text-danger"></i>
+        </button>
       </div>
     </div>
     <Vue3EasyDataTable
@@ -35,9 +37,7 @@
       :preventContextMenuRow="false"
       body-item-class-name="text-truncate"
       :style="{ filter: showSettings ? 'blur(3px)' : 'none', transition: 'filter 0.2s ease-in-out' }">
-      <template #header="header">
-        {{ header.text ? t(header.text) : '' }}
-      </template>
+      <template #header="header">{{ header.text ? t(header.text) : '' }}</template>
       <!-- Standard-Slot weiterleiten -->
       <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
         <slot :name="slot" v-bind="scope"></slot>

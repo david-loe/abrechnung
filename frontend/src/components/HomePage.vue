@@ -6,8 +6,8 @@
       @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
-          <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)"></TravelApplication>
-          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)"></Advance>
+          <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)" />
+          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)" />
           <div v-if="modalObject.state !== undefined" class="mb-1">
             <template v-if="modalObject.state <= State.APPLIED_FOR">
               <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
@@ -26,9 +26,7 @@
                 @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
                 {{ t('labels.delete') }}
               </button>
-              <button type="button" class="btn btn-light" @click="resetAndHide()">
-                {{ t('labels.cancel') }}
-              </button>
+              <button type="button" class="btn btn-light" @click="resetAndHide()">{{ t('labels.cancel') }}</button>
             </template>
           </div>
         </template>
@@ -36,7 +34,7 @@
           <TravelApplyForm
             v-if="modalObjectType === 'travel'"
             :mode="modalMode"
-            :travel="(modalObject as Partial<TravelSimple>)"
+            :travel="(modalObject as Partial<TravelSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             :minStartDate="APP_DATA?.user.access['approved:travel'] ? '' : undefined"
@@ -45,27 +43,25 @@
             @cancel="resetAndHide()"
             @add="handleSubmit"
             @edit="handleSubmit"
-            ref="travelApplyForm"></TravelApplyForm>
+            ref="travelApplyForm" />
           <ExpenseReportForm
             v-else-if="modalObjectType === 'expenseReport'"
             :mode="(modalMode as 'add' | 'edit')"
-            :expenseReport="(modalObject as Partial<ExpenseReportSimple>)"
+            :expenseReport="(modalObject as Partial<ExpenseReportSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
-            @add="handleSubmit">
-          </ExpenseReportForm>
+            @add="handleSubmit" />
           <HealthCareCostForm
             v-else-if="modalObjectType === 'healthCareCost'"
             :mode="(modalMode as 'add' | 'edit')"
-            :healthCareCost="(modalObject as Partial<HealthCareCostSimple>)"
+            :healthCareCost="(modalObject as Partial<HealthCareCostSimple<string>>)"
             :loading="modalFormIsLoading"
             :owner="APP_DATA?.user"
             update-user-org
             @cancel="resetAndHide()"
-            @add="handleSubmit">
-          </HealthCareCostForm>
+            @add="handleSubmit" />
           <AdvanceForm
             v-else
             :mode="(modalMode as 'add' | 'edit')"
@@ -73,8 +69,7 @@
             :loading="modalFormIsLoading"
             @cancel="resetAndHide()"
             @add="handleSubmit"
-            @edit="handleSubmit">
-          </AdvanceForm>
+            @edit="handleSubmit" />
         </template>
       </div>
     </ModalComponent>
@@ -118,7 +113,7 @@
           endpoint="travel"
           :columns-to-hide="COMMON_HIDDEN_COLUMNS"
           @clicked-applied="(t) => showModal('view', 'travel', t)"
-          dbKeyPrefix="home"></TravelList>
+          dbKeyPrefix="home" />
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.expenseReport">
         <h3>{{ t('labels.expenses') }}</h3>
@@ -127,7 +122,7 @@
           ref="expenseReportList"
           endpoint="expenseReport"
           :columns-to-hide="COMMON_HIDDEN_COLUMNS"
-          dbKeyPrefix="home"></ExpenseReportList>
+          dbKeyPrefix="home" />
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.healthCareCost">
         <h3>{{ t('labels.healthCareCost') }}</h3>
@@ -135,7 +130,7 @@
           ref="healthCareCostList"
           endpoint="healthCareCost"
           :columns-to-hide="COMMON_HIDDEN_COLUMNS"
-          dbKeyPrefix="home"></HealthCareCostList>
+          dbKeyPrefix="home" />
       </template>
       <template v-if="!APP_DATA.settings.disableReportType.advance">
         <h3>{{ t('labels.advance') }}</h3>
@@ -144,7 +139,7 @@
           endpoint="advance"
           :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
           @clicked="(t) => showModal('view', 'advance', t)"
-          dbKeyPrefix="home"></AdvanceList>
+          dbKeyPrefix="home" />
       </template>
     </div>
   </div>
@@ -162,7 +157,6 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
@@ -174,6 +168,7 @@ import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.v
 import TravelApplication from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost' | 'advance'
@@ -223,7 +218,9 @@ function resetAndHide() {
   hideModal()
 }
 
-async function handleSubmit(payload: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Partial<AdvanceSimple>) {
+async function handleSubmit(
+  payload: Partial<TravelSimple> | Partial<ExpenseReportSimple> | Partial<HealthCareCostSimple> | Partial<AdvanceSimple>
+) {
   modalFormIsLoading.value = true
   let result: { _id: string } | undefined
 

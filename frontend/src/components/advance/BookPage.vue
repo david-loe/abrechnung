@@ -5,7 +5,9 @@
         <h2>{{ $t('accesses.book/advance') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
+        <button class="btn btn-secondary" @click="handlePrint">
+          <i class="bi bi-printer-fill"></i>
+        </button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
@@ -35,14 +37,17 @@
       </template>
     </AdvanceList>
     <button v-if="!show" type="button" class="btn btn-light" @click="show = AdvanceState.BOOKED">
-      {{ t('labels.show') }} <StateBadge :state="AdvanceState.BOOKED" :StateEnum="AdvanceState"></StateBadge>
+      {{ t('labels.show') }}
+      <StateBadge :state="AdvanceState.BOOKED" :StateEnum="AdvanceState" />
       <i class="bi bi-chevron-down"></i>
     </button>
     <template v-else>
       <button type="button" class="btn btn-light" @click="show = null">
-        {{ t('labels.hide') }} <StateBadge :state="show" :StateEnum="AdvanceState"></StateBadge> <i class="bi bi-chevron-up"></i>
+        {{ t('labels.hide') }}
+        <StateBadge :state="show" :StateEnum="AdvanceState" />
+        <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" />
+      <hr class="hr" >
       <AdvanceList
         class="mb-5"
         table-class-name="small-table"
@@ -52,8 +57,7 @@
         :stateFilter="show"
         :rows-per-page="10"
         :rows-items="[10, 20, 50]"
-        dbKeyPrefix="booked">
-      </AdvanceList>
+        dbKeyPrefix="booked" />
     </template>
   </div>
 </template>
@@ -122,6 +126,7 @@ const { handlePrint } = useVueToPrint({
 }
 
 .vue3-easy-data-table__body td.expand {
+  /* biome-ignore lint/complexity/noImportantStyles: needed */
   padding: 0 !important;
 }
 </style>

@@ -20,7 +20,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.name" @click.stop>
-          <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+          <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
         </div>
       </div>
     </template>
@@ -47,7 +47,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter['destinationPlace.country']" @click.stop>
-          <CountrySelector v-model="filter['destinationPlace.country'] as any"></CountrySelector>
+          <CountrySelector v-model="filter['destinationPlace.country'] as any" />
         </div>
       </div>
     </template>
@@ -59,7 +59,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.project" @click.stop>
-          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
+          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5" />
         </div>
       </div>
     </template>
@@ -71,7 +71,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter['project.organisation']" @click.stop>
-          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
+          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id />
         </div>
       </div>
     </template>
@@ -85,7 +85,7 @@
           </span>
         </div>
         <div v-if="showFilter.owner" @click.stop>
-          <UserSelector v-model="filter.owner as any"></UserSelector>
+          <UserSelector v-model="filter.owner as any" />
         </div>
       </div>
     </template>
@@ -99,14 +99,12 @@
           </span>
         </div>
         <div v-if="showFilter.updatedAt" @click.stop>
-          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time></DateInput>
+          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time />
         </div>
       </div>
     </template>
     <template #item-name="travel: TravelSimple">
-      <span v-if="props.makeNameNoLink">
-        {{ travel.name }}
-      </span>
+      <span v-if="props.makeNameNoLink"> {{ travel.name }}</span>
       <template v-else>
         <template v-if="endpoint == 'travel' && travel.state <= TravelState.APPLIED_FOR">
           <a
@@ -124,41 +122,29 @@
         </template>
       </template>
     </template>
-    <template #item-startDate="{ startDate }">
-      {{ formatter.simpleDate(startDate) }}
-    </template>
+    <template #item-startDate="{ startDate }">{{ formatter.simpleDate(startDate) }}</template>
     <template #item-destinationPlace="{ destinationPlace }">
-      <PlaceElement :place="destinationPlace"></PlaceElement>
+      <PlaceElement :place="destinationPlace" />
     </template>
     <template #item-editor="{ editor }">
-      <span :title="formatter.name(editor.name)">
-        {{ formatter.name(editor.name, 'short') }}
-      </span>
+      <span :title="formatter.name(editor.name)"> {{ formatter.name(editor.name, 'short') }}</span>
     </template>
     <template #item-owner="{ owner }">
-      <span :title="formatter.name(owner.name)">
-        {{ formatter.name(owner.name, 'short') }}
-      </span>
+      <span :title="formatter.name(owner.name)"> {{ formatter.name(owner.name, 'short') }}</span>
     </template>
     <template #item-state="{ progress, state }">
-      <StateBadge :state="state" :StateEnum="TravelState" style="display: inline-block"></StateBadge>
-      <ProgressCircle
-        class="ms-3"
-        v-if="state === TravelState.APPROVED"
-        :progress="progress"
-        style="display: inline-block"></ProgressCircle>
+      <StateBadge :state="state" :StateEnum="TravelState" style="display: inline-block" />
+      <ProgressCircle class="ms-3" v-if="state === TravelState.APPROVED" :progress="progress" style="display: inline-block" />
     </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.totalTotal="{ addUp }">
-      {{ formatter.baseCurrency(getTotalTotal(addUp)) }}
-    </template>
+    <template #item-addUp.totalTotal="{ addUp }">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
         {{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}
         <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
-          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false"></AddUpTable>
+          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" />
         </template>
       </TooltipElement>
     </template>
@@ -174,9 +160,7 @@
         <i v-else class="bi bi-file-earmark-pdf"></i>
       </button>
     </template>
-    <template #item-updatedAt="{ updatedAt }">
-      {{ formatter.dateTime(updatedAt) }}
-    </template>
+    <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
     <template #item-bookingRemark="{ bookingRemark }">
       <span v-if="bookingRemark">
         <TooltipElement :text="bookingRemark">
@@ -198,7 +182,6 @@ import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
-import APP_LOADER from '@/appData.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CountrySelector from '@/components/elements/CountrySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -210,6 +193,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { bp, showFile } from '@/helper.js'
 

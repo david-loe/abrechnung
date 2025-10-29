@@ -9,13 +9,13 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
           </div>
         </div>
       </template>
 
       <template #item-name="category">
-        <Badge :text="category.name" :style="category.style"></Badge>
+        <Badge :text="category.name" :style="category.style" />
       </template>
       <template #item-buttons="category">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(category)">
@@ -39,7 +39,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postCategory(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.category') }) }}
@@ -54,9 +54,9 @@ import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
 import ListElement from '@/components/elements/ListElement.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 

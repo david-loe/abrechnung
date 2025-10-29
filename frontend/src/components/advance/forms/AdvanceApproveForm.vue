@@ -1,14 +1,14 @@
 <template>
   <div>
-    <Advance :advance="advance"></Advance>
+    <Advance :advance="advance" />
     <div class="mb-3">
       <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
-      <TextArea id="comment" v-model="comment"></TextArea>
+      <CTextArea id="comment" v-model="comment" />
     </div>
 
     <div class="mb-3">
       <label for="bookingRemark" class="form-label">{{ t('labels.bookingRemark') }}</label>
-      <TextArea id="bookingRemark" v-model="bookingRemark"></TextArea>
+      <CTextArea id="bookingRemark" v-model="bookingRemark" />
     </div>
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-success me-2" @click="emit('decision', 'approved', comment, bookingRemark)" :disabled="loading">
@@ -17,9 +17,7 @@
       <button type="button" class="btn btn-danger me-2" @click="emit('decision', 'rejected', comment, bookingRemark)" :disabled="loading">
         {{ $t('labels.reject') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">
-        {{ $t('labels.cancel') }}
-      </button>
+      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">{{ $t('labels.cancel') }}</button>
     </div>
   </div>
 </template>
@@ -29,7 +27,7 @@ import { AdvanceSimple } from 'abrechnung-common/types.js'
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Advance from '@/components/advance/Advance.vue'
-import TextArea from '@/components/elements/TextArea.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 
 const { t } = useI18n()
 

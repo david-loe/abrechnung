@@ -5,13 +5,13 @@
         <ul class="nav nav-pills flex-column">
           <li v-for="_entry in items" class="nav-item">
             <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
-              {{ $t('labels.' + _entry) }}
+              {{ t('labels.' + _entry) }}
             </span>
           </li>
           <li class="border-top my-3"></li>
           <li v-for="_entry in settings" class="nav-item">
             <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
-              {{ $t('labels.' + _entry) }}
+              {{ t('labels.' + _entry) }}
             </span>
           </li>
         </ul>
@@ -19,7 +19,7 @@
     </div>
     <div class="flex-grow-1" id="settingsContent">
       <div class="container px-lg-4 py-3">
-        <h2 class="mb-3">{{ $t('labels.' + entry) }}</h2>
+        <h2 class="mb-3">{{ t('labels.' + entry) }}</h2>
         <SettingsForm v-if="entry === 'settings'" />
         <ConnectionSettingsForm v-else-if="entry === 'connectionSettings'" />
         <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
@@ -30,10 +30,10 @@
             <template #default>
               <UserList class="mb-5" ref="userList" />
             </template>
-            <template #fallback> Loading.. </template>
+            <template #fallback>Loading.. </template>
           </Suspense>
 
-          <h3>{{ $t('labels.import') }}</h3>
+          <h3>{{ t('labels.import') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/user/bulk"
@@ -52,7 +52,7 @@
               'settings.organisation'
             ]"
             @submitted=";($refs.userList as any).loadFromServer()" />
-          <h3>{{ $t('labels.mergeUsers') }}</h3>
+          <h3>{{ t('labels.mergeUsers') }}</h3>
           <UserMerge />
         </template>
         <template v-else-if="entry === 'projects'">
@@ -60,10 +60,10 @@
             <template #default>
               <ProjectList class="mb-5" ref="projectList" />
             </template>
-            <template #fallback> Loading.. </template>
+            <template #fallback>Loading.. </template>
           </Suspense>
 
-          <h3>{{ $t('labels.import') }}</h3>
+          <h3>{{ t('labels.import') }}</h3>
           <CSVImport
             class="mb-5"
             endpoint="admin/project/bulk"
@@ -75,31 +75,31 @@
           <template #default>
             <OrganisationList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'categories'">
           <template #default>
             <CategoryList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'currencies'">
           <template #default>
             <CurrencyList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
         <Suspense v-else-if="entry === 'healthInsurances'">
           <template #default>
             <HealthInsuranceList />
           </template>
-          <template #fallback> Loading.. </template>
+          <template #fallback>Loading.. </template>
         </Suspense>
       </div>
     </div>
@@ -107,10 +107,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { convertGermanDateToHTMLDate } from 'abrechnung-common/utils/scripts.js'
-import { defineComponent } from 'vue'
-import APP_LOADER from '@/appData.js'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import CategoryList from '@/components/settings/elements/CategoryList.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
@@ -125,8 +123,13 @@ import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
 import TravelSettingsForm from '@/components/settings/elements/TravelSettingsForm.vue'
 import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
+import APP_LOADER from '@/dataLoader.js'
 import '@vueform/vueform/dist/vueform.css'
 import '@/vueform.css'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
 
@@ -134,44 +137,19 @@ const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'pr
 
 type Entry = (typeof items)[number] | (typeof settings)[number]
 
-export default defineComponent({
-  name: 'SettingsPage',
-  components: {
-    UserList,
-    SettingsForm,
-    OrganisationList,
-    ProjectList,
-    CountryList,
-    CurrencyList,
-    CategoryList,
-    HealthInsuranceList,
-    UserMerge,
-    CSVImport,
-    ConnectionSettingsForm,
-    DisplaySettingsForm,
-    TravelSettingsForm,
-    PrinterSettingsForm
-  },
-  data() {
-    return { items, settings, APP_DATA: APP_LOADER.data, entry: 'users' as Entry }
-  },
-  props: [],
-  methods: { convertGermanDateToHTMLDate },
-  computed: {
-    rightMargin() {
-      const container = document.getElementById('navBarContent')
-      let width = 0
-      if (container) {
-        width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
-      }
-      return `${width}px`
-    }
-  },
+const APP_DATA = APP_LOADER.data
+const entry = ref('users' as Entry)
 
-  async created() {
-    await APP_LOADER.loadData()
+const rightMargin = computed(() => {
+  const container = document.getElementById('navBarContent')
+  let width = 0
+  if (container) {
+    width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
   }
+  return `${width}px`
 })
+
+await APP_LOADER.loadData()
 </script>
 
 <style></style>

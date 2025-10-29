@@ -6,10 +6,21 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'
 
 @Tags('Printer Settings')
+@Route('printerSettings')
+@Security('cookieAuth', ['user'])
+@Security('httpBearer', ['user'])
+export class PrinterSettingsController extends Controller {
+  @Get()
+  public async get() {
+    return { data: (await PrinterSettings.findOne({}, { __v: 0 }).lean()) as IPrinterSettings }
+  }
+}
+
+@Tags('Printer Settings')
 @Route('admin/printerSettings')
 @Security('cookieAuth', ['admin'])
 @Security('httpBearer', ['admin'])
-export class PrinterSettingsController extends Controller {
+export class PrinterSettingsAdminController extends Controller {
   @Get()
   public async get() {
     return { data: (await PrinterSettings.findOne({}, { __v: 0 }).lean()) as IPrinterSettings }

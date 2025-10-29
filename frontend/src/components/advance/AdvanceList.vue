@@ -22,7 +22,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.name" @click.stop>
-          <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+          <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
         </div>
       </div>
     </template>
@@ -49,7 +49,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.project" @click.stop>
-          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5"></ProjectSelector>
+          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5" />
         </div>
       </div>
     </template>
@@ -61,7 +61,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter['project.organisation']" @click.stop>
-          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id></ProjectsOfOrganisationSelector>
+          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id />
         </div>
       </div>
     </template>
@@ -75,7 +75,7 @@
           </span>
         </div>
         <div v-if="showFilter.owner" @click.stop>
-          <UserSelector v-model="(filter.owner as any)"></UserSelector>
+          <UserSelector v-model="(filter.owner as any)" />
         </div>
       </div>
     </template>
@@ -89,14 +89,12 @@
           </span>
         </div>
         <div v-if="showFilter['log.30.on']" @click.stop>
-          <DateInput v-model="(filter['log.30.on'] as any).$gt" :max="new Date()" with-time></DateInput>
+          <DateInput v-model="(filter['log.30.on'] as any).$gt" :max="new Date()" with-time />
         </div>
       </div>
     </template>
     <template #item-name="advance: AdvanceSimple">
-      <span v-if="props.makeNameNoLink">
-        {{ advance.name }}
-      </span>
+      <span v-if="props.makeNameNoLink"> {{ advance.name }}</span>
       <a
         v-else
         class="clickable link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover"
@@ -105,27 +103,19 @@
       </a>
     </template>
     <template #item-editor="{ editor }: AdvanceSimple">
-      <span :title="formatter.name(editor.name)">
-        {{ formatter.name(editor.name, 'short') }}
-      </span>
+      <span :title="formatter.name(editor.name)"> {{ formatter.name(editor.name, 'short') }}</span>
     </template>
     <template #item-owner="{ owner }: AdvanceSimple">
-      <span :title="formatter.name(owner.name)">
-        {{ formatter.name(owner.name, 'short') }}
-      </span>
+      <span :title="formatter.name(owner.name)"> {{ formatter.name(owner.name, 'short') }}</span>
     </template>
     <template #item-state="{ state }: AdvanceSimple">
-      <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block"></StateBadge>
+      <StateBadge :state="state" :StateEnum="AdvanceState" style="display: inline-block" />
     </template>
     <template #item-organisation="{ project }: AdvanceSimple<string>">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-budget="{ budget }: AdvanceSimple">
-      {{ formatter.money(budget) }}
-    </template>
-    <template #item-balance="{ balance }: AdvanceSimple">
-      {{ formatter.money(balance) }}
-    </template>
+    <template #item-budget="{ budget }: AdvanceSimple">{{ formatter.money(budget) }}</template>
+    <template #item-balance="{ balance }: AdvanceSimple">{{ formatter.money(balance) }}</template>
     <template #item-report="{ _id, name }: AdvanceSimple">
       <button
         class="btn btn-primary btn-sm"
@@ -138,12 +128,8 @@
         <i v-else class="bi bi-file-earmark-pdf"></i>
       </button>
     </template>
-    <template #item-updatedAt="{ updatedAt }">
-      {{ formatter.dateTime(updatedAt) }}
-    </template>
-    <template #item-log.30.on="{ log }: AdvanceSimple">
-      {{ log[30] ? formatter.dateTime(log[30].on) : '' }}
-    </template>
+    <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
+    <template #item-log.30.on="{ log }: AdvanceSimple">{{ log[30] ? formatter.dateTime(log[30].on) : '' }}</template>
     <template #item-bookingRemark="{ bookingRemark }: AdvanceSimple">
       <span v-if="bookingRemark">
         <TooltipElement :text="bookingRemark">
@@ -165,7 +151,6 @@ import { getById } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header, SortType } from 'vue3-easy-data-table'
-import APP_LOADER from '@/appData.js'
 import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -173,6 +158,7 @@ import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrga
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { bp, showFile } from '@/helper.js'
 

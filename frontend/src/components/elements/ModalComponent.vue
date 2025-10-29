@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ $props.header }}</h5>
+          <h5 class="modal-title">{{ props.header }}</h5>
           <button type="button" class="btn-close" @click="hideModal"></button>
         </div>
         <div class="modal-body">
@@ -13,31 +13,30 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
 import { Modal } from 'bootstrap'
-import { defineComponent } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
-export default defineComponent({
-  name: 'ModalComponent',
-  emits: ['afterClose'],
-  data() {
-    return { modal: undefined as Modal | undefined }
-  },
-  props: { header: String },
-  methods: {
-    hideModal() {
-      this.modal?.hide()
-    }
-  },
-  mounted() {
-    const modalEl = this.$refs.modal as HTMLElement
-    if (modalEl) {
-      this.modal = new Modal(modalEl, {})
-      modalEl.addEventListener('hidden.bs.modal', () => this.$emit('afterClose'))
-    }
-  },
-  beforeUnmount() {
-    this.hideModal()
+const emit = defineEmits<{ afterClose: [] }>()
+const modalObj = ref(null as Modal | null)
+const modalRef = useTemplateRef('modal')
+
+defineExpose({ modal: modalObj, hideModal })
+
+const props = defineProps({ header: String })
+
+function hideModal() {
+  modalObj.value?.hide()
+}
+const emitAfterClose = () => emit('afterClose')
+onMounted(() => {
+  if (modalRef.value) {
+    modalObj.value = new Modal(modalRef.value, {})
+    modalRef.value.addEventListener('hidden.bs.modal', emitAfterClose)
   }
+})
+onUnmounted(() => {
+  modalRef.value?.removeEventListener('hidden.bs.modal', emitAfterClose)
+  modalObj.value?.dispose()
 })
 </script>

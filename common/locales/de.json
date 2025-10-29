@@ -303,6 +303,7 @@
     "filter": "Filter",
     "fk": "Authentifizierung",
     "flag": "Flagge",
+    "fontName": "Schriftart Name",
     "fontSizes": "Schriftgrößen",
     "from": "Von",
     "givenName": "Vorname",
@@ -483,11 +484,11 @@
   },
   "lumpSums": {
     "catering8": "Verpflegungspauschale (gekürzt)",
-    "catering8\n": "Verpflegungs\npauschale (gekürzt)",
+    "catering8/": "Verpflegungs\npauschale (gekürzt)",
     "catering24": "Verpflegungspauschale",
-    "catering24\n": "Verpflegungs\npauschale",
+    "catering24/": "Verpflegungs\npauschale",
     "overnight": "Übernachtungspauschale",
-    "overnight\n": "Übernachtungs\npauschale"
+    "overnight/": "Übernachtungs\npauschale"
   },
   "mail": {
     "advance": {

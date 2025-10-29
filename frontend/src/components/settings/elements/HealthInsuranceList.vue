@@ -9,7 +9,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
           </div>
         </div>
       </template>
@@ -22,7 +22,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.email" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.email as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.email as any).$regex" >
           </div>
         </div>
       </template>
@@ -49,7 +49,7 @@
         :sync="true"
         :endpoint="false"
         @submit="(form$: any) => postHealthInsurance(form$.data)"
-        @reset="_showForm = false"></Vueform>
+        @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
       {{ $t('labels.addX', { X: $t('labels.healthInsurance') }) }}
@@ -64,8 +64,8 @@ import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
 import ListElement from '@/components/elements/ListElement.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 

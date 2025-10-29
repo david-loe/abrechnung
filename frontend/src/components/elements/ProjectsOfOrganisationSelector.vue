@@ -7,9 +7,7 @@
     :disabled="disabled"
     :required="required"
     @update:modelValue="(o) => getProjects(o._id)">
-    <option v-for="organisation in APP_DATA.organisations" :value="organisation" :key="organisation._id">
-      {{ organisation.name }}
-    </option>
+    <option v-for="organisation in APP_DATA.organisations" :value="organisation" :key="organisation._id">{{ organisation.name }}</option>
   </OrganisationSelector>
 </template>
 
@@ -17,8 +15,8 @@
 import { OrganisationSimple, ProjectSimple } from 'abrechnung-common/types.js'
 import { getById } from 'abrechnung-common/utils/scripts.js'
 import { onMounted, ref } from 'vue'
-import APP_LOADER from '@/appData.js'
-import OrganisationSelector from '@/components/elements/OrganisationSelector.vue'
+import APP_LOADER from '@/dataLoader.js'
+import OrganisationSelector from './OrganisationSelector.vue'
 
 const props = defineProps<{
   modelValue: ProjectSimple<string>[] | string[] | [undefined] | [null]

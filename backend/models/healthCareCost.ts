@@ -1,7 +1,7 @@
 import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { addExchangeRate } from './exchangeRate.js'
+import { currencyConverter } from '../factory.js'
 import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
@@ -90,7 +90,7 @@ schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
 schema.methods.calculateExchangeRates = async function (this: HealthCareCostDoc) {
   const promiseList = []
   for (const expense of this.expenses) {
-    promiseList.push(addExchangeRate(expense.cost, expense.cost.date))
+    promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
   }
   await Promise.allSettled(promiseList)
 }

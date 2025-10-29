@@ -131,11 +131,17 @@ export class TravelCalculator {
       const newDays: {
         date: Date
         lumpSums: TravelDay<_id>['lumpSums']
-        cateringRefund?: TravelDay<_id>['cateringRefund']
-        purpose?: TravelDay<_id>['purpose']
-        overnightRefund?: TravelDay<_id>['overnightRefund']
+        cateringRefund: TravelDay<_id>['cateringRefund']
+        purpose: TravelDay<_id>['purpose']
+        overnightRefund: TravelDay<_id>['overnightRefund']
       }[] = days.map((d) => {
-        return { date: d, lumpSums: { overnight: { refund: { amount: 0 } }, catering: { refund: { amount: 0 }, type: 'catering8' } } }
+        return {
+          date: d,
+          lumpSums: { overnight: { refund: { amount: 0 } }, catering: { refund: { amount: 0 }, type: 'catering8' } },
+          cateringRefund: { breakfast: true, lunch: true, dinner: true },
+          overnightRefund: true,
+          purpose: 'professional'
+        }
       })
       if (oldDays) {
         for (const oldDay of oldDays) {
@@ -229,10 +235,10 @@ export class TravelCalculator {
     return null
   }
 
-  async calculateDays(
-    stages: Stage<_id, binary>[],
-    lastPlaceOfWork: Travel<_id, binary>['lastPlaceOfWork'],
-    destinationPlace: Travel<_id, binary>['destinationPlace'],
+  async calculateDays<idType extends _id = _id>(
+    stages: Stage<idType, binary>[],
+    lastPlaceOfWork: Travel<idType, binary>['lastPlaceOfWork'],
+    destinationPlace: Travel<idType, binary>['destinationPlace'],
     oldDays?: InputTravelDay[]
   ) {
     const borderCrossings: { date: Date; country: Country; special?: string }[] = []
@@ -249,8 +255,8 @@ export class TravelCalculator {
       ) {
         bXIndex++
       }
-      ;(day as Partial<TravelDayFullCountry<_id>>).country = borderCrossings[bXIndex].country
-      ;(day as Partial<TravelDayFullCountry<_id>>).special = borderCrossings[bXIndex].special
+      ;(day as Partial<TravelDayFullCountry<idType>>).country = borderCrossings[bXIndex].country
+      ;(day as Partial<TravelDayFullCountry<idType>>).special = borderCrossings[bXIndex].special
     }
 
     // change days according to last place of work
@@ -259,15 +265,15 @@ export class TravelCalculator {
     if (dateOfLastPlaceOfWork) {
       for (const day of days) {
         if (day.date.valueOf() >= dateOfLastPlaceOfWork.date.valueOf()) {
-          ;(day as Partial<TravelDayFullCountry<_id>>).country = await this.getCountryById(
+          ;(day as Partial<TravelDayFullCountry<idType>>).country = await this.getCountryById(
             dateOfLastPlaceOfWork.lastPlaceOfWork.country._id
           )
-          ;(day as Partial<TravelDayFullCountry<_id>>).special = dateOfLastPlaceOfWork.lastPlaceOfWork.special
+          ;(day as Partial<TravelDayFullCountry<idType>>).special = dateOfLastPlaceOfWork.lastPlaceOfWork.special
         }
       }
     }
 
-    return days as TravelDayFullCountry<_id>[]
+    return days as TravelDayFullCountry<idType>[]
   }
 
   async getCateringRefund(day: TravelDayFullCountry<_id>, type: CateringType, claimSpouseRefund: boolean) {

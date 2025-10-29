@@ -1,44 +1,49 @@
 <template>
   <Vueform
     :schema="schema"
-    ref="form$"
+    ref="form"
     :endpoint="false"
     @submit="(form$: any) => postDisplaySettings(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postDisplaySettings(($refs.form$ as any).data)}"></Vueform>
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postDisplaySettings(formRef?.data as any)}" />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { VueformElement, VueformSchema } from '@vueform/vueform'
 import { DisplaySettings } from 'abrechnung-common/types.js'
-import { defineComponent } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
-import APP_LOADER from '@/appData.js'
+import APP_LOADER from '@/dataLoader.js'
 
 const APP_DATA = APP_LOADER.data
-export default defineComponent({
-  name: 'DisplaySettingsForm',
-  data() {
-    return { schema: {} }
-  },
-  methods: {
-    async postDisplaySettings(displaySettings: DisplaySettings) {
-      const result = await API.setter<DisplaySettings<string>>('admin/displaySettings', displaySettings)
-      if (result.ok && APP_DATA.value) {
-        APP_DATA.value?.setDisplaySettings(result.ok)
-        ;(this.$refs.form$ as VueformElement).load(APP_DATA.value?.displaySettings, false)
-      }
-    }
-  },
-  async created() {
-    await APP_LOADER.loadData()
-    this.schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/displaySettings/form')).ok?.data, {
-      buttons: {
-        type: 'group',
-        schema: { submit: { type: 'button', submits: true, buttonLabel: this.$t('labels.save'), full: true, columns: { container: 6 } } }
-      },
-      _id: { type: 'hidden', meta: true }
-    })
-    queueMicrotask(() => (this.$refs.form$ as VueformElement).load(APP_DATA.value?.displaySettings, false))
+const { t } = useI18n()
+const schema = ref({})
+
+const formRef = useTemplateRef('form')
+
+async function postDisplaySettings(displaySettings: DisplaySettings) {
+  const result = await API.setter<DisplaySettings<string>>('admin/displaySettings', displaySettings)
+  if (result.ok && APP_DATA.value) {
+    APP_DATA.value.displaySettings = result.ok
+    loadDisplaySettings(APP_DATA.value?.displaySettings)
+  }
+}
+function loadDisplaySettings(displaySettings: DisplaySettings) {
+  //@ts-expect-error is wrongly typed as Vueform and not VueformElement
+  queueMicrotask(() => (formRef.value as VueformElement).load(displaySettings, false))
+}
+
+onMounted(async () => {
+  schema.value = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/displaySettings/form')).ok?.data, {
+    buttons: {
+      type: 'group',
+      schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }
+    },
+    _id: { type: 'hidden', meta: true }
+  })
+  await APP_LOADER.loadData()
+  if (APP_DATA.value) {
+    loadDisplaySettings(APP_DATA.value?.displaySettings)
   }
 })
 </script>

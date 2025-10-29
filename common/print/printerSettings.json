@@ -1,0 +1,20 @@
+{
+  "fontName": "Inter",
+  "fontSizes": {
+    "S": 9,
+    "M": 11,
+    "L": 16
+  },
+  "textColor": "#000",
+  "pagePadding": 36,
+  "borderColor": "#000",
+  "borderThickness": 1,
+  "cellPadding": {
+    "x": 2,
+    "bottom": 4
+  },
+  "pageSize": {
+    "width": 595.28,
+    "height": 841.89
+  }
+}

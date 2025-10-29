@@ -303,6 +303,7 @@
     "filter": "Filter",
     "fk": "Authentication",
     "flag": "Flag",
+    "fontName": "Font Name",
     "fontSizes": "Font sizes",
     "from": "From",
     "givenName": "Given name",
@@ -483,11 +484,11 @@
   },
   "lumpSums": {
     "catering8": "Catering lump sum (cut)",
-    "catering8\n": "Catering lump sum (cut)",
+    "catering8/": "Catering lump sum (cut)",
     "catering24": "Catering lump sum",
-    "catering24\n": "Catering lump sum",
+    "catering24/": "Catering lump sum",
     "overnight": "Overnight lump sum",
-    "overnight\n": "Overnight lump sum"
+    "overnight/": "Overnight lump sum"
   },
   "mail": {
     "advance": {

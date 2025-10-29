@@ -8,42 +8,42 @@
   </span>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { Tooltip } from 'bootstrap'
-import { defineComponent, nextTick } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
-export default defineComponent({
-  name: 'TooltipElement',
-  props: { text: { type: String, default: '' }, html: { type: Boolean, default: false } },
-  data() {
-    return { tooltipInstance: null as Tooltip | null }
-  },
-  async mounted() {
-    await nextTick()
+const props = defineProps({ text: { type: String, default: '' }, html: { type: Boolean, default: false } })
+const tooltipInstance = ref(null as Tooltip | null)
 
-    let htmlContent = (this.$refs.contentHolder as HTMLElement)?.innerHTML?.trim()
+const contentHolderRef = useTemplateRef('contentHolder')
+const tooltipTriggerRef = useTemplateRef('tooltipTrigger')
 
-    // fix vue3-easy-data-table issue adding style="display: none;" to all th elements
-    htmlContent = htmlContent.replace(/style="display:\s*none;?"/g, '')
+onMounted(async () => {
+  await nextTick()
 
-    const hasHTMLContent = Boolean(htmlContent)
-    if (hasHTMLContent || this.text) {
-      this.tooltipInstance = new Tooltip(this.$refs.tooltipTrigger as Element, {
-        trigger: 'click hover focus',
-        html: hasHTMLContent || this.html,
-        sanitize: !hasHTMLContent,
-        title: htmlContent || this.text
-      })
-    }
-  },
-  watch: {
-    text(newVal) {
-      this.tooltipInstance?.setContent({ '.tooltip-inner': newVal })
-    }
-  },
-  beforeUnmount() {
-    this.tooltipInstance?.dispose()
+  let htmlContent = contentHolderRef.value?.innerHTML?.trim()
+
+  // fix vue3-easy-data-table issue adding style="display: none;" to all th elements
+  htmlContent = htmlContent?.replace(/style="display:\s*none;?"/g, '')
+
+  const hasHTMLContent = Boolean(htmlContent)
+  if ((hasHTMLContent || props.text) && tooltipTriggerRef.value) {
+    tooltipInstance.value = new Tooltip(tooltipTriggerRef.value, {
+      trigger: 'click hover focus',
+      html: hasHTMLContent || props.html,
+      sanitize: !hasHTMLContent,
+      title: htmlContent || props.text
+    })
   }
+})
+watch(
+  () => props.text,
+  () => {
+    tooltipInstance.value?.setContent({ '.tooltip-inner': props.text })
+  }
+)
+onUnmounted(() => {
+  tooltipInstance.value?.dispose()
 })
 </script>
 

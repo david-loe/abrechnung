@@ -1,12 +1,12 @@
 <template>
-  <Badge :text="$t(`states.${StateEnum[state]}`)" :style="APP_DATA?.displaySettings.stateColors[state]"></Badge>
+  <Badge :text="$t(`states.${StateEnum[state]}`)" :style="APP_DATA?.displaySettings.stateColors[state]" />
 </template>
 
 <script lang="ts" setup>
 import { AnyState, AnyStateEnum } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
-import APP_LOADER from '@/appData.js'
 import Badge from '@/components/elements/Badge.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 defineProps({
   state: { type: Number as PropType<AnyState>, required: true },

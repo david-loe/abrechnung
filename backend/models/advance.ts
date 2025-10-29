@@ -12,8 +12,8 @@ import {
   Travel
 } from 'abrechnung-common/types.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
+import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
-import { addExchangeRate } from './exchangeRate.js'
 import { costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
@@ -95,7 +95,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
 }
 
 schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
-  await addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
+  await currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
