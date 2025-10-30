@@ -398,6 +398,7 @@ export type Log<idType extends _id = _id, S extends AnyState = AnyState> = {
 
 export interface ReportSimple<idType extends _id = _id, S extends AnyState = AnyState> {
   name: string
+  reference: number
   owner: UserSimple<idType>
   editor: UserSimple<idType>
   project: Project<idType>

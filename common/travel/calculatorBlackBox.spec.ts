@@ -91,6 +91,7 @@ const receipt1: DocumentFile<string, Blob> = {
 const travels = [
   {
     travel: {
+      reference: 1,
       _id: 'T-A',
       isCrossBorder: true,
       a1Certificate: { exactAddress: '10 Rue de Rivoli, 75001 Paris', destinationName: 'Kunde Paris' },
@@ -194,6 +195,7 @@ const travels = [
   },
   {
     travel: {
+      reference: 2,
       _id: 'T-B',
       isCrossBorder: true,
       professionalShare: 1.0,
@@ -278,6 +280,7 @@ const travels = [
   },
   {
     travel: {
+      reference: 3,
       _id: 'T-C',
       isCrossBorder: true,
       professionalShare: 0.8,
