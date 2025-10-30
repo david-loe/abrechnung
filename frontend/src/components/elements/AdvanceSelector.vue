@@ -3,7 +3,7 @@
     :options="advances"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => {setByUser = true; emit('update:modelValue', v)}"
+    @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => {setByUser = true; emit('update:modelValue', (v as AdvanceSimple[]))}"
     :filter="filter"
     :getOptionKey="(option: AdvanceSimple) => option._id"
     :getOptionLabel="(option: AdvanceSimple) => option.name"
@@ -34,13 +34,13 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
-      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name(owner?.name) }) }}</span>
+      <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name((owner as UserSimple | undefined)?.name) }) }}</span>
     </template>
   </v-select>
 </template>
 
 <script setup lang="ts">
-import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId, ProjectSimple } from 'abrechnung-common/types.js'
+import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/scripts.js'
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
