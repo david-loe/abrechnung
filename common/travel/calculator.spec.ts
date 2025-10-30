@@ -85,7 +85,8 @@ function createSetup() {
     reason: 'Reason',
     history: [],
     historic: false,
-    _id: 't1'
+    _id: 't1',
+    reference: 1
   }
 
   return { tc, stages, days, travel }

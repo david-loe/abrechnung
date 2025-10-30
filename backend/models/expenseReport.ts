@@ -2,7 +2,16 @@ import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates 
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
-import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import {
+  addReferenceOnNewDocs,
+  addToProjectBalance,
+  costObject,
+  offsetAdvance,
+  populateAll,
+  populateSelected,
+  requestBaseSchema,
+  setLog
+} from './helper.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -112,6 +121,7 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
   this.addUp = addUp(this) as AddUp<Types.ObjectId, ExpenseReport<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)
+  await addReferenceOnNewDocs(this, 'ExpenseReport')
 })
 
 schema.post('save', async function (this: ExpenseReportDoc) {

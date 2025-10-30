@@ -14,7 +14,7 @@ import {
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import { addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
@@ -172,6 +172,7 @@ schema.pre('save', async function (this: AdvanceDoc) {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
   setLog(this)
+  await addReferenceOnNewDocs(this, 'Advance')
 })
 
 export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)

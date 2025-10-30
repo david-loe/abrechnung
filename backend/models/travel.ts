@@ -15,6 +15,7 @@ import { currencyConverter, travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
 import {
+  addReferenceOnNewDocs,
   addToProjectBalance,
   costObject,
   offsetAdvance,
@@ -224,6 +225,7 @@ schema.pre('validate', async function (this: TravelDoc) {
 
 schema.pre('save', async function (this: TravelDoc) {
   setLog(this)
+  await addReferenceOnNewDocs(this, 'Travel')
 })
 
 schema.post('save', async function (this: TravelDoc) {

@@ -80,6 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 ) {
   const schema = {
     name: { type: String },
+    reference: { type: Number, index: true, unique: true, min: 0 },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: { type: Number, required: true, enum: stages, default: defaultState },
@@ -227,5 +228,20 @@ export async function addToProjectBalance(report: { addUp: AddUp[]; project: Pro
     throw error
   } finally {
     await session.endSession()
+  }
+}
+
+export async function addReferenceOnNewDocs(doc: HydratedDocument<{ reference: number; historic?: boolean }>, modelName: string) {
+  if (doc.isNew && !doc.historic) {
+    const maxRef =
+      (
+        await mongoose
+          .model<{ reference: number; historic?: boolean }>(modelName)
+          .findOne({ historic: { $ne: true } })
+          .sort({ reference: -1 })
+          .select({ reference: 1 })
+          .lean()
+      )?.reference || 0
+    doc.reference = maxRef + 1
   }
 }
