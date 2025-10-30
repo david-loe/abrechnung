@@ -560,6 +560,21 @@
 			"NativeDate": {
 				"type": "string"
 			},
+			"mongoose.DefaultTimestampProps": {
+				"properties": {
+					"updatedAt": {
+						"$ref": "#/components/schemas/NativeDate"
+					},
+					"createdAt": {
+						"$ref": "#/components/schemas/NativeDate"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt"
+				],
+				"type": "object"
+			},
 			"IdDocument_string_": {
 				"anyOf": [
 					{
@@ -10501,13 +10516,6 @@
 									"en"
 								]
 							},
-							"default": {
-								"type": "string",
-								"enum": [
-									"de",
-									"en"
-								]
-							},
 							"overwrite": {
 								"properties": {
 									"en": {
@@ -10526,6 +10534,13 @@
 									}
 								},
 								"type": "object"
+							},
+							"default": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
 							}
 						},
 						"type": "object"
@@ -12408,21 +12423,6 @@
 											"allOf": [
 												{
 													"properties": {
-														"updatedAt": {
-															"$ref": "#/components/schemas/NativeDate"
-														},
-														"createdAt": {
-															"$ref": "#/components/schemas/NativeDate"
-														}
-													},
-													"required": [
-														"updatedAt",
-														"createdAt"
-													],
-													"type": "object"
-												},
-												{
-													"properties": {
 														"expireAt": {
 															"$ref": "#/components/schemas/NativeDate"
 														},
@@ -12437,6 +12437,9 @@
 														"files"
 													],
 													"type": "object"
+												},
+												{
+													"$ref": "#/components/schemas/mongoose.DefaultTimestampProps"
 												},
 												{
 													"properties": {
