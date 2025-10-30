@@ -13,6 +13,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { getSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
@@ -40,11 +41,14 @@ export class TravelController extends Controller {
       sort: { startDate: -1 }
     })
   }
+
   @Delete()
   public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
+    const notAfterReview = (await getSettings()).preventOwnersFromDeletingReportsAfterReviewCompleted
     return await this.deleter(Travel, {
       _id: _id,
-      checkOldObject: async (oldObject: TravelDoc) => !oldObject.historic && oldObject.owner._id.equals(request.user._id)
+      checkOldObject: async (oldObject: TravelDoc) =>
+        !oldObject.historic && oldObject.owner._id.equals(request.user._id) && (!notAfterReview || oldObject.state < State.BOOKABLE)
     })
   }
 

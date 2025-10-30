@@ -34,6 +34,7 @@ export const settingsSchema = () => {
     userCanSeeAllProjects: { type: Boolean, required: true },
     onlyShowProjectNamesOnAssigned: { type: Boolean, required: true, conditions: [['userCanSeeAllProjects', true]] },
     autoSelectAvailableAdvances: { type: Boolean, required: true },
+    preventOwnersFromDeletingReportsAfterReviewCompleted: { type: Boolean, required: true },
     defaultAccess: { type: defaultAccess, required: true },
     disableReportType: { type: disableReportType, required: true },
     retentionPolicy: { type: retentionPolicy, required: true },

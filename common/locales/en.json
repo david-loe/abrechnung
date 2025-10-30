@@ -383,6 +383,7 @@
     "patientName": "Patient name",
     "place": "Place",
     "preciseServiceDescription": "Precise service description",
+    "preventOwnersFromDeletingReportsAfterReviewCompleted": "Prevent owners from deleting reports after the review is completed",
     "previous": "Previous",
     "printerSettings": "Print Settings",
     "private": "Private",
