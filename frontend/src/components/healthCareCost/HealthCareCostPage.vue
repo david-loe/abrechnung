@@ -154,7 +154,7 @@
               }}
             </template>
             <template #item-cost="{ cost }: Expense">
-              <div class="text-end">{{ formatter.money(cost) }}</div>
+              <div class="text-end tnum">{{ formatter.money(cost) }}</div>
             </template>
           </TableElement>
         </div>

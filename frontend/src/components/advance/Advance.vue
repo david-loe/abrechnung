@@ -13,7 +13,7 @@
       <tr>
         <th scope="row">{{ t('labels.budget') }}</th>
         <td>
-          <span> {{ formatter.money(advance.budget) }}</span>
+          <span class="tnum"> {{ formatter.money(advance.budget) }}</span>
           <span v-if="advance.budget.exchangeRate" class="text-secondary">
             &nbsp;-&nbsp;
             {{ formatter.money(advance.budget, { useExchangeRate: false }) }}
@@ -25,7 +25,7 @@
         <td>
           <div class="mb-1" v-for="report in advance.offsetAgainst">
             <small>
-              <span class="me-2">{{ formatter.money(report) }}</span>
+              <span class="me-2 tnum">{{ formatter.money(report) }}</span>
               <i
                 v-if="APP_DATA"
                 :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
@@ -37,7 +37,7 @@
       <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
         <td>
-          <span> {{ formatter.money(advance.balance) }}</span>
+          <span class="tnum"> {{ formatter.money(advance.balance) }}</span>
         </td>
       </tr>
       <tr>

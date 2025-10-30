@@ -16,7 +16,7 @@
           </small>
         </th>
         <template v-for="(col, index) of row">
-          <td v-if="index !== 0" class="text-end">
+          <td v-if="index !== 0" class="text-end tnum">
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
               <br >
@@ -27,7 +27,7 @@
       </tr>
       <tr v-if="addUp.length > 1">
         <th>{{ t('labels.totalBalance') }}</th>
-        <td :colspan="addUp.length" class="text-end">{{ formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
+        <td :colspan="addUp.length" class="text-end tnum">{{ formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
       <tr v-if="project.budget && project.budget.amount">
         <td>

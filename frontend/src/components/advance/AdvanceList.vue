@@ -114,8 +114,12 @@
     <template #item-organisation="{ project }: AdvanceSimple<string>">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-budget="{ budget }: AdvanceSimple">{{ formatter.money(budget) }}</template>
-    <template #item-balance="{ balance }: AdvanceSimple">{{ formatter.money(balance) }}</template>
+    <template #item-budget="{ budget }: AdvanceSimple">
+      <span class="tnum">{{ formatter.money(budget) }}</span>
+    </template>
+    <template #item-balance="{ balance }: AdvanceSimple">
+      <span class="tnum">{{ formatter.money(balance) }}</span>
+    </template>
     <template #item-report="{ _id, name }: AdvanceSimple">
       <button
         class="btn btn-primary btn-sm"

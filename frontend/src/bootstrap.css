@@ -5,3 +5,7 @@
 .clickable {
   cursor: pointer;
 }
+
+.tnum {
+  font-feature-settings: "tnum";
+}

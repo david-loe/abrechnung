@@ -176,7 +176,7 @@
               }}
             </template>
             <template #item-cost="{ cost }: Expense">
-              <div class="text-end">{{ formatter.money(cost) }}</div>
+              <div class="text-end tnum">{{ formatter.money(cost) }}</div>
             </template>
             <template #item-warning="expense: Expense">
               <span v-if="!(expense as Expense)._id" class="text-warning" :title="t('labels.draft')">

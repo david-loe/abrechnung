@@ -124,10 +124,12 @@
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.totalTotal="{ addUp }">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</template>
+    <template #item-addUp.totalTotal="{ addUp }">
+      <span class="tnum">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</span>
+    </template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
-        {{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}
+        <span class="tnum">{{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}</span>
         <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
           <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" />
         </template>
