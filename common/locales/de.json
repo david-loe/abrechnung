@@ -383,6 +383,7 @@
     "patientName": "Name des Leistungsempfängers",
     "place": "Ort",
     "preciseServiceDescription": "Genaue Leistungsbeschreibung",
+    "preventOwnersFromDeletingReportsAfterReviewCompleted": "Verhindern, dass Eigentümer Abrechnungen nach Abschluss der Überprüfung löschen",
     "previous": "Zurück",
     "printerSettings": "Druckeinstellungen",
     "private": "Privat",

@@ -33,5 +33,6 @@
   "userCanSeeAllProjects": true,
   "onlyShowProjectNamesOnAssigned": false,
   "autoSelectAvailableAdvances": true,
+  "preventOwnersFromDeletingReportsAfterReviewCompleted": false,
   "version": "2.1.14"
 }

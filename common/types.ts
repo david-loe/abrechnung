@@ -24,6 +24,7 @@ export interface Settings<idType extends _id = _id> {
   userCanSeeAllProjects: boolean
   onlyShowProjectNamesOnAssigned: boolean
   autoSelectAvailableAdvances: boolean
+  preventOwnersFromDeletingReportsAfterReviewCompleted: boolean
   defaultAccess: { [key in Access]: boolean }
   disableReportType: { [key in ReportType]: boolean }
   retentionPolicy: {

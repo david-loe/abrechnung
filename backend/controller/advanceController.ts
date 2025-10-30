@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, Locale, State } from 'abrechnung-common/types.js'
 import { Condition, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { getSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance, writeToDisk } from '../helper.js'
@@ -9,7 +10,7 @@ import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery } from './controller.js'
+import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
@@ -36,13 +37,16 @@ export class AdvanceController extends Controller {
       sort: { createdAt: -1 }
     })
   }
+
   @Delete()
   public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
+    const notAfterReview = (await getSettings()).preventOwnersFromDeletingReportsAfterReviewCompleted
     return await this.deleter(Advance, {
       _id: _id,
       checkOldObject: async (oldObject: AdvanceDoc) =>
-        request.user._id.equals(oldObject.owner._id) &&
-        (oldObject.state < State.BOOKABLE || (oldObject.state === State.BOOKED && Boolean(oldObject.settledOn)))
+        !oldObject.historic &&
+        (await checkOwner(request.user)(oldObject)) &&
+        (oldObject.state < State.BOOKABLE || (!notAfterReview && oldObject.state === State.BOOKED && Boolean(oldObject.settledOn)))
     })
   }
 
