@@ -46,7 +46,7 @@ export class ExpenseReportController extends Controller {
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        return (await checkOwner(request.user)(oldObject)) && (!notAfterReview || oldObject.state < State.BOOKABLE)
+        return !oldObject.historic && (await checkOwner(request.user)(oldObject)) && (!notAfterReview || oldObject.state < State.BOOKABLE)
       }
     })
   }

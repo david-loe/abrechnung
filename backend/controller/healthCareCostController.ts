@@ -49,7 +49,7 @@ export class HealthCareCostController extends Controller {
     return await this.deleter(HealthCareCost, {
       _id: _id,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        return (await checkOwner(request.user)(oldObject)) && (!notAfterReview || oldObject.state < State.BOOKABLE)
+        return !oldObject.historic && (await checkOwner(request.user)(oldObject)) && (!notAfterReview || oldObject.state < State.BOOKABLE)
       }
     })
   }

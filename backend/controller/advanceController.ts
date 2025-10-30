@@ -10,7 +10,7 @@ import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery } from './controller.js'
+import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
@@ -37,13 +37,15 @@ export class AdvanceController extends Controller {
       sort: { createdAt: -1 }
     })
   }
+
   @Delete()
   public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const notAfterReview = (await getSettings()).preventOwnersFromDeletingReportsAfterReviewCompleted
     return await this.deleter(Advance, {
       _id: _id,
       checkOldObject: async (oldObject: AdvanceDoc) =>
-        request.user._id.equals(oldObject.owner._id) &&
+        !oldObject.historic &&
+        (await checkOwner(request.user)(oldObject)) &&
         (oldObject.state < State.BOOKABLE || (!notAfterReview && oldObject.state === State.BOOKED && Boolean(oldObject.settledOn)))
     })
   }

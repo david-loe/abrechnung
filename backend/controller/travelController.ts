@@ -22,7 +22,7 @@ import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { sendA1Notification, sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { Controller, GetterQuery, SetterBody } from './controller.js'
+import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
 
@@ -48,7 +48,7 @@ export class TravelController extends Controller {
     return await this.deleter(Travel, {
       _id: _id,
       checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic && oldObject.owner._id.equals(request.user._id) && (!notAfterReview || oldObject.state < State.BOOKABLE)
+        !oldObject.historic && (await checkOwner(request.user)(oldObject)) && (!notAfterReview || oldObject.state < State.BOOKABLE)
     })
   }
 
