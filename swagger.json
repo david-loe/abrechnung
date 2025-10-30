@@ -6648,6 +6648,9 @@
 					"autoSelectAvailableAdvances": {
 						"type": "boolean"
 					},
+					"preventOwnersFromDeletingReportsAfterReviewCompleted": {
+						"type": "boolean"
+					},
 					"defaultAccess": {
 						"properties": {
 							"user": {
@@ -6788,6 +6791,7 @@
 					"userCanSeeAllProjects",
 					"onlyShowProjectNamesOnAssigned",
 					"autoSelectAvailableAdvances",
+					"preventOwnersFromDeletingReportsAfterReviewCompleted",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -6807,6 +6811,9 @@
 						"type": "boolean"
 					},
 					"autoSelectAvailableAdvances": {
+						"type": "boolean"
+					},
+					"preventOwnersFromDeletingReportsAfterReviewCompleted": {
 						"type": "boolean"
 					},
 					"defaultAccess": {
@@ -6949,6 +6956,7 @@
 					"userCanSeeAllProjects",
 					"onlyShowProjectNamesOnAssigned",
 					"autoSelectAvailableAdvances",
+					"preventOwnersFromDeletingReportsAfterReviewCompleted",
 					"defaultAccess",
 					"disableReportType",
 					"retentionPolicy",
@@ -7055,6 +7063,9 @@
 							}
 						},
 						"type": "object"
+					},
+					"preventOwnersFromDeletingReportsAfterReviewCompleted": {
+						"type": "boolean"
 					},
 					"autoSelectAvailableAdvances": {
 						"type": "boolean"
