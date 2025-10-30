@@ -19,10 +19,10 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/node": "^24.9.2",
     "ava": "^6.4.1",
-    "mongoose": "^8.18.1",
+    "mongoose": "^8.19.2",
     "nodemon": "^3.1.10",
-    "typescript": "^5.9.2",
-    "@types/node": "^24.9.2"
+    "typescript": "^5.9.3"
   }
 }
