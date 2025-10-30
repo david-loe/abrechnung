@@ -93,7 +93,11 @@ export class TRAVEL_APP_DATA extends LOGIN_APP_DATA {
   private _userSimple = {
     _id: '',
     projects: { assigned: [] as Project<string>[] },
-    settings: { lastCurrencies: [] as Currency[], lastCountries: [] as CountrySimple[] }
+    settings: { lastCurrencies: [], lastCountries: [] } as {
+      lastCurrencies: Currency[]
+      lastCountries: CountrySimple[]
+      organisation?: OrganisationSimple<string> | null
+    }
   }
 
   defaultCategory: Category<string> | undefined
