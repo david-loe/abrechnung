@@ -8,7 +8,7 @@ import {
   idDocumentToId,
   Log,
   Project,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   textColors,
   UserSimple
 } from 'abrechnung-common/types.js'
@@ -189,7 +189,7 @@ export function populateAll<DocType extends {}>(
 
 export async function offsetAdvance(
   report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId },
-  modelName: ReportModelName
+  modelName: ReportModelNameWithoutAdvance
 ) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
@@ -247,7 +247,7 @@ export async function addReferenceOnNewDocs(doc: HydratedDocument<ReferenceDoc>,
   }
 }
 
-type HistoryDoc = { reference: number; historic?: boolean; updatedAt: Date | string; history: Types.ObjectId[] }
+type HistoryDoc = { reference?: number; historic?: boolean; updatedAt: Date | string; history: Types.ObjectId[] }
 export async function addHistoryEntry(doc: HydratedDocument<HistoryDoc>, modelName: string, session: mongoose.ClientSession | null = null) {
   const m = mongoose.model<HistoryDoc>(modelName)
   const dbDoc = await m.findOne({ _id: doc._id }, { history: 0 }).session(session).lean()
@@ -257,7 +257,7 @@ export async function addHistoryEntry(doc: HydratedDocument<HistoryDoc>, modelNa
   dbDoc._id = new mongoose.Types.ObjectId()
   dbDoc.updatedAt = new Date()
   dbDoc.historic = true
-  dbDoc.reference = undefined as unknown as number
+  dbDoc.reference = undefined
   const old = new m(dbDoc)
   old.$locals.SKIP_POST_SAFE_HOOK = true
   await old.save({ timestamps: false, session })

@@ -45,12 +45,14 @@
               <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
                 <router-link :to="page.link">{{ t(page.title) }}</router-link>
               </li>
-              <li class="breadcrumb-item active" aria-current="page">{{ expenseReport.name }}</li>
+              <li class="breadcrumb-item active" aria-current="page">
+                <RefStringBadge :number="expenseReport.reference" type="ExpenseReport" />
+              </li>
             </ol>
           </nav>
         </div>
         <div class="col-auto">
-          <HelpButton :examinerMails="examinerMails" />
+          <HelpButton :examinerMails="examinerMails" :ref-string="refNumberToString(expenseReport.reference,'ExpenseReport')" />
         </div>
       </div>
 
@@ -291,7 +293,7 @@ import {
   State,
   UserSimple
 } from 'abrechnung-common/types.js'
-import { convertGermanDateToHTMLDate, getById } from 'abrechnung-common/utils/scripts.js'
+import { convertGermanDateToHTMLDate, getById, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -301,6 +303,7 @@ import Badge from '@/components/elements/Badge.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'

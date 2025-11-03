@@ -7,7 +7,7 @@ import {
   Comment,
   ExpenseReport,
   HealthCareCost,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   State,
   Travel
 } from 'abrechnung-common/types.js'
@@ -22,7 +22,7 @@ interface Methods {
   addComment(): void
   offset(
     reportTotal: number,
-    reportModelName: ReportModelName,
+    reportModelName: ReportModelNameWithoutAdvance,
     reportId: Types.ObjectId | null,
     session?: mongoose.ClientSession | null
   ): Promise<number>
@@ -115,7 +115,7 @@ interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
-  reportModelName: ReportModelName,
+  reportModelName: ReportModelNameWithoutAdvance,
   reportId: Types.ObjectId | null,
   session: mongoose.ClientSession | null = null
 ) {

@@ -17,7 +17,7 @@ import {
   PrinterSettings,
   Purpose,
   PurposeSimple,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   reportIsAdvance,
   reportIsExpenseReport,
   reportIsHealthCareCost,
@@ -599,7 +599,7 @@ class ReportPrint<idType extends _id> {
       width: 105,
       alignment: TextAlignment.Left,
       title: this.t('labels.type'),
-      fn: (t: ReportModelName) => this.t(`labels.${getReportTypeFromModelName(t)}`)
+      fn: (t: ReportModelNameWithoutAdvance) => this.t(`labels.${getReportTypeFromModelName(t)}`)
     })
     columns.push({
       key: 'amount',

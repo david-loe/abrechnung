@@ -45,12 +45,14 @@
               <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
                 <router-link :to="page.link">{{ t(page.title) }}</router-link>
               </li>
-              <li class="breadcrumb-item active" aria-current="page">{{ healthCareCost.name }}</li>
+              <li class="breadcrumb-item active" aria-current="page">
+                <RefStringBadge :number="healthCareCost.reference" type="HealthCareCost" />
+              </li>
             </ol>
           </nav>
         </div>
         <div class="col-auto">
-          <HelpButton :examinerMails="examinerMails" />
+          <HelpButton :examinerMails="examinerMails" :ref-string="refNumberToString(healthCareCost.reference,'HealthCareCost')" />
         </div>
       </div>
 
@@ -267,7 +269,7 @@ import {
   State,
   UserSimple
 } from 'abrechnung-common/types.js'
-import { getTotalTotal, mailToLink } from 'abrechnung-common/utils/scripts.js'
+import { getTotalTotal, mailToLink, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -276,6 +278,7 @@ import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'

@@ -429,7 +429,7 @@ export interface AdvanceBase<idType extends _id = _id> {
 }
 
 export interface AdvanceSimple<idType extends _id = _id> extends ReportSimple<idType, AdvanceState>, AdvanceBase<idType> {
-  offsetAgainst: { type: ReportModelName; report: { _id: idType; name: string } | null | undefined; amount: number }[]
+  offsetAgainst: { type: ReportModelNameWithoutAdvance; report: { _id: idType; name: string } | null | undefined; amount: number }[]
 }
 
 export interface Advance<idType extends _id = _id> extends Report<idType, AdvanceState>, AdvanceSimple<idType> {}
@@ -547,7 +547,8 @@ export type TransportType = (typeof transportTypes)[number]
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
 
-export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+export type ReportModelNameWithoutAdvance = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+export type ReportModelName = ReportModelNameWithoutAdvance | 'Advance'
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
@@ -566,6 +567,8 @@ export function getReportTypeFromModelName(modelName: ReportModelName) {
       return 'expenseReport'
     case 'HealthCareCost':
       return 'healthCareCost'
+    case 'Advance':
+      return 'advance'
   }
 }
 
@@ -726,6 +729,8 @@ export const emailRegex =
 export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
+
+export const refStringRegex = /^[TEHA]-([0123456789ABCDEFGHJKMNPQRSTVWXYZ]{3})+/
 
 export const baseCurrency: Currency = { _id: 'EUR', flag: '🇪🇺', name: { de: 'Euro', en: 'euro' }, subunit: 'Cent', symbol: '€' }
 export const defaultLocale: Locale = 'de'
