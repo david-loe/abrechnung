@@ -14,7 +14,7 @@ import {
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
-import { addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import { addHistoryEntry, addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
@@ -73,19 +73,8 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
 })
 
 schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
-  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance')
-    .findOne({ _id: this._id }, { history: 0 })
-    .session(session)
-    .lean()
-  if (!doc) {
-    throw new Error('Advance not found')
-  }
-  doc._id = new mongoose.Types.ObjectId()
-  doc.updatedAt = new Date()
-  doc.historic = true
-  const old = await model('Advance').create([doc], { timestamps: false, session })
-  this.history.push(old[0]._id)
-  this.markModified('history')
+  await addHistoryEntry(this, 'Advance', session)
+
   if (this.state === AdvanceState.APPLIED_FOR) {
     setAdvanceBalance(this)
   }
