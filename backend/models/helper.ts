@@ -80,7 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 ) {
   const schema = {
     name: { type: String },
-    reference: { type: Number, index: true, unique: true, min: 0 },
+    reference: { type: Number, index: true, unique: true, sparse: true, min: 0 },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: { type: Number, required: true, enum: stages, default: defaultState },
@@ -231,12 +231,13 @@ export async function addToProjectBalance(report: { addUp: AddUp[]; project: Pro
   }
 }
 
-export async function addReferenceOnNewDocs(doc: HydratedDocument<{ reference: number; historic?: boolean }>, modelName: string) {
+type ReferenceDoc = { reference: number; historic?: boolean }
+export async function addReferenceOnNewDocs(doc: HydratedDocument<ReferenceDoc>, modelName: string) {
   if (doc.isNew && !doc.historic) {
     const maxRef =
       (
         await mongoose
-          .model<{ reference: number; historic?: boolean }>(modelName)
+          .model<ReferenceDoc>(modelName)
           .findOne({ historic: { $ne: true } })
           .sort({ reference: -1 })
           .select({ reference: 1 })
@@ -244,4 +245,22 @@ export async function addReferenceOnNewDocs(doc: HydratedDocument<{ reference: n
       )?.reference || 0
     doc.reference = maxRef + 1
   }
+}
+
+type HistoryDoc = { reference: number; historic?: boolean; updatedAt: Date | string; history: Types.ObjectId[] }
+export async function addHistoryEntry(doc: HydratedDocument<HistoryDoc>, modelName: string) {
+  const m = mongoose.model<HistoryDoc>(modelName)
+  const dbDoc = await m.findOne({ _id: doc._id }, { history: 0 }).lean()
+  if (!dbDoc) {
+    throw new Error(`${modelName} (${doc._id}) not found while saving to history`)
+  }
+  dbDoc._id = new mongoose.Types.ObjectId()
+  dbDoc.updatedAt = new Date()
+  dbDoc.historic = true
+  dbDoc.reference = undefined as unknown as number
+  const old = new m(dbDoc)
+  old.$locals.SKIP_POST_SAFE_HOOK = true
+  await old.save({ timestamps: false })
+  doc.history.push(old._id)
+  doc.markModified('history')
 }

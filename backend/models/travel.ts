@@ -15,6 +15,7 @@ import { currencyConverter, travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
 import {
+  addHistoryEntry,
   addReferenceOnNewDocs,
   addToProjectBalance,
   costObject,
@@ -150,19 +151,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 })
 
 schema.methods.saveToHistory = async function (this: TravelDoc) {
-  const m = model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel')
-  const doc = await m.findOne({ _id: this._id }, { history: 0 }).lean()
-  if (!doc) {
-    throw new Error('Travel not found')
-  }
-  doc._id = new mongoose.Types.ObjectId()
-  doc.updatedAt = new Date()
-  doc.historic = true
-  const old = new m(doc)
-  old.$locals.SKIP_POST_SAFE_HOOK = true
-  await old.save({ timestamps: false })
-  this.history.push(old._id)
-  this.markModified('history')
+  await addHistoryEntry(this, 'Travel')
 
   if (this.state === TravelState.APPROVED) {
     // move vehicle registration of owner as receipt to 'ownCar' stages
