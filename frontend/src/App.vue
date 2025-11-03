@@ -5,8 +5,18 @@
   </ModalComponent>
   <HeaderComponent :language="APP_LOGIN_DATA?.language" @update:language="updateLanguage">
     <template v-if="APP_DATA">
-      <template v-for="access of accesses" :key="access">
-        <template v-if="access.indexOf(':') === -1 && APP_DATA.user.access[access]">
+      <li class=" nav-item ms-lg-auto me-lg-auto">
+        <form class="d-flex" role="search">
+          <input
+            type="search"
+            class="form-control"
+            :placeholder="'🔍 ' + t('labels.search') + '...'"
+            aria-label="Example text with button addon"
+            aria-describedby="button-addon1" >
+        </form>
+      </li>
+      <template v-if="orderdAccessList.flat().length <= 2">
+        <template v-for="access of orderdAccessList.flat()" :key="access">
           <li class="nav-item d-flex align-items-center">
             <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
               <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
@@ -15,7 +25,28 @@
           </li>
         </template>
       </template>
-      <li class="nav-item dropdown">
+      <template v-else>
+        <li class="nav-item dropdown me-2">
+          <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fs-4 bi bi-menu-down"></i><span class="ms-1">{{ t('labels.menu') }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <template v-for="(accesses,i) of orderdAccessList">
+              <li v-for="access of accesses" :key="access">
+                <router-link :to="'/' + access" class="d-flex align-items-center dropdown-item">
+                  <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-5 bi bi-' + icon"></i>
+                  <span class="ms-1">{{ t('accesses.' + access) }}</span>
+                </router-link>
+              </li>
+              <li v-if="i !== orderdAccessList.length - 1">
+                <hr class="dropdown-divider" >
+              </li>
+            </template>
+          </ul>
+        </li>
+      </template>
+
+      <li class="nav-item dropdown me-2">
         <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
           <i class="fs-4 bi bi-person-circle"></i>
           <span class="ms-1">{{ APP_DATA.user.name.givenName }}</span>
@@ -94,8 +125,8 @@
 </template>
 
 <script lang="ts" setup>
-import { accesses, Locale, User } from 'abrechnung-common/types.js'
-import { onMounted, useTemplateRef } from 'vue'
+import { Access, accesses, Locale, User } from 'abrechnung-common/types.js'
+import { computed, onMounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
@@ -139,6 +170,20 @@ async function updateLanguage(locale: Locale) {
     await API.setter('user/settings', { language: locale, hasUserSetLanguage: true } as Partial<User['settings']>, {}, false)
   }
 }
+
+const orderdAccessList = computed(() => {
+  const groups: Record<string, Access[]> = {}
+  if (APP_DATA.value) {
+    for (const access of accesses) {
+      if (APP_DATA.value.user.access[access] && access.indexOf(':') === -1) {
+        const prefix = access.split(/[:/]/)[0]
+        if (!groups[prefix]) groups[prefix] = []
+        groups[prefix].push(access)
+      }
+    }
+  }
+  return Object.values(groups)
+})
 
 function showInstallBanner() {
   if (installationBannerRef.value) {
