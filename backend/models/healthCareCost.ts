@@ -1,6 +1,6 @@
 import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
-import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
+import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
 import {
   addHistoryEntry,
