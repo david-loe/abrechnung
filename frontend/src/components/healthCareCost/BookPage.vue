@@ -22,7 +22,7 @@
       class="mb-5"
       table-class-name="small-table"
       endpoint="book/healthCareCost"
-      :columns-to-hide="['state']"
+      :columns-to-hide="['state', 'addUp.totalAdvance']"
       make-name-no-link
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
@@ -57,7 +57,7 @@
         class="mb-5"
         table-class-name="small-table"
         endpoint="book/healthCareCost"
-        :columns-to-hide="['state']"
+        :columns-to-hide="['state', 'addUp.totalAdvance']"
         make-name-no-link
         :stateFilter="show"
         :rows-per-page="10"

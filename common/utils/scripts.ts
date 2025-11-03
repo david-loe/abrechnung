@@ -156,6 +156,10 @@ export function getTotalTotal(addUps: FlatAddUp<_id>[]) {
   return addUps.reduce((sum, a) => sum + a.total.amount, 0)
 }
 
+export function getTotalAdvance(addUps: FlatAddUp<_id>[]) {
+  return addUps.reduce((sum, a) => sum + a.advance.amount, 0)
+}
+
 export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], withLumpSums = false) {
   const hasAdvance = addUps.some((addUp) => addUp.advance.amount > 0)
   const showExpenses = withLumpSums || hasAdvance

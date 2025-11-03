@@ -185,7 +185,7 @@ const healthCareCostList = useTemplateRef('healthCareCostList')
 const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
 
-const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'organisation', 'bookingRemark']
+const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'addUp.totalAdvance', 'organisation', 'bookingRemark']
 
 const router = useRouter()
 const { t } = useI18n()

@@ -127,6 +127,9 @@
     <template #item-addUp.totalTotal="{ addUp }">
       <span class="tnum">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</span>
     </template>
+    <template #item-addUp.totalAdvance="{ addUp }">
+      <span v-if="getTotalAdvance(addUp) > 0" class="tnum">{{ formatter.baseCurrency(getTotalAdvance(addUp)) }}</span>
+    </template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
         <span class="tnum">{{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}</span>
@@ -165,7 +168,7 @@
 
 <script lang="ts" setup>
 import { HealthCareCostSimple, HealthCareCostState, healthCareCostStates, Log } from 'abrechnung-common/types.js'
-import { getById, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils/scripts.js'
+import { getById, getTotalAdvance, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -221,6 +224,7 @@ if (window.innerWidth > bp.md) {
     { text: 'labels.organisation', value: 'organisation' },
     { text: 'labels.total', value: 'addUp.totalTotal' },
     { text: 'labels.balance', value: 'addUp.totalBalance' },
+    { text: 'labels.advance', value: 'addUp.totalAdvance' },
     { text: 'labels.owner', value: 'owner' },
     { text: 'labels.editor', value: 'editor' },
     { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },
