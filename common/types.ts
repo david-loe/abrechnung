@@ -559,7 +559,7 @@ export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
 export const defaultLastPlaceOfWorkSettings = ['destinationPlace', 'lastEndLocation'] as const
 export type DefaultLastPlaceOfWorkSetting = (typeof defaultLastPlaceOfWorkSettings)[number]
 
-export function getReportTypeFromModelName(modelName: ReportModelName) {
+export function getReportTypeFromModelName(modelName: ReportModelName): ReportType {
   switch (modelName) {
     case 'Travel':
       return 'travel'
@@ -569,6 +569,19 @@ export function getReportTypeFromModelName(modelName: ReportModelName) {
       return 'healthCareCost'
     case 'Advance':
       return 'advance'
+  }
+}
+
+export function getReportModelNameFromType(reportType: ReportType): ReportModelName {
+  switch (reportType) {
+    case 'travel':
+      return 'Travel'
+    case 'expenseReport':
+      return 'ExpenseReport'
+    case 'healthCareCost':
+      return 'HealthCareCost'
+    case 'advance':
+      return 'Advance'
   }
 }
 

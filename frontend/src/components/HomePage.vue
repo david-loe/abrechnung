@@ -4,6 +4,14 @@
       ref="modalComp"
       :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
       @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
+      <template #header="{header}">
+        <h5 class="modal-title">{{header}}</h5>
+        <RefStringBadge
+          v-if="modalObject.reference"
+          class="ms-2"
+          :number="modalObject.reference"
+          :type="getReportModelNameFromType(modalObjectType)" />
+      </template>
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)" />
@@ -149,6 +157,7 @@
 import {
   type AdvanceSimple,
   type ExpenseReportSimple,
+  getReportModelNameFromType,
   type HealthCareCostSimple,
   State,
   type TravelSimple
@@ -161,6 +170,7 @@ import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'

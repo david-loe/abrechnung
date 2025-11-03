@@ -3,7 +3,9 @@
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ props.header }}</h5>
+          <slot name="header" :header="props.header">
+            <h5 class="modal-title">{{ props.header }}</h5>
+          </slot>
           <button type="button" class="btn-close" @click="hideModal"></button>
         </div>
         <div class="modal-body">
