@@ -229,6 +229,11 @@ schema.post('save', async function (this: TravelDoc) {
   }
 })
 
+schema.index(
+  { name: 'text', 'comments.text': 'text', reason: 'text', 'destinationPlace.place': 'text', 'expenses.description': 'text' },
+  { weights: { name: 10, reason: 6, 'destinationPlace.place': 4, 'expenses.description': 4, 'comments.text': 3 } }
+)
+
 export default model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel', schema)
 
 export interface TravelDoc extends Methods, HydratedDocument<Travel<Types.ObjectId, mongo.Binary>> {}

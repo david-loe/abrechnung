@@ -7,7 +7,7 @@ import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
 
-export interface GetterQuery<ModelType> {
+export interface PaginationQuery {
   /**
    * @isInt
    * @minimum 0
@@ -20,6 +20,9 @@ export interface GetterQuery<ModelType> {
    * @default 1
    */
   page?: number
+}
+
+export interface GetterQuery<ModelType> extends PaginationQuery {
   _id?: string
   additionalFields?: (keyof ModelType)[]
   /**

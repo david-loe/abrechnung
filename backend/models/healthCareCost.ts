@@ -124,6 +124,11 @@ schema.post('save', async function (this: HealthCareCostDoc) {
   }
 })
 
+schema.index(
+  { name: 'text', 'comments.text': 'text', 'expenses.description': 'text' },
+  { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }
+)
+
 export default model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost', schema)
 
 export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost<Types.ObjectId, mongo.Binary>> {}

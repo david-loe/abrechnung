@@ -123,6 +123,11 @@ schema.post('save', async function (this: ExpenseReportDoc) {
   }
 })
 
+schema.index(
+  { name: 'text', reason: 'text', 'comments.text': 'text', 'expenses.description': 'text' },
+  { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }
+)
+
 export default model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport', schema)
 
 export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport<Types.ObjectId, mongo.Binary>> {}

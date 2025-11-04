@@ -164,6 +164,8 @@ schema.pre('save', async function (this: AdvanceDoc) {
   await addReferenceOnNewDocs(this, 'Advance')
 })
 
+schema.index({ name: 'text', reason: 'text', 'comments.text': 'text' }, { weights: { name: 10, reason: 6, 'comments.text': 3 } })
+
 export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)
 
 export interface AdvanceDoc extends Methods, HydratedDocument<Advance<Types.ObjectId>> {}
