@@ -81,12 +81,6 @@
         </ul>
       </li>
     </template>
-    <div v-else>
-      <router-link to="/login" class="nav-link link-body-emphasis d-flex align-items-center">
-        <i class="fs-4 bi bi-box-arrow-in-right"></i>
-        <span class="ms-1">{{ t('headlines.login') }}</span>
-      </router-link>
-    </div>
   </HeaderComponent>
 
   <div v-if="loadState !== 'LOADED'" class="position-absolute top-50 start-50 translate-middle">
