@@ -1,7 +1,7 @@
 <template>
   <span v-if="props.number > 0" class="badge text-bg-secondary clickable" @click="copyToClipboard">
     {{ refString }}
-    <span class="icon ms-1">
+    <span v-if="showCopy" class="icon ms-1">
       <i v-if="copied" class="bi bi-check-lg"></i>
       <i v-else class="bi bi-copy"></i>
     </span>
@@ -14,7 +14,11 @@ import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType, ref } from 'vue'
 import { logger } from '@/logger'
 
-const props = defineProps({ number: { type: Number, required: true }, type: { type: String as PropType<ReportModelName>, required: true } })
+const props = defineProps({
+  number: { type: Number, required: true },
+  type: { type: String as PropType<ReportModelName>, required: true },
+  showCopy: { type: Boolean, default: true }
+})
 
 const refString = computed(() => refNumberToString(props.number, props.type))
 
