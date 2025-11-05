@@ -123,6 +123,12 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   { path: '/user', component: HomePage, meta: { requiresAuth: true } },
+  {
+    path: '/advance/:_id([0-9a-fA-F]{24})',
+    component: HomePage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'advance' })
+  },
   { path: '/:pathMatch(.*)*', redirect: '/user' }
 ]
 

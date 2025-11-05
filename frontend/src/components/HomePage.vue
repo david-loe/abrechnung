@@ -159,10 +159,11 @@ import {
   type ExpenseReportSimple,
   getReportModelNameFromType,
   type HealthCareCostSimple,
+  ReportType,
   State,
   type TravelSimple
 } from 'abrechnung-common/types.js'
-import { ref, useTemplateRef } from 'vue'
+import { onMounted, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
@@ -199,6 +200,8 @@ const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal
 
 const router = useRouter()
 const { t } = useI18n()
+
+const props = defineProps({ reportType: { type: String as PropType<ReportType> }, reportId: { type: String } })
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -275,6 +278,26 @@ async function deleteReport(endpoint: 'travel' | 'advance', _id: string) {
     resetAndHide()
   }
 }
+
+async function showPropReport() {
+  if (props.reportId && props.reportType) {
+    const result = await API.getter<ModalObject>(props.reportType, { _id: props.reportId })
+    if (result.ok) {
+      showModal('view', props.reportType, result.ok.data)
+    }
+    router.replace('/user')
+  }
+}
+
+onMounted(() => {
+  showPropReport()
+})
+watch(
+  () => props.reportId,
+  () => {
+    showPropReport()
+  }
+)
 </script>
 
 <style></style>
