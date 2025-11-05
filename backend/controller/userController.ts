@@ -15,6 +15,7 @@ import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
+import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import Token from '../models/token.js'
@@ -196,9 +197,26 @@ export class UserAdminController extends Controller {
     return await this.deleter(User, {
       _id,
       referenceChecks: [
-        { model: Travel, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } },
-        { model: ExpenseReport, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } },
-        { model: HealthCareCost, paths: ['owner', 'editor', 'comments.author'], conditions: { historic: false } }
+        {
+          model: Travel,
+          paths: ['owner', 'editor', 'comments.author', 'log.-10.by', 'log.0.by', 'log.10.by', 'log.20.by', 'log.30.by', 'log.40.by'],
+          conditions: { historic: false }
+        },
+        {
+          model: ExpenseReport,
+          paths: ['owner', 'editor', 'comments.author', 'log.10.by', 'log.20.by', 'log.30.by', 'log.40.by'],
+          conditions: { historic: false }
+        },
+        {
+          model: HealthCareCost,
+          paths: ['owner', 'editor', 'comments.author', 'log.10.by', 'log.20.by', 'log.30.by', 'log.40.by'],
+          conditions: { historic: false }
+        },
+        {
+          model: Advance,
+          paths: ['owner', 'editor', 'comments.author', 'log.-10.by', 'log.0.by', 'log.30.by', 'log.40.by'],
+          conditions: { historic: false }
+        }
       ]
     })
   }
