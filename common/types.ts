@@ -585,6 +585,19 @@ export function getReportModelNameFromType(reportType: ReportType): ReportModelN
   }
 }
 
+export function getStateEnumFromModelName(modelName: ReportModelName): AnyStateEnum {
+  switch (modelName) {
+    case 'Travel':
+      return TravelState
+    case 'ExpenseReport':
+      return ExpenseReportState
+    case 'HealthCareCost':
+      return HealthCareCostState
+    case 'Advance':
+      return AdvanceState
+  }
+}
+
 export const retention = [
   'deleteBookedAfterXDays',
   'deleteApprovedTravelAfterXDaysUnused',
@@ -743,7 +756,8 @@ export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
 
-export const refStringRegex = /^[TEHA]-([0123456789ABCDEFGHJKMNPQRSTVWXYZ]{3})+/
+export const refStringRegex = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{3})+$/
+export const refStringRegexLax = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZILO]{3})+$/i
 
 export const baseCurrency: Currency = { _id: 'EUR', flag: '🇪🇺', name: { de: 'Euro', en: 'euro' }, subunit: 'Cent', symbol: '€' }
 export const defaultLocale: Locale = 'de'

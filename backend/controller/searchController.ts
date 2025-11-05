@@ -1,5 +1,6 @@
 import {
   AdvanceState,
+  AnyState,
   ExpenseReportState,
   HealthCareCostState,
   IdDocument,
@@ -8,7 +9,8 @@ import {
   ReportModelName,
   State,
   TravelState,
-  User
+  User,
+  UserSimple
 } from 'abrechnung-common/types.js'
 import mongoose, { FilterQuery } from 'mongoose'
 import { Get, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
@@ -39,8 +41,11 @@ export class SearchController {
   @Get('ref')
   public async getByRef(@Query() ref: number, @Query() type: ReportModelName, @Request() request: AuthenticatedExpressRequest) {
     const filter = getPermissionFilter(request.user)[type]
-    filter['reference'] = ref
-    const report = await mongoose.model(type).findOne(filter).lean()
+    const report = await mongoose
+      .model<{ state: AnyState; name: string; owner: UserSimple }>(type)
+      .findOne({ ...filter, reference: ref })
+      .select({ _id: 1, state: 1, name: 1, owner: 1 })
+      .lean()
     if (!report) {
       throw new NotFoundError(`No ${type} with ref: '${ref}' found or not allowed`)
     }
@@ -127,12 +132,21 @@ async function simpleSearch(termRaw: string, filter: Record<ReportModelName, Fil
       $unionWith: { coll: 'healthcarecosts', pipeline: [match('HealthCareCost'), { $addFields: { _reportModelName: 'HealthCareCost' } }] }
     },
     { $unionWith: { coll: 'advances', pipeline: [match('Advance'), { $addFields: { _reportModelName: 'Advance' } }] } },
-    { $project: { name: 1, _id: 1, score: { $meta: 'textScore' }, _reportModelName: 1 } },
+    { $project: { name: 1, _id: 1, state: 1, score: { $meta: 'textScore' }, _reportModelName: 1, owner: 1 } },
     { $sort: { score: -1 } },
     { $facet: { rows: [{ $skip: (page - 1) * limit }, { $limit: limit }], count: [{ $count: 'total' }] } },
     { $project: { rows: 1, total: { $ifNull: [{ $arrayElemAt: ['$count.total', 0] }, 0] } } }
   ]
-  console.log(JSON.stringify(pipeline))
-  const result = (await mongoose.connection.collection('travels').aggregate(pipeline).toArray())[0] as { rows: unknown[]; total: number }
+  const result = (await mongoose.connection.collection('travels').aggregate(pipeline).toArray())[0] as {
+    rows: {
+      name: string
+      _id: mongoose.Types.ObjectId
+      owner: mongoose.Types.ObjectId
+      state: AnyState
+      score: number
+      _reportModelName: ReportModelName
+    }[]
+    total: number
+  }
   return result
 }
