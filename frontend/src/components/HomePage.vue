@@ -163,7 +163,7 @@ import {
   State,
   type TravelSimple
 } from 'abrechnung-common/types.js'
-import { onMounted, PropType, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onMounted, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
@@ -285,19 +285,13 @@ async function showPropReport() {
     if (result.ok) {
       showModal('view', props.reportType, result.ok.data)
     }
+    await nextTick()
     router.replace('/user')
   }
 }
 
-onMounted(() => {
-  showPropReport()
-})
-watch(
-  () => props.reportId,
-  () => {
-    showPropReport()
-  }
-)
+onMounted(showPropReport)
+watch(() => props.reportId, showPropReport)
 </script>
 
 <style></style>

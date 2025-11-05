@@ -232,13 +232,18 @@ export async function addToProjectBalance(report: { addUp: AddUp[]; project: Pro
 }
 
 type ReferenceDoc = { reference: number; historic?: boolean }
-export async function addReferenceOnNewDocs(doc: HydratedDocument<ReferenceDoc>, modelName: string) {
+export async function addReferenceOnNewDocs(
+  doc: HydratedDocument<ReferenceDoc>,
+  modelName: string,
+  session: mongoose.ClientSession | null = null
+) {
   if (doc.isNew && !doc.historic) {
     const maxRef =
       (
         await mongoose
           .model<ReferenceDoc>(modelName)
           .findOne({ historic: { $ne: true } })
+          .session(session)
           .sort({ reference: -1 })
           .select({ reference: 1 })
           .lean()

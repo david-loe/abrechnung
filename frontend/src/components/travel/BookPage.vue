@@ -69,14 +69,15 @@
 
 <script lang="ts" setup>
 import { State, TravelSimple, TravelState } from 'abrechnung-common/types.js'
-import { ComponentPublicInstance, MaybeRefOrGetter, ref, useTemplateRef } from 'vue'
+import { ComponentPublicInstance, MaybeRefOrGetter, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useVueToPrint } from 'vue-to-print'
 import API from '@/api'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
-import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
+import { expandCollapseComments, hideExpandColumn as hideExpCol, showFile } from '@/helper'
 
 const { t } = useI18n()
 
@@ -133,6 +134,18 @@ const { handlePrint } = useVueToPrint({
       display: block;
     }`
 })
+
+const router = useRouter()
+const props = defineProps<{ _id?: string }>()
+async function showPropsReport() {
+  if (props._id) {
+    await showFile({ endpoint: `book/travel/report`, params: { _id: props._id }, filename: `${t('labels.travel')}.pdf` })
+    await nextTick()
+    router.replace('/book/travel')
+  }
+}
+onMounted(showPropsReport)
+watch(() => props._id, showPropsReport)
 </script>
 
 <style>

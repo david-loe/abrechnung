@@ -123,6 +123,9 @@ function getPermissionFilter(user: User) {
 
 async function simpleSearch(termRaw: string, filter: Record<ReportModelName, FilterQuery<unknown>>, limit: number, page: number) {
   const term = termRaw.trim()
+  if (!term) {
+    return { rows: [], total: 0 }
+  }
   const match = (reportModelName: ReportModelName) => ({ $match: { $text: { $search: term }, ...filter[reportModelName] } })
   const pipeline = [
     match('Travel'),

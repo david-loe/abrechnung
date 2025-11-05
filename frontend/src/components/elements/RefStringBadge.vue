@@ -11,12 +11,13 @@
 <script lang="ts" setup>
 import { ReportModelName } from 'abrechnung-common/types.js'
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
-import { PropType, ref } from 'vue'
+import { computed, PropType, ref } from 'vue'
 import { logger } from '@/logger'
 
 const props = defineProps({ number: { type: Number, required: true }, type: { type: String as PropType<ReportModelName>, required: true } })
 
-const refString = ref(refNumberToString(props.number, props.type))
+const refString = computed(() => refNumberToString(props.number, props.type))
+
 const copied = ref(false)
 
 const copyToClipboard = async () => {
@@ -27,7 +28,7 @@ const copyToClipboard = async () => {
       copied.value = false
     }, 2000) // Meldung nach 2 Sek. ausblenden
   } catch (err) {
-    logger.error(`Fehler beim Kopieren:\n${err}`)
+    logger.error(`Error on Copy:\n${err}`)
   }
 }
 </script>

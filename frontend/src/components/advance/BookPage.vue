@@ -64,13 +64,14 @@
 
 <script lang="ts" setup>
 import { AdvanceSimple, AdvanceState, State } from 'abrechnung-common/types.js'
-import { ComponentPublicInstance, MaybeRefOrGetter, ref, useTemplateRef } from 'vue'
+import { ComponentPublicInstance, MaybeRefOrGetter, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useVueToPrint } from 'vue-to-print'
 import API from '@/api'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
-import { expandCollapseComments, hideExpandColumn as hideExpCol } from '@/helper'
+import { expandCollapseComments, hideExpandColumn as hideExpCol, showFile } from '@/helper'
 
 const { t } = useI18n()
 const tableRef = useTemplateRef('table')
@@ -117,6 +118,18 @@ const { handlePrint } = useVueToPrint({
       margin: 0;        /* Removes header and footer margins */
     }`
 })
+
+const router = useRouter()
+const props = defineProps<{ _id?: string }>()
+async function showPropsReport() {
+  if (props._id) {
+    await showFile({ endpoint: `book/advance/report`, params: { _id: props._id }, filename: `${t('labels.advance')}.pdf` })
+    await nextTick()
+    router.replace('/book/advance')
+  }
+}
+onMounted(showPropsReport)
+watch(() => props._id, showPropsReport)
 </script>
 
 <style>

@@ -207,12 +207,14 @@ async function updateLanguage(locale: Locale) {
   }
 }
 
+// Group user accesses by prefix (e.g., "approve/travel" and "approve/advance" → "approve" group)
+// Excludes colon-based accesses (e.g., "appliedFor:advance") as they are derived permissions
 const orderdAccessList = computed(() => {
   const groups: Record<string, Access[]> = {}
   if (APP_DATA.value) {
     for (const access of accesses) {
       if (APP_DATA.value.user.access[access] && access.indexOf(':') === -1) {
-        const prefix = access.split(/[:/]/)[0]
+        const prefix = access.split('/')[0]
         if (!groups[prefix]) groups[prefix] = []
         groups[prefix].push(access)
       }
