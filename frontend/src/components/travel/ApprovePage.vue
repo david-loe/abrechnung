@@ -10,6 +10,10 @@
       "
       ref="modalComp"
       @afterClose="modalMode === 'view' ? resetModal() : null">
+      <template #header="{header}">
+        <h5 class="modal-title">{{header}}</h5>
+        <RefStringBadge v-if="modalTravel.reference" class="ms-2" :number="modalTravel.reference" type="Travel" />
+      </template>
       <div v-if="modalMode === 'approvedTravels'">
         <form
           @submit.prevent="
@@ -139,6 +143,7 @@ import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import DateInput from '@/components/elements/DateInput.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'

@@ -2,6 +2,7 @@ import cors from 'cors'
 import express, { NextFunction as ExNextFunction, Request as ExRequest, Response as ExResponse } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
+import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
@@ -16,6 +17,7 @@ import { checkForMigrations } from './migrations.js'
 export default async function () {
   await connectDB()
   await checkForMigrations()
+  await mongoose.syncIndexes()
 
   const app = express()
 

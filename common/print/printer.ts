@@ -211,10 +211,11 @@ export class PDFDrawer<idType extends _id> {
     this.doc = doc
     this.font = font
     this.formatter = formatter
-    this.settings = Object.assign({}, settings, {
-      textColor: componentsToColor(hexToRGB(settings.textColor), 0.00390625),
-      borderColor: componentsToColor(hexToRGB(settings.borderColor), 0.00390625)
-    })
+    this.settings = {
+      ...settings,
+      textColor: componentsToColor(hexToRGB(settings.textColor), 0.00390625) || rgb(0, 0, 0),
+      borderColor: componentsToColor(hexToRGB(settings.borderColor), 0.00390625) || rgb(0, 0, 0)
+    }
     this.getDocumentFileBufferById = getDocumentFileBufferById
     this.getOrganisationLogoIdById = getOrganisationLogoIdById
     this.formatter.setLocale(this.settings.language)
@@ -254,10 +255,11 @@ export class PDFDrawer<idType extends _id> {
    * returns bottom y end
    */
   drawMultilineText(text: string, options: Options & { alignment?: TextAlignment; width?: number }) {
-    const opts = Object.assign(options, {
+    const opts = {
       alignment: TextAlignment.Left,
-      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
-    })
+      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart,
+      ...options
+    }
     const multiLineText = layoutMultilineText(text, {
       alignment: opts.alignment,
       font: this.font,
@@ -277,10 +279,11 @@ export class PDFDrawer<idType extends _id> {
     options: Options & { alignment?: TextAlignment; width?: number }
   ) {
     let textWithPlace = text
-    const opts = Object.assign(options, {
+    const opts = {
       alignment: TextAlignment.Left,
-      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart
-    })
+      width: this.currentPage.getSize().width - this.settings.pagePadding - options.xStart,
+      ...options
+    }
     const flagPseudoSuffixWidth =
       this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
     if (place.place) {
@@ -496,18 +499,14 @@ export class PDFDrawer<idType extends _id> {
     }
     const flagPseudoSuffixWidth =
       this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
-    const opts = Object.assign(
-      {
-        cellHeight: options.fontSize * 1.5,
-        defaultCellWidth: 100,
-        xStart: this.settings.pagePadding,
-        yStart: this.currentPage.getSize().height - this.settings.pagePadding,
-        newPageXStart: this.settings.pagePadding,
-        newPageYStart: this.currentPage.getSize().height - this.settings.pagePadding,
-        firstRow: true
-      },
-      options
-    )
+    const opts = {
+      cellHeight: options.fontSize * 1.5,
+      defaultCellWidth: 100,
+      newPageXStart: this.settings.pagePadding,
+      newPageYStart: this.currentPage.getSize().height - this.settings.pagePadding,
+      firstRow: true,
+      ...options
+    }
 
     opts.yStart = opts.yStart - opts.cellHeight
     opts.newPageYStart = opts.newPageYStart - opts.cellHeight

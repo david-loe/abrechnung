@@ -304,6 +304,31 @@ export async function checkForMigrations() {
       logger.info('Apply migration from v2.1.13: set fontName')
       await mongoose.connection.collection('printersettings').updateOne({}, { $set: { fontName: 'Inter' } })
     }
+    if (semver.lte(migrateFrom, '2.1.14')) {
+      logger.info('Apply migration from v2.1.14: add reference numbers to existing documents')
+
+      async function addReference(collectionName: string) {
+        const collection = mongoose.connection.collection<{ reference: number; historic?: boolean }>(collectionName)
+        const cursor = collection.find({ historic: { $ne: true } }).sort({ _id: 1 })
+        let counter = 1
+        const batchSize = 1000
+        let batch = []
+        for await (const doc of cursor) {
+          batch.push({ updateOne: { filter: { _id: doc._id }, update: { $set: { reference: counter++ } } } })
+          if (batch.length === batchSize) {
+            await collection.bulkWrite(batch)
+            batch = []
+          }
+        }
+        if (batch.length > 0) {
+          await collection.bulkWrite(batch)
+        }
+      }
+      await addReference('travels')
+      await addReference('expensereports')
+      await addReference('healthcarecosts')
+      await addReference('advances')
+    }
 
     if (settings) {
       settings.migrateFrom = undefined

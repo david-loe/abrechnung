@@ -398,6 +398,7 @@ export type Log<idType extends _id = _id, S extends AnyState = AnyState> = {
 
 export interface ReportSimple<idType extends _id = _id, S extends AnyState = AnyState> {
   name: string
+  reference: number
   owner: UserSimple<idType>
   editor: UserSimple<idType>
   project: Project<idType>
@@ -428,7 +429,7 @@ export interface AdvanceBase<idType extends _id = _id> {
 }
 
 export interface AdvanceSimple<idType extends _id = _id> extends ReportSimple<idType, AdvanceState>, AdvanceBase<idType> {
-  offsetAgainst: { type: ReportModelName; report: { _id: idType; name: string } | null | undefined; amount: number }[]
+  offsetAgainst: { type: ReportModelNameWithoutAdvance; report: { _id: idType; name: string } | null | undefined; amount: number }[]
 }
 
 export interface Advance<idType extends _id = _id> extends Report<idType, AdvanceState>, AdvanceSimple<idType> {}
@@ -546,7 +547,8 @@ export type TransportType = (typeof transportTypes)[number]
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
 
-export type ReportModelName = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+export type ReportModelNameWithoutAdvance = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
+export type ReportModelName = ReportModelNameWithoutAdvance | 'Advance'
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]
@@ -557,7 +559,7 @@ export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
 export const defaultLastPlaceOfWorkSettings = ['destinationPlace', 'lastEndLocation'] as const
 export type DefaultLastPlaceOfWorkSetting = (typeof defaultLastPlaceOfWorkSettings)[number]
 
-export function getReportTypeFromModelName(modelName: ReportModelName) {
+export function getReportTypeFromModelName(modelName: ReportModelName): ReportType {
   switch (modelName) {
     case 'Travel':
       return 'travel'
@@ -565,6 +567,47 @@ export function getReportTypeFromModelName(modelName: ReportModelName) {
       return 'expenseReport'
     case 'HealthCareCost':
       return 'healthCareCost'
+    case 'Advance':
+      return 'advance'
+  }
+}
+
+export function getReportModelNameFromType(reportType: ReportType): ReportModelName {
+  switch (reportType) {
+    case 'travel':
+      return 'Travel'
+    case 'expenseReport':
+      return 'ExpenseReport'
+    case 'healthCareCost':
+      return 'HealthCareCost'
+    case 'advance':
+      return 'Advance'
+  }
+}
+
+export function getStateEnumFromModelName(modelName: ReportModelName): AnyStateEnum {
+  switch (modelName) {
+    case 'Travel':
+      return TravelState
+    case 'ExpenseReport':
+      return ExpenseReportState
+    case 'HealthCareCost':
+      return HealthCareCostState
+    case 'Advance':
+      return AdvanceState
+  }
+}
+export function getModelNameFromReport(report: Travel | ExpenseReport | HealthCareCost | Advance): ReportModelName
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
+export function getModelNameFromReport(report: any): ReportModelName {
+  if (reportIsTravel(report)) {
+    return 'Travel'
+  } else if (reportIsHealthCareCost(report)) {
+    return 'HealthCareCost'
+  } else if (reportIsAdvance(report)) {
+    return 'Advance'
+  } else {
+    return 'ExpenseReport'
   }
 }
 
@@ -725,6 +768,9 @@ export const emailRegex =
 export const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
+
+export const refStringRegex = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{3})+$/
+export const refStringRegexLax = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZILO]{3})+$/i
 
 export const baseCurrency: Currency = { _id: 'EUR', flag: '🇪🇺', name: { de: 'Euro', en: 'euro' }, subunit: 'Cent', symbol: '€' }
 export const defaultLocale: Locale = 'de'

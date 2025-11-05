@@ -136,15 +136,12 @@ tbody.vue3-easy-data-table__body td {
   position: relative; /* für absolutes Positionieren des Icons */
 }
 
-/* Das Icon verstecken und sanft einblenden */
 .overlay {
   z-index: 10;
   position: absolute;
   top: 1px;
   right: 1px;
-  /* Optional: Hintergrundkreis, damit’s besser zu erkennen ist */
   background-color: rgba(var(--bs-body-bg-rgb), 0.8);
-  /* line-height: 0; */
 }
 
 .settings-icon {

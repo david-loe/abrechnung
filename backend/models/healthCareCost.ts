@@ -1,8 +1,18 @@
 import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStates } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
-import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
+import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
-import { addToProjectBalance, costObject, offsetAdvance, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import {
+  addHistoryEntry,
+  addReferenceOnNewDocs,
+  addToProjectBalance,
+  costObject,
+  offsetAdvance,
+  populateAll,
+  populateSelected,
+  requestBaseSchema,
+  setLog
+} from './helper.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -69,19 +79,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Health
 })
 
 schema.methods.saveToHistory = async function (this: HealthCareCostDoc) {
-  const m = model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost')
-  const doc = await m.findOne({ _id: this._id }, { history: 0 }).lean()
-  if (!doc) {
-    throw new Error('Health Care Cost not found')
-  }
-  doc._id = new mongoose.Types.ObjectId()
-  doc.updatedAt = new Date()
-  doc.historic = true
-  const old = new m(doc)
-  old.$locals.SKIP_POST_SAFE_HOOK = true
-  await old.save({ timestamps: false })
-  this.history.push(old._id)
-  this.markModified('history')
+  await addHistoryEntry(this, 'HealthCareCost')
   this.$locals.SKIP_POST_SAFE_HOOK = true
   await this.save()
   this.$locals.SKIP_POST_SAFE_HOOK = false
@@ -113,6 +111,7 @@ schema.pre('save', async function (this: HealthCareCostDoc) {
   this.addUp = addUp(this) as AddUp<Types.ObjectId, HealthCareCost<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)
+  await addReferenceOnNewDocs(this, 'HealthCareCost')
 })
 
 schema.post('save', async function (this: HealthCareCostDoc) {
@@ -124,6 +123,11 @@ schema.post('save', async function (this: HealthCareCostDoc) {
     await offsetAdvance(this, 'HealthCareCost')
   }
 })
+
+schema.index(
+  { name: 'text', 'comments.text': 'text', 'expenses.description': 'text' },
+  { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }
+)
 
 export default model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost', schema)
 

@@ -29,10 +29,10 @@ import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 
-const props = defineProps<{ examinerMails: string[] }>()
+const props = defineProps<{ examinerMails: string[]; refString?: string }>()
 
-const mailToLinkVal = mailToLink(props.examinerMails)
-const msTeamsToLinkVal = msTeamsToLink(props.examinerMails)
+const mailToLinkVal = mailToLink(props.examinerMails, props.refString)
+const msTeamsToLinkVal = msTeamsToLink(props.examinerMails, props.refString)
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data

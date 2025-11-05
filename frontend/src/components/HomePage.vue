@@ -4,6 +4,14 @@
       ref="modalComp"
       :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
       @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
+      <template #header="{header}">
+        <h5 class="modal-title">{{header}}</h5>
+        <RefStringBadge
+          v-if="modalObject.reference"
+          class="ms-2"
+          :number="modalObject.reference"
+          :type="getReportModelNameFromType(modalObjectType)" />
+      </template>
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)" />
@@ -149,11 +157,13 @@
 import {
   type AdvanceSimple,
   type ExpenseReportSimple,
+  getReportModelNameFromType,
   type HealthCareCostSimple,
+  ReportType,
   State,
   type TravelSimple
 } from 'abrechnung-common/types.js'
-import { ref, useTemplateRef } from 'vue'
+import { nextTick, onMounted, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
@@ -161,6 +171,7 @@ import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
@@ -189,6 +200,8 @@ const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal
 
 const router = useRouter()
 const { t } = useI18n()
+
+const props = defineProps({ reportType: { type: String as PropType<ReportType> }, reportId: { type: String } })
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -265,6 +278,20 @@ async function deleteReport(endpoint: 'travel' | 'advance', _id: string) {
     resetAndHide()
   }
 }
+
+async function showPropReport() {
+  if (props.reportId && props.reportType) {
+    const result = await API.getter<ModalObject>(props.reportType, { _id: props.reportId })
+    if (result.ok) {
+      showModal('view', props.reportType, result.ok.data)
+    }
+    await nextTick()
+    router.replace('/user')
+  }
+}
+
+onMounted(showPropReport)
+watch(() => props.reportId, showPropReport)
 </script>
 
 <style></style>

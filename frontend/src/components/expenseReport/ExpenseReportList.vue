@@ -12,6 +12,21 @@
     :dbKeyPrefix="props.dbKeyPrefix"
     @update:items-selected="(v) => emits('update:itemsSelected',(v as ExpenseReportSimple[]))"
     @loaded="emits('loaded')">
+    <template #header-reference="header">
+      <div class="filter-column">
+        {{ t(header.text) }}
+        <span class="clickable" @click="(e) => clickFilter('reference', e)">
+          <i v-if="showFilter.reference" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.reference" @click.stop>
+          <input
+            type="text"
+            class="form-control"
+            @input="(event : Event)=> filter.reference = refStringRegexLax.exec((event.target as HTMLInputElement).value)? refStringToNumber((event.target as HTMLInputElement).value).ref : undefined" >
+        </div>
+      </div>
+    </template>
     <template #header-name="header">
       <div class="filter-column">
         {{ t(header.text) }}
@@ -47,7 +62,7 @@
           <i v-else class="bi bi-funnel"></i>
         </span>
         <div v-if="showFilter.category" @click.stop>
-          <CategorySelector v-model="filter.category as any" />
+          <CategorySelector v-model="(filter.category as any)" />
         </div>
       </div>
     </template>
@@ -102,6 +117,9 @@
           <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time />
         </div>
       </div>
+    </template>
+    <template #item-reference="{reference}">
+      <RefStringBadge :number="reference" type="ExpenseReport" :show-copy="false" />
     </template>
     <template #item-name="{ name, _id }">
       <span v-if="props.makeNameNoLink"> {{ name }}</span>
@@ -170,8 +188,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ExpenseReportSimple, ExpenseReportState, expenseReportStates } from 'abrechnung-common/types.js'
-import { getById, getTotalAdvance, getTotalBalance, getTotalTotal } from 'abrechnung-common/utils/scripts.js'
+import { ExpenseReportSimple, ExpenseReportState, expenseReportStates, refStringRegexLax } from 'abrechnung-common/types.js'
+import { getById, getTotalAdvance, getTotalBalance, getTotalTotal, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -182,6 +200,7 @@ import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -218,6 +237,7 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
+  { text: 'Ref', value: 'reference' },
   { text: 'labels.name', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
@@ -248,6 +268,7 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
 
 const getEmptyFilter = () =>
   ({
+    reference: undefined,
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
@@ -263,6 +284,7 @@ if (props.stateFilter !== undefined) {
 }
 
 const showFilter = ref({
+  reference: false,
   name: false,
   owner: false,
   state: false,

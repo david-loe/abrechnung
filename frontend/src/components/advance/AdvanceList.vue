@@ -14,6 +14,21 @@
     @loaded="emits('loaded')"
     :sort-by="sortBy"
     :sort-type="sortType">
+    <template #header-reference="header">
+      <div class="filter-column">
+        {{ t(header.text) }}
+        <span class="clickable" @click="(e) => clickFilter('reference', e)">
+          <i v-if="showFilter.reference" class="bi bi-funnel-fill"></i>
+          <i v-else class="bi bi-funnel"></i>
+        </span>
+        <div v-if="showFilter.reference" @click.stop>
+          <input
+            type="text"
+            class="form-control"
+            @input="(event : Event)=> filter.reference = refStringRegexLax.exec((event.target as HTMLInputElement).value)? refStringToNumber((event.target as HTMLInputElement).value).ref : undefined" >
+        </div>
+      </div>
+    </template>
     <template #header-name="header">
       <div class="filter-column">
         {{ t(header.text) }}
@@ -93,6 +108,9 @@
         </div>
       </div>
     </template>
+    <template #item-reference="{reference}">
+      <RefStringBadge :number="reference" type="Advance" :show-copy="false" />
+    </template>
     <template #item-name="advance: AdvanceSimple">
       <span v-if="props.makeNameNoLink"> {{ advance.name }}</span>
       <a
@@ -150,8 +168,8 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, AdvanceState, advanceStates } from 'abrechnung-common/types.js'
-import { getById } from 'abrechnung-common/utils/scripts.js'
+import { AdvanceSimple, AdvanceState, advanceStates, refStringRegexLax } from 'abrechnung-common/types.js'
+import { getById, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header, SortType } from 'vue3-easy-data-table'
@@ -159,6 +177,7 @@ import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import ProjectsOfOrganisationSelector from '@/components/elements/ProjectsOfOrganisationSelector.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -198,6 +217,7 @@ await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
+  { text: 'Ref', value: 'reference' },
   { text: 'labels.name', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
@@ -225,6 +245,7 @@ if (APP_DATA.value && APP_DATA.value.organisations.length <= 1) {
 
 const getEmptyFilter = () =>
   ({
+    reference: undefined,
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
@@ -238,7 +259,15 @@ if (props.stateFilter !== undefined) {
   filter.value.state = props.stateFilter
 }
 
-const showFilter = ref({ name: false, owner: false, state: false, project: false, 'project.organisation': false, 'log.30.on': false })
+const showFilter = ref({
+  reference: false,
+  name: false,
+  owner: false,
+  state: false,
+  project: false,
+  'project.organisation': false,
+  'log.30.on': false
+})
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()

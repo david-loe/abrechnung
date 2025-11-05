@@ -8,7 +8,7 @@ import {
   idDocumentToId,
   Log,
   Project,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   textColors,
   UserSimple
 } from 'abrechnung-common/types.js'
@@ -80,6 +80,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 ) {
   const schema = {
     name: { type: String },
+    reference: { type: Number, index: true, unique: true, sparse: true, min: 0 },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
     state: { type: Number, required: true, enum: stages, default: defaultState },
@@ -188,7 +189,7 @@ export function populateAll<DocType extends {}>(
 
 export async function offsetAdvance(
   report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId },
-  modelName: ReportModelName
+  modelName: ReportModelNameWithoutAdvance
 ) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
@@ -228,4 +229,43 @@ export async function addToProjectBalance(report: { addUp: AddUp[]; project: Pro
   } finally {
     await session.endSession()
   }
+}
+
+type ReferenceDoc = { reference: number; historic?: boolean }
+export async function addReferenceOnNewDocs(
+  doc: HydratedDocument<ReferenceDoc>,
+  modelName: string,
+  session: mongoose.ClientSession | null = null
+) {
+  if (doc.isNew && !doc.historic) {
+    const maxRef =
+      (
+        await mongoose
+          .model<ReferenceDoc>(modelName)
+          .findOne({ historic: { $ne: true } })
+          .session(session)
+          .sort({ reference: -1 })
+          .select({ reference: 1 })
+          .lean()
+      )?.reference || 0
+    doc.reference = maxRef + 1
+  }
+}
+
+type HistoryDoc = { reference?: number; historic?: boolean; updatedAt: Date | string; history: Types.ObjectId[] }
+export async function addHistoryEntry(doc: HydratedDocument<HistoryDoc>, modelName: string, session: mongoose.ClientSession | null = null) {
+  const m = mongoose.model<HistoryDoc>(modelName)
+  const dbDoc = await m.findOne({ _id: doc._id }, { history: 0 }).session(session).lean()
+  if (!dbDoc) {
+    throw new Error(`${modelName} (${doc._id}) not found while saving to history`)
+  }
+  dbDoc._id = new mongoose.Types.ObjectId()
+  dbDoc.updatedAt = new Date()
+  dbDoc.historic = true
+  dbDoc.reference = undefined
+  const old = new m(dbDoc)
+  old.$locals.SKIP_POST_SAFE_HOOK = true
+  await old.save({ timestamps: false, session })
+  doc.history.push(old._id)
+  doc.markModified('history')
 }

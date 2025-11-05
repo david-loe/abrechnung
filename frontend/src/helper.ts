@@ -1,3 +1,13 @@
+import {
+  AnyState,
+  getReportTypeFromModelName,
+  IdDocument,
+  idDocumentToId,
+  ReportModelName,
+  State,
+  TravelState,
+  User
+} from 'abrechnung-common/types.js'
 import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from './api'
@@ -110,4 +120,38 @@ export async function showFile(
     }
   }
   window.open(URL.createObjectURL(fileObj), '_blank')
+}
+
+export function getRouteForReport(
+  user: User,
+  report: { state: AnyState; owner: IdDocument; _id: string },
+  reportModelName: ReportModelName
+) {
+  const reportType = getReportTypeFromModelName(reportModelName)
+  if (user._id === idDocumentToId(report.owner)) {
+    return `/${reportType}/${report._id}`
+  }
+
+  if (reportType === 'advance') {
+    if (user.access['approve/advance']) {
+      return `/approve/advance/${report._id}`
+    }
+    return `/book/advance/${report._id}`
+  }
+
+  if (reportType === 'travel') {
+    if (user.access['examine/travel'] && report.state >= TravelState.APPROVED && report.state <= TravelState.REVIEW_COMPLETED) {
+      return `/examine/travel/${report._id}`
+    }
+    if (user.access['approve/travel'] && report.state <= TravelState.APPROVED) {
+      return `/approve/travel/${report._id}`
+    }
+    return `/book/travel/${report._id}`
+  }
+
+  //reportType === 'expenseReport' || reportType === 'healthCareCost'
+  if (user.access[`examine/${reportType}`] && report.state >= State.EDITABLE_BY_OWNER && report.state <= State.BOOKABLE) {
+    return `/examine/${reportType}/${report._id}`
+  }
+  return `/book/${reportType}/${report._id}`
 }

@@ -4,6 +4,10 @@
       :header="modalAdvance.state ? modalAdvance.name : t('labels.newX', { X: t('labels.advance') })"
       ref="modalComp"
       @afterClose="modalMode === 'view' ? resetModal() : null">
+      <template #header="{header}">
+        <h5 class="modal-title">{{header}}</h5>
+        <RefStringBadge v-if="modalAdvance.reference" class="ms-2" :number="modalAdvance.reference" type="Advance" />
+      </template>
       <div v-if="modalAdvance">
         <template v-if="modalMode === 'view'">
           <template v-if="modalAdvance._id">
@@ -111,6 +115,7 @@ import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceApproveForm from '@/components/advance/forms/AdvanceApproveForm.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
+import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 
 const props = defineProps<{ _id?: string }>()

@@ -10,9 +10,11 @@
       </button>
 
       <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        <ul class="navbar-nav" style="flex-wrap: wrap; line-height: 1">
-          <slot></slot>
-          <li class="nav-item d-flex align-items-center ms-lg-auto">
+        <ul class="navbar-nav" style="line-height: 1; width: 100%">
+          <slot>
+            <div class="ms-auto"></div>
+          </slot>
+          <li class="nav-item d-flex align-items-center">
             <select
               class="form-select"
               style="max-width: 68px"

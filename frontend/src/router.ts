@@ -41,14 +41,24 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
-  { path: '/book/advance', component: BookAdvancePage, meta: { requiresAuth: true } },
+  {
+    path: '/book/advance/:_id([0-9a-fA-F]{24})?',
+    component: BookAdvancePage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
   {
     path: '/approve/travel/:_id([0-9a-fA-F]{24})?',
     component: TravelApprovePage,
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
   },
-  { path: '/book/travel', component: BookTravelPage, meta: { requiresAuth: true } },
+  {
+    path: '/book/travel/:_id([0-9a-fA-F]{24})?',
+    component: BookTravelPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
   { path: '/examine/travel', component: ExamineTravelPage, meta: { requiresAuth: true } },
   {
     path: '/examine/travel/:_id([0-9a-fA-F]{24})',
@@ -66,7 +76,12 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
-  { path: '/book/expenseReport', component: BookExpenseReportPage, meta: { requiresAuth: true } },
+  {
+    path: '/book/expenseReport/:_id([0-9a-fA-F]{24})?',
+    component: BookExpenseReportPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
   { path: '/examine/expenseReport', component: ExamineExpenseReportPage, meta: { requiresAuth: true } },
   {
     path: '/examine/expenseReport/:_id([0-9a-fA-F]{24})',
@@ -84,7 +99,12 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
-  { path: '/book/healthCareCost', component: BookHealthCareCostPage, meta: { requiresAuth: true } },
+  {
+    path: '/book/healthCareCost/:_id([0-9a-fA-F]{24})?',
+    component: BookHealthCareCostPage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
   { path: '/examine/healthCareCost', component: ExamineHealthCareCostPage, meta: { requiresAuth: true } },
   {
     path: '/examine/healthCareCost/:_id([0-9a-fA-F]{24})',
@@ -103,6 +123,12 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   { path: '/user', component: HomePage, meta: { requiresAuth: true } },
+  {
+    path: '/advance/:_id([0-9a-fA-F]{24})',
+    component: HomePage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'advance' })
+  },
   { path: '/:pathMatch(.*)*', redirect: '/user' }
 ]
 

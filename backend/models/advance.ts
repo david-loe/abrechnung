@@ -7,14 +7,14 @@ import {
   Comment,
   ExpenseReport,
   HealthCareCost,
-  ReportModelName,
+  ReportModelNameWithoutAdvance,
   State,
   Travel
 } from 'abrechnung-common/types.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
-import { costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import { addHistoryEntry, addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 
 interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
@@ -22,7 +22,7 @@ interface Methods {
   addComment(): void
   offset(
     reportTotal: number,
-    reportModelName: ReportModelName,
+    reportModelName: ReportModelNameWithoutAdvance,
     reportId: Types.ObjectId | null,
     session?: mongoose.ClientSession | null
   ): Promise<number>
@@ -73,19 +73,8 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Advanc
 })
 
 schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
-  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance')
-    .findOne({ _id: this._id }, { history: 0 })
-    .session(session)
-    .lean()
-  if (!doc) {
-    throw new Error('Advance not found')
-  }
-  doc._id = new mongoose.Types.ObjectId()
-  doc.updatedAt = new Date()
-  doc.historic = true
-  const old = await model('Advance').create([doc], { timestamps: false, session })
-  this.history.push(old[0]._id)
-  this.markModified('history')
+  await addHistoryEntry(this, 'Advance', session)
+
   if (this.state === AdvanceState.APPLIED_FOR) {
     setAdvanceBalance(this)
   }
@@ -126,7 +115,7 @@ interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
-  reportModelName: ReportModelName,
+  reportModelName: ReportModelNameWithoutAdvance,
   reportId: Types.ObjectId | null,
   session: mongoose.ClientSession | null = null
 ) {
@@ -172,7 +161,10 @@ schema.pre('save', async function (this: AdvanceDoc) {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
   setLog(this)
+  await addReferenceOnNewDocs(this, 'Advance')
 })
+
+schema.index({ name: 'text', reason: 'text', 'comments.text': 'text' }, { weights: { name: 10, reason: 6, 'comments.text': 3 } })
 
 export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)
 

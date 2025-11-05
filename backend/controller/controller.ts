@@ -1,5 +1,5 @@
 import { _id, GETResponse, IdDocument, Meta, User } from 'abrechnung-common/types.js'
-import { Base64 } from 'abrechnung-common/utils/scripts.js'
+import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { DeleteResult } from 'mongodb'
 import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder, Types } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
@@ -7,7 +7,7 @@ import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
 
-export interface GetterQuery<ModelType> {
+export interface PaginationQuery {
   /**
    * @isInt
    * @minimum 0
@@ -20,6 +20,9 @@ export interface GetterQuery<ModelType> {
    * @default 1
    */
   page?: number
+}
+
+export interface GetterQuery<ModelType> extends PaginationQuery {
   _id?: string
   additionalFields?: (keyof ModelType)[]
   /**

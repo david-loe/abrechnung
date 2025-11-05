@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
-import { Base64 } from 'abrechnung-common/utils/scripts.js'
+import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import API from '@/api'
