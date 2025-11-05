@@ -1,5 +1,5 @@
 <template>
-  <span class="badge text-bg-secondary clickable" @click="copyToClipboard">
+  <span v-if="props.number > 0" class="badge text-bg-secondary clickable" @click="copyToClipboard">
     {{ refString }}
     <span class="icon ms-1">
       <i v-if="copied" class="bi bi-check-lg"></i>

@@ -597,6 +597,19 @@ export function getStateEnumFromModelName(modelName: ReportModelName): AnyStateE
       return AdvanceState
   }
 }
+export function getModelNameFromReport(report: Travel | ExpenseReport | HealthCareCost | Advance): ReportModelName
+// biome-ignore lint/suspicious/noExplicitAny: generic type is needed for type guard
+export function getModelNameFromReport(report: any): ReportModelName {
+  if (reportIsTravel(report)) {
+    return 'Travel'
+  } else if (reportIsHealthCareCost(report)) {
+    return 'HealthCareCost'
+  } else if (reportIsAdvance(report)) {
+    return 'Advance'
+  } else {
+    return 'ExpenseReport'
+  }
+}
 
 export const retention = [
   'deleteBookedAfterXDays',

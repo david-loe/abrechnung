@@ -9,6 +9,7 @@ import {
   Cost,
   CountrySimple,
   ExpenseReport,
+  getModelNameFromReport,
   getReportTypeFromModelName,
   HealthCareCost,
   Locale,
@@ -31,7 +32,7 @@ import {
   TravelState
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
-import { getAddUpTableData, getTotalBalance } from '../utils/scripts.js'
+import { getAddUpTableData, getTotalBalance, refNumberToString } from '../utils/scripts.js'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
 function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], number = 1) {
@@ -126,11 +127,23 @@ class ReportPrint<idType extends _id> {
   async run(options?: Partial<PrintOptions>) {
     const opts: PrintOptions = { reviewDates: true, reportInformation: true, project: true, ...options }
     let y = this.drawer.currentPage.getSize().height
+
     await this.drawer.drawLogo(this.t('headlines.title'), {
       fontSize: this.drawer.settings.fontSizes.L,
       xStart: this.drawer.settings.pagePadding / 3,
       yStart: y - this.drawer.settings.pagePadding / 3
     })
+
+    if (this.report.reference > 0) {
+      await this.drawer.drawMultilineText(refNumberToString(this.report.reference, getModelNameFromReport(this.report)), {
+        alignment: TextAlignment.Center,
+        xStart: 0,
+        yStart: y - this.drawer.settings.pagePadding / 5,
+        width: this.drawer.currentPage.getSize().width,
+        fontSize: this.drawer.settings.fontSizes.S
+      })
+    }
+
     await this.drawer.drawOrganisationLogo(this.report.project.organisation, {
       xStart: this.drawer.currentPage.getSize().width - 166,
       yStart: y - 66,
