@@ -145,7 +145,7 @@
         <AdvanceList
           ref="advanceList"
           endpoint="advance"
-          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.30.on']"
+          :columns-to-hide="['owner', 'updatedAt', 'report', 'organisation', 'bookingRemark', 'log.30.on', 'reference']"
           @clicked="(t) => showModal('view', 'advance', t)"
           dbKeyPrefix="home" />
       </template>
@@ -196,7 +196,16 @@ const healthCareCostList = useTemplateRef('healthCareCostList')
 const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
 
-const COMMON_HIDDEN_COLUMNS = ['owner', 'updatedAt', 'report', 'addUp.totalTotal', 'addUp.totalAdvance', 'organisation', 'bookingRemark']
+const COMMON_HIDDEN_COLUMNS = [
+  'owner',
+  'updatedAt',
+  'report',
+  'addUp.totalTotal',
+  'addUp.totalAdvance',
+  'organisation',
+  'bookingRemark',
+  'reference'
+]
 
 const router = useRouter()
 const { t } = useI18n()

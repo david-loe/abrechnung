@@ -105,7 +105,7 @@
           'updatedAt',
           'report',
           'organisation',
-          'bookingRemark','addUp.totalAdvance'
+          'bookingRemark','addUp.totalAdvance', 'reference'
         ]"
         dbKeyPrefix="approve" />
       <button v-if="!show" type="button" class="btn btn-light" @click="show = TravelState.APPROVED">
@@ -127,7 +127,7 @@
         <TravelList
           endpoint="approve/travel"
           :stateFilter="show"
-          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark','addUp.totalAdvance']"
+          :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark','addUp.totalAdvance', 'reference']"
           dbKeyPrefix="approved" />
       </template>
     </div>
