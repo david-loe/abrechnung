@@ -680,7 +680,7 @@ export interface SETResponse<T> {
   result: T
 }
 
-export const userReplaceCollections = ['travels', 'expensereports', 'healthcarecosts'] as const
+export const userReplaceCollections = ['travels', 'expensereports', 'healthcarecosts', 'advances'] as const
 export type UserReplaceReferencesResult = {
   [key in (typeof userReplaceCollections)[number] | 'documentfiles']?: { matchedCount: number; modifiedCount: number }
 }

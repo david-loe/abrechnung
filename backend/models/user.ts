@@ -164,6 +164,12 @@ schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwr
     await mongoose.connection
       .collection(collection)
       .updateMany(filter('comments.author'), update('comments.$[elem].author'), arrayFilter('author'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.-10.by'), update('log.-10.by'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.0.by'), update('log.0.by'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.10.by'), update('log.10.by'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.20.by'), update('log.20.by'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.30.by'), update('log.30.by'))
+    await mongoose.connection.collection(collection).updateMany(filter('log.40.by'), update('log.40.by'))
   }
   result.documentfiles = await mongoose.connection.collection('documentfiles').updateMany(filter('owner'), update('owner'))
   return result
