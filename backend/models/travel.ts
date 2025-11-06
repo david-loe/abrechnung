@@ -58,7 +58,7 @@ const travelSchema = () =>
             distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
             type: { type: String, enum: transportTypes, required: true }
           },
-          cost: costObject(true, true, false),
+          cost: costObject(true, true, false, 0),
           purpose: { type: String, enum: ['professional', 'mixed', 'private'], required: true, default: 'professional' },
           project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
@@ -67,7 +67,7 @@ const travelSchema = () =>
       expenses: [
         {
           description: { type: String, required: true },
-          cost: costObject(true, true, true),
+          cost: costObject(true, true, true, undefined),
           purpose: { type: String, enum: ['professional', 'mixed'], required: true, default: 'professional' },
           project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
@@ -86,9 +86,9 @@ const travelSchema = () =>
           overnightRefund: { type: Boolean, default: true },
           purpose: { type: String, enum: ['professional', 'private'], default: 'professional' },
           lumpSums: {
-            overnight: { refund: costObject(false, false, true) },
+            overnight: { refund: costObject(false, false, true, 0) },
             catering: {
-              refund: costObject(false, false, true),
+              refund: costObject(false, false, true, 0),
               type: { type: String, enum: cateringTypes, required: true, default: 'catering8' }
             }
           }

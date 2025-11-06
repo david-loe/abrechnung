@@ -236,7 +236,7 @@ function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums = fals
 function addToAddUps<idType extends _id>(
   addUps: FlatAddUp<idType>[],
   add: number,
-  key: 'balance' | 'total' | 'advance' | 'expenses' | 'lumpSums',
+  key: 'advance' | 'expenses' | 'lumpSums',
   project: ProjectSimple<idType> | undefined | null,
   isTravel = false
 ): void {
@@ -297,7 +297,9 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
     addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project, isTravel)
   }
   for (const addUp of addUps) {
-    addUp.total.amount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
+    const totalAmount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
+    addUp.total.amount = totalAmount < 0 ? 0 : totalAmount
+
     let balanceAmount = addUp.total.amount - addUp.advance.amount
     if (balanceAmount < 0) {
       addUp.advanceOverflow = true
