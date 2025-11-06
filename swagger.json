@@ -2040,6 +2040,23 @@
 			},
 			"UserReplaceReferencesResult": {
 				"properties": {
+					"advances": {
+						"properties": {
+							"modifiedCount": {
+								"type": "number",
+								"format": "double"
+							},
+							"matchedCount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"modifiedCount",
+							"matchedCount"
+						],
+						"type": "object"
+					},
 					"travels": {
 						"properties": {
 							"modifiedCount": {
