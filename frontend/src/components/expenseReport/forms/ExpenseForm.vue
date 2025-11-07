@@ -22,7 +22,7 @@
         <div v-if="formExpense.cost.amount && formExpense.cost.amount < 0" class="alert alert-info d-flex px-2 py-1 mt-2" role="alert">
           <small>
             <i class="bi bi-info-circle-fill"></i>
-            <span class="ms-2"> {{ t('alerts.amountIsNegativ') }}</span>
+            <span class="ms-2"> {{ t('alerts.amountIsNegative') }}</span>
           </small>
         </div>
       </div>
