@@ -14,8 +14,8 @@ export const projectSchema = () =>
     identifier: { type: String, trim: true, required: true, unique: true, index: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
     name: { type: String, trim: true },
-    budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false)),
-    balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true))
+    budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false, 0)),
+    balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, 0))
   })
 
 const schema = projectSchema()

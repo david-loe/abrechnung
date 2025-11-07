@@ -18,6 +18,7 @@
     "user": "Home"
   },
   "alerts": {
+    "amountIsNegative": "Der Betrag ist negativ. Er wird mit dem Rest verrechnet.",
     "apiKeyAlreadyExists": "Ein API-Schlüssel ist bereits vorhanden. Durch diese Aktion wird er unwiderruflich überschrieben.",
     "apiKeyShownOnlyOnce": "Dieser API Key wird nur einmal angezeigt. Bitte speichere ihn jetzt sicher, da er später nicht mehr abrufbar ist.",
     "areYouSureCompleteReview": "Bist du dir sicher, dass du die Prüfung abschließen möchtest?",

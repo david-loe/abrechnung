@@ -18,6 +18,7 @@
     "user": "Home"
   },
   "alerts": {
+    "amountIsNegative": "The amount is negative and will be offset against the rest.",
     "apiKeyAlreadyExists": "An API key already exists. This action will permanently overwrite it.",
     "apiKeyShownOnlyOnce": "This API key is shown only once. Please copy and store it securely—you won't be able to view it again.",
     "areYouSureCompleteReview": "Are you sure you want to complete the review?",

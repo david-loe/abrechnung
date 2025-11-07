@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="" data-bs-theme="light">
   <head>
+    <script>
+    function setHTMLBackground() {
+      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+      document.documentElement.style.backgroundColor = isDarkMode ? '#212529' : '#ffffff'
+    }
+    setHTMLBackground()
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setHTMLBackground)
+    </script>
     <meta charset="utf-8" >
     <meta http-equiv="X-UA-Compatible" content="IE=edge" >
     <meta name="viewport" content="width=device-width,initial-scale=1.0" >

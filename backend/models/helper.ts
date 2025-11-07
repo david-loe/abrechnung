@@ -17,17 +17,17 @@ import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 
 export function costObject(
-  exchangeRate = true,
-  receipts = true,
-  required = false,
+  exchangeRate: boolean,
+  receipts: boolean,
+  required: boolean,
+  min: number | undefined,
   defaultCurrency: string | null = null,
-  defaultAmount: number | null = null,
-  min: number | undefined = 0
+  defaultAmount: number | null = null
 ) {
   // biome-ignore lint/suspicious/noExplicitAny: typing to complex
   const type: any = { amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount } }
   if (exchangeRate) {
-    type.exchangeRate = { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min } }
+    type.exchangeRate = { type: { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min } } }
     type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
   }
   if (receipts) {
@@ -104,13 +104,13 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
   const addUp = Object.assign(
     {
       project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-      balance: costObject(false, false, true),
-      total: costObject(false, false, true),
-      expenses: costObject(false, false, true),
-      advance: costObject(false, false, true),
+      balance: costObject(false, false, true, 0),
+      total: costObject(false, false, true, 0),
+      expenses: costObject(false, false, true, undefined),
+      advance: costObject(false, false, true, 0),
       advanceOverflow: { type: Boolean, required: true, default: false }
     },
-    addUpLumpSums ? { lumpSums: costObject(false, false, true) } : {}
+    addUpLumpSums ? { lumpSums: costObject(false, false, true, 0) } : {}
   )
   const schemaWithAdvances = Object.assign(
     schema,

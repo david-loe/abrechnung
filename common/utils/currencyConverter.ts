@@ -66,7 +66,7 @@ export class CurrencyConverter {
   async addExchangeRate(costObject: Money, date: string | number | Date) {
     let exchangeRate = null
 
-    if (costObject.amount !== null && costObject.amount > 0) {
+    if (costObject.amount !== null && costObject.amount !== 0) {
       exchangeRate = await this.convert(date, costObject.amount, idDocumentToId(costObject.currency))
     }
     costObject.exchangeRate = exchangeRate
