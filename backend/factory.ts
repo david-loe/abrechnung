@@ -20,7 +20,7 @@ const printerSettings = await getPrinterSettings()
 const travelSettings = await getTravelSettings()
 export const reportPrinter = new ReportPrinter<Types.ObjectId>(
   printerSettings,
-  travelSettings.distanceRefunds,
+  travelSettings,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
