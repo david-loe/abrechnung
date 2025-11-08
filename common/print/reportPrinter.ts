@@ -35,13 +35,13 @@ import Formatter from '../utils/formatter.js'
 import { getAddUpTableData, getTotalBalance, refNumberToString } from '../utils/scripts.js'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
-function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], number = 1) {
-  let counter = number
+function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], startNumber = 1) {
+  let number = startNumber
   const map: ReceiptMap<idType> = {}
   for (const cost of costList) {
     if (cost.cost?.receipts) {
       for (const receipt of cost.cost.receipts) {
-        map[receipt._id.toString()] = Object.assign({ number: counter++, date: cost.cost.date as Date }, receipt)
+        map[receipt._id.toString()] = Object.assign({ number: number++, date: cost.cost.date as Date }, receipt)
       }
     }
   }
@@ -54,19 +54,24 @@ interface PrintOptions {
   project: boolean
 }
 
-export class ReportPrinter<idType extends _id> extends Printer<idType> {
+interface ReportPrinterTravelSettings {
   distanceRefunds: TravelSettings['distanceRefunds']
+  vehicleRegistrationWhenUsingOwnCar: TravelSettings['vehicleRegistrationWhenUsingOwnCar']
+}
+
+export class ReportPrinter<idType extends _id> extends Printer<idType> {
+  travelSettings: ReportPrinterTravelSettings
 
   constructor(
     settings: PrinterSettings,
-    distanceRefunds: TravelSettings['distanceRefunds'],
+    travelSettings: ReportPrinterTravelSettings,
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById']
   ) {
     super(settings, formatter, translateFunc, getDocumentFileBufferById, getOrganisationLogoIdById)
-    this.distanceRefunds = distanceRefunds
+    this.travelSettings = travelSettings
   }
 
   async print(
@@ -79,7 +84,7 @@ export class ReportPrinter<idType extends _id> extends Printer<idType> {
       this.settings,
       this.getDocumentFileBufferById,
       this.getOrganisationLogoIdById,
-      this.distanceRefunds,
+      this.travelSettings,
       this.formatter,
       this.translateFunc,
       language
@@ -87,26 +92,26 @@ export class ReportPrinter<idType extends _id> extends Printer<idType> {
     return await print.run(options)
   }
 
-  setDistanceRefunds(distanceRefunds: TravelSettings['distanceRefunds']) {
-    this.distanceRefunds = distanceRefunds
+  setTravelSettings(settings: ReportPrinterTravelSettings) {
+    this.travelSettings = settings
   }
 }
 
 class ReportPrint<idType extends _id> {
   drawer: PDFDrawer<idType>
   report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>
-  distanceRefunds: TravelSettings['distanceRefunds']
+  travelSettings: ReportPrinterTravelSettings
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
 
   constructor(
     report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>,
     drawer: PDFDrawer<idType>,
-    distanceRefunds: TravelSettings['distanceRefunds'],
+    travelSettings: ReportPrinterTravelSettings,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
   ) {
     this.report = report
     this.drawer = drawer
-    this.distanceRefunds = distanceRefunds
+    this.travelSettings = travelSettings
     this.translateFunc = translateFunc
   }
 
@@ -115,13 +120,13 @@ class ReportPrint<idType extends _id> {
     settings: PrinterSettings,
     getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
-    distanceRefunds: TravelSettings['distanceRefunds'],
+    travelSettings: ReportPrinterTravelSettings,
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     language: Locale
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
-    return new ReportPrint<idType>(report, drawer, distanceRefunds, translateFunc)
+    return new ReportPrint<idType>(report, drawer, travelSettings, translateFunc)
   }
 
   async run(options?: Partial<PrintOptions>) {
@@ -174,7 +179,14 @@ class ReportPrint<idType extends _id> {
 
     const receiptMap = {}
     if (!reportIsAdvance(this.report)) {
-      const optionalMapTravel = reportIsTravel(this.report) ? getReceiptMap(this.report.stages) : { map: {}, number: 1 }
+      const optionalMapTravel = reportIsTravel(this.report)
+        ? getReceiptMap(
+            this.report.stages.filter(
+              (s) => this.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none' || s.transport.type !== 'ownCar'
+            )
+          )
+        : { map: {}, number: 1 }
+
       Object.assign(receiptMap, optionalMapTravel.map, getReceiptMap(this.report.expenses, optionalMapTravel.number).map)
     }
     let yDates = y
@@ -446,7 +458,7 @@ class ReportPrint<idType extends _id> {
       title: this.t('labels.transport'),
       fn: (t: Transport) =>
         t.type === 'ownCar'
-          ? `${this.t(`distanceRefundTypes.${t.distanceRefundType}`)} (${this.distanceRefunds[t.distanceRefundType]} ${baseCurrency.symbol}/km)`
+          ? `${this.t(`distanceRefundTypes.${t.distanceRefundType}`)} (${this.travelSettings.distanceRefunds[t.distanceRefundType]} ${baseCurrency.symbol}/km)`
           : this.t(`labels.${t.type}`)
     })
     columns.push({
@@ -458,7 +470,7 @@ class ReportPrint<idType extends _id> {
     })
     columns.push({
       key: 'purpose',
-      width: 50,
+      width: 55,
       alignment: TextAlignment.Left,
       title: this.t('labels.purpose'),
       fn: (p: Purpose) =>
@@ -477,7 +489,11 @@ class ReportPrint<idType extends _id> {
       width: 45,
       alignment: TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', ') // receipts always have an _id in backend
+      fn: (m: Cost) =>
+        m.receipts
+          .filter((r) => receiptMap[(r._id as _id).toString()]) // if vehicle registration is 'none', receipts for ownCar stages are not included
+          .map((r) => receiptMap[(r._id as _id).toString()].number) // receipts always have an _id in backend
+          .join(', ')
     })
 
     const fontSize = options.fontSize + 2
@@ -497,7 +513,7 @@ class ReportPrint<idType extends _id> {
       const travel = this.report
       columns.push({
         key: 'purpose',
-        width: 50,
+        width: 55,
         alignment: TextAlignment.Left,
         title: this.t('labels.purpose'),
         fn: (p: TravelExpense['purpose']) =>
@@ -557,7 +573,7 @@ class ReportPrint<idType extends _id> {
     columns.push({ key: 'special', width: 80, alignment: TextAlignment.Left, title: this.t('labels.city'), fn: (s?: string) => s || '' })
     columns.push({
       key: 'purpose',
-      width: 50,
+      width: 55,
       alignment: TextAlignment.Left,
       title: this.t('labels.purpose'),
       fn: (p: PurposeSimple) => this.t(`labels.${p}`)

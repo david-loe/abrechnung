@@ -11,6 +11,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
+import { getTravelSettings } from '../db.js'
 import { currencyConverter, travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
@@ -153,7 +154,8 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 schema.methods.saveToHistory = async function (this: TravelDoc) {
   await addHistoryEntry(this, 'Travel')
 
-  if (this.state === TravelState.APPROVED) {
+  const travelSettings = await getTravelSettings()
+  if (this.state === TravelState.APPROVED && travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none') {
     // move vehicle registration of owner as receipt to 'ownCar' stages
     const receipts = []
     for (const stage of this.stages) {

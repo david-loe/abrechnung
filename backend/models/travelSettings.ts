@@ -46,7 +46,7 @@ const schema = travelSettingsSchema()
 schema.post('save', function (this: HydratedDocument<TravelSettings<Types.ObjectId>>) {
   const settings = this.toObject()
   travelCalculator.updateSettings(settings)
-  reportPrinter.setDistanceRefunds(settings.distanceRefunds)
+  reportPrinter.setTravelSettings(settings)
   approvedTravelsPrinter.setAllowSpouseRefund(settings.allowSpouseRefund)
 })
 
