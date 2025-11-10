@@ -4,6 +4,7 @@ services:
     restart: always
     depends_on:
       - db
+      - redis
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     env_file:
@@ -25,5 +26,12 @@ services:
     volumes:
       - db_data:/data/db
 
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
 volumes:
   db_data:
+  redis_data:
