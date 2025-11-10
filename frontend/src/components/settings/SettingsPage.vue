@@ -83,6 +83,12 @@
           </template>
           <template #fallback>Loading.. </template>
         </Suspense>
+        <Suspense v-else-if="entry === 'webhooks'">
+          <template #default>
+            <WebhookList />
+          </template>
+          <template #fallback>Loading.. </template>
+        </Suspense>
         <Suspense v-else-if="entry === 'countries'">
           <template #default>
             <CountryList />
@@ -128,10 +134,11 @@ import '@vueform/vueform/dist/vueform.css'
 import '@/vueform.css'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import WebhookList from './elements/WebhookList.vue'
 
 const { t } = useI18n()
 
-const items = ['users', 'projects', 'organisations', 'categories', 'countries', 'currencies', 'healthInsurances'] as const
+const items = ['users', 'projects', 'organisations', 'categories', 'webhooks', 'countries', 'currencies', 'healthInsurances'] as const
 
 const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
 

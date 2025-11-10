@@ -1,0 +1,123 @@
+<template>
+  <div>
+    <ListElement class="mb-3" ref="list" endpoint="admin/webhook" :filter="filter" :headers="headers" dbKeyPrefix="admin">
+      <template #header-name="header">
+        <div class="filter-column">
+          {{ t(header.text) }}
+          <span class="clickable" @click="clickFilter('name')">
+            <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="showFilter.name" @click.stop>
+            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+          </div>
+        </div>
+      </template>
+
+      <template #item-buttons="webhook">
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(webhook)">
+          <div class="d-none d-md-block">
+            <i class="bi bi-pencil"></i>
+          </div>
+          <i class="bi bi-pencil d-block d-md-none"></i>
+        </button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteWebhook(webhook)">
+          <div class="d-none d-md-block">
+            <i class="bi bi-trash"></i>
+          </div>
+          <i class="bi bi-trash d-block d-md-none"></i>
+        </button>
+      </template>
+    </ListElement>
+    <div v-if="_showForm" class="container">
+      <Vueform
+        :schema="schema"
+        v-model="webhookToEdit"
+        :sync="true"
+        :endpoint="false"
+        @submit="(form$: any) => postWebhook(form$.data)"
+        @reset="_showForm = false" />
+    </div>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.webhook') }) }}</button>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
+import { Webhook } from 'abrechnung-common/types.js'
+import { Ref, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Header } from 'vue3-easy-data-table'
+import API from '@/api.js'
+import ListElement, { Filter } from '@/components/elements/ListElement.vue'
+import APP_LOADER from '@/dataLoader.js'
+
+const { t } = useI18n()
+
+const headers: Header[] = [
+  { text: 'labels.name', value: 'name' },
+  { text: 'labels.reportType', value: 'reportType' },
+  { text: 'labels.onState', value: 'onState' },
+  { text: 'labels.executionOrder', value: 'executionOrder' },
+  { text: '', value: 'buttons', width: 80 }
+]
+
+const list = useTemplateRef('list')
+async function loadFromServer() {
+  if (list.value) {
+    list.value.loadFromServer()
+  }
+}
+defineExpose({ loadFromServer })
+
+await APP_LOADER.loadData()
+const APP_DATA = APP_LOADER.data
+
+const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' } })
+const filter = ref(getEmptyFilter())
+
+const showFilter = ref({ name: false })
+
+function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
+  event?.stopPropagation()
+  if (showFilter.value[header]) {
+    showFilter.value[header] = false
+    filter.value[header] = getEmptyFilter()[header]
+  } else {
+    showFilter.value[header] = true
+  }
+}
+
+const webhookToEdit: Ref<Webhook | undefined> = ref(undefined)
+const _showForm = ref(false)
+
+function showForm(webhook?: Webhook) {
+  webhookToEdit.value = webhook
+  _showForm.value = true
+}
+async function postWebhook(webhook: Webhook) {
+  const result = await API.setter<Webhook>('admin/webhook', webhook)
+  if (result.ok) {
+    _showForm.value = false
+    webhookToEdit.value = undefined
+    loadFromServer()
+  }
+}
+async function deleteWebhook(webhook: Webhook<string>) {
+  const result = await API.deleter('admin/webhook', { _id: webhook._id })
+  if (result) {
+    loadFromServer()
+  }
+}
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/webhook/form')).ok?.data, {
+  buttons: {
+    type: 'group',
+    schema: {
+      submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
+      reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
+    }
+  }
+})
+</script>
+
+<style></style>

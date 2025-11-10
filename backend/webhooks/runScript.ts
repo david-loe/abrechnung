@@ -1,4 +1,3 @@
-// npm i isolated-vm zod
 import { Webhook, WebhookMethod, webhookMethods } from 'abrechnung-common/types.js'
 import ivm from 'isolated-vm'
 import ENV from '../env.js'
@@ -38,7 +37,7 @@ export function validateWebhookResultPartial(obj: unknown): Partial<Webhook['req
   }
 
   const anyObj = obj as Record<string, unknown>
-  const { url, headers, method, pdfFormFieldName, data } = anyObj
+  const { url, headers, method, pdfFormFieldName, body } = anyObj
 
   if (url !== undefined) {
     if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
@@ -74,6 +73,6 @@ export function validateWebhookResultPartial(obj: unknown): Partial<Webhook['req
     ...(headers !== undefined ? { headers: headers as Record<string, string> } : {}),
     ...(method !== undefined ? { method: method as WebhookMethod } : {}),
     ...(pdfFormFieldName !== undefined ? { pdfFormFieldName } : {}),
-    ...(data !== undefined ? { data } : {})
+    ...(body !== undefined ? { body } : {})
   }
 }

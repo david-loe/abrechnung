@@ -1,21 +1,25 @@
-import { anyStates, reportTypes, Webhook, webhookMethods } from 'abrechnung-common/types.js'
+import { inspect } from 'node:util'
+import { anyStates, reportTypes, State, Webhook, webhookMethods } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
 
 export const webhookSchema = () =>
   new Schema<Webhook<Types.ObjectId>>({
+    name: { type: String, required: true },
+    executionOrder: { type: Number, required: true, min: 0 },
     reportType: { type: [{ type: String, enum: reportTypes, required: true }], required: true },
-    onState: { type: [{ type: Number, enum: Array.from(anyStates), required: true }], required: true },
-    script: { type: String },
+    onState: { type: [{ type: Number, enum: Array.from(anyStates), required: true }], required: true, description: inspect(State) },
     request: {
       type: {
-        url: { type: String, required: true },
-        headers: { type: Schema.Types.Mixed, required: true, default: () => ({}) },
-        method: { type: String, enum: webhookMethods, required: true },
-        pdfFormFieldName: { type: String },
-        data: { type: Schema.Types.Mixed }
+        url: { type: String, required: true, label: 'URL' },
+        method: { type: String, enum: webhookMethods, required: true, translationPrefix: '' },
+        headers: { type: Schema.Types.Mixed, required: true, default: () => ({}), label: 'Header' },
+        body: { type: Schema.Types.Mixed, label: 'Body' },
+        pdfFormFieldName: { type: String }
       },
-      required: true
-    }
+      required: true,
+      label: 'Request'
+    },
+    script: { type: String, specialType: 'code', noColumn: true }
   })
 
 const schema = webhookSchema()

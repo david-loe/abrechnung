@@ -2,6 +2,7 @@ import { defineConfig, VueformElement } from '@vueform/vueform'
 import vueform from '@vueform/vueform/dist/vueform'
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
+import CodeElement from '@/components/elements/vueform/CodeElement.vue'
 import CountryElement from '@/components/elements/vueform/CountryElement.vue'
 import CurrencyElement from '@/components/elements/vueform/CurrencyElement.vue'
 import DocumentfileElement from '@/components/elements/vueform/DocumentfileElement.vue'
@@ -39,7 +40,8 @@ export default defineConfig({
     ProjectElement,
     HealthinsuranceElement,
     UserElement,
-    MixedElement
+    MixedElement,
+    CodeElement
   ],
   locales: { de, en },
   locale: getLanguageFromNavigator(),

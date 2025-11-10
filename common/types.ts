@@ -24,10 +24,12 @@ export const webhookMethods = ['POST', 'PUT', 'PATCH'] as const
 export type WebhookMethod = (typeof webhookMethods)[number]
 
 export type Webhook<idType extends _id = _id> = {
+  name: string
+  executionOrder: number
   reportType: ReportType[]
   onState: AnyState[]
   script?: string | null
-  request: { url: string; headers: { [key: string]: string }; method: WebhookMethod; pdfFormFieldName?: string | null; data?: unknown }
+  request: { url: string; headers: { [key: string]: string }; method: WebhookMethod; pdfFormFieldName?: string | null; body?: unknown }
   _id: idType
 }
 
