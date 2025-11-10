@@ -2,7 +2,7 @@ import { Webhook, WebhookMethod, webhookMethods } from 'abrechnung-common/types.
 import ivm from 'isolated-vm'
 import ENV from '../env.js'
 
-export async function runUserScript(userScriptCode: string, input: Record<string, unknown>) {
+export async function runUserScript(userScriptCode: string, input: unknown) {
   const isolate = new ivm.Isolate({ memoryLimit: ENV.WEBHOOK_SCRIPT_MEMORY_LIMIT_MB })
   const context = await isolate.createContext()
   const jail = context.global

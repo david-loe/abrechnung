@@ -9,6 +9,7 @@ import multer from 'multer'
 import ENV from './env.js'
 import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
+import { fileSystemQueue } from './workers/fileSystem.js'
 
 interface ReqDocument extends Omit<IDocumentFile, 'data'> {
   data?: Buffer<ArrayBufferLike>
@@ -102,29 +103,9 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
 
 export async function writeToDisk(
   filePath: string,
-  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>,
-  retries = 5
+  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
 ): Promise<void> {
-  try {
-    await fs.mkdir(path.dirname(filePath), { recursive: true })
-  } catch (dirError: unknown) {
-    logger.error(`Fehler beim Erstellen des Verzeichnisses: ${dirError}`)
-  }
-
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      await fs.writeFile(filePath, data)
-      logger.debug(`Wrote to file ${filePath}`)
-      return
-    } catch (err: unknown) {
-      if ((err as { code?: unknown }).code === 'EAGAIN' && attempt < retries) {
-        logger.warn(`EAGAIN-Fehler beim Versuch ${attempt}. Neuer Versuch in 1 Sekunde...`)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-      } else {
-        logger.error(`Fehler beim Schreiben der Datei '${filePath}': ${err}`)
-      }
-    }
-  }
+  await fileSystemQueue.add('writeToDisk', { filePath, data })
 }
 
 export function checkIfUserIsProjectSupervisor(user: IUser<Types.ObjectId>, projectId: Types.ObjectId): boolean {

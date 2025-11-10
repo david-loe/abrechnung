@@ -1,0 +1,55 @@
+import { Advance, ExpenseReport, HealthCareCost, Travel, Webhook } from 'abrechnung-common/types.js'
+import { Queue, Worker } from 'bullmq'
+import { Types } from 'mongoose'
+import ENV from '../env.js'
+import { logger } from '../logger.js'
+import { processWebhookJob } from '../webhooks/execute.js'
+
+export interface WebhookJobData {
+  input: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+  webhook: Webhook<Types.ObjectId>
+}
+
+const WEBHOOK_QUEUE_NAME = 'webhook'
+
+export const webhookQueue = new Queue<WebhookJobData>(WEBHOOK_QUEUE_NAME, {
+  connection: { url: ENV.REDIS_URL },
+  defaultJobOptions: {
+    attempts: 1,
+    backoff: { type: 'exponential', delay: 5_000 },
+    removeOnComplete: { count: 3 },
+    removeOnFail: { count: 9 }
+  }
+})
+
+let workerInstance: Worker<WebhookJobData> | undefined
+
+export function startWebhookWorker(concurrency = 1) {
+  if (workerInstance) {
+    return workerInstance
+  }
+
+  workerInstance = new Worker<WebhookJobData>(
+    WEBHOOK_QUEUE_NAME,
+    async (job) => {
+      logger.debug(`Processing webhook job ${job.id}`)
+      await processWebhookJob(job.data)
+    },
+    { connection: { url: ENV.REDIS_URL }, concurrency }
+  )
+
+  workerInstance.on('completed', (job) => {
+    logger.debug(`Webhook job ${job.id} completed`)
+  })
+
+  workerInstance.on('failed', (job, error) => {
+    logger.error(`Webhook job ${job?.id} failed`, error)
+  })
+
+  workerInstance.on('error', (error) => {
+    logger.error('Webhook worker encountered an error', error)
+  })
+
+  logger.info('Webhook worker started')
+  return workerInstance
+}

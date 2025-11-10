@@ -5,7 +5,7 @@ import { model, Schema, Types } from 'mongoose'
 export const webhookSchema = () =>
   new Schema<Webhook<Types.ObjectId>>({
     name: { type: String, required: true },
-    executionOrder: { type: Number, required: true, min: 0 },
+    executionOrder: { type: Number, required: true, min: 1, max: 2_097_152 }, // https://docs.bullmq.io/guide/jobs/prioritized
     reportType: { type: [{ type: String, enum: reportTypes, required: true }], required: true },
     onState: { type: [{ type: Number, enum: Array.from(anyStates), required: true }], required: true, description: inspect(State) },
     request: {
