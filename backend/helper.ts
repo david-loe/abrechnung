@@ -1,5 +1,3 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
 import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
 import { getBaseCurrencyAmount } from 'abrechnung-common/utils/scripts.js'
 import { NextFunction, Request, Response } from 'express'
@@ -7,7 +5,6 @@ import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
 import ENV from './env.js'
-import { logger } from './logger.js'
 import DocumentFile from './models/documentFile.js'
 import { fileSystemQueue } from './workers/fileSystem.js'
 

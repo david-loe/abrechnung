@@ -11,7 +11,7 @@ import { Controller, GetterQuery, SetterBody } from './controller.js'
 @Security('httpBearer', ['admin'])
 export class WebhookAdminController extends Controller {
   @Get()
-  public async get(@Queries() query: GetterQuery<any>) {
+  public async get(@Queries() query: GetterQuery<unknown>) {
     return await this.getter(Webhook, { query })
   }
   @Post()

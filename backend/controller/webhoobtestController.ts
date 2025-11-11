@@ -1,12 +1,6 @@
 import { Request as ExRequest } from 'express'
-import mongoose, { FilterQuery } from 'mongoose'
-import { Body, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
+import { Body, Post, Request, Route, Tags } from 'tsoa'
 import { runUserScript } from '../webhooks/runScript.js'
-import { PaginationQuery } from './controller.js'
-
-interface SearchQuery extends PaginationQuery {
-  term: string
-}
 
 @Tags('Awebhook')
 @Route('webhook')
