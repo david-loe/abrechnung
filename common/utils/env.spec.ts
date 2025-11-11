@@ -15,6 +15,7 @@ const ENV = {
   COOKIE_SECRET: 'secret',
   MAGIC_LOGIN_SECRET: 'magic',
   MONGO_URL: 'mongodb://localhost:27017',
+  REDIS_URL: 'redis://redis:6379',
   BACKEND_PORT: '3000',
   TRUST_PROXY: 'true'
 }
