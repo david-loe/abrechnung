@@ -44,7 +44,7 @@ export function startFileSystemWorker(concurrency = 1) {
   })
 
   workerInstance.on('failed', (job, error) => {
-    logger.error(`FileSystem job ${job?.id} failed`, error)
+    logger.error(`FileSystem job ${job?.id} failed (${job?.data.filePath})`, error)
   })
 
   workerInstance.on('error', (error) => {

@@ -16,16 +16,10 @@
 
       <template #item-buttons="webhook">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(webhook)">
-          <div class="d-none d-md-block">
-            <i class="bi bi-pencil"></i>
-          </div>
-          <i class="bi bi-pencil d-block d-md-none"></i>
+          <i class="bi bi-pencil"></i>
         </button>
         <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteWebhook(webhook)">
-          <div class="d-none d-md-block">
-            <i class="bi bi-trash"></i>
-          </div>
-          <i class="bi bi-trash d-block d-md-none"></i>
+          <i class="bi bi-trash"></i>
         </button>
       </template>
     </ListElement>
