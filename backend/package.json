@@ -60,10 +60,11 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/server.js'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && sh -c \"npm run start & npm run worker && wait\"'",
     "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/server.js",
+    "worker": "node dist/workers/start.js",
     "test": "npm run build && LOG_LEVEL=WARN ava --serial --timeout=1m dist/tests/**/* ",
     "test:debug": "LOG_LEVEL=DEBUG ava debug --host 0.0.0.0 --port $BACKEND_DEBUG_PORT --serial dist/tests/api/travel.js",
     "setup": "npm run build && node dist/setup.js"

@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError } from './controller/error.js'
-import { connectDB, sessionStore } from './db.js'
+import { connectDB, initDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
@@ -16,6 +16,7 @@ import { checkForMigrations } from './migrations.js'
 
 export default async function () {
   await connectDB()
+  await initDB()
   await checkForMigrations()
   await mongoose.syncIndexes()
 

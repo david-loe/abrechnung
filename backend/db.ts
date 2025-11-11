@@ -41,7 +41,6 @@ export function connectDB() {
     mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
     connectionPromise = (async () => {
       const mongoDB = await mongoose.connect(ENV.MONGO_URL)
-      await initDB()
       return mongoDB.connection
     })()
   }
