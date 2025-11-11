@@ -1,8 +1,8 @@
 import { Advance, Expense, ExpenseReport, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { disconnectDB } from '../../db.js'
+import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { objectToFormFields } from '../_helper.js'
 
 const agent = await createAgent()
 

@@ -10,6 +10,7 @@ import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
+import { runWebhooks } from '../webhooks/execute.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -66,7 +67,10 @@ export class AdvanceController extends Controller {
     new Advance(extendedBody)
     return await this.setter(Advance, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (a: IAdvance<Types.ObjectId>) => {
+        await runWebhooks(a)
+        await sendNotification(a)
+      },
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
         oldObject.state <= AdvanceState.APPLIED_FOR &&
@@ -142,11 +146,12 @@ export class AdvanceApproveController extends Controller {
           `${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
-    const cb = async (advance: IAdvance<Types.ObjectId>) => {
-      sendNotification(advance)
-      sendViaMail(advance)
+    const cb = async (a: IAdvance<Types.ObjectId>) => {
+      await runWebhooks(a)
+      await sendNotification(a)
+      await sendViaMail(a)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(advance), await reportPrinter.print(advance, i18n.language as Locale))
+        await writeToDisk(await writeToDiskFilePath(a), await reportPrinter.print(a, i18n.language as Locale))
       }
     }
 
@@ -170,7 +175,10 @@ export class AdvanceApproveController extends Controller {
 
     return await this.setter(Advance, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (a: IAdvance<Types.ObjectId>) => {
+        await runWebhooks(a)
+        await sendNotification(a)
+      },
       allowNew: false,
       checkOldObject: async (oldObject: AdvanceDoc) =>
         oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)

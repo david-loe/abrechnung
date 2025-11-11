@@ -29,7 +29,14 @@ export type Webhook<idType extends _id = _id> = {
   reportType: ReportType[]
   onState: AnyState[]
   script?: string | null
-  request: { url: string; headers: { [key: string]: string }; method: WebhookMethod; pdfFormFieldName?: string | null; body?: unknown }
+  request: {
+    url: string
+    headers: { [key: string]: string }
+    method: WebhookMethod
+    convertBodyToFormData: boolean
+    pdfFormFieldName?: string | null
+    body?: unknown
+  }
   _id: idType
 }
 

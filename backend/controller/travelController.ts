@@ -22,6 +22,7 @@ import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { sendA1Notification, sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
+import { runWebhooks } from '../webhooks/execute.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -178,7 +179,10 @@ export class TravelController extends Controller {
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (t: ITravel<Types.ObjectId>) => {
+        await runWebhooks(t)
+        await sendNotification(t)
+      },
       checkOldObject: async (oldObject: TravelDoc) =>
         !oldObject.historic &&
         oldObject.state <= TravelState.APPROVED &&
@@ -237,7 +241,10 @@ export class TravelController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (t: ITravel<Types.ObjectId>) => {
+        await runWebhooks(t)
+        await sendNotification(t)
+      },
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
@@ -305,10 +312,11 @@ export class TravelApproveController extends Controller {
         travelApplication.name = `${travelApplication.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
-    const cb = async (travel: ITravel) => {
-      sendNotification(travel)
-      if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
-        sendA1Notification(travel)
+    const cb = async (t: ITravel<Types.ObjectId>) => {
+      await runWebhooks(t)
+      await sendNotification(t)
+      if (t.isCrossBorder && t.destinationPlace.country.needsA1Certificate) {
+        await sendA1Notification(t)
       }
     }
 
@@ -332,7 +340,10 @@ export class TravelApproveController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (t: ITravel<Types.ObjectId>) => {
+        await runWebhooks(t)
+        await sendNotification(t)
+      },
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) =>
         oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
@@ -503,11 +514,12 @@ export class TravelExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (travel: ITravel<Types.ObjectId>) => {
-      sendNotification(travel)
-      sendViaMail(travel)
+    const cb = async (t: ITravel<Types.ObjectId>) => {
+      await runWebhooks(t)
+      await sendNotification(t)
+      await sendViaMail(t)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(travel), await reportPrinter.print(travel, i18n.language as Locale))
+        await writeToDisk(await writeToDiskFilePath(t), await reportPrinter.print(t, i18n.language as Locale))
       }
     }
 
@@ -556,7 +568,10 @@ export class TravelExamineController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (t: ITravel<Types.ObjectId>) => {
+        await runWebhooks(t)
+        await sendNotification(t)
+      },
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPROVED && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

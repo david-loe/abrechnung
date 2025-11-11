@@ -230,6 +230,7 @@
     "configCateringRefund": "Config catering refund",
     "confirm": "Confirm",
     "connectionSettings": "Connection Settings",
+    "convertBodyToFormData": "Convert body object to FormData",
     "cost": "Cost",
     "countries": "Countries",
     "country": "Country",

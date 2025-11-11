@@ -23,6 +23,7 @@ import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
+import { runWebhooks } from '../webhooks/execute.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -128,7 +129,7 @@ export class HealthCareCostController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-
+      cb: runWebhooks,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === HealthCareCostState.IN_WORK && request.user.access['inWork:healthCareCost']) {
@@ -154,7 +155,10 @@ export class HealthCareCostController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
+        await runWebhooks(h)
+        await sendNotification(h)
+      },
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
@@ -325,7 +329,10 @@ export class HealthCareCostExamineController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: (e: IHealthCareCost) => sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined),
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
+        await runWebhooks(h)
+        await sendNotification(h, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined)
+      },
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
@@ -344,11 +351,12 @@ export class HealthCareCostExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (healthCareCost: IHealthCareCost<Types.ObjectId>) => {
-      sendNotification(healthCareCost)
-      sendViaMail(healthCareCost)
+    const cb = async (h: IHealthCareCost<Types.ObjectId>) => {
+      await runWebhooks(h)
+      await sendNotification(h)
+      await sendViaMail(h)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(healthCareCost), await reportPrinter.print(healthCareCost, i18n.language as Locale))
+        await writeToDisk(await writeToDiskFilePath(h), await reportPrinter.print(h, i18n.language as Locale))
       }
     }
 
@@ -375,7 +383,10 @@ export class HealthCareCostExamineController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
+        await runWebhooks(h)
+        await sendNotification(h)
+      },
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

@@ -1,7 +1,13 @@
 <template>
   <ElementLayout>
     <template #element>
-      <CodeEditor v-model="model" :read-only="isDisabled" :line-nums="true" width="100%" :highlight="hljs" :theme="getClass()" />
+      <CodeEditor
+        :modelValue="value == undefined ? '' : value"
+        @update:modelValue="update"
+        :read-only="isDisabled"
+        :line-nums="true"
+        width="100%"
+        :theme="getClass()" />
     </template>
 
     <!-- Default element slots -->
@@ -15,15 +21,21 @@
 
 <script>
 import { defineElement } from '@vueform/vueform'
-import hljs from 'highlight.js' //https://github.com/justcaliturner/simple-code-editor/issues/54
+//import hljs from 'highlight.js' //https://github.com/justcaliturner/simple-code-editor/issues/54
 import CodeEditor from 'simple-code-editor'
 
 export default defineElement({
   name: 'CodeElement',
   components: { CodeEditor },
+  data() {
+    return { content: '' }
+  },
   methods: {
     getClass() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'github-dark' : 'github'
+    },
+    getHljs() {
+      return hljs
     }
   }
 })

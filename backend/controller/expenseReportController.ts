@@ -21,6 +21,7 @@ import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
+import { runWebhooks } from '../webhooks/execute.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -124,6 +125,7 @@ export class ExpenseReportController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
+      cb: runWebhooks,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === ExpenseReportState.IN_WORK && request.user.access['inWork:expenseReport']) {
@@ -149,7 +151,10 @@ export class ExpenseReportController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (e: IExpenseReport<Types.ObjectId>) => {
+        await runWebhooks(e)
+        await sendNotification(e)
+      },
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
@@ -322,7 +327,10 @@ export class ExpenseReportExamineController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: (e: IExpenseReport) => sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined),
+      cb: async (e: IExpenseReport<Types.ObjectId>) => {
+        await runWebhooks(e)
+        await sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined)
+      },
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
@@ -341,11 +349,12 @@ export class ExpenseReportExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (expenseReport: IExpenseReport<Types.ObjectId>) => {
-      sendNotification(expenseReport)
-      sendViaMail(expenseReport)
+    const cb = async (e: IExpenseReport<Types.ObjectId>) => {
+      await runWebhooks(e)
+      await sendNotification(e)
+      await sendViaMail(e)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(expenseReport), await reportPrinter.print(expenseReport, i18n.language as Locale))
+        await writeToDisk(await writeToDiskFilePath(e), await reportPrinter.print(e, i18n.language as Locale))
       }
     }
 
@@ -372,7 +381,10 @@ export class ExpenseReportExamineController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: sendNotification,
+      cb: async (e: IExpenseReport<Types.ObjectId>) => {
+        await runWebhooks(e)
+        await sendNotification(e)
+      },
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

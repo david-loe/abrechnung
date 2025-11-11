@@ -11,11 +11,6 @@ export class WEbhookController {
   }
   @Post('test')
   public async post(@Request() req: ExRequest) {
-    const rawBody: Buffer = Buffer.isBuffer(req.body) ? (req.body as Buffer) : Buffer.from('')
-
-    const bodyText = rawBody.toString('utf8')
-    const bodyJson = tryParseJSON(rawBody)
-
     // Logobjekt bauen
     const logEntry = {
       remoteAddr: req.ip,
@@ -25,11 +20,7 @@ export class WEbhookController {
       headers: req.headers,
       query: req.query,
       params: req.params,
-      body: {
-        length: rawBody.length,
-        asTextPreview: bodyText.length > 2000 ? `${bodyText.slice(0, 2000)}…[truncated]` : bodyText,
-        asJSON: bodyJson // undefined, wenn kein gültiges JSON
-      }
+      body: req.body
     }
 
     console.log(logEntry)
@@ -38,20 +29,7 @@ export class WEbhookController {
     return {
       ok: true,
       // nur Metadaten zurückgeben, keine sensiblen Header spiegeln
-      meta: {
-        method: req.method,
-        path: req.path,
-        contentType: req.headers['content-type'] || null,
-        bodyLength: rawBody.length,
-        parsedJSON: bodyJson !== undefined
-      }
+      meta: { method: req.method, path: req.path, contentType: req.headers['content-type'] || null }
     }
-  }
-}
-function tryParseJSON(buf: Buffer) {
-  try {
-    return JSON.parse(buf.toString('utf8'))
-  } catch {
-    return undefined
   }
 }

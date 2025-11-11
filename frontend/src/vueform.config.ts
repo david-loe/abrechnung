@@ -17,7 +17,7 @@ import { getLanguageFromNavigator } from '@/i18n'
 en.vueform.elements.list.add = '+ Add'
 de.vueform.elements.list.add = '+ Hinzufügen'
 
-const keysToExclude = new Set(['loseAccessAt'])
+const keysToExclude = new Set(['loseAccessAt', 'script'])
 
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing
 function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set<string> = new Set()) {

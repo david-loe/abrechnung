@@ -40,6 +40,7 @@ services:
 
   redis:
     image: redis:8-alpine
+    command: ["redis-server", "--logfile", "/dev/null"]
     restart: unless-stopped
     volumes:
       - redis_data:/data
