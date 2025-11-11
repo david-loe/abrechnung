@@ -16,7 +16,12 @@ const MAIL_QUEUE_NAME = 'mail'
 
 export const mailQueue = new Queue<MailJobData>(MAIL_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
-  defaultJobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 }, removeOnComplete: true }
+  defaultJobOptions: {
+    attempts: 5,
+    backoff: { type: 'exponential', delay: 5_000 },
+    removeOnComplete: { count: 3 },
+    removeOnFail: { count: 9 }
+  }
 })
 
 let workerInstance: Worker<MailJobData> | undefined

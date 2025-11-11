@@ -71,7 +71,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   WEBHOOK_SCRIPT_MEMORY_LIMIT_MB: int({ default: 16, desc: 'Memory limit for user webhook scripts in MB' }),
   WEBHOOK_SCRIPT_COMPILE_TIMEOUT_MS: int({ default: 50, desc: 'Timeout for compiling user webhook scripts in milliseconds' }),
   WEBHOOK_SCRIPT_RUN_TIMEOUT_MS: int({ default: 100, desc: 'Timeout for running user webhook scripts in milliseconds' }),
-  WEBHOOK_REQUEST_TIMEOUT_MS: int({ default: 5_000, desc: 'Timeout for running user webhook scripts in milliseconds' }),
+  WEBHOOK_REQUEST_TIMEOUT_MS: int({ default: 5_000, desc: 'Timeout webhook HTTP requests in milliseconds' }),
   BACKEND_SAVE_REPORTS_ON_DISK: bool({
     default: false,
     desc: "⚠️Deprecated⚠️ If set to 'TRUE', all reports will be saved to `/reports` in the backend container. Uncomment the corresponding backend volume in `docker-compose.yml` to get reports on host machine"

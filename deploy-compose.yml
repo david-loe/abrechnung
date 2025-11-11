@@ -1,7 +1,7 @@
 services:
   backend:
     image: davidloe/abrechnung-backend:2
-    restart: always
+    restart: unless-stopped
     depends_on:
       - db
       - redis
@@ -12,7 +12,7 @@ services:
 
   frontend:
     image: davidloe/abrechnung-frontend:2
-    restart: always
+    restart: unless-stopped
     depends_on:
       - backend
     ports:
@@ -23,15 +23,16 @@ services:
   worker:
     image: davidloe/abrechnung-backend:2
     command: npm run worker
-    restart: always
+    restart: unless-stopped
     depends_on:
       - redis
+      - db
     env_file:
       - .env
 
   db:
     image: mongo:8
-    restart: always
+    restart: unless-stopped
     volumes:
       - db_data:/data/db
 

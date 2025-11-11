@@ -9,9 +9,9 @@ export interface FileSystemJobData {
   data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
 }
 
-const WEBHOOK_QUEUE_NAME = 'fileSystem'
+const FILESYSTEM_QUEUE_NAME = 'fileSystem'
 
-export const fileSystemQueue = new Queue<FileSystemJobData>(WEBHOOK_QUEUE_NAME, {
+export const fileSystemQueue = new Queue<FileSystemJobData>(FILESYSTEM_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
   defaultJobOptions: {
     attempts: 6,
@@ -29,7 +29,7 @@ export function startFileSystemWorker(concurrency = 1) {
   }
 
   workerInstance = new Worker<FileSystemJobData>(
-    WEBHOOK_QUEUE_NAME,
+    FILESYSTEM_QUEUE_NAME,
     async (job) => {
       logger.debug(`Processing fileSystem job ${job.id}`)
       await fs.mkdir(path.dirname(job.data.filePath), { recursive: true })

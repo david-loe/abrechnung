@@ -4,20 +4,25 @@ import axios from 'axios'
 import { getConnectionSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
+import { logger } from '../logger.js'
 import { WebhookJobData } from '../workers/webhook.js'
 import { runUserScript } from './runScript.js'
 
 export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   const request = { ...webhook.request, ...(webhook.script ? await runUserScript(webhook.script, input) : {}) }
 
-  if (request.pdfFormFieldName && request.body instanceof FormData) {
-    const connectionSettings = await getConnectionSettings()
-    const lng = connectionSettings.PDFReportsViaEmail.locale
-    request.body.append(
-      request.pdfFormFieldName,
-      new Blob([await reportPrinter.print(input, lng)], { type: 'application/pdf' }),
-      `${refNumberToString(input.reference, getModelNameFromReport(input))}.pdf`
-    )
+  if (request.pdfFormFieldName) {
+    if (request.body instanceof FormData) {
+      const connectionSettings = await getConnectionSettings()
+      const lng = connectionSettings.PDFReportsViaEmail.locale
+      request.body.append(
+        request.pdfFormFieldName,
+        new Blob([await reportPrinter.print(input, lng)], { type: 'application/pdf' }),
+        `${refNumberToString(input.reference, getModelNameFromReport(input))}.pdf`
+      )
+    } else {
+      logger.warn(`Unable to attach pdf to ${request.pdfFormFieldName} because request.body is no FormData Object.`)
+    }
   }
 
   const res = await axios.request({

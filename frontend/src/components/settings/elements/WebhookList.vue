@@ -9,7 +9,7 @@
             <i v-else class="bi bi-funnel"></i>
           </span>
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+            <input type="text" class="form-control" v-model="filter.name.$regex" >
           </div>
         </div>
       </template>

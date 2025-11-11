@@ -20,14 +20,14 @@ export class WEbhookController {
     const logEntry = {
       remoteAddr: req.ip,
       method: req.method,
-      httpVersion: (req.httpVersionMajor ?? 1) + '.' + (req.httpVersionMinor ?? 1),
+      httpVersion: `${req.httpVersionMajor ?? 1}.${req.httpVersionMinor ?? 1}`,
       url: req.originalUrl,
       headers: req.headers,
       query: req.query,
       params: req.params,
       body: {
         length: rawBody.length,
-        asTextPreview: bodyText.length > 2000 ? bodyText.slice(0, 2000) + '…[truncated]' : bodyText,
+        asTextPreview: bodyText.length > 2000 ? `${bodyText.slice(0, 2000)}…[truncated]` : bodyText,
         asJSON: bodyJson // undefined, wenn kein gültiges JSON
       }
     }

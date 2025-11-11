@@ -60,7 +60,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && sh -c \"npm run start & npm run worker && wait\"'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && sh -c \"set -m; npm run start & npm run worker & wait -n; kill 0\"'",
     "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/server.js",
