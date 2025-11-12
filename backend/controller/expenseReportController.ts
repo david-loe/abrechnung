@@ -6,7 +6,6 @@ import {
   ExpenseReport as IExpenseReport,
   User as IUser,
   idDocumentToId,
-  Locale,
   State,
   UserWithName
 } from 'abrechnung-common/types.js'

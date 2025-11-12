@@ -30,8 +30,8 @@ export async function runWebhooks(
 export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   const request = { ...webhook.request, ...(webhook.script ? await runUserScript(webhook.script, input) : {}) }
 
-  if (request.convertBodyToFormData && request.body) {
-    const form = buildFormData(request.body)
+  if (request.convertBodyToFormData) {
+    const form = buildFormData(request.body && typeof request.body === 'object' ? request.body : {})
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
       const connectionSettings = await getConnectionSettings()
       const lng = connectionSettings.PDFReportsViaEmail.locale
@@ -61,7 +61,7 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   }
 }
 
-function buildFormData(data: Record<string, any>): FormData {
+function buildFormData(data: object): FormData {
   const form = new FormData()
 
   for (const [key, value] of Object.entries(data)) {

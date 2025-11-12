@@ -7,7 +7,6 @@ import {
   Organisation as IOrganisation,
   User as IUser,
   idDocumentToId,
-  Locale,
   State,
   UserWithName
 } from 'abrechnung-common/types.js'

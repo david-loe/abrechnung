@@ -1,5 +1,5 @@
 import { Readable } from 'node:stream'
-import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, Locale, State } from 'abrechnung-common/types.js'
+import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
 import { Condition, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { getSettings } from '../db.js'

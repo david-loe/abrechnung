@@ -4,7 +4,6 @@ import {
   Travel as ITravel,
   User as IUser,
   idDocumentToId,
-  Locale,
   Stage,
   State,
   TravelExpense,
