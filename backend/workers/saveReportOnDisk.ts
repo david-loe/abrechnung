@@ -37,7 +37,7 @@ export function startSaveReportOnDiskWorker(concurrency = 1) {
     async (job) => {
       logger.debug(`Processing saveReportOnDisk job ${job.id}`)
       const { filePath, report } = job.data
-      const connectionSettings = await getConnectionSettings()
+      const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
       const pdf = await reportPrinter.print(report, lng)
       await fs.mkdir(path.dirname(filePath), { recursive: true })

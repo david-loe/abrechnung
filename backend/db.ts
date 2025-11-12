@@ -35,12 +35,15 @@ import Project from './models/project.js'
 
 let connectionPromise: Promise<Connection> | null = null
 
-export function connectDB() {
+export function connectDB(init = true) {
   if (!connectionPromise) {
     mongoose.connection.on('connected', () => logger.debug('Connected to Database'))
     mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
     connectionPromise = (async () => {
       const mongoDB = await mongoose.connect(ENV.MONGO_URL)
+      if (init) {
+        await initDB()
+      }
       return mongoDB.connection
     })()
   }
@@ -152,8 +155,8 @@ export async function fetchAndUpdateLumpSums() {
   }
 }
 
-export async function getSettings(): Promise<ISettings> {
-  await connectDB()
+export async function getSettings(init = true): Promise<ISettings> {
+  await connectDB(init)
   const settings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (settings) {
     return settings
@@ -161,8 +164,8 @@ export async function getSettings(): Promise<ISettings> {
   throw Error('Settings not found')
 }
 
-export async function getTravelSettings(): Promise<ITravelSettings> {
-  await connectDB()
+export async function getTravelSettings(init = true): Promise<ITravelSettings> {
+  await connectDB(init)
   const travelSettings = (await mongoose.connection.collection('travelsettings').findOne()) as ITravelSettings | null
   if (travelSettings) {
     return travelSettings
@@ -170,8 +173,8 @@ export async function getTravelSettings(): Promise<ITravelSettings> {
   throw Error('Travel Settings not found')
 }
 
-export async function getPrinterSettings(): Promise<IPrinterSettings> {
-  await connectDB()
+export async function getPrinterSettings(init = true): Promise<IPrinterSettings> {
+  await connectDB(init)
   const printerSettings = (await mongoose.connection.collection('printersettings').findOne()) as IPrinterSettings | null
   if (printerSettings) {
     return printerSettings
@@ -179,8 +182,8 @@ export async function getPrinterSettings(): Promise<IPrinterSettings> {
   throw Error('Printer Settings not found')
 }
 
-export async function getConnectionSettings(): Promise<IConnectionSettings> {
-  await connectDB()
+export async function getConnectionSettings(init = true): Promise<IConnectionSettings> {
+  await connectDB(init)
   const connectionSettings = (await mongoose.connection.collection('connectionsettings').findOne()) as IConnectionSettings | null
   if (connectionSettings) {
     return connectionSettings
@@ -188,8 +191,8 @@ export async function getConnectionSettings(): Promise<IConnectionSettings> {
   throw Error('Connection Settings not found')
 }
 
-export async function getDisplaySettings(): Promise<IDisplaySettings> {
-  await connectDB()
+export async function getDisplaySettings(init = true): Promise<IDisplaySettings> {
+  await connectDB(init)
   const displaySettings = (await mongoose.connection.collection('displaysettings').findOne()) as IDisplaySettings | null
   if (displaySettings) {
     return displaySettings

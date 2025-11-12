@@ -339,7 +339,10 @@ class ReportPrint<idType extends _id> {
       width: 95,
       alignment: TextAlignment.Left,
       title: 'value',
-      fn: (d: Date | string) => (isValidDate(d) ? this.drawer.formatter.date(d) : (d as string))
+      fn: (d: Date | string) => {
+        const validDate = isValidDate(d)
+        return validDate ? this.drawer.formatter.date(validDate) : String(validDate)
+      }
     })
 
     const summary = []

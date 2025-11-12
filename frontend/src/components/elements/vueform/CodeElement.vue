@@ -2,7 +2,7 @@
   <ElementLayout>
     <template #element>
       <CodeEditor
-        :modelValue="value == undefined ? '' : value"
+        :modelValue="value || ''"
         @update:modelValue="update"
         :read-only="isDisabled"
         :line-nums="true"
@@ -21,7 +21,6 @@
 
 <script>
 import { defineElement } from '@vueform/vueform'
-//import hljs from 'highlight.js' //https://github.com/justcaliturner/simple-code-editor/issues/54
 import CodeEditor from 'simple-code-editor'
 
 export default defineElement({
@@ -33,9 +32,6 @@ export default defineElement({
   methods: {
     getClass() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'github-dark' : 'github'
-    },
-    getHljs() {
-      return hljs
     }
   }
 })

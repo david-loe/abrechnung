@@ -33,7 +33,7 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   if (request.convertBodyToFormData) {
     const form = buildFormData(request.body && typeof request.body === 'object' ? request.body : {})
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
-      const connectionSettings = await getConnectionSettings()
+      const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
       form.append(
         request.pdfFormFieldName,
@@ -72,7 +72,7 @@ function buildFormData(data: object): FormData {
         if (typeof item === 'number' || typeof item === 'string') {
           form.append(key, String(item))
         } else {
-          throw new TypeError(`Listenelemente in '${key}' müssen number oder string sein: ${item}`)
+          throw new TypeError(`List elements in '${key}' have to be number or string: ${item}`)
         }
       }
     } else if (value instanceof Date) {
@@ -82,7 +82,7 @@ function buildFormData(data: object): FormData {
     } else if (['number', 'boolean', 'string'].includes(typeof value)) {
       form.append(key, String(value))
     } else {
-      throw new TypeError(`Nicht unterstützter Datentyp in Feld '${key}': ${typeof value}`)
+      throw new TypeError(`Not supported type in '${key}': ${typeof value}`)
     }
   }
 

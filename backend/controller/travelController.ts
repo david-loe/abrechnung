@@ -207,9 +207,12 @@ export class TravelController extends Controller {
         const date = new Date(extendedBody.startDate)
         extendedBody.name = `${extendedBody.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
-      cb = (travel: ITravel) => {
-        if (travel.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
-          sendA1Notification(travel)
+      cb = async (t: ITravel<Types.ObjectId>) => {
+        if (!extendedBody._id) {
+          await runWebhooks(t)
+        }
+        if (t.isCrossBorder && t.destinationPlace.country.needsA1Certificate) {
+          await sendA1Notification(t)
         }
       }
       Object.assign(extendedBody, { state: TravelState.APPROVED, editor: request.user._id, owner: request.user._id })
@@ -300,7 +303,7 @@ export class TravelApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postAnyBackApproved(
+  public async postAnyApproved(
     @Body() requestBody: ((TravelApplication & { owner: IdDocument }) | { _id: string }) & { comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
@@ -313,8 +316,10 @@ export class TravelApproveController extends Controller {
       }
     }
     const cb = async (t: ITravel<Types.ObjectId>) => {
-      await runWebhooks(t)
-      await sendNotification(t)
+      if (!extendedBody._id) {
+        await runWebhooks(t)
+        await sendNotification(t)
+      }
       if (t.isCrossBorder && t.destinationPlace.country.needsA1Certificate) {
         await sendA1Notification(t)
       }

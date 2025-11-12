@@ -133,6 +133,10 @@ interface FormField {
   val: string | boolean | number
 }
 
+/**⚠️ Potential issue | 🔴 Critical
+ *
+ * When an array element is a primitive or a Date, the recursive call iterates zero properties and never pushes anything, so arrays of IDs/flags/strings simply vanish from the payload. That breaks every form using scalar arrays.
+ */
 // biome-ignore lint/suspicious/noExplicitAny: generic function
 export function objectToFormFields(object: any, fieldPrefix = '', formFields: FormField[] = []): FormField[] {
   for (const key in object) {

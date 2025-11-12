@@ -3,9 +3,11 @@ import { Locale } from 'abrechnung-common/types.js'
 import i18next, { Resource } from 'i18next'
 import { getDisplaySettings } from './db.js'
 
+const displaySettings = await getDisplaySettings(false)
+
 async function loadLocaleMessages() {
   const messages: Resource = {}
-  const locales = loadLocales((await getDisplaySettings()).locale.overwrite)
+  const locales = loadLocales(displaySettings.locale.overwrite)
   for (const lang in locales) {
     messages[lang] = { translation: locales[lang as Locale] }
   }
@@ -13,8 +15,8 @@ async function loadLocaleMessages() {
 }
 
 const i18n = i18next.createInstance({
-  lng: (await getDisplaySettings()).locale.default,
-  fallbackLng: (await getDisplaySettings()).locale.fallback,
+  lng: displaySettings.locale.default,
+  fallbackLng: displaySettings.locale.fallback,
   resources: await loadLocaleMessages(),
   nsSeparator: false,
   interpolation: { prefix: '{', suffix: '}', nestingPrefix: "@:{'", nestingSuffix: "'}" }

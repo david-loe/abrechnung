@@ -13,11 +13,11 @@ import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 import Organisation from './models/organisation.js'
 
-const displaySettings = await getDisplaySettings()
+const displaySettings = await getDisplaySettings(false)
 export const formatter = new Formatter(displaySettings.locale.default, displaySettings.nameDisplayFormat)
 
-const printerSettings = await getPrinterSettings()
-const travelSettings = await getTravelSettings()
+const printerSettings = await getPrinterSettings(false)
+const travelSettings = await getTravelSettings(false)
 export const reportPrinter = new ReportPrinter<Types.ObjectId>(
   printerSettings,
   travelSettings.distanceRefunds,
@@ -68,7 +68,7 @@ approvedTravelsPrinter.setAllowSpouseRefund(travelSettings.allowSpouseRefund)
 
 export const travelCalculator = new TravelCalculator(
   (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
-  await getTravelSettings()
+  await getTravelSettings(false)
 )
 
 export const currencyConverter = new CurrencyConverter('InforEuro', [
