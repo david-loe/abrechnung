@@ -25,8 +25,7 @@ services:
     command: npm run worker
     restart: unless-stopped
     depends_on:
-      - redis
-      - db
+      - backend
     env_file:
       - .env
 

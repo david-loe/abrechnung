@@ -16,10 +16,10 @@ jobs:
       - name: copy .env file
         uses: canastro/copy-file-action@ae66602ce7d214dbd2e298c1db67a81388755a0a # master
         with:
-          source: '.env.example'
-          target: '.env'
+          source: ".env.example"
+          target: ".env"
       - name: Start dev Environment
-        run: docker compose up -d common db ldap inbucket
+        run: docker compose up -d common db redis ldap inbucket
       - name: Run common tests
         run: docker compose run common npm run test
       - name: Run backend tests
