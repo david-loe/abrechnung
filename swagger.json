@@ -7,6 +7,338 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Meta": {
+				"properties": {
+					"count": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"countPages": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"count",
+					"page",
+					"limit",
+					"countPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_unknown_": {
+				"properties": {
+					"data": {},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_unknown_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"minimum": 0
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1,
+						"minimum": 1
+					},
+					"_id": {
+						"type": "string"
+					},
+					"additionalFields": {
+						"items": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "number",
+									"format": "double"
+								}
+							]
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ReportType": {
+				"type": "string",
+				"enum": [
+					"travel",
+					"expenseReport",
+					"healthCareCost",
+					"advance"
+				]
+			},
+			"TravelState": {
+				"enum": [
+					-10,
+					0,
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
+			},
+			"HealthCareCostState": {
+				"enum": [
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
+			},
+			"ExpenseReportState": {
+				"enum": [
+					10,
+					20,
+					30,
+					40
+				],
+				"type": "number"
+			},
+			"AdvanceState": {
+				"enum": [
+					-10,
+					0,
+					30,
+					40
+				],
+				"type": "number"
+			},
+			"AnyState": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/TravelState"
+					},
+					{
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					{
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					{
+						"$ref": "#/components/schemas/AdvanceState"
+					}
+				]
+			},
+			"WebhookMethod": {
+				"type": "string",
+				"enum": [
+					"POST",
+					"PUT",
+					"PATCH"
+				]
+			},
+			"mongoose.Types.ObjectId": {
+				"type": "string"
+			},
+			"Webhook_mongoose.Types.ObjectId_": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"request": {
+						"properties": {
+							"body": {},
+							"pdfFormFieldName": {
+								"type": "string",
+								"nullable": true
+							},
+							"convertBodyToFormData": {
+								"type": "boolean"
+							},
+							"method": {
+								"$ref": "#/components/schemas/WebhookMethod"
+							},
+							"headers": {
+								"properties": {},
+								"additionalProperties": {
+									"type": "string"
+								},
+								"type": "object"
+							},
+							"url": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"convertBodyToFormData",
+							"method",
+							"headers",
+							"url"
+						],
+						"type": "object"
+					},
+					"isActive": {
+						"type": "boolean"
+					},
+					"script": {
+						"type": "string",
+						"nullable": true
+					},
+					"onState": {
+						"items": {
+							"$ref": "#/components/schemas/AnyState"
+						},
+						"type": "array"
+					},
+					"reportType": {
+						"items": {
+							"$ref": "#/components/schemas/ReportType"
+						},
+						"type": "array"
+					},
+					"executionOrder": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"request",
+					"isActive",
+					"onState",
+					"reportType",
+					"executionOrder",
+					"name"
+				],
+				"type": "object"
+			},
+			"SetterPartial_IWebhook_mongoose.Types.ObjectId_.NoPost_": {
+				"properties": {
+					"request": {
+						"properties": {
+							"body": {},
+							"pdfFormFieldName": {
+								"type": "string"
+							},
+							"convertBodyToFormData": {
+								"type": "boolean"
+							},
+							"method": {
+								"type": "string",
+								"enum": [
+									"POST",
+									"PUT",
+									"PATCH"
+								]
+							},
+							"headers": {
+								"properties": {},
+								"additionalProperties": {
+									"type": "string"
+								},
+								"type": "object"
+							},
+							"url": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"isActive": {
+						"type": "boolean"
+					},
+					"script": {
+						"type": "string"
+					},
+					"onState": {
+						"items": {
+							"$ref": "#/components/schemas/AnyState"
+						},
+						"type": "array"
+					},
+					"reportType": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"travel",
+								"expenseReport",
+								"healthCareCost",
+								"advance"
+							]
+						},
+						"type": "array"
+					},
+					"executionOrder": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_IWebhook_mongoose.Types.ObjectId__": {
+				"$ref": "#/components/schemas/SetterPartial_IWebhook_mongoose.Types.ObjectId_.NoPost_"
+			},
+			"DeleteResult": {
+				"properties": {
+					"acknowledged": {
+						"type": "boolean",
+						"description": "Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined."
+					},
+					"deletedCount": {
+						"type": "number",
+						"format": "double",
+						"description": "The number of documents that were deleted"
+					}
+				},
+				"required": [
+					"acknowledged",
+					"deletedCount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"BaseCurrencyMoneyNotNull": {
 				"properties": {
 					"amount": {
@@ -33,9 +365,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"mongoose.Types.ObjectId": {
-				"type": "string"
 			},
 			"_id": {
 				"anyOf": [
@@ -808,34 +1137,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Meta": {
-				"properties": {
-					"count": {
-						"type": "number",
-						"format": "double"
-					},
-					"page": {
-						"type": "number",
-						"format": "double"
-					},
-					"limit": {
-						"type": "number",
-						"format": "double"
-					},
-					"countPages": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"count",
-					"page",
-					"limit",
-					"countPages"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"GETResponse_User__id.binary_-or-User__id.binary_-Array_": {
 				"properties": {
 					"data": {
@@ -1290,13 +1591,13 @@
 								"anyOf": [
 									{
 										"items": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+											"type": "string"
 										},
 										"type": "array"
 									},
 									{
 										"items": {
-											"type": "string"
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 										},
 										"type": "array"
 									}
@@ -1580,6 +1881,16 @@
 						},
 						"type": "object"
 					},
+					"token": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Token_mongoose.Types.ObjectId.Binary_"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"name": {
 						"properties": {
 							"familyName": {
@@ -1598,16 +1909,6 @@
 							},
 							{
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-							}
-						]
-					},
-					"token": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Token_mongoose.Types.ObjectId.Binary_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
 					}
@@ -1676,13 +1977,13 @@
 								"anyOf": [
 									{
 										"items": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+											"type": "string"
 										},
 										"type": "array"
 									},
 									{
 										"items": {
-											"type": "string"
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 										},
 										"type": "array"
 									}
@@ -1966,6 +2267,16 @@
 						},
 						"type": "object"
 					},
+					"token": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Token_mongoose.Types.ObjectId.Binary_"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
 					"name": {
 						"properties": {
 							"familyName": {
@@ -1984,16 +2295,6 @@
 							},
 							{
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-							}
-						]
-					},
-					"token": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Token_mongoose.Types.ObjectId.Binary_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 							}
 						]
 					}
@@ -2018,25 +2319,6 @@
 						"type": "object"
 					}
 				]
-			},
-			"DeleteResult": {
-				"properties": {
-					"acknowledged": {
-						"type": "boolean",
-						"description": "Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined."
-					},
-					"deletedCount": {
-						"type": "number",
-						"format": "double",
-						"description": "The number of documents that were deleted"
-					}
-				},
-				"required": [
-					"acknowledged",
-					"deletedCount"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"UserReplaceReferencesResult": {
 				"properties": {
@@ -3053,15 +3335,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AdvanceState": {
-				"enum": [
-					-10,
-					0,
-					30,
-					40
-				],
-				"type": "number"
-			},
 			"AdvanceBase__id_": {
 				"properties": {
 					"name": {
@@ -3149,17 +3422,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"TravelState": {
-				"enum": [
-					-10,
-					0,
-					10,
-					20,
-					30,
-					40
-				],
-				"type": "number"
 			},
 			"Comment__id.TravelState_": {
 				"properties": {
@@ -4839,7 +5101,237 @@
 			"SetterBody_Stage_mongoose.Types.ObjectId.Binary__": {
 				"$ref": "#/components/schemas/SetterPartial_Stage_mongoose.Types.ObjectId.Binary_.NoPost_"
 			},
-			"TravelSimple__id_": {
+			"DocumentFile_mongoose.Types.ObjectId.binary_": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/binary"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"type": {
+						"$ref": "#/components/schemas/DocumentFileType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"data",
+					"owner",
+					"type",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Cost_mongoose.Types.ObjectId.binary_": {
+				"properties": {
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					},
+					"receipts": {
+						"items": {
+							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.binary_"
+						},
+						"type": "array"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"amount",
+					"currency",
+					"receipts",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Stage_mongoose.Types.ObjectId.binary_": {
+				"properties": {
+					"departure": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"arrival": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"startLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"endLocation": {
+						"$ref": "#/components/schemas/Place"
+					},
+					"midnightCountries": {
+						"items": {
+							"properties": {
+								"country": {
+									"$ref": "#/components/schemas/CountrySimple"
+								},
+								"date": {
+									"anyOf": [
+										{
+											"type": "string",
+											"format": "date-time"
+										},
+										{
+											"type": "string"
+										}
+									]
+								}
+							},
+							"required": [
+								"country",
+								"date"
+							],
+							"type": "object"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"transport": {
+						"$ref": "#/components/schemas/Transport"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
+					},
+					"purpose": {
+						"$ref": "#/components/schemas/Purpose"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"departure",
+					"arrival",
+					"startLocation",
+					"endLocation",
+					"transport",
+					"cost",
+					"purpose",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TravelExpense_mongoose.Types.ObjectId.binary_": {
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
+					},
+					"project": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
+					"note": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"purpose": {
+						"type": "string",
+						"enum": [
+							"professional",
+							"mixed"
+						]
+					}
+				},
+				"required": [
+					"description",
+					"cost",
+					"_id",
+					"purpose"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Travel_mongoose.Types.ObjectId.binary_": {
 				"properties": {
 					"reason": {
 						"type": "string"
@@ -4885,13 +5377,13 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
 					},
 					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
 					},
 					"project": {
-						"$ref": "#/components/schemas/Project__id_"
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
 					},
 					"comment": {
 						"type": "string",
@@ -4903,7 +5395,7 @@
 					},
 					"comments": {
 						"items": {
-							"$ref": "#/components/schemas/Comment__id.TravelState_"
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.TravelState_"
 						},
 						"type": "array"
 					},
@@ -4911,7 +5403,7 @@
 						"$ref": "#/components/schemas/TravelState"
 					},
 					"log": {
-						"$ref": "#/components/schemas/Log__id.TravelState_"
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.TravelState_"
 					},
 					"createdAt": {
 						"anyOf": [
@@ -4936,7 +5428,7 @@
 						]
 					},
 					"_id": {
-						"$ref": "#/components/schemas/_id"
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					},
 					"progress": {
 						"type": "number",
@@ -4944,13 +5436,13 @@
 					},
 					"addUp": {
 						"items": {
-							"$ref": "#/components/schemas/AddUp__id.Travel__id.binary__"
+							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.Travel__id.binary__"
 						},
 						"type": "array"
 					},
 					"advances": {
 						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
+							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
 						},
 						"type": "array"
 					},
@@ -4973,6 +5465,46 @@
 						],
 						"type": "object",
 						"nullable": true
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"lastPlaceOfWork": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Omit_Place.place_"
+							}
+						],
+						"nullable": true
+					},
+					"professionalShare": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"stages": {
+						"items": {
+							"$ref": "#/components/schemas/Stage_mongoose.Types.ObjectId.binary_"
+						},
+						"type": "array"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/TravelExpense_mongoose.Types.ObjectId.binary_"
+						},
+						"type": "array"
+					},
+					"days": {
+						"items": {
+							"$ref": "#/components/schemas/TravelDay_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -4993,525 +5525,13 @@
 					"_id",
 					"progress",
 					"addUp",
-					"advances"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AddUp__id.ExpenseReport__id.binary__": {
-				"$ref": "#/components/schemas/AddUpBase__id_"
-			},
-			"HexColor": {
-				"type": "string",
-				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
-			},
-			"TextColor": {
-				"type": "string",
-				"enum": [
-					"black",
-					"white"
-				]
-			},
-			"BadgeStyle": {
-				"properties": {
-					"color": {
-						"$ref": "#/components/schemas/HexColor"
-					},
-					"text": {
-						"$ref": "#/components/schemas/TextColor"
-					}
-				},
-				"required": [
-					"color",
-					"text"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Category__id_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"style": {
-						"$ref": "#/components/schemas/BadgeStyle"
-					},
-					"isDefault": {
-						"type": "boolean"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"name",
-					"style",
-					"isDefault",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ExpenseReportState": {
-				"enum": [
-					10,
-					20,
-					30,
-					40
-				],
-				"type": "number"
-			},
-			"Comment__id.ExpenseReportState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log__id.ExpenseReportState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"ExpenseReportSimple__id_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project__id_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment__id.ExpenseReportState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log__id.ExpenseReportState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp__id.ExpenseReport__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
-						},
-						"type": "array"
-					},
-					"category": {
-						"$ref": "#/components/schemas/Category__id_"
-					}
-				},
-				"required": [
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"addUp",
 					"advances",
-					"category"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AddUp__id.HealthCareCost__id.binary__": {
-				"$ref": "#/components/schemas/AddUpBase__id_"
-			},
-			"HealthCareCostState": {
-				"enum": [
-					10,
-					20,
-					30,
-					40
-				],
-				"type": "number"
-			},
-			"Comment__id.HealthCareCostState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log__id.HealthCareCostState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"HealthCareCostSimple__id_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project__id_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment__id.HealthCareCostState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log__id.HealthCareCostState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"patientName": {
-						"type": "string"
-					},
-					"insurance": {
-						"$ref": "#/components/schemas/HealthInsurance__id_"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp__id.HealthCareCost__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase__id_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"patientName",
-					"insurance",
-					"addUp",
-					"advances"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Comment__id.AdvanceState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log__id.AdvanceState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"ReportModelNameWithoutAdvance": {
-				"type": "string",
-				"enum": [
-					"Travel",
-					"ExpenseReport",
-					"HealthCareCost"
-				]
-			},
-			"Advance__id_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple__id_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project__id_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment__id.AdvanceState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log__id.AdvanceState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/_id"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/MoneyNotNull"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"reason": {
-						"type": "string"
-					},
-					"settledOn": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
-					"offsetAgainst": {
-						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
-								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/_id"
-										}
-									},
-									"required": [
-										"name",
-										"_id"
-									],
-									"type": "object",
-									"nullable": true
-								},
-								"type": {
-									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
-								}
-							},
-							"required": [
-								"amount",
-								"type"
-							],
-							"type": "object"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
 					"history",
 					"historic",
-					"budget",
-					"balance",
-					"reason",
-					"offsetAgainst"
+					"professionalShare",
+					"stages",
+					"expenses",
+					"days"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -5994,441 +6014,6 @@
 						"$ref": "#/components/schemas/MoneyPost"
 					}
 				},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"DocumentFile_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"data": {
-						"$ref": "#/components/schemas/binary"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"type": {
-						"$ref": "#/components/schemas/DocumentFileType"
-					},
-					"name": {
-						"type": "string"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"data",
-					"owner",
-					"type",
-					"name",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Cost_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"currency": {
-						"$ref": "#/components/schemas/Currency"
-					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"receipts": {
-						"items": {
-							"$ref": "#/components/schemas/DocumentFile_mongoose.Types.ObjectId.binary_"
-						},
-						"type": "array"
-					},
-					"date": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					}
-				},
-				"required": [
-					"amount",
-					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Stage_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"departure": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"arrival": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"startLocation": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"endLocation": {
-						"$ref": "#/components/schemas/Place"
-					},
-					"midnightCountries": {
-						"items": {
-							"properties": {
-								"country": {
-									"$ref": "#/components/schemas/CountrySimple"
-								},
-								"date": {
-									"anyOf": [
-										{
-											"type": "string",
-											"format": "date-time"
-										},
-										{
-											"type": "string"
-										}
-									]
-								}
-							},
-							"required": [
-								"country",
-								"date"
-							],
-							"type": "object"
-						},
-						"type": "array",
-						"nullable": true
-					},
-					"transport": {
-						"$ref": "#/components/schemas/Transport"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
-					},
-					"purpose": {
-						"$ref": "#/components/schemas/Purpose"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
-					"note": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"departure",
-					"arrival",
-					"startLocation",
-					"endLocation",
-					"transport",
-					"cost",
-					"purpose",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"TravelExpense_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"description": {
-						"type": "string"
-					},
-					"cost": {
-						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
-					"note": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"purpose": {
-						"type": "string",
-						"enum": [
-							"professional",
-							"mixed"
-						]
-					}
-				},
-				"required": [
-					"description",
-					"cost",
-					"_id",
-					"purpose"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Travel_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"reason": {
-						"type": "string"
-					},
-					"destinationPlace": {
-						"$ref": "#/components/schemas/Omit_Place.special_"
-					},
-					"startDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"endDate": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"claimSpouseRefund": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"fellowTravelersNames": {
-						"type": "string",
-						"nullable": true
-					},
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.TravelState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/TravelState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.TravelState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"progress": {
-						"type": "number",
-						"format": "double"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.Travel__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					},
-					"isCrossBorder": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"a1Certificate": {
-						"properties": {
-							"destinationName": {
-								"type": "string"
-							},
-							"exactAddress": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"destinationName",
-							"exactAddress"
-						],
-						"type": "object",
-						"nullable": true
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"lastPlaceOfWork": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/Omit_Place.place_"
-							}
-						],
-						"nullable": true
-					},
-					"professionalShare": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"stages": {
-						"items": {
-							"$ref": "#/components/schemas/Stage_mongoose.Types.ObjectId.binary_"
-						},
-						"type": "array"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/TravelExpense_mongoose.Types.ObjectId.binary_"
-						},
-						"type": "array"
-					},
-					"days": {
-						"items": {
-							"$ref": "#/components/schemas/TravelDay_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"reason",
-					"destinationPlace",
-					"startDate",
-					"endDate",
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"progress",
-					"addUp",
-					"advances",
-					"history",
-					"historic",
-					"professionalShare",
-					"stages",
-					"expenses",
-					"days"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -7163,20 +6748,12 @@
 			"SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom__": {
 				"$ref": "#/components/schemas/SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom_.NoPost_"
 			},
-			"AnyState": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/TravelState"
-					},
-					{
-						"$ref": "#/components/schemas/HealthCareCostState"
-					},
-					{
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					{
-						"$ref": "#/components/schemas/AdvanceState"
-					}
+			"ReportModelNameWithoutAdvance": {
+				"type": "string",
+				"enum": [
+					"Travel",
+					"ExpenseReport",
+					"HealthCareCost"
 				]
 			},
 			"ReportModelName": {
@@ -7436,13 +7013,13 @@
 						"anyOf": [
 							{
 								"items": {
-									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									"type": "string"
 								},
 								"type": "array"
 							},
 							{
 								"items": {
-									"type": "string"
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 								},
 								"type": "array"
 							}
@@ -7452,13 +7029,13 @@
 						"anyOf": [
 							{
 								"items": {
-									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+									"type": "string"
 								},
 								"type": "array"
 							},
 							{
 								"items": {
-									"type": "string"
+									"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 								},
 								"type": "array"
 							}
@@ -7572,6 +7149,10 @@
 					"NotoSans",
 					"Inter"
 				]
+			},
+			"HexColor": {
+				"type": "string",
+				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
 			},
 			"PrinterSettings__id_": {
 				"properties": {
@@ -8364,6 +7945,37 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AddUp__id.HealthCareCost__id.binary__": {
+				"$ref": "#/components/schemas/AddUpBase__id_"
+			},
+			"Comment__id.HealthCareCostState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/HealthCareCostState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log__id.HealthCareCostState_": {
+				"properties": {},
+				"type": "object"
+			},
 			"HealthCareCost__id.binary_": {
 				"properties": {
 					"name": {
@@ -8997,6 +8609,185 @@
 			"SetterBody_Expense_mongoose.Types.ObjectId.Binary__": {
 				"$ref": "#/components/schemas/SetterPartial_Expense_mongoose.Types.ObjectId.Binary_.NoPost_"
 			},
+			"Comment_mongoose.Types.ObjectId.AdvanceState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.AdvanceState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"Advance_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"reference": {
+						"type": "number",
+						"format": "double"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.AdvanceState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.AdvanceState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"offsetAgainst": {
+						"items": {
+							"properties": {
+								"amount": {
+									"type": "number",
+									"format": "double"
+								},
+								"report": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+										}
+									},
+									"required": [
+										"name",
+										"_id"
+									],
+									"type": "object",
+									"nullable": true
+								},
+								"type": {
+									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+								}
+							},
+							"required": [
+								"amount",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"reference",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"history",
+					"historic",
+					"budget",
+					"balance",
+					"reason",
+					"offsetAgainst"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Expense_mongoose.Types.ObjectId.binary_": {
 				"properties": {
 					"description": {
@@ -9025,6 +8816,200 @@
 					"description",
 					"cost",
 					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__": {
+				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
+			},
+			"TextColor": {
+				"type": "string",
+				"enum": [
+					"black",
+					"white"
+				]
+			},
+			"BadgeStyle": {
+				"properties": {
+					"color": {
+						"$ref": "#/components/schemas/HexColor"
+					},
+					"text": {
+						"$ref": "#/components/schemas/TextColor"
+					}
+				},
+				"required": [
+					"color",
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Category_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"isDefault",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment_mongoose.Types.ObjectId.ExpenseReportState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log_mongoose.Types.ObjectId.ExpenseReportState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"ExpenseReport_mongoose.Types.ObjectId.binary_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"reference": {
+						"type": "number",
+						"format": "double"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.ExpenseReportState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.ExpenseReportState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"addUp": {
+						"items": {
+							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__"
+						},
+						"type": "array"
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"category": {
+						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"expenses": {
+						"items": {
+							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.binary_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"reference",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"addUp",
+					"advances",
+					"category",
+					"history",
+					"historic",
+					"expenses"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -9148,6 +9133,61 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"AddUp__id.ExpenseReport__id.binary__": {
+				"$ref": "#/components/schemas/AddUpBase__id_"
+			},
+			"Category__id_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"isDefault",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Comment__id.ExpenseReportState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/ExpenseReportState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log__id.ExpenseReportState_": {
+				"properties": {},
+				"type": "object"
 			},
 			"ExpenseReport__id.binary_": {
 				"properties": {
@@ -9477,61 +9517,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__": {
-				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
-			},
-			"Category_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"style": {
-						"$ref": "#/components/schemas/BadgeStyle"
-					},
-					"isDefault": {
-						"type": "boolean"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"style",
-					"isDefault",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Comment_mongoose.Types.ObjectId.ExpenseReportState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.ExpenseReportState_": {
-				"properties": {},
-				"type": "object"
-			},
 			"ExpenseReport_mongoose.Types.ObjectId.Binary_": {
 				"properties": {
 					"name": {
@@ -9622,122 +9607,6 @@
 					"expenses": {
 						"items": {
 							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.Binary_"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"addUp",
-					"advances",
-					"category",
-					"history",
-					"historic",
-					"expenses"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ExpenseReport_mongoose.Types.ObjectId.binary_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.ExpenseReportState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/ExpenseReportState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.ExpenseReportState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"addUp": {
-						"items": {
-							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__"
-						},
-						"type": "array"
-					},
-					"advances": {
-						"items": {
-							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
-						},
-						"type": "array"
-					},
-					"category": {
-						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"expenses": {
-						"items": {
-							"$ref": "#/components/schemas/Expense_mongoose.Types.ObjectId.binary_"
 						},
 						"type": "array"
 					}
@@ -12025,6 +11894,185 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Comment__id.AdvanceState_": {
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"toState": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"text",
+					"author",
+					"toState",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Log__id.AdvanceState_": {
+				"properties": {},
+				"type": "object"
+			},
+			"Advance__id_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"reference": {
+						"type": "number",
+						"format": "double"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"editor": {
+						"$ref": "#/components/schemas/UserSimple__id_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project__id_"
+					},
+					"comment": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingRemark": {
+						"type": "string",
+						"nullable": true
+					},
+					"comments": {
+						"items": {
+							"$ref": "#/components/schemas/Comment__id.AdvanceState_"
+						},
+						"type": "array"
+					},
+					"state": {
+						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"log": {
+						"$ref": "#/components/schemas/Log__id.AdvanceState_"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"history": {
+						"items": {
+							"$ref": "#/components/schemas/_id"
+						},
+						"type": "array"
+					},
+					"historic": {
+						"type": "boolean"
+					},
+					"budget": {
+						"$ref": "#/components/schemas/MoneyNotNull"
+					},
+					"balance": {
+						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"settledOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"offsetAgainst": {
+						"items": {
+							"properties": {
+								"amount": {
+									"type": "number",
+									"format": "double"
+								},
+								"report": {
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"_id": {
+											"$ref": "#/components/schemas/_id"
+										}
+									},
+									"required": [
+										"name",
+										"_id"
+									],
+									"type": "object",
+									"nullable": true
+								},
+								"type": {
+									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+								}
+							},
+							"required": [
+								"amount",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"reference",
+					"owner",
+					"editor",
+					"project",
+					"comments",
+					"state",
+					"log",
+					"createdAt",
+					"updatedAt",
+					"_id",
+					"history",
+					"historic",
+					"budget",
+					"balance",
+					"reason",
+					"offsetAgainst"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GETResponse_Advance__id_-or-Advance__id_-Array_": {
 				"properties": {
 					"data": {
@@ -12303,185 +12351,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"Comment_mongoose.Types.ObjectId.AdvanceState_": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"author": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"toState": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"text",
-					"author",
-					"toState",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Log_mongoose.Types.ObjectId.AdvanceState_": {
-				"properties": {},
-				"type": "object"
-			},
-			"Advance_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reference": {
-						"type": "number",
-						"format": "double"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"editor": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
-					},
-					"project": {
-						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
-					},
-					"comment": {
-						"type": "string",
-						"nullable": true
-					},
-					"bookingRemark": {
-						"type": "string",
-						"nullable": true
-					},
-					"comments": {
-						"items": {
-							"$ref": "#/components/schemas/Comment_mongoose.Types.ObjectId.AdvanceState_"
-						},
-						"type": "array"
-					},
-					"state": {
-						"$ref": "#/components/schemas/AdvanceState"
-					},
-					"log": {
-						"$ref": "#/components/schemas/Log_mongoose.Types.ObjectId.AdvanceState_"
-					},
-					"createdAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"updatedAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"history": {
-						"items": {
-							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-						},
-						"type": "array"
-					},
-					"historic": {
-						"type": "boolean"
-					},
-					"budget": {
-						"$ref": "#/components/schemas/MoneyNotNull"
-					},
-					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
-					},
-					"reason": {
-						"type": "string"
-					},
-					"settledOn": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
-					"offsetAgainst": {
-						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
-								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									},
-									"required": [
-										"name",
-										"_id"
-									],
-									"type": "object",
-									"nullable": true
-								},
-								"type": {
-									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
-								}
-							},
-							"required": [
-								"amount",
-								"type"
-							],
-							"type": "object"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"reference",
-					"owner",
-					"editor",
-					"project",
-					"comments",
-					"state",
-					"log",
-					"createdAt",
-					"updatedAt",
-					"_id",
-					"history",
-					"historic",
-					"budget",
-					"balance",
-					"reason",
-					"offsetAgainst"
-				],
-				"type": "object",
-				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -12502,6 +12371,320 @@
 		"contact": {}
 	},
 	"paths": {
+		"/admin/webhook": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_unknown_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Webhook"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "number",
+										"format": "double"
+									}
+								]
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Webhook_mongoose.Types.ObjectId_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Webhook"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_IWebhook_mongoose.Types.ObjectId__"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Webhook"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/webhook/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Webhook"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/webhook/script": {
+			"post": {
+				"operationId": "Get",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Awebhook"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"script": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"script"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/webhook/test": {
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"meta": {
+											"properties": {
+												"contentType": {
+													"type": "string"
+												},
+												"path": {
+													"type": "string"
+												},
+												"method": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"contentType",
+												"path",
+												"method"
+											],
+											"type": "object"
+										},
+										"ok": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"meta",
+										"ok"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Awebhook"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/user": {
 			"get": {
 				"operationId": "GetMe",
@@ -14300,20 +14483,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -14423,20 +14593,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -14707,7 +14864,7 @@
 		},
 		"/approve/travel/approved": {
 			"post": {
-				"operationId": "PostAnyBackApproved",
+				"operationId": "PostAnyApproved",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -14716,7 +14873,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/Travel__id.binary_"
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -14813,20 +14970,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -15507,20 +15651,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -17760,7 +17891,20 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.binary_"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.binary_"
+												}
+											]
 										},
 										"message": {
 											"type": "string"
@@ -17838,20 +17982,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -18363,7 +18494,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/HealthCareCost__id.binary_"
+											"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -18517,20 +18648,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -19277,7 +19395,20 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.binary_"
+												},
+												{
+													"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.binary_"
+												},
+												{
+													"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.binary_"
+												}
+											]
 										},
 										"message": {
 											"type": "string"
@@ -19352,20 +19483,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -19873,7 +19991,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/ExpenseReport__id.binary_"
+											"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -20024,20 +20142,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.binary_"
 										},
 										"message": {
 											"type": "string"
@@ -22386,20 +22491,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
 										},
 										"message": {
 											"type": "string"
@@ -22893,20 +22985,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/TravelSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/ExpenseReportSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/HealthCareCostSimple__id_"
-												},
-												{
-													"$ref": "#/components/schemas/Advance__id_"
-												}
-											]
+											"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
 										},
 										"message": {
 											"type": "string"
