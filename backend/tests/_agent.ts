@@ -2,10 +2,6 @@ import { User } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import request from 'supertest'
 import APP from '../app.js'
-import { disconnectDB } from '../db.js'
-import { closeMailQueue } from '../workers/mail.js'
-import { closeSaveReportOnDiskQueue } from '../workers/saveReportOnDisk.js'
-import { closeWebhookQueue } from '../workers/webhook.js'
 
 const users = {
   user: {
@@ -69,11 +65,4 @@ export default async function createAgent() {
 export async function loginUser(agent: request.Agent, userKey: keyof typeof users) {
   await agent.post('/logout')
   await agent.post('/auth/ldapauth').send({ username: users[userKey].username, password: users[userKey].password })
-}
-
-export async function shutdown() {
-  await closeMailQueue()
-  await closeSaveReportOnDiskQueue()
-  await closeWebhookQueue()
-  await disconnectDB()
 }
