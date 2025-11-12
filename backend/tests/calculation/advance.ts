@@ -1,8 +1,7 @@
 import { Advance, Expense, ExpenseReport, User } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { disconnectDB } from '../../db.js'
 import { objectToFormFields } from '../../helper.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 
@@ -82,5 +81,5 @@ test.serial('correct balance after advance booked', async (t) => {
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
-  await disconnectDB()
+  await shutdown()
 })

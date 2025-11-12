@@ -341,7 +341,7 @@ class ReportPrint<idType extends _id> {
       title: 'value',
       fn: (d: Date | string) => {
         const validDate = isValidDate(d)
-        return validDate ? this.drawer.formatter.date(validDate) : String(validDate)
+        return validDate ? this.drawer.formatter.date(validDate) : String(d)
       }
     })
 

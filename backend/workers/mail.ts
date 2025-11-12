@@ -24,6 +24,10 @@ export const mailQueue = new Queue<MailJobData>(MAIL_QUEUE_NAME, {
   }
 })
 
+export async function closeMailQueue() {
+  await mailQueue.close()
+}
+
 let workerInstance: Worker<MailJobData> | undefined
 
 export function startMailWorker(concurrency = 5) {

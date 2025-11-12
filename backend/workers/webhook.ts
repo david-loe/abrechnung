@@ -22,6 +22,10 @@ export const webhookQueue = new Queue<WebhookJobData>(WEBHOOK_QUEUE_NAME, {
   }
 })
 
+export async function closeWebhookQueue() {
+  await webhookQueue.close()
+}
+
 let workerInstance: Worker<WebhookJobData> | undefined
 
 export function startWebhookWorker(concurrency = 1) {

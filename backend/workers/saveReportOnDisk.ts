@@ -25,6 +25,10 @@ export const saveReportOnDiskQueue = new Queue<SaveReportOnDiskJobData>(SAVE_REP
   }
 })
 
+export async function closeSaveReportOnDiskQueue() {
+  await saveReportOnDiskQueue.close()
+}
+
 let workerInstance: Worker<SaveReportOnDiskJobData> | undefined
 
 export function startSaveReportOnDiskWorker(concurrency = 1) {

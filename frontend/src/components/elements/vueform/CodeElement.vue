@@ -2,7 +2,7 @@
   <ElementLayout>
     <template #element>
       <CodeEditor
-        :modelValue="value || ''"
+        :modelValue="value ?? ''"
         @update:modelValue="update"
         :read-only="isDisabled"
         :line-nums="true"
@@ -26,9 +26,6 @@ import CodeEditor from 'simple-code-editor'
 export default defineElement({
   name: 'CodeElement',
   components: { CodeEditor },
-  data() {
-    return { content: '' }
-  },
   methods: {
     getClass() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'github-dark' : 'github'
@@ -37,7 +34,7 @@ export default defineElement({
 })
 </script>
 
-<style>
+<style scoped>
 .code-editor {
   letter-spacing: 0;
   line-height: 0;
