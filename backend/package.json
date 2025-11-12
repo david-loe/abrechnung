@@ -7,6 +7,7 @@
     "abrechnung-common": "file:../common",
     "axios": "^1.13.1",
     "body-parser": "^2.2.0",
+    "bullmq": "^5.63.0",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "cron": "^4.3.3",
@@ -15,6 +16,7 @@
     "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
     "i18next": "^25.6.0",
+    "isolated-vm": "^6.0.2",
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
@@ -58,11 +60,12 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node dist/server.js'",
+    "dev": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && sh -c \"npm run start & pid1=$!; npm run worker & pid2=$!; wait -n $pid1 $pid2; kill $pid1 $pid2 2>/dev/null\"'",
     "debug": "nodemon --ext ts,js,json,ejs,tsv --watch './**/*' --ignore './dist/**/*' --exec 'yarn run tsoa spec-and-routes &&  npx tsc && node --inspect=0.0.0.0:$BACKEND_DEBUG_PORT dist/server.js'",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/server.js",
-    "test": "npm run build && LOG_LEVEL=WARN ava --serial --timeout=1m dist/tests/**/* ",
+    "worker": "node dist/workers/start.js",
+    "test": "npm run build && LOG_LEVEL=WARN ava --serial --timeout=10s dist/tests/**/* ",
     "test:debug": "LOG_LEVEL=DEBUG ava debug --host 0.0.0.0 --port $BACKEND_DEBUG_PORT --serial dist/tests/api/travel.js",
     "setup": "npm run build && node dist/setup.js"
   }

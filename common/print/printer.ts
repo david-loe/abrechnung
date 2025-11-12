@@ -238,7 +238,7 @@ export class PDFDrawer<idType extends _id> {
   }
 
   async finish() {
-    return await this.doc.save()
+    return (await this.doc.save()) as Uint8Array<ArrayBuffer>
   }
 
   newPage(orientation: PageOrientation = this.settings.defaultPageOrientation) {

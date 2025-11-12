@@ -1,7 +1,7 @@
 <template>
   <ElementLayout>
     <template #element>
-      <JsonEditorVue v-model="model" :stringified="false" :mainMenuBar="false" :statusBar="false" mode="text" />
+      <JsonEditorVue v-model="value" :stringified="false" :mainMenuBar="false" :statusBar="false" mode="text" />
     </template>
 
     <!-- Default element slots -->

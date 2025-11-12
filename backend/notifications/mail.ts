@@ -8,6 +8,7 @@ import i18n from '../i18n.js'
 import { logger } from '../logger.js'
 import { mapSmtpConfig } from '../settingsValidator.js'
 import { getMailTemplate } from '../templates/cache.js'
+import { MailJobData, mailQueue } from '../workers/mail.js'
 
 export async function getClient() {
   const connectionSettings = await getConnectionSettings()
@@ -16,15 +17,20 @@ export async function getClient() {
   }
   throw new Error('SMTP not configured in Connection Settings')
 }
+export type MailRecipient = Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }
 
 export async function sendMail(
-  recipients: Array<Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }>,
+  recipients: MailRecipient[],
   subject: string,
   paragraph: string,
   button?: { text: string; link: string },
   lastParagraph?: string | string[],
   authenticateLink = true
 ) {
+  await mailQueue.add('sendMail', { recipients, subject, paragraph, button, lastParagraph, authenticateLink })
+}
+
+export async function processMailJob({ recipients, subject, paragraph, button, lastParagraph, authenticateLink }: MailJobData) {
   const mailPromises = []
   for (const recipient of recipients) {
     const language = recipient.settings.language
@@ -40,7 +46,7 @@ export async function sendMail(
     }
     mailPromises.push(_sendMail(recipient, subject, paragraph, language, recipientButton, lastParagraph))
   }
-  return await Promise.allSettled(mailPromises)
+  await Promise.allSettled(mailPromises)
 }
 
 async function _sendMail(

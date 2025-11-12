@@ -20,6 +20,27 @@ export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
  */
 export type HexColor = string
 
+export const webhookMethods = ['POST', 'PUT', 'PATCH'] as const
+export type WebhookMethod = (typeof webhookMethods)[number]
+
+export type Webhook<idType extends _id = _id> = {
+  name: string
+  executionOrder: number
+  reportType: ReportType[]
+  onState: AnyState[]
+  script?: string | null
+  isActive: boolean
+  request: {
+    url: string
+    headers: { [key: string]: string }
+    method: WebhookMethod
+    convertBodyToFormData: boolean
+    pdfFormFieldName?: string | null
+    body?: unknown
+  }
+  _id: idType
+}
+
 export interface Settings<idType extends _id = _id> {
   userCanSeeAllProjects: boolean
   onlyShowProjectNamesOnAssigned: boolean

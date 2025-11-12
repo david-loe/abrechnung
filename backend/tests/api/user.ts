@@ -1,8 +1,8 @@
 import { User } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { disconnectDB } from '../../db.js'
+import { shutdown } from '../../app.js'
+import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { objectToFormFields } from '../_helper.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -92,5 +92,5 @@ test('POST /user/vehicleRegistration', async (t) => {
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
-  await disconnectDB()
+  await shutdown()
 })

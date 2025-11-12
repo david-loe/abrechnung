@@ -1,6 +1,6 @@
 import { Advance, AdvanceSimple, AdvanceState } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { disconnectDB } from '../../db.js'
+import { shutdown } from '../../app.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -97,5 +97,5 @@ test.serial('DELETE /advance 40X', async (t) => {
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
-  await disconnectDB()
+  await shutdown()
 })

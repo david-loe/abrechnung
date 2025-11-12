@@ -32,7 +32,7 @@ import {
   TravelState
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
-import { getAddUpTableData, getTotalBalance, refNumberToString } from '../utils/scripts.js'
+import { getAddUpTableData, getTotalBalance, isValidDate, refNumberToString } from '../utils/scripts.js'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
 function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], startNumber = 1) {
@@ -351,7 +351,10 @@ class ReportPrint<idType extends _id> {
       width: 95,
       alignment: TextAlignment.Left,
       title: 'value',
-      fn: (d: Date | string) => (typeof d === 'string' ? d : this.drawer.formatter.date(d))
+      fn: (d: Date | string) => {
+        const validDate = isValidDate(d)
+        return validDate ? this.drawer.formatter.date(validDate) : String(d)
+      }
     })
 
     const summary = []

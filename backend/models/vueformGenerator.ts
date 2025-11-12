@@ -73,7 +73,7 @@ function mapSchemaTypeToVueformElement(
     vueformElement.default = schemaType.default
   }
 
-  if (!vueformElement.columns && isNotNested(schemaType)) {
+  if (!vueformElement.columns && isNotNested(schemaType) && !schemaType.noColumn) {
     vueformElement.columns = { md: 6 }
   }
 
@@ -83,6 +83,8 @@ function mapSchemaTypeToVueformElement(
       vueformElement.placeholder = vueformElement.label
       vueformElement.label = undefined
     }
+  } else if (schemaType.specialType) {
+    vueformElement.type = schemaType.specialType
   } else if (schemaType.type === String) {
     vueformElement.placeholder = vueformElement.label
     vueformElement.label = undefined
