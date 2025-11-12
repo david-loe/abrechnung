@@ -58,11 +58,11 @@ const { t } = useI18n()
 const defaultScript = `/** @typedef {{_id: string, email: string, name: {givenName: string, familyName: string}}} User */
 /** @typedef {{_id: string, identifier: string, organisation: string}} Project */
 /** @typedef {{amount: number}} Money */
-/** @typedef {Object<number,{on: Date ; by: User}>} Log */
+/** @typedef {Object<number,{on: string ; by: User}>} Log */
 /** @typedef {{project: Project, balance: Money, total: Money, advance: Money, expenses: Money, lumpSums?: Money , advanceOverflow: boolean }} AddUp */
 
 /** 
- * @param {{name: string, reference: number, owner: User, editor: User, project: Project, bookingRemark?: string, state: number, log: Log, createdAt: Date, updatedAt: Date, _id: string, addUp?: AddUp[]}} input
+ * @param {{name: string, reference: number, owner: User, editor: User, project: Project, bookingRemark?: string, state: number, log: Log, createdAt: string, updatedAt: string, _id: string, addUp?: AddUp[]}} input
  * @returns {{url?: string, headers?: Object.<string,string>, method?: 'POST'| 'PUT'| 'PATCH', convertBodyToFormData?: boolean, pdfFormFieldName?: string, body?: Object.<string,any> }}
 */
 function run(input) {
