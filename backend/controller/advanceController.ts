@@ -5,12 +5,13 @@ import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Secu
 import { getSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, setAdvanceBalance, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { runWebhooks } from '../webhooks/execute.js'
+import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -151,7 +152,7 @@ export class AdvanceApproveController extends Controller {
       await sendNotification(a)
       await sendViaMail(a)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(a), await reportPrinter.print(a, i18n.language as Locale))
+        await writeReportToDisk(await writeToDiskFilePath(a), a)
       }
     }
 

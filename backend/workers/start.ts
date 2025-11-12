@@ -1,7 +1,7 @@
-import { startFileSystemWorker } from './fileSystem.js'
 import { startMailWorker } from './mail.js'
+import { startSaveReportOnDiskWorker } from './saveReportOnDisk.js'
 import { startWebhookWorker } from './webhook.js'
 
-startFileSystemWorker()
+startSaveReportOnDiskWorker()
 startMailWorker()
 startWebhookWorker()

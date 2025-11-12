@@ -16,13 +16,14 @@ import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Quer
 import { getSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { sendA1Notification, sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { runWebhooks } from '../webhooks/execute.js'
+import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -519,7 +520,7 @@ export class TravelExamineController extends Controller {
       await sendNotification(t)
       await sendViaMail(t)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(t), await reportPrinter.print(t, i18n.language as Locale))
+        await writeReportToDisk(await writeToDiskFilePath(t), t)
       }
     }
 

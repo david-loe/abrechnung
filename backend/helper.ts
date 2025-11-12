@@ -6,7 +6,6 @@ import { Types } from 'mongoose'
 import multer from 'multer'
 import ENV from './env.js'
 import DocumentFile from './models/documentFile.js'
-import { fileSystemQueue } from './workers/fileSystem.js'
 
 interface ReqDocument extends Omit<IDocumentFile, 'data'> {
   data?: Buffer<ArrayBufferLike>
@@ -96,13 +95,6 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
       next()
     }
   }
-}
-
-export async function writeToDisk(
-  filePath: string,
-  data: string | NodeJS.ArrayBufferView | Iterable<string | NodeJS.ArrayBufferView> | AsyncIterable<string | NodeJS.ArrayBufferView>
-): Promise<void> {
-  await fileSystemQueue.add('writeToDisk', { filePath, data })
 }
 
 export function checkIfUserIsProjectSupervisor(user: IUser<Types.ObjectId>, projectId: Types.ObjectId): boolean {

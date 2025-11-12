@@ -15,13 +15,14 @@ import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Quer
 import { getSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler, writeToDisk } from '../helper.js'
+import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { sendNotification } from '../notifications/notification.js'
 import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
 import { runWebhooks } from '../webhooks/execute.js'
+import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -354,7 +355,7 @@ export class ExpenseReportExamineController extends Controller {
       await sendNotification(e)
       await sendViaMail(e)
       if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeToDisk(await writeToDiskFilePath(e), await reportPrinter.print(e, i18n.language as Locale))
+        await writeReportToDisk(await writeToDiskFilePath(e), e)
       }
     }
 
