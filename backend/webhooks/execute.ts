@@ -13,7 +13,6 @@ import { Types } from 'mongoose'
 import { getConnectionSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
-import { objectToFormFields } from '../helper.js'
 import Webhook from '../models/webhook.js'
 import { WebhookJobData, webhookQueue } from '../workers/webhook.js'
 import { runUserScript } from './runScript.js'
@@ -32,11 +31,7 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   const request = { ...webhook.request, ...(webhook.script ? await runUserScript(webhook.script, input) : {}) }
 
   if (request.convertBodyToFormData && request.body) {
-    const form = new FormData()
-    const fields = objectToFormFields(request.body)
-    fields.forEach(({ field, val }) => {
-      form.append(field, val.toString())
-    })
+    const form = buildFormData(request.body)
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
       const connectionSettings = await getConnectionSettings()
       const lng = connectionSettings.PDFReportsViaEmail.locale
@@ -64,4 +59,32 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
     url: (res.request?.res?.responseUrl ?? request.url) as string,
     body: res.data
   }
+}
+
+function buildFormData(data: Record<string, any>): FormData {
+  const form = new FormData()
+
+  for (const [key, value] of Object.entries(data)) {
+    if (value === null || value === undefined) continue
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'number' || typeof item === 'string') {
+          form.append(key, String(item))
+        } else {
+          throw new TypeError(`Listenelemente in '${key}' müssen number oder string sein: ${item}`)
+        }
+      }
+    } else if (value instanceof Date) {
+      form.append(key, value.toISOString())
+    } else if (typeof value === 'object') {
+      form.append(key, JSON.stringify(value))
+    } else if (['number', 'boolean', 'string'].includes(typeof value)) {
+      form.append(key, String(value))
+    } else {
+      throw new TypeError(`Nicht unterstützter Datentyp in Feld '${key}': ${typeof value}`)
+    }
+  }
+
+  return form
 }
