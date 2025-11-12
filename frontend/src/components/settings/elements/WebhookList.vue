@@ -14,6 +14,13 @@
         </div>
       </template>
 
+      <template #item-isActive="{isActive}:Webhook">{{ isActive? '✅' : '❌' }}</template>
+      <template #item-reportType="{reportType}: Webhook">
+        <span v-if="APP_DATA" v-for="r of reportType" :title="t('labels.' + r)" class="me-2">
+          <i v-for="icon of APP_DATA.displaySettings.reportTypeIcons[r]" :class="`bi bi-${icon}`"></i>
+        </span>
+      </template>
+
       <template #item-buttons="webhook">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(webhook)">
           <i class="bi bi-pencil"></i>
@@ -48,8 +55,23 @@ import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 
+const defaultScript = `/** @typedef {{_id: string, email: string, name: {givenName: string, familyName: string}}} User */
+/** @typedef {{_id: string, identifier: string, organisation: string}} Project */
+/** @typedef {{amount: number}} Money */
+/** @typedef {Object<number,{on: Date ; by: User}>} Log */
+/** @typedef {{project: Project, balance: Money, total: Money, advance: Money, expenses: Money, lumpSums?: Money , advanceOverflow: boolean }} AddUp */
+
+/** 
+ * @param {{name: string, reference: number, owner: User, editor: User, project: Project, bookingRemark?: string, state: number, log: Log, createdAt: Date, updatedAt: Date, _id: string, addUp?: AddUp[]}} input
+ * @returns {{url?: string, headers?: Object.<string,string>, method?: 'POST'| 'PUT'| 'PATCH', convertBodyToFormData?: boolean, pdfFormFieldName?: string, body?: Object.<string,any> }}
+*/
+function run(input) {
+  return {}
+}`
+
 const headers: Header[] = [
   { text: 'labels.name', value: 'name' },
+  { text: 'labels.isActive', value: 'isActive' },
   { text: 'labels.reportType', value: 'reportType' },
   { text: 'labels.onState', value: 'onState' },
   { text: 'labels.executionOrder', value: 'executionOrder' },
@@ -86,10 +108,13 @@ const webhookToEdit: Ref<Webhook | undefined> = ref(undefined)
 const _showForm = ref(false)
 
 function showForm(webhook?: Webhook) {
-  webhookToEdit.value = webhook
+  const hook = webhook ? webhook : ({} as Webhook)
+  hook.script = hook.script ? hook.script : defaultScript
+  webhookToEdit.value = hook
   _showForm.value = true
 }
 async function postWebhook(webhook: Webhook) {
+  webhook.script = webhook.script === defaultScript ? undefined : webhook.script
   const result = await API.setter<Webhook>('admin/webhook', webhook)
   if (result.ok) {
     _showForm.value = false

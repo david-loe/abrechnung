@@ -29,6 +29,7 @@ export type Webhook<idType extends _id = _id> = {
   reportType: ReportType[]
   onState: AnyState[]
   script?: string | null
+  isActive: boolean
   request: {
     url: string
     headers: { [key: string]: string }

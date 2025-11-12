@@ -22,7 +22,7 @@ export async function runWebhooks(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
 ) {
   const reportType = getReportTypeFromModelName(getModelNameFromReport(report))
-  const hooks = await Webhook.find({ reportType, onState: report.state }).sort({ executionOrder: 1 }).lean()
+  const hooks = await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
   for (const hook of hooks) {
     await webhookQueue.add(`webhook:${hook.name}`, { input: report, webhook: hook }, { priority: hook.executionOrder })
   }

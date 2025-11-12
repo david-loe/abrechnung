@@ -329,6 +329,7 @@
     "installApp": "Install app",
     "insurance": "Health insurance",
     "invoiceDate": "Date of invoice",
+    "isActive": "Is active?",
     "isCrossBorder": "Is a cross-border trip",
     "isDefault": "Is default?",
     "label": "Label",
