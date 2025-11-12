@@ -511,6 +511,7 @@ export class PDFDrawer<idType extends _id> {
     opts.yStart = opts.yStart - opts.cellHeight
     opts.newPageYStart = opts.newPageYStart - opts.cellHeight
 
+    let alreadyOnCompletelyNewPage = false
     let x = opts.xStart
     let y = opts.yStart
     for (let i = 0; i < data.length; i++) {
@@ -575,7 +576,7 @@ export class PDFDrawer<idType extends _id> {
         yMin = multiText.bounds.y < yMin ? multiText.bounds.y : yMin
         x = x + column.width
       }
-      if (yMin < this.settings.pagePadding) {
+      if (yMin < this.settings.pagePadding && !alreadyOnCompletelyNewPage) {
         this.currentPage.drawLine({
           // top border ╤
           start: { x: opts.xStart - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
@@ -591,6 +592,7 @@ export class PDFDrawer<idType extends _id> {
           color: this.settings.borderColor
         })
         this.newPage()
+        alreadyOnCompletelyNewPage = true
         x = opts.newPageXStart
         y = opts.newPageYStart
         opts.xStart = opts.newPageXStart
@@ -612,6 +614,7 @@ export class PDFDrawer<idType extends _id> {
           })
         }
       }
+      alreadyOnCompletelyNewPage = false
       for (const border of columnBorders) {
         border.end.y = yMin - this.settings.borderThickness
         this.currentPage.drawLine(border)
