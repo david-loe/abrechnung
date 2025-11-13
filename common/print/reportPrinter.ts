@@ -16,6 +16,7 @@ import {
   Meal,
   Place,
   PrinterSettings,
+  PrintOptions,
   Purpose,
   PurposeSimple,
   ReportModelNameWithoutAdvance,
@@ -46,12 +47,6 @@ function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], s
     }
   }
   return { map, number }
-}
-
-interface PrintOptions {
-  reviewDates: boolean
-  reportInformation: boolean
-  project: boolean
 }
 
 interface ReportPrinterTravelSettings {
@@ -130,7 +125,9 @@ class ReportPrint<idType extends _id> {
   }
 
   async run(options?: Partial<PrintOptions>) {
-    const opts: PrintOptions = { reviewDates: true, reportInformation: true, project: true, ...options }
+    const modelName = getModelNameFromReport(this.report)
+
+    const opts = { ...this.drawer.settings.options[getReportTypeFromModelName(modelName)], ...options }
     let y = this.drawer.currentPage.getSize().height
 
     await this.drawer.drawLogo(this.t('headlines.title'), {
@@ -140,7 +137,7 @@ class ReportPrint<idType extends _id> {
     })
 
     if (this.report.reference > 0) {
-      await this.drawer.drawMultilineText(refNumberToString(this.report.reference, getModelNameFromReport(this.report)), {
+      await this.drawer.drawMultilineText(refNumberToString(this.report.reference, modelName), {
         alignment: TextAlignment.Center,
         xStart: 0,
         yStart: y - this.drawer.settings.pagePadding / 5,
@@ -162,7 +159,7 @@ class ReportPrint<idType extends _id> {
         { xStart: this.drawer.settings.pagePadding, yStart: y - 24, fontSize: this.drawer.settings.fontSizes.M },
         opts.project
       ) - 10
-    if (opts.reportInformation) {
+    if (opts.metaInformation) {
       y = await this.drawTravelInformation({
         xStart: this.drawer.settings.pagePadding,
         yStart: y,
@@ -202,19 +199,21 @@ class ReportPrint<idType extends _id> {
 
     y = y < yDates ? y : yDates
 
-    y = await this.drawStages(receiptMap, {
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.S
-    })
-    y = await this.drawExpenses(receiptMap, {
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - 16,
-      fontSize: this.drawer.settings.fontSizes.S
-    })
+    y = await this.drawStages(
+      receiptMap,
+      { xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S },
+      opts.notes
+    )
+    y = await this.drawExpenses(
+      receiptMap,
+      { xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S },
+      opts.notes
+    )
     y = await this.drawDays({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
     y = await this.drawReports({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
-    y = await this.drawComments({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
+    if (opts.comments) {
+      y = await this.drawComments({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
+    }
 
     await this.drawer.attachReceipts(receiptMap)
 
@@ -418,7 +417,7 @@ class ReportPrint<idType extends _id> {
     return await this.drawer.drawTable<Comment<idType, AnyState>>(this.report.comments, columns, tableOptions)
   }
 
-  async drawStages(receiptMap: ReceiptMap<idType>, options: Options) {
+  async drawStages(receiptMap: ReceiptMap<idType>, options: Options, drawNotes = true) {
     if (!reportIsTravel(this.report) || this.report.stages.length === 0) {
       return options.yStart
     }
@@ -486,7 +485,9 @@ class ReportPrint<idType extends _id> {
       title: this.t('labels.cost'),
       fn: (m: Cost) => this.drawer.formatter.detailedMoney(m)
     })
-    columns.push({ key: 'note', width: 70, alignment: TextAlignment.Left, title: this.t('labels.note') })
+    if (drawNotes) {
+      columns.push({ key: 'note', width: 70, alignment: TextAlignment.Left, title: this.t('labels.note') })
+    }
     columns.push({
       key: 'cost',
       width: 45,
@@ -506,7 +507,7 @@ class ReportPrint<idType extends _id> {
     return await this.drawer.drawTable(this.report.stages, columns, options)
   }
 
-  async drawExpenses(receiptMap: ReceiptMap<idType>, options: Options) {
+  async drawExpenses(receiptMap: ReceiptMap<idType>, options: Options, drawNotes = true) {
     if (reportIsAdvance(this.report) || this.report.expenses.length === 0) {
       return options.yStart
     }
@@ -537,7 +538,9 @@ class ReportPrint<idType extends _id> {
       title: this.t('labels.invoiceDate'),
       fn: (c: Cost) => this.drawer.formatter.date(c.date)
     })
-    columns.push({ key: 'note', width: 130, alignment: TextAlignment.Left, title: this.t('labels.note') })
+    if (drawNotes) {
+      columns.push({ key: 'note', width: 130, alignment: TextAlignment.Left, title: this.t('labels.note') })
+    }
     columns.push({
       key: 'cost',
       width: 45,

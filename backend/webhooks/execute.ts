@@ -10,7 +10,7 @@ import {
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import { Types } from 'mongoose'
-import { getConnectionSettings } from '../db.js'
+import { getConnectionSettings, getPrinterSettings, getTravelSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import Webhook from '../models/webhook.js'
@@ -35,6 +35,11 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
       const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
+
+      const printerSettings = await getPrinterSettings(false)
+      const travelSettings = await getTravelSettings(false)
+      reportPrinter.setSettings(printerSettings)
+      reportPrinter.setTravelSettings(travelSettings)
       form.append(
         request.pdfFormFieldName,
         new Blob([await reportPrinter.print(input, lng)], { type: 'application/pdf' }),

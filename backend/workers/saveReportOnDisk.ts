@@ -3,7 +3,7 @@ import path from 'node:path'
 import { Advance, ExpenseReport, HealthCareCost, Travel } from 'abrechnung-common/types.js'
 import { Queue, Worker } from 'bullmq'
 import { Types } from 'mongoose'
-import { getConnectionSettings } from '../db.js'
+import { getConnectionSettings, getPrinterSettings, getTravelSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { logger } from '../logger.js'
@@ -41,9 +41,16 @@ export function startSaveReportOnDiskWorker(concurrency = 1) {
     async (job) => {
       logger.debug(`Processing saveReportOnDisk job ${job.id}`)
       const { filePath, report } = job.data
+
       const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
+
+      const printerSettings = await getPrinterSettings(false)
+      const travelSettings = await getTravelSettings(false)
+      reportPrinter.setSettings(printerSettings)
+      reportPrinter.setTravelSettings(travelSettings)
       const pdf = await reportPrinter.print(report, lng)
+
       await fs.mkdir(path.dirname(filePath), { recursive: true })
       logger.debug(`Write to file ${filePath}`)
       await fs.writeFile(filePath, pdf)
