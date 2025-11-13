@@ -7154,6 +7154,34 @@
 				"type": "string",
 				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
 			},
+			"PrintOptions": {
+				"properties": {
+					"reviewDates": {
+						"type": "boolean"
+					},
+					"metaInformation": {
+						"type": "boolean"
+					},
+					"project": {
+						"type": "boolean"
+					},
+					"comments": {
+						"type": "boolean"
+					},
+					"notes": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"reviewDates",
+					"metaInformation",
+					"project",
+					"comments",
+					"notes"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PrinterSettings__id_": {
 				"properties": {
 					"fontSizes": {
@@ -7226,6 +7254,29 @@
 						],
 						"type": "object"
 					},
+					"options": {
+						"properties": {
+							"travel": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"expenseReport": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"healthCareCost": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"advance": {
+								"$ref": "#/components/schemas/PrintOptions"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost",
+							"advance"
+						],
+						"type": "object"
+					},
 					"fontName": {
 						"$ref": "#/components/schemas/FontName"
 					},
@@ -7241,6 +7292,7 @@
 					"borderThickness",
 					"cellPadding",
 					"pageSize",
+					"options",
 					"fontName",
 					"_id"
 				],
@@ -7319,6 +7371,29 @@
 						],
 						"type": "object"
 					},
+					"options": {
+						"properties": {
+							"travel": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"expenseReport": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"healthCareCost": {
+								"$ref": "#/components/schemas/PrintOptions"
+							},
+							"advance": {
+								"$ref": "#/components/schemas/PrintOptions"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost",
+							"advance"
+						],
+						"type": "object"
+					},
 					"fontName": {
 						"$ref": "#/components/schemas/FontName"
 					},
@@ -7334,6 +7409,7 @@
 					"borderThickness",
 					"cellPadding",
 					"pageSize",
+					"options",
 					"fontName",
 					"_id"
 				],
@@ -7405,6 +7481,91 @@
 							"NotoSans",
 							"Inter"
 						]
+					},
+					"options": {
+						"properties": {
+							"advance": {
+								"properties": {
+									"notes": {
+										"type": "boolean"
+									},
+									"metaInformation": {
+										"type": "boolean"
+									},
+									"reviewDates": {
+										"type": "boolean"
+									},
+									"comments": {
+										"type": "boolean"
+									},
+									"project": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							},
+							"healthCareCost": {
+								"properties": {
+									"notes": {
+										"type": "boolean"
+									},
+									"metaInformation": {
+										"type": "boolean"
+									},
+									"reviewDates": {
+										"type": "boolean"
+									},
+									"comments": {
+										"type": "boolean"
+									},
+									"project": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							},
+							"expenseReport": {
+								"properties": {
+									"notes": {
+										"type": "boolean"
+									},
+									"metaInformation": {
+										"type": "boolean"
+									},
+									"reviewDates": {
+										"type": "boolean"
+									},
+									"comments": {
+										"type": "boolean"
+									},
+									"project": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							},
+							"travel": {
+								"properties": {
+									"notes": {
+										"type": "boolean"
+									},
+									"metaInformation": {
+										"type": "boolean"
+									},
+									"reviewDates": {
+										"type": "boolean"
+									},
+									"comments": {
+										"type": "boolean"
+									},
+									"project": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
 					},
 					"_id": {
 						"anyOf": [
