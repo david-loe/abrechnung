@@ -21,11 +21,15 @@
 
 <script>
 import { defineElement } from '@vueform/vueform'
+import hljs from 'highlight.js' //https://github.com/justcaliturner/simple-code-editor/issues/54
 import CodeEditor from 'simple-code-editor'
 
 export default defineElement({
   name: 'CodeElement',
   components: { CodeEditor },
+  data() {
+    return { hljs }
+  },
   methods: {
     getClass() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'github-dark' : 'github'

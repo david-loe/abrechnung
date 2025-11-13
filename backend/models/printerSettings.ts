@@ -1,9 +1,33 @@
-import { fontNames, hexColorRegex, PrinterSettings } from 'abrechnung-common/types.js'
+import { fontNames, hexColorRegex, PrinterSettings, ReportType, reportTypes } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
 import { reportPrinter } from '../factory.js'
 
-export const printerSettingsSchema = () =>
-  new Schema<PrinterSettings<Types.ObjectId>>({
+export const printerSettingsSchema = () => {
+  const options = {} as {
+    [key in ReportType]: {
+      type: {
+        reviewDates: { type: BooleanConstructor; required: true }
+        metaInformation: { type: BooleanConstructor; required: true }
+        project: { type: BooleanConstructor; required: true }
+        comments: { type: BooleanConstructor; required: true }
+        notes: { type: BooleanConstructor; required: true }
+      }
+      required: true
+    }
+  }
+  for (const reportType of reportTypes) {
+    options[reportType] = {
+      type: {
+        reviewDates: { type: Boolean, required: true },
+        metaInformation: { type: Boolean, required: true },
+        project: { type: Boolean, required: true },
+        comments: { type: Boolean, required: true },
+        notes: { type: Boolean, required: true }
+      },
+      required: true
+    }
+  }
+  return new Schema<PrinterSettings<Types.ObjectId>>({
     pageSize: {
       type: { width: { type: Number, min: 0, required: true }, height: { type: Number, min: 0, required: true } },
       required: true,
@@ -25,8 +49,10 @@ export const printerSettingsSchema = () =>
     fontName: { type: String, required: true, enum: fontNames, translationPrefix: '' },
     textColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
     borderColor: { type: String, required: true, validate: hexColorRegex, description: 'Hex: #rrggbb / #rgb' },
-    borderThickness: { type: Number, min: 0, required: true }
+    borderThickness: { type: Number, min: 0, required: true },
+    options: { type: options, required: true }
   })
+}
 
 const schema = printerSettingsSchema()
 

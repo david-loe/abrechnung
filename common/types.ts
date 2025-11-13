@@ -153,6 +153,15 @@ export interface PrintSettingsBase {
   borderThickness: number
   cellPadding: { x: number; bottom: number }
   pageSize: { width: number; height: number }
+  options: { [key in ReportType]: PrintOptions }
+}
+
+export interface PrintOptions {
+  reviewDates: boolean
+  metaInformation: boolean
+  project: boolean
+  comments: boolean
+  notes: boolean
 }
 
 export interface BadgeStyle {

@@ -329,6 +329,24 @@ export async function checkForMigrations() {
       await addReference('healthcarecosts')
       await addReference('advances')
     }
+    if (semver.lte(migrateFrom, '2.3.0')) {
+      logger.info('Apply migration from v2.3.0: set printer settings options')
+      await mongoose.connection
+        .collection('printersettings')
+        .updateOne(
+          {},
+          {
+            $set: {
+              options: {
+                travel: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
+                expenseReport: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
+                healthCareCost: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
+                advance: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true }
+              }
+            }
+          }
+        )
+    }
 
     if (settings) {
       settings.migrateFrom = undefined
