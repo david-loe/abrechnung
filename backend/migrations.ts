@@ -1,7 +1,8 @@
+import { PrinterSettings } from 'abrechnung-common/types.js'
 import { detectImageType } from 'abrechnung-common/utils/file.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
-import { formatter } from './factory.js'
+import { formatter, reportPrinter } from './factory.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
 
@@ -346,6 +347,10 @@ export async function checkForMigrations() {
             }
           }
         )
+      const printerSettings = await mongoose.connection.collection<PrinterSettings>('printersettings').findOne({})
+      if (printerSettings) {
+        reportPrinter.setSettings(printerSettings)
+      }
     }
 
     if (settings) {
