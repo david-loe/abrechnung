@@ -19,7 +19,7 @@
     "isolated-vm": "^6.0.2",
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.10",
+    "nodemailer": "^7.0.11",
     "openid-client": "^6.8.1",
     "passport": "^0.7.0",
     "passport-http-bearer": "^1.0.1",
