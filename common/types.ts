@@ -335,7 +335,8 @@ export const tokenAdminUser = {
   fk: { magiclogin: 'admin@to.ken' },
   email: 'admin@to.ken',
   name: { familyName: 'Token Access', givenName: 'Admin' },
-  access: { user: true, admin: true }
+  access: { user: true, admin: true },
+  isActive: async () => true
 }
 
 export interface BaseCurrencyMoneyNotNull extends BaseCurrencyMoney {

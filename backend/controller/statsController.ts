@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Get, Query, Route, Tags } from 'tsoa'
+import { Get, Query, Route, Security, Tags } from 'tsoa'
 import ReportUsage from '../models/reportUsage.js'
 import { Controller } from './controller.js'
 import { NotFoundError } from './error.js'
@@ -13,11 +13,17 @@ export class StatsController extends Controller {
   }
 
   @Get('stats/dbUsage')
+  @Security('cookieAuth', ['admin'])
+  @Security('httpBearer', ['admin'])
+  @Security('usageToken')
   public async getDBUsage() {
     return await getDBUsage()
   }
 
   @Get('stats/reportUsage')
+  @Security('cookieAuth', ['admin'])
+  @Security('httpBearer', ['admin'])
+  @Security('usageToken')
   public async getReportUsage(@Query() from: Date, @Query() to: Date) {
     return { reportUsage: await getReportUsage(from, to), from, to }
   }
