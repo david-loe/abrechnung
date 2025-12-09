@@ -67,7 +67,12 @@ export async function fileEventToDocumentFiles(
   return null
 }
 
-export function formatBytes(bytes: number): string {
+export function formatBytes(input: number, scale = 1): string {
+  const bytes = input * scale
+  if (bytes >= 1024 * 1024 * 1024) {
+    const gb = bytes / (1024 * 1024 * 1024)
+    return `${gb.toFixed(2)} GB`
+  }
   if (bytes >= 1024 * 1024) {
     const mb = bytes / (1024 * 1024)
     return `${mb.toFixed(2)} MB`

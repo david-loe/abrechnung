@@ -28,6 +28,7 @@ import {
   setLog,
   travelBaseSchema
 } from './helper.js'
+import ReportUsage from './reportUsage.js'
 import User from './user.js'
 
 interface Methods {
@@ -226,6 +227,7 @@ schema.post('save', async function (this: TravelDoc) {
   if (this.state === TravelState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'Travel')
+    await ReportUsage.addOrUpdate(this)
   } else if (this.state === TravelState.APPROVED) {
     await ApprovedTravel.addOrUpdate(this)
   }

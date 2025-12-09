@@ -15,6 +15,7 @@ import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Type
 import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
 import { addHistoryEntry, addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
+import ReportUsage from './reportUsage.js'
 
 interface Methods {
   saveToHistory(save?: boolean, session?: mongoose.ClientSession | null): Promise<void>
@@ -162,6 +163,15 @@ schema.pre('save', async function (this: AdvanceDoc) {
   await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
+})
+
+schema.post('save', async function (this: AdvanceDoc) {
+  if (this.$locals.SKIP_POST_SAFE_HOOK) {
+    return
+  }
+  if (this.state === AdvanceState.APPROVED) {
+    await ReportUsage.addOrUpdate(this)
+  }
 })
 
 schema.index({ name: 'text', reason: 'text', 'comments.text': 'text' }, { weights: { name: 10, reason: 6, 'comments.text': 3 } })
