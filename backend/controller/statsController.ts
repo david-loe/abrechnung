@@ -17,7 +17,7 @@ export class StatsController extends Controller {
   @Security('httpBearer', ['admin'])
   @Security('usageToken')
   public async getDBUsage() {
-    return await getDBUsage()
+    return { data: await getDBUsage() }
   }
 
   @Get('stats/reportUsage')
@@ -25,7 +25,7 @@ export class StatsController extends Controller {
   @Security('httpBearer', ['admin'])
   @Security('usageToken')
   public async getReportUsage(@Query() from: Date, @Query() to: Date) {
-    return { reportUsage: await getReportUsage(from, to), from, to }
+    return { data: { reportUsage: await getReportUsage(from, to), from, to } }
   }
 }
 

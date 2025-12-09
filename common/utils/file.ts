@@ -67,21 +67,22 @@ export async function fileEventToDocumentFiles(
   return null
 }
 
-export function formatBytes(input: number, scale = 1): string {
-  const bytes = input * scale
-  if (bytes >= 1024 * 1024 * 1024) {
-    const gb = bytes / (1024 * 1024 * 1024)
-    return `${gb.toFixed(2)} GB`
+export function formatBytes(value: number, scale = 1) {
+  const bytes = value * scale
+  if (!bytes) {
+    return '0 B'
   }
-  if (bytes >= 1024 * 1024) {
-    const mb = bytes / (1024 * 1024)
-    return `${mb.toFixed(2)} MB`
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let size = bytes
+  let unitIndex = 0
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024
+    unitIndex++
   }
-  if (bytes >= 1024) {
-    const kb = bytes / 1024
-    return `${kb.toFixed(2)} KB`
-  }
-  return `${bytes} B`
+
+  const fixed = size >= 10 ? size.toFixed(0) : size.toFixed(1)
+  return `${fixed} ${units[unitIndex]}`
 }
 
 export function detectImageType(buffer: ArrayBuffer) {
