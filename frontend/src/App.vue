@@ -1,4 +1,5 @@
 <template>
+  <ReadOnlyBanner />
   <OfflineBanner ref="offlineBanner" />
   <template v-if="APP_DATA">
     <ModalComponent header="API Key" ref="apiKeyModal" @afterClose=";($refs.apiKeyForm as any).resetForm()">
@@ -171,6 +172,7 @@ import HeaderComponent from '@/components/elements/HeaderComponent.vue'
 import InstallationBanner from '@/components/elements/InstallationBanner.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import OfflineBanner from '@/components/elements/OfflineBanner.vue'
+import ReadOnlyBanner from '@/components/elements/ReadOnlyBanner.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import APP_LOADER from '@/dataLoader.js'

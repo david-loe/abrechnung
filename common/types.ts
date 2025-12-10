@@ -52,6 +52,7 @@ export interface Settings<idType extends _id = _id> {
     [key in RetentionType]: number
   }
   uploadTokenExpireAfterSeconds: number
+  isReadOnly: boolean
   version: string
   /**
    * @Hidden

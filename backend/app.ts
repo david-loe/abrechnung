@@ -5,8 +5,8 @@ import session from 'express-session'
 import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
-import { errorHandler, RateLimitExceededError } from './controller/error.js'
-import { connectDB, disconnectDB, sessionStore } from './db.js'
+import { errorHandler, RateLimitExceededError, ReadOnlyError } from './controller/error.js'
+import { BACKEND_CACHE, connectDB, disconnectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
@@ -47,6 +47,14 @@ export default async function () {
       })
     )
   }
+
+  app.use((req, _res, next) => {
+    if (BACKEND_CACHE.settings.isReadOnly && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.path !== '/readOnly') {
+      next(new ReadOnlyError())
+    } else {
+      next()
+    }
+  })
 
   // only use secure cookie with https and trust proxy setup
   const useSecureCookie = ENV.VITE_BACKEND_URL.startsWith('https') && Boolean(ENV.TRUST_PROXY)

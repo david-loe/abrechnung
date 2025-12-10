@@ -37,6 +37,11 @@ export class NotImplementedError extends ClientError {
   name = 'alerts.notImplemented'
 }
 
+export class ReadOnlyError extends ClientError {
+  status = 503
+  name = 'alerts.isReadOnly'
+}
+
 export function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): void {
   if (!(err instanceof AuthorizationError)) {
     logger.warn(`Error on request: ${req.user?.email || 'Guest'} -> ${req.method} ${req.url}`)

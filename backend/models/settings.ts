@@ -40,6 +40,7 @@ export const settingsSchema = () => {
     disableReportType: { type: disableReportType, required: true },
     retentionPolicy: { type: retentionPolicy, required: true },
     uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
+    isReadOnly: { type: Boolean, required: true, hide: true },
     version: { type: String, required: true, hide: true },
     migrateFrom: { type: String, hide: true }
   })
@@ -52,4 +53,4 @@ schema.post('save', function (this: HydratedDocument<Settings<Types.ObjectId>>) 
   BACKEND_CACHE.setSettings(settings)
 })
 
-export default model('Settings', settingsSchema())
+export default model('Settings', schema)

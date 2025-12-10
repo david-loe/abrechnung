@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
-import { Get, Query, Route, Security, Tags } from 'tsoa'
+import { Body, Get, Post, Query, Route, Security, Tags } from 'tsoa'
+import { BACKEND_CACHE } from '../db.js'
 import ReportUsage from '../models/reportUsage.js'
+import Settings from '../models/settings.js'
 import { Controller } from './controller.js'
 import { NotFoundError } from './error.js'
 
@@ -26,6 +28,12 @@ export class StatsController extends Controller {
   @Security('usageToken')
   public async getReportUsage(@Query() from: Date, @Query() to: Date) {
     return { data: { reportUsage: await getReportUsage(from, to), from, to } }
+  }
+
+  @Post('readOnly')
+  @Security('usageToken')
+  public async postReadOnly(@Body() requestBody: { isReadOnly: boolean }) {
+    return await this.setter(Settings, { requestBody: { _id: BACKEND_CACHE.settings._id, ...requestBody }, allowNew: false })
   }
 }
 

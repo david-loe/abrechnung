@@ -34,5 +34,6 @@
   "onlyShowProjectNamesOnAssigned": false,
   "autoSelectAvailableAdvances": true,
   "preventOwnersFromDeletingReportsAfterReviewCompleted": false,
+  "isReadOnly": false,
   "version": "2.3.2"
 }

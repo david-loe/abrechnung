@@ -35,6 +35,7 @@
     "fileXToLargeMaxIsY": "File '{X}' is too large. Maximum allowed size is {Y}.",
     "fillOut": "Please provide the following information so we can better match your statements.",
     "futureNotAllowed": "Date is not allowed to be in the future",
+    "isReadOnly": "System is read-only!",
     "loginFailed": "Failed to log in!",
     "mailSend": "Email was sent.",
     "noData": {
@@ -47,6 +48,7 @@
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
     "notImplemented": "Not implemented!",
+    "offline": "You are offline. The data may not be up to date.",
     "rateLimitExceeded": "Rate Limit Exceeded!",
     "reloadRequired": "Reload required",
     "stagesOverlapping": "Stages are overlapping",
