@@ -6293,171 +6293,6 @@
 			"SetterBody_TravelPost_": {
 				"$ref": "#/components/schemas/SetterPartial_TravelPost.NoPost_"
 			},
-			"Settings__id_": {
-				"properties": {
-					"userCanSeeAllProjects": {
-						"type": "boolean"
-					},
-					"onlyShowProjectNamesOnAssigned": {
-						"type": "boolean"
-					},
-					"autoSelectAvailableAdvances": {
-						"type": "boolean"
-					},
-					"preventOwnersFromDeletingReportsAfterReviewCompleted": {
-						"type": "boolean"
-					},
-					"defaultAccess": {
-						"properties": {
-							"user": {
-								"type": "boolean"
-							},
-							"inWork:expenseReport": {
-								"type": "boolean"
-							},
-							"inWork:healthCareCost": {
-								"type": "boolean"
-							},
-							"appliedFor:advance": {
-								"type": "boolean"
-							},
-							"appliedFor:travel": {
-								"type": "boolean"
-							},
-							"approved:travel": {
-								"type": "boolean"
-							},
-							"approve/advance": {
-								"type": "boolean"
-							},
-							"approve/travel": {
-								"type": "boolean"
-							},
-							"examine/travel": {
-								"type": "boolean"
-							},
-							"examine/expenseReport": {
-								"type": "boolean"
-							},
-							"examine/healthCareCost": {
-								"type": "boolean"
-							},
-							"book/advance": {
-								"type": "boolean"
-							},
-							"book/travel": {
-								"type": "boolean"
-							},
-							"book/expenseReport": {
-								"type": "boolean"
-							},
-							"book/healthCareCost": {
-								"type": "boolean"
-							},
-							"admin": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"user",
-							"inWork:expenseReport",
-							"inWork:healthCareCost",
-							"appliedFor:advance",
-							"appliedFor:travel",
-							"approved:travel",
-							"approve/advance",
-							"approve/travel",
-							"examine/travel",
-							"examine/expenseReport",
-							"examine/healthCareCost",
-							"book/advance",
-							"book/travel",
-							"book/expenseReport",
-							"book/healthCareCost",
-							"admin"
-						],
-						"type": "object"
-					},
-					"disableReportType": {
-						"properties": {
-							"travel": {
-								"type": "boolean"
-							},
-							"expenseReport": {
-								"type": "boolean"
-							},
-							"healthCareCost": {
-								"type": "boolean"
-							},
-							"advance": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"travel",
-							"expenseReport",
-							"healthCareCost",
-							"advance"
-						],
-						"type": "object"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteBookedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteBookedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
-					},
-					"uploadTokenExpireAfterSeconds": {
-						"type": "number",
-						"format": "double"
-					},
-					"version": {
-						"type": "string"
-					},
-					"migrateFrom": {
-						"type": "string",
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"userCanSeeAllProjects",
-					"onlyShowProjectNamesOnAssigned",
-					"autoSelectAvailableAdvances",
-					"preventOwnersFromDeletingReportsAfterReviewCompleted",
-					"defaultAccess",
-					"disableReportType",
-					"retentionPolicy",
-					"uploadTokenExpireAfterSeconds",
-					"version",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Settings_mongoose.Types.ObjectId_": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -6597,6 +6432,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"isReadOnly": {
+						"type": "boolean"
+					},
 					"version": {
 						"type": "string"
 					},
@@ -6617,13 +6455,183 @@
 					"disableReportType",
 					"retentionPolicy",
 					"uploadTokenExpireAfterSeconds",
+					"isReadOnly",
 					"version",
 					"_id"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom_.NoPost_": {
+			"Settings__id_": {
+				"properties": {
+					"userCanSeeAllProjects": {
+						"type": "boolean"
+					},
+					"onlyShowProjectNamesOnAssigned": {
+						"type": "boolean"
+					},
+					"autoSelectAvailableAdvances": {
+						"type": "boolean"
+					},
+					"preventOwnersFromDeletingReportsAfterReviewCompleted": {
+						"type": "boolean"
+					},
+					"defaultAccess": {
+						"properties": {
+							"user": {
+								"type": "boolean"
+							},
+							"inWork:expenseReport": {
+								"type": "boolean"
+							},
+							"inWork:healthCareCost": {
+								"type": "boolean"
+							},
+							"appliedFor:advance": {
+								"type": "boolean"
+							},
+							"appliedFor:travel": {
+								"type": "boolean"
+							},
+							"approved:travel": {
+								"type": "boolean"
+							},
+							"approve/advance": {
+								"type": "boolean"
+							},
+							"approve/travel": {
+								"type": "boolean"
+							},
+							"examine/travel": {
+								"type": "boolean"
+							},
+							"examine/expenseReport": {
+								"type": "boolean"
+							},
+							"examine/healthCareCost": {
+								"type": "boolean"
+							},
+							"book/advance": {
+								"type": "boolean"
+							},
+							"book/travel": {
+								"type": "boolean"
+							},
+							"book/expenseReport": {
+								"type": "boolean"
+							},
+							"book/healthCareCost": {
+								"type": "boolean"
+							},
+							"admin": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"user",
+							"inWork:expenseReport",
+							"inWork:healthCareCost",
+							"appliedFor:advance",
+							"appliedFor:travel",
+							"approved:travel",
+							"approve/advance",
+							"approve/travel",
+							"examine/travel",
+							"examine/expenseReport",
+							"examine/healthCareCost",
+							"book/advance",
+							"book/travel",
+							"book/expenseReport",
+							"book/healthCareCost",
+							"admin"
+						],
+						"type": "object"
+					},
+					"disableReportType": {
+						"properties": {
+							"travel": {
+								"type": "boolean"
+							},
+							"expenseReport": {
+								"type": "boolean"
+							},
+							"healthCareCost": {
+								"type": "boolean"
+							},
+							"advance": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"travel",
+							"expenseReport",
+							"healthCareCost",
+							"advance"
+						],
+						"type": "object"
+					},
+					"retentionPolicy": {
+						"properties": {
+							"deleteBookedAfterXDays": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteApprovedTravelAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"deleteInWorkReportsAfterXDaysUnused": {
+								"type": "number",
+								"format": "double"
+							},
+							"mailXDaysBeforeDeletion": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"deleteBookedAfterXDays",
+							"deleteApprovedTravelAfterXDaysUnused",
+							"deleteInWorkReportsAfterXDaysUnused",
+							"mailXDaysBeforeDeletion"
+						],
+						"type": "object"
+					},
+					"uploadTokenExpireAfterSeconds": {
+						"type": "number",
+						"format": "double"
+					},
+					"isReadOnly": {
+						"type": "boolean"
+					},
+					"version": {
+						"type": "string"
+					},
+					"migrateFrom": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"userCanSeeAllProjects",
+					"onlyShowProjectNamesOnAssigned",
+					"autoSelectAvailableAdvances",
+					"preventOwnersFromDeletingReportsAfterReviewCompleted",
+					"defaultAccess",
+					"disableReportType",
+					"retentionPolicy",
+					"uploadTokenExpireAfterSeconds",
+					"isReadOnly",
+					"version",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom-or-isReadOnly_.NoPost_": {
 				"properties": {
 					"uploadTokenExpireAfterSeconds": {
 						"type": "number",
@@ -6745,29 +6753,8 @@
 				},
 				"type": "object"
 			},
-			"SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom__": {
-				"$ref": "#/components/schemas/SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom_.NoPost_"
-			},
-			"ReportModelNameWithoutAdvance": {
-				"type": "string",
-				"enum": [
-					"Travel",
-					"ExpenseReport",
-					"HealthCareCost"
-				]
-			},
-			"ReportModelName": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
-					},
-					{
-						"type": "string",
-						"enum": [
-							"Advance"
-						]
-					}
-				]
+			"SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom-or-isReadOnly__": {
+				"$ref": "#/components/schemas/SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom-or-isReadOnly_.NoPost_"
 			},
 			"SearchQuery": {
 				"properties": {
@@ -6796,6 +6783,15 @@
 			"mongoose.FlattenMaps__state-AnyState--name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string____": {
 				"properties": {},
 				"type": "object"
+			},
+			"ReportModelName": {
+				"type": "string",
+				"enum": [
+					"Travel",
+					"Advance",
+					"ExpenseReport",
+					"HealthCareCost"
+				]
 			},
 			"ProjectSimpleWithName__id_": {
 				"properties": {
@@ -8797,6 +8793,14 @@
 			"Log_mongoose.Types.ObjectId.AdvanceState_": {
 				"properties": {},
 				"type": "object"
+			},
+			"ReportModelNameWithoutAdvance": {
+				"type": "string",
+				"enum": [
+					"Travel",
+					"ExpenseReport",
+					"HealthCareCost"
+				]
 			},
 			"Advance_mongoose.Types.ObjectId_": {
 				"properties": {
@@ -16083,6 +16087,269 @@
 				}
 			}
 		},
+		"/health": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"db": {
+											"type": "string"
+										},
+										"status": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"db",
+										"status"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Stats"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/stats/dbUsage": {
+			"get": {
+				"operationId": "GetDBUsage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"properties": {
+												"fsTotalSize": {
+													"type": "number",
+													"format": "double"
+												},
+												"fsUsedSize": {
+													"type": "number",
+													"format": "double"
+												},
+												"scale": {
+													"type": "number",
+													"format": "double"
+												},
+												"totalSize": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"required": [
+												"fsTotalSize",
+												"fsUsedSize",
+												"scale",
+												"totalSize"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Stats"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					},
+					{
+						"usageToken": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/stats/reportUsage": {
+			"get": {
+				"operationId": "GetReportUsage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"properties": {
+												"to": {
+													"type": "string",
+													"format": "date-time"
+												},
+												"from": {
+													"type": "string",
+													"format": "date-time"
+												},
+												"reportUsage": {
+													"properties": {
+														"Advance": {
+															"type": "number",
+															"format": "double"
+														},
+														"HealthCareCost": {
+															"type": "number",
+															"format": "double"
+														},
+														"Travel": {
+															"type": "number",
+															"format": "double"
+														},
+														"ExpenseReport": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"Advance",
+														"HealthCareCost",
+														"Travel",
+														"ExpenseReport"
+													],
+													"type": "object"
+												}
+											},
+											"required": [
+												"to",
+												"from",
+												"reportUsage"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Stats"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					},
+					{
+						"usageToken": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"format": "date-time",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"format": "date-time",
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/readOnly": {
+			"post": {
+				"operationId": "PostReadOnly",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Settings_mongoose.Types.ObjectId_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Stats"
+				],
+				"security": [
+					{
+						"usageToken": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"isReadOnly": {
+										"type": "boolean"
+									}
+								},
+								"required": [
+									"isReadOnly"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/settings": {
 			"get": {
 				"operationId": "Get",
@@ -16172,7 +16439,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom__"
+								"$ref": "#/components/schemas/SetterBody_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom-or-isReadOnly__"
 							}
 						}
 					}
@@ -16235,7 +16502,13 @@
 											"items": {
 												"properties": {
 													"_reportModelName": {
-														"$ref": "#/components/schemas/ReportModelName"
+														"type": "string",
+														"enum": [
+															"Travel",
+															"Advance",
+															"ExpenseReport",
+															"HealthCareCost"
+														]
 													},
 													"score": {
 														"type": "number",
@@ -22958,7 +23231,7 @@
 		},
 		"/approve/advance/approved": {
 			"post": {
-				"operationId": "PostAnyBackApproved",
+				"operationId": "PostAnyApproved",
 				"responses": {
 					"200": {
 						"description": "Ok",
