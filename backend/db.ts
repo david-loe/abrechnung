@@ -17,6 +17,7 @@ import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
 import mongoose, { Connection, HydratedDocument, Model, Types } from 'mongoose'
+import { CACHE } from './data/cache.js'
 import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
 import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
@@ -199,3 +200,6 @@ export async function getDisplaySettings(init = true): Promise<IDisplaySettings>
   }
   throw Error('Display Settings not found')
 }
+
+// only init on server start NOT workers
+export const BACKEND_CACHE = await CACHE.create(process.argv[1].endsWith('server.js'))

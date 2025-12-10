@@ -2,7 +2,7 @@ import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import { Types } from 'mongoose'
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from 'tsoa'
-import { getSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -33,7 +33,6 @@ export class UploadController extends Controller {
     @Query() tokenId: string,
     @Query() ownerId?: string
   ): Promise<void> {
-    const settings = await getSettings()
     const user = await User.findOne({ _id: userId }).lean()
     if (!user?.token) {
       throw new NotFoundError(`No user with token found for userId: ${userId}`)
@@ -60,7 +59,7 @@ export class UploadController extends Controller {
     }
     const renderedHTML = ejs.render(template, {
       url: url.href,
-      expireAfterSeconds: settings.uploadTokenExpireAfterSeconds,
+      expireAfterSeconds: BACKEND_CACHE.settings.uploadTokenExpireAfterSeconds,
       secondsLeft,
       text,
       maxFileSizeInBytes: ENV.VITE_MAX_FILE_SIZE,

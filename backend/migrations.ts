@@ -355,7 +355,7 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '2.3.1')) {
       logger.info('Apply migration from v2.3.1: fill report usage collection')
       const reportUsageCol = mongoose.connection.collection('reportusages')
-      async function addReference(collectionName: string, modelName: string) {
+      async function addReportUsage(collectionName: string, modelName: string) {
         const col = mongoose.connection.collection<{
           updatedAt: Date
           reference: number
@@ -365,7 +365,7 @@ export async function checkForMigrations() {
           log: { [key: number]: { on: Date; by: Types.ObjectId } }
         }>(collectionName)
         const cursor = col.find({ historic: { $ne: true }, state: { $gte: 30 } }).sort({ _id: 1 })
-        const batchSize = 1000
+        const batchSize = 500
         let batch = []
         for await (const doc of cursor) {
           const organisationId = (
@@ -388,10 +388,10 @@ export async function checkForMigrations() {
           await reportUsageCol.insertMany(batch)
         }
       }
-      await addReference('travels', 'Travel')
-      await addReference('expensereports', 'ExpenseReport')
-      await addReference('healthcarecosts', 'HealthCareCost')
-      await addReference('advances', 'Advance')
+      await addReportUsage('travels', 'Travel')
+      await addReportUsage('expensereports', 'ExpenseReport')
+      await addReportUsage('healthcarecosts', 'HealthCareCost')
+      await addReportUsage('advances', 'Advance')
     }
 
     if (settings) {

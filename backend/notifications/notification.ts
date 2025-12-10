@@ -17,7 +17,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { getDiffInDays, PlaceToString } from 'abrechnung-common/utils/scripts.js'
 import { RootFilterQuery } from 'mongoose'
-import { getDisplaySettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { formatter } from '../factory.js'
 import i18n from '../i18n.js'
@@ -91,8 +91,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
 export async function sendA1Notification(report: TravelSimple) {
   const org = await Organisation.findOne({ _id: report.project.organisation })
   if (org?.a1CertificateEmail) {
-    const displaySettings = await getDisplaySettings()
-    const language = displaySettings.locale.default
+    const language = BACKEND_CACHE.displaySettings.locale.default
     const dif = getDiffInDays(report.startDate, report.endDate) + 1
     const t = (key: string) => i18n.t(key, { lng: language })
     const subject = t('mail.travel.a1.subject')
