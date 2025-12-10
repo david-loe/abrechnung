@@ -12,7 +12,8 @@ import {
   reportTypes,
   TravelState
 } from 'abrechnung-common/types.js'
-import { model, Schema, Types } from 'mongoose'
+import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { BACKEND_CACHE } from '../db.js'
 import { colorSchema } from './helper.js'
 
 export const displaySettingsSchema = () => {
@@ -103,4 +104,11 @@ export const displaySettingsSchema = () => {
   )
 }
 
-export default model('DisplaySettings', displaySettingsSchema())
+const schema = displaySettingsSchema()
+
+schema.post('save', function (this: HydratedDocument<DisplaySettings<Types.ObjectId>>) {
+  const settings = this.toObject()
+  BACKEND_CACHE.setDisplaySettings(settings)
+})
+
+export default model('DisplaySettings', schema)

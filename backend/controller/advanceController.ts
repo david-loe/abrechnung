@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
 import { Condition, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { getSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
@@ -42,7 +42,7 @@ export class AdvanceController extends Controller {
 
   @Delete()
   public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const notAfterReview = (await getSettings()).preventOwnersFromDeletingReportsAfterReviewCompleted
+    const notAfterReview = BACKEND_CACHE.settings.preventOwnersFromDeletingReportsAfterReviewCompleted
     return await this.deleter(Advance, {
       _id: _id,
       checkOldObject: async (oldObject: AdvanceDoc) =>
@@ -132,7 +132,7 @@ export class AdvanceApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postAnyBackApproved(
+  public async postAnyApproved(
     @Body() requestBody:
       | (AdvanceApplication & { owner: IdDocument; bookingRemark?: string | null })
       | { _id: string; comment?: string; bookingRemark?: string | null },

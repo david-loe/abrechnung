@@ -1,5 +1,6 @@
 import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from 'abrechnung-common/types.js'
-import { model, Schema, Types } from 'mongoose'
+import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { BACKEND_CACHE } from '../db.js'
 
 export const settingsSchema = () => {
   const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
@@ -39,9 +40,17 @@ export const settingsSchema = () => {
     disableReportType: { type: disableReportType, required: true },
     retentionPolicy: { type: retentionPolicy, required: true },
     uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
+    isReadOnly: { type: Boolean, required: true, hide: true },
     version: { type: String, required: true, hide: true },
     migrateFrom: { type: String, hide: true }
   })
 }
 
-export default model('Settings', settingsSchema())
+const schema = settingsSchema()
+
+schema.post('save', function (this: HydratedDocument<Settings<Types.ObjectId>>) {
+  const settings = this.toObject()
+  BACKEND_CACHE.setSettings(settings)
+})
+
+export default model('Settings', schema)

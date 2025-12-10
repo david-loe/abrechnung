@@ -52,6 +52,7 @@ export interface Settings<idType extends _id = _id> {
     [key in RetentionType]: number
   }
   uploadTokenExpireAfterSeconds: number
+  isReadOnly: boolean
   version: string
   /**
    * @Hidden
@@ -335,7 +336,8 @@ export const tokenAdminUser = {
   fk: { magiclogin: 'admin@to.ken' },
   email: 'admin@to.ken',
   name: { familyName: 'Token Access', givenName: 'Admin' },
-  access: { user: true, admin: true }
+  access: { user: true, admin: true },
+  isActive: async () => true
 }
 
 export interface BaseCurrencyMoneyNotNull extends BaseCurrencyMoney {
@@ -523,6 +525,16 @@ export interface ApprovedTravel<idType extends _id = _id> extends TravelBase {
   approvedOn: Date | string
 }
 
+export interface ReportUsage<idType extends _id = _id> {
+  reportId: idType
+  reference: number
+  reportModelName: ReportModelName
+  organisationId: idType
+  projectId: idType
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
 export const State = { REJECTED: -10, APPLIED_FOR: 0, EDITABLE_BY_OWNER: 10, IN_REVIEW: 20, BOOKABLE: 30, BOOKED: 40 } as const
 
 export enum TravelState {
@@ -577,8 +589,11 @@ export type TransportType = (typeof transportTypes)[number]
 export const distanceRefundTypes = ['car', 'motorcycle', 'halfCar'] as const
 export type DistanceRefundType = (typeof distanceRefundTypes)[number]
 
-export type ReportModelNameWithoutAdvance = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
-export type ReportModelName = ReportModelNameWithoutAdvance | 'Advance'
+export const reportModelNamesWithoutAdvance = ['Travel', 'ExpenseReport', 'HealthCareCost'] as const
+export type ReportModelNameWithoutAdvance = (typeof reportModelNamesWithoutAdvance)[number]
+
+export const reportModelNames = [...reportModelNamesWithoutAdvance, 'Advance'] as const
+export type ReportModelName = (typeof reportModelNames)[number]
 
 export const reportTypes = ['travel', 'expenseReport', 'healthCareCost', 'advance'] as const
 export type ReportType = (typeof reportTypes)[number]

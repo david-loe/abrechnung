@@ -144,6 +144,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 }
 
 export async function retentionPolicy() {
+  // NO BACKEND_CACHE bc only queried once a day
   const settings = await getSettings()
 
   await notificationMailForDeletions(settings.retentionPolicy)

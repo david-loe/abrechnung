@@ -44,7 +44,7 @@ const baseEnvConfig = {
   VITE_PUBLIC_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Public VAPID Key for WebPush Notifications' }),
   VITE_MAX_FILE_SIZE: int({ default: 16_000_000, desc: 'Maximal size allowed of files being uploaded in bytes' }),
   VITE_IMAGE_COMPRESSION_THRESHOLD_PX: int({
-    default: 1400,
+    default: 1_400,
     desc: 'Longest side of an image in pixels before client side compression is applied'
   })
 }
@@ -59,6 +59,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   BACKEND_PORT: port({ desc: 'Port the backend listens on' }),
 
   COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
+  USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),
   PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
   LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),
   TZ: notEmptyString({

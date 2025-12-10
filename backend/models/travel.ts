@@ -11,7 +11,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { getTravelSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import { currencyConverter, travelCalculator } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
@@ -28,6 +28,7 @@ import {
   setLog,
   travelBaseSchema
 } from './helper.js'
+import ReportUsage from './reportUsage.js'
 import User from './user.js'
 
 interface Methods {
@@ -154,8 +155,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
 schema.methods.saveToHistory = async function (this: TravelDoc) {
   await addHistoryEntry(this, 'Travel')
 
-  const travelSettings = await getTravelSettings()
-  if (this.state === TravelState.APPROVED && travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none') {
+  if (this.state === TravelState.APPROVED && BACKEND_CACHE.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none') {
     // move vehicle registration of owner as receipt to 'ownCar' stages
     const receipts = []
     for (const stage of this.stages) {
@@ -226,6 +226,7 @@ schema.post('save', async function (this: TravelDoc) {
   if (this.state === TravelState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'Travel')
+    await ReportUsage.addOrUpdate(this)
   } else if (this.state === TravelState.APPROVED) {
     await ApprovedTravel.addOrUpdate(this)
   }

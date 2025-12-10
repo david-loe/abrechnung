@@ -44,7 +44,7 @@ export async function storeRequestToDB(data: GETResponse<unknown>, key: string) 
 
 export async function readRequestFromDB(
   key: string,
-  ttlMillis = 86400000 // 1 day
+  ttlMillis = 86_400_000 // 1 day
 ) {
   const entry = await readFromDB('urls', key)
   if (!entry) return null

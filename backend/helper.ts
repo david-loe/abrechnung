@@ -113,7 +113,7 @@ export function genAuthenticatedLink(
   const secret = ENV.MAGIC_LOGIN_SECRET
   const callbackUrl = `${ENV.VITE_BACKEND_URL}/auth/magiclogin/callback`
   return new Promise<string>((resolve, reject) => {
-    const code = `${Math.floor(Math.random() * 90000) + 10000}`
+    const code = `${Math.floor(Math.random() * 90_000) + 10_000}`
     jwt.sign({ ...payload, code }, secret, jwtOptions, (err, token) => {
       if (err) {
         reject(err)

@@ -15,7 +15,7 @@ let advance: Partial<Advance> = {
   reason: 'Traveling is expensive',
   owner: user,
   // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
-  budget: { amount: 1000, currency: 'EUR' as any }
+  budget: { amount: 1_000, currency: 'EUR' as any }
 }
 const project = (await agent.get('/project')).body.data[0]
 const category = (await agent.get('/category')).body.data[0]

@@ -25,6 +25,7 @@
         <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
         <TravelSettingsForm v-else-if="entry === 'travelSettings'" />
         <PrinterSettingsForm v-else-if="entry === 'printerSettings'" />
+        <StatsPage v-else-if="entry === 'stats'" />
         <template v-else-if="entry === 'users'">
           <Suspense>
             <template #default>
@@ -126,6 +127,7 @@ import OrganisationList from '@/components/settings/elements/OrganisationList.vu
 import PrinterSettingsForm from '@/components/settings/elements/PrinterSettingsForm.vue'
 import ProjectList from '@/components/settings/elements/ProjectList.vue'
 import SettingsForm from '@/components/settings/elements/SettingsForm.vue'
+import StatsPage from '@/components/settings/elements/StatsPage.vue'
 import TravelSettingsForm from '@/components/settings/elements/TravelSettingsForm.vue'
 import UserList from '@/components/settings/elements/UserList.vue'
 import UserMerge from '@/components/settings/elements/UserMerge.vue'
@@ -140,7 +142,7 @@ const { t } = useI18n()
 
 const items = ['users', 'projects', 'organisations', 'categories', 'webhooks', 'countries', 'currencies', 'healthInsurances'] as const
 
-const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
+const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings', 'stats'] as const
 
 type Entry = (typeof items)[number] | (typeof settings)[number]
 

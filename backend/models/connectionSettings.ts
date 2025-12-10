@@ -1,7 +1,8 @@
 import { ConnectionSettings, defaultLocale, emailRegex, locales } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { verifyLdapauthConfig, verifySmtpConfig } from '../data/settingsValidator.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
-import { verifyLdapauthConfig, verifySmtpConfig } from '../settingsValidator.js'
 
 function requiredIf(ifPath: string) {
   return [{ required: [ifPath, 'not_in', [null, '', false]] }, { nullable: [ifPath, 'in', [null, '', false]] }]
@@ -21,7 +22,7 @@ export const connectionSettingsSchema = () =>
     smtp: {
       type: {
         host: { type: String, trim: true, required: true, label: 'Host', rules: requiredIf('smtp.user') },
-        port: { type: Number, required: true, min: 1, max: 65535, label: 'Port', rules: requiredIf('smtp.host') },
+        port: { type: Number, required: true, min: 1, max: 65_535, label: 'Port', rules: requiredIf('smtp.host') },
         secure: { type: Boolean, default: true, required: true, label: 'Secure' },
         user: { type: String, trim: true, required: true, rules: requiredIf('smtp.host') },
         password: { type: String, trim: true, required: true, rules: requiredIf('smtp.host') },
@@ -138,6 +139,11 @@ schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings
   if (this.smtp?.host) {
     await verifySmtpConfig(this.smtp)
   }
+})
+
+schema.post('save', function (this: HydratedDocument<ConnectionSettings<Types.ObjectId>>) {
+  const settings = this.toObject()
+  BACKEND_CACHE.setConnectionSettings(settings)
 })
 
 export default model<ConnectionSettings<Types.ObjectId>>('ConnectionSettings', schema)

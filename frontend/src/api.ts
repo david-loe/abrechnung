@@ -120,7 +120,7 @@ class API {
       if (index !== -1) {
         this.alerts.splice(index, 1)
       }
-    }, alertWithId.ttl || 5000)
+    }, alertWithId.ttl || 5_000)
   }
   redirectToLogin() {
     this.router.push({ path: '/login', query: { redirect: router.currentRoute.value.path } })

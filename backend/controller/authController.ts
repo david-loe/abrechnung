@@ -8,7 +8,7 @@ import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
 import { getOidcStrategy } from '../authStrategies/oidc.js'
-import { getDisplaySettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import User from '../models/user.js'
 import { NotAllowedError, NotImplementedError } from './error.js'
@@ -21,7 +21,7 @@ const NotImplementedMiddleware = (_req: ExRequest, _res: ExResponse, _next: Next
 }
 
 const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.ldapauth) {
+  if (BACKEND_CACHE.displaySettings.auth.ldapauth) {
     passport.authenticate(await getLdapauthStrategy(), { session: true })(req, res, next)
   } else {
     NotImplementedMiddleware(req, res, next)
@@ -29,7 +29,7 @@ const ldapauthHandler = async (req: ExRequest, res: ExResponse, next: NextFuncti
 }
 
 const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.microsoft) {
+  if (BACKEND_CACHE.displaySettings.auth.microsoft) {
     if (req.query.redirect && typeof req.query.redirect === 'string') {
       req.session.redirect = req.query.redirect
     }
@@ -40,7 +40,7 @@ const microsoftHandler = async (req: ExRequest, res: ExResponse, next: NextFunct
 }
 
 const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.microsoft) {
+  if (BACKEND_CACHE.displaySettings.auth.microsoft) {
     const successRedirect = req.session.redirect ? ENV.VITE_FRONTEND_URL + req.session.redirect : ENV.VITE_FRONTEND_URL
     passport.authenticate(await getMicrosoftStrategy(), { successRedirect })(req, res, next)
   } else {
@@ -49,7 +49,7 @@ const microsoftCallbackHandler = async (req: ExRequest, res: ExResponse, next: N
 }
 
 const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.magiclogin) {
+  if (BACKEND_CACHE.displaySettings.auth.magiclogin) {
     const user = await User.findOne({ 'fk.magiclogin': { $regex: new RegExp(`^${escapeRegExp(req.body.destination)}$`, 'i') } })
     if (!user || !(await user.isActive())) {
       throw new NotAllowedError(`No magiclogin user found for e-mail: ${req.body.destination}`)
@@ -61,7 +61,7 @@ const magicloginHandler = async (req: ExRequest, res: ExResponse, next: NextFunc
 }
 
 const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.oidc) {
+  if (BACKEND_CACHE.displaySettings.auth.oidc) {
     if (req.query.redirect && typeof req.query.redirect === 'string') {
       req.session.redirect = req.query.redirect
     }
@@ -72,7 +72,7 @@ const oidcHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) 
 }
 
 const oidcCallbackHandler = async (req: ExRequest, res: ExResponse, next: NextFunction) => {
-  if ((await getDisplaySettings()).auth.oidc) {
+  if (BACKEND_CACHE.displaySettings.auth.oidc) {
     const successRedirect = req.session.redirect ? ENV.VITE_FRONTEND_URL + req.session.redirect : ENV.VITE_FRONTEND_URL
     passport.authenticate(await getOidcStrategy(), { successRedirect })(req, res, next)
   } else {
@@ -91,7 +91,7 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
       redirect = redirectPath
     }
   }
-  if ((await getDisplaySettings()).auth.magiclogin || tokenAdmin) {
+  if (BACKEND_CACHE.displaySettings.auth.magiclogin || tokenAdmin) {
     passport.authenticate(magiclogin, { failureRedirect: `${ENV.VITE_FRONTEND_URL}/login${redirect ? `?redirect=${redirect}` : ''}` })(
       req,
       res,

@@ -13,6 +13,7 @@ import {
   requestBaseSchema,
   setLog
 } from './helper.js'
+import ReportUsage from './reportUsage.js'
 
 interface Methods {
   saveToHistory(): Promise<void>
@@ -121,6 +122,7 @@ schema.post('save', async function (this: HealthCareCostDoc) {
   if (this.state === HealthCareCostState.REVIEW_COMPLETED) {
     await addToProjectBalance(this)
     await offsetAdvance(this, 'HealthCareCost')
+    await ReportUsage.addOrUpdate(this)
   }
 })
 

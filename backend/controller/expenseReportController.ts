@@ -11,7 +11,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { Condition, mongo, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { getSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
@@ -43,7 +43,7 @@ export class ExpenseReportController extends Controller {
   }
   @Delete()
   public async deleteOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const notAfterReview = (await getSettings()).preventOwnersFromDeletingReportsAfterReviewCompleted
+    const notAfterReview = BACKEND_CACHE.settings.preventOwnersFromDeletingReportsAfterReviewCompleted
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: ExpenseReportDoc) {

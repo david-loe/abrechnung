@@ -7,6 +7,7 @@ import {
   TravelSettings
 } from 'abrechnung-common/types.js'
 import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { BACKEND_CACHE } from '../db.js'
 import { approvedTravelsPrinter, reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {
@@ -48,6 +49,7 @@ schema.post('save', function (this: HydratedDocument<TravelSettings<Types.Object
   travelCalculator.updateSettings(settings)
   reportPrinter.setTravelSettings(settings)
   approvedTravelsPrinter.setAllowSpouseRefund(settings.allowSpouseRefund)
+  BACKEND_CACHE.setTravelSettings(settings)
 })
 
 export default model('TravelSettings', schema)

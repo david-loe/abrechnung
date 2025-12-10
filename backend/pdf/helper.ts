@@ -10,7 +10,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { getTotalBalance, sanitizeFilename } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
-import { getConnectionSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import { formatter, reportPrinter } from '../factory.js'
 import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
@@ -47,12 +47,11 @@ export async function writeToDiskFilePath(
 export async function sendViaMail(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
 ) {
-  const connectionSettings = await getConnectionSettings()
-  if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
+  if (BACKEND_CACHE.connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
     const org = await Organisation.findOne({ _id: report.project.organisation._id })
     if (org?.reportEmail) {
       const mailClient = await getClient()
-      const lng = connectionSettings.PDFReportsViaEmail.locale
+      const lng = BACKEND_CACHE.connectionSettings.PDFReportsViaEmail.locale
       formatter.setLocale(lng)
       let subject = '🧾 '
       const pdf = await reportPrinter.print(report, lng)

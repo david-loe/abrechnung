@@ -8,7 +8,7 @@ import {
   userReplaceCollections
 } from 'abrechnung-common/types.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { getDisplaySettings, getSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import { populateAll, populateSelected } from './helper.js'
 
 interface Methods {
@@ -22,19 +22,30 @@ interface Methods {
 type UserModel = Model<User<Types.ObjectId, mongo.Binary>, {}, Methods>
 
 export const userSchema = async () => {
-  const settings = await getSettings()
-  const displaySettings = await getDisplaySettings()
-
   const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
   for (const access of accesses) {
-    accessObject[access] = { type: Boolean, default: settings.defaultAccess[access], label: `accesses.${access}` }
+    accessObject[access] = { type: Boolean, default: BACKEND_CACHE.settings.defaultAccess[access], label: `accesses.${access}` }
   }
   return new Schema<User<Types.ObjectId, mongo.Binary>, UserModel, Methods>({
     fk: {
       type: {
-        microsoft: { type: String, index: true, unique: true, sparse: true, label: 'Microsoft ID', hide: !displaySettings.auth.microsoft },
-        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !displaySettings.auth.oidc },
-        ldapauth: { type: String, index: true, unique: true, sparse: true, label: 'LDAP UID', hide: !displaySettings.auth.ldapauth },
+        microsoft: {
+          type: String,
+          index: true,
+          unique: true,
+          sparse: true,
+          label: 'Microsoft ID',
+          hide: !BACKEND_CACHE.displaySettings.auth.microsoft
+        },
+        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !BACKEND_CACHE.displaySettings.auth.oidc },
+        ldapauth: {
+          type: String,
+          index: true,
+          unique: true,
+          sparse: true,
+          label: 'LDAP UID',
+          hide: !BACKEND_CACHE.displaySettings.auth.ldapauth
+        },
         magiclogin: {
           type: String,
           index: true,
@@ -43,7 +54,7 @@ export const userSchema = async () => {
           validate: emailRegex,
           trim: true,
           label: 'Magic Login Email',
-          hide: !displaySettings.auth.magiclogin
+          hide: !BACKEND_CACHE.displaySettings.auth.magiclogin
         },
         httpBearer: { type: String, index: true, unique: true, sparse: true, label: 'API Key Hash' }
       },
@@ -84,11 +95,11 @@ export const userSchema = async () => {
 
     settings: {
       type: {
-        language: { type: String, default: displaySettings.locale.default, enum: locales, required: true },
+        language: { type: String, default: BACKEND_CACHE.displaySettings.locale.default, enum: locales, required: true },
         hasUserSetLanguage: { type: Boolean, required: true, default: false, hide: true },
         lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, hide: true },
         lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, hide: true },
-        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', hide: settings.disableReportType.healthCareCost },
+        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', hide: BACKEND_CACHE.settings.disableReportType.healthCareCost },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
         showInstallBanner: { type: Boolean, required: true, default: true, hide: true }
       },

@@ -6,21 +6,18 @@ import { CurrencyConverter, ExchangeRateProvider, InforEuroResponse } from 'abre
 import Formatter from 'abrechnung-common/utils/formatter.js'
 import axios from 'axios'
 import { Types } from 'mongoose'
-import { getDisplaySettings, getPrinterSettings, getTravelSettings } from './db.js'
+import { BACKEND_CACHE } from './db.js'
 import i18n from './i18n.js'
 import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 import Organisation from './models/organisation.js'
 
-const displaySettings = await getDisplaySettings(false)
-export const formatter = new Formatter(displaySettings.locale.default, displaySettings.nameDisplayFormat)
+export const formatter = new Formatter(BACKEND_CACHE.displaySettings.locale.default, BACKEND_CACHE.displaySettings.nameDisplayFormat)
 
-const printerSettings = await getPrinterSettings(false)
-const travelSettings = await getTravelSettings(false)
 export const reportPrinter = new ReportPrinter<Types.ObjectId>(
-  printerSettings,
-  travelSettings,
+  BACKEND_CACHE.printerSettings,
+  BACKEND_CACHE.travelSettings,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
@@ -43,7 +40,7 @@ export const reportPrinter = new ReportPrinter<Types.ObjectId>(
 )
 
 export const approvedTravelsPrinter = new ApprovedTravelsPrinter<Types.ObjectId>(
-  printerSettings,
+  BACKEND_CACHE.printerSettings,
   formatter,
   (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
     return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
@@ -64,11 +61,11 @@ export const approvedTravelsPrinter = new ApprovedTravelsPrinter<Types.ObjectId>
     return null
   }
 )
-approvedTravelsPrinter.setAllowSpouseRefund(travelSettings.allowSpouseRefund)
+approvedTravelsPrinter.setAllowSpouseRefund(BACKEND_CACHE.travelSettings.allowSpouseRefund)
 
 export const travelCalculator = new TravelCalculator(
   (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
-  await getTravelSettings(false)
+  BACKEND_CACHE.travelSettings
 )
 
 export const currencyConverter = new CurrencyConverter('InforEuro', [

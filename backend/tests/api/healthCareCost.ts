@@ -169,7 +169,7 @@ test.serial('POST /examine/healthCareCost/reviewCompleted', async (t) => {
 // REPORT
 
 test.serial('GET /healthCareCost/report', async (t) => {
-  t.timeout(20000) // 20 seconds
+  t.timeout(20_000) // 20 seconds
   await loginUser(agent, 'user')
   const res = await agent.get('/healthCareCost/report').query({ _id: healthCareCost._id })
   if (res.status === 200) {

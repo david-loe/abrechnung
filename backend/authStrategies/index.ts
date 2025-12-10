@@ -1,6 +1,6 @@
 import { Contact, User as IUser, tokenAdminUser } from 'abrechnung-common/types.js'
 import { HydratedDocument } from 'mongoose'
-import { getSettings } from '../db.js'
+import { BACKEND_CACHE } from '../db.js'
 import User from '../models/user.js'
 
 export interface NewUser extends Contact {
@@ -33,7 +33,7 @@ export async function findOrCreateUser(
   if (!user && email) {
     user = await User.findOne({ email: email })
   }
-  const newUser: NewUser = { fk: filter, email: email, name: userData.name, access: (await getSettings()).defaultAccess }
+  const newUser: NewUser = { fk: filter, email: email, name: userData.name, access: BACKEND_CACHE.settings.defaultAccess }
   if (!user) {
     user = new User(newUser)
   } else {
