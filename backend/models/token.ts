@@ -11,7 +11,7 @@ const schema = tokenSchema()
 
 schema.pre('save', async function (this: HydratedDocument<Token<Types.ObjectId, mongo.Binary>>) {
   if (this.isNew) {
-    this.expireAt = new Date(Date.now() + BACKEND_CACHE.settings.uploadTokenExpireAfterSeconds * 1000)
+    this.expireAt = new Date(Date.now() + BACKEND_CACHE.settings.uploadTokenExpireAfterSeconds * 1_000)
   }
 })
 

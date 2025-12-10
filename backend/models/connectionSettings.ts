@@ -22,7 +22,7 @@ export const connectionSettingsSchema = () =>
     smtp: {
       type: {
         host: { type: String, trim: true, required: true, label: 'Host', rules: requiredIf('smtp.user') },
-        port: { type: Number, required: true, min: 1, max: 65535, label: 'Port', rules: requiredIf('smtp.host') },
+        port: { type: Number, required: true, min: 1, max: 65_535, label: 'Port', rules: requiredIf('smtp.host') },
         secure: { type: Boolean, default: true, required: true, label: 'Secure' },
         user: { type: String, trim: true, required: true, rules: requiredIf('smtp.host') },
         password: { type: String, trim: true, required: true, rules: requiredIf('smtp.host') },

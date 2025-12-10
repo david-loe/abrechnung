@@ -80,7 +80,7 @@ export function getFlagEmoji(countryCode: string): string | null {
     .slice(0, 2)
     .toUpperCase()
     .split('')
-    .map((char) => 127397 + char.charCodeAt(0))
+    .map((char) => 127_397 + char.charCodeAt(0))
   return String.fromCodePoint(...codePoints)
 }
 
@@ -114,7 +114,7 @@ export function datetimeToDatetimeString(datetime: Date | string | number): stri
 export function htmlInputStringToDateTime(dateTimeStr: string): Date | null {
   const date = isValidDate(dateTimeStr)
   if (date) {
-    return new Date(date.valueOf() - date.getTimezoneOffset() * 60 * 1000)
+    return new Date(date.valueOf() - date.getTimezoneOffset() * 60_000)
   }
   return null
 }
@@ -126,13 +126,13 @@ export function datetimeToDate(datetime: Date | string | number): Date {
 export function getDiffInDays(startDate: Date | string | number, endDate: Date | string | number): number {
   const firstDay = datetimeToDate(startDate)
   const lastDay = datetimeToDate(endDate)
-  return (lastDay.valueOf() - firstDay.valueOf()) / (1000 * 60 * 60 * 24)
+  return (lastDay.valueOf() - firstDay.valueOf()) / 86_400_000
 }
 
 export function getDayList(startDate: Date | string | number, endDate: Date | string | number): Date[] {
   const days: Date[] = []
   for (let i = 0; i < getDiffInDays(startDate, endDate) + 1; i++) {
-    days.push(new Date(datetimeToDate(startDate).valueOf() + i * 1000 * 60 * 60 * 24))
+    days.push(new Date(datetimeToDate(startDate).valueOf() + i * 86_400_000))
   }
   return days
 }

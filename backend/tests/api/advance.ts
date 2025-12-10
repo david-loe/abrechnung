@@ -9,7 +9,7 @@ await loginUser(agent, 'user')
 let advance: Partial<Advance> = {
   name: 'Advance for next trip',
   reason: 'Traveling is expensive', // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
-  budget: { amount: 1000, currency: 'USD' as any }
+  budget: { amount: 1_000, currency: 'USD' as any }
 }
 
 test.serial('GET /project', async (t) => {

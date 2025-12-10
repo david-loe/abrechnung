@@ -76,8 +76,8 @@ export function formatBytes(value: number, scale = 1) {
   let size = bytes
   let unitIndex = 0
 
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
+  while (size >= 1_000 && unitIndex < units.length - 1) {
+    size /= 1_000
     unitIndex++
   }
 

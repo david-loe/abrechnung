@@ -63,11 +63,7 @@ export default async function () {
     session({
       store: await sessionStore(),
       secret: ENV.COOKIE_SECRET,
-      cookie: {
-        maxAge: ENV.COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
-        secure: useSecureCookie,
-        sameSite: useSecureCookie ? 'none' : 'lax'
-      },
+      cookie: { maxAge: ENV.COOKIE_MAX_AGE_DAYS * 86_400_000, secure: useSecureCookie, sameSite: useSecureCookie ? 'none' : 'lax' },
       resave: true,
       saveUninitialized: false,
       name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')

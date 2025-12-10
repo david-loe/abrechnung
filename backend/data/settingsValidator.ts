@@ -48,6 +48,6 @@ export function mapSmtpConfig(config: smtpSettings): SMTPTransport.Options {
     secure: config.secure,
     auth: { user: config.user, pass: config.password },
     from: config.senderAddress,
-    dnsTimeout: 1500
+    dnsTimeout: 1_500
   }
 }

@@ -46,7 +46,7 @@ declare module 'chart.js' {
 const { t, locale } = useI18n()
 
 const COUNT_MONTH = 4
-const thresholdBytes = 1024 * 1024 * 1024 // 1 GB
+const thresholdBytes = 1_000_000_000 // 1 GB
 
 const dbUsage = (await API.getter<{ totalSize: number; scale: number; fsUsedSize: number; fsTotalSize: number }>('stats/dbUsage')).ok?.data
 const bodyFont = getComputedStyle(document.body).fontFamily || 'inherit'

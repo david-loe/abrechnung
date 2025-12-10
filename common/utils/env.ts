@@ -44,7 +44,7 @@ const baseEnvConfig = {
   VITE_PUBLIC_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Public VAPID Key for WebPush Notifications' }),
   VITE_MAX_FILE_SIZE: int({ default: 16_000_000, desc: 'Maximal size allowed of files being uploaded in bytes' }),
   VITE_IMAGE_COMPRESSION_THRESHOLD_PX: int({
-    default: 1400,
+    default: 1_400,
     desc: 'Longest side of an image in pixels before client side compression is applied'
   })
 }

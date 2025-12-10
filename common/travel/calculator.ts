@@ -181,12 +181,12 @@ export class TravelCalculator {
               if (stage.midnightCountries) borderCrossings.push(...(stage.midnightCountries as { date: Date; country: CountrySimple }[]))
             } else if (stage.transport.type === 'airplane') {
               borderCrossings.push({
-                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                date: new Date(new Date(stage.departure).valueOf() + 86_400_000),
                 country: { _id: this.travelSettings.secondNightOnAirplaneLumpSumCountry }
               })
             } else if (stage.transport.type === 'shipOrFerry') {
               borderCrossings.push({
-                date: new Date(new Date(stage.departure).valueOf() + 24 * 60 * 60 * 1000),
+                date: new Date(new Date(stage.departure).valueOf() + 86_400_000),
                 country: { _id: this.travelSettings.secondNightOnShipOrFerryLumpSumCountry }
               })
             }
@@ -251,7 +251,7 @@ export class TravelCalculator {
     for (const day of days) {
       while (
         bXIndex < borderCrossings.length - 1 &&
-        day.date.valueOf() + 1000 * 24 * 60 * 60 - 1 - borderCrossings[bXIndex + 1].date.valueOf() > 0
+        day.date.valueOf() + 86_400_000 - 1 - borderCrossings[bXIndex + 1].date.valueOf() > 0
       ) {
         bXIndex++
       }
@@ -311,9 +311,10 @@ export class TravelCalculator {
 
   async addCateringRefunds(days: TravelDay<_id>[], stages: Stage<_id, binary>[], claimSpouseRefund: boolean) {
     const totalTravelLength = this.getTotalTravelLengthMS(stages)
-    const h = 60 * 60 * 1000
+    const H24 = 86_400_000
+    const H8 = 28_800_000
     // Mehrtägige Reise
-    if (totalTravelLength > 24 * h) {
+    if (totalTravelLength > H24) {
       for (let i = 0; i < days.length; i++) {
         const day = days[i] as TravelDayFullCountry<_id>
         if (day.purpose === 'professional') {
@@ -326,23 +327,23 @@ export class TravelCalculator {
           }
         }
       }
-    } else if (totalTravelLength > 8 * h) {
+    } else if (totalTravelLength > H8) {
       // "Eintägige" Reise
       if (days.length === 2) {
         const day1Length = new Date(days[1].date).valueOf() - new Date(stages[0].departure).valueOf()
         const day2Length = new Date(stages[stages.length - 1].arrival).valueOf() - new Date(days[1].date).valueOf()
-        if (day1Length > 8 * h && day2Length > 8 * h) {
+        if (day1Length > H8 && day2Length > H8) {
           if (days[0].purpose === 'professional') {
             days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
           if (days[1].purpose === 'professional') {
             days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
-        } else if (day1Length > 8 * h) {
+        } else if (day1Length > H8) {
           if (days[0].purpose === 'professional') {
             days[0].lumpSums.catering = await this.getCateringRefund(days[0] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
-        } else if (day2Length > 8 * h) {
+        } else if (day2Length > H8) {
           if (days[1].purpose === 'professional') {
             days[1].lumpSums.catering = await this.getCateringRefund(days[1] as TravelDayFullCountry<_id>, 'catering8', claimSpouseRefund)
           }
@@ -373,7 +374,7 @@ export class TravelCalculator {
         if (i === days.length - 1) {
           break
         }
-        const midnight = new Date(day.date).valueOf() + 1000 * 24 * 60 * 60 - 1
+        const midnight = new Date(day.date).valueOf() + 86_400_000 - 1
         while (stageIndex < stages.length - 1 && midnight - new Date(stages[stageIndex].arrival).valueOf() > 0) {
           stageIndex++
         }
@@ -512,7 +513,7 @@ export class TravelValidator {
     const cs = travel.stages.length
     if (cs > 0) {
       const travelLength = new Date(travel.stages[cs - 1].arrival).valueOf() - new Date(travel.stages[0].departure).valueOf()
-      const limit = this.travelSettings.minHoursOfTravel * 1000 * 60 * 60
+      const limit = this.travelSettings.minHoursOfTravel * 3_600_000
       if (travelLength < limit) {
         warnings.push({ name: 'travelLengthToShort', val: travelLength, limit: limit })
       }

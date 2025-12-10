@@ -312,7 +312,7 @@ export async function checkForMigrations() {
         const collection = mongoose.connection.collection<{ reference: number; historic?: boolean }>(collectionName)
         const cursor = collection.find({ historic: { $ne: true } }).sort({ _id: 1 })
         let counter = 1
-        const batchSize = 1000
+        const batchSize = 1_000
         let batch = []
         for await (const doc of cursor) {
           batch.push({ updateOne: { filter: { _id: doc._id }, update: { $set: { reference: counter++ } } } })
