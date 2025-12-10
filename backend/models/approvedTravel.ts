@@ -1,10 +1,10 @@
 import { ApprovedTravel, Travel, TravelState } from 'abrechnung-common/types.js'
-import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
+import { Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { formatter } from '../factory.js'
 import { populateSelected, travelBaseSchema } from './helper.js'
 
 interface ApprovedTravelModelType extends Model<ApprovedTravel<Types.ObjectId>> {
-  addOrUpdate(travel: Travel): Promise<HydratedDocument<ApprovedTravel<Types.ObjectId>>>
+  addOrUpdate(travel: Travel): Promise<ApprovedTravel<Types.ObjectId>>
 }
 
 function convert(travel: Travel<Types.ObjectId, mongo.Binary>): ApprovedTravel<Types.ObjectId> {
@@ -47,7 +47,7 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<ApprovedTravel, A
   await populateSelected(this, populates)
 })
 
-schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<ApprovedTravel> {
+schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<ApprovedTravel<Types.ObjectId>> {
   const converted = convert(travel)
   return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
 }

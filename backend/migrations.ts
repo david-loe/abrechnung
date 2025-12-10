@@ -1,6 +1,6 @@
 import { PrinterSettings } from 'abrechnung-common/types.js'
 import { detectImageType } from 'abrechnung-common/utils/file.js'
-import mongoose from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 import semver from 'semver'
 import { formatter, reportPrinter } from './factory.js'
 import { logger } from './logger.js'
@@ -351,6 +351,47 @@ export async function checkForMigrations() {
       if (printerSettings) {
         reportPrinter.setSettings(printerSettings)
       }
+    }
+    if (semver.lte(migrateFrom, '2.3.1')) {
+      logger.info('Apply migration from v2.3.1: fill report usage collection')
+      const reportUsageCol = mongoose.connection.collection('reportusages')
+      async function addReference(collectionName: string, modelName: string) {
+        const col = mongoose.connection.collection<{
+          updatedAt: Date
+          reference: number
+          project: Types.ObjectId
+          historic?: boolean
+          state: number
+          log: { [key: number]: { on: Date; by: Types.ObjectId } }
+        }>(collectionName)
+        const cursor = col.find({ historic: { $ne: true }, state: { $gte: 30 } }).sort({ _id: 1 })
+        const batchSize = 1000
+        let batch = []
+        for await (const doc of cursor) {
+          const organisationId = (
+            await mongoose.connection.collection<{ organisation: Types.ObjectId }>('projects').findOne({ _id: doc.project })
+          )?.organisation
+          batch.push({
+            reportId: doc._id,
+            reference: doc.reference,
+            reportModelName: modelName,
+            organisationId: organisationId,
+            projectId: doc.project,
+            createdAt: doc.log[30]?.on || doc.updatedAt
+          })
+          if (batch.length === batchSize) {
+            await reportUsageCol.insertMany(batch)
+            batch = []
+          }
+        }
+        if (batch.length > 0) {
+          await reportUsageCol.insertMany(batch)
+        }
+      }
+      await addReference('travels', 'Travel')
+      await addReference('expensereports', 'ExpenseReport')
+      await addReference('healthcarecosts', 'HealthCareCost')
+      await addReference('advances', 'Advance')
     }
 
     if (settings) {

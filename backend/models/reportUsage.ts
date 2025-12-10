@@ -8,7 +8,7 @@ import {
   reportModelNames,
   Travel
 } from 'abrechnung-common/types.js'
-import { HydratedDocument, Model, model, mongo, Schema, Types } from 'mongoose'
+import { Model, model, mongo, Schema, Types } from 'mongoose'
 
 type Report =
   | Travel<Types.ObjectId, mongo.Binary>
@@ -17,7 +17,7 @@ type Report =
   | Advance<Types.ObjectId>
 
 interface ReportUsageModelType extends Model<ReportUsage<Types.ObjectId>> {
-  addOrUpdate(report: Report): Promise<HydratedDocument<ReportUsage<Types.ObjectId>>>
+  addOrUpdate(report: Report): Promise<ReportUsage<Types.ObjectId>>
 }
 
 function convert(report: Report) {
@@ -46,7 +46,7 @@ const schema = reportUsageSchema()
 
 schema.index({ createdAt: 1 })
 
-schema.statics.addOrUpdate = async function (report: Report): Promise<ReportUsage> {
+schema.statics.addOrUpdate = async function (report: Report): Promise<ReportUsage<Types.ObjectId>> {
   const converted = convert(report)
   return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
 }

@@ -30,6 +30,7 @@
 <script lang="ts" setup>
 import { ReportModelName, reportModelNames } from 'abrechnung-common/types.js'
 import { formatBytes } from 'abrechnung-common/utils/file.js'
+import type { Plugin } from 'chart.js'
 import Chart from 'chart.js/auto'
 import { onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 
@@ -97,6 +98,45 @@ const thresholdLinePlugin = {
   }
 }
 
+const stackedTotalLabelsPlugin = (formatter?: (total: number) => string) =>
+  ({
+    id: 'stackedTotalLabels',
+    afterDatasetsDraw(chart) {
+      const { data, ctx, scales } = chart
+      const yScale = scales.y
+      if (!yScale || !data.labels?.length) return
+      const font = Chart.defaults.font || {}
+      const fontString = `${font.weight ? `${font.weight} ` : ''}${font.size ?? 12}px ${font.family ?? 'sans-serif'}`
+      ctx.save()
+      ctx.font = fontString
+      ctx.fillStyle = textColor || '#000'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'bottom'
+
+      data.labels.forEach((_label, dataIndex) => {
+        let total = 0
+        let hasValue = false
+        let xPos: number | null = null
+        data.datasets.forEach((dataset, datasetIndex) => {
+          if (!chart.isDatasetVisible(datasetIndex) || !Array.isArray(dataset.data)) return
+          const raw = dataset.data[dataIndex]
+          const value = typeof raw === 'number' ? raw : Number(raw)
+          if (!Number.isFinite(value)) return
+          total += value
+          hasValue = true
+          if (xPos == null) {
+            const element = chart.getDatasetMeta(datasetIndex)?.data?.[dataIndex] as { x: number } | undefined
+            xPos = element?.x ?? null
+          }
+        })
+        if (!hasValue || xPos == null) return
+        const y = yScale.getPixelForValue(total)
+        ctx.fillText(`${formatter ? formatter(total) : total}`, xPos, y - 6)
+      })
+      ctx.restore()
+    }
+  }) as Plugin<'bar'>
+
 const reportLabels: Record<ReportModelName, string> = {
   Advance: t('labels.advance'),
   ExpenseReport: t('labels.expenseReport'),
@@ -137,9 +177,9 @@ function createReportUsageChart() {
         data: reportUsage.map((entry) => entry.usage[type] ?? 0),
         backgroundColor: reportColors[type],
         borderColor: chartBorderColors[type],
-        borderWidth: 1.5,
-        borderRadius: 10,
-        maxBarThickness: 26
+        borderWidth: 0.5,
+        borderRadius: 2,
+        maxBarThickness: 35
       }))
     },
     options: {
@@ -156,7 +196,8 @@ function createReportUsageChart() {
         y: { stacked: true, beginAtZero: true, ticks: { precision: 0, color: textColor }, grid: { color: gridColor } }
       },
       elements: { bar: { borderSkipped: false } }
-    }
+    },
+    plugins: [stackedTotalLabelsPlugin()]
   })
 }
 
@@ -277,17 +318,8 @@ function createDbTotalSizeChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { usePointStyle: true, color: textColor } },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              const raw = Number(context.raw)
-              if (Number.isNaN(raw)) return ''
-              const label = context.dataset.label || context.label
-              return `${label}: ${formatBytes(raw)}`
-            }
-          }
-        },
+        legend: { display: false },
+        tooltip: { enabled: false },
         thresholdLine: { value: thresholdBytes, color: totalSizeColors.threshold }
       },
       interaction: { intersect: false },
@@ -303,7 +335,7 @@ function createDbTotalSizeChart() {
       },
       elements: { bar: { borderSkipped: false } }
     },
-    plugins: [thresholdLinePlugin]
+    plugins: [thresholdLinePlugin, stackedTotalLabelsPlugin(formatBytes)]
   })
 }
 </script>
