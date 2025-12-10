@@ -10,18 +10,18 @@
     </div>
     <div class="col">
       <h4>{{ t('labels.dbUsage') }}</h4>
-      <small class="chart-card__meta">{{ t('labels.total') + ': ' + formatBytes(dbUsage?.fsTotalSize ?? 0) }}</small>
-
-      <div class="chart-wrapper">
-        <canvas ref="dbUsageCanvas" />
-      </div>
-    </div>
-    <div class="col">
-      <h4>{{ t('labels.dbTotalSize') }}</h4>
       <small class="chart-card__meta">{{ t('labels.threshold') + ': ' + formatBytes(thresholdBytes) }}</small>
 
       <div class="chart-wrapper">
         <canvas ref="dbTotalSizeCanvas" />
+      </div>
+    </div>
+    <div class="col">
+      <h4>{{ t('labels.fsUsage') }}</h4>
+      <small class="chart-card__meta">{{ t('labels.total') + ': ' + formatBytes(dbUsage?.fsTotalSize ?? 0) }}</small>
+
+      <div class="chart-wrapper">
+        <canvas ref="dbUsageCanvas" />
       </div>
     </div>
   </div>
