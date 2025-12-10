@@ -8,6 +8,7 @@ import {
   ExpenseReport,
   HealthCareCost,
   ReportModelNameWithoutAdvance,
+  reportModelNamesWithoutAdvance,
   State,
   Travel
 } from 'abrechnung-common/types.js'
@@ -41,7 +42,7 @@ const advanceSchema = () =>
       offsetAgainst: {
         type: [
           {
-            type: { type: String, enum: ['Travel', 'ExpenseReport', 'HealthCareCost'], required: true },
+            type: { type: String, enum: reportModelNamesWithoutAdvance, required: true },
             report: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
             amount: { type: Number, min: 0, required: true }
           }
@@ -80,7 +81,9 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
     setAdvanceBalance(this)
   }
   if (save) {
+    this.$locals.SKIP_POST_SAFE_HOOK = true
     await this.save({ session })
+    this.$locals.SKIP_POST_SAFE_HOOK = false
   }
 }
 

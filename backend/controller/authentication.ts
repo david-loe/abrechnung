@@ -11,14 +11,14 @@ export async function expressAuthentication(req: Request, securityName: string, 
       return req.user
     }
   } else if (securityName === 'httpBearer') {
-    return BearerAuthentication(req, httpBearerStrategy, scopes)
+    return bearerAuthentication(req, httpBearerStrategy, scopes)
   } else if (securityName === 'usageToken') {
-    return BearerAuthentication(req, usageTokenStrategy, scopes)
+    return bearerAuthentication(req, usageTokenStrategy, scopes)
   }
   throw new AuthorizationError()
 }
 
-function BearerAuthentication(req: Request, strategy: passport.Strategy, scopes?: string[]) {
+function bearerAuthentication(req: Request, strategy: passport.Strategy, scopes?: string[]) {
   return new Promise<Express.User>((resolve, reject) => {
     const authenticateCallback: AuthenticateCallback = async (err, user, _info, _status) => {
       if (err || !user || !(await isUserAllowedToAccess(user as Express.User, scopes as Access[] | undefined))) {

@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ReportModelName } from 'abrechnung-common/types.js'
+import { ReportModelName, reportModelNames } from 'abrechnung-common/types.js'
 import { formatBytes } from 'abrechnung-common/utils/file.js'
 import Chart from 'chart.js/auto'
 import { onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
@@ -107,8 +107,6 @@ const reportLabels: Record<ReportModelName, string> = {
 const reportColors: Record<ReportModelName, string> = { Advance: '', ExpenseReport: '', HealthCareCost: '', Travel: '' }
 const chartBorderColors: Record<ReportModelName, string> = { Advance: '', ExpenseReport: '', HealthCareCost: '', Travel: '' }
 
-const reportTypes: ReportModelName[] = ['ExpenseReport', 'Travel', 'HealthCareCost', 'Advance']
-
 onMounted(() => {
   applyPalette()
   createReportUsageChart()
@@ -134,7 +132,7 @@ function createReportUsageChart() {
     type: 'bar',
     data: {
       labels,
-      datasets: reportTypes.map((type) => ({
+      datasets: reportModelNames.map((type) => ({
         label: reportLabels[type],
         data: reportUsage.map((entry) => entry.usage[type] ?? 0),
         backgroundColor: reportColors[type],
@@ -253,7 +251,7 @@ function createDbTotalSizeChart() {
   }
 
   dbTotalChart?.destroy()
-  const totalBytes = dbUsage.totalSize * (dbUsage.scale ?? 1)
+  const totalBytes = dbUsage.totalSize * dbUsage.scale
   const tickStep = thresholdBytes / 4
   const maxValue = Math.max(totalBytes, thresholdBytes, 1)
   const yMax = Math.ceil(maxValue / tickStep) * tickStep + tickStep
@@ -321,8 +319,8 @@ function createDbTotalSizeChart() {
 }
 
 .chart-wrapper canvas {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
   image-rendering: optimizeQuality;
 }
 </style>

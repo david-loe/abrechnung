@@ -47,17 +47,9 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<ApprovedTravel, A
   await populateSelected(this, populates)
 })
 
-schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<HydratedDocument<ApprovedTravel>> {
-  const alreadyExsists = await this.findOne({ reportId: travel._id })
-  if (alreadyExsists) {
-    alreadyExsists.set(convert(travel))
-    await alreadyExsists.save()
-    return alreadyExsists
-  } else {
-    const newOne = new this(convert(travel))
-    await newOne.save()
-    return newOne
-  }
+schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<ApprovedTravel> {
+  const converted = convert(travel)
+  return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
 }
 
 export default model<ApprovedTravel, ApprovedTravelModelType>('ApprovedTravel', schema)

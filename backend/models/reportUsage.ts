@@ -33,7 +33,7 @@ function convert(report: Report) {
 const reportUsageSchema = () =>
   new Schema<ReportUsage, ReportUsageModelType>(
     {
-      reportId: { type: Schema.Types.ObjectId, refPath: 'reportModelName', required: true },
+      reportId: { type: Schema.Types.ObjectId, refPath: 'reportModelName', required: true, unique: true },
       reference: { type: Number, required: true, min: 0 },
       reportModelName: { type: String, enum: reportModelNames, required: true },
       organisationId: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true },
@@ -46,17 +46,9 @@ const schema = reportUsageSchema()
 
 schema.index({ createdAt: 1 })
 
-schema.statics.addOrUpdate = async function (report: Report): Promise<HydratedDocument<ReportUsage>> {
-  const alreadyExsists = await this.findOne({ reportId: report._id })
-  if (alreadyExsists) {
-    alreadyExsists.set(convert(report))
-    await alreadyExsists.save()
-    return alreadyExsists
-  } else {
-    const newOne = new this(convert(report))
-    await newOne.save()
-    return newOne
-  }
+schema.statics.addOrUpdate = async function (report: Report): Promise<ReportUsage> {
+  const converted = convert(report)
+  return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
 }
 
 export default model<ReportUsage, ReportUsageModelType>('ReportUsage', schema)

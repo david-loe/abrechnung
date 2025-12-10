@@ -132,7 +132,7 @@ export class AdvanceApproveController extends Controller {
   }
 
   @Post('approved')
-  public async postAnyBackApproved(
+  public async postAnyApproved(
     @Body() requestBody:
       | (AdvanceApplication & { owner: IdDocument; bookingRemark?: string | null })
       | { _id: string; comment?: string; bookingRemark?: string | null },
