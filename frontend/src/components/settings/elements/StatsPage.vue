@@ -46,7 +46,7 @@ declare module 'chart.js' {
 const { t, locale } = useI18n()
 
 const COUNT_MONTH = 4
-const thresholdBytes = 2 * 1024 * 1024 * 1024 // 2 GB
+const thresholdBytes = 1024 * 1024 * 1024 // 1 GB
 
 const dbUsage = (await API.getter<{ totalSize: number; scale: number; fsUsedSize: number; fsTotalSize: number }>('stats/dbUsage')).ok?.data
 const bodyFont = getComputedStyle(document.body).fontFamily || 'inherit'
@@ -296,6 +296,7 @@ function createDbTotalSizeChart() {
   const tickStep = thresholdBytes / 4
   const maxValue = Math.max(totalBytes, thresholdBytes, 1)
   const yMax = Math.ceil(maxValue / tickStep) * tickStep + tickStep
+  const stepSize = (Math.ceil(maxValue / tickStep) * tickStep) / 4
   const totalLabel = translateOrFallback('labels.dbTotalSize', 'Total Size')
 
   dbTotalChart = new Chart(dbTotalSizeCanvas.value, {
@@ -328,7 +329,7 @@ function createDbTotalSizeChart() {
         y: {
           beginAtZero: true,
           max: yMax,
-          ticks: { callback: (value) => formatBytes(Number(value)), color: textColor, stepSize: tickStep },
+          ticks: { callback: (value) => formatBytes(Number(value)), color: textColor, stepSize: stepSize },
           grid: { color: gridColor }
         },
         x: { stacked: false, grid: { display: false }, ticks: { color: textColor } }
