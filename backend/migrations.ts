@@ -9,7 +9,7 @@ import Settings from './models/settings.js'
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
   if (settings?.migrateFrom) {
-    const migrateFrom = settings?.migrateFrom
+    const migrateFrom = settings.migrateFrom
     const minVersion = '2.0.0'
     if (semver.lt(migrateFrom, minVersion)) {
       throw new Error(`Migration from v${migrateFrom} to v${settings.version} not supported. Migrate to v${minVersion} first.`)
@@ -394,9 +394,7 @@ export async function checkForMigrations() {
       await addReportUsage('advances', 'Advance')
     }
 
-    if (settings) {
-      settings.migrateFrom = undefined
-      await settings.save()
-    }
+    settings.migrateFrom = undefined
+    await settings.save()
   }
 }

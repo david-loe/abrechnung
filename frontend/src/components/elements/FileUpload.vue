@@ -5,7 +5,7 @@
         <template v-if="multiple">
           <FileUploadFileElement
             v-for="(file, index) of modelValue"
-            :file="file"
+            :file="(file as DocumentFile<string, Blob>)"
             :disabled="disabled"
             :key="(file as DocumentFile<string, Blob>).name"
             @show="_showFile(file)"

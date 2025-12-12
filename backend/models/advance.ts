@@ -94,17 +94,17 @@ schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
   const reports: Document[] = []
   reports.push(
-    ...(await model<Travel>('Travel')
+    ...(await model<Travel<Types.ObjectId>>('Travel')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<ExpenseReport>('ExpenseReport')
+    ...(await model<ExpenseReport<Types.ObjectId>>('ExpenseReport')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<HealthCareCost>('HealthCareCost')
+    ...(await model<HealthCareCost<Types.ObjectId>>('HealthCareCost')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )

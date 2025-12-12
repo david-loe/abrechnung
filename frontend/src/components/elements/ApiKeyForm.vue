@@ -25,7 +25,6 @@
         type="button"
         class="btn btn-light"
         v-on:click="
-          //prettier-ignore
           emits('cancel');
           resetForm()
         ">

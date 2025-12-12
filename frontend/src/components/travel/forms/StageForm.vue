@@ -215,7 +215,6 @@
           type="button"
           class="btn btn-sm btn-link ms-3"
           @click="
-          //prettier-ignore
           useDifferentProject = false;
           //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
           formStage.project = ''

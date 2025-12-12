@@ -20,7 +20,7 @@
   "disableReportType": {
     "advance": false,
     "expenseReport": false,
-    "healthCareCost": false,
+    "healthCareCost": true,
     "travel": false
   },
   "retentionPolicy": {

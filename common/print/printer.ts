@@ -160,7 +160,6 @@ const layoutMultilineText = (
     while (prevRemainder !== undefined) {
       const { line, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize)
 
-      // prettier-ignore
       const x =
         alignment === TextAlignment.Left
           ? bounds.x
