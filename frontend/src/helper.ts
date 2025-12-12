@@ -60,9 +60,9 @@ function urlBase64ToUint8Array(base64String: string) {
 
 export const bp = { sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 } as const
 
-export function hideExpandColumn(colDeleted: boolean, colIndex = 0) {
+export function hideExpandColumn(table: ParentNode, colDeleted: boolean, colIndex = 0) {
   queueMicrotask(() => {
-    for (const tr of document.querySelectorAll<HTMLTableRowElement>('tr')) {
+    for (const tr of table.querySelectorAll<HTMLTableRowElement>('tr')) {
       const cells = tr.querySelectorAll<HTMLElement>('th, td')
       const cell = cells[colIndex]
       if (cell) {
@@ -71,7 +71,7 @@ export function hideExpandColumn(colDeleted: boolean, colIndex = 0) {
     }
 
     if (!colDeleted) {
-      const cols = document.querySelectorAll<HTMLElement>('col')
+      const cols = table.querySelectorAll<HTMLElement>('col')
       const col = cols[colIndex]
       if (col) {
         col.remove()
@@ -80,8 +80,8 @@ export function hideExpandColumn(colDeleted: boolean, colIndex = 0) {
   })
 }
 
-export function expandCollapseComments() {
-  for (const td of document.querySelectorAll<HTMLElement>('td.can-expand')) {
+export function expandCollapseComments(table: ParentNode) {
+  for (const td of table.querySelectorAll<HTMLElement>('td.can-expand')) {
     td.click()
   }
 }

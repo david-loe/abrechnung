@@ -102,7 +102,9 @@ async function book(expenseReports: ExpenseReportSimple[]) {
 
 let colDeleted = false
 function hideExpandColumn() {
-  hideExpCol(colDeleted, 1)
+  if (tableRef.value) {
+    hideExpCol(tableRef.value.$el, colDeleted, 1)
+  }
   colDeleted = true
 }
 
@@ -112,12 +114,16 @@ const { handlePrint } = useVueToPrint({
   removeAfterPrint: true,
   onBeforeGetContent() {
     return new Promise((resolve) => {
-      expandCollapseComments()
+      if (tableRef.value) {
+        expandCollapseComments(tableRef.value.$el)
+      }
       queueMicrotask(resolve)
     })
   },
   onAfterPrint() {
-    expandCollapseComments()
+    if (tableRef.value) {
+      expandCollapseComments(tableRef.value.$el)
+    }
   },
   pageStyle: `
     @page {
