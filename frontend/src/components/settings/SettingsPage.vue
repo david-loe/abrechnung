@@ -14,6 +14,12 @@
               {{ t('labels.' + _entry) }}
             </span>
           </li>
+          <li class="border-top my-3"></li>
+          <li v-for="_entry in utils" class="nav-item">
+            <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
+              {{ t('labels.' + _entry) }}
+            </span>
+          </li>
         </ul>
       </div>
     </div>
@@ -26,6 +32,7 @@
         <TravelSettingsForm v-else-if="entry === 'travelSettings'" />
         <PrinterSettingsForm v-else-if="entry === 'printerSettings'" />
         <StatsPage v-else-if="entry === 'stats'" />
+        <AdminTools v-else-if="entry === 'adminTools'" />
         <template v-else-if="entry === 'users'">
           <Suspense>
             <template #default>
@@ -117,6 +124,7 @@
 <script lang="ts" setup>
 import { convertGermanDateToHTMLDate } from 'abrechnung-common/utils/scripts.js'
 import CSVImport from '@/components/elements/CSVImport.vue'
+import AdminTools from '@/components/settings/elements/AdminTools.vue'
 import CategoryList from '@/components/settings/elements/CategoryList.vue'
 import ConnectionSettingsForm from '@/components/settings/elements/ConnectionSettingsForm.vue'
 import CountryList from '@/components/settings/elements/CountryList.vue'
@@ -142,9 +150,11 @@ const { t } = useI18n()
 
 const items = ['users', 'projects', 'organisations', 'categories', 'webhooks', 'countries', 'currencies', 'healthInsurances'] as const
 
-const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings', 'stats'] as const
+const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'printerSettings', 'settings'] as const
 
-type Entry = (typeof items)[number] | (typeof settings)[number]
+const utils = ['stats', 'adminTools'] as const
+
+type Entry = (typeof items)[number] | (typeof settings)[number] | (typeof utils)[number]
 
 const APP_DATA = APP_LOADER.data
 const entry = ref('users' as Entry)
