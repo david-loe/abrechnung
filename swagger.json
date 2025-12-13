@@ -12516,6 +12516,25 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__": {
+				"properties": {},
+				"type": "object"
+			},
+			"Partial__owner-IdDocument_string_--project-IdDocument_string_--name-string__": {
+				"properties": {
+					"owner": {
+						"$ref": "#/components/schemas/IdDocument_string_"
+					},
+					"project": {
+						"$ref": "#/components/schemas/IdDocument_string_"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
 			}
 		},
 		"securitySchemes": {
@@ -23749,6 +23768,240 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/tools/report/ref": {
+			"get": {
+				"operationId": "GetByRef",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__"
+												},
+												{
+													"properties": {
+														"_id": {
+															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+														}
+													},
+													"required": [
+														"_id"
+													],
+													"type": "object"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ref",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/ReportModelName"
+						}
+					}
+				]
+			}
+		},
+		"/admin/tools/report": {
+			"post": {
+				"operationId": "UpdateReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__"
+												},
+												{
+													"properties": {
+														"_id": {
+															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+														}
+													},
+													"required": [
+														"_id"
+													],
+													"type": "object"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"data": {
+										"$ref": "#/components/schemas/Partial__owner-IdDocument_string_--project-IdDocument_string_--name-string__"
+									},
+									"type": {
+										"$ref": "#/components/schemas/ReportModelName"
+									},
+									"ref": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"data",
+									"type",
+									"ref"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ref",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/ReportModelName"
+						}
+					}
+				]
 			}
 		}
 	},
