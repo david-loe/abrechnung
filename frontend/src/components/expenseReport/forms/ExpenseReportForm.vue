@@ -22,12 +22,12 @@
     </div>
 
     <div class="mb-3">
-      <label for="healthCareCostFormProject" class="form-label me-2">
+      <label for="expenseReportFormProject" class="form-label me-2">
         {{ t('labels.project') }}
         <span class="text-danger">*</span>
       </label>
       <InfoPoint :text="t('info.project')" />
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpenseReport.project" :update-user-org="updateUserOrg" required />
+      <ProjectSelector id="expenseReportFormProject" v-model="formExpenseReport.project" :update-user-org="updateUserOrg" required />
     </div>
 
     <div class="mb-3" v-if="APP_DATA?.settings.disableReportType.advance === false">
