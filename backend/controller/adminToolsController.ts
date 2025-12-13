@@ -41,6 +41,10 @@ export class AdminToolController extends Controller {
   @Delete('report')
   public async deleteReport(@Query() ref: number, @Query() type: ReportModelName) {
     const model = mongoose.model<{ name: string; owner: UserSimple; project: ProjectSimple; reference: number }>(type)
-    return await model.deleteOne({ reference: ref })
+    const result = await model.deleteOne({ reference: ref })
+    if (result.deletedCount === 0) {
+      throw new NotFoundError(`No ${type} with ref: '${ref}' found`)
+    }
+    return result
   }
 }
