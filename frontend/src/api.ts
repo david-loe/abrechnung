@@ -68,7 +68,7 @@ class API {
   }
   async deleter(
     endpoint: string,
-    params: { _id?: string; parentId?: string },
+    params: { _id?: string; parentId?: string } & Record<string, unknown>,
     ask = true,
     showAlert = { success: true, error: true }
   ): Promise<boolean | unknown> {
