@@ -201,5 +201,7 @@ export async function getDisplaySettings(init = true): Promise<IDisplaySettings>
   throw Error('Display Settings not found')
 }
 
-// only init on server start or test NOT workers
-export const BACKEND_CACHE = await CACHE.create(process.argv[1].endsWith('server.js') || process.argv[1].includes('ava'))
+// only init on server start or setup(migration test) or test NOT workers
+export const BACKEND_CACHE = await CACHE.create(
+  process.argv[1].endsWith('server.js') || process.argv[1].endsWith('setup.js') || process.argv[1].includes('ava')
+)
