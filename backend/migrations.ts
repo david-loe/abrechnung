@@ -2,6 +2,7 @@ import { PrinterSettings } from 'abrechnung-common/types.js'
 import { detectImageType } from 'abrechnung-common/utils/file.js'
 import mongoose, { Types } from 'mongoose'
 import semver from 'semver'
+import { fetchAndUpdateLumpSums } from './db.js'
 import { formatter, reportPrinter } from './factory.js'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
@@ -392,6 +393,11 @@ export async function checkForMigrations() {
       await addReportUsage('expensereports', 'ExpenseReport')
       await addReportUsage('healthcarecosts', 'HealthCareCost')
       await addReportUsage('advances', 'Advance')
+    }
+    if (semver.lte(migrateFrom, '2.3.2')) {
+      logger.info('Apply migration from v2.3.2: refill lumpSums with validUntil')
+      await mongoose.connection.collection('countries').updateMany({}, { $set: { lumpSums: [] } })
+      await fetchAndUpdateLumpSums()
     }
 
     settings.migrateFrom = undefined

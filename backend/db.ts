@@ -137,7 +137,7 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
 }
 
 export async function fetchAndUpdateLumpSums() {
-  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api/ALL.json'
+  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api@1/ALL.json'
   try {
     const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
     if (res.status === 200) {
@@ -201,5 +201,7 @@ export async function getDisplaySettings(init = true): Promise<IDisplaySettings>
   throw Error('Display Settings not found')
 }
 
-// only init on server start or test NOT workers
-export const BACKEND_CACHE = await CACHE.create(process.argv[1].endsWith('server.js') || process.argv[1].includes('ava'))
+// only init on server start or setup(migration test) or test NOT workers
+export const BACKEND_CACHE = await CACHE.create(
+  process.argv[1].endsWith('server.js') || process.argv[1].endsWith('setup.js') || process.argv[1].includes('ava')
+)

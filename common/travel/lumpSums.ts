@@ -1,7 +1,7 @@
-import { Country, CountryCode, CountryLumpSum } from '../types.js'
+import { Country, CountryCode, CountryLumpSum, LumpSumWithSpecials } from '../types.js'
 
-export type LumpSumsJSON = { data: LumpSumWithCountryCode[]; validFrom: string }[]
-type LumpSumWithCountryCode = Omit<CountryLumpSum, 'validFrom'> & { countryCode: string }
+export type LumpSumsJSON = { data: LumpSumWithCountryCode[]; validFrom: string; validUntil: string | null }[]
+type LumpSumWithCountryCode = LumpSumWithSpecials & { countryCode: string }
 export async function addLumpSumsToCountries(
   lumpSumsJSON: LumpSumsJSON,
   getCountryById: (id: CountryCode) => Promise<Country | null>,
@@ -21,7 +21,11 @@ export async function addLumpSumsToCountries(
           }
         }
         if (newData) {
-          const newLumpSum: CountryLumpSum = Object.assign({ validFrom: new Date(lumpSums.validFrom) }, lumpSum)
+          const newLumpSum: CountryLumpSum = {
+            ...lumpSum,
+            validFrom: new Date(lumpSums.validFrom),
+            validUntil: lumpSums.validUntil ? new Date(lumpSums.validUntil) : null
+          }
           country.lumpSums.push(newLumpSum)
           await saveNewCountry(country)
         }

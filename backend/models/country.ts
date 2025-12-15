@@ -15,6 +15,7 @@ export const countrySchema = () =>
         {
           type: {
             validFrom: { type: Date },
+            validUntil: { type: Date },
             catering24: { type: Number, label: 'lumpSums.catering24' },
             catering8: { type: Number, label: 'lumpSums.catering8' },
             overnight: { type: Number, label: 'lumpSums.overnight' },
