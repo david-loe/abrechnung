@@ -137,7 +137,7 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
 }
 
 export async function fetchAndUpdateLumpSums() {
-  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api/ALL.json'
+  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api@1/ALL.json'
   try {
     const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
     if (res.status === 200) {

@@ -12,6 +12,7 @@ const DE: Country = {
   lumpSums: [
     {
       validFrom: '2024-01-01',
+      validUntil: '2024-12-31',
       overnight: 18,
       catering8: 12,
       catering24: 24,
@@ -19,6 +20,7 @@ const DE: Country = {
     },
     {
       validFrom: '2025-01-01',
+      validUntil: null,
       overnight: 20,
       catering8: 14,
       catering24: 28,
@@ -36,6 +38,7 @@ const FR: Country = {
   lumpSums: [
     {
       validFrom: '2024-01-01',
+      validUntil: '2024-12-31',
       overnight: 55,
       catering8: 16,
       catering24: 32,
@@ -43,6 +46,7 @@ const FR: Country = {
     },
     {
       validFrom: '2025-01-01',
+      validUntil: null,
       overnight: 45,
       catering8: 17,
       catering24: 34,
@@ -57,8 +61,8 @@ const AT: Country = {
   currency: 'EUR',
 
   lumpSums: [
-    { validFrom: '2024-01-01', overnight: 32, catering8: 14, catering24: 28 },
-    { validFrom: '2025-01-01', overnight: 35, catering8: 15, catering24: 30 }
+    { validFrom: '2024-01-01', validUntil: '2024-12-31', overnight: 32, catering8: 14, catering24: 28 },
+    { validFrom: '2025-01-01', validUntil: null, overnight: 35, catering8: 15, catering24: 30 }
   ]
 }
 
@@ -68,8 +72,8 @@ const LU: Country = {
   currency: 'EUR',
 
   lumpSums: [
-    { validFrom: '2024-01-01', overnight: 36, catering8: 14, catering24: 28 },
-    { validFrom: '2025-01-01', overnight: 38, catering8: 16, catering24: 32 }
+    { validFrom: '2024-01-01', validUntil: '2024-12-31', overnight: 36, catering8: 14, catering24: 28 },
+    { validFrom: '2025-01-01', validUntil: null, overnight: 38, catering8: 16, catering24: 32 }
   ]
 }
 

@@ -191,9 +191,13 @@ export interface CountrySimple {
   currency?: CurrencyCode | null
 }
 
-export interface CountryLumpSum extends LumpSum {
-  validFrom: Date | string
+export interface LumpSumWithSpecials extends LumpSum {
   specials?: ({ city: string } & LumpSum)[]
+}
+
+export interface CountryLumpSum extends LumpSumWithSpecials {
+  validFrom: Date | string
+  validUntil: Date | string | null
 }
 
 export interface Country extends CountrySimple {

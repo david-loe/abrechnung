@@ -5,6 +5,7 @@ import {
   CateringType,
   Country,
   CountryCode,
+  CountryLumpSum,
   CountrySimple,
   LumpSum,
   LumpsumType,
@@ -548,28 +549,31 @@ export default class LumpSumCalculator {
       const lumpSumFrom = await this.getCountryById(country.lumpSumsFrom)
       return this.getLumpSum(lumpSumFrom, date)
     }
-    if (country.lumpSums.length === 0) {
+    let lumpSum: CountryLumpSum | null = null
+    for (const ls of country.lumpSums) {
+      const validUntil = ls.validUntil ? new Date(ls.validUntil) : null
+      const validUntilValue = validUntil
+        ? Date.UTC(validUntil.getUTCFullYear(), validUntil.getUTCMonth(), validUntil.getUTCDate(), 23, 59, 59, 999).valueOf()
+        : null
+      if ((!validUntilValue || date.valueOf() <= validUntilValue) && date.valueOf() >= new Date(ls.validFrom).valueOf()) {
+        lumpSum = ls
+        break
+      }
+    }
+    if (lumpSum) {
+      if (special && lumpSum.specials) {
+        for (const lumpSumSpecial of lumpSum.specials) {
+          if (lumpSumSpecial.city === special) {
+            return lumpSumSpecial
+          }
+        }
+      }
+      return lumpSum
+    } else if (country._id !== this.fallbackLumpSumCountry) {
       const fallbackLumpSumCountry = await this.getCountryById(this.fallbackLumpSumCountry)
       return this.getLumpSum(fallbackLumpSumCountry, date)
     }
-    let nearest = 0
-    for (let i = 0; i < country.lumpSums.length; i++) {
-      const diff = date.valueOf() - new Date(country.lumpSums[i].validFrom).valueOf()
-      if (diff >= 0 && diff < date.valueOf() - new Date(country.lumpSums[nearest].validFrom).valueOf()) {
-        nearest = i
-      }
-    }
-    const neatestLumpSums = country.lumpSums[nearest]
-    if (date.valueOf() - new Date(neatestLumpSums.validFrom).valueOf() < 0) {
-      throw new Error(`No valid lumpSum found for Country: ${country._id} for date: ${date}`)
-    }
-    if (special && neatestLumpSums.specials) {
-      for (const lumpSumSpecial of neatestLumpSums.specials) {
-        if (lumpSumSpecial.city === special) {
-          return lumpSumSpecial
-        }
-      }
-    }
-    return neatestLumpSums
+
+    throw new Error(`No valid lumpSum found for Country: ${country._id} for date: ${date}`)
   }
 }
