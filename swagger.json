@@ -10982,17 +10982,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"validFrom": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						]
-					},
 					"specials": {
 						"items": {
 							"allOf": [
@@ -11013,13 +11002,37 @@
 							]
 						},
 						"type": "array"
+					},
+					"validFrom": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"validUntil": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
 					}
 				},
 				"required": [
 					"catering8",
 					"catering24",
 					"overnight",
-					"validFrom"
+					"validFrom",
+					"validUntil"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -11276,6 +11289,17 @@
 										"type": "object"
 									},
 									"type": "array"
+								},
+								"validUntil": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "string",
+											"format": "date-time"
+										}
+									]
 								},
 								"validFrom": {
 									"anyOf": [
