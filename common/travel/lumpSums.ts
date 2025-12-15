@@ -24,7 +24,7 @@ export async function addLumpSumsToCountries(
           const newLumpSum: CountryLumpSum = {
             ...lumpSum,
             validFrom: new Date(lumpSums.validFrom),
-            validUntil: lumpSums.validUntil === null ? null : new Date(lumpSums.validUntil)
+            validUntil: lumpSums.validUntil ? new Date(lumpSums.validUntil) : null
           }
           country.lumpSums.push(newLumpSum)
           await saveNewCountry(country)
