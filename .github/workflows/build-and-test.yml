@@ -22,5 +22,8 @@ jobs:
         run: docker compose up -d common db redis ldap inbucket
       - name: Run common tests
         run: docker compose run common npm run test
+        # ensures setup runs without error, prevents migration test from failing in next release
+      - name: Run backend setup
+        run: docker compose run backend npm run setup
       - name: Run backend tests
         run: docker compose run backend npm run test
