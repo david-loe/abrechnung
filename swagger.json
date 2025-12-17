@@ -10733,6 +10733,13 @@
 									"en"
 								]
 							},
+							"default": {
+								"type": "string",
+								"enum": [
+									"de",
+									"en"
+								]
+							},
 							"overwrite": {
 								"properties": {
 									"en": {
@@ -10751,13 +10758,6 @@
 									}
 								},
 								"type": "object"
-							},
-							"default": {
-								"type": "string",
-								"enum": [
-									"de",
-									"en"
-								]
 							}
 						},
 						"type": "object"
@@ -12575,7 +12575,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "2.3.2",
+		"version": "2.3.3",
 		"contact": {}
 	},
 	"paths": {
