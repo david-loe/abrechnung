@@ -1,5 +1,13 @@
 import { ConnectionSettings, DisplaySettings, PrinterSettings, Settings, TravelSettings } from 'abrechnung-common/types.js'
-import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getSettings, getTravelSettings } from '../db.js'
+
+export type CacheLoader<T> = (init?: boolean) => Promise<T>
+export type CacheLoaders = {
+  loadSettings: CacheLoader<Settings>
+  loadConnectionSettings: CacheLoader<ConnectionSettings>
+  loadDisplaySettings: CacheLoader<DisplaySettings>
+  loadPrinterSettings: CacheLoader<PrinterSettings>
+  loadTravelSettings: CacheLoader<TravelSettings>
+}
 
 export class CACHE {
   #settings: Settings
@@ -7,14 +15,17 @@ export class CACHE {
   #displaySettings: DisplaySettings
   #printerSettings: PrinterSettings
   #travelSettings: TravelSettings
+  #loaders: CacheLoaders
 
   constructor(
+    loaders: CacheLoaders,
     settings: Settings,
     connectionSettings: ConnectionSettings,
     displaySettings: DisplaySettings,
     printerSettings: PrinterSettings,
     travelSettings: TravelSettings
   ) {
+    this.#loaders = loaders
     this.#settings = settings
     this.#connectionSettings = connectionSettings
     this.#displaySettings = displaySettings
@@ -23,20 +34,21 @@ export class CACHE {
   }
 
   async reload() {
-    this.#settings = await getSettings(false)
-    this.#connectionSettings = await getConnectionSettings(false)
-    this.#displaySettings = await getDisplaySettings(false)
-    this.#printerSettings = await getPrinterSettings(false)
-    this.#travelSettings = await getTravelSettings(false)
+    this.#settings = await this.#loaders.loadSettings()
+    this.#connectionSettings = await this.#loaders.loadConnectionSettings()
+    this.#displaySettings = await this.#loaders.loadDisplaySettings()
+    this.#printerSettings = await this.#loaders.loadPrinterSettings()
+    this.#travelSettings = await this.#loaders.loadTravelSettings()
   }
 
-  static async create(init = true) {
+  static async create(loaders: CacheLoaders, init = true) {
     return new CACHE(
-      await getSettings(init),
-      await getConnectionSettings(init),
-      await getDisplaySettings(init),
-      await getPrinterSettings(init),
-      await getTravelSettings(init)
+      loaders,
+      await loaders.loadSettings(init),
+      await loaders.loadConnectionSettings(init),
+      await loaders.loadDisplaySettings(init),
+      await loaders.loadPrinterSettings(init),
+      await loaders.loadTravelSettings(init)
     )
   }
 
