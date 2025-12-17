@@ -17,6 +17,7 @@
     "express-session": "^1.18.2",
     "i18next": "^25.7.3",
     "isolated-vm": "^6.0.2",
+    "mongodb": "6.20.0",
     "mongoose": "^8.20.3",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.11",
