@@ -17,7 +17,7 @@ case "$(uname -s)" in
     ;;
 esac
 
-BIOME_VERSION="2.3.2"
+BIOME_VERSION="2.3.9"
 IMAGE_NAME="ghcr.io/biomejs/biome:${BIOME_VERSION}"
 
 # Run Docker
