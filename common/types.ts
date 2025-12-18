@@ -184,9 +184,9 @@ export type CountryCode = string
 
 export interface CountrySimple {
   _id: CountryCode
-  name: { de: string; en: string }
+  name: { [key in Locale]: string }
   needsA1Certificate?: boolean | null
-  alias?: { de: string[]; en?: string[] }
+  alias?: { [key in Locale]?: string[] }
   flag?: string | null
   currency?: CurrencyCode | null
 }
@@ -218,7 +218,7 @@ export interface ExchangeRate {
 export type CurrencyCode = string
 
 export interface Currency {
-  name: { de: string; en: string }
+  name: { [key in Locale]: string }
   _id: CurrencyCode
   subunit?: string | null
   symbol?: string | null
@@ -579,7 +579,7 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
-export const locales = ['de', 'en'] as const
+export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const
 export type Locale = (typeof locales)[number]
 
 export const anyStates = new Set([...travelStates, ...expenseReportStates, ...healthCareCostStates, ...advanceStates])
@@ -821,5 +821,11 @@ export const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/
 export const refStringRegex = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{3})+$/
 export const refStringRegexLax = /^[TEHA](-[0123456789ABCDEFGHJKMNPQRSTVWXYZILO]{3})+$/i
 
-export const baseCurrency: Currency = { _id: 'EUR', flag: '🇪🇺', name: { de: 'Euro', en: 'euro' }, subunit: 'Cent', symbol: '€' }
+export const baseCurrency: Currency = {
+  _id: 'EUR',
+  name: { de: 'Euro', en: 'euro', fr: 'euro', es: 'euro', ru: 'евро', kk: 'Еуро' },
+  subunit: 'Cent',
+  symbol: '€',
+  flag: '🇪🇺'
+}
 export const defaultLocale: Locale = 'de'

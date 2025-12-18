@@ -1,13 +1,20 @@
-import { Country } from 'abrechnung-common/types.js'
+import { Country, Locale, locales } from 'abrechnung-common/types.js'
 import { model, Schema } from 'mongoose'
 
-export const countrySchema = () =>
-  new Schema<Country>({
+export const countrySchema = () => {
+  const names = {} as { [key in Locale]: { type: StringConstructor; required: true; trim: true; label: string } }
+  const aliases = {} as { [key in Locale]: { type: { type: StringConstructor; trim: true }[]; label: string } }
+  for (const locale of locales) {
+    names[locale] = { type: String, required: true, trim: true, label: `languages.${locale}` }
+    aliases[locale] = { type: [{ type: String, trim: true }], label: `languages.${locale}` }
+  }
+
+  return new Schema<Country>({
     _id: { type: String, required: true, trim: true, alias: 'code', label: 'labels.code' },
     flag: { type: String },
-    name: { type: { de: { type: String, required: true, trim: true }, en: { type: String, required: true, trim: true } }, required: true },
+    name: { type: names, required: true },
     needsA1Certificate: { type: Boolean },
-    alias: { type: { de: { type: [{ type: String, trim: true }] }, en: { type: [{ type: String, trim: true }] } } },
+    alias: { type: aliases },
     lumpSumsFrom: { type: String, ref: 'Country', trim: true },
     currency: { type: String, ref: 'Currency' },
     lumpSums: {
@@ -36,5 +43,6 @@ export const countrySchema = () =>
       ]
     }
   })
+}
 
 export default model('Country', countrySchema())

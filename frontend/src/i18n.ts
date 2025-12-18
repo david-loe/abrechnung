@@ -1,9 +1,6 @@
-import de from 'abrechnung-common/locales/de.json' with { type: 'json' }
-import en from 'abrechnung-common/locales/en.json' with { type: 'json' }
+import { loadLocales } from 'abrechnung-common/locales/load.js'
 import { defaultLocale, Locale, locales } from 'abrechnung-common/types.js'
 import { createI18n, DefaultLocaleMessageSchema, I18n } from 'vue-i18n'
-
-const defaultMessages = { de, en }
 
 export function getLanguageFromNavigator() {
   // language code without region
@@ -20,6 +17,6 @@ export default createI18n<DefaultLocaleMessageSchema, Locale, false>({
   legacy: false,
   locale: getLanguageFromNavigator(),
   fallbackLocale: defaultLocale,
-  messages: defaultMessages,
+  messages: loadLocales(),
   globalInjection: true
 }) as I18n<{}, {}, {}, Locale, false>

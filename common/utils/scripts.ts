@@ -84,6 +84,17 @@ export function getFlagEmoji(countryCode: string): string | null {
   return String.fromCodePoint(...codePoints)
 }
 
+export function getFlagEmojiFromLocale(locale: Locale): string | null {
+  switch (locale) {
+    case 'en':
+      return '🇬🇧'
+    case 'kk':
+      return '🇰🇿'
+    default:
+      return getFlagEmoji(locale)
+  }
+}
+
 export function isValidDate(date: Date | string | number): Date | null {
   if (date === null) {
     return null

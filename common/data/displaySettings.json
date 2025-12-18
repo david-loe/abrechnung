@@ -14,7 +14,11 @@
     "fallback": "de",
     "overwrite": {
       "de": {},
-      "en": {}
+      "en": {},
+      "fr": {},
+      "ru": {},
+      "es": {},
+      "kk": {}
     }
   },
   "nameDisplayFormat": "givenNameFirst",

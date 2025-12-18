@@ -32,7 +32,7 @@ import {
 
 type Id = string
 
-const DE: CountrySimple = { _id: 'DE', name: { de: 'Deutschland', en: 'Germany' }, flag: '🇩🇪' }
+const DE: CountrySimple = { _id: 'DE', name: { de: 'Deutschland', en: 'Germany', fr: '', es: '', ru: '', kk: '' }, flag: '🇩🇪' }
 
 const place: Place = { place: 'Berlin', country: DE }
 

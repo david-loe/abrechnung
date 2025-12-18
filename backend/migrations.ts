@@ -1,3 +1,5 @@
+import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
+import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
 import { PrinterSettings } from 'abrechnung-common/types.js'
 import { detectImageType } from 'abrechnung-common/utils/file.js'
 import mongoose, { Types } from 'mongoose'
@@ -398,6 +400,23 @@ export async function checkForMigrations() {
       logger.info('Apply migration from v2.3.2: refill lumpSums with validUntil')
       await mongoose.connection.collection('countries').updateMany({}, { $set: { lumpSums: [] } })
       await fetchAndUpdateLumpSums()
+    }
+    if (semver.lte(migrateFrom, '2.3.3')) {
+      logger.info('Apply migration from v2.3.3: update country and currency names')
+
+      const countryCol = mongoose.connection.collection<{ name: { [key: string]: string }; _id: string }>('countries')
+      const countryBatch = []
+      for (const country of countries) {
+        countryBatch.push({ updateOne: { filter: { _id: country.code }, update: { $set: { name: country.name } } } })
+      }
+      await countryCol.bulkWrite(countryBatch)
+
+      const currencyCol = mongoose.connection.collection<{ name: { [key: string]: string }; _id: string }>('currencies')
+      const currencyBatch = []
+      for (const currency of currencies) {
+        currencyBatch.push({ updateOne: { filter: { _id: currency.code }, update: { $set: { name: currency.name } } } })
+      }
+      await currencyCol.bulkWrite(currencyBatch)
     }
 
     settings.migrateFrom = undefined

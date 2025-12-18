@@ -13,7 +13,7 @@ export const connectionSettingsSchema = () =>
     PDFReportsViaEmail: {
       type: {
         sendPDFReportsToOrganisationEmail: { type: Boolean, default: false, required: true },
-        locale: { type: String, enum: locales, required: true, default: defaultLocale }
+        locale: { type: String, enum: locales, required: true, default: defaultLocale, translationPrefix: 'languages.' }
       },
       required: true,
       default: () => ({}),
