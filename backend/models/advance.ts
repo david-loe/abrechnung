@@ -24,8 +24,9 @@ interface Methods {
   addComment(): void
   offset(
     reportTotal: number,
-    reportModelName: ReportModelNameWithoutAdvance,
+    reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
     reportId: Types.ObjectId | null,
+    subject: string,
     session?: mongoose.ClientSession | null
   ): Promise<number>
 }
@@ -42,8 +43,10 @@ const advanceSchema = () =>
       offsetAgainst: {
         type: [
           {
-            type: { type: String, enum: reportModelNamesWithoutAdvance, required: true },
+            type: { type: String, enum: [...reportModelNamesWithoutAdvance, 'offsetEntry'], required: true },
             report: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
+            reportName: { type: String },
+            subject: { type: String },
             amount: { type: Number, min: 0, required: true }
           }
         ]
@@ -57,7 +60,6 @@ const schema = advanceSchema()
 
 const populates = {
   budget: [{ path: 'budget.currency' }],
-  offsetAgainst: [{ path: 'offsetAgainst.report', select: { name: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -119,8 +121,9 @@ interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 schema.methods.offset = async function (
   this: AdvanceBaseDoc,
   reportTotal: number,
-  reportModelName: ReportModelNameWithoutAdvance,
+  reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
   reportId: Types.ObjectId | null,
+  subject: string,
   session: mongoose.ClientSession | null = null
 ) {
   if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal <= 0) {
@@ -130,7 +133,7 @@ schema.methods.offset = async function (
   if (!doc) {
     return reportTotal
   }
-  if (reportId && doc.offsetAgainst.some((o) => o.report?._id.equals(reportId))) {
+  if (reportId && doc.offsetAgainst.some((o) => o.reportId?.equals(reportId))) {
     throw new Error('This report has already been used to offset this advance')
   }
   let amount = reportTotal
@@ -143,7 +146,7 @@ schema.methods.offset = async function (
     doc.balance.amount = -difference
     difference = 0
   }
-  doc.offsetAgainst.push({ type: reportModelName, report: reportId as unknown as { _id: Types.ObjectId; name: string }, amount })
+  doc.offsetAgainst.push({ type: reportModelName, reportId, subject, amount })
   doc.markModified('offsetAgainst')
   await doc.save({ session })
   await recalcAllAssociatedReports(doc._id, session)

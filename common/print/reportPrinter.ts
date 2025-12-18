@@ -622,19 +622,14 @@ class ReportPrint<idType extends _id> {
       return options.yStart
     }
     const columns: Column[] = []
-    columns.push({
-      key: 'report',
-      width: 280,
-      alignment: TextAlignment.Left,
-      title: this.t('labels.name'),
-      fn: (r: { name: string } | null) => r?.name ?? ''
-    })
+    columns.push({ key: 'subject', width: 280, alignment: TextAlignment.Left, title: this.t('labels.subject') })
     columns.push({
       key: 'type',
       width: 105,
       alignment: TextAlignment.Left,
       title: this.t('labels.type'),
-      fn: (t: ReportModelNameWithoutAdvance) => this.t(`labels.${getReportTypeFromModelName(t)}`)
+      fn: (t: ReportModelNameWithoutAdvance | 'offsetEntry') =>
+        t === 'offsetEntry' ? this.t('labels.offsetEntry') : this.t(`labels.${getReportTypeFromModelName(t)}`)
     })
     columns.push({
       key: 'amount',
