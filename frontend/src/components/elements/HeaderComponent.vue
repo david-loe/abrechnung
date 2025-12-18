@@ -20,8 +20,8 @@
               style="max-width: 68px"
               :value="props.language"
               @change="(e) => emits('update:language', (e.target as HTMLSelectElement).value as Locale)">
-              <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('labels.' + lang)">
-                {{ lang !== 'en' ? getFlagEmoji(lang) : '🇬🇧' }}
+              <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('languages.' + lang)">
+                {{  getFlagEmojiFromLocale(lang) }}
               </option>
             </select>
           </li>
@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { Locale, locales } from 'abrechnung-common/types.js'
-import { getFlagEmoji } from 'abrechnung-common/utils/scripts.js'
+import { getFlagEmojiFromLocale } from 'abrechnung-common/utils/scripts.js'
 import { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 

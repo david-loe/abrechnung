@@ -251,7 +251,6 @@
     "days": "Días",
     "dbTotalSize": "Tamaño total de la base de datos",
     "dbUsage": "Uso de la base de datos",
-    "de": "Alemán 🇩🇪",
     "default": "Por defecto",
     "defaultAccess": "Acceso por defecto",
     "delete": "Eliminar",
@@ -281,7 +280,6 @@
     "editor": "Editor",
     "editX": "Editar {X}",
     "email": "Dirección de correo electrónico",
-    "en": "Inglés 🇬🇧",
     "enabled": "Activado",
     "endDate": "Fecha de finalización",
     "endLocation": "Hacia",
@@ -509,6 +507,14 @@
     "white": "Blanco",
     "width": "Ancho",
     "XDetails": "Detalles de {X}"
+  },
+  "languages": {
+    "de": "Alemán 🇩🇪",
+    "en": "Inglés 🇬🇧",
+    "es": "Español 🇪🇸",
+    "fr": "Francés 🇫🇷",
+    "kk": "Kazajo 🇰🇿",
+    "ru": "Ruso 🇷🇺"
   },
   "login": {
     "signIn": "Por favor inicie sesión"

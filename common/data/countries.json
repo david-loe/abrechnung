@@ -2,7 +2,11 @@
   {
     "name": {
       "de": "Andorra",
-      "en": "Andorra"
+      "en": "Andorra",
+      "fr": "Andorre",
+      "es": "Andorra",
+      "ru": "Андорра",
+      "kk": "Андорра"
     },
     "code": "AD",
     "currency": "EUR",
@@ -11,7 +15,11 @@
   {
     "name": {
       "de": "Vereinigte Arabische Emirate",
-      "en": "United Arab Emirates"
+      "en": "United Arab Emirates",
+      "fr": "Émirats arabes unis",
+      "es": "Emiratos Árabes Unidos",
+      "ru": "ОАЭ",
+      "kk": "Біріккен Араб Әмірліктері"
     },
     "code": "AE",
     "currency": "AED",
@@ -20,7 +28,11 @@
   {
     "name": {
       "de": "Afghanistan",
-      "en": "Afghanistan"
+      "en": "Afghanistan",
+      "fr": "Afghanistan",
+      "es": "Afganistán",
+      "ru": "Афганистан",
+      "kk": "Ауғанстан"
     },
     "code": "AF",
     "currency": "AFN",
@@ -29,7 +41,11 @@
   {
     "name": {
       "de": "Antigua und Barbuda",
-      "en": "Antigua and Barbuda"
+      "en": "Antigua and Barbuda",
+      "fr": "Antigua-et-Barbuda",
+      "es": "Antigua y Barbuda",
+      "ru": "Антигуа и Барбуда",
+      "kk": "Антигуа және Барбуда"
     },
     "code": "AG",
     "currency": "XCD",
@@ -39,7 +55,11 @@
   {
     "name": {
       "de": "Anguilla",
-      "en": "Anguilla"
+      "en": "Anguilla",
+      "fr": "Anguilla",
+      "es": "Anguila",
+      "ru": "Ангилья",
+      "kk": "Ангилья"
     },
     "code": "AI",
     "currency": "XCD",
@@ -49,7 +69,11 @@
   {
     "name": {
       "de": "Albanien",
-      "en": "Albania"
+      "en": "Albania",
+      "fr": "Albanie",
+      "es": "Albania",
+      "ru": "Албания",
+      "kk": "Албания"
     },
     "code": "AL",
     "currency": "ALL",
@@ -58,7 +82,11 @@
   {
     "name": {
       "de": "Armenien",
-      "en": "Armenia"
+      "en": "Armenia",
+      "fr": "Arménie",
+      "es": "Armenia",
+      "ru": "Армения",
+      "kk": "Армения"
     },
     "code": "AM",
     "currency": "AMD",
@@ -67,7 +95,11 @@
   {
     "name": {
       "de": "Angola",
-      "en": "Angola"
+      "en": "Angola",
+      "fr": "Angola",
+      "es": "Angola",
+      "ru": "Ангола",
+      "kk": "Ангола"
     },
     "code": "AO",
     "currency": "AOA",
@@ -76,7 +108,11 @@
   {
     "name": {
       "de": "Argentinien",
-      "en": "Argentina"
+      "en": "Argentina",
+      "fr": "Argentine",
+      "es": "Argentina",
+      "ru": "Аргентина",
+      "kk": "Аргентина"
     },
     "code": "AR",
     "currency": "ARS",
@@ -85,7 +121,11 @@
   {
     "name": {
       "de": "Amerikanisch-Samoa",
-      "en": "American Samoa"
+      "en": "American Samoa",
+      "fr": "Samoa américaines",
+      "es": "Samoa Americana",
+      "ru": "Американское Самоа",
+      "kk": "Америкалық Самоа"
     },
     "code": "AS",
     "currency": "USD",
@@ -95,7 +135,11 @@
   {
     "name": {
       "de": "Österreich",
-      "en": "Austria"
+      "en": "Austria",
+      "fr": "Autriche",
+      "es": "Austria",
+      "ru": "Австрия",
+      "kk": "Австрия"
     },
     "code": "AT",
     "currency": "EUR",
@@ -105,7 +149,11 @@
   {
     "name": {
       "de": "Australien",
-      "en": "Australia"
+      "en": "Australia",
+      "fr": "Australie",
+      "es": "Australia",
+      "ru": "Австралия",
+      "kk": "Австралия"
     },
     "code": "AU",
     "currency": "AUD",
@@ -114,7 +162,11 @@
   {
     "name": {
       "de": "Aruba",
-      "en": "Aruba"
+      "en": "Aruba",
+      "fr": "Aruba",
+      "es": "Aruba",
+      "ru": "Аруба",
+      "kk": "Аруба"
     },
     "code": "AW",
     "currency": "AWG",
@@ -124,7 +176,11 @@
   {
     "name": {
       "de": "Ålandinseln",
-      "en": "Åland Islands"
+      "en": "Åland Islands",
+      "fr": "Îles Åland",
+      "es": "Islas Åland",
+      "ru": "Аландские о-ва",
+      "kk": "Аланд аралдары"
     },
     "code": "AX",
     "currency": "EUR",
@@ -133,7 +189,11 @@
   {
     "name": {
       "de": "Aserbaidschan",
-      "en": "Azerbaijan"
+      "en": "Azerbaijan",
+      "fr": "Azerbaïdjan",
+      "es": "Azerbaiyán",
+      "ru": "Азербайджан",
+      "kk": "Әзірбайжан"
     },
     "code": "AZ",
     "currency": "AZN",
@@ -142,7 +202,11 @@
   {
     "name": {
       "de": "Bosnien und Herzegowina",
-      "en": "Bosnia and Herzegovina"
+      "en": "Bosnia and Herzegovina",
+      "fr": "Bosnie-Herzégovine",
+      "es": "Bosnia y Herzegovina",
+      "ru": "Босния и Герцеговина",
+      "kk": "Босния және Герцеговина"
     },
     "code": "BA",
     "currency": "BAM",
@@ -151,7 +215,11 @@
   {
     "name": {
       "de": "Barbados",
-      "en": "Barbados"
+      "en": "Barbados",
+      "fr": "Barbade",
+      "es": "Barbados",
+      "ru": "Барбадос",
+      "kk": "Барбадос"
     },
     "code": "BB",
     "currency": "BBD",
@@ -160,7 +228,11 @@
   {
     "name": {
       "de": "Bangladesch",
-      "en": "Bangladesh"
+      "en": "Bangladesh",
+      "fr": "Bangladesh",
+      "es": "Bangladés",
+      "ru": "Бангладеш",
+      "kk": "Бангладеш"
     },
     "code": "BD",
     "currency": "BDT",
@@ -169,7 +241,11 @@
   {
     "name": {
       "de": "Belgien",
-      "en": "Belgium"
+      "en": "Belgium",
+      "fr": "Belgique",
+      "es": "Bélgica",
+      "ru": "Бельгия",
+      "kk": "Бельгия"
     },
     "code": "BE",
     "currency": "EUR",
@@ -179,7 +255,11 @@
   {
     "name": {
       "de": "Burkina Faso",
-      "en": "Burkina Faso"
+      "en": "Burkina Faso",
+      "fr": "Burkina Faso",
+      "es": "Burkina Faso",
+      "ru": "Буркина-Фасо",
+      "kk": "Буркина-Фасо"
     },
     "code": "BF",
     "currency": "XOF",
@@ -188,7 +268,11 @@
   {
     "name": {
       "de": "Bulgarien",
-      "en": "Bulgaria"
+      "en": "Bulgaria",
+      "fr": "Bulgarie",
+      "es": "Bulgaria",
+      "ru": "Болгария",
+      "kk": "Болгария"
     },
     "code": "BG",
     "currency": "BGN",
@@ -198,7 +282,11 @@
   {
     "name": {
       "de": "Bahrain",
-      "en": "Bahrain"
+      "en": "Bahrain",
+      "fr": "Bahreïn",
+      "es": "Baréin",
+      "ru": "Бахрейн",
+      "kk": "Бахрейн"
     },
     "code": "BH",
     "currency": "BHD",
@@ -207,7 +295,11 @@
   {
     "name": {
       "de": "Burundi",
-      "en": "Burundi"
+      "en": "Burundi",
+      "fr": "Burundi",
+      "es": "Burundi",
+      "ru": "Бурунди",
+      "kk": "Бурунди"
     },
     "code": "BI",
     "currency": "BIF",
@@ -216,7 +308,11 @@
   {
     "name": {
       "de": "Benin",
-      "en": "Benin"
+      "en": "Benin",
+      "fr": "Bénin",
+      "es": "Benín",
+      "ru": "Бенин",
+      "kk": "Бенин"
     },
     "code": "BJ",
     "currency": "XOF",
@@ -225,7 +321,11 @@
   {
     "name": {
       "de": "St. Barthélemy",
-      "en": "Saint Barthélemy"
+      "en": "Saint Barthélemy",
+      "fr": "Saint-Barthélemy",
+      "es": "San Bartolomé",
+      "ru": "Сен-Бартелеми",
+      "kk": "Сен-Бартелеми"
     },
     "code": "BL",
     "currency": "EUR",
@@ -235,7 +335,11 @@
   {
     "name": {
       "de": "Bermuda",
-      "en": "Bermuda"
+      "en": "Bermuda",
+      "fr": "Bermudes",
+      "es": "Bermudas",
+      "ru": "Бермудские о-ва",
+      "kk": "Бермуд аралдары"
     },
     "code": "BM",
     "currency": "BMD",
@@ -245,7 +349,11 @@
   {
     "name": {
       "de": "Brunei",
-      "en": "Brunei"
+      "en": "Brunei",
+      "fr": "Brunéi Darussalam",
+      "es": "Brunéi",
+      "ru": "Бруней-Даруссалам",
+      "kk": "Бруней"
     },
     "code": "BN",
     "currency": "BND",
@@ -254,7 +362,11 @@
   {
     "name": {
       "de": "Bolivien",
-      "en": "Bolivia"
+      "en": "Bolivia",
+      "fr": "Bolivie",
+      "es": "Bolivia",
+      "ru": "Боливия",
+      "kk": "Боливия"
     },
     "code": "BO",
     "currency": "BOB",
@@ -263,7 +375,11 @@
   {
     "name": {
       "de": "Brasilien",
-      "en": "Brazil"
+      "en": "Brazil",
+      "fr": "Brésil",
+      "es": "Brasil",
+      "ru": "Бразилия",
+      "kk": "Бразилия"
     },
     "code": "BR",
     "currency": "BRL",
@@ -272,7 +388,11 @@
   {
     "name": {
       "de": "Bahamas",
-      "en": "Bahamas"
+      "en": "Bahamas",
+      "fr": "Bahamas",
+      "es": "Bahamas",
+      "ru": "Багамы",
+      "kk": "Багам аралдары"
     },
     "code": "BS",
     "currency": "BSD",
@@ -281,7 +401,11 @@
   {
     "name": {
       "de": "Bhutan",
-      "en": "Bhutan"
+      "en": "Bhutan",
+      "fr": "Bhoutan",
+      "es": "Bután",
+      "ru": "Бутан",
+      "kk": "Бутан"
     },
     "code": "BT",
     "currency": "BTN",
@@ -290,7 +414,11 @@
   {
     "name": {
       "de": "Bouvetinsel",
-      "en": "Bouvet Island"
+      "en": "Bouvet Island",
+      "fr": "Île Bouvet",
+      "es": "Isla Bouvet",
+      "ru": "о-в Буве",
+      "kk": "Буве аралы"
     },
     "code": "BV",
     "lumpSumsFrom": "NO",
@@ -299,7 +427,11 @@
   {
     "name": {
       "de": "Botsuana",
-      "en": "Botswana"
+      "en": "Botswana",
+      "fr": "Botswana",
+      "es": "Botsuana",
+      "ru": "Ботсвана",
+      "kk": "Ботсвана"
     },
     "code": "BW",
     "currency": "BWP",
@@ -308,7 +440,11 @@
   {
     "name": {
       "de": "Belarus",
-      "en": "Belarus"
+      "en": "Belarus",
+      "fr": "Biélorussie",
+      "es": "Bielorrusia",
+      "ru": "Беларусь",
+      "kk": "Беларусь"
     },
     "alias": {
       "de": ["Weißrussland"]
@@ -320,7 +456,11 @@
   {
     "name": {
       "de": "Belize",
-      "en": "Belize"
+      "en": "Belize",
+      "fr": "Belize",
+      "es": "Belice",
+      "ru": "Белиз",
+      "kk": "Белиз"
     },
     "code": "BZ",
     "currency": "BZD",
@@ -329,7 +469,11 @@
   {
     "name": {
       "de": "Kanada",
-      "en": "Canada"
+      "en": "Canada",
+      "fr": "Canada",
+      "es": "Canadá",
+      "ru": "Канада",
+      "kk": "Канада"
     },
     "code": "CA",
     "currency": "CAD",
@@ -338,7 +482,11 @@
   {
     "name": {
       "de": "Kokosinseln",
-      "en": "Cocos Islands"
+      "en": "Cocos Islands",
+      "fr": "Îles Cocos",
+      "es": "Islas Cocos",
+      "ru": "Кокосовые о-ва",
+      "kk": "Кокос (Килинг) аралдары"
     },
     "code": "CC",
     "currency": "AUD",
@@ -348,7 +496,11 @@
   {
     "name": {
       "de": "Demokratische Republik Kongo",
-      "en": "Democratic Republic of the Congo"
+      "en": "Democratic Republic of the Congo",
+      "fr": "Congo-Kinshasa",
+      "es": "República Democrática del Congo",
+      "ru": "Конго - Киншаса",
+      "kk": "Конго"
     },
     "alias": {
       "de": ["Kongo, Demokratische Republik"]
@@ -360,7 +512,11 @@
   {
     "name": {
       "de": "Zentralafrikanische Republik",
-      "en": "Central African Republic"
+      "en": "Central African Republic",
+      "fr": "République centrafricaine",
+      "es": "República Centroafricana",
+      "ru": "Центрально-Африканская Республика",
+      "kk": "Орталық Африка Республикасы"
     },
     "code": "CF",
     "currency": "XAF",
@@ -369,7 +525,11 @@
   {
     "name": {
       "de": "Kongo",
-      "en": "Congo"
+      "en": "Congo",
+      "fr": "Congo-Brazzaville",
+      "es": "Congo",
+      "ru": "Конго - Браззавиль",
+      "kk": "Конго-Браззавиль Республикасы"
     },
     "alias": {
       "de": ["Kongo, Republik"]
@@ -381,7 +541,11 @@
   {
     "name": {
       "de": "Schweiz",
-      "en": "Switzerland"
+      "en": "Switzerland",
+      "fr": "Suisse",
+      "es": "Suiza",
+      "ru": "Швейцария",
+      "kk": "Швейцария"
     },
     "code": "CH",
     "currency": "CHF",
@@ -391,7 +555,11 @@
   {
     "name": {
       "de": "Côte d’Ivoire",
-      "en": "Côte d’Ivoire"
+      "en": "Côte d’Ivoire",
+      "fr": "Côte d’Ivoire",
+      "es": "Côte d’Ivoire",
+      "ru": "Кот-д’Ивуар",
+      "kk": "Кот-д’Ивуар"
     },
     "alias": {
       "de": ["Elfenbeinküste"]
@@ -403,7 +571,11 @@
   {
     "name": {
       "de": "Cookinseln",
-      "en": "Cook Islands"
+      "en": "Cook Islands",
+      "fr": "Îles Cook",
+      "es": "Islas Cook",
+      "ru": "Острова Кука",
+      "kk": "Кук аралдары"
     },
     "code": "CK",
     "currency": "NZD",
@@ -412,7 +584,11 @@
   {
     "name": {
       "de": "Chile",
-      "en": "Chile"
+      "en": "Chile",
+      "fr": "Chili",
+      "es": "Chile",
+      "ru": "Чили",
+      "kk": "Чили"
     },
     "code": "CL",
     "currency": "CLP",
@@ -421,7 +597,11 @@
   {
     "name": {
       "de": "Kamerun",
-      "en": "Cameroon"
+      "en": "Cameroon",
+      "fr": "Cameroun",
+      "es": "Camerún",
+      "ru": "Камерун",
+      "kk": "Камерун"
     },
     "code": "CM",
     "currency": "XAF",
@@ -430,7 +610,11 @@
   {
     "name": {
       "de": "China",
-      "en": "China"
+      "en": "China",
+      "fr": "Chine",
+      "es": "China",
+      "ru": "Китай",
+      "kk": "Қытай"
     },
     "code": "CN",
     "currency": "CNY",
@@ -439,7 +623,11 @@
   {
     "name": {
       "de": "Kolumbien",
-      "en": "Colombia"
+      "en": "Colombia",
+      "fr": "Colombie",
+      "es": "Colombia",
+      "ru": "Колумбия",
+      "kk": "Колумбия"
     },
     "code": "CO",
     "currency": "COP",
@@ -448,7 +636,11 @@
   {
     "name": {
       "de": "Clipperton",
-      "en": "Clipperton"
+      "en": "Clipperton",
+      "fr": "Île Clipperton",
+      "es": "Isla Clipperton",
+      "ru": "о-в Клиппертон",
+      "kk": "Клиппертон аралы"
     },
     "code": "CP",
     "lumpSumsFrom": "FR",
@@ -457,7 +649,11 @@
   {
     "name": {
       "de": "Costa Rica",
-      "en": "Costa Rica"
+      "en": "Costa Rica",
+      "fr": "Costa Rica",
+      "es": "Costa Rica",
+      "ru": "Коста-Рика",
+      "kk": "Коста-Рика"
     },
     "code": "CR",
     "currency": "CRC",
@@ -466,7 +662,11 @@
   {
     "name": {
       "de": "Kuba",
-      "en": "Cuba"
+      "en": "Cuba",
+      "fr": "Cuba",
+      "es": "Cuba",
+      "ru": "Куба",
+      "kk": "Куба"
     },
     "code": "CU",
     "currency": "CUP",
@@ -475,7 +675,11 @@
   {
     "name": {
       "de": "Cabo Verde",
-      "en": "Cabo Verde"
+      "en": "Cabo Verde",
+      "fr": "Cap-Vert",
+      "es": "Cabo Verde",
+      "ru": "Кабо-Верде",
+      "kk": "Кабо-Верде"
     },
     "alias": {
       "de": ["Kap Verde"]
@@ -487,7 +691,11 @@
   {
     "name": {
       "de": "Curaçao",
-      "en": "Curaçao"
+      "en": "Curaçao",
+      "fr": "Curaçao",
+      "es": "Curazao",
+      "ru": "Кюрасао",
+      "kk": "Кюрасао"
     },
     "code": "CW",
     "currency": "ANG",
@@ -497,7 +705,11 @@
   {
     "name": {
       "de": "Weihnachtsinsel",
-      "en": "Christmas Island"
+      "en": "Christmas Island",
+      "fr": "Île Christmas",
+      "es": "Isla de Navidad",
+      "ru": "о-в Рождества",
+      "kk": "Рождество аралы"
     },
     "code": "CX",
     "currency": "AUD",
@@ -507,7 +719,11 @@
   {
     "name": {
       "de": "Zypern",
-      "en": "Cyprus"
+      "en": "Cyprus",
+      "fr": "Chypre",
+      "es": "Chipre",
+      "ru": "Кипр",
+      "kk": "Кипр"
     },
     "code": "CY",
     "currency": "EUR",
@@ -517,7 +733,11 @@
   {
     "name": {
       "de": "Tschechien",
-      "en": "Czechia"
+      "en": "Czechia",
+      "fr": "Tchéquie",
+      "es": "Chequia",
+      "ru": "Чехия",
+      "kk": "Чехия"
     },
     "alias": {
       "de": ["Tschechische Republik"]
@@ -530,7 +750,11 @@
   {
     "name": {
       "de": "Deutschland",
-      "en": "Germany"
+      "en": "Germany",
+      "fr": "Allemagne",
+      "es": "Alemania",
+      "ru": "Германия",
+      "kk": "Германия"
     },
     "code": "DE",
     "currency": "EUR",
@@ -539,7 +763,11 @@
   {
     "name": {
       "de": "Dschibuti",
-      "en": "Djibouti"
+      "en": "Djibouti",
+      "fr": "Djibouti",
+      "es": "Yibuti",
+      "ru": "Джибути",
+      "kk": "Джибути"
     },
     "code": "DJ",
     "currency": "DJF",
@@ -548,7 +776,11 @@
   {
     "name": {
       "de": "Dänemark",
-      "en": "Denmark"
+      "en": "Denmark",
+      "fr": "Danemark",
+      "es": "Dinamarca",
+      "ru": "Дания",
+      "kk": "Дания"
     },
     "code": "DK",
     "currency": "DKK",
@@ -558,7 +790,11 @@
   {
     "name": {
       "de": "Dominica",
-      "en": "Dominica"
+      "en": "Dominica",
+      "fr": "Dominique",
+      "es": "Dominica",
+      "ru": "Доминика",
+      "kk": "Доминика"
     },
     "code": "DM",
     "currency": "XCD",
@@ -568,7 +804,11 @@
   {
     "name": {
       "de": "Dominikanische Republik",
-      "en": "Dominican Republic"
+      "en": "Dominican Republic",
+      "fr": "République dominicaine",
+      "es": "República Dominicana",
+      "ru": "Доминиканская Республика",
+      "kk": "Доминикан Республикасы"
     },
     "code": "DO",
     "currency": "DOP",
@@ -577,7 +817,11 @@
   {
     "name": {
       "de": "Algerien",
-      "en": "Algeria"
+      "en": "Algeria",
+      "fr": "Algérie",
+      "es": "Argelia",
+      "ru": "Алжир",
+      "kk": "Алжир"
     },
     "code": "DZ",
     "currency": "DZD",
@@ -586,7 +830,11 @@
   {
     "name": {
       "de": "Ecuador",
-      "en": "Ecuador"
+      "en": "Ecuador",
+      "fr": "Équateur",
+      "es": "Ecuador",
+      "ru": "Эквадор",
+      "kk": "Эквадор"
     },
     "code": "EC",
     "currency": "USD",
@@ -595,7 +843,11 @@
   {
     "name": {
       "de": "Estland",
-      "en": "Estonia"
+      "en": "Estonia",
+      "fr": "Estonie",
+      "es": "Estonia",
+      "ru": "Эстония",
+      "kk": "Эстония"
     },
     "code": "EE",
     "currency": "EUR",
@@ -605,7 +857,11 @@
   {
     "name": {
       "de": "Ägypten",
-      "en": "Egypt"
+      "en": "Egypt",
+      "fr": "Égypte",
+      "es": "Egipto",
+      "ru": "Египет",
+      "kk": "Мысыр"
     },
     "code": "EG",
     "currency": "EGP",
@@ -614,7 +870,11 @@
   {
     "name": {
       "de": "Westsahara",
-      "en": "Western Sahara"
+      "en": "Western Sahara",
+      "fr": "Sahara occidental",
+      "es": "Sáhara Occidental",
+      "ru": "Западная Сахара",
+      "kk": "Батыс Сахара"
     },
     "code": "EH",
     "currency": "MAD",
@@ -623,7 +883,11 @@
   {
     "name": {
       "de": "Griechenland",
-      "en": "Greece"
+      "en": "Greece",
+      "fr": "Grèce",
+      "es": "Grecia",
+      "ru": "Греция",
+      "kk": "Грекия"
     },
     "code": "GR",
     "currency": "EUR",
@@ -633,7 +897,11 @@
   {
     "name": {
       "de": "Eritrea",
-      "en": "Eritrea"
+      "en": "Eritrea",
+      "fr": "Érythrée",
+      "es": "Eritrea",
+      "ru": "Эритрея",
+      "kk": "Эритрея"
     },
     "code": "ER",
     "currency": "ERN",
@@ -642,7 +910,11 @@
   {
     "name": {
       "de": "Spanien",
-      "en": "Spain"
+      "en": "Spain",
+      "fr": "Espagne",
+      "es": "España",
+      "ru": "Испания",
+      "kk": "Испания"
     },
     "code": "ES",
     "currency": "EUR",
@@ -652,7 +924,11 @@
   {
     "name": {
       "de": "Äthiopien",
-      "en": "Ethiopia"
+      "en": "Ethiopia",
+      "fr": "Éthiopie",
+      "es": "Etiopía",
+      "ru": "Эфиопия",
+      "kk": "Эфиопия"
     },
     "code": "ET",
     "currency": "ETB",
@@ -661,7 +937,11 @@
   {
     "name": {
       "de": "Finnland",
-      "en": "Finland"
+      "en": "Finland",
+      "fr": "Finlande",
+      "es": "Finlandia",
+      "ru": "Финляндия",
+      "kk": "Финляндия"
     },
     "code": "FI",
     "currency": "EUR",
@@ -671,7 +951,11 @@
   {
     "name": {
       "de": "Fidschi",
-      "en": "Fiji"
+      "en": "Fiji",
+      "fr": "Fidji",
+      "es": "Fiyi",
+      "ru": "Фиджи",
+      "kk": "Фиджи"
     },
     "code": "FJ",
     "currency": "FJD",
@@ -680,7 +964,11 @@
   {
     "name": {
       "de": "Falklandinseln",
-      "en": "Falkland Islands"
+      "en": "Falkland Islands",
+      "fr": "Îles Malouines",
+      "es": "Islas Malvinas",
+      "ru": "Фолклендские о-ва",
+      "kk": "Фолкленд аралдары"
     },
     "code": "FK",
     "currency": "FKP",
@@ -690,7 +978,11 @@
   {
     "name": {
       "de": "Mikronesien",
-      "en": "Micronesia"
+      "en": "Micronesia",
+      "fr": "États fédérés de Micronésie",
+      "es": "Micronesia",
+      "ru": "Федеративные Штаты Микронезии",
+      "kk": "Микронезия"
     },
     "code": "FM",
     "currency": "USD",
@@ -700,7 +992,11 @@
   {
     "name": {
       "de": "Färöer",
-      "en": "Faroes"
+      "en": "Faroes",
+      "fr": "Îles Féroé",
+      "es": "Islas Feroe",
+      "ru": "Фарерские о-ва",
+      "kk": "Фарер аралдары"
     },
     "code": "FO",
     "currency": "DKK",
@@ -710,7 +1006,11 @@
   {
     "name": {
       "de": "Frankreich",
-      "en": "France"
+      "en": "France",
+      "fr": "France",
+      "es": "Francia",
+      "ru": "Франция",
+      "kk": "Франция"
     },
     "code": "FR",
     "currency": "EUR",
@@ -720,7 +1020,11 @@
   {
     "name": {
       "de": "Gabun",
-      "en": "Gabon"
+      "en": "Gabon",
+      "fr": "Gabon",
+      "es": "Gabón",
+      "ru": "Габон",
+      "kk": "Габон"
     },
     "code": "GA",
     "currency": "XAF",
@@ -729,7 +1033,11 @@
   {
     "name": {
       "de": "Grenada",
-      "en": "Grenada"
+      "en": "Grenada",
+      "fr": "Grenade",
+      "es": "Granada",
+      "ru": "Гренада",
+      "kk": "Гренада"
     },
     "code": "GD",
     "currency": "XCD",
@@ -739,7 +1047,11 @@
   {
     "name": {
       "de": "Georgien",
-      "en": "Georgia"
+      "en": "Georgia",
+      "fr": "Géorgie",
+      "es": "Georgia",
+      "ru": "Грузия",
+      "kk": "Грузия"
     },
     "code": "GE",
     "currency": "GEL",
@@ -748,7 +1060,11 @@
   {
     "name": {
       "de": "Französisch-Guayana",
-      "en": "French Guiana"
+      "en": "French Guiana",
+      "fr": "Guyane française",
+      "es": "Guayana Francesa",
+      "ru": "Французская Гвиана",
+      "kk": "Француз Гвианасы"
     },
     "code": "GF",
     "currency": "EUR",
@@ -758,7 +1074,11 @@
   {
     "name": {
       "de": "Guernsey",
-      "en": "Guernsey"
+      "en": "Guernsey",
+      "fr": "Guernesey",
+      "es": "Guernsey",
+      "ru": "Гернси",
+      "kk": "Гернси"
     },
     "code": "GG",
     "currency": "GBP",
@@ -768,7 +1088,11 @@
   {
     "name": {
       "de": "Ghana",
-      "en": "Ghana"
+      "en": "Ghana",
+      "fr": "Ghana",
+      "es": "Ghana",
+      "ru": "Гана",
+      "kk": "Гана"
     },
     "code": "GH",
     "currency": "GHS",
@@ -777,7 +1101,11 @@
   {
     "name": {
       "de": "Gibraltar",
-      "en": "Gibraltar"
+      "en": "Gibraltar",
+      "fr": "Gibraltar",
+      "es": "Gibraltar",
+      "ru": "Гибралтар",
+      "kk": "Гибралтар"
     },
     "code": "GI",
     "currency": "GIP",
@@ -787,7 +1115,11 @@
   {
     "name": {
       "de": "Grönland",
-      "en": "Greenland"
+      "en": "Greenland",
+      "fr": "Groenland",
+      "es": "Groenlandia",
+      "ru": "Гренландия",
+      "kk": "Гренландия"
     },
     "code": "GL",
     "currency": "DKK",
@@ -797,7 +1129,11 @@
   {
     "name": {
       "de": "Gambia",
-      "en": "The Gambia"
+      "en": "The Gambia",
+      "fr": "Gambie",
+      "es": "Gambia",
+      "ru": "Гамбия",
+      "kk": "Гамбия"
     },
     "code": "GM",
     "currency": "GMD",
@@ -806,7 +1142,11 @@
   {
     "name": {
       "de": "Guinea",
-      "en": "Guinea"
+      "en": "Guinea",
+      "fr": "Guinée",
+      "es": "Guinea",
+      "ru": "Гвинея",
+      "kk": "Гвинея"
     },
     "code": "GN",
     "currency": "GNF",
@@ -815,7 +1155,11 @@
   {
     "name": {
       "de": "Guadeloupe",
-      "en": "Guadeloupe"
+      "en": "Guadeloupe",
+      "fr": "Guadeloupe",
+      "es": "Guadalupe",
+      "ru": "Гваделупа",
+      "kk": "Гваделупа"
     },
     "code": "GP",
     "currency": "EUR",
@@ -825,7 +1169,11 @@
   {
     "name": {
       "de": "Äquatorialguinea",
-      "en": "Equatorial Guinea"
+      "en": "Equatorial Guinea",
+      "fr": "Guinée équatoriale",
+      "es": "Guinea Ecuatorial",
+      "ru": "Экваториальная Гвинея",
+      "kk": "Экваторлық Гвинея"
     },
     "code": "GQ",
     "currency": "XAF",
@@ -834,7 +1182,11 @@
   {
     "name": {
       "de": "Südgeorgien und Südliche Sandwichinseln",
-      "en": "South Georgia and the South Sandwich Islands"
+      "en": "South Georgia and the South Sandwich Islands",
+      "fr": "Géorgie du Sud et îles Sandwich du Sud",
+      "es": "Islas Georgia del Sur y Sandwich del Sur",
+      "ru": "Южная Георгия и Южные Сандвичевы о-ва",
+      "kk": "Оңтүстік Георгия және Оңтүстік Сандвич аралдары"
     },
     "code": "GS",
     "lumpSumsFrom": "GB",
@@ -843,7 +1195,11 @@
   {
     "name": {
       "de": "Guatemala",
-      "en": "Guatemala"
+      "en": "Guatemala",
+      "fr": "Guatemala",
+      "es": "Guatemala",
+      "ru": "Гватемала",
+      "kk": "Гватемала"
     },
     "code": "GT",
     "currency": "GTQ",
@@ -852,7 +1208,11 @@
   {
     "name": {
       "de": "Guam",
-      "en": "Guam"
+      "en": "Guam",
+      "fr": "Guam",
+      "es": "Guam",
+      "ru": "Гуам",
+      "kk": "Гуам"
     },
     "code": "GU",
     "currency": "USD",
@@ -862,7 +1222,11 @@
   {
     "name": {
       "de": "Guinea-Bissau",
-      "en": "Guinea-Bissau"
+      "en": "Guinea-Bissau",
+      "fr": "Guinée-Bissau",
+      "es": "Guinea-Bisáu",
+      "ru": "Гвинея-Бисау",
+      "kk": "Гвинея-Бисау"
     },
     "code": "GW",
     "currency": "XOF",
@@ -871,7 +1235,11 @@
   {
     "name": {
       "de": "Guyana",
-      "en": "Guyana"
+      "en": "Guyana",
+      "fr": "Guyana",
+      "es": "Guyana",
+      "ru": "Гайана",
+      "kk": "Гайана"
     },
     "code": "GY",
     "currency": "GYD",
@@ -881,7 +1249,11 @@
   {
     "name": {
       "de": "Hongkong",
-      "en": "Hong Kong"
+      "en": "Hong Kong",
+      "fr": "R.A.S. chinoise de Hong Kong",
+      "es": "RAE de Hong Kong (China)",
+      "ru": "Гонконг (САР)",
+      "kk": "Сянган АӘА"
     },
     "code": "HK",
     "currency": "HKD",
@@ -891,7 +1263,11 @@
   {
     "name": {
       "de": "Heard und die McDonaldinseln",
-      "en": "Heard Island and McDonald Islands"
+      "en": "Heard Island and McDonald Islands",
+      "fr": "Îles Heard et McDonald",
+      "es": "Islas Heard y McDonald",
+      "ru": "о-ва Херд и Макдональд",
+      "kk": "Херд аралы және Макдональд аралдары"
     },
     "code": "HM",
     "lumpSumsFrom": "AU",
@@ -900,7 +1276,11 @@
   {
     "name": {
       "de": "Honduras",
-      "en": "Honduras"
+      "en": "Honduras",
+      "fr": "Honduras",
+      "es": "Honduras",
+      "ru": "Гондурас",
+      "kk": "Гондурас"
     },
     "code": "HN",
     "currency": "HNL",
@@ -909,7 +1289,11 @@
   {
     "name": {
       "de": "Kroatien",
-      "en": "Croatia"
+      "en": "Croatia",
+      "fr": "Croatie",
+      "es": "Croacia",
+      "ru": "Хорватия",
+      "kk": "Хорватия"
     },
     "code": "HR",
     "currency": "EUR",
@@ -919,7 +1303,11 @@
   {
     "name": {
       "de": "Haiti",
-      "en": "Haiti"
+      "en": "Haiti",
+      "fr": "Haïti",
+      "es": "Haití",
+      "ru": "Гаити",
+      "kk": "Гаити"
     },
     "code": "HT",
     "currency": "HTG",
@@ -928,7 +1316,11 @@
   {
     "name": {
       "de": "Ungarn",
-      "en": "Hungary"
+      "en": "Hungary",
+      "fr": "Hongrie",
+      "es": "Hungría",
+      "ru": "Венгрия",
+      "kk": "Венгрия"
     },
     "code": "HU",
     "currency": "HUF",
@@ -938,7 +1330,11 @@
   {
     "name": {
       "de": "Indonesien",
-      "en": "Indonesia"
+      "en": "Indonesia",
+      "fr": "Indonésie",
+      "es": "Indonesia",
+      "ru": "Индонезия",
+      "kk": "Индонезия"
     },
     "code": "ID",
     "currency": "IDR",
@@ -947,7 +1343,11 @@
   {
     "name": {
       "de": "Irland",
-      "en": "Ireland"
+      "en": "Ireland",
+      "fr": "Irlande",
+      "es": "Irlanda",
+      "ru": "Ирландия",
+      "kk": "Ирландия"
     },
     "code": "IE",
     "currency": "EUR",
@@ -957,7 +1357,11 @@
   {
     "name": {
       "de": "Israel",
-      "en": "Israel"
+      "en": "Israel",
+      "fr": "Israël",
+      "es": "Israel",
+      "ru": "Израиль",
+      "kk": "Израиль"
     },
     "code": "IL",
     "currency": "ILS",
@@ -966,7 +1370,11 @@
   {
     "name": {
       "de": "Insel Man",
-      "en": "Isle of Man"
+      "en": "Isle of Man",
+      "fr": "Île de Man",
+      "es": "Isla de Man",
+      "ru": "о-в Мэн",
+      "kk": "Мэн аралы"
     },
     "code": "IM",
     "currency": "GBP",
@@ -975,7 +1383,11 @@
   {
     "name": {
       "de": "Indien",
-      "en": "India"
+      "en": "India",
+      "fr": "Inde",
+      "es": "India",
+      "ru": "Индия",
+      "kk": "Үндістан"
     },
     "code": "IN",
     "currency": "INR",
@@ -984,7 +1396,11 @@
   {
     "name": {
       "de": "Britisches Territorium im Indischen Ozean",
-      "en": "British Indian Ocean Territory"
+      "en": "British Indian Ocean Territory",
+      "fr": "Territoire britannique de l’océan Indien",
+      "es": "Territorio Británico del Océano Índico",
+      "ru": "Британская территория в Индийском океане",
+      "kk": "Үнді мұхитындағы Британ аймағы"
     },
     "code": "IO",
     "currency": "USD",
@@ -994,7 +1410,11 @@
   {
     "name": {
       "de": "Irak",
-      "en": "Iraq"
+      "en": "Iraq",
+      "fr": "Irak",
+      "es": "Irak",
+      "ru": "Ирак",
+      "kk": "Ирак"
     },
     "code": "IQ",
     "currency": "IQD",
@@ -1003,7 +1423,11 @@
   {
     "name": {
       "de": "Iran",
-      "en": "Iran"
+      "en": "Iran",
+      "fr": "Iran",
+      "es": "Irán",
+      "ru": "Иран",
+      "kk": "Иран"
     },
     "code": "IR",
     "currency": "IRR",
@@ -1012,7 +1436,11 @@
   {
     "name": {
       "de": "Island",
-      "en": "Iceland"
+      "en": "Iceland",
+      "fr": "Islande",
+      "es": "Islandia",
+      "ru": "Исландия",
+      "kk": "Исландия"
     },
     "code": "IS",
     "currency": "ISK",
@@ -1022,7 +1450,11 @@
   {
     "name": {
       "de": "Italien",
-      "en": "Italy"
+      "en": "Italy",
+      "fr": "Italie",
+      "es": "Italia",
+      "ru": "Италия",
+      "kk": "Италия"
     },
     "code": "IT",
     "currency": "EUR",
@@ -1032,7 +1464,11 @@
   {
     "name": {
       "de": "Jersey",
-      "en": "Jersey"
+      "en": "Jersey",
+      "fr": "Jersey",
+      "es": "Jersey",
+      "ru": "Джерси",
+      "kk": "Джерси"
     },
     "code": "JE",
     "currency": "GBP",
@@ -1041,7 +1477,11 @@
   {
     "name": {
       "de": "Jamaika",
-      "en": "Jamaica"
+      "en": "Jamaica",
+      "fr": "Jamaïque",
+      "es": "Jamaica",
+      "ru": "Ямайка",
+      "kk": "Ямайка"
     },
     "code": "JM",
     "currency": "JMD",
@@ -1050,7 +1490,11 @@
   {
     "name": {
       "de": "Jordanien",
-      "en": "Jordan"
+      "en": "Jordan",
+      "fr": "Jordanie",
+      "es": "Jordania",
+      "ru": "Иордания",
+      "kk": "Иордания"
     },
     "code": "JO",
     "currency": "JOD",
@@ -1059,7 +1503,11 @@
   {
     "name": {
       "de": "Japan",
-      "en": "Japan"
+      "en": "Japan",
+      "fr": "Japon",
+      "es": "Japón",
+      "ru": "Япония",
+      "kk": "Жапония"
     },
     "code": "JP",
     "currency": "JPY",
@@ -1068,7 +1516,11 @@
   {
     "name": {
       "de": "Kenia",
-      "en": "Kenya"
+      "en": "Kenya",
+      "fr": "Kenya",
+      "es": "Kenia",
+      "ru": "Кения",
+      "kk": "Кения"
     },
     "code": "KE",
     "currency": "KES",
@@ -1077,7 +1529,11 @@
   {
     "name": {
       "de": "Kirgisistan",
-      "en": "Kyrgyzstan"
+      "en": "Kyrgyzstan",
+      "fr": "Kirghizistan",
+      "es": "Kirguistán",
+      "ru": "Киргизия",
+      "kk": "Қырғызстан"
     },
     "code": "KG",
     "currency": "KGS",
@@ -1086,7 +1542,11 @@
   {
     "name": {
       "de": "Kambodscha",
-      "en": "Cambodia"
+      "en": "Cambodia",
+      "fr": "Cambodge",
+      "es": "Camboya",
+      "ru": "Камбоджа",
+      "kk": "Камбоджа"
     },
     "code": "KH",
     "currency": "KHR",
@@ -1095,7 +1555,11 @@
   {
     "name": {
       "de": "Kiribati",
-      "en": "Kiribati"
+      "en": "Kiribati",
+      "fr": "Kiribati",
+      "es": "Kiribati",
+      "ru": "Кирибати",
+      "kk": "Кирибати"
     },
     "code": "KI",
     "currency": "AUD",
@@ -1104,7 +1568,11 @@
   {
     "name": {
       "de": "Komoren",
-      "en": "Comoros"
+      "en": "Comoros",
+      "fr": "Comores",
+      "es": "Comoras",
+      "ru": "Коморы",
+      "kk": "Комор аралдары"
     },
     "code": "KM",
     "currency": "KMF",
@@ -1113,7 +1581,11 @@
   {
     "name": {
       "de": "St. Kitts und Nevis",
-      "en": "Saint Kitts and Nevis"
+      "en": "Saint Kitts and Nevis",
+      "fr": "Saint-Christophe-et-Niévès",
+      "es": "San Cristóbal y Nieves",
+      "ru": "Сент-Китс и Невис",
+      "kk": "Сент-Китс және Невис"
     },
     "code": "KN",
     "currency": "XCD",
@@ -1123,7 +1595,11 @@
   {
     "name": {
       "de": "Nordkorea",
-      "en": "North Korea"
+      "en": "North Korea",
+      "fr": "Corée du Nord",
+      "es": "Corea del Norte",
+      "ru": "КНДР",
+      "kk": "Солтүстік Корея"
     },
     "alias": {
       "de": ["Korea, Demokratische Volksrepublik"]
@@ -1135,7 +1611,11 @@
   {
     "name": {
       "de": "Südkorea",
-      "en": "South Korea"
+      "en": "South Korea",
+      "fr": "Corée du Sud",
+      "es": "Corea del Sur",
+      "ru": "Республика Корея",
+      "kk": "Оңтүстік Корея"
     },
     "alias": {
       "de": ["Korea, Republik"]
@@ -1147,7 +1627,11 @@
   {
     "name": {
       "de": "Kuwait",
-      "en": "Kuwait"
+      "en": "Kuwait",
+      "fr": "Koweït",
+      "es": "Kuwait",
+      "ru": "Кувейт",
+      "kk": "Кувейт"
     },
     "code": "KW",
     "currency": "KWD",
@@ -1156,7 +1640,11 @@
   {
     "name": {
       "de": "Kaimaninseln",
-      "en": "Cayman Islands"
+      "en": "Cayman Islands",
+      "fr": "Îles Caïmans",
+      "es": "Islas Caimán",
+      "ru": "Острова Кайман",
+      "kk": "Кайман аралдары"
     },
     "code": "KY",
     "currency": "KYD",
@@ -1166,7 +1654,11 @@
   {
     "name": {
       "de": "Kasachstan",
-      "en": "Kazakhstan"
+      "en": "Kazakhstan",
+      "fr": "Kazakhstan",
+      "es": "Kazajistán",
+      "ru": "Казахстан",
+      "kk": "Қазақстан"
     },
     "code": "KZ",
     "currency": "KZT",
@@ -1175,7 +1667,11 @@
   {
     "name": {
       "de": "Laos",
-      "en": "Laos"
+      "en": "Laos",
+      "fr": "Laos",
+      "es": "Laos",
+      "ru": "Лаос",
+      "kk": "Лаос"
     },
     "code": "LA",
     "currency": "LAK",
@@ -1184,7 +1680,11 @@
   {
     "name": {
       "de": "Libanon",
-      "en": "Lebanon"
+      "en": "Lebanon",
+      "fr": "Liban",
+      "es": "Líbano",
+      "ru": "Ливан",
+      "kk": "Ливан"
     },
     "code": "LB",
     "currency": "LBP",
@@ -1193,7 +1693,11 @@
   {
     "name": {
       "de": "St. Lucia",
-      "en": "Saint Lucia"
+      "en": "Saint Lucia",
+      "fr": "Sainte-Lucie",
+      "es": "Santa Lucía",
+      "ru": "Сент-Люсия",
+      "kk": "Сент-Люсия"
     },
     "code": "LC",
     "currency": "XCD",
@@ -1203,7 +1707,11 @@
   {
     "name": {
       "de": "Liechtenstein",
-      "en": "Liechtenstein"
+      "en": "Liechtenstein",
+      "fr": "Liechtenstein",
+      "es": "Liechtenstein",
+      "ru": "Лихтенштейн",
+      "kk": "Лихтенштейн"
     },
     "code": "LI",
     "currency": "CHF",
@@ -1213,7 +1721,11 @@
   {
     "name": {
       "de": "Sri Lanka",
-      "en": "Sri Lanka"
+      "en": "Sri Lanka",
+      "fr": "Sri Lanka",
+      "es": "Sri Lanka",
+      "ru": "Шри-Ланка",
+      "kk": "Шри-Ланка"
     },
     "code": "LK",
     "currency": "LKR",
@@ -1222,7 +1734,11 @@
   {
     "name": {
       "de": "Liberia",
-      "en": "Liberia"
+      "en": "Liberia",
+      "fr": "Libéria",
+      "es": "Liberia",
+      "ru": "Либерия",
+      "kk": "Либерия"
     },
     "code": "LR",
     "currency": "LRD",
@@ -1231,7 +1747,11 @@
   {
     "name": {
       "de": "Lesotho",
-      "en": "Lesotho"
+      "en": "Lesotho",
+      "fr": "Lesotho",
+      "es": "Lesoto",
+      "ru": "Лесото",
+      "kk": "Лесото"
     },
     "code": "LS",
     "currency": "LSL",
@@ -1240,7 +1760,11 @@
   {
     "name": {
       "de": "Litauen",
-      "en": "Lithuania"
+      "en": "Lithuania",
+      "fr": "Lituanie",
+      "es": "Lituania",
+      "ru": "Литва",
+      "kk": "Литва"
     },
     "code": "LT",
     "currency": "EUR",
@@ -1250,7 +1774,11 @@
   {
     "name": {
       "de": "Luxemburg",
-      "en": "Luxembourg"
+      "en": "Luxembourg",
+      "fr": "Luxembourg",
+      "es": "Luxemburgo",
+      "ru": "Люксембург",
+      "kk": "Люксембург"
     },
     "code": "LU",
     "currency": "EUR",
@@ -1260,7 +1788,11 @@
   {
     "name": {
       "de": "Lettland",
-      "en": "Latvia"
+      "en": "Latvia",
+      "fr": "Lettonie",
+      "es": "Letonia",
+      "ru": "Латвия",
+      "kk": "Латвия"
     },
     "code": "LV",
     "currency": "EUR",
@@ -1270,7 +1802,11 @@
   {
     "name": {
       "de": "Libyen",
-      "en": "Libya"
+      "en": "Libya",
+      "fr": "Libye",
+      "es": "Libia",
+      "ru": "Ливия",
+      "kk": "Ливия"
     },
     "code": "LY",
     "currency": "LYD",
@@ -1279,7 +1815,11 @@
   {
     "name": {
       "de": "Marokko",
-      "en": "Morocco"
+      "en": "Morocco",
+      "fr": "Maroc",
+      "es": "Marruecos",
+      "ru": "Марокко",
+      "kk": "Марокко"
     },
     "code": "MA",
     "currency": "MAD",
@@ -1288,7 +1828,11 @@
   {
     "name": {
       "de": "Monaco",
-      "en": "Monaco"
+      "en": "Monaco",
+      "fr": "Monaco",
+      "es": "Mónaco",
+      "ru": "Монако",
+      "kk": "Монако"
     },
     "code": "MC",
     "currency": "EUR",
@@ -1297,7 +1841,11 @@
   {
     "name": {
       "de": "Moldau",
-      "en": "Moldova"
+      "en": "Moldova",
+      "fr": "Moldavie",
+      "es": "Moldavia",
+      "ru": "Молдова",
+      "kk": "Молдова"
     },
     "alias": {
       "de": ["Moldau, Republik"]
@@ -1309,7 +1857,11 @@
   {
     "name": {
       "de": "Montenegro",
-      "en": "Montenegro"
+      "en": "Montenegro",
+      "fr": "Monténégro",
+      "es": "Montenegro",
+      "ru": "Черногория",
+      "kk": "Черногория"
     },
     "code": "ME",
     "currency": "EUR",
@@ -1318,7 +1870,11 @@
   {
     "name": {
       "de": "St. Martin",
-      "en": "Saint Martin"
+      "en": "Saint Martin",
+      "fr": "Saint-Martin",
+      "es": "San Martín",
+      "ru": "Сен-Мартен",
+      "kk": "Сен-Мартен"
     },
     "code": "MF",
     "currency": "EUR",
@@ -1328,7 +1884,11 @@
   {
     "name": {
       "de": "Madagaskar",
-      "en": "Madagascar"
+      "en": "Madagascar",
+      "fr": "Madagascar",
+      "es": "Madagascar",
+      "ru": "Мадагаскар",
+      "kk": "Мадагаскар"
     },
     "code": "MG",
     "currency": "MGA",
@@ -1337,7 +1897,11 @@
   {
     "name": {
       "de": "Marshallinseln",
-      "en": "Marshall Islands"
+      "en": "Marshall Islands",
+      "fr": "Îles Marshall",
+      "es": "Islas Marshall",
+      "ru": "Маршалловы Острова",
+      "kk": "Маршалл аралдары"
     },
     "alias": {
       "de": ["Marshall Inseln"]
@@ -1349,7 +1913,11 @@
   {
     "name": {
       "de": "Nordmazedonien",
-      "en": "North Macedonia"
+      "en": "North Macedonia",
+      "fr": "Macédoine du Nord",
+      "es": "Macedonia del Norte",
+      "ru": "Северная Македония",
+      "kk": "Солтүстік Македония"
     },
     "code": "MK",
     "currency": "MKD",
@@ -1358,7 +1926,11 @@
   {
     "name": {
       "de": "Mali",
-      "en": "Mali"
+      "en": "Mali",
+      "fr": "Mali",
+      "es": "Mali",
+      "ru": "Мали",
+      "kk": "Мали"
     },
     "code": "ML",
     "currency": "XOF",
@@ -1367,7 +1939,11 @@
   {
     "name": {
       "de": "Myanmar",
-      "en": "Myanmar/Burma"
+      "en": "Myanmar/Burma",
+      "fr": "Myanmar (Birmanie)",
+      "es": "Myanmar (Birmania)",
+      "ru": "Мьянма (Бирма)",
+      "kk": "Мьянма (Бирма)"
     },
     "code": "MM",
     "currency": "MMK",
@@ -1376,7 +1952,11 @@
   {
     "name": {
       "de": "Mongolei",
-      "en": "Mongolia"
+      "en": "Mongolia",
+      "fr": "Mongolie",
+      "es": "Mongolia",
+      "ru": "Монголия",
+      "kk": "Моңғолия"
     },
     "code": "MN",
     "currency": "MNT",
@@ -1385,7 +1965,11 @@
   {
     "name": {
       "de": "Macau",
-      "en": "Macao"
+      "en": "Macao",
+      "fr": "R.A.S. chinoise de Macao",
+      "es": "RAE de Macao (China)",
+      "ru": "Макао (САР)",
+      "kk": "Макао АӘА"
     },
     "code": "MO",
     "currency": "MOP",
@@ -1395,7 +1979,11 @@
   {
     "name": {
       "de": "Nördliche Marianen",
-      "en": "Northern Mariana Islands"
+      "en": "Northern Mariana Islands",
+      "fr": "Îles Mariannes du Nord",
+      "es": "Islas Marianas del Norte",
+      "ru": "Северные Марианские о-ва",
+      "kk": "Солтүстік Мариана аралдары"
     },
     "code": "MP",
     "currency": "USD",
@@ -1405,7 +1993,11 @@
   {
     "name": {
       "de": "Martinique",
-      "en": "Martinique"
+      "en": "Martinique",
+      "fr": "Martinique",
+      "es": "Martinica",
+      "ru": "Мартиника",
+      "kk": "Мартиника"
     },
     "code": "MQ",
     "currency": "EUR",
@@ -1415,7 +2007,11 @@
   {
     "name": {
       "de": "Mauretanien",
-      "en": "Mauritania"
+      "en": "Mauritania",
+      "fr": "Mauritanie",
+      "es": "Mauritania",
+      "ru": "Мавритания",
+      "kk": "Мавритания"
     },
     "code": "MR",
     "currency": "MRU",
@@ -1424,7 +2020,11 @@
   {
     "name": {
       "de": "Montserrat",
-      "en": "Montserrat"
+      "en": "Montserrat",
+      "fr": "Montserrat",
+      "es": "Montserrat",
+      "ru": "Монтсеррат",
+      "kk": "Монтсеррат"
     },
     "code": "MS",
     "currency": "XCD",
@@ -1434,7 +2034,11 @@
   {
     "name": {
       "de": "Malta",
-      "en": "Malta"
+      "en": "Malta",
+      "fr": "Malte",
+      "es": "Malta",
+      "ru": "Мальта",
+      "kk": "Мальта"
     },
     "code": "MT",
     "currency": "EUR",
@@ -1444,7 +2048,11 @@
   {
     "name": {
       "de": "Mauritius",
-      "en": "Mauritius"
+      "en": "Mauritius",
+      "fr": "Maurice",
+      "es": "Mauricio",
+      "ru": "Маврикий",
+      "kk": "Маврикий"
     },
     "code": "MU",
     "currency": "MUR",
@@ -1453,7 +2061,11 @@
   {
     "name": {
       "de": "Malediven",
-      "en": "Maldives"
+      "en": "Maldives",
+      "fr": "Maldives",
+      "es": "Maldivas",
+      "ru": "Мальдивы",
+      "kk": "Мальдив аралдары"
     },
     "code": "MV",
     "currency": "MVR",
@@ -1462,7 +2074,11 @@
   {
     "name": {
       "de": "Malawi",
-      "en": "Malawi"
+      "en": "Malawi",
+      "fr": "Malawi",
+      "es": "Malaui",
+      "ru": "Малави",
+      "kk": "Малави"
     },
     "code": "MW",
     "currency": "MWK",
@@ -1471,7 +2087,11 @@
   {
     "name": {
       "de": "Mexiko",
-      "en": "Mexico"
+      "en": "Mexico",
+      "fr": "Mexique",
+      "es": "México",
+      "ru": "Мексика",
+      "kk": "Мексика"
     },
     "code": "MX",
     "currency": "MXN",
@@ -1480,7 +2100,11 @@
   {
     "name": {
       "de": "Malaysia",
-      "en": "Malaysia"
+      "en": "Malaysia",
+      "fr": "Malaisie",
+      "es": "Malasia",
+      "ru": "Малайзия",
+      "kk": "Малайзия"
     },
     "code": "MY",
     "currency": "MYR",
@@ -1489,7 +2113,11 @@
   {
     "name": {
       "de": "Mosambik",
-      "en": "Mozambique"
+      "en": "Mozambique",
+      "fr": "Mozambique",
+      "es": "Mozambique",
+      "ru": "Мозамбик",
+      "kk": "Мозамбик"
     },
     "code": "MZ",
     "currency": "MZN",
@@ -1498,7 +2126,11 @@
   {
     "name": {
       "de": "Namibia",
-      "en": "Namibia"
+      "en": "Namibia",
+      "fr": "Namibie",
+      "es": "Namibia",
+      "ru": "Намибия",
+      "kk": "Намибия"
     },
     "code": "NA",
     "currency": "NAD",
@@ -1507,7 +2139,11 @@
   {
     "name": {
       "de": "Neukaledonien",
-      "en": "New Caledonia"
+      "en": "New Caledonia",
+      "fr": "Nouvelle-Calédonie",
+      "es": "Nueva Caledonia",
+      "ru": "Новая Каледония",
+      "kk": "Жаңа Каледония"
     },
     "code": "NC",
     "currency": "XPF",
@@ -1517,7 +2153,11 @@
   {
     "name": {
       "de": "Niger",
-      "en": "Niger"
+      "en": "Niger",
+      "fr": "Niger",
+      "es": "Níger",
+      "ru": "Нигер",
+      "kk": "Нигер"
     },
     "code": "NE",
     "currency": "XOF",
@@ -1526,7 +2166,11 @@
   {
     "name": {
       "de": "Norfolkinsel",
-      "en": "Norfolk Island"
+      "en": "Norfolk Island",
+      "fr": "Île Norfolk",
+      "es": "Isla Norfolk",
+      "ru": "о-в Норфолк",
+      "kk": "Норфолк аралы"
     },
     "code": "NF",
     "currency": "AUD",
@@ -1536,7 +2180,11 @@
   {
     "name": {
       "de": "Nigeria",
-      "en": "Nigeria"
+      "en": "Nigeria",
+      "fr": "Nigéria",
+      "es": "Nigeria",
+      "ru": "Нигерия",
+      "kk": "Нигерия"
     },
     "code": "NG",
     "currency": "NGN",
@@ -1545,7 +2193,11 @@
   {
     "name": {
       "de": "Nicaragua",
-      "en": "Nicaragua"
+      "en": "Nicaragua",
+      "fr": "Nicaragua",
+      "es": "Nicaragua",
+      "ru": "Никарагуа",
+      "kk": "Никарагуа"
     },
     "code": "NI",
     "currency": "NIO",
@@ -1554,7 +2206,11 @@
   {
     "name": {
       "de": "Niederlande",
-      "en": "Netherlands"
+      "en": "Netherlands",
+      "fr": "Pays-Bas",
+      "es": "Países Bajos",
+      "ru": "Нидерланды",
+      "kk": "Нидерланд"
     },
     "code": "NL",
     "currency": "EUR",
@@ -1564,7 +2220,11 @@
   {
     "name": {
       "de": "Norwegen",
-      "en": "Norway"
+      "en": "Norway",
+      "fr": "Norvège",
+      "es": "Noruega",
+      "ru": "Норвегия",
+      "kk": "Норвегия"
     },
     "code": "NO",
     "currency": "NOK",
@@ -1574,7 +2234,11 @@
   {
     "name": {
       "de": "Nepal",
-      "en": "Nepal"
+      "en": "Nepal",
+      "fr": "Népal",
+      "es": "Nepal",
+      "ru": "Непал",
+      "kk": "Непал"
     },
     "code": "NP",
     "currency": "NPR",
@@ -1583,7 +2247,11 @@
   {
     "name": {
       "de": "Nauru",
-      "en": "Nauru"
+      "en": "Nauru",
+      "fr": "Nauru",
+      "es": "Nauru",
+      "ru": "Науру",
+      "kk": "Науру"
     },
     "code": "NR",
     "currency": "AUD",
@@ -1592,7 +2260,11 @@
   {
     "name": {
       "de": "Niue",
-      "en": "Niue"
+      "en": "Niue",
+      "fr": "Niue",
+      "es": "Niue",
+      "ru": "Ниуэ",
+      "kk": "Ниуэ"
     },
     "code": "NU",
     "currency": "NZD",
@@ -1602,7 +2274,11 @@
   {
     "name": {
       "de": "Neuseeland",
-      "en": "New Zealand"
+      "en": "New Zealand",
+      "fr": "Nouvelle-Zélande",
+      "es": "Nueva Zelanda",
+      "ru": "Новая Зеландия",
+      "kk": "Жаңа Зеландия"
     },
     "code": "NZ",
     "currency": "NZD",
@@ -1611,7 +2287,11 @@
   {
     "name": {
       "de": "Oman",
-      "en": "Oman"
+      "en": "Oman",
+      "fr": "Oman",
+      "es": "Omán",
+      "ru": "Оман",
+      "kk": "Оман"
     },
     "code": "OM",
     "currency": "OMR",
@@ -1620,7 +2300,11 @@
   {
     "name": {
       "de": "Panama",
-      "en": "Panama"
+      "en": "Panama",
+      "fr": "Panama",
+      "es": "Panamá",
+      "ru": "Панама",
+      "kk": "Панама"
     },
     "code": "PA",
     "currency": "PAB",
@@ -1629,7 +2313,11 @@
   {
     "name": {
       "de": "Peru",
-      "en": "Peru"
+      "en": "Peru",
+      "fr": "Pérou",
+      "es": "Perú",
+      "ru": "Перу",
+      "kk": "Перу"
     },
     "code": "PE",
     "currency": "PEN",
@@ -1638,7 +2326,11 @@
   {
     "name": {
       "de": "Französisch-Polynesien",
-      "en": "French Polynesia"
+      "en": "French Polynesia",
+      "fr": "Polynésie française",
+      "es": "Polinesia Francesa",
+      "ru": "Французская Полинезия",
+      "kk": "Француз Полинезиясы"
     },
     "code": "PF",
     "currency": "XPF",
@@ -1648,7 +2340,11 @@
   {
     "name": {
       "de": "Papua-Neuguinea",
-      "en": "Papua New Guinea"
+      "en": "Papua New Guinea",
+      "fr": "Papouasie-Nouvelle-Guinée",
+      "es": "Papúa Nueva Guinea",
+      "ru": "Папуа — Новая Гвинея",
+      "kk": "Папуа — Жаңа Гвинея"
     },
     "code": "PG",
     "currency": "PGK",
@@ -1657,7 +2353,11 @@
   {
     "name": {
       "de": "Philippinen",
-      "en": "Philippines"
+      "en": "Philippines",
+      "fr": "Philippines",
+      "es": "Filipinas",
+      "ru": "Филиппины",
+      "kk": "Филиппин аралдары"
     },
     "code": "PH",
     "currency": "PHP",
@@ -1666,7 +2366,11 @@
   {
     "name": {
       "de": "Pakistan",
-      "en": "Pakistan"
+      "en": "Pakistan",
+      "fr": "Pakistan",
+      "es": "Pakistán",
+      "ru": "Пакистан",
+      "kk": "Пәкістан"
     },
     "code": "PK",
     "currency": "PKR",
@@ -1675,7 +2379,11 @@
   {
     "name": {
       "de": "Polen",
-      "en": "Poland"
+      "en": "Poland",
+      "fr": "Pologne",
+      "es": "Polonia",
+      "ru": "Польша",
+      "kk": "Польша"
     },
     "code": "PL",
     "currency": "PLN",
@@ -1685,7 +2393,11 @@
   {
     "name": {
       "de": "St. Pierre und Miquelon",
-      "en": "Saint Pierre and Miquelon"
+      "en": "Saint Pierre and Miquelon",
+      "fr": "Saint-Pierre-et-Miquelon",
+      "es": "San Pedro y Miquelón",
+      "ru": "Сен-Пьер и Микелон",
+      "kk": "Сен-Пьер және Микелон"
     },
     "code": "PM",
     "currency": "EUR",
@@ -1695,7 +2407,11 @@
   {
     "name": {
       "de": "Pitcairninseln",
-      "en": "Pitcairn Islands"
+      "en": "Pitcairn Islands",
+      "fr": "Îles Pitcairn",
+      "es": "Islas Pitcairn",
+      "ru": "о-ва Питкэрн",
+      "kk": "Питкэрн аралдары"
     },
     "code": "PN",
     "currency": "NZD",
@@ -1705,7 +2421,11 @@
   {
     "name": {
       "de": "Puerto Rico",
-      "en": "Puerto Rico"
+      "en": "Puerto Rico",
+      "fr": "Porto Rico",
+      "es": "Puerto Rico",
+      "ru": "Пуэрто-Рико",
+      "kk": "Пуэрто-Рико"
     },
     "code": "PR",
     "currency": "USD",
@@ -1715,7 +2435,11 @@
   {
     "name": {
       "de": "Portugal",
-      "en": "Portugal"
+      "en": "Portugal",
+      "fr": "Portugal",
+      "es": "Portugal",
+      "ru": "Португалия",
+      "kk": "Португалия"
     },
     "code": "PT",
     "currency": "EUR",
@@ -1725,7 +2449,11 @@
   {
     "name": {
       "de": "Palau",
-      "en": "Palau"
+      "en": "Palau",
+      "fr": "Palaos",
+      "es": "Palaos",
+      "ru": "Палау",
+      "kk": "Палау"
     },
     "code": "PW",
     "currency": "USD",
@@ -1734,7 +2462,11 @@
   {
     "name": {
       "de": "Paraguay",
-      "en": "Paraguay"
+      "en": "Paraguay",
+      "fr": "Paraguay",
+      "es": "Paraguay",
+      "ru": "Парагвай",
+      "kk": "Парагвай"
     },
     "code": "PY",
     "currency": "PYG",
@@ -1743,7 +2475,11 @@
   {
     "name": {
       "de": "Katar",
-      "en": "Qatar"
+      "en": "Qatar",
+      "fr": "Qatar",
+      "es": "Catar",
+      "ru": "Катар",
+      "kk": "Катар"
     },
     "code": "QA",
     "currency": "QAR",
@@ -1752,7 +2488,11 @@
   {
     "name": {
       "de": "Réunion",
-      "en": "Réunion"
+      "en": "Réunion",
+      "fr": "La Réunion",
+      "es": "Reunión",
+      "ru": "Реюньон",
+      "kk": "Реюньон"
     },
     "code": "RE",
     "currency": "EUR",
@@ -1762,7 +2502,11 @@
   {
     "name": {
       "de": "Rumänien",
-      "en": "Romania"
+      "en": "Romania",
+      "fr": "Roumanie",
+      "es": "Rumanía",
+      "ru": "Румыния",
+      "kk": "Румыния"
     },
     "code": "RO",
     "currency": "RON",
@@ -1772,7 +2516,11 @@
   {
     "name": {
       "de": "Serbien",
-      "en": "Serbia"
+      "en": "Serbia",
+      "fr": "Serbie",
+      "es": "Serbia",
+      "ru": "Сербия",
+      "kk": "Сербия"
     },
     "code": "RS",
     "currency": "RSD",
@@ -1781,7 +2529,11 @@
   {
     "name": {
       "de": "Russland",
-      "en": "Russia"
+      "en": "Russia",
+      "fr": "Russie",
+      "es": "Rusia",
+      "ru": "Россия",
+      "kk": "Ресей"
     },
     "alias": {
       "de": ["Russische Föderation"]
@@ -1793,7 +2545,11 @@
   {
     "name": {
       "de": "Ruanda",
-      "en": "Rwanda"
+      "en": "Rwanda",
+      "fr": "Rwanda",
+      "es": "Ruanda",
+      "ru": "Руанда",
+      "kk": "Руанда"
     },
     "code": "RW",
     "currency": "RWF",
@@ -1802,7 +2558,11 @@
   {
     "name": {
       "de": "Saudi-Arabien",
-      "en": "Saudi Arabia"
+      "en": "Saudi Arabia",
+      "fr": "Arabie saoudite",
+      "es": "Arabia Saudí",
+      "ru": "Саудовская Аравия",
+      "kk": "Сауд Арабиясы"
     },
     "code": "SA",
     "currency": "SAR",
@@ -1811,7 +2571,11 @@
   {
     "name": {
       "de": "Salomonen",
-      "en": "Solomon Islands"
+      "en": "Solomon Islands",
+      "fr": "Îles Salomon",
+      "es": "Islas Salomón",
+      "ru": "Соломоновы Острова",
+      "kk": "Соломон аралдары"
     },
     "code": "SB",
     "currency": "SBD",
@@ -1820,7 +2584,11 @@
   {
     "name": {
       "de": "Seychellen",
-      "en": "Seychelles"
+      "en": "Seychelles",
+      "fr": "Seychelles",
+      "es": "Seychelles",
+      "ru": "Сейшельские Острова",
+      "kk": "Сейшель аралдары"
     },
     "code": "SC",
     "currency": "SCR",
@@ -1829,7 +2597,11 @@
   {
     "name": {
       "de": "Sudan",
-      "en": "Sudan"
+      "en": "Sudan",
+      "fr": "Soudan",
+      "es": "Sudán",
+      "ru": "Судан",
+      "kk": "Судан"
     },
     "code": "SD",
     "currency": "SDG",
@@ -1838,7 +2610,11 @@
   {
     "name": {
       "de": "Schweden",
-      "en": "Sweden"
+      "en": "Sweden",
+      "fr": "Suède",
+      "es": "Suecia",
+      "ru": "Швеция",
+      "kk": "Швеция"
     },
     "code": "SE",
     "currency": "SEK",
@@ -1848,7 +2624,11 @@
   {
     "name": {
       "de": "Singapur",
-      "en": "Singapore"
+      "en": "Singapore",
+      "fr": "Singapour",
+      "es": "Singapur",
+      "ru": "Сингапур",
+      "kk": "Сингапур"
     },
     "code": "SG",
     "currency": "SGD",
@@ -1857,7 +2637,11 @@
   {
     "name": {
       "de": "St. Helena, Ascension und Tristan da Cunha",
-      "en": "Saint Helena, Ascension and Tristan da Cunha"
+      "en": "Saint Helena, Ascension and Tristan da Cunha",
+      "fr": "Sainte-Hélène",
+      "es": "Santa Elena",
+      "ru": "о-в Св. Елены",
+      "kk": "Әулие Елена аралы"
     },
     "code": "SH",
     "currency": "SHP",
@@ -1867,7 +2651,11 @@
   {
     "name": {
       "de": "Slowenien",
-      "en": "Slovenia"
+      "en": "Slovenia",
+      "fr": "Slovénie",
+      "es": "Eslovenia",
+      "ru": "Словения",
+      "kk": "Словения"
     },
     "code": "SI",
     "currency": "EUR",
@@ -1877,7 +2665,11 @@
   {
     "name": {
       "de": "Svalbard und Jan Mayen",
-      "en": "Svalbard and Jan Mayen"
+      "en": "Svalbard and Jan Mayen",
+      "fr": "Svalbard et Jan Mayen",
+      "es": "Svalbard y Jan Mayen",
+      "ru": "Шпицберген и Ян-Майен",
+      "kk": "Шпицберген және Ян-Майен"
     },
     "code": "SJ",
     "currency": "NOK",
@@ -1887,7 +2679,11 @@
   {
     "name": {
       "de": "Slowakei",
-      "en": "Slovakia"
+      "en": "Slovakia",
+      "fr": "Slovaquie",
+      "es": "Eslovaquia",
+      "ru": "Словакия",
+      "kk": "Словакия"
     },
     "alias": {
       "de": ["Slowakische Republik"]
@@ -1900,7 +2696,11 @@
   {
     "name": {
       "de": "Sierra Leone",
-      "en": "Sierra Leone"
+      "en": "Sierra Leone",
+      "fr": "Sierra Leone",
+      "es": "Sierra Leona",
+      "ru": "Сьерра-Леоне",
+      "kk": "Сьерра-Леоне"
     },
     "code": "SL",
     "currency": "SLE",
@@ -1909,7 +2709,11 @@
   {
     "name": {
       "de": "San Marino",
-      "en": "San Marino"
+      "en": "San Marino",
+      "fr": "Saint-Marin",
+      "es": "San Marino",
+      "ru": "Сан-Марино",
+      "kk": "Сан-Марино"
     },
     "code": "SM",
     "currency": "EUR",
@@ -1918,7 +2722,11 @@
   {
     "name": {
       "de": "Senegal",
-      "en": "Senegal"
+      "en": "Senegal",
+      "fr": "Sénégal",
+      "es": "Senegal",
+      "ru": "Сенегал",
+      "kk": "Сенегал"
     },
     "code": "SN",
     "currency": "XOF",
@@ -1927,7 +2735,11 @@
   {
     "name": {
       "de": "Somalia",
-      "en": "Somalia"
+      "en": "Somalia",
+      "fr": "Somalie",
+      "es": "Somalia",
+      "ru": "Сомали",
+      "kk": "Сомали"
     },
     "code": "SO",
     "currency": "SOS",
@@ -1936,7 +2748,11 @@
   {
     "name": {
       "de": "Suriname",
-      "en": "Suriname"
+      "en": "Suriname",
+      "fr": "Suriname",
+      "es": "Surinam",
+      "ru": "Суринам",
+      "kk": "Суринам"
     },
     "code": "SR",
     "currency": "SRD",
@@ -1946,7 +2762,11 @@
   {
     "name": {
       "de": "Südsudan",
-      "en": "South Sudan"
+      "en": "South Sudan",
+      "fr": "Soudan du Sud",
+      "es": "Sudán del Sur",
+      "ru": "Южный Судан",
+      "kk": "Оңтүстік Судан"
     },
     "code": "SS",
     "currency": "SSP",
@@ -1955,7 +2775,11 @@
   {
     "name": {
       "de": "São Tomé und Príncipe",
-      "en": "São Tomé and Príncipe"
+      "en": "São Tomé and Príncipe",
+      "fr": "Sao Tomé-et-Principe",
+      "es": "Santo Tomé y Príncipe",
+      "ru": "Сан-Томе и Принсипи",
+      "kk": "Сан-Томе және Принсипи"
     },
     "alias": {
       "de": ["São Tomé – Príncipe"]
@@ -1967,7 +2791,11 @@
   {
     "name": {
       "de": "El Salvador",
-      "en": "El Salvador"
+      "en": "El Salvador",
+      "fr": "Salvador",
+      "es": "El Salvador",
+      "ru": "Сальвадор",
+      "kk": "Сальвадор"
     },
     "code": "SV",
     "currency": "SVC",
@@ -1976,7 +2804,11 @@
   {
     "name": {
       "de": "Sint Maarten",
-      "en": "Sint Maarten"
+      "en": "Sint Maarten",
+      "fr": "Saint-Martin (partie néerlandaise)",
+      "es": "Sint Maarten",
+      "ru": "Синт-Мартен",
+      "kk": "Синт-Мартен"
     },
     "code": "SX",
     "currency": "ANG",
@@ -1986,7 +2818,11 @@
   {
     "name": {
       "de": "Syrien",
-      "en": "Syria"
+      "en": "Syria",
+      "fr": "Syrie",
+      "es": "Siria",
+      "ru": "Сирия",
+      "kk": "Сирия"
     },
     "code": "SY",
     "currency": "SYP",
@@ -1995,7 +2831,11 @@
   {
     "name": {
       "de": "Eswatini",
-      "en": "Eswatini"
+      "en": "Eswatini",
+      "fr": "Eswatini",
+      "es": "Esuatini",
+      "ru": "Эсватини",
+      "kk": "Свазиленд"
     },
     "code": "SZ",
     "currency": "SZL",
@@ -2004,7 +2844,11 @@
   {
     "name": {
       "de": "Turks- und Caicosinseln",
-      "en": "Turks and Caicos Islands"
+      "en": "Turks and Caicos Islands",
+      "fr": "Îles Turques-et-Caïques",
+      "es": "Islas Turcas y Caicos",
+      "ru": "о-ва Тёркс и Кайкос",
+      "kk": "Теркс және Кайкос аралдары"
     },
     "code": "TC",
     "currency": "USD",
@@ -2014,7 +2858,11 @@
   {
     "name": {
       "de": "Tschad",
-      "en": "Chad"
+      "en": "Chad",
+      "fr": "Tchad",
+      "es": "Chad",
+      "ru": "Чад",
+      "kk": "Чад"
     },
     "code": "TD",
     "currency": "XAF",
@@ -2023,7 +2871,11 @@
   {
     "name": {
       "de": "Französische Süd- und Antarktisgebiete",
-      "en": "French Southern and Antarctic Lands"
+      "en": "French Southern and Antarctic Lands",
+      "fr": "Terres australes françaises",
+      "es": "Territorios Australes Franceses",
+      "ru": "Французские Южные территории",
+      "kk": "Францияның оңтүстік аймақтары"
     },
     "code": "TF",
     "currency": "EUR",
@@ -2033,7 +2885,11 @@
   {
     "name": {
       "de": "Togo",
-      "en": "Togo"
+      "en": "Togo",
+      "fr": "Togo",
+      "es": "Togo",
+      "ru": "Того",
+      "kk": "Того"
     },
     "code": "TG",
     "currency": "XOF",
@@ -2042,7 +2898,11 @@
   {
     "name": {
       "de": "Thailand",
-      "en": "Thailand"
+      "en": "Thailand",
+      "fr": "Thaïlande",
+      "es": "Tailandia",
+      "ru": "Таиланд",
+      "kk": "Тайланд"
     },
     "code": "TH",
     "currency": "THB",
@@ -2051,7 +2911,11 @@
   {
     "name": {
       "de": "Tadschikistan",
-      "en": "Tajikistan"
+      "en": "Tajikistan",
+      "fr": "Tadjikistan",
+      "es": "Tayikistán",
+      "ru": "Таджикистан",
+      "kk": "Тәжікстан"
     },
     "code": "TJ",
     "currency": "TJS",
@@ -2060,7 +2924,11 @@
   {
     "name": {
       "de": "Tokelau",
-      "en": "Tokelau"
+      "en": "Tokelau",
+      "fr": "Tokelau",
+      "es": "Tokelau",
+      "ru": "Токелау",
+      "kk": "Токелау"
     },
     "code": "TK",
     "currency": "NZD",
@@ -2070,7 +2938,11 @@
   {
     "name": {
       "de": "Timor-Leste",
-      "en": "Timor-Leste"
+      "en": "Timor-Leste",
+      "fr": "Timor oriental",
+      "es": "Timor-Leste",
+      "ru": "Восточный Тимор",
+      "kk": "Тимор-Лесте"
     },
     "code": "TL",
     "currency": "USD",
@@ -2079,7 +2951,11 @@
   {
     "name": {
       "de": "Turkmenistan",
-      "en": "Turkmenistan"
+      "en": "Turkmenistan",
+      "fr": "Turkménistan",
+      "es": "Turkmenistán",
+      "ru": "Туркменистан",
+      "kk": "Түрікменстан"
     },
     "code": "TM",
     "currency": "TMT",
@@ -2088,7 +2964,11 @@
   {
     "name": {
       "de": "Tunesien",
-      "en": "Tunisia"
+      "en": "Tunisia",
+      "fr": "Tunisie",
+      "es": "Túnez",
+      "ru": "Тунис",
+      "kk": "Тунис"
     },
     "code": "TN",
     "currency": "TND",
@@ -2097,7 +2977,11 @@
   {
     "name": {
       "de": "Tonga",
-      "en": "Tonga"
+      "en": "Tonga",
+      "fr": "Tonga",
+      "es": "Tonga",
+      "ru": "Тонга",
+      "kk": "Тонга"
     },
     "code": "TO",
     "currency": "TOP",
@@ -2106,7 +2990,11 @@
   {
     "name": {
       "de": "Türkei",
-      "en": "Türkiye"
+      "en": "Türkiye",
+      "fr": "Turquie",
+      "es": "Turquía",
+      "ru": "Турция",
+      "kk": "Түркия"
     },
     "code": "TR",
     "currency": "TRY",
@@ -2115,7 +3003,11 @@
   {
     "name": {
       "de": "Trinidad und Tobago",
-      "en": "Trinidad and Tobago"
+      "en": "Trinidad and Tobago",
+      "fr": "Trinité-et-Tobago",
+      "es": "Trinidad y Tobago",
+      "ru": "Тринидад и Тобаго",
+      "kk": "Тринидад және Тобаго"
     },
     "code": "TT",
     "currency": "TTD",
@@ -2124,7 +3016,11 @@
   {
     "name": {
       "de": "Tuvalu",
-      "en": "Tuvalu"
+      "en": "Tuvalu",
+      "fr": "Tuvalu",
+      "es": "Tuvalu",
+      "ru": "Тувалу",
+      "kk": "Тувалу"
     },
     "code": "TV",
     "currency": "AUD",
@@ -2133,7 +3029,11 @@
   {
     "name": {
       "de": "Taiwan",
-      "en": "Taiwan"
+      "en": "Taiwan",
+      "fr": "Taïwan",
+      "es": "Taiwán",
+      "ru": "Тайвань",
+      "kk": "Тайвань"
     },
     "code": "TW",
     "currency": "TWD",
@@ -2142,7 +3042,11 @@
   {
     "name": {
       "de": "Tansania",
-      "en": "Tanzania"
+      "en": "Tanzania",
+      "fr": "Tanzanie",
+      "es": "Tanzania",
+      "ru": "Танзания",
+      "kk": "Танзания"
     },
     "code": "TZ",
     "currency": "TZS",
@@ -2151,7 +3055,11 @@
   {
     "name": {
       "de": "Ukraine",
-      "en": "Ukraine"
+      "en": "Ukraine",
+      "fr": "Ukraine",
+      "es": "Ucrania",
+      "ru": "Украина",
+      "kk": "Украина"
     },
     "code": "UA",
     "currency": "UAH",
@@ -2160,7 +3068,11 @@
   {
     "name": {
       "de": "Uganda",
-      "en": "Uganda"
+      "en": "Uganda",
+      "fr": "Ouganda",
+      "es": "Uganda",
+      "ru": "Уганда",
+      "kk": "Уганда"
     },
     "code": "UG",
     "currency": "UGX",
@@ -2169,7 +3081,11 @@
   {
     "name": {
       "de": "Vereinigtes Königreich",
-      "en": "United Kingdom"
+      "en": "United Kingdom",
+      "fr": "Royaume-Uni",
+      "es": "Reino Unido",
+      "ru": "Великобритания",
+      "kk": "Ұлыбритания"
     },
     "alias": {
       "de": ["Vereinigtes Königreich von Großbritannien und Nordirland"]
@@ -2182,7 +3098,11 @@
   {
     "name": {
       "de": "Kleinere Amerikanische Überseeinseln",
-      "en": "United States Minor Outlying Islands"
+      "en": "United States Minor Outlying Islands",
+      "fr": "Îles mineures éloignées des États-Unis",
+      "es": "Islas menores alejadas de EE. UU.",
+      "ru": "Внешние малые о-ва (США)",
+      "kk": "АҚШ-тың сыртқы кіші аралдары"
     },
     "code": "UM",
     "currency": "USD",
@@ -2192,7 +3112,11 @@
   {
     "name": {
       "de": "Vereinigte Staaten",
-      "en": "United States"
+      "en": "United States",
+      "fr": "États-Unis",
+      "es": "Estados Unidos",
+      "ru": "Соединенные Штаты",
+      "kk": "Америка Құрама Штаттары"
     },
     "alias": {
       "de": ["Vereinigte Staaten von Amerika (USA)"]
@@ -2204,7 +3128,11 @@
   {
     "name": {
       "de": "Uruguay",
-      "en": "Uruguay"
+      "en": "Uruguay",
+      "fr": "Uruguay",
+      "es": "Uruguay",
+      "ru": "Уругвай",
+      "kk": "Уругвай"
     },
     "code": "UY",
     "currency": "UYU",
@@ -2213,7 +3141,11 @@
   {
     "name": {
       "de": "Usbekistan",
-      "en": "Uzbekistan"
+      "en": "Uzbekistan",
+      "fr": "Ouzbékistan",
+      "es": "Uzbekistán",
+      "ru": "Узбекистан",
+      "kk": "Өзбекстан"
     },
     "code": "UZ",
     "currency": "UZS",
@@ -2222,7 +3154,11 @@
   {
     "name": {
       "de": "Vatikanstadt",
-      "en": "Vatican City State"
+      "en": "Vatican City State",
+      "fr": "État de la Cité du Vatican",
+      "es": "Ciudad del Vaticano",
+      "ru": "Ватикан",
+      "kk": "Ватикан"
     },
     "alias": {
       "de": ["Vatikanstaat"]
@@ -2234,7 +3170,11 @@
   {
     "name": {
       "de": "St. Vincent und Grenadinen",
-      "en": "Saint Vincent and the Grenadines"
+      "en": "Saint Vincent and the Grenadines",
+      "fr": "Saint-Vincent-et-les-Grenadines",
+      "es": "San Vicente y las Granadinas",
+      "ru": "Сент-Винсент и Гренадины",
+      "kk": "Сент-Винсент және Гренадин аралдары"
     },
     "code": "VC",
     "currency": "XCD",
@@ -2244,7 +3184,11 @@
   {
     "name": {
       "de": "Venezuela",
-      "en": "Venezuela"
+      "en": "Venezuela",
+      "fr": "Venezuela",
+      "es": "Venezuela",
+      "ru": "Венесуэла",
+      "kk": "Венесуэла"
     },
     "code": "VE",
     "currency": "VES",
@@ -2253,7 +3197,11 @@
   {
     "name": {
       "de": "Britische Jungferninseln",
-      "en": "British Virgin Islands"
+      "en": "British Virgin Islands",
+      "fr": "Îles Vierges britanniques",
+      "es": "Islas Vírgenes Británicas",
+      "ru": "Виргинские о-ва (Великобритания)",
+      "kk": "Британдық Виргин аралдары"
     },
     "code": "VG",
     "currency": "USD",
@@ -2263,7 +3211,11 @@
   {
     "name": {
       "de": "Amerikanische Jungferninseln",
-      "en": "US Virgin Islands"
+      "en": "US Virgin Islands",
+      "fr": "Îles Vierges des États-Unis",
+      "es": "Islas Vírgenes de EE. UU.",
+      "ru": "Виргинские о-ва (США)",
+      "kk": "АҚШ-тың Виргин аралдары"
     },
     "code": "VI",
     "currency": "USD",
@@ -2273,7 +3225,11 @@
   {
     "name": {
       "de": "Vietnam",
-      "en": "Vietnam"
+      "en": "Vietnam",
+      "fr": "Vietnam",
+      "es": "Vietnam",
+      "ru": "Вьетнам",
+      "kk": "Вьетнам"
     },
     "code": "VN",
     "currency": "VND",
@@ -2282,7 +3238,11 @@
   {
     "name": {
       "de": "Vanuatu",
-      "en": "Vanuatu"
+      "en": "Vanuatu",
+      "fr": "Vanuatu",
+      "es": "Vanuatu",
+      "ru": "Вануату",
+      "kk": "Вануату"
     },
     "code": "VU",
     "currency": "VUV",
@@ -2291,7 +3251,11 @@
   {
     "name": {
       "de": "Wallis und Futuna",
-      "en": "Wallis and Futuna"
+      "en": "Wallis and Futuna",
+      "fr": "Wallis-et-Futuna",
+      "es": "Wallis y Futuna",
+      "ru": "Уоллис и Футуна",
+      "kk": "Уоллис және Футуна"
     },
     "code": "WF",
     "currency": "XPF",
@@ -2301,7 +3265,11 @@
   {
     "name": {
       "de": "Samoa",
-      "en": "Samoa"
+      "en": "Samoa",
+      "fr": "Samoa",
+      "es": "Samoa",
+      "ru": "Самоа",
+      "kk": "Самоа"
     },
     "code": "WS",
     "currency": "WST",
@@ -2310,7 +3278,11 @@
   {
     "name": {
       "de": "Jemen",
-      "en": "Yemen"
+      "en": "Yemen",
+      "fr": "Yémen",
+      "es": "Yemen",
+      "ru": "Йемен",
+      "kk": "Йемен"
     },
     "code": "YE",
     "currency": "YER",
@@ -2319,7 +3291,11 @@
   {
     "name": {
       "de": "Mayotte",
-      "en": "Mayotte"
+      "en": "Mayotte",
+      "fr": "Mayotte",
+      "es": "Mayotte",
+      "ru": "Майотта",
+      "kk": "Майотта"
     },
     "code": "YT",
     "currency": "EUR",
@@ -2329,7 +3305,11 @@
   {
     "name": {
       "de": "Südafrika",
-      "en": "South Africa"
+      "en": "South Africa",
+      "fr": "Afrique du Sud",
+      "es": "Sudáfrica",
+      "ru": "Южно-Африканская Республика",
+      "kk": "Оңтүстік Африка Республикасы"
     },
     "code": "ZA",
     "currency": "ZAR",
@@ -2338,7 +3318,11 @@
   {
     "name": {
       "de": "Sambia",
-      "en": "Zambia"
+      "en": "Zambia",
+      "fr": "Zambie",
+      "es": "Zambia",
+      "ru": "Замбия",
+      "kk": "Замбия"
     },
     "code": "ZM",
     "currency": "ZMW",
@@ -2347,7 +3331,11 @@
   {
     "name": {
       "de": "Simbabwe",
-      "en": "Zimbabwe"
+      "en": "Zimbabwe",
+      "fr": "Zimbabwe",
+      "es": "Zimbabue",
+      "ru": "Зимбабве",
+      "kk": "Зимбабве"
     },
     "code": "ZW",
     "currency": "ZWL",
@@ -2356,7 +3344,11 @@
   {
     "name": {
       "de": "Kosovo",
-      "en": "Kosovo"
+      "en": "Kosovo",
+      "fr": "Kosovo",
+      "es": "Kosovo",
+      "ru": "Косово",
+      "kk": "Косово"
     },
     "code": "XK",
     "currency": "EUR",

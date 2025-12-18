@@ -95,7 +95,13 @@ export const userSchema = async () => {
 
     settings: {
       type: {
-        language: { type: String, default: BACKEND_CACHE.displaySettings.locale.default, enum: locales, required: true },
+        language: {
+          type: String,
+          default: BACKEND_CACHE.displaySettings.locale.default,
+          enum: locales,
+          required: true,
+          translationPrefix: 'languages.'
+        },
         hasUserSetLanguage: { type: Boolean, required: true, default: false, hide: true },
         lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, hide: true },
         lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, hide: true },

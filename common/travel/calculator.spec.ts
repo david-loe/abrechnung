@@ -6,7 +6,7 @@ import travelSettings from './travelSettings.json' with { type: 'json' }
 function createSetup() {
   const countryDE: Country = {
     _id: 'DE',
-    name: { de: 'Deutschland', en: 'Germany' },
+    name: { de: 'Deutschland', en: '', fr: '', es: '', ru: '', kk: '' },
     lumpSums: [
       { validFrom: new Date('2020-01-01'), validUntil: null, catering8: 10, catering24: 20, overnight: 30 },
       { validFrom: new Date('2019-01-01'), validUntil: new Date('2019-12-31'), catering8: 99, catering24: 99, overnight: 99 }
@@ -15,7 +15,7 @@ function createSetup() {
 
   const countryFR: Country = {
     _id: 'FR',
-    name: { de: 'Frankreich', en: 'France' },
+    name: { de: 'Frankreich', en: '', fr: '', es: '', ru: '', kk: '' },
     lumpSums: [
       { validFrom: new Date('2020-01-01'), validUntil: new Date('2999-12-31'), catering8: 12, catering24: 24, overnight: 40 },
       { validFrom: new Date('3000-01-01'), validUntil: null, catering8: 99, catering24: 99, overnight: 99 }

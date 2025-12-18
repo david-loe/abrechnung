@@ -6,7 +6,7 @@ import travelSettings from './travelSettings.json' with { type: 'json' }
 
 const DE: Country = {
   _id: 'DE',
-  name: { de: 'Deutschland', en: 'Germany' },
+  name: { de: 'Deutschland', en: '', fr: '', es: '', ru: '', kk: '' },
   currency: 'EUR',
 
   lumpSums: [
@@ -31,7 +31,7 @@ const DE: Country = {
 
 const FR: Country = {
   _id: 'FR',
-  name: { de: 'Frankreich', en: 'France' },
+  name: { de: 'Frankreich', en: '', fr: '', es: '', ru: '', kk: '' },
   currency: 'EUR',
   needsA1Certificate: true,
 
@@ -57,7 +57,7 @@ const FR: Country = {
 
 const AT: Country = {
   _id: 'AT',
-  name: { de: 'Österreich', en: 'Austria' },
+  name: { de: 'Österreich', en: '', fr: '', es: '', ru: '', kk: '' },
   currency: 'EUR',
 
   lumpSums: [
@@ -68,7 +68,7 @@ const AT: Country = {
 
 const LU: Country = {
   _id: 'LU',
-  name: { de: 'Luxemburg', en: 'Luxembourg' },
+  name: { de: 'Luxemburg', en: '', fr: '', es: '', ru: '', kk: '' },
   currency: 'EUR',
 
   lumpSums: [
