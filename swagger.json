@@ -433,7 +433,11 @@
 				"type": "string",
 				"enum": [
 					"de",
-					"en"
+					"en",
+					"fr",
+					"ru",
+					"es",
+					"kk"
 				]
 			},
 			"CurrencyCode": {
@@ -444,16 +448,32 @@
 				"properties": {
 					"name": {
 						"properties": {
+							"de": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
-							"de": {
+							"fr": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"kk": {
 								"type": "string"
 							}
 						},
 						"required": [
+							"de",
 							"en",
-							"de"
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						],
 						"type": "object"
 					},
@@ -491,16 +511,32 @@
 					},
 					"name": {
 						"properties": {
+							"de": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
-							"de": {
+							"fr": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"kk": {
 								"type": "string"
 							}
 						},
 						"required": [
+							"de",
 							"en",
-							"de"
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						],
 						"type": "object"
 					},
@@ -510,22 +546,43 @@
 					},
 					"alias": {
 						"properties": {
+							"de": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"en": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"de": {
+							"fr": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"ru": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"es": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"kk": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							}
 						},
-						"required": [
-							"de"
-						],
 						"type": "object"
 					},
 					"flag": {
@@ -987,6 +1044,30 @@
 										},
 										"alias": {
 											"properties": {
+												"kk": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
+												"es": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
+												"ru": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
+												"fr": {
+													"items": {
+														"type": "string"
+													},
+													"type": "array"
+												},
 												"en": {
 													"items": {
 														"type": "string"
@@ -1004,6 +1085,18 @@
 										},
 										"name": {
 											"properties": {
+												"kk": {
+													"type": "string"
+												},
+												"es": {
+													"type": "string"
+												},
+												"ru": {
+													"type": "string"
+												},
+												"fr": {
+													"type": "string"
+												},
 												"en": {
 													"type": "string"
 												},
@@ -1036,6 +1129,18 @@
 										},
 										"name": {
 											"properties": {
+												"kk": {
+													"type": "string"
+												},
+												"es": {
+													"type": "string"
+												},
+												"ru": {
+													"type": "string"
+												},
+												"fr": {
+													"type": "string"
+												},
 												"en": {
 													"type": "string"
 												},
@@ -1071,7 +1176,11 @@
 						"type": "string",
 						"enum": [
 							"de",
-							"en"
+							"en",
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						]
 					}
 				},
@@ -1791,6 +1900,30 @@
 												},
 												"alias": {
 													"properties": {
+														"kk": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"es": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"ru": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"fr": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
 														"en": {
 															"items": {
 																"type": "string"
@@ -1808,6 +1941,18 @@
 												},
 												"name": {
 													"properties": {
+														"kk": {
+															"type": "string"
+														},
+														"es": {
+															"type": "string"
+														},
+														"ru": {
+															"type": "string"
+														},
+														"fr": {
+															"type": "string"
+														},
 														"en": {
 															"type": "string"
 														},
@@ -1840,6 +1985,18 @@
 												},
 												"name": {
 													"properties": {
+														"kk": {
+															"type": "string"
+														},
+														"es": {
+															"type": "string"
+														},
+														"ru": {
+															"type": "string"
+														},
+														"fr": {
+															"type": "string"
+														},
 														"en": {
 															"type": "string"
 														},
@@ -1875,7 +2032,11 @@
 								"type": "string",
 								"enum": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								]
 							}
 						},
@@ -2177,6 +2338,30 @@
 												},
 												"alias": {
 													"properties": {
+														"kk": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"es": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"ru": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
+														"fr": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
 														"en": {
 															"items": {
 																"type": "string"
@@ -2194,6 +2379,18 @@
 												},
 												"name": {
 													"properties": {
+														"kk": {
+															"type": "string"
+														},
+														"es": {
+															"type": "string"
+														},
+														"ru": {
+															"type": "string"
+														},
+														"fr": {
+															"type": "string"
+														},
 														"en": {
 															"type": "string"
 														},
@@ -2226,6 +2423,18 @@
 												},
 												"name": {
 													"properties": {
+														"kk": {
+															"type": "string"
+														},
+														"es": {
+															"type": "string"
+														},
+														"ru": {
+															"type": "string"
+														},
+														"fr": {
+															"type": "string"
+														},
 														"en": {
 															"type": "string"
 														},
@@ -2261,7 +2470,11 @@
 								"type": "string",
 								"enum": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								]
 							}
 						},
@@ -9862,11 +10075,43 @@
 											"type": "string"
 										},
 										"type": "object"
+									},
+									"fr": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"ru": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"es": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"kk": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
 									}
 								},
 								"required": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								],
 								"type": "object"
 							},
@@ -10189,11 +10434,43 @@
 											"type": "string"
 										},
 										"type": "object"
+									},
+									"fr": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"ru": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"es": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"kk": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
 									}
 								},
 								"required": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								],
 								"type": "object"
 							},
@@ -10730,18 +11007,54 @@
 								"type": "string",
 								"enum": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								]
 							},
 							"default": {
 								"type": "string",
 								"enum": [
 									"de",
-									"en"
+									"en",
+									"fr",
+									"ru",
+									"es",
+									"kk"
 								]
 							},
 							"overwrite": {
 								"properties": {
+									"kk": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"es": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"ru": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
+									"fr": {
+										"properties": {},
+										"additionalProperties": {
+											"type": "string"
+										},
+										"type": "object"
+									},
 									"en": {
 										"properties": {},
 										"additionalProperties": {
@@ -10836,16 +11149,32 @@
 				"properties": {
 					"name": {
 						"properties": {
+							"de": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
-							"de": {
+							"fr": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"kk": {
 								"type": "string"
 							}
 						},
 						"required": [
+							"de",
 							"en",
-							"de"
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						],
 						"type": "object"
 					},
@@ -10925,6 +11254,18 @@
 					},
 					"name": {
 						"properties": {
+							"kk": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"fr": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
@@ -11044,16 +11385,32 @@
 					},
 					"name": {
 						"properties": {
+							"de": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
-							"de": {
+							"fr": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"kk": {
 								"type": "string"
 							}
 						},
 						"required": [
+							"de",
 							"en",
-							"de"
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						],
 						"type": "object"
 					},
@@ -11063,22 +11420,43 @@
 					},
 					"alias": {
 						"properties": {
+							"de": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"en": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"de": {
+							"fr": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"ru": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"es": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"kk": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							}
 						},
-						"required": [
-							"de"
-						],
 						"type": "object"
 					},
 					"flag": {
@@ -11145,16 +11523,32 @@
 					},
 					"name": {
 						"properties": {
+							"de": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
-							"de": {
+							"fr": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"kk": {
 								"type": "string"
 							}
 						},
 						"required": [
+							"de",
 							"en",
-							"de"
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						],
 						"type": "object"
 					},
@@ -11164,22 +11558,43 @@
 					},
 					"alias": {
 						"properties": {
+							"de": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"en": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							},
-							"de": {
+							"fr": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"ru": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"es": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"kk": {
 								"items": {
 									"type": "string"
 								},
 								"type": "array"
 							}
 						},
-						"required": [
-							"de"
-						],
 						"type": "object"
 					},
 					"flag": {
@@ -11340,6 +11755,30 @@
 					},
 					"alias": {
 						"properties": {
+							"kk": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"es": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"ru": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"fr": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"en": {
 								"items": {
 									"type": "string"
@@ -11357,6 +11796,18 @@
 					},
 					"name": {
 						"properties": {
+							"kk": {
+								"type": "string"
+							},
+							"es": {
+								"type": "string"
+							},
+							"ru": {
+								"type": "string"
+							},
+							"fr": {
+								"type": "string"
+							},
 							"en": {
 								"type": "string"
 							},
