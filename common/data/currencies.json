@@ -31,7 +31,7 @@
     "code": "GBP",
     "name": {
       "de": "Pfund Sterling",
-      "en": "Guernsey pound",
+      "en": "Pound Sterling",
       "fr": "livre sterling",
       "es": "libra esterlina",
       "ru": "британский фунт стерлингов",
@@ -1217,7 +1217,7 @@
       "fr": "loti lesothan",
       "es": "loti lesothense",
       "ru": "Лоти",
-      "kk": "LSL"
+      "kk": "Лесото лотиси"
     },
     "subunit": "Sente",
     "flag": "🇱🇸"
@@ -1761,10 +1761,10 @@
     "name": {
       "de": "Leone",
       "en": "leone",
-      "fr": "SLE",
-      "es": "SLE",
-      "ru": "SLE",
-      "kk": "SLE"
+      "fr": "Leone",
+      "es": "Leone",
+      "ru": "Леоне",
+      "kk": "Леоне"
     },
     "subunit": "Cent",
     "flag": "🇸🇱"
@@ -1831,7 +1831,7 @@
       "fr": "colón salvadorien",
       "es": "colón salvadoreño",
       "ru": "Сальвадорский колон",
-      "kk": "SVC"
+      "kk": "Сальвадор колон"
     },
     "subunit": "Centavo",
     "symbol": "$",
@@ -2095,10 +2095,10 @@
     "name": {
       "de": "Simbabwe-Dollar",
       "en": "Zimbabwe dollar",
-      "fr": "dollar zimbabwéen (2009)",
+      "fr": "dollar zimbabwéen",
       "es": "dólar zimbabuense",
-      "ru": "Доллар Зимбабве (2009)",
-      "kk": "ZWL"
+      "ru": "Доллар Зимбабве",
+      "kk": "Зимбабве доллары"
     },
     "subunit": "Cent",
     "flag": "🇿🇼"
