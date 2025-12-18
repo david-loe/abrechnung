@@ -27,7 +27,7 @@
             <small>
               <span class="me-2 tnum">{{ formatter.money(report) }}</span>
               <i
-                v-if="APP_DATA"
+                v-if="APP_DATA && report.type !== 'offsetEntry'"
                 :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
               <span>{{ report.subject }}</span>
             </small>
