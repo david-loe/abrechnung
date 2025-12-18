@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - uses: ./.github/actions/setup-production-env
-      # - name: Start previous release
-      #   run: docker compose -f deploy-compose.yml run backend npm run setup
-      # - name: Run Migration
-      #   run: docker compose run backend npm run setup
+      - name: Start previous release
+        run: docker compose -f deploy-compose.yml run backend npm run setup
+      - name: Run Migration
+        run: docker compose run backend npm run setup
