@@ -12021,72 +12021,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ConnectionSettings_mongoose.Types.ObjectId_": {
-				"properties": {
-					"PDFReportsViaEmail": {
-						"properties": {
-							"locale": {
-								"$ref": "#/components/schemas/Locale"
-							},
-							"sendPDFReportsToOrganisationEmail": {
-								"type": "boolean"
-							}
-						},
-						"required": [
-							"locale",
-							"sendPDFReportsToOrganisationEmail"
-						],
-						"type": "object"
-					},
-					"auth": {
-						"properties": {
-							"oidc": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/oidcSettings"
-									}
-								],
-								"nullable": true
-							},
-							"ldapauth": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/ldapauthSettings"
-									}
-								],
-								"nullable": true
-							},
-							"microsoft": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/microsoftSettings"
-									}
-								],
-								"nullable": true
-							}
-						},
-						"type": "object"
-					},
-					"smtp": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/smtpSettings"
-							}
-						],
-						"nullable": true
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"PDFReportsViaEmail",
-					"auth",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"IConnectionSettings": {
 				"properties": {
 					"PDFReportsViaEmail": {
@@ -22353,16 +22287,16 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"result": {
-											"$ref": "#/components/schemas/ConnectionSettings_mongoose.Types.ObjectId_"
-										},
 										"message": {
 											"type": "string"
+										},
+										"result": {
+											"$ref": "#/components/schemas/ConnectionSettings__id_"
 										}
 									},
 									"required": [
-										"result",
-										"message"
+										"message",
+										"result"
 									],
 									"type": "object"
 								}
