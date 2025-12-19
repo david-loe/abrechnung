@@ -31,7 +31,6 @@ function assertSanitizedValue(t: ExecutionContext, data: unknown, original: unkn
 test('GET /admin/connectionSettings hides secrets', async (t) => {
   const existingSettings = await ConnectionSettings.findOne().lean()
   const res = await agent.get('/admin/connectionSettings')
-
   t.is(res.status, 200)
   const data = res.body.data
 

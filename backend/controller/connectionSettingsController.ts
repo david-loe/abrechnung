@@ -5,12 +5,7 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller } from './controller.js'
 
 const SECRET_PLACEHOLDER = '********'
-const SECRET_PATHS = [
-  'smtp.password',
-  'auth.microsoft.clientSecret',
-  'auth.ldapauth.bindCredentials',
-  'auth.oidc.clientSecret'
-]
+const SECRET_PATHS = ['smtp.password', 'auth.microsoft.clientSecret', 'auth.ldapauth.bindCredentials', 'auth.oidc.clientSecret']
 
 function cloneSettings<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T
@@ -36,7 +31,7 @@ function setIfPresent(object: unknown, path: string[], value: unknown) {
     current = next as Record<string, unknown>
   }
   const lastKey = path.at(-1)
-  if (lastKey && Object.prototype.hasOwnProperty.call(current, lastKey)) {
+  if (lastKey && Object.hasOwn(current, lastKey)) {
     current[lastKey] = value as never
   }
 }
@@ -64,10 +59,7 @@ function sanitizeConnectionSettings(connectionSettings?: IConnectionSettings | n
   return sanitized
 }
 
-function keepOriginalSecrets(
-  updatedSettings: IConnectionSettings,
-  existingSettings?: IConnectionSettings | null
-): IConnectionSettings {
+function keepOriginalSecrets(updatedSettings: IConnectionSettings, existingSettings?: IConnectionSettings | null): IConnectionSettings {
   if (!existingSettings) return updatedSettings
 
   const mergedSettings = cloneSettings(updatedSettings)
