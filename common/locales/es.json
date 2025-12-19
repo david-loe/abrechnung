@@ -498,6 +498,7 @@
     "users": "Usuarios",
     "userToOverwrite": "Usuario que se sobrescribirá",
     "validFrom": "Válido desde",
+    "validUntil": "Válido hasta",
     "vehicleRegistration": "Registro del vehículo",
     "vehicleRegistrationWhenUsingOwnCar": "Registro del vehículo cuando se usa el propio coche",
     "version": "Versión",
