@@ -1,3 +1,4 @@
+import { ConnectionSettings as IConnectionSettings } from 'abrechnung-common/types.js'
 import test, { ExecutionContext } from 'ava'
 import { shutdown } from '../../app.js'
 import ConnectionSettings from '../../models/connectionSettings.js'
@@ -59,6 +60,20 @@ test('POST /admin/connectionSettings keeps original secrets when placeholder is 
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'ldapauth', 'bindCredentials'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'microsoft', 'clientSecret'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'oidc', 'clientSecret'])
+})
+
+test('POST /admin/connectionSettings accepts new secret values', async (t) => {
+  const getRes = await agent.get('/admin/connectionSettings')
+  t.is(getRes.status, 200)
+  const settings: IConnectionSettings = getRes.body.data
+  settings.auth.microsoft = { clientSecret: 'newSecretValue123', clientId: 'newClientId456', tenant: 'newTenant789' }
+
+  const postRes = await agent.post('/admin/connectionSettings').send(settings)
+  t.is(postRes.status, 200)
+
+  const updatedSettings = await ConnectionSettings.findOne().lean()
+  t.is(updatedSettings?.auth.microsoft?.clientSecret, settings.auth?.microsoft?.clientSecret)
+  t.is(postRes.body.result.auth.microsoft.clientSecret, SECRET_PLACEHOLDER)
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
