@@ -498,6 +498,7 @@
     "users": "Пользователи",
     "userToOverwrite": "Пользователь для перезаписи",
     "validFrom": "Действителен с",
+    "validUntil": "Действительно до",
     "vehicleRegistration": "Регистрация транспортного средства",
     "vehicleRegistrationWhenUsingOwnCar": "Регистрация транспортного средства при использовании собственного авто",
     "version": "Версия",

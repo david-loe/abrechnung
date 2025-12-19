@@ -498,6 +498,7 @@
     "users": "Users",
     "userToOverwrite": "User to overwrite",
     "validFrom": "Valid from",
+    "validUntil": "Valid until",
     "vehicleRegistration": "Vehicle Registration",
     "vehicleRegistrationWhenUsingOwnCar": "Vehicle registration if traveling with own car",
     "version": "Version",

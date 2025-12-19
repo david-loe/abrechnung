@@ -498,6 +498,7 @@
     "users": "Benutzer",
     "userToOverwrite": "Benutzer der überschrieben werden soll",
     "validFrom": "Gültig ab",
+    "validUntil": "Gültig bis",
     "vehicleRegistration": "Fahrzeugschein",
     "vehicleRegistrationWhenUsingOwnCar": "Fahrzeugschein wenn mit eigenem Auto unterwegs",
     "version": "Version",
