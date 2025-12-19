@@ -44,8 +44,7 @@ const advanceSchema = () =>
         type: [
           {
             type: { type: String, enum: [...reportModelNamesWithoutAdvance, 'offsetEntry'], required: true },
-            report: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
-            reportName: { type: String },
+            reportId: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
             subject: { type: String },
             amount: { type: Number, min: 0, required: true }
           }
