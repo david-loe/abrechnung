@@ -498,6 +498,7 @@
     "users": "Utilisateurs",
     "userToOverwrite": "Utilisateur à écraser",
     "validFrom": "Valide à partir de",
+    "validUntil": "Valide jusqu'au",
     "vehicleRegistration": "Certificat d'immatriculation",
     "vehicleRegistrationWhenUsingOwnCar": "Certificat d'immatriculation en cas de voyage avec votre propre voiture",
     "version": "Version",
