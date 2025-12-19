@@ -4,7 +4,7 @@ import ConnectionSettings, { connectionSettingsSchema } from '../models/connecti
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller } from './controller.js'
 
-const SECRET_PLACEHOLDER = '********'
+export const SECRET_PLACEHOLDER = '********'
 const SECRET_PATHS = ['smtp.password', 'auth.microsoft.clientSecret', 'auth.ldapauth.bindCredentials', 'auth.oidc.clientSecret']
 
 function cloneSettings<T>(value: T): T {

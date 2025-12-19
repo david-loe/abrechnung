@@ -1,10 +1,10 @@
 import { ConnectionSettings as IConnectionSettings } from 'abrechnung-common/types.js'
 import test, { ExecutionContext } from 'ava'
 import { shutdown } from '../../app.js'
+import { SECRET_PLACEHOLDER } from '../../controller/connectionSettingsController.js'
 import ConnectionSettings from '../../models/connectionSettings.js'
 import createAgent, { loginUser } from '../_agent.js'
 
-const SECRET_PLACEHOLDER = '********'
 const agent = await createAgent()
 await loginUser(agent, 'admin')
 
@@ -29,7 +29,7 @@ function assertSanitizedValue(t: ExecutionContext, data: unknown, original: unkn
   }
 }
 
-test('GET /admin/connectionSettings hides secrets', async (t) => {
+test.serial('GET /admin/connectionSettings hides secrets', async (t) => {
   const existingSettings = await ConnectionSettings.findOne().lean()
   const res = await agent.get('/admin/connectionSettings')
   t.is(res.status, 200)
@@ -41,7 +41,7 @@ test('GET /admin/connectionSettings hides secrets', async (t) => {
   assertSanitizedValue(t, data, existingSettings, ['auth', 'oidc', 'clientSecret'])
 })
 
-test('POST /admin/connectionSettings keeps original secrets when placeholder is sent', async (t) => {
+test.serial('POST /admin/connectionSettings keeps original secrets when placeholder is sent', async (t) => {
   const originalSettings = await ConnectionSettings.findOne().lean()
   const getRes = await agent.get('/admin/connectionSettings')
   t.is(getRes.status, 200)
@@ -62,7 +62,7 @@ test('POST /admin/connectionSettings keeps original secrets when placeholder is 
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'oidc', 'clientSecret'])
 })
 
-test('POST /admin/connectionSettings accepts new secret values', async (t) => {
+test.serial('POST /admin/connectionSettings accepts new secret values', async (t) => {
   const getRes = await agent.get('/admin/connectionSettings')
   t.is(getRes.status, 200)
   const settings: IConnectionSettings = getRes.body.data
