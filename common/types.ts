@@ -465,7 +465,7 @@ export interface AdvanceBase<idType extends _id = _id> {
 }
 
 export interface AdvanceSimple<idType extends _id = _id> extends ReportSimple<idType, AdvanceState>, AdvanceBase<idType> {
-  offsetAgainst: { type: ReportModelNameWithoutAdvance; report: { _id: idType; name: string } | null | undefined; amount: number }[]
+  offsetAgainst: { type: ReportModelNameWithoutAdvance | 'offsetEntry'; reportId?: idType | null; subject: string; amount: number }[]
 }
 
 export interface Advance<idType extends _id = _id> extends Report<idType, AdvanceState>, AdvanceSimple<idType> {}

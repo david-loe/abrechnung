@@ -21,13 +21,20 @@
               <Advance :advance="(modalAdvance as AdvanceSimple<string>)" endpointPrefix="approve/" />
               <template v-if="!modalAdvance.settledOn">
                 <form class="mb-2 mt-3" v-if="showOffsetForm" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
-                  <div class="row">
+                  <div class="row gy-3">
                     <label for="amount" class="col-form-label col-auto">
                       {{ t('labels.amount') }}
                       <span class="text-danger">*</span>
                     </label>
                     <div class="col-auto">
                       <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required >
+                    </div>
+                    <label for="subject" class="col-form-label col-auto">
+                      {{ t('labels.subject') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-auto">
+                      <input type="text" class="form-control" id="subject" v-model="offsetSubject" required >
                     </div>
                     <div class="col-auto">
                       <div class="mb-1 d-flex align-items-center">
@@ -40,7 +47,7 @@
                 </form>
                 <div class="mb-2 d-flex" v-else>
                   <button type="button" class="btn btn-link pt-0 ms-auto" @click="showOffsetForm = true">
-                    {{ t('labels.addOffsetEntry') }}
+                    {{ t('labels.addX', {X: t('labels.offsetEntry')}) }}
                   </button>
                 </div>
               </template>
@@ -128,6 +135,7 @@ const show = ref<null | AdvanceState.APPROVED>(null)
 const modalFormIsLoading = ref(false)
 const showOffsetForm = ref(false)
 const offsetAmount = ref(0)
+const offsetSubject = ref('')
 
 const modalComp = useTemplateRef('modalComp')
 const advanceList = useTemplateRef('advanceList')
@@ -150,6 +158,8 @@ function resetModal() {
   modalAdvance.value = {}
   modalMode.value = 'view'
   showOffsetForm.value = false
+  offsetAmount.value = 0
+  offsetSubject.value = ''
   router.push('/approve/advance')
 }
 function resetAndHide() {
@@ -182,11 +192,12 @@ async function approveAdvance(
 async function offsetAdvance(advanceId: string, amount: number) {
   if (advanceId && amount) {
     modalFormIsLoading.value = true
-    const result = await API.setter<AdvanceSimple<string>>('approve/advance/offset', { advanceId, amount })
+    const result = await API.setter<AdvanceSimple<string>>('approve/advance/offset', { advanceId, amount, subject: offsetSubject.value })
     modalFormIsLoading.value = false
     if (result.ok) {
       showModal('view', result.ok)
       approvedAdvanceList.value?.loadFromServer()
+      offsetSubject.value = ''
     }
   }
 }

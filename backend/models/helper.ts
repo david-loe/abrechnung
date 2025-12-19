@@ -188,7 +188,7 @@ export function populateAll<DocType extends {}>(
 }
 
 export async function offsetAdvance(
-  report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId },
+  report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId; name: string },
   modelName: ReportModelNameWithoutAdvance
 ) {
   const session = await mongoose.startSession()
@@ -199,7 +199,7 @@ export async function offsetAdvance(
       let total = addUp.total.amount || 0
       for (const advance of report.advances) {
         if (advance.project._id.equals(idDocumentToId(addUp.project))) {
-          total = await (advance as AdvanceDoc).offset(total, modelName, report._id, session)
+          total = await (advance as AdvanceDoc).offset(total, modelName, report._id, report.name, session)
         }
       }
     }

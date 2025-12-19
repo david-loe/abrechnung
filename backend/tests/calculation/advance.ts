@@ -56,7 +56,8 @@ test.serial('correct balance after report review completed', async (t) => {
   const _advance: Advance = res.body.data
   t.is(_advance.balance.amount, 900)
   t.is(_advance.offsetAgainst.length, 1)
-  t.is(_advance.offsetAgainst[0].report?._id, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].reportId, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].subject, expenseReport.name)
 })
 
 test.serial('correct balance after report booked', async (t) => {
@@ -66,7 +67,8 @@ test.serial('correct balance after report booked', async (t) => {
   const _advance: Advance = res.body.data
   t.is(_advance.balance.amount, 900)
   t.is(_advance.offsetAgainst.length, 1)
-  t.is(_advance.offsetAgainst[0].report?._id, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].reportId, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].subject, expenseReport.name)
 })
 
 test.serial('correct balance after advance booked', async (t) => {
@@ -78,7 +80,8 @@ test.serial('correct balance after advance booked', async (t) => {
   const _advance: Advance = res.body.data
   t.is(_advance.balance.amount, 900)
   t.is(_advance.offsetAgainst.length, 1)
-  t.is(_advance.offsetAgainst[0].report?._id, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].reportId, expenseReport._id)
+  t.is(_advance.offsetAgainst[0].subject, expenseReport.name)
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
