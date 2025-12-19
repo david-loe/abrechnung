@@ -44,7 +44,6 @@ export async function checkForMigrations() {
               .model<{ name: string }>(offset.type as string)
               .findOne({ _id: offset.report })
               .lean()
-            console.log(report)
             subject = report?.name || ''
           }
           newOffsetAgainst.push({
@@ -56,7 +55,9 @@ export async function checkForMigrations() {
         }
         advanceBatch.push({ updateOne: { filter: { _id: doc._id }, update: { $set: { offsetAgainst: newOffsetAgainst } } } })
       }
-      await advanceCol.bulkWrite(advanceBatch)
+      if (advanceBatch.length > 0) {
+        await advanceCol.bulkWrite(advanceBatch)
+      }
     }
 
     settings.migrateFrom = undefined

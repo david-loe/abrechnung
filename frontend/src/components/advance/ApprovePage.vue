@@ -192,11 +192,7 @@ async function approveAdvance(
 async function offsetAdvance(advanceId: string, amount: number) {
   if (advanceId && amount) {
     modalFormIsLoading.value = true
-    const result = await API.setter<AdvanceSimple<string>>('approve/advance/offset', {
-      advanceId,
-      amount,
-      subject: offsetSubject.value || undefined
-    })
+    const result = await API.setter<AdvanceSimple<string>>('approve/advance/offset', { advanceId, amount, subject: offsetSubject.value })
     modalFormIsLoading.value = false
     if (result.ok) {
       showModal('view', result.ok)
