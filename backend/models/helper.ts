@@ -55,7 +55,7 @@ export function logObject<T extends AnyState>(states: readonly T[]) {
 }
 
 export function setLog(doc: HydratedDocument<{ state: AnyState; log: Log<Types.ObjectId>; editor: UserSimple<Types.ObjectId> }>) {
-  if (doc.isModified('state')) {
+  if (doc.isModified('state') && !doc.log[doc.state]) {
     doc.log[doc.state] = { on: new Date(), by: doc.editor }
   }
 }

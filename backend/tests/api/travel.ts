@@ -1,4 +1,4 @@
-import { Stage, Travel, TravelExpense, TravelSimple, TravelState } from 'abrechnung-common/types.js'
+import { Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
@@ -26,16 +26,21 @@ test.serial('GET /project', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
 })
 
 test.serial('POST /travel/appliedFor', async (t) => {
+  t.plan(2)
   const res = await agent.post('/travel/appliedFor').send(travel)
   travel = res.body.result
   if (res.status === 200) {
     t.pass()
+    const user: User = (await agent.get('/user')).body.data
+    t.is((res.body.result as Travel).log[0]?.by._id, user._id)
   } else {
     console.log(res.body)
+    t.fail()
   }
 })
 
@@ -46,6 +51,7 @@ test.serial('GET /travel', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
   for (const gotTravel of res.body.data as TravelSimple[]) {
     if (travel._id === gotTravel._id) {
@@ -65,6 +71,7 @@ test.serial('GET /approve/travel', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
   for (const gotTravel of res.body.data as TravelSimple[]) {
     if (travel._id === gotTravel._id) {
@@ -75,13 +82,16 @@ test.serial('GET /approve/travel', async (t) => {
 })
 
 test.serial('POST /approve/travel/approved', async (t) => {
-  t.plan(4)
+  t.plan(5)
   const comment = 'A Comment'
   const res = await agent.post('/approve/travel/approved').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
+    const user: User = (await agent.get('/user')).body.data
+    t.is((res.body.result as Travel).log[10]?.by._id, user._id)
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is((res.body.result as Travel).state, TravelState.APPROVED)
   t.is((res.body.result as Travel).history.length, 1)
@@ -175,6 +185,7 @@ test.serial('POST /travel/stage', async (t) => {
       t.pass()
     } else {
       console.log(res.body)
+      t.fail()
     }
   }
 })
@@ -208,18 +219,22 @@ test.serial('POST /travel/expense', async (t) => {
       t.pass()
     } else {
       console.log(res.body)
+      t.fail()
     }
   }
 })
 
 test.serial('POST /travel/underExamination', async (t) => {
-  t.plan(4)
+  t.plan(5)
   const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
   const res = await agent.post('/travel/underExamination').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
+    const user: User = (await agent.get('/user')).body.data
+    t.is((res.body.result as Travel).log[20]?.by._id, user._id)
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
   t.is((res.body.result as Travel).history.length, 2)
@@ -233,6 +248,7 @@ test.serial('POST /travel/approved AGAIN', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is((res.body.result as Travel).state, TravelState.APPROVED)
   t.is((res.body.result as Travel).history.length, 3)
@@ -245,6 +261,7 @@ test.serial('POST /travel/underExamination AGAIN', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
   t.is((res.body.result as Travel).history.length, 4)
@@ -254,13 +271,16 @@ test.serial('POST /travel/underExamination AGAIN', async (t) => {
 
 test.serial('POST /examine/travel/reviewCompleted', async (t) => {
   await loginUser(agent, 'travel')
-  t.plan(4)
+  t.plan(5)
   const comment = '' // empty string should not create comment
   const res = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id, comment })
   if (res.status === 200) {
     t.pass()
+    const user: User = (await agent.get('/user')).body.data
+    t.is((res.body.result as Travel).log[30]?.by._id, user._id)
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is((res.body.result as Travel).state, TravelState.REVIEW_COMPLETED)
   t.is((res.body.result as Travel).history.length, 5)
@@ -276,6 +296,7 @@ test.serial('GET /travel/report', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
 })
 
@@ -289,19 +310,21 @@ test.serial('POST /book/travel/booked', async (t) => {
     t.pass()
   } else {
     console.log(res.body)
+    t.fail()
   }
   t.is(res.body.result[0].status, 'fulfilled')
 })
 
-test.after.always('DELETE /travel', async (t) => {
-  await loginUser(agent, 'user')
-  const res = await agent.delete('/travel').query({ _id: travel._id })
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-  }
-})
+// test.after.always('DELETE /travel', async (t) => {
+//   await loginUser(agent, 'user')
+//   const res = await agent.delete('/travel').query({ _id: travel._id })
+//   if (res.status === 200) {
+//     t.pass()
+//   } else {
+//     console.log(res.body)
+//     t.fail()
+//   }
+// })
 
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
