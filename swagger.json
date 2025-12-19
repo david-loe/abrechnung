@@ -9115,28 +9115,34 @@
 									"type": "number",
 									"format": "double"
 								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
+								"subject": {
+									"type": "string"
+								},
+								"reportId": {
+									"allOf": [
+										{
 											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 										}
-									},
-									"required": [
-										"name",
-										"_id"
 									],
-									"type": "object",
 									"nullable": true
 								},
 								"type": {
-									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+										},
+										{
+											"type": "string",
+											"enum": [
+												"offsetEntry"
+											]
+										}
+									]
 								}
 							},
 							"required": [
 								"amount",
+								"subject",
 								"type"
 							],
 							"type": "object"
@@ -12596,28 +12602,34 @@
 									"type": "number",
 									"format": "double"
 								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
+								"subject": {
+									"type": "string"
+								},
+								"reportId": {
+									"allOf": [
+										{
 											"$ref": "#/components/schemas/_id"
 										}
-									},
-									"required": [
-										"name",
-										"_id"
 									],
-									"type": "object",
 									"nullable": true
 								},
 								"type": {
-									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+										},
+										{
+											"type": "string",
+											"enum": [
+												"offsetEntry"
+											]
+										}
+									]
 								}
 							},
 							"required": [
 								"amount",
+								"subject",
 								"type"
 							],
 							"type": "object"
@@ -12773,28 +12785,34 @@
 									"type": "number",
 									"format": "double"
 								},
-								"report": {
-									"properties": {
-										"name": {
-											"type": "string"
-										},
-										"_id": {
+								"subject": {
+									"type": "string"
+								},
+								"reportId": {
+									"allOf": [
+										{
 											"$ref": "#/components/schemas/_id"
 										}
-									},
-									"required": [
-										"name",
-										"_id"
 									],
-									"type": "object",
 									"nullable": true
 								},
 								"type": {
-									"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+										},
+										{
+											"type": "string",
+											"enum": [
+												"offsetEntry"
+											]
+										}
+									]
 								}
 							},
 							"required": [
 								"amount",
+								"subject",
 								"type"
 							],
 							"type": "object"
@@ -23868,6 +23886,9 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"subject": {
+										"type": "string"
+									},
 									"advanceId": {
 										"$ref": "#/components/schemas/IdDocument"
 									},
@@ -23877,6 +23898,7 @@
 									}
 								},
 								"required": [
+									"subject",
 									"advanceId",
 									"amount"
 								],
