@@ -22,7 +22,7 @@
       class="mb-5"
       table-class-name="small-table"
       endpoint="book/advance"
-      :columns-to-hide="['balance', 'updatedAt', 'state']"
+      :columns-to-hide="['balance', 'receivedOn', 'updatedAt', 'state']"
       make-name-no-link
       :rows-per-page="10"
       :rows-items="[10, 20, 50]"
@@ -52,7 +52,7 @@
         class="mb-5"
         table-class-name="small-table"
         endpoint="book/advance"
-        :columns-to-hide="['balance', 'log.30.on', 'state']"
+        :columns-to-hide="['balance', 'receivedOn', 'log.30.on', 'state']"
         make-name-no-link
         :stateFilter="show"
         :rows-per-page="10"

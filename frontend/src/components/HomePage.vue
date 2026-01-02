@@ -15,7 +15,15 @@
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)" />
-          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)" />
+          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)">
+            <template #buttons>
+              <template v-if="canConfirmReceipt(modalObject as AdvanceSimple<string>)">
+                <button type="button" class="btn btn-success" @click="openReceiptModal(modalObject as AdvanceSimple<string>)">
+                  {{ t('labels.confirmReceipt') }}
+                </button>
+              </template>
+            </template>
+          </Advance>
           <div v-if="modalObject.state !== undefined" class="mb-1">
             <template v-if="modalObject.state <= State.APPLIED_FOR">
               <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
@@ -80,6 +88,14 @@
             @edit="handleSubmit" />
         </template>
       </div>
+    </ModalComponent>
+    <ModalComponent ref="receiptModalComp" :header="t('labels.confirmReceipt')" @afterClose="resetReceiptModal">
+      <AdvanceReceivedForm
+        v-if="receiptAdvance"
+        :advance="receiptAdvance"
+        :loading="receiptFormIsLoading"
+        @confirm="confirmReceipt"
+        @cancel="hideReceiptModal" />
     </ModalComponent>
     <div v-if="APP_DATA" class="container py-3">
       <div class="row mb-3 justify-content-end gx-4 gy-2">
@@ -156,6 +172,7 @@
 <script setup lang="ts">
 import {
   type AdvanceSimple,
+  AdvanceState,
   type ExpenseReportSimple,
   getReportModelNameFromType,
   type HealthCareCostSimple,
@@ -170,6 +187,7 @@ import API from '@/api.js'
 import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
+import AdvanceReceivedForm from '@/components/advance/forms/AdvanceReceivedForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
@@ -189,12 +207,15 @@ const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('travel')
 const modalObject = ref<ModalObject>({})
 const modalFormIsLoading = ref(false)
+const receiptAdvance = ref<AdvanceSimple<string> | null>(null)
+const receiptFormIsLoading = ref(false)
 
 const travelList = useTemplateRef('travelList')
 const expenseReportList = useTemplateRef('expenseReportList')
 const healthCareCostList = useTemplateRef('healthCareCostList')
 const advanceList = useTemplateRef('advanceList')
 const modalComp = useTemplateRef('modalComp')
+const receiptModalComp = useTemplateRef('receiptModalComp')
 
 const COMMON_HIDDEN_COLUMNS = [
   'owner',
@@ -210,7 +231,11 @@ const COMMON_HIDDEN_COLUMNS = [
 const router = useRouter()
 const { t } = useI18n()
 
-const props = defineProps({ reportType: { type: String as PropType<ReportType> }, reportId: { type: String } })
+const props = defineProps({
+  reportType: { type: String as PropType<ReportType> },
+  reportId: { type: String },
+  confirmAdvance: { type: Boolean, default: false }
+})
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -238,6 +263,47 @@ function resetModal() {
 function resetAndHide() {
   resetModal()
   hideModal()
+}
+
+function openReceiptModal(advance: AdvanceSimple<string>) {
+  receiptAdvance.value = advance
+  receiptFormIsLoading.value = false
+  modalComp.value?.hideModal()
+  receiptModalComp.value?.modal?.show()
+}
+
+function hideReceiptModal() {
+  receiptModalComp.value?.hideModal()
+}
+
+function resetReceiptModal() {
+  receiptAdvance.value = null
+  receiptFormIsLoading.value = false
+}
+
+function canConfirmReceipt(advance: AdvanceSimple<string>) {
+  return (
+    Boolean(APP_DATA.value?.user) &&
+    advance.owner._id === APP_DATA.value?.user._id &&
+    advance.state >= AdvanceState.APPROVED &&
+    !advance.receivedOn
+  )
+}
+
+async function confirmReceipt(receivedOn: Date | string) {
+  if (!receiptAdvance.value) {
+    return
+  }
+  receiptFormIsLoading.value = true
+  const result = await API.setter<AdvanceSimple<string>>('advance/received', { _id: receiptAdvance.value._id, receivedOn })
+  receiptFormIsLoading.value = false
+  if (result.ok) {
+    if (modalObject.value && modalObjectType.value === 'advance' && modalObject.value._id === result.ok._id) {
+      modalObject.value = result.ok
+    }
+    advanceList.value?.loadFromServer()
+    hideReceiptModal()
+  }
 }
 
 async function handleSubmit(
@@ -292,7 +358,11 @@ async function showPropReport() {
   if (props.reportId && props.reportType) {
     const result = await API.getter<ModalObject>(props.reportType, { _id: props.reportId })
     if (result.ok) {
-      showModal('view', props.reportType, result.ok.data)
+      if (props.confirmAdvance && props.reportType === 'advance') {
+        openReceiptModal(result.ok.data as AdvanceSimple<string>)
+      } else {
+        showModal('view', props.reportType, result.ok.data)
+      }
     }
     await nextTick()
     router.replace('/user')

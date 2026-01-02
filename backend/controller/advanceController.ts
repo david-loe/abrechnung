@@ -81,6 +81,27 @@ export class AdvanceController extends Controller {
     })
   }
 
+  @Post('received')
+  public async postReceived(
+    @Body() requestBody: { _id: string; receivedOn: Date | string },
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const extendedBody = Object.assign(requestBody, { editor: request.user._id })
+    return await this.setter(Advance, {
+      requestBody: extendedBody,
+      allowNew: false,
+      cb: async (a: IAdvance<Types.ObjectId>) => {
+        a.state += 5
+        await runWebhooks(a)
+      },
+      checkOldObject: async (oldObject: AdvanceDoc) =>
+        !oldObject.historic &&
+        oldObject.state >= AdvanceState.APPROVED &&
+        !oldObject.receivedOn &&
+        request.user._id.equals(oldObject.owner._id)
+    })
+  }
+
   @Get('report')
   @Produces('application/pdf')
   public async getReportForOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {

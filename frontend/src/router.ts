@@ -129,6 +129,12 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'advance' })
   },
+  {
+    path: '/advance/:_id([0-9a-fA-F]{24})/confirm',
+    component: HomePage,
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'advance', confirmAdvance: true })
+  },
   { path: '/:pathMatch(.*)*', redirect: '/user' }
 ]
 
