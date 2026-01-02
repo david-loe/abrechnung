@@ -82,7 +82,12 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
 
   const subject = i18n.t(`mail.${reportType}.${stateLabel}.subject`, interpolation)
   const paragraph = i18n.t(`mail.${reportType}.${stateLabel}.paragraph`, interpolation)
-  const lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation) : ''
+  let lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation) : ''
+  if (reportIsAdvance(report) && report.state === AdvanceState.APPROVED) {
+    const confirmLink = `${ENV.VITE_FRONTEND_URL}/advance/${report._id}/confirm`
+    const confirmLine = i18n.t('mail.advance.APPROVED.confirmationLine', { ...interpolation, confirmLink })
+    lastParagraph = interpolation.comment ? [lastParagraph, confirmLine] : confirmLine
+  }
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)
   sendMail(recipients, subject, paragraph, button, lastParagraph)

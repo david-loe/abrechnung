@@ -50,6 +50,7 @@ const advanceSchema = () =>
           }
         ]
       },
+      receivedOn: { type: Date },
       settledOn: { type: Date }
     }),
     { timestamps: true }

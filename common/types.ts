@@ -460,6 +460,7 @@ export interface AdvanceBase<idType extends _id = _id> {
   balance: BaseCurrencyMoneyNotNull
   reason: string
   state: AdvanceState
+  receivedOn?: Date | string | null
   settledOn?: Date | string | null
   _id: idType
 }

@@ -188,6 +188,7 @@
     "adminTools": "Admin Tools",
     "advance": "Vorschuss",
     "advanceFromEmployer": "Vorschuss vom Arbeitgeber",
+    "advanceReceiptConfirmation": "Hiermit bestätige ich, dass ich den Vorschuss in Höhe von {amount} erhalten habe.",
     "advances": "Vorschüsse",
     "airplane": "Flugzeug ✈",
     "alias": "Alias",
@@ -233,6 +234,7 @@
     "completeReview": "Prüfung abschließen",
     "configCateringRefund": "Einstellungen Verpflegungspauschalen",
     "confirm": "Bestätigen",
+    "confirmReceipt": "Erhalt bestätigen",
     "connectionSettings": "Verbindungseinstellungen",
     "convertBodyToFormData": "Body-Objekt zu FormData konvertieren",
     "cost": "Kosten",
@@ -416,6 +418,7 @@
     "reapplyForX": "{X} neu beantragen",
     "reason": "Grund",
     "receipt": "Beleg",
+    "receivedOn": "Erhalten am",
     "receiptNumber": "Beleg Nr.",
     "receipts": "Belege",
     "refund": "Erstatten",
@@ -537,6 +540,7 @@
         "subject": "🆕 Neue Vorschussantrag"
       },
       "APPROVED": {
+        "confirmationLine": "Sobald du das Geld erhalten hast, kannst du das hier bestätigen: {confirmLink}",
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Vorschussantrag wurde genehmigt.",
         "subject": "✅ Vorschuss genehmigt"

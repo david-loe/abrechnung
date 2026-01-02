@@ -188,6 +188,7 @@
     "adminTools": "Herramientas de administrador",
     "advance": "Anticipo",
     "advanceFromEmployer": "Anticipo del empleador",
+    "advanceReceiptConfirmation": "Confirmo que he recibido el anticipo de {amount}.",
     "advances": "Anticipos",
     "airplane": "Avión ✈",
     "alias": "Alias",
@@ -233,6 +234,7 @@
     "completeReview": "Completar revisión",
     "configCateringRefund": "Ajustes de reembolso de catering",
     "confirm": "Confirmar",
+    "confirmReceipt": "Confirmar recepción",
     "connectionSettings": "Configuraciones de conexión",
     "convertBodyToFormData": "Convertir objeto Body a FormData",
     "cost": "Costo",
@@ -416,6 +418,7 @@
     "reapplyForX": "Solicitar nuevamente {X}",
     "reason": "Razón",
     "receipt": "Recibo",
+    "receivedOn": "Recibido el",
     "receiptNumber": "Recibo Nº",
     "receipts": "Recibos",
     "refund": "Reembolsar",
@@ -537,6 +540,7 @@
         "subject": "🆕 Nueva solicitud de anticipo"
       },
       "APPROVED": {
+        "confirmationLine": "Una vez que hayas recibido el dinero, puedes confirmarlo aquí: {confirmLink}",
         "lastParagraph": "{commentator} escribió: '{comment}'",
         "paragraph": "Tu solicitud de anticipo ha sido aprobada.",
         "subject": "✅ Anticipo aprobado"

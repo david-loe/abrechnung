@@ -40,6 +40,10 @@
           <span class="tnum"> {{ formatter.money(advance.balance) }}</span>
         </td>
       </tr>
+      <tr v-if="advance.receivedOn">
+        <th scope="row">{{ t('labels.receivedOn') }}</th>
+        <td>{{ formatter.date(advance.receivedOn) }}</td>
+      </tr>
       <tr>
         <th scope="row">{{ t('labels.project') }}</th>
         <td>{{ `${advance.project.identifier} ${advance.project.name}` }}</td>

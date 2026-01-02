@@ -363,6 +363,9 @@ class ReportPrint<idType extends _id> {
         value: this.report.log[AdvanceState.APPLIED_FOR]?.on || this.report.createdAt
       })
       summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[AdvanceState.APPROVED]?.on })
+      if (this.report.receivedOn) {
+        summary.push({ reference: this.t('labels.receivedOn'), value: this.report.receivedOn })
+      }
       summary.push({
         reference: this.t('labels.approvedBy'),
         value: `${this.drawer.formatter.name(this.report.log[AdvanceState.APPROVED]?.by.name)}`

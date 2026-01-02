@@ -188,6 +188,7 @@
     "adminTools": "Admin Tools",
     "advance": "Advance",
     "advanceFromEmployer": "Advance From Employer",
+    "advanceReceiptConfirmation": "I hereby confirm that I have received the advance of {amount}.",
     "advances": "Advances",
     "airplane": "Airplane ✈",
     "alias": "Alias",
@@ -233,6 +234,7 @@
     "completeReview": "Complete Review",
     "configCateringRefund": "Config catering refund",
     "confirm": "Confirm",
+    "confirmReceipt": "Confirm receipt",
     "connectionSettings": "Connection Settings",
     "convertBodyToFormData": "Convert body object to FormData",
     "cost": "Cost",
@@ -416,6 +418,7 @@
     "reapplyForX": "Reapply for {X}",
     "reason": "Reason",
     "receipt": "Receipt",
+    "receivedOn": "Received on",
     "receiptNumber": "Receipt No.",
     "receipts": "Receipts",
     "refund": "Refund",
@@ -537,6 +540,7 @@
         "subject": "🆕 New advance request"
       },
       "APPROVED": {
+        "confirmationLine": "Once you have received the money, you can confirm it here: {confirmLink}",
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request has been approved.",
         "subject": "✅ Advance approved"
