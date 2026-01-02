@@ -212,7 +212,18 @@
 					},
 					"onState": {
 						"items": {
-							"$ref": "#/components/schemas/AnyState"
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/AnyState"
+								},
+								{
+									"type": "number",
+									"enum": [
+										35,
+										45
+									]
+								}
+							]
 						},
 						"type": "array"
 					},
@@ -281,7 +292,18 @@
 					},
 					"onState": {
 						"items": {
-							"$ref": "#/components/schemas/AnyState"
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/AnyState"
+								},
+								{
+									"type": "number",
+									"enum": [
+										35,
+										45
+									]
+								}
+							]
 						},
 						"type": "array"
 					},
@@ -3568,6 +3590,18 @@
 					"state": {
 						"$ref": "#/components/schemas/AdvanceState"
 					},
+					"receivedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"settledOn": {
 						"anyOf": [
 							{
@@ -4597,6 +4631,18 @@
 					},
 					"state": {
 						"$ref": "#/components/schemas/AdvanceState"
+					},
+					"receivedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
 					},
 					"settledOn": {
 						"anyOf": [
@@ -5968,6 +6014,17 @@
 												}
 											]
 										},
+										"receivedOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -6139,6 +6196,17 @@
 								"items": {
 									"properties": {
 										"settledOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
+										"receivedOn": {
 											"anyOf": [
 												{
 													"type": "string"
@@ -6366,6 +6434,17 @@
 								"items": {
 									"properties": {
 										"settledOn": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
+										"receivedOn": {
 											"anyOf": [
 												{
 													"type": "string"
@@ -9095,6 +9174,18 @@
 					},
 					"reason": {
 						"type": "string"
+					},
+					"receivedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
 					},
 					"settledOn": {
 						"anyOf": [
@@ -12583,6 +12674,18 @@
 					"reason": {
 						"type": "string"
 					},
+					"receivedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"settledOn": {
 						"anyOf": [
 							{
@@ -12766,6 +12869,18 @@
 					"reason": {
 						"type": "string"
 					},
+					"receivedOn": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"settledOn": {
 						"anyOf": [
 							{
@@ -12897,6 +13012,7 @@
 								"balance",
 								"reason",
 								"state",
+								"receivedOn",
 								"settledOn",
 								"_id",
 								"offsetAgainst"
@@ -23210,6 +23326,7 @@
 									"balance",
 									"reason",
 									"state",
+									"receivedOn",
 									"settledOn",
 									"_id",
 									"offsetAgainst"
@@ -23326,6 +23443,81 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/AdvanceApplication"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/advance/received": {
+			"post": {
+				"operationId": "PostReceived",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"receivedOn": {
+										"anyOf": [
+											{
+												"type": "string",
+												"format": "date-time"
+											},
+											{
+												"type": "string"
+											}
+										]
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"receivedOn",
+									"_id"
+								],
+								"type": "object"
 							}
 						}
 					}
@@ -23517,6 +23709,7 @@
 									"balance",
 									"reason",
 									"state",
+									"receivedOn",
 									"settledOn",
 									"_id",
 									"offsetAgainst"
@@ -23648,6 +23841,7 @@
 									"balance",
 									"reason",
 									"state",
+									"receivedOn",
 									"settledOn",
 									"_id",
 									"offsetAgainst"
@@ -24056,6 +24250,7 @@
 									"balance",
 									"reason",
 									"state",
+									"receivedOn",
 									"settledOn",
 									"_id",
 									"offsetAgainst"
