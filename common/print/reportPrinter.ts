@@ -359,7 +359,7 @@ class ReportPrint<idType extends _id> {
     const summary = []
     if (reportIsAdvance(this.report)) {
       if (this.report.log[AdvanceState.APPLIED_FOR]) {
-        summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.log[AdvanceState.APPLIED_FOR] })
+        summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.log[AdvanceState.APPLIED_FOR].on })
       }
       summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[AdvanceState.APPROVED]?.on })
       summary.push({

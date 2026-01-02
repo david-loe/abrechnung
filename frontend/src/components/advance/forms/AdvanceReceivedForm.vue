@@ -48,7 +48,9 @@ watch(
 )
 
 function submit() {
-  emit('confirm', receivedOn.value)
+  if (confirmed.value) {
+    emit('confirm', receivedOn.value)
+  }
 }
 </script>
 

@@ -89,10 +89,12 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     : undefined
   if (reportIsAdvance(report) && report.state === AdvanceState.APPROVED) {
     const confirmRoute = `/advance/${report._id}/confirm`
-    const confirmLink =
-      recipients.length === 1 && recipients[0].fk.magiclogin
-        ? await genAuthenticatedLink({ destination: recipients[0].fk.magiclogin, redirect: confirmRoute })
-        : `${ENV.VITE_FRONTEND_URL}${confirmRoute}`
+    let confirmLink = `${ENV.VITE_FRONTEND_URL}${confirmRoute}`
+    if (recipients.length === 1 && recipients[0].fk.magiclogin) {
+      try {
+        confirmLink = await genAuthenticatedLink({ destination: recipients[0].fk.magiclogin, redirect: confirmRoute })
+      } catch (_error) {}
+    }
     const confirmLine = mdLinksToHtml(i18n.t('mail.advance.APPROVED.confirmationLine', { ...interpolation, confirmLink }))
     lastParagraph = interpolation.comment ? [lastParagraph as string, confirmLine] : confirmLine
   }
