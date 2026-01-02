@@ -151,6 +151,7 @@
       </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
+    <template #item-receivedOn="{ receivedOn }">{{ formatter.date(receivedOn) }}</template>
     <template #item-log.30.on="{ log }: AdvanceSimple">{{ log[30] ? formatter.dateTime(log[30].on) : '' }}</template>
     <template #item-bookingRemark="{ bookingRemark }: AdvanceSimple">
       <span v-if="bookingRemark">
@@ -228,6 +229,7 @@ if (window.innerWidth > bp.md) {
     { text: 'labels.budget', value: 'budget' },
     { text: 'labels.balance', value: 'balance' },
     { text: 'labels.owner', value: 'owner' },
+    { text: 'labels.receivedOn', value: 'receivedOn', sortable: true },
     { text: 'labels.editor', value: 'editor' },
     { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },
     { text: 'labels.approvedOn', value: 'log.30.on', sortable: true },

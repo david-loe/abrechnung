@@ -1,26 +1,22 @@
 <template>
   <form @submit.prevent="submit">
     <div class="form-check mb-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        id="advanceReceivedCheck"
-        v-model="confirmed"
-        :disabled="loading" />
+      <input class="form-check-input" type="checkbox" id="advanceReceivedCheck" v-model="confirmed" :disabled="loading" required >
       <label class="form-check-label" for="advanceReceivedCheck">
         {{ t('labels.advanceReceiptConfirmation', { amount: formatter.money(props.advance.budget) }) }}
+        <span class="text-danger">*</span>
       </label>
     </div>
     <div class="mb-3">
-      <label class="form-label" for="advanceReceivedOn">{{ t('labels.receivedOn') }}</label>
-      <DateInput id="advanceReceivedOn" v-model="receivedOn" :disabled="loading" required />
+      <label class="form-label" for="advanceReceivedOn">
+        {{ t('labels.receivedOn') }}
+        <span class="text-danger">*</span>
+      </label>
+      <DateInput id="advanceReceivedOn" v-model="receivedOn" :disabled="loading" :max="new Date()" required />
     </div>
-    <button type="submit" class="btn btn-primary me-2" :disabled="loading || !confirmed">
-      {{ t('labels.confirm') }}
-    </button>
-    <button type="button" class="btn btn-light" @click="emit('cancel')" :disabled="loading">
-      {{ t('labels.cancel') }}
-    </button>
+    <button type="submit" class="btn btn-primary me-2" :disabled="loading">{{ t('labels.confirm') }}</button>
+    <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
+    <button type="button" class="btn btn-light" @click="emit('cancel')" :disabled="loading">{{ t('labels.cancel') }}</button>
   </form>
 </template>
 

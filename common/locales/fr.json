@@ -189,6 +189,7 @@
     "advance": "Avance",
     "advanceFromEmployer": "Avance de l'employeur",
     "advanceReceiptConfirmation": "Je confirme avoir reçu l'avance d'un montant de {amount}.",
+    "advanceRecipient": "Bénéficiaire de l’avance",
     "advances": "Avances",
     "airplane": "Avion ✈",
     "alias": "Alias",
@@ -418,9 +419,9 @@
     "reapplyForX": "Demander à nouveau {X}",
     "reason": "Raison",
     "receipt": "Justificatif",
-    "receivedOn": "Reçu le",
     "receiptNumber": "Numéro de justificatif",
     "receipts": "Justificatifs",
+    "receivedOn": "Reçu le",
     "refund": "Rembourser",
     "reject": "Refuser",
     "report": "Rapport",
@@ -540,7 +541,7 @@
         "subject": "🆕 Nouvelle demande d'avance"
       },
       "APPROVED": {
-        "confirmationLine": "Une fois l'argent reçu, vous pouvez le confirmer ici : {confirmLink}",
+        "confirmationLine": "Une fois l'argent reçu, vous pouvez le confirmer [ici]({- confirmLink}).",
         "lastParagraph": "{commentator} a écrit : '{comment}'",
         "paragraph": "Votre demande d'avance a été approuvée.",
         "subject": "✅ Avance approuvée"

@@ -371,10 +371,10 @@
                         <p>
                         <% if (Array.isArray(lastParagraph)) { %>
                           <% for (const par of lastParagraph) { %>
-                            <%= par %><br>
+                            <%- par %><br>
                           <% } %>
                         <% }else{ %>
-                          <%= lastParagraph %>
+                          <%- lastParagraph %>
                         <% } %>
                         </p>
                         <% } %>

@@ -61,10 +61,12 @@
       </tr>
     </tbody>
   </table>
-  <button
-    v-if="advance.state >= State.BOOKABLE"
-    class="btn btn-primary mb-2"
-    @click="
+  <div class="mb-1 d-flex align-items-center">
+    <slot name="buttons"></slot>
+    <button
+      v-if="advance.state >= State.BOOKABLE"
+      class="btn btn-primary ms-auto"
+      @click="
       showFile({
         endpoint: `${props.endpointPrefix}advance/report`,
         params: { _id: advance._id },
@@ -72,12 +74,13 @@
         isDownloading: isDownloadingFn()
       })
     "
-    :title="t('labels.report')"
-    :disabled="Boolean(isDownloading)">
-    <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
-    <i v-else class="bi bi-file-earmark-pdf"></i>
-    <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
-  </button>
+      :title="t('labels.report')"
+      :disabled="Boolean(isDownloading)">
+      <span v-if="isDownloading" class="spinner-border spinner-border-sm"></span>
+      <i v-else class="bi bi-file-earmark-pdf"></i>
+      <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
+    </button>
+  </div>
 </template>
 <script setup lang="ts">
 import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from 'abrechnung-common/types.js'

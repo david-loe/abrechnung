@@ -189,6 +189,7 @@
     "advance": "Anticipo",
     "advanceFromEmployer": "Anticipo del empleador",
     "advanceReceiptConfirmation": "Confirmo que he recibido el anticipo de {amount}.",
+    "advanceRecipient": "Receptor del anticipo",
     "advances": "Anticipos",
     "airplane": "Avión ✈",
     "alias": "Alias",
@@ -418,9 +419,9 @@
     "reapplyForX": "Solicitar nuevamente {X}",
     "reason": "Razón",
     "receipt": "Recibo",
-    "receivedOn": "Recibido el",
     "receiptNumber": "Recibo Nº",
     "receipts": "Recibos",
+    "receivedOn": "Recibido el",
     "refund": "Reembolsar",
     "reject": "Rechazar",
     "report": "Informe",
@@ -540,7 +541,7 @@
         "subject": "🆕 Nueva solicitud de anticipo"
       },
       "APPROVED": {
-        "confirmationLine": "Una vez que hayas recibido el dinero, puedes confirmarlo aquí: {confirmLink}",
+        "confirmationLine": "Una vez que hayas recibido el dinero, puedes confirmarlo [aquí]({- confirmLink}).",
         "lastParagraph": "{commentator} escribió: '{comment}'",
         "paragraph": "Tu solicitud de anticipo ha sido aprobada.",
         "subject": "✅ Anticipo aprobado"

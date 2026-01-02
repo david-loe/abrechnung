@@ -90,6 +90,10 @@ export class AdvanceController extends Controller {
     return await this.setter(Advance, {
       requestBody: extendedBody,
       allowNew: false,
+      cb: async (a: IAdvance<Types.ObjectId>) => {
+        a.state += 5
+        await runWebhooks(a)
+      },
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
         oldObject.state >= AdvanceState.APPROVED &&

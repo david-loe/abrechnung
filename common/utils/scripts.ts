@@ -590,3 +590,12 @@ export function hexToRGB(hex: HexColor): [number, number, number] {
 
   return [red, green, blue]
 }
+
+export function mdLinksToHtml(input: string): string {
+  // Only match Markdown links whose URL starts with http:// or https://
+  const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/gi
+
+  return input.replace(mdLinkRegex, (_full, text: string, href: string) => {
+    return `<a href="${href}">${text}</a>`
+  })
+}

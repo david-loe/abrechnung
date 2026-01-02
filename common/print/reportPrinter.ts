@@ -303,7 +303,7 @@ class ReportPrint<idType extends _id> {
     let y = options.yStart
     if (reportIsAdvance(this.report)) {
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.reason')}: ${this.report.reason}`,
+        `${this.t('labels.advanceRecipient')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.reason')}: ${this.report.reason}`,
         { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
       )
     }
@@ -358,18 +358,17 @@ class ReportPrint<idType extends _id> {
 
     const summary = []
     if (reportIsAdvance(this.report)) {
-      summary.push({
-        reference: this.t('labels.appliedForOn'),
-        value: this.report.log[AdvanceState.APPLIED_FOR]?.on || this.report.createdAt
-      })
-      summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[AdvanceState.APPROVED]?.on })
-      if (this.report.receivedOn) {
-        summary.push({ reference: this.t('labels.receivedOn'), value: this.report.receivedOn })
+      if (this.report.log[AdvanceState.APPLIED_FOR]) {
+        summary.push({ reference: this.t('labels.appliedForOn'), value: this.report.log[AdvanceState.APPLIED_FOR] })
       }
+      summary.push({ reference: this.t('labels.approvedOn'), value: this.report.log[AdvanceState.APPROVED]?.on })
       summary.push({
         reference: this.t('labels.approvedBy'),
         value: `${this.drawer.formatter.name(this.report.log[AdvanceState.APPROVED]?.by.name)}`
       })
+      if (this.report.receivedOn) {
+        summary.push({ reference: this.t('labels.receivedOn'), value: this.report.receivedOn })
+      }
     } else {
       if (reportIsTravel(this.report)) {
         summary.push({

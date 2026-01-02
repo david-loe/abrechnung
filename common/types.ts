@@ -27,7 +27,7 @@ export type Webhook<idType extends _id = _id> = {
   name: string
   executionOrder: number
   reportType: ReportType[]
-  onState: AnyState[]
+  onState: (AnyState | 35 | 45)[]
   script?: string | null
   isActive: boolean
   request: {

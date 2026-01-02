@@ -189,6 +189,7 @@
     "advance": "Advance",
     "advanceFromEmployer": "Advance From Employer",
     "advanceReceiptConfirmation": "I hereby confirm that I have received the advance of {amount}.",
+    "advanceRecipient": "Advance recipient",
     "advances": "Advances",
     "airplane": "Airplane ✈",
     "alias": "Alias",
@@ -418,9 +419,9 @@
     "reapplyForX": "Reapply for {X}",
     "reason": "Reason",
     "receipt": "Receipt",
-    "receivedOn": "Received on",
     "receiptNumber": "Receipt No.",
     "receipts": "Receipts",
+    "receivedOn": "Received on",
     "refund": "Refund",
     "reject": "Reject",
     "report": "Report",
@@ -540,7 +541,7 @@
         "subject": "🆕 New advance request"
       },
       "APPROVED": {
-        "confirmationLine": "Once you have received the money, you can confirm it here: {confirmLink}",
+        "confirmationLine": "Once you have received the money, you can confirm it [here]({- confirmLink}).",
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request has been approved.",
         "subject": "✅ Advance approved"

@@ -15,11 +15,13 @@ import {
   TravelSimple,
   TravelState
 } from 'abrechnung-common/types.js'
-import { getDiffInDays, PlaceToString } from 'abrechnung-common/utils/scripts.js'
+import { getDiffInDays, mdLinksToHtml, PlaceToString } from 'abrechnung-common/utils/scripts.js'
+import escapeHtml from 'escape-html'
 import { RootFilterQuery } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { formatter } from '../factory.js'
+import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
@@ -75,18 +77,24 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   if (report.comments.length > 0) {
     const comment = report.comments[report.comments.length - 1]
     if (comment.toState === report.state) {
-      interpolation.comment = comment.text
+      interpolation.comment = escapeHtml(comment.text)
       interpolation.commentator = comment.author.name.givenName
     }
   }
 
   const subject = i18n.t(`mail.${reportType}.${stateLabel}.subject`, interpolation)
   const paragraph = i18n.t(`mail.${reportType}.${stateLabel}.paragraph`, interpolation)
-  let lastParagraph = interpolation.comment ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation) : ''
+  let lastParagraph: string | string[] | undefined = interpolation.comment
+    ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation)
+    : undefined
   if (reportIsAdvance(report) && report.state === AdvanceState.APPROVED) {
-    const confirmLink = `${ENV.VITE_FRONTEND_URL}/advance/${report._id}/confirm`
-    const confirmLine = i18n.t('mail.advance.APPROVED.confirmationLine', { ...interpolation, confirmLink })
-    lastParagraph = interpolation.comment ? [lastParagraph, confirmLine] : confirmLine
+    const confirmRoute = `/advance/${report._id}/confirm`
+    const confirmLink =
+      recipients.length === 1 && recipients[0].fk.magiclogin
+        ? await genAuthenticatedLink({ destination: recipients[0].fk.magiclogin, redirect: confirmRoute })
+        : `${ENV.VITE_FRONTEND_URL}${confirmRoute}`
+    const confirmLine = mdLinksToHtml(i18n.t('mail.advance.APPROVED.confirmationLine', { ...interpolation, confirmLink }))
+    lastParagraph = interpolation.comment ? [lastParagraph as string, confirmLine] : confirmLine
   }
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)

@@ -15,14 +15,15 @@
       <div v-if="modalObject">
         <template v-if="modalMode === 'view'">
           <TravelApplication v-if="modalObjectType === 'travel'" :travel="(modalObject as TravelSimple)" />
-          <template v-else-if="modalObjectType === 'advance'">
-            <Advance :advance="(modalObject as AdvanceSimple<string>)" />
-            <div v-if="canConfirmReceipt(modalObject as AdvanceSimple<string>)" class="mb-2">
-              <button type="button" class="btn btn-primary" @click="openReceiptModal(modalObject as AdvanceSimple<string>)">
-                {{ t('labels.confirmReceipt') }}
-              </button>
-            </div>
-          </template>
+          <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)">
+            <template #buttons>
+              <template v-if="canConfirmReceipt(modalObject as AdvanceSimple<string>)">
+                <button type="button" class="btn btn-success" @click="openReceiptModal(modalObject as AdvanceSimple<string>)">
+                  {{ t('labels.confirmReceipt') }}
+                </button>
+              </template>
+            </template>
+          </Advance>
           <div v-if="modalObject.state !== undefined" class="mb-1">
             <template v-if="modalObject.state <= State.APPLIED_FOR">
               <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">

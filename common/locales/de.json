@@ -189,6 +189,7 @@
     "advance": "Vorschuss",
     "advanceFromEmployer": "Vorschuss vom Arbeitgeber",
     "advanceReceiptConfirmation": "Hiermit bestätige ich, dass ich den Vorschuss in Höhe von {amount} erhalten habe.",
+    "advanceRecipient": "Vorschussempfänger",
     "advances": "Vorschüsse",
     "airplane": "Flugzeug ✈",
     "alias": "Alias",
@@ -418,9 +419,9 @@
     "reapplyForX": "{X} neu beantragen",
     "reason": "Grund",
     "receipt": "Beleg",
-    "receivedOn": "Erhalten am",
     "receiptNumber": "Beleg Nr.",
     "receipts": "Belege",
+    "receivedOn": "Erhalten am",
     "refund": "Erstatten",
     "reject": "Ablehnen",
     "report": "Bericht",
@@ -540,7 +541,7 @@
         "subject": "🆕 Neue Vorschussantrag"
       },
       "APPROVED": {
-        "confirmationLine": "Sobald du das Geld erhalten hast, kannst du das hier bestätigen: {confirmLink}",
+        "confirmationLine": "Sobald du das Geld erhalten hast, kannst du das [hier]({- confirmLink}) bestätigen.",
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Vorschussantrag wurde genehmigt.",
         "subject": "✅ Vorschuss genehmigt"

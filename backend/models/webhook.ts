@@ -8,7 +8,11 @@ export const webhookSchema = () =>
       name: { type: String, required: true },
       executionOrder: { type: Number, required: true, min: 1, max: 2_097_152 }, // https://docs.bullmq.io/guide/jobs/prioritized
       reportType: { type: [{ type: String, enum: reportTypes, required: true }], required: true },
-      onState: { type: [{ type: Number, enum: Array.from(anyStates), required: true }], required: true, description: inspect(State) },
+      onState: {
+        type: [{ type: Number, enum: [...Array.from(anyStates), 35, 45], required: true }],
+        required: true,
+        description: inspect({ ...State, ADVANCE_CONFIRMED: '35 or 45' })
+      },
       isActive: { type: Boolean, required: true, default: true },
       request: {
         type: {
