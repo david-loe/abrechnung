@@ -97,7 +97,13 @@ export async function initDB() {
   }
 
   if (ENV.NODE_ENV === 'production') {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd])
+    if (ENV.PROD_INIT_CONNECTION_SETTINGS) {
+      await initer(ConnectionSettings, 'connectionSettings', [
+        ENV.PROD_INIT_CONNECTION_SETTINGS as Partial<IConnectionSettings<Types.ObjectId>>
+      ])
+    } else {
+      await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd])
+    }
   } else {
     await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDev as Partial<IConnectionSettings<Types.ObjectId>>], true)
   }

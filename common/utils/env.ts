@@ -1,4 +1,5 @@
-import { bool, CleanOptions, cleanEnv, EnvError, makeValidator, str } from 'envalid'
+import { bool, CleanOptions, cleanEnv, EnvError, json, makeValidator, str } from 'envalid'
+import { ConnectionSettings } from '../types.js'
 
 const int = makeValidator<number>((input: string) => {
   const coerced = Number.parseInt(input, 10)
@@ -58,7 +59,6 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   REDIS_URL: notEmptyString({ desc: 'Redis URL' }),
 
   COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
-  USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),
   PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
   LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),
   TZ: notEmptyString({
@@ -72,6 +72,11 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   WEBHOOK_SCRIPT_COMPILE_TIMEOUT_MS: int({ default: 50, desc: 'Timeout for compiling user webhook scripts in milliseconds' }),
   WEBHOOK_SCRIPT_RUN_TIMEOUT_MS: int({ default: 100, desc: 'Timeout for running user webhook scripts in milliseconds' }),
   WEBHOOK_REQUEST_TIMEOUT_MS: int({ default: 5_000, desc: 'Timeout webhook HTTP requests in milliseconds' }),
+  PROD_INIT_CONNECTION_SETTINGS: json<Partial<ConnectionSettings>>({
+    default: undefined,
+    desc: 'Initial connection settings for production environment as JSON object'
+  }),
+  USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),
   BACKEND_SAVE_REPORTS_ON_DISK: bool({
     default: false,
     desc: "⚠️Deprecated⚠️ If set to 'TRUE', all reports will be saved to `/reports` in the backend container. Uncomment the corresponding backend volume in `docker-compose.yml` to get reports on host machine"
