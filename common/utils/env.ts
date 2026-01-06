@@ -1,4 +1,4 @@
-import { bool, CleanOptions, cleanEnv, EnvError, makeValidator, port, str } from 'envalid'
+import { bool, CleanOptions, cleanEnv, EnvError, makeValidator, str } from 'envalid'
 
 const int = makeValidator<number>((input: string) => {
   const coerced = Number.parseInt(input, 10)
@@ -56,7 +56,6 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   MAGIC_LOGIN_SECRET: notEmptyString({ desc: "Secret for magic login links (use something like: 'openssl rand -base64 60')" }),
   MONGO_URL: notEmptyString({ desc: 'MongoDB connection string' }),
   REDIS_URL: notEmptyString({ desc: 'Redis URL' }),
-  BACKEND_PORT: port({ desc: 'Port the backend listens on' }),
 
   COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
   USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),

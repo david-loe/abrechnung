@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-;(await APP()).listen(ENV.BACKEND_PORT, () => {
+;(await APP()).listen(8000, () => {
   logger.info(`Backend listening at ${ENV.VITE_BACKEND_URL}`)
 })
 
