@@ -2,10 +2,10 @@ import { Contact, User as IUser, Locale } from 'abrechnung-common/types.js'
 import ejs from 'ejs'
 import nodemailer from 'nodemailer'
 import { mapSmtpConfig } from '../data/settingsValidator.js'
-import { getConnectionSettings } from '../db.js'
+import { getConnectionSettings, getDisplaySettings } from '../db.js'
 import ENV from '../env.js'
 import { genAuthenticatedLink } from '../helper.js'
-import i18n from '../i18n.js'
+import i18n, { updateI18n } from '../i18n.js'
 import { logger } from '../logger.js'
 import { getMailTemplate } from '../templates/cache.js'
 import { MailJobData, mailQueue } from '../workers/mail.js'
@@ -33,6 +33,9 @@ export async function sendMail(
 
 export async function processMailJob({ recipients, subject, paragraph, button, lastParagraph, authenticateLink }: MailJobData) {
   const mailPromises = []
+
+  const displaySettings = await getDisplaySettings(false)
+  updateI18n(displaySettings.locale)
   for (const recipient of recipients) {
     const language = recipient.settings.language
     let recipientButton: { text: string; link: string } | undefined

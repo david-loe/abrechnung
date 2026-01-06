@@ -10,9 +10,10 @@ import {
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import { Types } from 'mongoose'
-import { getConnectionSettings, getPrinterSettings, getTravelSettings } from '../db.js'
+import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
+import { updateI18n } from '../i18n.js'
 import Webhook from '../models/webhook.js'
 import { WebhookJobData, webhookQueue } from '../workers/webhook.js'
 import { runUserScript } from './runScript.js'
@@ -35,6 +36,9 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
       const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
+
+      const displaySettings = await getDisplaySettings(false)
+      updateI18n(displaySettings.locale)
 
       const printerSettings = await getPrinterSettings(false)
       const travelSettings = await getTravelSettings(false)

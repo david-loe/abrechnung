@@ -1,4 +1,5 @@
 import { ConnectionSettings, DisplaySettings, PrinterSettings, Settings, TravelSettings } from 'abrechnung-common/types.js'
+import { updateI18n } from '../i18n.js'
 
 export type CacheLoader<T> = (init?: boolean) => Promise<T>
 export type CacheLoaders = {
@@ -31,6 +32,11 @@ export class CACHE {
     this.#displaySettings = displaySettings
     this.#printerSettings = printerSettings
     this.#travelSettings = travelSettings
+    this.onInit()
+  }
+
+  onInit() {
+    updateI18n(this.#displaySettings.locale)
   }
 
   async reload() {

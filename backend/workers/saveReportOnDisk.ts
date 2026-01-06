@@ -3,9 +3,10 @@ import path from 'node:path'
 import { Advance, ExpenseReport, HealthCareCost, Travel } from 'abrechnung-common/types.js'
 import { Queue, Worker } from 'bullmq'
 import { Types } from 'mongoose'
-import { getConnectionSettings, getPrinterSettings, getTravelSettings } from '../db.js'
+import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../db.js'
 import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
+import { updateI18n } from '../i18n.js'
 import { logger } from '../logger.js'
 
 export interface SaveReportOnDiskJobData {
@@ -44,6 +45,9 @@ export function startSaveReportOnDiskWorker(concurrency = 1) {
 
       const connectionSettings = await getConnectionSettings(false)
       const lng = connectionSettings.PDFReportsViaEmail.locale
+
+      const displaySettings = await getDisplaySettings(false)
+      updateI18n(displaySettings.locale)
 
       const printerSettings = await getPrinterSettings(false)
       const travelSettings = await getTravelSettings(false)
