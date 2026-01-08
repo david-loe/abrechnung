@@ -6585,6 +6585,24 @@
 			"SetterBody_TravelPost_": {
 				"$ref": "#/components/schemas/SetterPartial_TravelPost.NoPost_"
 			},
+			"ReportUsageQuery": {
+				"properties": {
+					"from": {
+						"type": "string",
+						"format": "date"
+					},
+					"to": {
+						"type": "string",
+						"format": "date"
+					}
+				},
+				"required": [
+					"from",
+					"to"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Settings_mongoose.Types.ObjectId_": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -16840,7 +16858,7 @@
 						"name": "from",
 						"required": true,
 						"schema": {
-							"format": "date-time",
+							"format": "date",
 							"type": "string"
 						}
 					},
@@ -16849,7 +16867,7 @@
 						"name": "to",
 						"required": true,
 						"schema": {
-							"format": "date-time",
+							"format": "date",
 							"type": "string"
 						}
 					}
