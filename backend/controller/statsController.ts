@@ -1,10 +1,22 @@
+import { datetimeToDate, isValidDate } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
-import { Body, Get, Post, Query, Route, Security, Tags } from 'tsoa'
+import { Body, Get, Post, Queries, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ReportUsage from '../models/reportUsage.js'
 import Settings from '../models/settings.js'
 import { Controller } from './controller.js'
-import { NotFoundError } from './error.js'
+import { ClientError, NotFoundError } from './error.js'
+
+interface ReportUsageQuery {
+  /**
+   * @isDate
+   */
+  from: Date
+  /**
+   * @isDate
+   */
+  to: Date
+}
 
 @Tags('Stats')
 @Route()
@@ -26,7 +38,12 @@ export class StatsController extends Controller {
   @Security('cookieAuth', ['admin'])
   @Security('httpBearer', ['admin'])
   @Security('usageToken')
-  public async getReportUsage(@Query() from: Date, @Query() to: Date) {
+  public async getReportUsage(@Queries() q: ReportUsageQuery) {
+    const from = datetimeToDate(q.from)
+    const to = new Date(datetimeToDate(q.to).valueOf() + 86_400_000 - 1) // include whole day
+    if (!isValidDate(from) || !isValidDate(to) || from > to) {
+      throw new ClientError('Invalid dates')
+    }
     return { data: { reportUsage: await getReportUsage(from, to), from, to } }
   }
 
@@ -53,7 +70,7 @@ async function getDBUsage(scale?: number) {
 async function getReportUsage(from: Date, to: Date) {
   const reportUsage = { ExpenseReport: 0, Travel: 0, HealthCareCost: 0, Advance: 0 }
   const result = await ReportUsage.aggregate([
-    { $match: { createdAt: { $gte: from, $lt: to } } },
+    { $match: { createdAt: { $gte: from, $lte: to } } },
     { $group: { _id: '$reportModelName', count: { $sum: 1 } } }
   ])
   for (const r of result) {

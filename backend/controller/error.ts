@@ -3,7 +3,7 @@ import { Error as MongooseErrors } from 'mongoose'
 import { ValidateError } from 'tsoa'
 import { logger } from '../logger.js'
 
-class ClientError extends Error {
+export class ClientError extends Error {
   status = 400
 }
 
