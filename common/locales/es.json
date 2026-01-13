@@ -59,7 +59,8 @@
     "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres dejar la página?",
     "ValidationError": "Error de validación",
     "warningReapply": "Al solicitar de nuevo podrían perderse registros que estén fuera del período solicitado nuevamente.",
-    "wrongPassword": "Contraseña incorrecta"
+    "wrongPassword": "Contraseña incorrecta",
+    "XHasUnusedAdvance": "{X} aún tiene un anticipo que actualmente no se está compensando."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Para no realizar una eliminación automática, introduce 0",
@@ -319,6 +320,7 @@
     "fsUsage": "Uso del sistema de archivos",
     "givenName": "Nombre",
     "givenNameFirst": "Nombres primero",
+    "goToSettings": "Ir a la configuración",
     "healthCareCost": "Costos de salud",
     "healthCareCostName": "Nombre de reembolso de costos de salud",
     "healthCareCosts": "Costos de salud",

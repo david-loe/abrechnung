@@ -59,7 +59,8 @@
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
-    "wrongPassword": "Wrong Password"
+    "wrongPassword": "Wrong Password",
+    "XHasUnusedAdvance": "{X} still has an advance that is currently not being offset."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
@@ -319,6 +320,7 @@
     "fsUsage": "Filesystem Usage",
     "givenName": "Given name",
     "givenNameFirst": "Given name first",
+    "goToSettings": "Go to settings",
     "healthCareCost": "Health care cost",
     "healthCareCostName": "Health care cost name",
     "healthCareCosts": "Health care costs",

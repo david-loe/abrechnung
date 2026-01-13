@@ -63,7 +63,7 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -73,9 +73,7 @@
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editHealthCareCost">
-                          <span class="me-1"
-                            ><i class="bi bi-lock"></i></span
-                          >
+                          <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
@@ -87,38 +85,28 @@
                 </template>
                 <li>
                   <a
-                    :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
-                    href="#"
+                    :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
                     @click="showModal('edit', 'healthCareCost', healthCareCost)">
-                    <span class="me-1"
-                      ><i class="bi bi-pencil"></i></span
-                    >
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.healthCareCost') }) }) }}</span>
                   </a>
                 </li>
-                <li>
-                  <a
-                    :class="
-                      'dropdown-item' + (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? ' disabled' : '')
+                <li><a
+                  :class="
+                      'dropdown-item clickable' + (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? ' disabled' : '')
                     "
-                    href="#"
-                    @click="isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? null : deleteHealthCareCost()">
-                    <span class="me-1"
-                      ><i class="bi bi-trash"></i></span
-                    >
-                    <span>{{ t('labels.delete') }}</span>
-                  </a>
-                </li>
+                  @click="isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? null : deleteHealthCareCost()">
+                  <span class="me-1"><i class="bi bi-trash"></i></span>
+                  <span>{{ t('labels.delete') }}</span>
+                </a></li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{
-            (endpointPrefix === 'examine/' ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
             healthCareCost.project.identifier +
-            (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '')
-          }}
+            (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '') }}
         </div>
       </div>
 
@@ -149,11 +137,9 @@
             body-row-class-name="clickable"
             @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
             <template #item-cost.date="{ cost }: Expense">
-              {{
-                new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+              {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
                   ? formatter.simpleDate(cost.date)
-                  : formatter.date(cost.date)
-              }}
+                  : formatter.date(cost.date) }}
             </template>
             <template #item-cost="{ cost }: Expense">
               <div class="text-end tnum">{{ formatter.money(cost) }}</div>
@@ -161,6 +147,13 @@
           </TableElement>
         </div>
         <div class="col-lg-4 col">
+          <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+              {{ $t('alerts.XHasUnusedAdvance', {X: formatter.name(healthCareCost.owner.name)}) }}
+              <a class="clickable" role="button" @click="goToSettings(healthCareCost)">{{ $t('labels.goToSettings') }}</a>
+            </div>
+          </div>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
@@ -171,14 +164,12 @@
                     :project="healthCareCost.project"
                     :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />
                 </table>
-                <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
-                  <small>
-                    <p v-for="comment of healthCareCost.comments" :key="comment._id">
-                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                      <span>{{ comment.text }}</span>
-                    </p>
-                  </small>
-                </div>
+                <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
+                  <p v-for="comment of healthCareCost.comments" :key="comment._id">
+                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                    <span>{{ comment.text }}</span>
+                  </p>
+                </small></div>
                 <div v-if="healthCareCost.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -243,12 +234,10 @@
                       <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
                     </button>
                   </div>
-                  <div class="mt-2">
-                    <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
-                      <i class="bi bi-envelope"></i>
-                      <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
-                    </a>
-                  </div>
+                  <div class="mt-2"><a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
+                    <i class="bi bi-envelope"></i>
+                    <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
+                  </a></div>
                 </template>
               </div>
             </div>
@@ -285,6 +274,7 @@ import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
+import { getHasUnusedAdvances } from '@/components/scripts.js'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
@@ -309,6 +299,8 @@ const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
+
+const hasUnusedAdvances = ref(false)
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -446,10 +438,13 @@ async function getHealthCareCost() {
   }
 }
 
-function setHealthCareCost(newHealthCareCost: HealthCareCost<string>) {
+async function setHealthCareCost(newHealthCareCost: HealthCareCost<string>) {
   healthCareCost.value = newHealthCareCost
   logger.info(`${t('labels.healthCareCost')}:`)
   logger.info(healthCareCost.value)
+  if (props.endpointPrefix === 'examine/') {
+    hasUnusedAdvances.value = await getHasUnusedAdvances(newHealthCareCost, props.endpointPrefix)
+  }
 }
 
 async function getExaminerMails(): Promise<string[]> {
@@ -474,6 +469,10 @@ function getPrev(expense: Expense) {
     return undefined
   }
   return healthCareCost.value.expenses[idx - 1]
+}
+
+function goToSettings(healthCareCost: HealthCareCost<string>) {
+  showModal('edit', 'healthCareCost', healthCareCost)
 }
 
 await APP_LOADER.loadData()

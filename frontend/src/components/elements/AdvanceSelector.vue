@@ -13,20 +13,14 @@
     <template #option="{ name, budget, balance, project }">
       <div class="row align-items-center">
         <div class="col text-truncate">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto px-1">
-          <span>{{ formatter.money(balance) }}</span>
-        </div>
-        <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75">
-          <span>{{ formatter.money(budget) }}</span>
-        </div>
+        <div class="col-auto px-1"><span>{{ formatter.money(balance) }}</span></div>
+        <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75"><span>{{ formatter.money(budget) }}</span></div>
       </div>
     </template>
     <template #selected-option="{ name, balance, project }">
       <div class="row align-items-center">
         <div class="col-auto text-truncate" style="max-width: 220px">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto opacity-75">
-          <span>{{ formatter.money(balance) }}</span>
-        </div>
+        <div class="col-auto opacity-75"><span>{{ formatter.money(balance) }}</span></div>
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
@@ -40,12 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
-import { Base64 } from 'abrechnung-common/utils/encoding.js'
+import { getAdvances } from '@/components/advance/scripts.js'
+import { formatter } from '@/formatter.js'
+import { AdvanceSimple, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import API from '@/api'
-import { formatter } from '@/formatter.js'
 
 type BaseProps = {
   required?: boolean
@@ -89,22 +82,6 @@ function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
   )
 }
 
-async function getAdvances(ownerId: string | undefined) {
-  const filter: Partial<Record<keyof AdvanceSimple, string | number | null | { $gte: number }>> = {
-    state: { $gte: AdvanceState.APPROVED },
-    settledOn: null
-  }
-  if (ownerId) filter.owner = ownerId
-  const response = await API.getter<AdvanceSimple[]>(`${props.endpointPrefix}advance`, {
-    filterJSON: Base64.encode(JSON.stringify(filter))
-  })
-  const result = response.ok
-  if (result) {
-    return result.data
-  }
-  return []
-}
-
 function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
   if (
     props.setDefault &&
@@ -127,7 +104,7 @@ function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
 }
 
 onMounted(async () => {
-  advances.value = await getAdvances(idDocumentToId(props.owner))
+  advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
   setDefaultAdvances(advances.value)
 })
 
@@ -141,7 +118,7 @@ watch(
         emit('update:modelValue', null)
       }
     }
-    advances.value = await getAdvances(idDocumentToId(props.owner))
+    advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
     setDefaultAdvances(advances.value)
   }
 )

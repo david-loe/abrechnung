@@ -59,7 +59,8 @@
     "unsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter la page ?",
     "ValidationError": "Erreur de validation",
     "warningReapply": "En soumettant à nouveau, vous risquez de perdre des entrées en dehors de la nouvelle fenêtre de temps demandée.",
-    "wrongPassword": "Mot de passe incorrect"
+    "wrongPassword": "Mot de passe incorrect",
+    "XHasUnusedAdvance": "{X} a encore une avance qui n’est actuellement pas imputée."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Entrez 0 pour ne pas effectuer de suppression automatique",
@@ -319,6 +320,7 @@
     "fsUsage": "Utilisation du système de fichiers",
     "givenName": "Prénom",
     "givenNameFirst": "Prénom en premier",
+    "goToSettings": "Aller aux paramètres",
     "healthCareCost": "Frais de santé",
     "healthCareCostName": "Nom du décompte des frais de santé",
     "healthCareCosts": "Frais de santé",

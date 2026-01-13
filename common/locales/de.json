@@ -59,7 +59,8 @@
     "unsavedChanges": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du die Seite verlassen willst?",
     "ValidationError": "Validierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubeantragten Zeitfensters liegen.",
-    "wrongPassword": "Falsches Passwort"
+    "wrongPassword": "Falsches Passwort",
+    "XHasUnusedAdvance": "{X} hat noch einen Vorschuss der aktuell nicht verrechnet wird."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
@@ -319,6 +320,7 @@
     "fsUsage": "Dateisystemnutzung",
     "givenName": "Vorname",
     "givenNameFirst": "Vornamen zuerst",
+    "goToSettings": "Zu den Einstellungen",
     "healthCareCost": "Krankenkosten",
     "healthCareCostName": "Name der Krankenkostenabrechnung",
     "healthCareCosts": "Krankenkosten",

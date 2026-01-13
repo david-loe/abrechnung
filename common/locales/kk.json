@@ -59,7 +59,8 @@
     "unsavedChanges": "Сақталмаған өзгерістеріңіз бар. Бұл бетті қалдыруға сенімдісіз бе?",
     "ValidationError": "Тексеру қатесі",
     "warningReapply": "Қайта сұрау кезінде жаңадан берілмеген терезеден тыс жазбалар жоғалуы мүмкін.",
-    "wrongPassword": "Қате құпия сөз"
+    "wrongPassword": "Қате құпия сөз",
+    "XHasUnusedAdvance": "{X}-те қазіргі уақытта есепке алынбай тұрған аванс бар."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Автоматты түрде жою үшін 0 енгізіңіз",
@@ -319,6 +320,7 @@
     "fsUsage": "Файлдық жүйені пайдалану",
     "givenName": "Азан аты",
     "givenNameFirst": "Азан аты бірінші",
+    "goToSettings": "Баптауларға өту",
     "healthCareCost": "Денсаулық сақтау шығыстары",
     "healthCareCostName": "Денсаулық сақтау шығыс атауы",
     "healthCareCosts": "Денсаулық шығындары",

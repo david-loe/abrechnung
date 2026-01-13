@@ -101,7 +101,7 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -111,9 +111,7 @@
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editTravel">
-                          <span class="me-1"
-                            ><i class="bi bi-lock"></i></span
-                          >
+                          <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
@@ -123,37 +121,26 @@
                     <hr class="dropdown-divider" >
                   </li>
                 </template>
-                <li>
-                  <a :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')" href="#" @click="showModal('edit', 'travel', travel)">
-                    <span class="me-1"
-                      ><i class="bi bi-pencil"></i></span
-                    >
-                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    :class="
-                      'dropdown-item' + (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? ' disabled' : '')
+                <li><a :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')" @click="showModal('edit', 'travel', travel)">
+                  <span class="me-1"><i class="bi bi-pencil"></i></span>
+                  <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
+                </a></li>
+                <li><a
+                  :class="
+                      'dropdown-item clickable' + (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? ' disabled' : '')
                     "
-                    href="#"
-                    @click="isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? null : deleteTravel()">
-                    <span class="me-1"
-                      ><i class="bi bi-trash"></i></span
-                    >
-                    <span>{{ t('labels.delete') }}</span>
-                  </a>
-                </li>
+                  @click="isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? null : deleteTravel()">
+                  <span class="me-1"><i class="bi bi-trash"></i></span>
+                  <span>{{ t('labels.delete') }}</span>
+                </a></li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{
-            (endpointPrefix === 'examine/' ? formatter.name(travel.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' ? formatter.name(travel.owner.name) + ' - ' : '') +
             travel.project.identifier +
-            (travel.project.name ? ' ' + travel.project.name : '')
-          }}
+            (travel.project.name ? ' ' + travel.project.name : '') }}
         </div>
       </div>
 
@@ -192,6 +179,13 @@
         </div>
 
         <div class="col-lg-4 col">
+          <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+              {{ $t('alerts.XHasUnusedAdvance', {X: formatter.name(travel.owner.name)}) }}
+              <a class="clickable" role="button" @click="goToSettings(travel)">{{ $t('labels.goToSettings') }}</a>
+            </div>
+          </div>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
@@ -203,14 +197,12 @@
                   :project="travel.project"
                   withLumpSums
                   :showAdvanceOverflow="travel.state < State.BOOKABLE" />
-                <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
-                  <small>
-                    <p v-for="comment of travel.comments" :key="comment._id">
-                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                      <span>{{ comment.text }}</span>
-                    </p>
-                  </small>
-                </div>
+                <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
+                  <p v-for="comment of travel.comments" :key="comment._id">
+                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                    <span>{{ comment.text }}</span>
+                  </p>
+                </small></div>
                 <div v-if="travel.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -286,7 +278,6 @@
 <script lang="ts" setup>
 import {
   DocumentFile,
-  Place,
   Stage,
   State,
   Travel,
@@ -313,6 +304,7 @@ import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
+import { getHasUnusedAdvances } from '@/components/scripts.js'
 import LumpSumEditor from '@/components/travel/elements/LumpSumEditor.vue'
 import TravelTable from '@/components/travel/elements/TravelTable.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
@@ -344,6 +336,8 @@ const modalObjectType = ref<ModalObjectType>('stage')
 const error = ref<RequestError | undefined>(undefined)
 const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
+
+const hasUnusedAdvances = ref(false)
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -566,10 +560,17 @@ async function getTravel() {
   }
 }
 
-function setTravel(newTravel: Travel<string>) {
+async function setTravel(newTravel: Travel<string>) {
   travel.value = newTravel
   logger.info(`${t('labels.travel')}:`)
   logger.info(travel.value)
+  if (props.endpointPrefix === 'examine/') {
+    hasUnusedAdvances.value = await getHasUnusedAdvances(newTravel, props.endpointPrefix)
+  }
+}
+
+function goToSettings(travel: Travel<string>) {
+  showModal('edit', 'travel', travel)
 }
 
 async function getExaminerMails(): Promise<string[]> {

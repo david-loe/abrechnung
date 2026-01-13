@@ -70,7 +70,7 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis" data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button">
+              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -80,9 +80,7 @@
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" >
                         <label class="form-check-label text-nowrap" for="editExpenseReport">
-                          <span class="me-1"
-                            ><i class="bi bi-lock"></i></span
-                          >
+                          <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
                         </label>
                       </div>
@@ -94,41 +92,31 @@
                 </template>
                 <li>
                   <a
-                    :class="'dropdown-item' + (isReadOnly ? ' disabled' : '')"
-                    href="#"
+                    :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
                     @click="showModal('edit', 'expenseReport', expenseReport)">
-                    <span class="me-1"
-                      ><i class="bi bi-pencil"></i></span
-                    >
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
                   </a>
                 </li>
-                <li>
-                  <a
-                    :class="
-                      'dropdown-item' +
+                <li><a
+                  :class="
+                      'dropdown-item clickable' +
                       (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? ' disabled' : '')
                     "
-                    href="#"
-                    @click="
+                  @click="
                       isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? null : deleteExpenseReport()
                     ">
-                    <span class="me-1"
-                      ><i class="bi bi-trash"></i></span
-                    >
-                    <span>{{ t('labels.delete') }}</span>
-                  </a>
-                </li>
+                  <span class="me-1"><i class="bi bi-trash"></i></span>
+                  <span>{{ t('labels.delete') }}</span>
+                </a></li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{
-            (endpointPrefix === 'examine/' ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
             expenseReport.project.identifier +
-            (expenseReport.project.name ? ' ' + expenseReport.project.name : '')
-          }}
+            (expenseReport.project.name ? ' ' + expenseReport.project.name : '') }}
         </div>
       </div>
 
@@ -171,11 +159,9 @@
             :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
             @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)">
             <template #item-cost.date="{ cost }: Expense">
-              {{
-                new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+              {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
                   ? formatter.simpleDate(cost.date)
-                  : formatter.date(cost.date)
-              }}
+                  : formatter.date(cost.date) }}
             </template>
             <template #item-cost="{ cost }: Expense">
               <div class="text-end tnum">{{ formatter.money(cost) }}</div>
@@ -186,16 +172,19 @@
               </span>
             </template>
           </TableElement>
-          <div v-if="expenseReport.drafts && expenseReport.drafts.length > 0" class="row g-2 text-danger">
-            <div class="col-auto">
-              <i class="bi bi-exclamation-triangle"></i>
-            </div>
-            <div class="col">
-              <span> {{ t('alerts.draftsWillBeLost') }}</span>
-            </div>
+          <div v-if="expenseReport.drafts && expenseReport.drafts.length > 0" class="row g-2 text-danger mt-1">
+            <div class="col-auto"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="col"><span> {{ t('alerts.draftsWillBeLost') }}</span></div>
           </div>
         </div>
         <div class="col-lg-4 col">
+          <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+              {{ $t('alerts.XHasUnusedAdvance', {X: formatter.name(expenseReport.owner.name)}) }}
+              <a class="clickable" role="button" @click="goToSettings(expenseReport)">{{ $t('labels.goToSettings') }}</a>
+            </div>
+          </div>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{ t('labels.summary') }}</h5>
@@ -204,14 +193,12 @@
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
                   :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />
-                <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
-                  <small>
-                    <p v-for="comment of expenseReport.comments" :key="comment._id">
-                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                      <span>{{ comment.text }}</span>
-                    </p>
-                  </small>
-                </div>
+                <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
+                  <p v-for="comment of expenseReport.comments" :key="comment._id">
+                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                    <span>{{ comment.text }}</span>
+                  </p>
+                </small></div>
                 <div v-if="expenseReport.state <= State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -310,6 +297,7 @@ import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import { getHasUnusedAdvances } from '@/components/scripts'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
@@ -342,6 +330,8 @@ const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport<string>)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
+
+const hasUnusedAdvances = ref(false)
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -495,12 +485,15 @@ async function getExpenseReport() {
   }
 }
 
-function setExpenseReport(er: ExpenseReport<string>) {
+async function setExpenseReport(er: ExpenseReport<string>) {
   const drafts = expenseReport.value.drafts || []
   expenseReport.value = er
   expenseReport.value.drafts = drafts
   logger.info(`${t('labels.expenseReport')}:`)
   logger.info(expenseReport.value)
+  if (props.endpointPrefix === 'examine/') {
+    hasUnusedAdvances.value = await getHasUnusedAdvances(er, props.endpointPrefix)
+  }
 }
 
 async function getExaminerMails(): Promise<string[]> {
@@ -538,6 +531,10 @@ function addDrafts(draftExpenses: ExpenseDraft[]) {
     expenseReport.value.drafts = []
   }
   expenseReport.value.drafts.push(...draftExpenses)
+}
+
+function goToSettings(expenseReport: ExpenseReport<string>) {
+  showModal('edit', 'expenseReport', expenseReport)
 }
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
