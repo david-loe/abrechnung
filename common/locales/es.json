@@ -27,7 +27,6 @@
     "areYouSureMerge": "¿Estás seguro de que quieres fusionar estos usuarios? Esto no se puede deshacer.",
     "conflict": "¡Conflicto!",
     "countryChangeBetweenStages": "Cambio de país entre etapas consecutivas",
-    "defaultLastPlaceOfWork": "Valor por defecto para el último lugar de trabajo",
     "departureAndArrivalOnDifferentDaysX": "¿Estás seguro de que estuviste en \"{X}\" durante varios días?",
     "draftsWillBeLost": "¡Todos los borradores se perderán al salir de esta página! Añade y guarda recibos para conservarlos.",
     "errorCorrection": "Aquí se pueden cambiar las declaraciones independientemente del estado. Esto es solo para corregir errores. ¡Usar con precaución!",
@@ -60,7 +59,8 @@
     "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres dejar la página?",
     "ValidationError": "Error de validación",
     "warningReapply": "Al solicitar de nuevo podrían perderse registros que estén fuera del período solicitado nuevamente.",
-    "wrongPassword": "Contraseña incorrecta"
+    "wrongPassword": "Contraseña incorrecta",
+    "XHasUnusedAdvance": "{X} aún tiene un anticipo que actualmente no se está compensando."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Para no realizar una eliminación automática, introduce 0",
@@ -255,6 +255,7 @@
     "dbUsage": "Uso de la base de datos",
     "default": "Por defecto",
     "defaultAccess": "Acceso por defecto",
+    "defaultLastPlaceOfWork": "Valor por defecto para el último lugar de trabajo",
     "delete": "Eliminar",
     "deleteApprovedTravelAfterXDaysUnused": "Eliminar viajes aprobados sin uso - en días",
     "deleteBookedAfterXDays": "Eliminar solicitudes y viajes reservados - en días",
@@ -319,6 +320,7 @@
     "fsUsage": "Uso del sistema de archivos",
     "givenName": "Nombre",
     "givenNameFirst": "Nombres primero",
+    "goToSettings": "Ir a la configuración",
     "healthCareCost": "Costos de salud",
     "healthCareCostName": "Nombre de reembolso de costos de salud",
     "healthCareCosts": "Costos de salud",
