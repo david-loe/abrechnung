@@ -181,8 +181,8 @@
           <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
-              {{ $t('alerts.XHasUnusedAdvance', {X: formatter.name(expenseReport.owner.name)}) }}
-              <a class="clickable" role="button" @click="goToSettings(expenseReport)">{{ $t('labels.goToSettings') }}</a>
+              {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(expenseReport.owner.name)}) }}
+              <a class="clickable" role="button" @click="goToSettings(expenseReport)">{{ t('labels.goToSettings') }}</a>
             </div>
           </div>
           <div class="card">
@@ -297,7 +297,7 @@ import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
-import { getHasUnusedAdvances } from '@/components/scripts'
+import { getHasUnusedAdvances } from '@/components/scripts.js'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'

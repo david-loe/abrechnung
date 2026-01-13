@@ -12,12 +12,12 @@
     </div>
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-success me-2" @click="emit('decision', 'approved', comment, bookingRemark)" :disabled="loading">
-        {{ $t('labels.approve') }}
+        {{ t('labels.approve') }}
       </button>
       <button type="button" class="btn btn-danger me-2" @click="emit('decision', 'rejected', comment, bookingRemark)" :disabled="loading">
-        {{ $t('labels.reject') }}
+        {{ t('labels.reject') }}
       </button>
-      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">{{ $t('labels.cancel') }}</button>
+      <button type="button" class="btn btn-light" v-on:click="emit('cancel')">{{ t('labels.cancel') }}</button>
     </div>
   </div>
 </template>

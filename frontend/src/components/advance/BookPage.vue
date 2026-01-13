@@ -2,12 +2,10 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2>{{ $t('accesses.book/advance') }}</h2>
+        <h2>{{ t('accesses.book/advance') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint">
-          <i class="bi bi-printer-fill"></i>
-        </button>
+        <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">

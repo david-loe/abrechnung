@@ -150,8 +150,8 @@
           <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
-              {{ $t('alerts.XHasUnusedAdvance', {X: formatter.name(healthCareCost.owner.name)}) }}
-              <a class="clickable" role="button" @click="goToSettings(healthCareCost)">{{ $t('labels.goToSettings') }}</a>
+              {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(healthCareCost.owner.name)}) }}
+              <a class="clickable" role="button" @click="goToSettings(healthCareCost)">{{ t('labels.goToSettings') }}</a>
             </div>
           </div>
           <div class="card">

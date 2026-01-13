@@ -28,12 +28,8 @@
 
       <template #item-organisation="{ organisation }">{{ getById(organisation, APP_DATA!.organisations)?.name }}</template>
       <template #item-buttons="project">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(project)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteProject(project)">
-          <i class="bi bi-trash"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(project)"><i class="bi bi-pencil"></i></button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteProject(project)"><i class="bi bi-trash"></i></button>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -45,7 +41,7 @@
         @submit="(form$: any) => postProject(form$.data)"
         @reset="_showForm = false" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.project') }) }}</button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.project') }) }}</button>
   </div>
 </template>
 

@@ -2,12 +2,10 @@
   <div class="container py-3">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <h2>{{ $t('accesses.book/healthCareCost') }}</h2>
+        <h2>{{ t('accesses.book/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint">
-          <i class="bi bi-printer-fill"></i>
-        </button>
+        <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
@@ -35,9 +33,7 @@
           <div v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" class="d-inline-block">
             <AddUpTable class="table-sm" :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" id="addUp" />
           </div>
-          <div v-if="report.bookingRemark">
-            <small style="white-space: pre-wrap">{{ report.bookingRemark }}</small>
-          </div>
+          <div v-if="report.bookingRemark"><small style="white-space: pre-wrap">{{ report.bookingRemark }}</small></div>
         </div>
       </template>
     </HealthCareCostList>

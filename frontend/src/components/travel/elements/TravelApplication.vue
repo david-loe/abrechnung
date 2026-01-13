@@ -5,12 +5,12 @@
       <tbody>
         <tr v-for="key of keys" :key="key">
           <template v-if="displayKey(key)">
-            <th>{{ $t('labels.' + key) }}</th>
+            <th>{{ t('labels.' + key) }}</th>
             <td>{{ displayKey(key) }}</td>
           </template>
         </tr>
         <tr>
-          <th>{{ $t('labels.destinationPlace') }}</th>
+          <th>{{ t('labels.destinationPlace') }}</th>
           <td>
             <PlaceElement :place="props.travel.destinationPlace" />
           </td>

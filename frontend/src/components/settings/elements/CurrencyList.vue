@@ -29,12 +29,8 @@
 
       <template #item-name="{ name }">{{ name[$i18n.locale] }}</template>
       <template #item-buttons="currency">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(currency)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCurrency(currency)">
-          <i class="bi bi-trash"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(currency)"><i class="bi bi-pencil"></i></button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCurrency(currency)"><i class="bi bi-trash"></i></button>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -46,9 +42,7 @@
         @submit="(form$: any) => postCurrency(form$.data)"
         @reset="_showForm = false" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.currency') }) }}
-    </button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.currency') }) }}</button>
   </div>
 </template>
 

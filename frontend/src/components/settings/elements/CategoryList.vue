@@ -18,12 +18,8 @@
         <Badge :text="category.name" :style="category.style" />
       </template>
       <template #item-buttons="category">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(category)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCategory(category)">
-          <i class="bi bi-trash"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(category)"><i class="bi bi-pencil"></i></button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCategory(category)"><i class="bi bi-trash"></i></button>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -35,9 +31,7 @@
         @submit="(form$: any) => postCategory(form$.data)"
         @reset="_showForm = false" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.category') }) }}
-    </button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.category') }) }}</button>
   </div>
 </template>
 

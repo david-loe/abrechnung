@@ -61,18 +61,14 @@
       </template>
       <template #item-access="user">
         <template v-for="access of accesses">
-          <span v-if="user.access[access]" class="ms-3" :title="$t('accesses.' + access)">
+          <span v-if="user.access[access]" class="ms-3" :title="t('accesses.' + access)">
             <i v-for="icon of APP_DATA!.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
           </span>
         </template>
       </template>
       <template #item-buttons="user">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(user)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteUser(user)">
-          <i class="bi bi-trash"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(user)"><i class="bi bi-pencil"></i></button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteUser(user)"><i class="bi bi-trash"></i></button>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -86,7 +82,7 @@
         @reset="_showForm = false"
         @mounted="(form$:any) => {form$.el$('fk.genApiKey').on('click', () => {($refs.modal as any).modal.show()})}" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.user') }) }}</button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.user') }) }}</button>
   </div>
 </template>
 

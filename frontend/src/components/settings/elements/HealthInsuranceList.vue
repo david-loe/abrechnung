@@ -28,9 +28,7 @@
       </template>
 
       <template #item-buttons="healthInsurance">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(healthInsurance)">
-          <i class="bi bi-pencil"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(healthInsurance)"><i class="bi bi-pencil"></i></button>
         <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteHealthInsurance(healthInsurance)">
           <i class="bi bi-trash"></i>
         </button>
@@ -46,7 +44,7 @@
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.healthInsurance') }) }}
+      {{ t('labels.addX', { X: t('labels.healthInsurance') }) }}
     </button>
   </div>
 </template>

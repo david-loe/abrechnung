@@ -33,24 +33,16 @@
         </tr>
         <tr>
           <td></td>
-          <td class="py-0 px-2 text-nowrap" v-for="meal in lumpSums" :key="meal">
-            <span v-if="!disabled" class="d-sm-inline d-none">
-              <span class="clickable text-primary" @click="setAll(meal, true)">
-                <i class="bi bi-check-square"></i>
-              </span>
-              <span class="ms-2 clickable text-danger" @click="setAll(meal, false)">
-                <i class="bi bi-x-square"></i>
-              </span>
+          <td class="py-0 px-2 text-nowrap" v-for="meal in lumpSums" :key="meal"><span v-if="!disabled" class="d-sm-inline d-none">
+            <span class="clickable text-primary" @click="setAll(meal, true)"> <i class="bi bi-check-square"></i> </span>
+            <span class="ms-2 clickable text-danger" @click="setAll(meal, false)"> <i class="bi bi-x-square"></i> </span>
+          </span></td>
+          <td v-if="professionalShare !== null" class="py-0"><small>
+            <span class="d-lg-inline d-none"> {{ t('labels.professionalShare') + ': ' }}</span>
+            <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
+              {{ Math.round(professionalShare * 100) + '%' }}
             </span>
-          </td>
-          <td v-if="professionalShare !== null" class="py-0">
-            <small>
-              <span class="d-lg-inline d-none"> {{ t('labels.professionalShare') + ': ' }}</span>
-              <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
-                {{ Math.round(professionalShare * 100) + '%' }}
-              </span>
-            </small>
-          </td>
+          </small></td>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -100,7 +92,7 @@
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">{{ t('labels.save') }}</button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
-      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ $t('labels.cancel') }}</button>
+      <button type="button" class="btn btn-light" @click="emit('cancel')">{{ t('labels.cancel') }}</button>
     </div>
   </form>
 </template>

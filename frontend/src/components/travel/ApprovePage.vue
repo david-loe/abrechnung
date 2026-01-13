@@ -11,7 +11,7 @@
       ref="modalComp"
       @afterClose="modalMode === 'view' ? resetModal() : null">
       <template #header="{header}">
-        <h5 class="modal-title">{{header}}</h5>
+        <h5 class="modal-title">{{ header }}</h5>
         <RefStringBadge v-if="modalTravel.reference" class="ms-2" :number="modalTravel.reference" type="Travel" />
       </template>
       <div v-if="modalMode === 'approvedTravels'">
@@ -35,20 +35,20 @@
           <div class="row mb-4 align-items-end">
             <div class="col-auto">
               <label for="fromDateInput" class="form-label">
-                {{ $t('labels.from') }}
+                {{ t('labels.from') }}
                 <span class="text-danger">*</span>
               </label>
               <DateInput id="fromDateInput" v-model="approvedTravelsReportForm.from" :required="true" />
             </div>
             <div class="col-auto">
               <label for="toDateInput" class="form-label">
-                {{ $t('labels.to') }}
+                {{ t('labels.to') }}
                 <span class="text-danger">*</span>
               </label>
               <DateInput id="toDateInput" v-model="approvedTravelsReportForm.to" :required="true" :min="approvedTravelsReportForm.from" />
             </div>
             <div v-if="APP_DATA && APP_DATA.organisations.length > 1" class="col-auto">
-              <label for="organisationInput" class="form-label">{{ $t('labels.organisation') }}</label>
+              <label for="organisationInput" class="form-label">{{ t('labels.organisation') }}</label>
               <OrganisationSelector id="organisationInput" v-model="approvedTravelsReportForm.organisation" />
             </div>
           </div>

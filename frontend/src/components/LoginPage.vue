@@ -1,7 +1,7 @@
 <template>
   <div v-if="LOGIN_APP_DATA.displaySettings" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
-    <h2 class="h3 mb-3 fw-normal">{{ $t('login.signIn') }}</h2>
+    <h2 class="h3 mb-3 fw-normal">{{ t('login.signIn') }}</h2>
     <div v-if="strategy === 'ldapauth'">
       <form v-if="LOGIN_APP_DATA.displaySettings.auth.ldapauth" class="form-signin" @submit.prevent="login()">
         <div class="form-floating">
@@ -14,7 +14,7 @@
             placeholder=""
             v-model="usernameLDAP"
             required >
-          <label for="usernameLDAP">{{ $t('labels.username') }}</label>
+          <label for="usernameLDAP">{{ t('labels.username') }}</label>
         </div>
         <div class="form-floating">
           <input
@@ -26,11 +26,11 @@
             autocomplete="currentPassword"
             v-model="passwordLDAP"
             required >
-          <label for="passwordLDAP">{{ $t('labels.password') }}</label>
+          <label for="passwordLDAP">{{ t('labels.password') }}</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
           <i class="bi bi-people-fill me-1"></i>
-          {{ $t('labels.signIn') }}
+          {{ t('labels.signIn') }}
         </button>
       </form>
     </div>
@@ -50,7 +50,7 @@
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
           <i class="bi bi-envelope-fill me-1"></i>
-          {{ $t('labels.sendMail') }}
+          {{ t('labels.sendMail') }}
         </button>
       </form>
     </div>
@@ -58,28 +58,24 @@
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.ldapauth" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
         <i class="bi bi-people-fill me-1"></i>
-        {{ $t('labels.signInX', { X: 'LDAP' }) }}
+        {{ t('labels.signInX', { X: 'LDAP' }) }}
       </button>
     </div>
 
-    <div v-if="LOGIN_APP_DATA.displaySettings.auth.microsoft" class="mt-4">
-      <a class="btn btn-lg btn-primary" :href="microsoftLink()">
-        <i class="bi bi-microsoft me-1"></i>
-        {{ $t('labels.signInX', { X: 'Microsoft' }) }}
-      </a>
-    </div>
+    <div v-if="LOGIN_APP_DATA.displaySettings.auth.microsoft" class="mt-4"><a class="btn btn-lg btn-primary" :href="microsoftLink()">
+      <i class="bi bi-microsoft me-1"></i>
+      {{ t('labels.signInX', { X: 'Microsoft' }) }}
+    </a></div>
 
-    <div v-if="LOGIN_APP_DATA.displaySettings.auth.oidc" class="mt-4">
-      <a class="btn btn-lg btn-primary" :href="oidcLink()">
-        <i :class="`bi bi-${LOGIN_APP_DATA.displaySettings.oidc.icon} me-1`"></i>
-        {{ $t('labels.signInX', { X: LOGIN_APP_DATA.displaySettings.oidc.label }) }}
-      </a>
-    </div>
+    <div v-if="LOGIN_APP_DATA.displaySettings.auth.oidc" class="mt-4"><a class="btn btn-lg btn-primary" :href="oidcLink()">
+      <i :class="`bi bi-${LOGIN_APP_DATA.displaySettings.oidc.icon} me-1`"></i>
+      {{ t('labels.signInX', { X: LOGIN_APP_DATA.displaySettings.oidc.label }) }}
+    </a></div>
 
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.magiclogin" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
-        {{ $t('labels.signInX', { X: 'E-Mail' }) }}
+        {{ t('labels.signInX', { X: 'E-Mail' }) }}
       </button>
     </div>
   </div>
