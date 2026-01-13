@@ -8,21 +8,17 @@
     @option:selected="setLastCountry"
     :filter="filter"
     :getOptionKey="(option: CountrySimple) => option._id"
-    :getOptionLabel="(option: CountrySimple) => option.name[$i18n.locale as Locale]"
+    :getOptionLabel="(option: CountrySimple) => option.name[locale as Locale]"
     :disabled="props.disabled"
     style="min-width: 160px">
     <template #option="{ name, flag }">
-      <div class="row align-items-center" :title="name[$i18n.locale]">
-        <div v-if="flag" class="col-auto px-1">
-          <span class="fs-3">{{ flag }}</span>
-        </div>
-        <div class="col p-1 text-truncate">
-          <small>{{ name[$i18n.locale] }}</small>
-        </div>
+      <div class="row align-items-center" :title="name[locale]">
+        <div v-if="flag" class="col-auto px-1"><span class="fs-3">{{ flag }}</span></div>
+        <div class="col p-1 text-truncate"><small>{{ name[locale] }}</small></div>
       </div>
     </template>
     <template #selected-option="{ _id, name, flag }">
-      <div :title="name[$i18n.locale]">
+      <div :title="name[locale]">
         <span v-if="flag" class="me-1">{{ flag }}</span>
         <span>{{ _id }}</span>
       </div>
@@ -42,7 +38,7 @@ import { eventBus } from '../../eventBus.js'
 import { setLast } from '../../helper.js'
 import i18n from '../../i18n.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const APP_DATA = APP_LOADER.data
 const props = defineProps({
   modelValue: { type: Object as PropType<CountrySimple> },

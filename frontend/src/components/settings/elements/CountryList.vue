@@ -26,7 +26,7 @@
           </div>
         </div>
       </template>
-      <template #item-name="{ name }">{{ name[$i18n.locale] }}</template>
+      <template #item-name="{ name }">{{ name[locale] }}</template>
 
       <template #item-buttons="country">
         <button type="button" class="btn btn-light btn-sm" @click="showForm(country)"><i class="bi bi-pencil"></i></button>
@@ -56,7 +56,7 @@ import API from '@/api.js'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import APP_LOADER from '@/dataLoader.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const headers: Header[] = [
   { text: 'labels.name', value: 'name' },
