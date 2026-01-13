@@ -38,7 +38,7 @@
     "ldapjs": "^3.0.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.9",
+    "@biomejs/biome": "2.3.11",
     "@types/cors": "^2.8.19",
     "@types/ejs": "^3.1.5",
     "@types/escape-html": "^1.0.4",
