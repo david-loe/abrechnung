@@ -36,7 +36,6 @@ import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { eventBus } from '../../eventBus.js'
 import { setLast } from '../../helper.js'
-import i18n from '../../i18n.js'
 
 const { t, locale } = useI18n()
 const APP_DATA = APP_LOADER.data
@@ -49,7 +48,7 @@ const emits = defineEmits<{ 'update:modelValue': [CountrySimple] }>()
 
 function filter(options: CountrySimple[], search: string): CountrySimple[] {
   return options.filter((option) => {
-    const currentLocale = i18n.global.locale.value as Locale
+    const currentLocale = locale.value as Locale
     const name = option.name[currentLocale].toLowerCase().indexOf(search.toLowerCase()) > -1
     if (name) {
       return name

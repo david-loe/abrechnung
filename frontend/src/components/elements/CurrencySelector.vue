@@ -42,7 +42,6 @@ import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { eventBus } from '../../eventBus.js'
 import { setLast } from '../../helper.js'
-import i18n from '../../i18n.js'
 
 const { t, locale } = useI18n()
 const APP_DATA = APP_LOADER.data
@@ -55,7 +54,7 @@ const emits = defineEmits<{ 'update:modelValue': [Currency] }>()
 
 function filter(options: Currency[], search: string): Currency[] {
   return options.filter((option) => {
-    const name = option.name[i18n.global.locale.value as Locale].toLowerCase().indexOf(search.toLowerCase()) > -1
+    const name = option.name[locale.value as Locale].toLowerCase().indexOf(search.toLowerCase()) > -1
     if (name) {
       return name
     }
