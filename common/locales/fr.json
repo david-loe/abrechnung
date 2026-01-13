@@ -27,7 +27,6 @@
     "areYouSureMerge": "Êtes-vous sûr de vouloir fusionner ces utilisateurs ? Cela ne peut pas être annulé.",
     "conflict": "Conflit!",
     "countryChangeBetweenStages": "Changement de pays entre des étapes consécutives",
-    "defaultLastPlaceOfWork": "Valeur standard pour le dernier lieu d'activité",
     "departureAndArrivalOnDifferentDaysX": "Êtes-vous sûr d'avoir été assis dans le '{X}' pendant plusieurs jours ?",
     "draftsWillBeLost": "Tous les brouillons seront perdus dès que vous quitterez cette page ! Ajoutez des justificatifs et sauvegardez-les pour les conserver.",
     "errorCorrection": "Ici, les comptes peuvent être modifiés indépendamment de leur statut. Cela est uniquement destiné à la correction d'erreurs. Utiliser avec précaution !",
@@ -60,7 +59,8 @@
     "unsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter la page ?",
     "ValidationError": "Erreur de validation",
     "warningReapply": "En soumettant à nouveau, vous risquez de perdre des entrées en dehors de la nouvelle fenêtre de temps demandée.",
-    "wrongPassword": "Mot de passe incorrect"
+    "wrongPassword": "Mot de passe incorrect",
+    "XHasUnusedAdvance": "{X} a encore une avance qui n’est actuellement pas imputée."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Entrez 0 pour ne pas effectuer de suppression automatique",
@@ -255,6 +255,7 @@
     "dbUsage": "Utilisation de la base de données",
     "default": "Standard",
     "defaultAccess": "Droits d'accès par défaut",
+    "defaultLastPlaceOfWork": "Valeur standard pour le dernier lieu d'activité",
     "delete": "Supprimer",
     "deleteApprovedTravelAfterXDaysUnused": "Suppression des voyages approuvés et non utilisés - en jours",
     "deleteBookedAfterXDays": "Suppression des demandes et voyages réservés - en jours",
@@ -319,6 +320,7 @@
     "fsUsage": "Utilisation du système de fichiers",
     "givenName": "Prénom",
     "givenNameFirst": "Prénom en premier",
+    "goToSettings": "Aller aux paramètres",
     "healthCareCost": "Frais de santé",
     "healthCareCostName": "Nom du décompte des frais de santé",
     "healthCareCosts": "Frais de santé",

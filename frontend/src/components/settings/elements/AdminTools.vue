@@ -1,7 +1,7 @@
 <template>
   <div class="alert alert-warning d-flex align-items-center" role="alert">
     <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    <div>{{ $t('alerts.errorCorrection') }}</div>
+    <div>{{ t('alerts.errorCorrection') }}</div>
   </div>
   <div class="row">
     <div class="col" style="max-width: 400px;">
@@ -36,7 +36,7 @@
           <ProjectSelector id="expenseReportFormProject" v-model="report.project" required />
         </div>
         <div class="mb-1 d-flex align-items-center">
-          <button type="submit" class="btn btn-primary me-2" :disabled="loadingUpdate">{{  t('labels.save') }}</button>
+          <button type="submit" class="btn btn-primary me-2" :disabled="loadingUpdate">{{ t('labels.save') }}</button>
           <span v-if="loadingUpdate" class="spinner-border spinner-border-sm ms-1 me-3"></span>
           <button type="button" class="btn btn-light" @click="reset()">{{ t('labels.cancel') }}</button>
           <button type="button" class="btn btn-danger ms-auto" @click="deleteReport" :disabled="loadingUpdate">

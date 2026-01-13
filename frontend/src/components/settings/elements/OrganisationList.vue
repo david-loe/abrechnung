@@ -15,9 +15,7 @@
       </template>
 
       <template #item-buttons="organisation">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(organisation)">
-          <i class="bi bi-pencil"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(organisation)"><i class="bi bi-pencil"></i></button>
         <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteOrganisation(organisation)">
           <i class="bi bi-trash"></i>
         </button>
@@ -33,7 +31,7 @@
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
-      {{ $t('labels.addX', { X: $t('labels.organisation') }) }}
+      {{ t('labels.addX', { X: t('labels.organisation') }) }}
     </button>
   </div>
 </template>

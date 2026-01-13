@@ -27,7 +27,6 @@
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
-    "defaultLastPlaceOfWork": "Default value for last place of work",
     "departureAndArrivalOnDifferentDaysX": "Are you sure you were sitting in '{X}' for several days?",
     "draftsWillBeLost": "All drafts will be lost once you leave this page! Add receipts and save them so they are retained.",
     "errorCorrection": "Here, reports can be changed regardless of their state. This is only intended for correcting errors. Use with caution!",
@@ -60,7 +59,8 @@
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
-    "wrongPassword": "Wrong Password"
+    "wrongPassword": "Wrong Password",
+    "XHasUnusedAdvance": "{X} still has an advance that is currently not being offset."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
@@ -255,6 +255,7 @@
     "dbUsage": "Database Usage",
     "default": "Default",
     "defaultAccess": "Default access rights",
+    "defaultLastPlaceOfWork": "Default value for last place of work",
     "delete": "Delete",
     "deleteApprovedTravelAfterXDaysUnused": "Delete approved, unused trips - in days",
     "deleteBookedAfterXDays": "Delete booked reports and trips - in days",
@@ -319,6 +320,7 @@
     "fsUsage": "Filesystem Usage",
     "givenName": "Given name",
     "givenNameFirst": "Given name first",
+    "goToSettings": "Go to settings",
     "healthCareCost": "Health care cost",
     "healthCareCostName": "Health care cost name",
     "healthCareCosts": "Health care costs",

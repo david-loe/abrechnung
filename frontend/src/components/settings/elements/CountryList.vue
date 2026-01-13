@@ -26,15 +26,11 @@
           </div>
         </div>
       </template>
-      <template #item-name="{ name }">{{ name[$i18n.locale] }}</template>
+      <template #item-name="{ name }">{{ name[locale] }}</template>
 
       <template #item-buttons="country">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(country)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCountry(country)">
-          <i class="bi bi-trash"></i>
-        </button>
+        <button type="button" class="btn btn-light btn-sm" @click="showForm(country)"><i class="bi bi-pencil"></i></button>
+        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteCountry(country)"><i class="bi bi-trash"></i></button>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -46,7 +42,7 @@
         @submit="(form$: any) => postCountry(form$.data)"
         @reset="_showForm = false" />
     </div>
-    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ $t('labels.addX', { X: $t('labels.country') }) }}</button>
+    <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.country') }) }}</button>
   </div>
 </template>
 
@@ -60,7 +56,7 @@ import API from '@/api.js'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import APP_LOADER from '@/dataLoader.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const headers: Header[] = [
   { text: 'labels.name', value: 'name' },

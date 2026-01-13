@@ -27,7 +27,6 @@
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
     "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
-    "defaultLastPlaceOfWork": "Standard Wert für den letzten Tätigkeitsort",
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
     "draftsWillBeLost": "Alle Entwürfe gehen verloren sobald du diese Seite verlässt! Füge Belege hinzu und speichere sie, damit sie erhalten bleiben.",
     "errorCorrection": "Hier können Abrechnungen unabhängig vom Status geändert werden. Dies ist nur zur Korrektur von Fehler gedacht. Mit Vorsicht benutzen!",
@@ -60,7 +59,8 @@
     "unsavedChanges": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du die Seite verlassen willst?",
     "ValidationError": "Validierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubeantragten Zeitfensters liegen.",
-    "wrongPassword": "Falsches Passwort"
+    "wrongPassword": "Falsches Passwort",
+    "XHasUnusedAdvance": "{X} hat noch einen Vorschuss der aktuell nicht verrechnet wird."
   },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
@@ -255,6 +255,7 @@
     "dbUsage": "Datenbanknutzung",
     "default": "Standard",
     "defaultAccess": "Standard Zugriffsrechte",
+    "defaultLastPlaceOfWork": "Standard Wert für den letzten Tätigkeitsort",
     "delete": "Löschen",
     "deleteApprovedTravelAfterXDaysUnused": "Löschen von genehmigten, ungenutzten Reisen - in Tagen",
     "deleteBookedAfterXDays": "Löschen von gebuchten Anträge und Reisen - in Tagen",
@@ -319,6 +320,7 @@
     "fsUsage": "Dateisystemnutzung",
     "givenName": "Vorname",
     "givenNameFirst": "Vornamen zuerst",
+    "goToSettings": "Zu den Einstellungen",
     "healthCareCost": "Krankenkosten",
     "healthCareCostName": "Name der Krankenkostenabrechnung",
     "healthCareCosts": "Krankenkosten",

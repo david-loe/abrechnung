@@ -54,7 +54,10 @@
       </template>
       <template v-else>
         <li class="nav-item dropdown me-2">
-          <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <a
+            class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable"
+            role="button"
+            data-bs-toggle="dropdown">
             <i class="fs-4 bi bi-menu-down"></i><span class="ms-1">{{ t('labels.menu') }}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
@@ -74,7 +77,7 @@
       </template>
 
       <li class="nav-item dropdown me-2">
-        <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
+        <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable" data-bs-toggle="dropdown" role="button">
           <i class="fs-4 bi bi-person-circle"></i>
           <span class="ms-1">{{ APP_DATA.user.name.givenName }}</span>
         </a>
@@ -99,27 +102,19 @@
           <li>
             <hr class="dropdown-divider" >
           </li>
-          <li>
-            <a class="d-flex align-items-center dropdown-item" href="#" @click="logout">
-              <i class="fs-4 bi bi-box-arrow-left"></i>
-              <span class="ms-1">{{ t('headlines.logout') }}</span>
-            </a>
-          </li>
+          <li><a class="d-flex align-items-center dropdown-item clickable" @click="logout">
+            <i class="fs-4 bi bi-box-arrow-left"></i>
+            <span class="ms-1">{{ t('headlines.logout') }}</span>
+          </a></li>
         </ul>
       </li>
     </template>
   </HeaderComponent>
 
   <div v-if="loadState !== 'LOADED'" class="position-absolute top-50 start-50 translate-middle">
-    <div class="spinner-grow me-3" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <div class="spinner-grow me-3" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <div class="spinner-grow" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+    <div class="spinner-grow me-3" role="status"><span class="visually-hidden">Loading...</span></div>
+    <div class="spinner-grow me-3" role="status"><span class="visually-hidden">Loading...</span></div>
+    <div class="spinner-grow" role="status"><span class="visually-hidden">Loading...</span></div>
   </div>
   <div class="position-relative">
     <AlertComponent />

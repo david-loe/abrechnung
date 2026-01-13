@@ -20,8 +20,8 @@
               style="max-width: 68px"
               :value="props.language"
               @change="(e) => emits('update:language', (e.target as HTMLSelectElement).value as Locale)">
-              <option v-for="lang of locales" :key="lang" :value="lang" :title="$t('languages.' + lang)">
-                {{  getFlagEmojiFromLocale(lang) }}
+              <option v-for="lang of locales" :key="lang" :value="lang" :title="t('languages.' + lang)">
+                {{ getFlagEmojiFromLocale(lang) }}
               </option>
             </select>
           </li>
