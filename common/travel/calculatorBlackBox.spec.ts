@@ -2,7 +2,7 @@ import test from 'ava'
 import { AddUpTravel, baseCurrency, Country, CountryCode, DocumentFile } from '../types.js'
 import { addUp } from '../utils/scripts.js'
 import { TravelCalculator } from './calculator.js'
-import travelSettings from './travelSettings.js' with { type: 'json' }
+import travelSettings from './travelSettings.js'
 
 const DE: Country = {
   _id: 'DE',
