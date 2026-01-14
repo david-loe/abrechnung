@@ -72,7 +72,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   WEBHOOK_SCRIPT_COMPILE_TIMEOUT_MS: int({ default: 50, desc: 'Timeout for compiling user webhook scripts in milliseconds' }),
   WEBHOOK_SCRIPT_RUN_TIMEOUT_MS: int({ default: 100, desc: 'Timeout for running user webhook scripts in milliseconds' }),
   WEBHOOK_REQUEST_TIMEOUT_MS: int({ default: 5_000, desc: 'Timeout webhook HTTP requests in milliseconds' }),
-  PROD_INIT_CONNECTION_SETTINGS: json<Partial<ConnectionSettings>>({
+  PROD_INIT_CONNECTION_SETTINGS: json<Partial<Omit<ConnectionSettings, '_id'>>>({
     default: undefined,
     desc: 'Initial connection settings for production environment as JSON object'
   }),

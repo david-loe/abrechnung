@@ -1,0 +1,19 @@
+export default {
+  allowSpouseRefund: false,
+  allowTravelApplicationForThePast: false,
+  defaultLastPlaceOfWork: 'destinationPlace',
+  distanceRefunds: { car: 0.3, halfCar: 0.15, motorcycle: 0.2 },
+  factorCateringLumpSum: 1,
+  factorCateringLumpSumExceptions: [] as string[],
+  factorOvernightLumpSum: 1,
+  factorOvernightLumpSumExceptions: [] as string[],
+  fallbackLumpSumCountry: 'LU',
+  lumpSumCut: { breakfast: 0.2, dinner: 0.4, lunch: 0.4 },
+  maxTravelDayCount: 92,
+  minHoursOfTravel: 8,
+  minProfessionalShare: 0.5,
+  secondNightOnAirplaneLumpSumCountry: 'AT',
+  secondNightOnShipOrFerryLumpSumCountry: 'LU',
+  toleranceStageDatesToApprovedTravelDates: 3,
+  vehicleRegistrationWhenUsingOwnCar: 'optional'
+} as const

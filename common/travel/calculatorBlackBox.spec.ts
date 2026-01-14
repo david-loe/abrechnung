@@ -1,8 +1,8 @@
 import test from 'ava'
-import { AddUpTravel, baseCurrency, Country, CountryCode, DocumentFile, TravelSettings } from '../types.js'
+import { AddUpTravel, baseCurrency, Country, CountryCode, DocumentFile } from '../types.js'
 import { addUp } from '../utils/scripts.js'
 import { TravelCalculator } from './calculator.js'
-import travelSettings from './travelSettings.json' with { type: 'json' }
+import travelSettings from './travelSettings.js' with { type: 'json' }
 
 const DE: Country = {
   _id: 'DE',
@@ -363,7 +363,7 @@ const travels = [
 const countries: Record<CountryCode, Country> = { DE, FR, AT, LU }
 const getCountryById = async (id: CountryCode) => countries[id]
 
-const calculator = new TravelCalculator(getCountryById, Object.assign(travelSettings, { _id: 'settings' }) as TravelSettings)
+const calculator = new TravelCalculator(getCountryById, { ...travelSettings, _id: 'settings' })
 
 for (const { travel, expectedResult } of travels) {
   test(`Travel ${travel._id} calculation`, async (t) => {

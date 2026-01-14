@@ -1,7 +1,7 @@
 import test from 'ava'
-import { baseCurrency, Country, CountryCode, Stage, TravelSettings, TravelState } from '../types.js'
+import { baseCurrency, Country, CountryCode, Stage, TravelState } from '../types.js'
 import { TravelCalculator } from './calculator.js'
-import travelSettings from './travelSettings.json' with { type: 'json' }
+import travelSettings from './travelSettings.js'
 
 function createSetup() {
   const countryDE: Country = {
@@ -25,7 +25,7 @@ function createSetup() {
   const countries: Record<CountryCode, Country> = { DE: countryDE, FR: countryFR }
   const getCountryById = async (id: CountryCode) => countries[id]
 
-  const tc = new TravelCalculator(getCountryById, Object.assign(travelSettings, { _id: 'settings' }) as TravelSettings)
+  const tc = new TravelCalculator(getCountryById, { ...travelSettings, _id: 'settings' })
 
   const stages: Stage<string>[] = [
     {

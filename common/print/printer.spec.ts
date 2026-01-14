@@ -1,5 +1,5 @@
 import test from 'ava'
-import printerSettings from './printerSettings.json' with { type: 'json' }
+import printerSettings from './printerSettings.js'
 
 test('printerSettings default exist', (t) => {
   t.truthy(printerSettings)

@@ -6,7 +6,8 @@
   "exports": {
     "./*": "./dist/*",
     "./fonts/*": "./fonts/*",
-    "./data/*": "./data/*"
+    "./data/*": "./data/*",
+    "./data/*.js": "./dist/data/*.js"
   },
   "dependencies": {
     "envalid": "^8.1.1",

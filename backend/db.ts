@@ -1,9 +1,9 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
-import displaySettings from 'abrechnung-common/data/displaySettings.json' with { type: 'json' }
-import printerSettings from 'abrechnung-common/print/printerSettings.json' with { type: 'json' }
+import displaySettings from 'abrechnung-common/data/displaySettings.js'
+import printerSettings from 'abrechnung-common/print/printerSettings.js'
 import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
-import travelSettings from 'abrechnung-common/travel/travelSettings.json' with { type: 'json' }
+import travelSettings from 'abrechnung-common/travel/travelSettings.js'
 import {
   accesses,
   ConnectionSettings as IConnectionSettings,
@@ -18,20 +18,18 @@ import {
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, HydratedDocument, Model, Types } from 'mongoose'
+import mongoose, { Connection, HydratedDocument, Model } from 'mongoose'
 import { CACHE } from './data/cache.js'
-import connectionSettingsDev from './data/connectionSettings.development.json' with { type: 'json' }
-import connectionSettingsProd from './data/connectionSettings.production.json' with { type: 'json' }
+import connectionSettingsDev from './data/connectionSettings.development.js'
+import connectionSettingsProd from './data/connectionSettings.production.js'
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
-import settings from './data/settings.json' with { type: 'json' }
+import settings from './data/settings.js'
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
 import { logger } from './logger.js'
 import Category from './models/category.js'
-import ConnectionSettings from './models/connectionSettings.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
-import DisplaySettings from './models/displaySettings.js'
 import HealthInsurance from './models/healthInsurance.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
@@ -79,7 +77,7 @@ export async function initDB() {
       DBsettings.migrateFrom = DBsettings.version
     }
     DBsettings.version = settings.version
-    const mergedSettings = mergeDeep({}, settings, DBsettings)
+    const mergedSettings = mergeDeep({}, settings satisfies Omit<ISettings, '_id'>, DBsettings)
     await mongoose.connection.collection('settings').findOneAndDelete({})
     await mongoose.connection.collection('settings').insertOne(mergedSettings)
     logger.info('Updated Settings')
@@ -88,29 +86,37 @@ export async function initDB() {
     logger.info('Created Settings from Default')
   }
 
-  const DBtravelSettings = (await mongoose.connection.collection('travelsettings').findOne()) as ITravelSettings | null
-  if (!DBtravelSettings) {
-    await mongoose.connection.collection('travelsettings').insertOne(travelSettings)
+  if ((await mongoose.connection.collection('travelsettings').countDocuments()) === 0) {
+    await mongoose.connection.collection('travelsettings').insertOne(travelSettings satisfies Omit<ITravelSettings, '_id'>)
   }
 
-  const DBprinterSettings = (await mongoose.connection.collection('printersettings').findOne()) as IPrinterSettings | null
-  if (!DBprinterSettings) {
-    await mongoose.connection.collection('printersettings').insertOne(printerSettings)
+  if ((await mongoose.connection.collection('printersettings').countDocuments()) === 0) {
+    await mongoose.connection.collection('printersettings').insertOne(printerSettings satisfies Omit<IPrinterSettings, '_id'>)
   }
 
-  if (ENV.NODE_ENV === 'production') {
-    if (ENV.PROD_INIT_CONNECTION_SETTINGS) {
-      await initer(ConnectionSettings, 'connectionSettings', [
-        ENV.PROD_INIT_CONNECTION_SETTINGS as Partial<IConnectionSettings<Types.ObjectId>>
-      ])
+  if ((await mongoose.connection.collection('displaysettings').countDocuments()) === 0) {
+    await mongoose.connection.collection('displaysettings').insertOne(displaySettings satisfies Omit<IDisplaySettings, '_id'>)
+  }
+
+  if ((await mongoose.connection.collection('connectionsettings').countDocuments()) === 0) {
+    if (ENV.NODE_ENV === 'production') {
+      if (ENV.PROD_INIT_CONNECTION_SETTINGS) {
+        await mongoose.connection
+          .collection('connectionsettings')
+          .insertOne({
+            PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: 'de' },
+            auth: {},
+            ...ENV.PROD_INIT_CONNECTION_SETTINGS
+          } satisfies Omit<IConnectionSettings, '_id'>)
+      } else {
+        await mongoose.connection
+          .collection('connectionsettings')
+          .insertOne(connectionSettingsProd satisfies Omit<IConnectionSettings, '_id'>)
+      }
     } else {
-      await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsProd])
+      await mongoose.connection.collection('connectionsettings').insertOne(connectionSettingsDev satisfies Omit<IConnectionSettings, '_id'>)
     }
-  } else {
-    await initer(ConnectionSettings, 'connectionSettings', [connectionSettingsDev as Partial<IConnectionSettings<Types.ObjectId>>], true)
   }
-
-  await initer(DisplaySettings, 'displaySettings', [displaySettings as Partial<IDisplaySettings<Types.ObjectId>>])
 
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
