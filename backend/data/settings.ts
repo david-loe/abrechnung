@@ -30,5 +30,5 @@ export default {
   autoSelectAvailableAdvances: true,
   preventOwnersFromDeletingReportsAfterReviewCompleted: false,
   isReadOnly: false,
-  version: '2.4.2'
+  version: '2.4.3'
 } as const
