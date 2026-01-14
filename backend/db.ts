@@ -5,12 +5,14 @@ import printerSettings from 'abrechnung-common/print/printerSettings.json' with 
 import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.json' with { type: 'json' }
 import {
+  accesses,
   ConnectionSettings as IConnectionSettings,
   Country as ICountry,
   DisplaySettings as IDisplaySettings,
   PrinterSettings as IPrinterSettings,
   Settings as ISettings,
   TravelSettings as ITravelSettings,
+  User as IUser,
   tokenAdminUser
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
@@ -122,6 +124,21 @@ export async function initDB() {
   await initer(Project, 'projects', projects)
   const categories = [{ name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true }]
   await initer(Category, 'category', categories)
+
+  if (ENV.NODE_ENV === 'production' && ENV.PROD_INIT_ADMIN_USER && (await mongoose.connection.collection('users').countDocuments()) === 0) {
+    const ac: Partial<IUser['access']> = {}
+    for (const access of accesses) {
+      ac[access] = access !== 'approved:travel'
+    }
+    const adminUser: Omit<IUser, '_id'> = {
+      ...ENV.PROD_INIT_ADMIN_USER,
+      fk: { magiclogin: ENV.PROD_INIT_ADMIN_USER.email },
+      access: ac as IUser['access'],
+      settings: { language: 'de', hasUserSetLanguage: false, lastCountries: [], lastCurrencies: [], showInstallBanner: true },
+      projects: { assigned: [], supervised: [] }
+    }
+    await mongoose.connection.collection('users').insertOne(adminUser)
+  }
 
   const tokenAdmin = await mongoose.connection.collection('users').findOne({ 'fk.magiclogin': tokenAdminUser.fk.magiclogin })
   if (tokenAdmin) {

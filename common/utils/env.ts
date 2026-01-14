@@ -1,5 +1,5 @@
 import { bool, CleanOptions, cleanEnv, EnvError, json, makeValidator, str } from 'envalid'
-import { ConnectionSettings } from '../types.js'
+import { ConnectionSettings, Contact } from '../types.js'
 
 const int = makeValidator<number>((input: string) => {
   const coerced = Number.parseInt(input, 10)
@@ -76,6 +76,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
     default: undefined,
     desc: 'Initial connection settings for production environment as JSON object'
   }),
+  PROD_INIT_ADMIN_USER: json<Contact>({ default: undefined, desc: 'Initial Admin User for production environment as JSON object' }),
   USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),
   BACKEND_SAVE_REPORTS_ON_DISK: bool({
     default: false,
