@@ -147,7 +147,10 @@
           </TableElement>
         </div>
         <div class="col-lg-4 col">
-          <div v-if="endpointPrefix === 'examine/' && hasUnusedAdvances" class="alert alert-info d-flex align-items-center" role="alert">
+          <div
+            v-if="endpointPrefix === 'examine/' && healthCareCost.state < HealthCareCostState.REVIEW_COMPLETED && hasUnusedAdvances"
+            class="alert alert-info d-flex align-items-center"
+            role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
               {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(healthCareCost.owner.name)}) }}
