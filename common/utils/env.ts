@@ -57,7 +57,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   MAGIC_LOGIN_SECRET: notEmptyString({ desc: "Secret for magic login links (use something like: 'openssl rand -base64 60')" }),
   MONGO_URL: notEmptyString({ desc: 'MongoDB connection string' }),
   REDIS_URL: notEmptyString({ desc: 'Redis URL' }),
-
+  REDIS_PREFIX: notEmptyString({ default: 'abrechnung', desc: 'Prefix for Redis keys' }),
   COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
   PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
   LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),

@@ -18,6 +18,7 @@ const SAVE_REPORT_ON_DISK_QUEUE_NAME = 'saveReportOnDisk'
 
 export const saveReportOnDiskQueue = new Queue<SaveReportOnDiskJobData>(SAVE_REPORT_ON_DISK_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
+  prefix: ENV.REDIS_PREFIX,
   defaultJobOptions: {
     attempts: 6,
     backoff: { type: 'exponential', delay: 3_000 },
@@ -59,7 +60,7 @@ export function startSaveReportOnDiskWorker(concurrency = 1) {
       logger.debug(`Write to file ${filePath}`)
       await fs.writeFile(filePath, pdf)
     },
-    { connection: { url: ENV.REDIS_URL }, concurrency }
+    { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency }
   )
 
   workerInstance.on('completed', (job) => {

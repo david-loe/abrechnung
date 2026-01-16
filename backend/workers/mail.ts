@@ -16,6 +16,7 @@ const MAIL_QUEUE_NAME = 'mail'
 
 export const mailQueue = new Queue<MailJobData>(MAIL_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
+  prefix: ENV.REDIS_PREFIX,
   defaultJobOptions: {
     attempts: 5,
     backoff: { type: 'exponential', delay: 5_000 },
@@ -41,7 +42,7 @@ export function startMailWorker(concurrency = 5) {
       logger.debug(`Processing mail job ${job.id}`)
       await processMailJob(job.data)
     },
-    { connection: { url: ENV.REDIS_URL }, concurrency }
+    { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency }
   )
 
   workerInstance.on('completed', (job) => {

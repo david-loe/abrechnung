@@ -14,6 +14,7 @@ const WEBHOOK_QUEUE_NAME = 'webhook'
 
 export const webhookQueue = new Queue<WebhookJobData>(WEBHOOK_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
+  prefix: ENV.REDIS_PREFIX,
   defaultJobOptions: {
     attempts: 1,
     backoff: { type: 'exponential', delay: 5_000 },
@@ -39,7 +40,7 @@ export function startWebhookWorker(concurrency = 1) {
       logger.debug(`Processing webhook job ${job.id}`)
       await processWebhookJob(job.data)
     },
-    { connection: { url: ENV.REDIS_URL }, concurrency }
+    { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency }
   )
 
   workerInstance.on('completed', (job) => {
