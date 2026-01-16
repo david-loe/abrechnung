@@ -52,10 +52,10 @@ export const displaySettingsSchema = () => {
     {
       auth: {
         type: {
-          magiclogin: { type: Boolean, required: true, label: 'Magiclogin', hide: !BACKEND_CACHE.connectionSettings.smtp },
-          microsoft: { type: Boolean, required: true, label: 'Microsoft', hide: !BACKEND_CACHE.connectionSettings.auth.microsoft },
-          ldapauth: { type: Boolean, required: true, label: 'LDAP', hide: !BACKEND_CACHE.connectionSettings.auth.ldapauth },
-          oidc: { type: Boolean, required: true, label: 'OIDC', hide: !BACKEND_CACHE.connectionSettings.auth.oidc }
+          magiclogin: { type: Boolean, required: true, label: 'Magiclogin' },
+          microsoft: { type: Boolean, required: true, label: 'Microsoft' },
+          ldapauth: { type: Boolean, required: true, label: 'LDAP' },
+          oidc: { type: Boolean, required: true, label: 'OIDC' }
         },
         required: true
       },
