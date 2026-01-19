@@ -20,7 +20,7 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@types/node": "^24.10.8",
+    "@types/node": "^24.10.9",
     "ava": "^6.4.1",
     "mongoose": "^8.21.0",
     "nodemon": "^3.1.11",
