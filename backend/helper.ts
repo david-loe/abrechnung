@@ -12,7 +12,7 @@ interface ReqDocument extends Omit<IDocumentFile, 'data'> {
 }
 type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean }
 export function documentFileHandler(pathToFiles: string[], options: FileHandleOptions = {}) {
-  const opts = Object.assign({ checkOwner: true, multiple: true }, options)
+  const opts = { checkOwner: true, multiple: true, ...options }
   return async (req: Request, _res?: Response, next?: NextFunction) => {
     let fileOwner: Types.ObjectId
     if (opts.owner) {

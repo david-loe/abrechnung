@@ -25,7 +25,7 @@ import { genAuthenticatedLink } from '../helper.js'
 import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
-import { sendMail } from './mail.js'
+import { enqueueMail } from './mail.js'
 import { sendPushNotification } from './push.js'
 
 export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, textState?: string) {
@@ -100,7 +100,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   }
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
   sendPushNotification(subject, paragraph, recipients, button.link)
-  sendMail(recipients, subject, paragraph, button, lastParagraph)
+  enqueueMail(recipients, subject, paragraph, button, lastParagraph)
 }
 
 export async function sendA1Notification(report: TravelSimple) {
@@ -124,7 +124,7 @@ export async function sendA1Notification(report: TravelSimple) {
     if (report.fellowTravelersNames) {
       lastParagraph.splice(1, 0, `\n${t('labels.fellowTravelersNames')}: ${report.fellowTravelersNames}`)
     }
-    sendMail(
+    enqueueMail(
       [{ email: org.a1CertificateEmail, fk: {}, settings: { language }, name: { givenName: org.name, familyName: '' } }],
       subject,
       paragraph,

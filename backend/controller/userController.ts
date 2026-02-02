@@ -22,7 +22,7 @@ import Token from '../models/token.js'
 import Travel from '../models/travel.js'
 import User, { userSchema } from '../models/user.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
-import { sendMail } from '../notifications/mail.js'
+import { enqueueMail } from '../notifications/mail.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, File } from './types.js'
@@ -127,7 +127,7 @@ export class UsersController extends Controller {
 }
 
 function sendNewMagicloginMail(user: IUser) {
-  sendMail(
+  enqueueMail(
     [user],
     i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),
     i18n.t('mail.newMagiclogin.paragraph', { lng: user.settings.language }),
