@@ -99,8 +99,8 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     lastParagraph = interpolation.comment ? [lastParagraph as string, confirmLine] : confirmLine
   }
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
-  sendPushNotification(subject, paragraph, recipients, button.link)
-  enqueueMail(recipients, subject, paragraph, button, lastParagraph)
+  await sendPushNotification(subject, paragraph, recipients, button.link)
+  await enqueueMail(recipients, subject, paragraph, button, lastParagraph)
 }
 
 export async function sendA1Notification(report: TravelSimple) {
@@ -124,7 +124,7 @@ export async function sendA1Notification(report: TravelSimple) {
     if (report.fellowTravelersNames) {
       lastParagraph.splice(1, 0, `\n${t('labels.fellowTravelersNames')}: ${report.fellowTravelersNames}`)
     }
-    enqueueMail(
+    await enqueueMail(
       [{ email: org.a1CertificateEmail, fk: {}, settings: { language }, name: { givenName: org.name, familyName: '' } }],
       subject,
       paragraph,

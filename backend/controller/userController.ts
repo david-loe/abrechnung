@@ -126,8 +126,8 @@ export class UsersController extends Controller {
   }
 }
 
-function sendNewMagicloginMail(user: IUser) {
-  enqueueMail(
+async function sendNewMagicloginMail(user: IUser) {
+  await enqueueMail(
     [user],
     i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),
     i18n.t('mail.newMagiclogin.paragraph', { lng: user.settings.language }),
@@ -184,9 +184,9 @@ export class UserAdminController extends Controller {
         newMagicloginUsers.push(i)
       }
     }
-    const cb = (users: IUser[]) => {
+    const cb = async (users: IUser[]) => {
       for (const index of newMagicloginUsers) {
-        sendNewMagicloginMail(users[index])
+        await sendNewMagicloginMail(users[index])
       }
     }
     return await this.insertMany(User, { requestBody, cb })

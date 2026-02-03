@@ -20,7 +20,7 @@ export default new MagicLoginStrategy.default({
     if (!user) {
       throw new NotAllowedError(`No magiclogin user found for e-mail: ${destination}`)
     }
-    enqueueMail(
+    await enqueueMail(
       [user],
       i18n.t('mail.magiclogin.subject', { lng: user.settings.language }),
       i18n.t('mail.magiclogin.paragraph', { lng: user.settings.language }),
