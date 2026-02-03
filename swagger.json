@@ -12049,11 +12049,79 @@
 					"secure": {
 						"type": "boolean"
 					},
-					"user": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
+					"auth": {
+						"anyOf": [
+							{
+								"properties": {
+									"pass": {
+										"type": "string"
+									},
+									"user": {
+										"type": "string"
+									},
+									"authType": {
+										"type": "string",
+										"enum": [
+											"Login"
+										],
+										"nullable": false
+									}
+								},
+								"required": [
+									"pass",
+									"user",
+									"authType"
+								],
+								"type": "object"
+							},
+							{
+								"properties": {
+									"serviceClient": {
+										"type": "string"
+									},
+									"timeout": {
+										"type": "number",
+										"format": "double"
+									},
+									"expires": {
+										"type": "number",
+										"format": "double"
+									},
+									"privateKey": {
+										"type": "string"
+									},
+									"accessToken": {
+										"type": "string"
+									},
+									"accessUrl": {
+										"type": "string"
+									},
+									"refreshToken": {
+										"type": "string"
+									},
+									"clientSecret": {
+										"type": "string"
+									},
+									"clientId": {
+										"type": "string"
+									},
+									"user": {
+										"type": "string"
+									},
+									"authType": {
+										"type": "string",
+										"enum": [
+											"OAuth2"
+										],
+										"nullable": false
+									}
+								},
+								"required": [
+									"authType"
+								],
+								"type": "object"
+							}
+						]
 					},
 					"senderAddress": {
 						"type": "string"
@@ -12063,8 +12131,7 @@
 					"host",
 					"port",
 					"secure",
-					"user",
-					"password",
+					"auth",
 					"senderAddress"
 				],
 				"type": "object",
