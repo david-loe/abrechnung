@@ -1,6 +1,7 @@
 import { ldapauthSettings, smtpSettings } from 'abrechnung-common/types.js'
 import ldap from 'ldapjs'
 import nodemailer from 'nodemailer'
+import SMTPConnection from 'nodemailer/lib/smtp-connection/index.js'
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
 import LdapStrategy from 'passport-ldapauth'
 
@@ -42,12 +43,23 @@ export function mapLdapauthConfig(config: ldapauthSettings): LdapStrategy.Option
 }
 
 export function mapSmtpConfig(config: smtpSettings): SMTPTransport.Options {
-  return {
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: { user: config.user, pass: config.password },
-    from: config.senderAddress,
-    dnsTimeout: 1_500
+  let auth: SMTPConnection.AuthenticationType | undefined
+  if (config.auth.authType === 'Login') {
+    auth = { user: config.auth.user, pass: config.auth.pass, type: 'login' }
+  } else if (config.auth.authType === 'OAuth2') {
+    auth = {
+      user: config.auth.user,
+      clientId: config.auth.clientId,
+      clientSecret: config.auth.clientSecret,
+      refreshToken: config.auth.refreshToken,
+      accessToken: config.auth.accessToken,
+      accessUrl: config.auth.accessUrl,
+      privateKey: config.auth.privateKey,
+      expires: config.auth.expires,
+      timeout: config.auth.timeout,
+      serviceClient: config.auth.serviceClient,
+      type: 'OAuth2'
+    }
   }
+  return { host: config.host, port: config.port, secure: config.secure, auth, from: config.senderAddress, dnsTimeout: 1_500 }
 }

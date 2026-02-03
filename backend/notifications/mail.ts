@@ -8,7 +8,7 @@ import { genAuthenticatedLink } from '../helper.js'
 import i18n, { updateI18n } from '../i18n.js'
 import { logger } from '../logger.js'
 import { getMailTemplate } from '../templates/cache.js'
-import { MailJobData, mailQueue } from '../workers/mail.js'
+import { mailQueue } from '../workers/mail.js'
 
 export async function getClient() {
   // NO BACKEND_CACHE bc used in worker

@@ -95,12 +95,28 @@ export interface ldapauthSettings {
   givenNameAttribute: string
 }
 
+export const smtpAuthTypes = ['Login', 'OAuth2'] as const
+export type SMTPAuthType = (typeof smtpAuthTypes)[number]
+
 export interface smtpSettings {
   host: string
   port: number
   secure: boolean
-  user: string
-  password: string
+  auth:
+    | { authType: 'Login'; user: string; pass: string }
+    | {
+        authType: 'OAuth2'
+        user?: string
+        clientId?: string
+        clientSecret?: string
+        refreshToken?: string
+        accessUrl?: string
+        accessToken?: string
+        privateKey?: string // | { key: string; passphrase: string }
+        expires?: number
+        timeout?: number
+        serviceClient?: string
+      }
   senderAddress: string
 }
 
