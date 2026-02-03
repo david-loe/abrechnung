@@ -61,10 +61,12 @@ export async function checkForMigrations() {
     }
     if (semver.lte(migrateFrom, '2.4.3')) {
       logger.info('Apply migration from v2.4.3: add oauth2 option to smtp settings')
-      await mongoose.connection.collection('connectionsettings').updateMany({}, { $set: { 'smtp.auth.authType': 'Login' } })
       await mongoose.connection
         .collection('connectionsettings')
-        .updateMany({}, { $rename: { 'smtp.user': 'smtp.auth.user', 'smtp.password': 'smtp.auth.pass' } })
+        .updateMany(
+          { smtp: { $exists: true } },
+          { $set: { 'smtp.auth.authType': 'Login' }, $rename: { 'smtp.user': 'smtp.auth.user', 'smtp.password': 'smtp.auth.pass' } }
+        )
     }
     settings.migrateFrom = undefined
     await settings.save()

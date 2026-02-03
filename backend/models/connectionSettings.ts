@@ -71,14 +71,12 @@ export const connectionSettingsSchema = () =>
             privateKey: { type: String, trim: true, multiline: true, conditions: [['smtp.auth.authType', 'OAuth2']], label: 'Private Key' },
             expires: {
               type: Number,
-              trim: true,
               conditions: [['smtp.auth.authType', 'OAuth2']],
               label: 'Token Expire Time',
               description: 'Access Token expire time in ms'
             },
             timeout: {
               type: Number,
-              trim: true,
               conditions: [['smtp.auth.authType', 'OAuth2']],
               label: 'Timeout',
               description: 'TTL for Access Token in seconds'

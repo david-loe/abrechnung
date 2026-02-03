@@ -9,6 +9,8 @@ const SECRET_PATHS = [
   'smtp.auth.pass',
   'smtp.auth.clientSecret',
   'smtp.auth.privateKey',
+  'smtp.auth.refreshToken',
+  'smtp.auth.accessToken',
   'auth.microsoft.clientSecret',
   'auth.ldapauth.bindCredentials',
   'auth.oidc.clientSecret'
