@@ -8,7 +8,7 @@ import { genAuthenticatedLink } from '../helper.js'
 import i18n, { updateI18n } from '../i18n.js'
 import { logger } from '../logger.js'
 import { getMailTemplate } from '../templates/cache.js'
-import { MailJobData, mailQueue } from '../workers/mail.js'
+import { mailQueue } from '../workers/mail.js'
 
 export async function getClient() {
   // NO BACKEND_CACHE bc used in worker
@@ -20,7 +20,7 @@ export async function getClient() {
 }
 export type MailRecipient = Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }
 
-export async function sendMail(
+export async function enqueueMail(
   recipients: MailRecipient[],
   subject: string,
   paragraph: string,
@@ -28,12 +28,6 @@ export async function sendMail(
   lastParagraph?: string | string[],
   authenticateLink = true
 ) {
-  await mailQueue.add('sendMail', { recipients, subject, paragraph, button, lastParagraph, authenticateLink })
-}
-
-export async function processMailJob({ recipients, subject, paragraph, button, lastParagraph, authenticateLink }: MailJobData) {
-  const mailPromises = []
-
   const displaySettings = await getDisplaySettings(false)
   updateI18n(displaySettings.locale)
   for (const recipient of recipients) {
@@ -48,12 +42,11 @@ export async function processMailJob({ recipients, subject, paragraph, button, l
         })
       }
     }
-    mailPromises.push(_sendMail(recipient, subject, paragraph, language, recipientButton, lastParagraph))
+    await mailQueue.add('sendMail', { recipient, subject, paragraph, language, button: recipientButton, lastParagraph })
   }
-  await Promise.allSettled(mailPromises)
 }
 
-async function _sendMail(
+export async function sendMail(
   recipient: Contact,
   subject: string,
   paragraph: string,

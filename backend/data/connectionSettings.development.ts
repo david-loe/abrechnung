@@ -13,7 +13,12 @@ export default {
       givenNameAttribute: 'givenName'
     }
   },
-
-  smtp: { host: 'inbucket', port: 2500, secure: false, user: 'username', password: 'password', senderAddress: 'info@abrechnung.com' },
+  smtp: {
+    host: 'inbucket',
+    port: 2500,
+    secure: false,
+    auth: { authType: 'Login', user: 'username', pass: 'password' },
+    senderAddress: 'info@abrechnung.com'
+  },
   PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: 'de' }
 } as const

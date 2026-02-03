@@ -35,7 +35,7 @@ test.serial('GET /admin/connectionSettings hides secrets', async (t) => {
   t.is(res.status, 200)
   const data = res.body.data
 
-  assertSanitizedValue(t, data, existingSettings, ['smtp', 'password'])
+  assertSanitizedValue(t, data, existingSettings, ['smtp', 'auth', 'pass'])
   assertSanitizedValue(t, data, existingSettings, ['auth', 'ldapauth', 'bindCredentials'])
   assertSanitizedValue(t, data, existingSettings, ['auth', 'microsoft', 'clientSecret'])
   assertSanitizedValue(t, data, existingSettings, ['auth', 'oidc', 'clientSecret'])
@@ -50,13 +50,17 @@ test.serial('POST /admin/connectionSettings keeps original secrets when placehol
   t.is(postRes.status, 200)
 
   const updatedSettings = await ConnectionSettings.findOne().lean()
-
-  t.is(updatedSettings?.smtp?.password, originalSettings?.smtp?.password)
+  if (updatedSettings?.smtp?.auth.authType === 'Login' && originalSettings?.smtp?.auth.authType === 'Login') {
+    t.is(updatedSettings?.smtp?.auth.pass, originalSettings?.smtp?.auth.pass)
+  } else if (updatedSettings?.smtp?.auth.authType === 'OAuth2' && originalSettings?.smtp?.auth.authType === 'OAuth2') {
+    t.is(updatedSettings?.smtp?.auth.clientSecret, originalSettings?.smtp?.auth.clientSecret)
+  }
   t.is(updatedSettings?.auth?.ldapauth?.bindCredentials, originalSettings?.auth?.ldapauth?.bindCredentials)
   t.is(updatedSettings?.auth?.microsoft?.clientSecret, originalSettings?.auth?.microsoft?.clientSecret)
   t.is(updatedSettings?.auth?.oidc?.clientSecret, originalSettings?.auth?.oidc?.clientSecret)
 
-  assertSanitizedValue(t, postRes.body.result, originalSettings, ['smtp', 'password'])
+  assertSanitizedValue(t, postRes.body.result, originalSettings, ['smtp', 'auth', 'pass'])
+  assertSanitizedValue(t, postRes.body.result, originalSettings, ['smtp', 'auth', 'clientSecret'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'ldapauth', 'bindCredentials'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'microsoft', 'clientSecret'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'oidc', 'clientSecret'])

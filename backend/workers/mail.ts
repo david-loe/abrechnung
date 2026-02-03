@@ -1,15 +1,16 @@
+import { Contact, Locale } from 'abrechnung-common/types.js'
 import { Queue, Worker } from 'bullmq'
 import ENV from '../env.js'
 import { logger } from '../logger.js'
-import { MailRecipient, processMailJob } from '../notifications/mail.js'
+import { sendMail } from '../notifications/mail.js'
 
 export interface MailJobData {
-  recipients: MailRecipient[]
+  recipient: Contact
   subject: string
   paragraph: string
+  language: Locale
   button?: { text: string; link: string }
   lastParagraph?: string | string[]
-  authenticateLink: boolean
 }
 
 const MAIL_QUEUE_NAME = 'mail'
@@ -40,7 +41,7 @@ export function startMailWorker(concurrency = 5) {
     MAIL_QUEUE_NAME,
     async (job) => {
       logger.debug(`Processing mail job ${job.id}`)
-      await processMailJob(job.data)
+      await sendMail(job.data.recipient, job.data.subject, job.data.paragraph, job.data.language, job.data.button, job.data.lastParagraph)
     },
     { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency }
   )

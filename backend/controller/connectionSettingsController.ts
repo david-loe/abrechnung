@@ -5,7 +5,16 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller } from './controller.js'
 
 export const SECRET_PLACEHOLDER = '********'
-const SECRET_PATHS = ['smtp.password', 'auth.microsoft.clientSecret', 'auth.ldapauth.bindCredentials', 'auth.oidc.clientSecret']
+const SECRET_PATHS = [
+  'smtp.auth.pass',
+  'smtp.auth.clientSecret',
+  'smtp.auth.privateKey',
+  'smtp.auth.refreshToken',
+  'smtp.auth.accessToken',
+  'auth.microsoft.clientSecret',
+  'auth.ldapauth.bindCredentials',
+  'auth.oidc.clientSecret'
+]
 
 function cloneSettings<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T

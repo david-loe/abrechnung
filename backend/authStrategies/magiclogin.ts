@@ -4,7 +4,7 @@ import { NotAllowedError } from '../controller/error.js'
 import ENV from '../env.js'
 import i18n from '../i18n.js'
 import User from '../models/user.js'
-import { sendMail } from '../notifications/mail.js'
+import { enqueueMail } from '../notifications/mail.js'
 
 const secret = ENV.MAGIC_LOGIN_SECRET
 const callbackUrl = `${ENV.VITE_BACKEND_URL}/auth/magiclogin/callback`
@@ -20,7 +20,7 @@ export default new MagicLoginStrategy.default({
     if (!user) {
       throw new NotAllowedError(`No magiclogin user found for e-mail: ${destination}`)
     }
-    sendMail(
+    await enqueueMail(
       [user],
       i18n.t('mail.magiclogin.subject', { lng: user.settings.language }),
       i18n.t('mail.magiclogin.paragraph', { lng: user.settings.language }),

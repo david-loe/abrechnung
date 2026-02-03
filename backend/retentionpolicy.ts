@@ -21,7 +21,7 @@ import { formatter } from './factory.js'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
 import User from './models/user.js'
-import { sendMail } from './notifications/mail.js'
+import { enqueueMail } from './notifications/mail.js'
 
 async function getForRetentionPolicy(schema: schemaNames, date: Date, state: AnyState, startDate?: Date) {
   let res: Array<ITravel | IExpenseReport | IHealthCareCost>
@@ -138,7 +138,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 
       const subject = i18n.t(`mail.${reportType}.${stateLabel}_getsDeletedSoon.subject`, interpolation)
       const paragraph = i18n.t(`mail.${reportType}.${stateLabel}_getsDeletedSoon.paragraph`, interpolation)
-      await sendMail(recipients, subject, paragraph, button)
+      await enqueueMail(recipients, subject, paragraph, button)
     }
   }
 }
