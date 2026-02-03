@@ -112,7 +112,7 @@
 
       <StatePipeline class="mb-3" :state="healthCareCost.state" :StateEnum="HealthCareCostState" />
 
-      <div class="row row justify-content-between">
+      <div class="row gy-3 justify-content-center">
         <div class="col-lg-8 col-12">
           <div class="row mb-3">
             <div class="col-auto">
@@ -146,7 +146,7 @@
             </template>
           </TableElement>
         </div>
-        <div class="col-lg-4 col">
+        <div class="col-lg-4 col-auto">
           <div
             v-if="endpointPrefix === 'examine/' && healthCareCost.state < HealthCareCostState.REVIEW_COMPLETED && hasUnusedAdvances"
             class="alert alert-info d-flex align-items-center"

@@ -108,6 +108,7 @@ test.serial('POST /expenseReport/underExamination', async (t) => {
   const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
   const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
+    expenseReport = res.body.result
     t.pass()
   } else {
     console.log(res.body)
@@ -122,6 +123,7 @@ test.serial('POST /expenseReport/inWork AGAIN', async (t) => {
   const comment = ''
   const res = await agent.post('/expenseReport/inWork').send({ _id: expenseReport._id, comment })
   if (res.status === 200) {
+    expenseReport = res.body.result
     t.pass()
   } else {
     console.log(res.body)
@@ -135,6 +137,7 @@ test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id })
   if (res.status === 200) {
+    expenseReport = res.body.result
     t.pass()
   } else {
     console.log(res.body)
@@ -144,6 +147,22 @@ test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
 })
 
 // EXAMINE
+
+test.serial('POST /examine/expenseReport/expense', async (t) => {
+  await loginUser(agent, 'expenseReport')
+  t.plan(2)
+  let req = agent.post('/examine/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
+  for (const entry of objectToFormFields((expenseReport as ExpenseReport).expenses[0])) {
+    req = req.field(entry.field, entry.val)
+  }
+  const res = await req
+  if (res.status === 200) {
+    t.pass()
+  } else {
+    console.log(res.body)
+  }
+  t.is((res.body.result as ExpenseReport).expenses[0].cost.receipts.length, 2)
+})
 
 test.serial('POST /examine/expenseReport/reviewCompleted', async (t) => {
   await loginUser(agent, 'expenseReport')

@@ -122,7 +122,7 @@
 
       <StatePipeline class="mb-3" :state="expenseReport.state" :StateEnum="ExpenseReportState" />
 
-      <div class="row justify-content-between">
+      <div class="row gy-3 justify-content-center">
         <div class="col-lg-8 col-12">
           <div class="row mb-3">
             <div class="col-auto">
@@ -177,7 +177,7 @@
             <div class="col"><span> {{ t('alerts.draftsWillBeLost') }}</span></div>
           </div>
         </div>
-        <div class="col-lg-4 col">
+        <div class="col-lg-4 col-auto">
           <div
             v-if="endpointPrefix === 'examine/' && expenseReport.state < ExpenseReportState.REVIEW_COMPLETED && hasUnusedAdvances"
             class="alert alert-info d-flex align-items-center"
