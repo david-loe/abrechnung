@@ -7476,6 +7476,9 @@
 					},
 					"notes": {
 						"type": "boolean"
+					},
+					"bookingRemark": {
+						"type": "boolean"
 					}
 				},
 				"required": [
@@ -7483,7 +7486,8 @@
 					"metaInformation",
 					"project",
 					"comments",
-					"notes"
+					"notes",
+					"bookingRemark"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -7804,6 +7808,9 @@
 									"comments": {
 										"type": "boolean"
 									},
+									"bookingRemark": {
+										"type": "boolean"
+									},
 									"project": {
 										"type": "boolean"
 									}
@@ -7822,6 +7829,9 @@
 										"type": "boolean"
 									},
 									"comments": {
+										"type": "boolean"
+									},
+									"bookingRemark": {
 										"type": "boolean"
 									},
 									"project": {
@@ -7844,6 +7854,9 @@
 									"comments": {
 										"type": "boolean"
 									},
+									"bookingRemark": {
+										"type": "boolean"
+									},
 									"project": {
 										"type": "boolean"
 									}
@@ -7862,6 +7875,9 @@
 										"type": "boolean"
 									},
 									"comments": {
+										"type": "boolean"
+									},
+									"bookingRemark": {
 										"type": "boolean"
 									},
 									"project": {
