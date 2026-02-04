@@ -608,22 +608,22 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
-export interface Booking {
-  ledgerAccount: LedgerAccount
+export interface Booking<idType extends _id = _id> {
+  ledgerAccount: LedgerAccount<idType>
   report: { _id: _id; name: string }
   reportType: ReportModelNameWithoutAdvance
   amount: number
   date: Date | string
-  project: ProjectSimple
+  project: ProjectSimple<idType>
   employee: { _id: _id; name: User['name']; employeeId: User['employeeId'] }
   remark?: string | null
-  _id: _id
+  _id: idType
 }
 
-export interface LedgerAccount {
+export interface LedgerAccount<idType extends _id = _id> {
   identifier: string
   name: string
-  _id: _id
+  _id: idType
 }
 
 export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const

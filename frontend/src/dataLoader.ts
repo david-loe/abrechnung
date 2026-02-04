@@ -107,7 +107,7 @@ class APP_LOADER {
           Promise.allSettled([
             this.withProgress(this.loadOptional<ProjectSimpleWithName<string>[]>('project')),
             this.withProgress(this.loadOptional<UserSimpleWithProject<string>[]>('users')),
-            this.withProgress(this.loadOptional<LedgerAccount[]>('admin/ledgerAccount'))
+            this.withProgress(this.loadOptional<LedgerAccount<string>[]>('admin/ledgerAccount'))
           ])
         ]).then((result) => {
           if (result[0].status === 'rejected') {
@@ -129,7 +129,7 @@ class APP_LOADER {
 
             let projects: ProjectSimpleWithName<string>[] | undefined
             let users: UserSimpleWithProject<string>[] | undefined
-            let ledgerAccounts: LedgerAccount[] | undefined
+            let ledgerAccounts: LedgerAccount<string>[] | undefined
             if (result[1].status === 'fulfilled') {
               projects = result[1].value[0].status === 'fulfilled' ? result[1].value[0].value : undefined
               users = result[1].value[1].status === 'fulfilled' ? result[1].value[1].value : undefined
@@ -233,11 +233,17 @@ function setData(appData: APP_DATA, endpoint: APP_DATA_ENDPOINTS, newData: unkno
     case 'displaySettings':
       appData.displaySettings = newData as DisplaySettings<string>
       break
+    case 'printerSettings':
+      appData.printerSettings = newData as PrinterSettings<string>
+      break
     case 'project':
       appData.projects = newData as ProjectSimpleWithName<string>[]
       break
     case 'users':
       appData.users = newData as UserSimpleWithProject<string>[]
+      break
+    case 'admin/ledgerAccount':
+      appData.ledgerAccounts = newData as LedgerAccount<string>[]
       break
   }
 }

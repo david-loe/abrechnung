@@ -135,10 +135,10 @@ export async function initDB() {
   ]
   await initer(LedgerAccount, 'ledger accounts', ledgerAccounts)
 
-  const account1530 = await LedgerAccount.findOne({ identifier: '1530' })
-  const account1740 = await LedgerAccount.findOne({ identifier: '1740' })
-  const account4660 = await LedgerAccount.findOne({ identifier: '4660' })
-  const account4900 = await LedgerAccount.findOne({ identifier: '4900' })
+  const account1530 = await LedgerAccount.findOne({ identifier: '1530' }).lean()
+  const account1740 = await LedgerAccount.findOne({ identifier: '1740' }).lean()
+  const account4660 = await LedgerAccount.findOne({ identifier: '4660' }).lean()
+  const account4900 = await LedgerAccount.findOne({ identifier: '4900' }).lean()
   const organisation = {
     name: 'My Organisation',
     accountingSettings: {
@@ -151,8 +151,9 @@ export async function initDB() {
     organisation.accountingSettings.accountMapping[item] = account4660?._id
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: id instead of full leaderAccount
   await initer(Organisation, 'organisation', [organisation as any])
-  const org = await Organisation.findOne()
+  const org = await Organisation.findOne().lean()
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
   const categories = [
