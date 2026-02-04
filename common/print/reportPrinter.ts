@@ -3,7 +3,6 @@ import {
   _id,
   Advance,
   AdvanceState,
-  AnyState,
   baseCurrency,
   Comment,
   Cost,
