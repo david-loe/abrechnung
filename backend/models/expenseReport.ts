@@ -21,11 +21,8 @@ interface Methods {
   addComment(): void
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type ExpenseReportModel = Model<ExpenseReport<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 const expenseReportSchema = () =>
-  new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel, Methods>(
+  new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, Model<ExpenseReport<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
       category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
       expenses: [
@@ -130,6 +127,6 @@ schema.index(
   { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }
 )
 
-export default model<ExpenseReport<Types.ObjectId, mongo.Binary>, ExpenseReportModel>('ExpenseReport', schema)
+export default model('ExpenseReport', schema)
 
 export interface ExpenseReportDoc extends Methods, HydratedDocument<ExpenseReport<Types.ObjectId, mongo.Binary>> {}

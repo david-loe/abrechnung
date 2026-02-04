@@ -5,12 +5,9 @@ import {
   advanceStates,
   baseCurrency,
   Comment,
-  ExpenseReport,
-  HealthCareCost,
   ReportModelNameWithoutAdvance,
   reportModelNamesWithoutAdvance,
-  State,
-  Travel
+  State
 } from 'abrechnung-common/types.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
@@ -31,11 +28,8 @@ interface Methods {
   ): Promise<number>
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type AdvanceModel = Model<Advance<Types.ObjectId>, {}, Methods>
-
 const advanceSchema = () =>
-  new Schema<Advance<Types.ObjectId>, AdvanceModel, Methods>(
+  new Schema<Advance<Types.ObjectId>, Model<Advance<Types.ObjectId>>, Methods>(
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject(true, false, true, 0, baseCurrency._id),
@@ -96,17 +90,17 @@ schema.methods.calculateExchangeRates = async function () {
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
   const reports: Document[] = []
   reports.push(
-    ...(await model<Travel<Types.ObjectId>>('Travel')
+    ...(await model('Travel')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<ExpenseReport<Types.ObjectId>>('ExpenseReport')
+    ...(await model('ExpenseReport')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<HealthCareCost<Types.ObjectId>>('HealthCareCost')
+    ...(await model('HealthCareCost')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
@@ -115,6 +109,8 @@ async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mo
   }
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
+type AdvanceModel = Model<Advance<Types.ObjectId>, {}, Methods>
 // When calling this method from populated paths, only the populated field are in the document
 interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
@@ -182,6 +178,6 @@ schema.post('save', async function () {
 
 schema.index({ name: 'text', reason: 'text', 'comments.text': 'text' }, { weights: { name: 10, reason: 6, 'comments.text': 3 } })
 
-export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)
+export default model('Advance', schema)
 
 export interface AdvanceDoc extends Methods, HydratedDocument<Advance<Types.ObjectId>> {}

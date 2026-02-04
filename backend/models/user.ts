@@ -18,15 +18,12 @@ interface Methods {
   addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }): Promise<void>
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type UserModel = Model<User<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 export const userSchema = async () => {
   const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
   for (const access of accesses) {
     accessObject[access] = { type: Boolean, default: BACKEND_CACHE.settings.defaultAccess[access], label: `accesses.${access}` }
   }
-  return new Schema<User<Types.ObjectId, mongo.Binary>, UserModel, Methods>({
+  return new Schema<User<Types.ObjectId, mongo.Binary>, Model<User<Types.ObjectId, mongo.Binary>>, Methods>({
     fk: {
       type: {
         microsoft: {
@@ -250,6 +247,6 @@ schema.methods.addProjects = async function addProjects(projects: { assigned?: T
   }
 }
 
-export default model<User<Types.ObjectId, mongo.Binary>, UserModel>('User', schema)
+export default model('User', schema)
 
 export interface UserDoc extends Methods, HydratedDocument<User<Types.ObjectId, mongo.Binary>> {}

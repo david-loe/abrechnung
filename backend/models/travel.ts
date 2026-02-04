@@ -37,11 +37,8 @@ interface Methods {
   addComment(): void
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type TravelModel = Model<Travel<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 const travelSchema = () =>
-  new Schema<Travel<Types.ObjectId, mongo.Binary>, TravelModel, Methods>(
+  new Schema<Travel<Types.ObjectId, mongo.Binary>, Model<Travel<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), travelBaseSchema(), {
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
@@ -237,6 +234,6 @@ schema.index(
   { weights: { name: 10, reason: 6, 'destinationPlace.place': 4, 'expenses.description': 4, 'comments.text': 3 } }
 )
 
-export default model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel', schema)
+export default model('Travel', schema)
 
 export interface TravelDoc extends Methods, HydratedDocument<Travel<Types.ObjectId, mongo.Binary>> {}

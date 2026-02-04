@@ -21,11 +21,8 @@ interface Methods {
   addComment(): void
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type HealthCareCostModel = Model<HealthCareCost<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 const healthCareCostSchema = () =>
-  new Schema<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel, Methods>(
+  new Schema<HealthCareCost<Types.ObjectId, mongo.Binary>, Model<HealthCareCost<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(healthCareCostStates, HealthCareCostState.IN_WORK, 'HealthCareCost', true, false), {
       patientName: { type: String, trim: true, required: true },
       insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', required: true },
@@ -131,6 +128,6 @@ schema.index(
   { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }
 )
 
-export default model<HealthCareCost<Types.ObjectId, mongo.Binary>, HealthCareCostModel>('HealthCareCost', schema)
+export default model('HealthCareCost', schema)
 
 export interface HealthCareCostDoc extends Methods, HydratedDocument<HealthCareCost<Types.ObjectId, mongo.Binary>> {}

@@ -12,7 +12,7 @@ import {
   User,
   UserSimple
 } from 'abrechnung-common/types.js'
-import mongoose, { FilterQuery } from 'mongoose'
+import mongoose, { QueryFilter } from 'mongoose'
 import { Get, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PaginationQuery } from './controller.js'
 import { NotFoundError } from './error.js'
@@ -55,7 +55,7 @@ export class SearchController {
 
 function getPermissionFilter(user: User) {
   const permissionFilter = (states?: Set<number>, projects?: IdDocument[]) => {
-    const ors: FilterQuery<unknown>[] = []
+    const ors: QueryFilter<unknown>[] = []
     if (states && states.size > 0) {
       ors.push({ state: { $in: Array.from(states) } })
     }
@@ -63,7 +63,7 @@ function getPermissionFilter(user: User) {
       const projectIds = projects.map((p) => idDocumentToId(p))
       ors.push({ project: { $in: projectIds } })
     }
-    return { historic: false, $or: [{ owner: user._id }, ...ors] } as FilterQuery<unknown>
+    return { historic: false, $or: [{ owner: user._id }, ...ors] } as QueryFilter<unknown>
   }
 
   const travelStates = new Set<number>()
@@ -121,7 +121,7 @@ function getPermissionFilter(user: User) {
   }
 }
 
-async function simpleSearch(termRaw: string, filter: Record<ReportModelName, FilterQuery<unknown>>, limit: number, page: number) {
+async function simpleSearch(termRaw: string, filter: Record<ReportModelName, QueryFilter<unknown>>, limit: number, page: number) {
   const term = termRaw.trim()
   if (!term) {
     return { rows: [], total: 0 }
