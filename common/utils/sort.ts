@@ -31,8 +31,12 @@ function isDateLike(v: unknown): v is Date {
   return v instanceof Date && !Number.isNaN(v.getTime())
 }
 
+function isNullish(v: unknown): boolean {
+  return v === null || v === undefined
+}
+
 function toComparable(v: unknown): { kind: 'nullish' | 'number' | 'string' | 'boolean' | 'date' | 'other'; value: unknown } {
-  if (v === null || v === undefined) return { kind: 'nullish', value: null }
+  if (isNullish(v)) return { kind: 'nullish', value: null }
   if (isDateLike(v)) return { kind: 'date', value: v.getTime() }
   if (typeof v === 'number') return { kind: 'number', value: v }
   if (typeof v === 'boolean') return { kind: 'boolean', value: v ? 1 : 0 }
@@ -94,7 +98,11 @@ export function sortByPath<T extends object>(arr: readonly T[], path: string, op
     .map((item, idx) => ({ item, idx, key: getByPath(item, path) }))
     .sort((a, b) => {
       const cmp = compareValues(a.key, b.key, opts)
-      if (cmp !== 0) return cmp * dir
+      if (cmp !== 0) {
+        // Null-Reihenfolge soll unabhängig von asc/desc bleiben.
+        if (isNullish(a.key) || isNullish(b.key)) return cmp
+        return cmp * dir
+      }
       return a.idx - b.idx // Stabilität bei Gleichstand
     })
     .map((x) => x.item)
