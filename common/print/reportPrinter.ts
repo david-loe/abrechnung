@@ -3,7 +3,6 @@ import {
   _id,
   Advance,
   AdvanceState,
-  AnyState,
   baseCurrency,
   Comment,
   Cost,
@@ -30,7 +29,8 @@ import {
   TravelDay,
   TravelExpense,
   TravelSettings,
-  TravelState
+  TravelState,
+  UserSimple
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
 import { getAddUpTableData, getTotalBalance, isValidDate, refNumberToString } from '../utils/scripts.js'
@@ -211,9 +211,12 @@ class ReportPrint<idType extends _id> {
     )
     y = await this.drawDays({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
     y = await this.drawReports({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
-    if (opts.comments) {
-      y = await this.drawComments({ xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.S })
-    }
+
+    y = await this.drawComments(opts.comments, opts.bookingRemark, {
+      xStart: this.drawer.settings.pagePadding,
+      yStart: y - 16,
+      fontSize: this.drawer.settings.fontSizes.S
+    })
 
     await this.drawer.attachReceipts(receiptMap)
 
@@ -394,8 +397,8 @@ class ReportPrint<idType extends _id> {
     return await this.drawer.drawTable(summary, columns, tableOptions)
   }
 
-  async drawComments(options: Options) {
-    if (this.report.comments.length === 0) {
+  async drawComments(drawComments: boolean, drawBookingRemark: boolean, options: Options) {
+    if ((this.report.comments.length === 0 || !drawComments) && (!this.report.bookingRemark || !drawBookingRemark)) {
       return options.yStart
     }
     const columns: Column[] = []
@@ -404,7 +407,7 @@ class ReportPrint<idType extends _id> {
       width: 120,
       alignment: TextAlignment.Left,
       title: 'author',
-      fn: (a: Comment['author']) => `${this.drawer.formatter.name(a.name)}`
+      fn: (a: Comment['author'] | string) => ((a as UserSimple).name ? this.drawer.formatter.name((a as UserSimple).name) : (a as string))
     })
     columns.push({ key: 'text', width: 300, alignment: TextAlignment.Left, title: 'value' })
 
@@ -415,7 +418,15 @@ class ReportPrint<idType extends _id> {
     const tableOptions: TableOptions = options
     tableOptions.firstRow = false
 
-    return await this.drawer.drawTable<Comment<idType, AnyState>>(this.report.comments, columns, tableOptions)
+    let rows: { author: Comment['author'] | string; text: string }[] = []
+    if (drawComments) {
+      rows = [...this.report.comments]
+    }
+    if (drawBookingRemark && this.report.bookingRemark) {
+      rows.push({ author: this.t('labels.bookingRemark'), text: this.report.bookingRemark })
+    }
+
+    return await this.drawer.drawTable<{ author: Comment['author'] | string; text: string }>(rows, columns, tableOptions)
   }
 
   async drawStages(receiptMap: ReceiptMap<idType>, options: Options, drawNotes = true) {

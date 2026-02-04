@@ -8,9 +8,9 @@ export default {
   cellPadding: { x: 2, bottom: 4 },
   pageSize: { width: 595.28, height: 841.89 },
   options: {
-    travel: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
-    expenseReport: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
-    healthCareCost: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true },
-    advance: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true }
+    travel: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true, bookingRemark: true },
+    expenseReport: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true, bookingRemark: true },
+    healthCareCost: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true, bookingRemark: true },
+    advance: { reviewDates: true, metaInformation: true, project: true, comments: true, notes: true, bookingRemark: true }
   }
 } as const

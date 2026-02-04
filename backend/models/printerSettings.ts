@@ -12,6 +12,7 @@ export const printerSettingsSchema = () => {
         project: { type: BooleanConstructor; required: true }
         comments: { type: BooleanConstructor; required: true }
         notes: { type: BooleanConstructor; required: true }
+        bookingRemark: { type: BooleanConstructor; required: true }
       }
       required: true
     }
@@ -23,7 +24,8 @@ export const printerSettingsSchema = () => {
         metaInformation: { type: Boolean, required: true },
         project: { type: Boolean, required: true },
         comments: { type: Boolean, required: true },
-        notes: { type: Boolean, required: true }
+        notes: { type: Boolean, required: true },
+        bookingRemark: { type: Boolean, required: true }
       },
       required: true
     }
