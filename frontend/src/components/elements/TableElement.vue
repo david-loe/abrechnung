@@ -2,18 +2,14 @@
   <div class="table-wrapper" :class="{ 'settings-open': showSettings }">
     <div v-if="USE_DB_SETTINGS" class="overlay">
       <div v-if="!showSettings" class="settings-icon">
-        <button type="button" class="btn p-0 m-1" @click="showSettings = true">
-          <i class="bi bi-gear"></i>
-        </button>
+        <button type="button" class="btn p-0 m-1" @click="showSettings = true"><i class="bi bi-gear"></i></button>
       </div>
       <div v-else class="d-flex align-items-center">
         <ArrowSortableList v-model="columnOrder" :labelFn="(c: {text: string, value: string}) => c.text ? t(c.text) : c.value" />
         <button type="button" class="btn p-0 m-2" :title="t('labels.save')" @click="applyOrder">
           <i class="bi bi-check-lg text-success"></i>
         </button>
-        <button type="button" class="btn p-0 m-2" @click="resetOrder">
-          <i class="bi bi-arrow-counterclockwise text-danger"></i>
-        </button>
+        <button type="button" class="btn p-0 m-2" @click="resetOrder"><i class="bi bi-arrow-counterclockwise text-danger"></i></button>
       </div>
     </div>
     <Vue3EasyDataTable
@@ -27,6 +23,7 @@
       @update:items-selected="(s: Item[]) => emits('update:itemsSelected', s)"
       @update:server-options="(o: ServerOptions) => emits('update:serverOptions', o)"
       @click-row="(a: ClickRowArgument) => emits('click-row', a)"
+      @update-sort="(s: UpdateSortArgument) => emits('update-sort', s)"
       :server-items-length="serverItemsLength"
       :loading="loading"
       :items="items"
@@ -48,7 +45,7 @@
 
 <script lang="ts" setup>
 import { PropType, ref } from 'vue'
-import type { ClickRowArgument, FilterOption, Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
+import type { ClickRowArgument, FilterOption, Header, Item, ServerOptions, SortType, UpdateSortArgument } from 'vue3-easy-data-table'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import { useI18n } from 'vue-i18n'
@@ -77,7 +74,12 @@ const props = defineProps({
   serverOptions: { type: Object as PropType<ServerOptions> }
 })
 
-const emits = defineEmits<{ 'update:itemsSelected': [Item[]]; 'update:serverOptions': [ServerOptions]; 'click-row': [ClickRowArgument] }>()
+const emits = defineEmits<{
+  'update:itemsSelected': [Item[]]
+  'update:serverOptions': [ServerOptions]
+  'click-row': [ClickRowArgument]
+  'update-sort': [UpdateSortArgument]
+}>()
 
 const headers = ref(props.headers)
 for (const columnToHide of props.columnsToHide) {

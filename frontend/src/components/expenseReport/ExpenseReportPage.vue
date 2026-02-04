@@ -157,7 +157,8 @@
             ]"
             :items="allExpenses"
             :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)">
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)"
+            @update-sort="updateExpenseSorting">
             <template #item-cost.date="{ cost }: Expense">
               {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
                   ? formatter.simpleDate(cost.date)
@@ -305,6 +306,8 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import { UpdateSortArgument } from 'vue3-easy-data-table'
+import { sortByPath } from 'abrechnung-common/utils/sort.js'
 
 type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
@@ -492,6 +495,7 @@ async function setExpenseReport(er: ExpenseReport<string>) {
   const drafts = expenseReport.value.drafts || []
   expenseReport.value = er
   expenseReport.value.drafts = drafts
+  sortedExpenseIds = er.expenses.map((e) => e._id)
   logger.info(`${t('labels.expenseReport')}:`)
   logger.info(expenseReport.value)
   if (props.endpointPrefix === 'examine/') {
@@ -508,20 +512,32 @@ async function getExaminerMails(): Promise<string[]> {
   return []
 }
 
+let sortedExpenseIds: string[] = []
+
+function updateExpenseSorting(sort: UpdateSortArgument) {
+  if (sort.sortType === null) {
+    sortedExpenseIds = expenseReport.value.expenses.map((e) => e._id)
+  } else {
+    sortedExpenseIds = sortByPath(expenseReport.value.expenses, sort.sortBy, { order: sort.sortType }).map((e) => e._id)
+  }
+}
+
 function getNext(expense: Expense<string>): Expense<string> | undefined {
-  const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
-  if (index === -1 || index + 1 === expenseReport.value.expenses.length) {
+  const index = sortedExpenseIds.indexOf(expense._id)
+  if (index === -1 || index + 1 === sortedExpenseIds.length) {
     return undefined
   }
-  return expenseReport.value.expenses[index + 1]
+  const next = getById(sortedExpenseIds[index + 1], expenseReport.value.expenses)
+  return next || undefined
 }
 
 function getPrev(expense: Expense<string>): Expense<string> | undefined {
-  const index = expenseReport.value.expenses.findIndex((e) => e._id === expense._id)
+  const index = sortedExpenseIds.indexOf(expense._id)
   if (index === -1 || index === 0) {
     return undefined
   }
-  return expenseReport.value.expenses[index - 1]
+  const prev = getById(sortedExpenseIds[index - 1], expenseReport.value.expenses)
+  return prev || undefined
 }
 
 function addDrafts(draftExpenses: ExpenseDraft[]) {

@@ -17,14 +17,14 @@
           :mode="modalMode"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
-          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense))"
-          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense))"
+          :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
+          :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
           @edit="postExpense"
           @deleted="deleteExpense"
           @cancel="resetAndHide"
-          @next="() => { const next = getNext(modalObject as Expense); if (next) { showModal('edit', 'expense', next) } else { hideModal() } }"
-          @prev="() => { const prev = getPrev(modalObject as Expense); if (prev) { showModal('edit', 'expense', prev) } else { hideModal() } }" />
+          @next="() => { const next = getNext(modalObject as Expense<string>); if (next) { showModal('edit', 'expense', next) } else { hideModal() } }"
+          @prev="() => { const prev = getPrev(modalObject as Expense<string>); if (prev) { showModal('edit', 'expense', prev) } else { hideModal() } }" />
         <HealthCareCostForm
           v-else
           :mode="(modalMode as 'add' | 'edit')"
@@ -135,7 +135,8 @@
             ]"
             :items="healthCareCost.expenses"
             body-row-class-name="clickable"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)">
+            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)"
+            @update-sort="updateExpenseSorting">
             <template #item-cost.date="{ cost }: Expense">
               {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
                   ? formatter.simpleDate(cost.date)
@@ -261,7 +262,7 @@ import {
   State,
   UserSimple
 } from 'abrechnung-common/types.js'
-import { getTotalTotal, mailToLink, refNumberToString } from 'abrechnung-common/utils/scripts.js'
+import { getById, getTotalTotal, mailToLink, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -282,6 +283,8 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import { UpdateSortArgument } from 'vue3-easy-data-table'
+import { sortByPath } from 'abrechnung-common/utils/sort.js'
 
 type ModalObject = Partial<Expense> | HealthCareCostSimple
 type ModalObjectType = 'expense' | 'healthCareCost'
@@ -443,6 +446,7 @@ async function getHealthCareCost() {
 
 async function setHealthCareCost(newHealthCareCost: HealthCareCost<string>) {
   healthCareCost.value = newHealthCareCost
+  sortedExpenseIds = newHealthCareCost.expenses.map((e) => e._id)
   logger.info(`${t('labels.healthCareCost')}:`)
   logger.info(healthCareCost.value)
   if (props.endpointPrefix === 'examine/') {
@@ -458,20 +462,32 @@ async function getExaminerMails(): Promise<string[]> {
   return []
 }
 
-function getNext(expense: Expense) {
-  const idx = healthCareCost.value.expenses.findIndex((e) => e._id === expense._id)
-  if (idx === -1 || idx + 1 === healthCareCost.value.expenses.length) {
-    return undefined
+let sortedExpenseIds: string[] = []
+
+function updateExpenseSorting(sort: UpdateSortArgument) {
+  if (sort.sortType === null) {
+    sortedExpenseIds = healthCareCost.value.expenses.map((e) => e._id)
+  } else {
+    sortedExpenseIds = sortByPath(healthCareCost.value.expenses, sort.sortBy, { order: sort.sortType }).map((e) => e._id)
   }
-  return healthCareCost.value.expenses[idx + 1]
 }
 
-function getPrev(expense: Expense) {
-  const idx = healthCareCost.value.expenses.findIndex((e) => e._id === expense._id)
-  if (idx === -1 || idx === 0) {
+function getNext(expense: Expense<string>): Expense<string> | undefined {
+  const index = sortedExpenseIds.indexOf(expense._id)
+  if (index === -1 || index + 1 === sortedExpenseIds.length) {
     return undefined
   }
-  return healthCareCost.value.expenses[idx - 1]
+  const next = getById(sortedExpenseIds[index + 1], healthCareCost.value.expenses)
+  return next || undefined
+}
+
+function getPrev(expense: Expense<string>): Expense<string> | undefined {
+  const index = sortedExpenseIds.indexOf(expense._id)
+  if (index === -1 || index === 0) {
+    return undefined
+  }
+  const prev = getById(sortedExpenseIds[index - 1], healthCareCost.value.expenses)
+  return prev || undefined
 }
 
 function goToSettings(healthCareCost: HealthCareCost<string>) {
