@@ -1,5 +1,6 @@
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
-import { _id, LedgerAccount as ILedgerAccount, locales, travelExpenseItems } from 'abrechnung-common/types.js'
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from '@tsoa/runtime'
+import { LedgerAccount as ILedgerAccount, locales, travelExpenseItems } from 'abrechnung-common/types.js'
+import { Types } from 'mongoose'
 import Booking from '../models/booking.js'
 import Category from '../models/category.js'
 import LedgerAccount, { ledgerAccountSchema } from '../models/ledgerAccount.js'
@@ -18,17 +19,17 @@ export class LedgerAccountAdminController extends Controller {
   }
 
   @Post()
-  public async post(@Body() requestBody: SetterBody<ILedgerAccount>) {
-    return await this.setter(LedgerAccount, { requestBody: requestBody as ILedgerAccount, allowNew: true })
+  public async post(@Body() requestBody: SetterBody<ILedgerAccount<Types.ObjectId>>) {
+    return await this.setter(LedgerAccount, { requestBody, allowNew: true })
   }
 
   @Post('bulk')
-  public async postMany(@Body() requestBody: SetterBody<Omit<ILedgerAccount, 'logo'>>[]) {
+  public async postMany(@Body() requestBody: SetterBody<ILedgerAccount<Types.ObjectId>>[]) {
     return await this.insertMany(LedgerAccount, { requestBody })
   }
 
   @Delete()
-  public async delete(@Query() _id: _id) {
+  public async delete(@Query() _id: string) {
     return await this.deleter(LedgerAccount, {
       _id: _id,
       referenceChecks: [
@@ -36,7 +37,8 @@ export class LedgerAccountAdminController extends Controller {
         {
           model: Organisation,
           paths: [
-            'accountingSettings.employeeClearingAccount',
+            'accountingSettings.employeeLiabilitiesAccount',
+            'accountingSettings.employeeClaimsAccount',
             ...travelExpenseItems.map((item) => `accountingSettings.accountMapping.${item}`)
           ]
         },

@@ -57,6 +57,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VueformSchema } from '@vueform/vueform'
 import { LedgerAccount } from 'abrechnung-common/types.js'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
@@ -99,15 +100,15 @@ function clickFilter(header: keyof typeof showFilter.value) {
   }
 }
 
-const ledgerAccountToEdit: Ref<LedgerAccount | undefined> = ref(undefined)
+const ledgerAccountToEdit: Ref<LedgerAccount<string> | undefined> = ref(undefined)
 const _showForm = ref(false)
 
-function showForm(ledgerAccount?: LedgerAccount) {
+function showForm(ledgerAccount?: LedgerAccount<string>) {
   ledgerAccountToEdit.value = ledgerAccount
   _showForm.value = true
 }
-async function postLedgerAccount(ledgerAccount: LedgerAccount) {
-  const result = await API.setter<LedgerAccount>('admin/ledgerAccount', ledgerAccount)
+async function postLedgerAccount(ledgerAccount: LedgerAccount<string>) {
+  const result = await API.setter<LedgerAccount<string>>('admin/ledgerAccount', ledgerAccount)
   if (result.ok) {
     _showForm.value = false
     ledgerAccountToEdit.value = undefined
@@ -115,7 +116,7 @@ async function postLedgerAccount(ledgerAccount: LedgerAccount) {
     APP_LOADER.loadOptional('admin/ledgerAccount')
   }
 }
-async function deleteLedgerAccount(ledgerAccount: LedgerAccount) {
+async function deleteLedgerAccount(ledgerAccount: LedgerAccount<string>) {
   const result = await API.deleter('admin/ledgerAccount', { _id: ledgerAccount._id })
   if (result) {
     loadFromServer()
@@ -123,7 +124,7 @@ async function deleteLedgerAccount(ledgerAccount: LedgerAccount) {
   }
 }
 
-const schema = Object.assign({}, (await API.getter<any>('admin/ledgerAccount/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/ledgerAccount/form')).ok?.data, {
   buttons: {
     type: 'group',
     schema: {

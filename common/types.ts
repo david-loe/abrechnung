@@ -228,7 +228,7 @@ export interface BadgeStyle {
 export interface Category<idType extends _id = _id> {
   name: string
   style: BadgeStyle
-  ledgerAccount: LedgerAccount
+  ledgerAccount: LedgerAccount<idType>
   isDefault: boolean
   for: 'Travel' | 'ExpenseReport' | 'both'
   _id: idType
@@ -349,16 +349,16 @@ export interface ProjectUsers<idType extends _id = _id> {
 
 export interface ProjectWithUsers<idType extends _id = _id> extends Project<idType>, ProjectUsers<idType> {}
 
-export interface AccountingSettings {
-  employeeLiabilitiesAccount: LedgerAccount
-  employeeClaimsAccount: LedgerAccount
+export interface AccountingSettings<idType extends _id = _id> {
+  employeeLiabilitiesAccount: LedgerAccount<idType>
+  employeeClaimsAccount: LedgerAccount<idType>
   employeeSpecificTemplate?: string | null
-  accountMapping: { [key in TravelExpenseItem]: LedgerAccount }
+  accountMapping: { [key in TravelExpenseItem]: LedgerAccount<idType> }
 }
 
 export interface Organisation<idType extends _id = _id, dataType extends binary = binary> extends OrganisationSimple<idType> {
   subfolderPath: string
-  accountingSettings: AccountingSettings
+  accountingSettings: AccountingSettings<idType>
   reportEmail?: string | null
   a1CertificateEmail?: string | null
   bankDetails?: string | null
@@ -650,22 +650,22 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
-export interface Booking {
-  ledgerAccount: LedgerAccount
-  report: { _id: _id; name: string }
+export interface Booking<idType extends _id = _id> {
+  ledgerAccount: LedgerAccount<idType>
+  report: { _id: idType; name: string }
   reportType: ReportModelNameWithoutAdvance
   amount: number
   date: Date | string
-  project: ProjectSimple
-  employee: { _id: _id; name: User['name']; employeeId: User['employeeId'] }
+  project: ProjectSimple<idType>
+  employee: { _id: idType; name: User['name']; employeeId: User['employeeId'] }
   remark?: string | null
-  _id: _id
+  _id: idType
 }
 
-export interface LedgerAccount {
+export interface LedgerAccount<idType extends _id = _id> {
   identifier: string
   name: string
-  _id: _id
+  _id: idType
 }
 
 export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const
