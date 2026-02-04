@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-common",
-  "version": "2.4.3",
+  "version": "2.5.0",
   "private": true,
   "type": "module",
   "exports": {
@@ -20,9 +20,9 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@types/node": "^24.10.8",
+    "@types/node": "^24.10.10",
     "ava": "^6.4.1",
-    "mongoose": "^8.21.0",
+    "mongoose": "^8.22.0",
     "nodemon": "^3.1.11",
     "typescript": "^5.9.3"
   }
