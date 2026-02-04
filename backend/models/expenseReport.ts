@@ -65,7 +65,7 @@ schema.pre(
   }
 )
 
-schema.pre('deleteOne', { document: true, query: false }, function (this: ExpenseReportDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function () {
   for (const historyId of this.history) {
     model('ExpenseReport').deleteOne({ _id: historyId }).exec()
   }
@@ -78,14 +78,14 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Expens
   }
 })
 
-schema.methods.saveToHistory = async function (this: ExpenseReportDoc) {
+schema.methods.saveToHistory = async function () {
   await addHistoryEntry(this, 'ExpenseReport')
   this.$locals.SKIP_POST_SAFE_HOOK = true
   await this.save()
   this.$locals.SKIP_POST_SAFE_HOOK = false
 }
 
-schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) {
+schema.methods.calculateExchangeRates = async function () {
   const promiseList = []
   for (const expense of this.expenses) {
     promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
@@ -93,18 +93,18 @@ schema.methods.calculateExchangeRates = async function (this: ExpenseReportDoc) 
   await Promise.allSettled(promiseList)
 }
 
-schema.methods.addComment = function (this: ExpenseReportDoc) {
+schema.methods.addComment = function () {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, ExpenseReportState>)
     this.comment = undefined
   }
 }
 
-schema.pre('validate', function (this: ExpenseReportDoc) {
+schema.pre('validate', function () {
   this.addComment()
 })
 
-schema.pre('save', async function (this: ExpenseReportDoc) {
+schema.pre('save', async function () {
   await populateAll(this, populates)
 
   await this.calculateExchangeRates()
@@ -114,7 +114,7 @@ schema.pre('save', async function (this: ExpenseReportDoc) {
   await addReferenceOnNewDocs(this, 'ExpenseReport')
 })
 
-schema.post('save', async function (this: ExpenseReportDoc) {
+schema.post('save', async function () {
   if (this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }

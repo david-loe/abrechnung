@@ -70,13 +70,13 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance<Types.Obj
   await populateSelected(this, populates)
 })
 
-schema.pre('deleteOne', { document: true, query: false }, function (this: AdvanceDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function () {
   for (const historyId of this.history) {
     model('Advance').deleteOne({ _id: historyId }).exec()
   }
 })
 
-schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
+schema.methods.saveToHistory = async function (save = true, session: mongoose.ClientSession | null = null) {
   await addHistoryEntry(this, 'Advance', session)
 
   if (this.state === AdvanceState.APPLIED_FOR) {
@@ -89,7 +89,7 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
   }
 }
 
-schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
+schema.methods.calculateExchangeRates = async function () {
   await currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
@@ -153,25 +153,25 @@ schema.methods.offset = async function (
   return difference
 }
 
-schema.methods.addComment = function (this: AdvanceDoc) {
+schema.methods.addComment = function () {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, AdvanceState>)
     this.comment = undefined
   }
 }
 
-schema.pre('validate', function (this: AdvanceDoc) {
+schema.pre('validate', function () {
   this.addComment()
 })
 
-schema.pre('save', async function (this: AdvanceDoc) {
+schema.pre('save', async function () {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
 })
 
-schema.post('save', async function (this: AdvanceDoc) {
+schema.post('save', async function () {
   if (this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }

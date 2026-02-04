@@ -138,7 +138,7 @@ schema.pre('save', async function () {
   await populateAll(this, populates)
 })
 
-schema.methods.isActive = async function (this: UserDoc) {
+schema.methods.isActive = async function () {
   if (this.access.user) {
     if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= Date.now())) {
       return true
@@ -152,7 +152,7 @@ schema.methods.isActive = async function (this: UserDoc) {
 }
 
 type StringIdMap = Record<string, Types.ObjectId>
-schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
+schema.methods.replaceReferences = async function (userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
     const filter: StringIdMap = {}
     filter[path] = userIdToOverwrite
@@ -192,7 +192,7 @@ schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwr
   return result
 }
 
-schema.methods.merge = async function (this: UserDoc, userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean) {
+schema.methods.merge = async function (userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean) {
   const thisPojo = this.toObject()
   if (mergeFk) {
     Object.assign(this.fk, userToOverwrite.fk, thisPojo.fk)

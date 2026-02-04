@@ -107,7 +107,7 @@ export const displaySettingsSchema = () => {
 
 const schema = displaySettingsSchema()
 
-schema.post('save', function (this: HydratedDocument<DisplaySettings<Types.ObjectId>>) {
+schema.post('save', function () {
   const settings = this.toObject()
   updateI18n(settings.locale)
   BACKEND_CACHE.setDisplaySettings(settings)

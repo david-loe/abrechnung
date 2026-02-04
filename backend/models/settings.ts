@@ -48,7 +48,7 @@ export const settingsSchema = () => {
 
 const schema = settingsSchema()
 
-schema.post('save', function (this: HydratedDocument<Settings<Types.ObjectId>>) {
+schema.post('save', function () {
   const settings = this.toObject()
   BACKEND_CACHE.setSettings(settings)
 })

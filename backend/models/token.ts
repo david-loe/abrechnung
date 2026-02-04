@@ -1,5 +1,4 @@
-import { Token } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, mongo, Schema, Types } from 'mongoose'
+import { model, Schema } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 
 const tokenSchema = () =>
@@ -9,7 +8,7 @@ const tokenSchema = () =>
   )
 const schema = tokenSchema()
 
-schema.pre('save', async function (this: HydratedDocument<Token<Types.ObjectId, mongo.Binary>>) {
+schema.pre('save', async function () {
   if (this.isNew) {
     this.expireAt = new Date(Date.now() + BACKEND_CACHE.settings.uploadTokenExpireAfterSeconds * 1_000)
   }
