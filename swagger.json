@@ -668,7 +668,7 @@
 				"description": "A class representation of the BSON Binary type."
 			},
 			"buffer.Blob": {
-				"description": "The **`Blob`** interface represents a blob, which is a file-like object of immutable, raw data; they can be read as text or binary data, or converted into a ReadableStream so its methods can be used for processing the data.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob)\n`Blob` class is a global reference for `import { Blob } from 'node:buffer'`\nhttps://nodejs.org/api/buffer.html#class-blob\nThe **`Blob`** interface represents a blob, which is a file-like object of immutable, raw data; they can be read as text or binary data, or converted into a ReadableStream so its methods can be used for processing the data.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob)\n`Blob` class is a global reference for `import { Blob } from 'node:buffer'`\nhttps://nodejs.org/api/buffer.html#class-blob",
+				"description": "The **`Blob`** interface represents a blob, which is a file-like object of immutable, raw data; they can be read as text or binary data, or converted into a ReadableStream so its methods can be used for processing the data.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob)\n`Blob` class is a global reference for `import { Blob } from 'node:buffer'`\nhttps://nodejs.org/api/buffer.html#class-blob",
 				"properties": {},
 				"type": "object",
 				"additionalProperties": false
@@ -13195,7 +13195,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "2.4.3",
+		"version": "2.5.0",
 		"contact": {}
 	},
 	"paths": {
