@@ -67,6 +67,21 @@ export async function checkForMigrations() {
           { smtp: { $exists: true } },
           { $set: { 'smtp.auth.authType': 'Login' }, $rename: { 'smtp.user': 'smtp.auth.user', 'smtp.password': 'smtp.auth.pass' } }
         )
+
+      logger.info('Apply migration from v2.4.3: add bookingRemark option to printer settings')
+      await mongoose.connection
+        .collection('printersettings')
+        .updateMany(
+          {},
+          {
+            $set: {
+              'options.travel.bookingRemark': false,
+              'options.expenseReport.bookingRemark': false,
+              'options.healthCareCost.bookingRemark': false,
+              'options.advance.bookingRemark': false
+            }
+          }
+        )
     }
     settings.migrateFrom = undefined
     await settings.save()

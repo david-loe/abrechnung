@@ -179,6 +179,7 @@ export interface PrintOptions {
   project: boolean
   comments: boolean
   notes: boolean
+  bookingRemark: boolean
 }
 
 export interface BadgeStyle {
