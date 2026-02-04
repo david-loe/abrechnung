@@ -32,7 +32,7 @@ function isDateLike(v: unknown): v is Date {
 }
 
 function isNullish(v: unknown): boolean {
-  return v === null || v === undefined
+  return v === null || v === undefined || (typeof v === 'number' && Number.isNaN(v))
 }
 
 function toComparable(v: unknown): { kind: 'nullish' | 'number' | 'string' | 'boolean' | 'date' | 'other'; value: unknown } {
