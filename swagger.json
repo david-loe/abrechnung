@@ -7090,15 +7090,11 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"mongoose.FlattenMaps__state-AnyState--name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string____": {
-				"properties": {},
-				"type": "object"
-			},
 			"ReportModelName": {
 				"type": "string",
 				"enum": [
-					"Travel",
 					"Advance",
+					"Travel",
 					"ExpenseReport",
 					"HealthCareCost"
 				]
@@ -13161,10 +13157,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__": {
-				"properties": {},
-				"type": "object"
-			},
 			"Partial__owner-IdDocument_string_--project-IdDocument_string_--name-string__": {
 				"properties": {
 					"owner": {
@@ -17167,8 +17159,8 @@
 													"_reportModelName": {
 														"type": "string",
 														"enum": [
-															"Travel",
 															"Advance",
+															"Travel",
 															"ExpenseReport",
 															"HealthCareCost"
 														]
@@ -17275,7 +17267,23 @@
 										"data": {
 											"allOf": [
 												{
-													"$ref": "#/components/schemas/mongoose.FlattenMaps__state-AnyState--name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string____"
+													"properties": {
+														"owner": {
+															"$ref": "#/components/schemas/UserSimple__id_"
+														},
+														"name": {
+															"type": "string"
+														},
+														"state": {
+															"$ref": "#/components/schemas/AnyState"
+														}
+													},
+													"required": [
+														"owner",
+														"name",
+														"state"
+													],
+													"type": "object"
 												},
 												{
 													"properties": {
@@ -24510,7 +24518,28 @@
 										"data": {
 											"allOf": [
 												{
-													"$ref": "#/components/schemas/mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__"
+													"properties": {
+														"reference": {
+															"type": "number",
+															"format": "double"
+														},
+														"project": {
+															"$ref": "#/components/schemas/ProjectSimple__id_"
+														},
+														"owner": {
+															"$ref": "#/components/schemas/UserSimple__id_"
+														},
+														"name": {
+															"type": "string"
+														}
+													},
+													"required": [
+														"reference",
+														"project",
+														"owner",
+														"name"
+													],
+													"type": "object"
 												},
 												{
 													"properties": {
@@ -24596,7 +24625,28 @@
 										"result": {
 											"allOf": [
 												{
-													"$ref": "#/components/schemas/mongoose.FlattenMaps__name-string--owner_58___id_58__id--email-string--name_58__givenName-string--familyName-string__--project_58__identifier-string--organisation_58__id--_id_58__id_--reference-number__"
+													"properties": {
+														"reference": {
+															"type": "number",
+															"format": "double"
+														},
+														"project": {
+															"$ref": "#/components/schemas/ProjectSimple__id_"
+														},
+														"owner": {
+															"$ref": "#/components/schemas/UserSimple__id_"
+														},
+														"name": {
+															"type": "string"
+														}
+													},
+													"required": [
+														"reference",
+														"project",
+														"owner",
+														"name"
+													],
+													"type": "object"
 												},
 												{
 													"properties": {
