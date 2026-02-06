@@ -223,7 +223,7 @@ schema.methods.merge = async function (userToOverwrite: User<Types.ObjectId, mon
   return this.toObject()
 }
 
-schema.methods.addProjects = async function addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }) {
+schema.methods.addProjects = async function (projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }) {
   let changed = false
   if (projects.assigned) {
     for (const newProjectId of projects.assigned) {
@@ -243,7 +243,7 @@ schema.methods.addProjects = async function addProjects(projects: { assigned?: T
     }
   }
   if (changed) {
-    this.save()
+    await this.save()
   }
 }
 
