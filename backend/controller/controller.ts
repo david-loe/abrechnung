@@ -227,7 +227,7 @@ export class Controller extends TsoaController {
       if (!('$and' in conditions) || !Array.isArray(conditions.$and)) {
         conditions.$and = []
       }
-      //@ts-expect-error Type instantiation is excessively deep and possibly infinite.
+      //@ts-expect-error mongoose QueryFilter with complex generics hits TS depth limit (Type instantiation is excessively deep and possibly infinite)
       conditions.$and.push(options.filter)
     }
 

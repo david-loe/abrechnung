@@ -175,8 +175,11 @@ export class HealthCareCostController extends Controller {
   @Produces('application/pdf')
   public async getReportFromOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const healthCareCost = await HealthCareCost.findOne({
+      _id,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
-      $and: [{ _id, owner: request.user._id as any, historic: false, state: { $gte: State.BOOKABLE } }]
+      owner: request.user._id as any,
+      historic: false,
+      state: { $gte: State.BOOKABLE }
     }).lean()
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
