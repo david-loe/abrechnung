@@ -9,7 +9,7 @@ import {
   State,
   UserWithName
 } from 'abrechnung-common/types.js'
-import { Condition, mongo, Types } from 'mongoose'
+import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
@@ -35,7 +35,8 @@ export class ExpenseReportController extends Controller {
   public async getOwn(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
     return await this.getter(ExpenseReport, {
       query,
-      filter: { owner: request.user._id, historic: false },
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter: { owner: request.user._id as any, historic: false },
       projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
@@ -171,7 +172,8 @@ export class ExpenseReportController extends Controller {
   public async getReportForOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const expenseReport = await ExpenseReport.findOne({
       _id: _id,
-      owner: request.user._id,
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      owner: request.user._id as any,
       historic: false,
       state: { $gte: State.BOOKABLE }
     }).lean()
@@ -202,9 +204,10 @@ export class ExpenseReportController extends Controller {
 export class ExpenseReportExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { historic: false }
+    const filter: QueryFilter<IExpenseReport> = { historic: false }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(ExpenseReport, {
       query,
@@ -399,9 +402,10 @@ export class ExpenseReportExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IExpenseReport<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (!expenseReport) {
@@ -422,9 +426,10 @@ export class ExpenseReportExamineController extends Controller {
 export class ExpenseReportBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IExpenseReport>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IExpenseReport> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(ExpenseReport, {
       query,
@@ -438,9 +443,10 @@ export class ExpenseReportBookableController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IExpenseReport> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IExpenseReport<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const expenseReport = await ExpenseReport.findOne(filter).lean()
     if (!expenseReport) {

@@ -10,7 +10,7 @@ import {
   TravelState,
   UserWithName
 } from 'abrechnung-common/types.js'
-import { Condition, mongo, Types } from 'mongoose'
+import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
@@ -36,7 +36,8 @@ export class TravelController extends Controller {
   public async getOwn(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
     return await this.getter(Travel, {
       query,
-      filter: { owner: request.user._id, historic: false },
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter: { owner: request.user._id as any, historic: false },
       projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { startDate: -1 }
@@ -262,7 +263,13 @@ export class TravelController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getOwnReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const travel = await Travel.findOne({ _id: _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }).lean()
+    const travel = await Travel.findOne({
+      _id: _id,
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      owner: request.user._id as any,
+      historic: false,
+      state: { $gte: State.BOOKABLE }
+    }).lean()
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
@@ -290,9 +297,10 @@ export class TravelController extends Controller {
 export class TravelApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = { $and: [{ historic: false, state: { $gte: State.APPLIED_FOR, $lt: State.IN_REVIEW } }] }
+    const filter: QueryFilter<ITravel> = { $and: [{ historic: false, state: { $gte: State.APPLIED_FOR, $lt: State.IN_REVIEW } }] }
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Travel, {
       query,
@@ -363,9 +371,10 @@ export class TravelApproveController extends Controller {
 export class TravelExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = { $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER } }] }
+    const filter: QueryFilter<ITravel> = { $and: [{ historic: false, state: { $gte: State.EDITABLE_BY_OWNER } }] }
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Travel, {
       query,
@@ -591,9 +600,10 @@ export class TravelExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<ITravel<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const travel = await Travel.findOne(filter).lean()
     if (!travel) {
@@ -614,9 +624,10 @@ export class TravelExamineController extends Controller {
 export class TravelBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<ITravel>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = { historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<ITravel> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(Travel, {
       query,
@@ -630,9 +641,10 @@ export class TravelBookableController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<ITravel> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<ITravel<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const travel = await Travel.findOne(filter).lean()
     if (!travel) {

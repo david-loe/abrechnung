@@ -1,7 +1,7 @@
 import { _id, GETResponse, IdDocument, Meta, User } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { DeleteResult } from 'mongodb'
-import { FilterQuery, HydratedDocument, Model, mongo, ProjectionType, SortOrder, Types } from 'mongoose'
+import { HydratedDocument, Model, mongo, ProjectionType, QueryFilter, SortOrder, Types } from 'mongoose'
 import { Controller as TsoaController } from 'tsoa'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
@@ -37,7 +37,7 @@ export interface GetterQuery<ModelType> extends PaginationQuery {
 
 export interface GetterOptions<ModelType> {
   query: GetterQuery<ModelType>
-  filter?: FilterQuery<ModelType>
+  filter?: QueryFilter<ModelType>
   projection?: ProjectionType<ModelType>
   sort?: string | { [key: string]: SortOrder } | [string, SortOrder][] | undefined | null
   cb?: (data: ModelType | ModelType[]) => unknown
@@ -219,7 +219,7 @@ export class Controller extends TsoaController {
 
     // find all
     // conditions
-    let conditions: FilterQuery<ModelType> = {}
+    let conditions: QueryFilter<ModelType> = {}
     if (options.query.filterJSON) {
       conditions = JSON.parse(Base64.decode(options.query.filterJSON))
     }
@@ -227,6 +227,7 @@ export class Controller extends TsoaController {
       if (!('$and' in conditions) || !Array.isArray(conditions.$and)) {
         conditions.$and = []
       }
+      //@ts-expect-error mongoose QueryFilter with complex generics hits TS depth limit (Type instantiation is excessively deep and possibly infinite)
       conditions.$and.push(options.filter)
     }
 
@@ -341,7 +342,7 @@ export class Controller extends TsoaController {
     }
     if (options.referenceChecks) {
       for (const referenceCheck of options.referenceChecks) {
-        const filter: FilterQuery<unknown> = {}
+        const filter: QueryFilter<unknown> = {}
         filter.$or = []
         for (const path of referenceCheck.paths) {
           const conditions = structuredClone(referenceCheck.conditions) || {}

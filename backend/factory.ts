@@ -73,7 +73,7 @@ export const currencyConverter = new CurrencyConverter('InforEuro', [
     if (TO !== 'EUR') {
       return null
     }
-    const month = date.getUTCMonth() + 1
+    const month = (date.getUTCMonth() + 1) as IExchangeRate['month']
     const year = date.getUTCFullYear()
     let data: IExchangeRate | null | undefined = await ExchangeRate.findOne({ currency: FROM, month: month, year: year }).lean()
     if (!data && !(await ExchangeRate.findOne({ month: month, year: year }).lean())) {

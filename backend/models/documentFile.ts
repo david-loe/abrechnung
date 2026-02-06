@@ -12,7 +12,7 @@ const fileSchema = () =>
 
 const schema = fileSchema()
 
-schema.pre('save', function (next) {
+schema.pre('save', function () {
   if (this.isNew && this.type.startsWith('image/') && this.data) {
     // Wrong type in mongodb BSON Binary, so need assertion here
     const detectedType = detectImageType(this.data.buffer as unknown as ArrayBuffer)
@@ -20,7 +20,6 @@ schema.pre('save', function (next) {
       this.type = detectedType
     }
   }
-  next()
 })
 
 export default model<DocumentFile<Types.ObjectId, mongo.Binary>>('DocumentFile', schema)

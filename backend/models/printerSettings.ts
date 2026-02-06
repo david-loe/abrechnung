@@ -1,5 +1,5 @@
 import { fontNames, hexColorRegex, PrinterSettings, ReportType, reportTypes } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { reportPrinter } from '../factory.js'
 
@@ -59,7 +59,7 @@ export const printerSettingsSchema = () => {
 
 const schema = printerSettingsSchema()
 
-schema.post('save', function (this: HydratedDocument<PrinterSettings<Types.ObjectId>>) {
+schema.post('save', function () {
   const settings = this.toObject()
   reportPrinter.setSettings(settings)
   BACKEND_CACHE.setPrinterSettings(settings)

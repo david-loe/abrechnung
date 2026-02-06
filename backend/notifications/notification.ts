@@ -17,7 +17,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { getDiffInDays, mdLinksToHtml, PlaceToString } from 'abrechnung-common/utils/scripts.js'
 import escapeHtml from 'escape-html'
-import { RootFilterQuery } from 'mongoose'
+import { mongo, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { formatter } from '../factory.js'
@@ -48,7 +48,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
   const button = { text: '', link: '' }
 
   const supervisedProjectsFilter = { $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }] }
-  const userFilter: RootFilterQuery<IUser> = {}
+  const userFilter: QueryFilter<IUser<Types.ObjectId, mongo.Binary>> = {}
   if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)

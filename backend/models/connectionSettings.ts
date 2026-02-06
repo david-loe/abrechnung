@@ -1,5 +1,5 @@
 import { ConnectionSettings, defaultLocale, emailRegex, locales, smtpAuthTypes } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../data/settingsValidator.js'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
@@ -185,7 +185,7 @@ export const connectionSettingsSchema = () =>
 
 const schema = connectionSettingsSchema()
 
-schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings<Types.ObjectId>>) {
+schema.pre('validate', async function () {
   if (this.auth.ldapauth?.url) {
     await verifyLdapauthConfig(this.auth.ldapauth)
   }
@@ -194,7 +194,7 @@ schema.pre('validate', async function (this: HydratedDocument<ConnectionSettings
   }
 })
 
-schema.post('save', function (this: HydratedDocument<ConnectionSettings<Types.ObjectId>>) {
+schema.post('save', function () {
   const settings = this.toObject()
   BACKEND_CACHE.setConnectionSettings(settings)
 })

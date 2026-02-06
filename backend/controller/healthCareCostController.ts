@@ -10,7 +10,7 @@ import {
   State,
   UserWithName
 } from 'abrechnung-common/types.js'
-import { Condition, mongo, Types } from 'mongoose'
+import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
@@ -37,7 +37,8 @@ export class HealthCareCostController extends Controller {
   public async getOwn(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
     return await this.getter(HealthCareCost, {
       query,
-      filter: { owner: request.user._id, historic: false },
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter: { owner: request.user._id as any, historic: false },
       projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
@@ -174,7 +175,11 @@ export class HealthCareCostController extends Controller {
   @Produces('application/pdf')
   public async getReportFromOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
     const healthCareCost = await HealthCareCost.findOne({
-      $and: [{ _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }]
+      _id,
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      owner: request.user._id as any,
+      historic: false,
+      state: { $gte: State.BOOKABLE }
     }).lean()
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
@@ -203,9 +208,10 @@ export class HealthCareCostController extends Controller {
 export class HealthCareCostExamineController extends Controller {
   @Get()
   public async getToExamine(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { historic: false }
+    const filter: QueryFilter<IHealthCareCost> = { historic: false }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(HealthCareCost, {
       query,
@@ -401,9 +407,10 @@ export class HealthCareCostExamineController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IHealthCareCost<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (!healthCareCost) {
@@ -429,10 +436,11 @@ export class HealthCareCostExamineController extends Controller {
 export class HealthCareCostBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IHealthCareCost>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IHealthCareCost> = { historic: false, state: { $gte: State.BOOKABLE } }
 
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(HealthCareCost, {
       query,
@@ -446,10 +454,11 @@ export class HealthCareCostBookableController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IHealthCareCost> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IHealthCareCost<Types.ObjectId, mongo.Binary>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
 
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const healthCareCost = await HealthCareCost.findOne(filter).lean()
     if (!healthCareCost) {

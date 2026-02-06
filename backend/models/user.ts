@@ -18,15 +18,12 @@ interface Methods {
   addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }): Promise<void>
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type UserModel = Model<User<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 export const userSchema = async () => {
   const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
   for (const access of accesses) {
     accessObject[access] = { type: Boolean, default: BACKEND_CACHE.settings.defaultAccess[access], label: `accesses.${access}` }
   }
-  return new Schema<User<Types.ObjectId, mongo.Binary>, UserModel, Methods>({
+  return new Schema<User<Types.ObjectId, mongo.Binary>, Model<User<Types.ObjectId, mongo.Binary>>, Methods>({
     fk: {
       type: {
         microsoft: {
@@ -138,7 +135,7 @@ schema.pre('save', async function () {
   await populateAll(this, populates)
 })
 
-schema.methods.isActive = async function (this: UserDoc) {
+schema.methods.isActive = async function () {
   if (this.access.user) {
     if (!(this.loseAccessAt && (this.loseAccessAt as Date).valueOf() <= Date.now())) {
       return true
@@ -152,7 +149,7 @@ schema.methods.isActive = async function (this: UserDoc) {
 }
 
 type StringIdMap = Record<string, Types.ObjectId>
-schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwrite: Types.ObjectId) {
+schema.methods.replaceReferences = async function (userIdToOverwrite: Types.ObjectId) {
   const filter = (path: string) => {
     const filter: StringIdMap = {}
     filter[path] = userIdToOverwrite
@@ -192,7 +189,7 @@ schema.methods.replaceReferences = async function (this: UserDoc, userIdToOverwr
   return result
 }
 
-schema.methods.merge = async function (this: UserDoc, userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean) {
+schema.methods.merge = async function (userToOverwrite: User<Types.ObjectId, mongo.Binary>, mergeFk: boolean) {
   const thisPojo = this.toObject()
   if (mergeFk) {
     Object.assign(this.fk, userToOverwrite.fk, thisPojo.fk)
@@ -226,7 +223,7 @@ schema.methods.merge = async function (this: UserDoc, userToOverwrite: User<Type
   return this.toObject()
 }
 
-schema.methods.addProjects = async function addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }) {
+schema.methods.addProjects = async function (projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }) {
   let changed = false
   if (projects.assigned) {
     for (const newProjectId of projects.assigned) {
@@ -246,10 +243,10 @@ schema.methods.addProjects = async function addProjects(projects: { assigned?: T
     }
   }
   if (changed) {
-    this.save()
+    await this.save()
   }
 }
 
-export default model<User<Types.ObjectId, mongo.Binary>, UserModel>('User', schema)
+export default model('User', schema)
 
 export interface UserDoc extends Methods, HydratedDocument<User<Types.ObjectId, mongo.Binary>> {}

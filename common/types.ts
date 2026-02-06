@@ -686,8 +686,6 @@ export const retention = [
 ] as const
 export type RetentionType = (typeof retention)[number]
 
-export type schemaNames = 'Travel' | 'ExpenseReport' | 'HealthCareCost'
-
 export const accesses = [
   'user',
   'inWork:expenseReport',

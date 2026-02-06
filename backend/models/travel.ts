@@ -37,11 +37,8 @@ interface Methods {
   addComment(): void
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type TravelModel = Model<Travel<Types.ObjectId, mongo.Binary>, {}, Methods>
-
 const travelSchema = () =>
-  new Schema<Travel<Types.ObjectId, mongo.Binary>, TravelModel, Methods>(
+  new Schema<Travel<Types.ObjectId, mongo.Binary>, Model<Travel<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(travelStates, TravelState.APPLIED_FOR, 'Travel'), travelBaseSchema(), {
       isCrossBorder: { type: Boolean },
       a1Certificate: { type: { exactAddress: { type: String, required: true }, destinationName: { type: String, required: true } } },
@@ -135,7 +132,7 @@ schema.pre(
   }
 )
 
-schema.pre('deleteOne', { document: true, query: false }, function (this: TravelDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function () {
   for (const historyId of this.history) {
     model('Travel').deleteOne({ _id: historyId }).exec()
   }
@@ -152,7 +149,7 @@ schema.pre('deleteOne', { document: true, query: false }, function (this: Travel
   deleteReceipts(this.expenses)
 })
 
-schema.methods.saveToHistory = async function (this: TravelDoc) {
+schema.methods.saveToHistory = async function () {
   await addHistoryEntry(this, 'Travel')
 
   if (this.state === TravelState.APPROVED && BACKEND_CACHE.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none') {
@@ -180,7 +177,7 @@ schema.methods.saveToHistory = async function (this: TravelDoc) {
   this.$locals.SKIP_POST_SAFE_HOOK = false
 }
 
-schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
+schema.methods.calculateExchangeRates = async function () {
   const promiseList = []
   for (const stage of this.stages) {
     promiseList.push(currencyConverter.addExchangeRate(stage.cost, stage.cost.date))
@@ -191,14 +188,14 @@ schema.methods.calculateExchangeRates = async function (this: TravelDoc) {
   await Promise.allSettled(promiseList)
 }
 
-schema.methods.addComment = function (this: TravelDoc) {
+schema.methods.addComment = function () {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, TravelState>)
     this.comment = undefined
   }
 }
 
-schema.pre('validate', async function (this: TravelDoc) {
+schema.pre('validate', async function () {
   this.addComment()
 
   await populateAll(this, populates)
@@ -214,12 +211,12 @@ schema.pre('validate', async function (this: TravelDoc) {
   await populateAll(this, populates)
 })
 
-schema.pre('save', async function (this: TravelDoc) {
+schema.pre('save', async function () {
   setLog(this)
   await addReferenceOnNewDocs(this, 'Travel')
 })
 
-schema.post('save', async function (this: TravelDoc) {
+schema.post('save', async function () {
   if (this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }
@@ -237,6 +234,6 @@ schema.index(
   { weights: { name: 10, reason: 6, 'destinationPlace.place': 4, 'expenses.description': 4, 'comments.text': 3 } }
 )
 
-export default model<Travel<Types.ObjectId, mongo.Binary>, TravelModel>('Travel', schema)
+export default model('Travel', schema)
 
 export interface TravelDoc extends Methods, HydratedDocument<Travel<Types.ObjectId, mongo.Binary>> {}

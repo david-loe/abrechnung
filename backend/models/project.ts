@@ -6,11 +6,8 @@ interface Methods {
   addToBalance(reportTotal: number, session?: mongoose.ClientSession | null): Promise<void>
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type ProjectModel = Model<Project<Types.ObjectId>, {}, Methods>
-
 export const projectSchema = () =>
-  new Schema<Project<Types.ObjectId>, ProjectModel, Methods>({
+  new Schema<Project<Types.ObjectId>, Model<Project<Types.ObjectId>>, Methods>({
     identifier: { type: String, trim: true, required: true, unique: true, index: true },
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
     name: { type: String, trim: true },
@@ -20,6 +17,8 @@ export const projectSchema = () =>
 
 const schema = projectSchema()
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
+type ProjectModel = Model<Project<Types.ObjectId>, {}, Methods>
 // When calling this method from populated paths, only the populated field are in the document
 interface ProjectSimpleDoc extends Methods, HydratedDocument<ProjectSimple> {}
 
@@ -38,7 +37,7 @@ schema.methods.addToBalance = async function (this: ProjectSimpleDoc, reportTota
 export type ProjectSchema = InferSchemaType<typeof schema>
 export type IProject = ProjectSchema & { _id: _id }
 
-export default model<Project<Types.ObjectId>, ProjectModel>('Project', schema)
+export default model('Project', schema)
 
 export interface ProjectDoc extends Methods, HydratedDocument<Project<Types.ObjectId>> {}
 

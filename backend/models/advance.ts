@@ -5,12 +5,9 @@ import {
   advanceStates,
   baseCurrency,
   Comment,
-  ExpenseReport,
-  HealthCareCost,
   ReportModelNameWithoutAdvance,
   reportModelNamesWithoutAdvance,
-  State,
-  Travel
+  State
 } from 'abrechnung-common/types.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
@@ -31,11 +28,8 @@ interface Methods {
   ): Promise<number>
 }
 
-// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
-type AdvanceModel = Model<Advance<Types.ObjectId>, {}, Methods>
-
 const advanceSchema = () =>
-  new Schema<Advance<Types.ObjectId>, AdvanceModel, Methods>(
+  new Schema<Advance<Types.ObjectId>, Model<Advance<Types.ObjectId>>, Methods>(
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject(true, false, true, 0, baseCurrency._id),
@@ -70,13 +64,13 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance<Types.Obj
   await populateSelected(this, populates)
 })
 
-schema.pre('deleteOne', { document: true, query: false }, function (this: AdvanceDoc) {
+schema.pre('deleteOne', { document: true, query: false }, function () {
   for (const historyId of this.history) {
     model('Advance').deleteOne({ _id: historyId }).exec()
   }
 })
 
-schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, session: mongoose.ClientSession | null = null) {
+schema.methods.saveToHistory = async function (save = true, session: mongoose.ClientSession | null = null) {
   await addHistoryEntry(this, 'Advance', session)
 
   if (this.state === AdvanceState.APPLIED_FOR) {
@@ -89,24 +83,24 @@ schema.methods.saveToHistory = async function (this: AdvanceDoc, save = true, se
   }
 }
 
-schema.methods.calculateExchangeRates = async function (this: AdvanceDoc) {
+schema.methods.calculateExchangeRates = async function () {
   await currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
   const reports: Document[] = []
   reports.push(
-    ...(await model<Travel<Types.ObjectId>>('Travel')
+    ...(await model('Travel')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<ExpenseReport<Types.ObjectId>>('ExpenseReport')
+    ...(await model('ExpenseReport')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
   reports.push(
-    ...(await model<HealthCareCost<Types.ObjectId>>('HealthCareCost')
+    ...(await model('HealthCareCost')
       .find({ advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } })
       .session(session))
   )
@@ -115,6 +109,8 @@ async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mo
   }
 }
 
+// biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
+type AdvanceModel = Model<Advance<Types.ObjectId>, {}, Methods>
 // When calling this method from populated paths, only the populated field are in the document
 interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
@@ -153,25 +149,25 @@ schema.methods.offset = async function (
   return difference
 }
 
-schema.methods.addComment = function (this: AdvanceDoc) {
+schema.methods.addComment = function () {
   if (this.comment) {
     this.comments.push({ text: this.comment, author: this.editor, toState: this.state } as Comment<Types.ObjectId, AdvanceState>)
     this.comment = undefined
   }
 }
 
-schema.pre('validate', function (this: AdvanceDoc) {
+schema.pre('validate', function () {
   this.addComment()
 })
 
-schema.pre('save', async function (this: AdvanceDoc) {
+schema.pre('save', async function () {
   await populateAll(this, populates)
   await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
 })
 
-schema.post('save', async function (this: AdvanceDoc) {
+schema.post('save', async function () {
   if (this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }
@@ -182,6 +178,6 @@ schema.post('save', async function (this: AdvanceDoc) {
 
 schema.index({ name: 'text', reason: 'text', 'comments.text': 'text' }, { weights: { name: 10, reason: 6, 'comments.text': 3 } })
 
-export default model<Advance<Types.ObjectId>, AdvanceModel>('Advance', schema)
+export default model('Advance', schema)
 
 export interface AdvanceDoc extends Methods, HydratedDocument<Advance<Types.ObjectId>> {}

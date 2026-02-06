@@ -12,7 +12,7 @@ import {
   reportTypes,
   TravelState
 } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { updateI18n } from '../i18n.js'
 import { colorSchema } from './helper.js'
@@ -107,7 +107,7 @@ export const displaySettingsSchema = () => {
 
 const schema = displaySettingsSchema()
 
-schema.post('save', function (this: HydratedDocument<DisplaySettings<Types.ObjectId>>) {
+schema.post('save', function () {
   const settings = this.toObject()
   updateI18n(settings.locale)
   BACKEND_CACHE.setDisplaySettings(settings)

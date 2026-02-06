@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
-import { Condition, Types } from 'mongoose'
+import { QueryFilter, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
@@ -34,7 +34,8 @@ export class AdvanceController extends Controller {
   public async getOwn(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
     return await this.getter(Advance, {
       query,
-      filter: { owner: request.user._id, historic: false },
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter: { owner: request.user._id as any, historic: false },
       projection: { history: 0, historic: 0, bookingRemark: 0 },
       sort: { createdAt: -1 }
     })
@@ -105,7 +106,13 @@ export class AdvanceController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReportForOwn(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const advance = await Advance.findOne({ _id: _id, owner: request.user._id, historic: false, state: { $gte: State.BOOKABLE } }).lean()
+    const advance = await Advance.findOne({
+      _id: _id,
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      owner: request.user._id as any,
+      historic: false,
+      state: { $gte: State.BOOKABLE }
+    }).lean()
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
@@ -130,9 +137,10 @@ export class AdvanceController extends Controller {
 export class AdvanceExamineController extends Controller {
   @Get()
   public async getForExamineReport(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: { $gte: AdvanceState.APPROVED } }] }
+    const filter: QueryFilter<IAdvance> = { $and: [{ historic: false }, { state: { $gte: AdvanceState.APPROVED } }] }
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0, bookingRemark: 0 }, sort: { updatedAt: -1 } })
   }
@@ -145,9 +153,10 @@ export class AdvanceExamineController extends Controller {
 export class AdvanceApproveController extends Controller {
   @Get()
   public async getToApprove(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { $and: [{ historic: false }, { state: { $gte: State.APPLIED_FOR } }] }
+    const filter: QueryFilter<IAdvance> = { $and: [{ historic: false }, { state: { $gte: State.APPLIED_FOR } }] }
     if (request.user.projects.supervised.length > 0) {
-      filter.$and.push({ project: { $in: request.user.projects.supervised } })
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0 }, sort: { updatedAt: -1 } })
   }
@@ -234,9 +243,10 @@ export class AdvanceApproveController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getReportForAny(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IAdvance<Types.ObjectId>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const advance = await Advance.findOne(filter).lean()
     if (!advance) {
@@ -257,9 +267,10 @@ export class AdvanceApproveController extends Controller {
 export class AdvanceBookableController extends Controller {
   @Get()
   public async getBookable(@Queries() query: GetterQuery<IAdvance>, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IAdvance> = { historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     return await this.getter(Advance, {
       query,
@@ -272,9 +283,10 @@ export class AdvanceBookableController extends Controller {
   @Get('report')
   @Produces('application/pdf')
   public async getBookableReport(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
-    const filter: Condition<IAdvance> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
+    const filter: QueryFilter<IAdvance<Types.ObjectId>> = { _id, historic: false, state: { $gte: State.BOOKABLE } }
     if (request.user.projects.supervised.length > 0) {
-      filter.project = { $in: request.user.projects.supervised }
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      filter.project = { $in: request.user.projects.supervised as any }
     }
     const advance = await Advance.findOne(filter).lean()
     if (!advance) {
