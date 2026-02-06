@@ -12,7 +12,7 @@ import {
   reportTypes,
   TravelState
 } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { updateI18n } from '../i18n.js'
 import { colorSchema } from './helper.js'

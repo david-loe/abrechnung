@@ -12,7 +12,7 @@ import {
   textColors,
   UserSimple
 } from 'abrechnung-common/types.js'
-import mongoose, { HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
+import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 
@@ -173,7 +173,8 @@ export function populateSelected<DocType extends {}>(
 }
 
 export function populateAll<DocType extends {}>(
-  doc: HydratedDocument<DocType>,
+  // biome-ignore lint/complexity/noBannedTypes: mongoose uses {} as type
+  doc: Document<unknown, {}, DocType>,
   projectionPopulateMap: Partial<Record<keyof DocType, PopulateOptions[]>>
 ) {
   const populates: Promise<unknown>[] = []

@@ -1,5 +1,5 @@
 import { ConnectionSettings, defaultLocale, emailRegex, locales, smtpAuthTypes } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../data/settingsValidator.js'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'

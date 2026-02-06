@@ -1,5 +1,5 @@
 import { Access, accesses, ReportType, RetentionType, reportTypes, retention, Settings } from 'abrechnung-common/types.js'
-import { HydratedDocument, model, Schema, Types } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 
 export const settingsSchema = () => {
