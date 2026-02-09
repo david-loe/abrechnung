@@ -16,7 +16,7 @@
     "@popperjs/core": "^2.11.8",
     "@vueform/vueform": "^1.13.8",
     "abrechnung-common": "file:../common",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
