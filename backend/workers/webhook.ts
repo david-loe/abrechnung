@@ -16,7 +16,7 @@ export const webhookQueue = new Queue<WebhookJobData>(WEBHOOK_QUEUE_NAME, {
   connection: { url: ENV.REDIS_URL },
   prefix: ENV.REDIS_PREFIX,
   defaultJobOptions: {
-    attempts: ENV.WEBHOOK_RETRY_ATTEMPTS,
+    attempts: ENV.WEBHOOK_ATTEMPTS,
     backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY },
     removeOnComplete: { count: 3 },
     removeOnFail: { count: 9 }
