@@ -8,9 +8,7 @@ import { enqueueMail } from '../notifications/mail.js'
 
 const secret = ENV.MAGIC_LOGIN_SECRET
 const callbackUrl = `${ENV.VITE_BACKEND_URL}/auth/magiclogin/callback`
-const options = {
-  expiresIn: 60 * 120 // in seconds -> 120min
-}
+const options = { expiresIn: ENV.MAGIC_LOGIN_TTL_SECONDS }
 
 export default new MagicLoginStrategy.default({
   secret: secret,

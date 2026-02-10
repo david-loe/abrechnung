@@ -108,7 +108,7 @@ export const fileHandler = multer({ limits: { fileSize: ENV.VITE_MAX_FILE_SIZE }
 
 export function genAuthenticatedLink(
   payload: { destination: string; redirect: string },
-  jwtOptions: jwt.SignOptions = { expiresIn: 60 * 120 }
+  jwtOptions: jwt.SignOptions = { expiresIn: ENV.MAGIC_LOGIN_TTL_SECONDS }
 ) {
   const secret = ENV.MAGIC_LOGIN_SECRET
   const callbackUrl = `${ENV.VITE_BACKEND_URL}/auth/magiclogin/callback`
