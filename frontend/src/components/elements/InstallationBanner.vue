@@ -4,99 +4,97 @@
     v-if="showInstallationBanner && isMobile"
     class="bg-body-secondary"
     style="width: 100%; position: fixed; left: 0px; bottom: 0px; z-index: 9999; display: block">
-    <div class="container-lg p-3">
-      <div id="installationHeader" style="display: flex; justify-content: space-between">
-        <h5 class="">{{ t('installation.header') }}</h5>
+    <div class="container p-2">
+      <div id="installationHeader" class="d-flex justify-content-between mb-2">
+        <span class="fs-5">{{ t('installation.header') }}</span>
         <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
-      <div>
-        <div v-if="!promptInstallEvent" id="installationBody" class="my-1">
-          <div v-if="operationSystem === 'iOS'">
-            <div v-if="browser === 'Safari'">
-              <div>
-                {{ t('installation.iosSafari.steps.one.one') }}
-                <i class="bi bi-box-arrow-up"></i>
-                {{ t('installation.iosSafari.steps.one.two') }}
-              </div>
-              <div>
-                {{ t('installation.iosSafari.steps.two') }}
-                <i class="bi bi-plus-square"></i>
-              </div>
-              <div>{{ t('installation.iosSafari.steps.three') }}</div>
+      <div v-if="!promptInstallEvent" id="installationBody" class="mb-2">
+        <div v-if="operationSystem === 'iOS'">
+          <div v-if="browser === 'Safari'">
+            <div>
+              {{ t('installation.iosSafari.steps.one.one') }}
+              <i class="bi bi-box-arrow-up"></i>
+              {{ t('installation.iosSafari.steps.one.two') }}
             </div>
-            <div v-else-if="browser === 'Chrome'">
-              <div>
-                {{ t('installation.iosChrome.steps.one.one') }}
-                <i class="bi bi-box-arrow-up"></i>
-                {{ t('installation.iosChrome.steps.one.two') }}
-              </div>
-              <div>
-                {{ t('installation.iosChrome.steps.two') }}
-                <i class="bi bi-plus-square"></i>
-              </div>
-              <div>{{ t('installation.iosChrome.steps.three') }}</div>
+            <div>
+              {{ t('installation.iosSafari.steps.two') }}
+              <i class="bi bi-plus-square"></i>
             </div>
-            <div v-else-if="browser === 'Firefox'">
-              <div>
-                {{ t('installation.iosFirefox.steps.one.one') }}
-                <i class="bi bi-list"></i>
-                {{ t('installation.iosFirefox.steps.one.two') }}
-              </div>
-              <div>
-                {{ t('installation.iosFirefox.steps.two') }}
-                <i class="bi bi-box-arrow-up"></i>
-              </div>
-              <div>
-                {{ t('installation.iosFirefox.steps.three') }}
-                <i class="bi bi-plus-square"></i>
-              </div>
-              <div>{{ t('installation.iosFirefox.steps.four') }}</div>
-            </div>
+            <div>{{ t('installation.iosSafari.steps.three') }}</div>
           </div>
-          <div v-else-if="operationSystem === 'Android'">
-            <div v-if="browser === 'SamsungInternet'">
-              <div>
-                {{ t('installation.AndroidSamsung.steps.one.one') }}
-                <i class="bi bi-arrow-down-square"></i>
-                {{ t('installation.AndroidSamsung.steps.one.two') }}
-              </div>
-              <div>{{ t('installation.AndroidSamsung.steps.two') }}</div>
+          <div v-else-if="browser === 'Chrome'">
+            <div>
+              {{ t('installation.iosChrome.steps.one.one') }}
+              <i class="bi bi-box-arrow-up"></i>
+              {{ t('installation.iosChrome.steps.one.two') }}
             </div>
-            <div v-else-if="browser === 'Chrome'">
-              <div>
-                {{ t('installation.AndroidChrome.steps.one.one') }}
-                <i class="bi bi-three-dots-vertical"></i>
-                {{ t('installation.AndroidChrome.steps.one.two') }}
-              </div>
-              <div>{{ t('installation.AndroidChrome.steps.two') }}</div>
-              <div>{{ t('installation.AndroidChrome.steps.three') }}</div>
+            <div>
+              {{ t('installation.iosChrome.steps.two') }}
+              <i class="bi bi-plus-square"></i>
             </div>
-            <div v-else-if="browser === 'Firefox'">
-              <div>
-                {{ t('installation.AndroidFirefox.steps.one.one') }}
-                <i class="bi bi-three-dots-vertical"></i>
-                {{ t('installation.AndroidFirefox.steps.one.two') }}
-              </div>
-              <div>{{ t('installation.AndroidFirefox.steps.two') }}</div>
-              <div>{{ t('installation.AndroidFirefox.steps.three') }}</div>
-            </div>
+            <div>{{ t('installation.iosChrome.steps.three') }}</div>
           </div>
-          <div v-else>
-            <div>{{ t('installation.default.steps.one') }}</div>
-            <div>{{ t('installation.default.steps.two') }}</div>
+          <div v-else-if="browser === 'Firefox'">
+            <div>
+              {{ t('installation.iosFirefox.steps.one.one') }}
+              <i class="bi bi-list"></i>
+              {{ t('installation.iosFirefox.steps.one.two') }}
+            </div>
+            <div>
+              {{ t('installation.iosFirefox.steps.two') }}
+              <i class="bi bi-box-arrow-up"></i>
+            </div>
+            <div>
+              {{ t('installation.iosFirefox.steps.three') }}
+              <i class="bi bi-plus-square"></i>
+            </div>
+            <div>{{ t('installation.iosFirefox.steps.four') }}</div>
           </div>
         </div>
+        <div v-else-if="operationSystem === 'Android'">
+          <div v-if="browser === 'SamsungInternet'">
+            <div>
+              {{ t('installation.AndroidSamsung.steps.one.one') }}
+              <i class="bi bi-arrow-down-square"></i>
+              {{ t('installation.AndroidSamsung.steps.one.two') }}
+            </div>
+            <div>{{ t('installation.AndroidSamsung.steps.two') }}</div>
+          </div>
+          <div v-else-if="browser === 'Chrome'">
+            <div>
+              {{ t('installation.AndroidChrome.steps.one.one') }}
+              <i class="bi bi-three-dots-vertical"></i>
+              {{ t('installation.AndroidChrome.steps.one.two') }}
+            </div>
+            <div>{{ t('installation.AndroidChrome.steps.two') }}</div>
+            <div>{{ t('installation.AndroidChrome.steps.three') }}</div>
+          </div>
+          <div v-else-if="browser === 'Firefox'">
+            <div>
+              {{ t('installation.AndroidFirefox.steps.one.one') }}
+              <i class="bi bi-three-dots-vertical"></i>
+              {{ t('installation.AndroidFirefox.steps.one.two') }}
+            </div>
+            <div>{{ t('installation.AndroidFirefox.steps.two') }}</div>
+            <div>{{ t('installation.AndroidFirefox.steps.three') }}</div>
+          </div>
+        </div>
+        <div v-else>
+          <div>{{ t('installation.default.steps.one') }}</div>
+          <div>{{ t('installation.default.steps.two') }}</div>
+        </div>
       </div>
-      <div id="installationFooter" class="mt-auto" style="bottom: 0px">
-        <button type="button" class="btn btn-primary m-1" @click="install()">{{ t('labels.install') }}</button>
-        <button type="button" class="btn btn-danger" @click="dontShowAgain()">{{ t('labels.dontShowAgain') }}</button>
+      <div id="installationFooter" class="d-flex">
+        <button v-if="promptInstallEvent" type="button" class="btn btn-primary" @click="install()">{{ t('labels.install') }}</button>
+        <button type="button" class="btn btn-sm btn-secondary ms-auto" @click="dontShowAgain()">{{ t('labels.dontShowAgain') }}</button>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { User } from 'abrechnung-common/types.js'
-import { onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
 import { isMobile } from '@/helper.js'
@@ -115,11 +113,16 @@ interface BeforeInstallPromptEvent extends Event {
 
 const APP_DATA = APP_LOADER.data
 
-const eventCatch = (event: Event) => {
+function eventCatch(event: Event) {
   event.preventDefault()
-  promptInstallEvent = event as BeforeInstallPromptEvent
+  promptInstallEvent.value = event as BeforeInstallPromptEvent
 }
-window.addEventListener('beforeinstallprompt', eventCatch)
+
+function appInstalled() {
+  promptInstallEvent.value = undefined
+  hideBanner()
+}
+
 defineExpose({ showBanner })
 
 await APP_LOADER.loadData()
@@ -127,7 +130,7 @@ await APP_LOADER.loadData()
 const showInstallationBanner = ref(!APP_DATA.value || APP_DATA.value.user.settings.showInstallBanner)
 const operationSystem = detectOS()
 const browser = detectBrowser()
-let promptInstallEvent = undefined as BeforeInstallPromptEvent | undefined
+const promptInstallEvent = ref<BeforeInstallPromptEvent | undefined>()
 
 function hideBanner() {
   showInstallationBanner.value = false
@@ -143,10 +146,11 @@ async function dontShowAgain() {
   hideBanner()
 }
 async function install() {
-  if (promptInstallEvent) {
-    await promptInstallEvent.prompt()
+  if (promptInstallEvent.value) {
+    await promptInstallEvent.value.prompt()
+    await promptInstallEvent.value.userChoice
   }
-  promptInstallEvent = undefined
+  promptInstallEvent.value = undefined
   hideBanner()
 }
 function detectBrowser(): BrowserType {
@@ -168,7 +172,13 @@ function detectOS(): OsName {
   return 'Unknown'
 }
 
+onMounted(() => {
+  window.addEventListener('beforeinstallprompt', eventCatch)
+  window.addEventListener('appinstalled', appInstalled)
+})
+
 onUnmounted(() => {
   window.removeEventListener('beforeinstallprompt', eventCatch)
+  window.removeEventListener('appinstalled', appInstalled)
 })
 </script>
