@@ -2,7 +2,7 @@
   <form v-if="APP_DATA" class="container" @submit.prevent="emit(mode as 'add', output())">
     <div v-if="!owner" class="mb-2">
       <label for="travelFormOwner" class="form-label">
-        {{ t('labels.owner') }}
+        {{ t('labels.traveler') }}
         <span class="text-danger">*</span>
       </label>
       <UserSelector v-model="formTravel.owner" required />
@@ -130,13 +130,11 @@
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        {{
-          mode === 'add' && !createNotApply
+        {{ mode === 'add' && !createNotApply
             ? t('labels.applyForX', { X: t('labels.travel') })
             : (travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED) && !createNotApply
             ? t('labels.reapplyForX', { X: t('labels.travel') })
-            : t('labels.save')
-        }}
+            : t('labels.save') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">{{ t('labels.cancel') }}</button>

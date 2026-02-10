@@ -132,12 +132,8 @@
     <template #item-organisation="{ project }: AdvanceSimple<string>">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-budget="{ budget }: AdvanceSimple">
-      <span class="tnum">{{ formatter.money(budget) }}</span>
-    </template>
-    <template #item-balance="{ balance }: AdvanceSimple">
-      <span class="tnum">{{ formatter.money(balance) }}</span>
-    </template>
+    <template #item-budget="{ budget }: AdvanceSimple"><span class="tnum">{{ formatter.money(budget) }}</span></template>
+    <template #item-balance="{ balance }: AdvanceSimple"><span class="tnum">{{ formatter.money(balance) }}</span></template>
     <template #item-report="{ _id, name }: AdvanceSimple">
       <button
         class="btn btn-primary btn-sm"
@@ -153,13 +149,9 @@
     <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
     <template #item-receivedOn="{ receivedOn }">{{ formatter.date(receivedOn) }}</template>
     <template #item-log.30.on="{ log }: AdvanceSimple">{{ log[30] ? formatter.dateTime(log[30].on) : '' }}</template>
-    <template #item-bookingRemark="{ bookingRemark }: AdvanceSimple">
-      <span v-if="bookingRemark">
-        <TooltipElement :text="bookingRemark">
-          <i class="bi bi-chat-left-text"></i>
-        </TooltipElement>
-      </span>
-    </template>
+    <template #item-bookingRemark="{ bookingRemark }: AdvanceSimple"><span v-if="bookingRemark">
+      <TooltipElement :text="bookingRemark"><i class="bi bi-chat-left-text"></i></TooltipElement>
+    </span></template>
     <!-- Standard-Slot weiterleiten -->
 
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
@@ -219,7 +211,7 @@ const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
   { text: 'Ref', value: 'reference' },
-  { text: 'labels.name', value: 'name' },
+  { text: 'labels.label', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
 if (window.innerWidth > bp.md) {
@@ -228,7 +220,7 @@ if (window.innerWidth > bp.md) {
     { text: 'labels.organisation', value: 'organisation' },
     { text: 'labels.budget', value: 'budget' },
     { text: 'labels.balance', value: 'balance' },
-    { text: 'labels.owner', value: 'owner' },
+    { text: 'labels.advanceRecipient', value: 'owner' },
     { text: 'labels.receivedOn', value: 'receivedOn', sortable: true },
     { text: 'labels.editor', value: 'editor' },
     { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },

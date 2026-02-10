@@ -9,7 +9,7 @@
       <Suspense>
         <TableElement
           :items="searchResult"
-          :headers="[{text: 'label.type', value: '_reportModelName'},{text: 'labels.name', value: 'name'}, {text: 'labels.state', value: 'state'}, {text: 'labels.owner', value: 'owner'} ]"
+          :headers="[{text: 'label.type', value: '_reportModelName'},{text: 'labels.label', value: 'name'}, {text: 'labels.state', value: 'state'}, {text: 'labels.owner', value: 'owner'} ]"
           body-row-class-name="clickable"
           @click-row="(r) => clickSearchResult((r as SearchResult & { _reportModelName: ReportModelName }))">
           <template #customize-headers></template>

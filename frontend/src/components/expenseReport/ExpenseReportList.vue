@@ -133,9 +133,7 @@
     <template #item-editor="{ editor }">
       <span :title="formatter.name(editor.name)"> {{ formatter.name(editor.name, 'short') }}</span>
     </template>
-    <template #item-owner="{ owner }">
-      <span :title="formatter.name(owner.name)"> {{ formatter.name(owner.name, 'short') }}</span>
-    </template>
+    <template #item-owner="{ owner }"><span :title="formatter.name(owner.name)"> {{ formatter.name(owner.name, 'short') }}</span></template>
     <template #item-state="{ state }">
       <StateBadge :state="state" :StateEnum="ExpenseReportState" style="display: inline-block" />
     </template>
@@ -145,9 +143,7 @@
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.totalTotal="{ addUp }">
-      <span class="tnum">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</span>
-    </template>
+    <template #item-addUp.totalTotal="{ addUp }"><span class="tnum">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</span></template>
     <template #item-addUp.totalAdvance="{ addUp }">
       <span v-if="getTotalAdvance(addUp) > 0" class="tnum">{{ formatter.baseCurrency(getTotalAdvance(addUp)) }}</span>
     </template>
@@ -172,13 +168,9 @@
       </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
-    <template #item-bookingRemark="{ bookingRemark }">
-      <span v-if="bookingRemark">
-        <TooltipElement :text="bookingRemark">
-          <i class="bi bi-chat-left-text"></i>
-        </TooltipElement>
-      </span>
-    </template>
+    <template #item-bookingRemark="{ bookingRemark }"><span v-if="bookingRemark">
+      <TooltipElement :text="bookingRemark"><i class="bi bi-chat-left-text"></i></TooltipElement>
+    </span></template>
     <!-- Standard-Slot weiterleiten -->
 
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
@@ -238,7 +230,7 @@ const APP_DATA = APP_LOADER.data
 
 const headers: Header[] = [
   { text: 'Ref', value: 'reference' },
-  { text: 'labels.name', value: 'name' },
+  { text: 'labels.label', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
 if (APP_DATA.value && APP_DATA.value.categories.length > 1) {
@@ -251,7 +243,7 @@ if (window.innerWidth > bp.md) {
     { text: 'labels.total', value: 'addUp.totalTotal' },
     { text: 'labels.balance', value: 'addUp.totalBalance' },
     { text: 'labels.advance', value: 'addUp.totalAdvance' },
-    { text: 'labels.owner', value: 'owner' },
+    { text: 'labels.expensePayer', value: 'owner' },
     { text: 'labels.editor', value: 'editor' },
     { text: 'labels.updatedAt', value: 'updatedAt', sortable: true },
     { text: '', value: 'report', width: 40 },

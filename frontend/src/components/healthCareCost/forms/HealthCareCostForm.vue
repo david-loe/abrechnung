@@ -2,7 +2,7 @@
   <form class="container" @submit.prevent="emit(mode as 'add', output())">
     <div v-if="!owner" class="mb-3">
       <label for="travelFormOwner" class="form-label">
-        {{ t('labels.owner') }}
+        {{ t('labels.expensePayer') }}
         <span class="text-danger">*</span>
       </label>
       <UserSelector v-model="formHealthCareCost.owner" required />

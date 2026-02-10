@@ -2,14 +2,14 @@
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
     <div v-if="askOwner" class="mb-3">
       <label for="travelFormOwner" class="form-label">
-        {{ t('labels.owner') }}
+        {{ t('labels.advanceRecipient') }}
         <span class="text-danger">*</span>
       </label>
       <UserSelector v-model="formAdvance.owner" required />
     </div>
 
     <div class="mb-2">
-      <label for="advanceFormName" class="form-label">{{ t('labels.name') }}</label>
+      <label for="advanceFormName" class="form-label">{{ t('labels.label') }}</label>
       <input type="text" class="form-control" id="advanceFormName" v-model="formAdvance.name" :disabled="disabled" >
     </div>
 
