@@ -29,8 +29,8 @@ import PlaceElement from '@/components/elements/PlaceElement.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import { formatter } from '@/formatter.js'
 
-const keys: (keyof TravelSimple)[] = [
-  'owner',
+const keys = [
+  'traveler',
   'project',
   'reason',
   'startDate',
@@ -41,12 +41,12 @@ const keys: (keyof TravelSimple)[] = [
   'claimSpouseRefund',
   'fellowTravelersNames',
   'a1Certificate'
-]
+] as const
 const { t } = useI18n()
 
 const props = defineProps({ travel: { type: Object as PropType<TravelSimple>, required: true } })
 
-function displayKey(key: keyof TravelSimple): string {
+function displayKey(key: (typeof keys)[number]): string {
   switch (key) {
     case 'startDate':
       return formatter.date(props.travel[key])
@@ -54,15 +54,13 @@ function displayKey(key: keyof TravelSimple): string {
       const dif = getDiffInDays(props.travel.startDate, props.travel.endDate) + 1
       return `${formatter.date(props.travel[key])} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`
     }
-    case 'state':
-      return t(`states.${props.travel[key]}`)
     case 'editor':
       if (props.travel.owner._id === props.travel.editor._id) {
         return ''
       }
       return formatter.name(props.travel[key].name)
-    case 'owner':
-      return formatter.name(props.travel[key].name)
+    case 'traveler':
+      return formatter.name(props.travel.owner.name)
     case 'comments':
       if (props.travel.comments.length > 0) {
         const c = props.travel.comments[props.travel.comments.length - 1]

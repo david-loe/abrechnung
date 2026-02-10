@@ -74,7 +74,7 @@ export async function sendViaMail(
 
       const text =
         `${i18n.t('labels.project', { lng })}: ${report.project.identifier}\n` +
-        `${i18n.t('labels.name', { lng })}: ${report.name}\n` +
+        `${i18n.t('labels.label', { lng })}: ${report.name}\n` +
         `${i18n.t('labels.owner', { lng })}: ${formatter.name(report.owner.name)}\n` +
         `${i18n.t('labels.balance', { lng })}: ${totalSum}\n`
 

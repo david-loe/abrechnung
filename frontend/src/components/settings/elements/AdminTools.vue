@@ -16,7 +16,7 @@
       <form v-if="showForm" @submit.prevent="updateReport">
         <div class="mb-3">
           <label for="expenseReportFormName" class="form-label">
-            {{ t('labels.name') }}
+            {{ t('labels.label') }}
             <span class="text-danger">*</span>
           </label>
           <input type="text" class="form-control" id="expenseReportFormName" v-model="report.name" required >
