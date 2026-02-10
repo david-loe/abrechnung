@@ -59,6 +59,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
   REDIS_URL: notEmptyString({ desc: 'Redis URL' }),
   REDIS_PREFIX: notEmptyString({ default: 'abrechnung', desc: 'Prefix for Redis keys' }),
   COOKIE_MAX_AGE_DAYS: int({ default: 30 }),
+  MAGIC_LOGIN_TTL_SECONDS: int({ default: 86_400, desc: 'Time to live for magic login tokens in seconds' }),
   PRIVATE_VAPID_KEY: notEmptyString({ default: undefined, desc: 'Private VAPID Key for WebPush Notifications' }),
   LOG_LEVEL: notEmptyString({ default: 'INFO', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], desc: 'Log Level for the backend' }),
   TZ: notEmptyString({
