@@ -10,7 +10,7 @@
         <button type="button" class="btn-close" @click="hideBanner()"></button>
       </div>
       <div v-if="!promptInstallEvent" id="installationBody" class="mb-2">
-        <div v-if="operationSystem === 'iOS'">
+        <div v-if="operationSystem === 'iOS' && iosBrowsers.includes(browser)">
           <div v-if="browser === 'Safari'">
             <div>
               {{ t('installation.iosSafari.steps.one.one') }}
@@ -52,7 +52,7 @@
             <div>{{ t('installation.iosFirefox.steps.four') }}</div>
           </div>
         </div>
-        <div v-else-if="operationSystem === 'Android'">
+        <div v-else-if="operationSystem === 'Android' && androidBrowser.includes(browser)">
           <div v-if="browser === 'SamsungInternet'">
             <div>
               {{ t('installation.AndroidSamsung.steps.one.one') }}
@@ -104,6 +104,9 @@ const { t } = useI18n()
 
 type OsName = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Linux' | 'Windows'
 type BrowserType = 'Chrome' | 'Safari' | 'Firefox' | 'Unknown' | 'Edge' | 'SamsungInternet'
+
+const iosBrowsers: BrowserType[] = ['Safari', 'Chrome', 'Firefox']
+const androidBrowser: BrowserType[] = ['SamsungInternet', 'Chrome', 'Firefox']
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[]
