@@ -38,8 +38,7 @@ onMounted(async () => {
     buttons: {
       type: 'group',
       schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }
-    },
-    _id: { type: 'hidden', meta: true }
+    }
   })
   await APP_LOADER.loadData()
   if (APP_DATA.value) {

@@ -32,16 +32,16 @@ export const userSchema = async () => {
           unique: true,
           sparse: true,
           label: 'Microsoft ID',
-          hide: !BACKEND_CACHE.displaySettings.auth.microsoft
+          meta: !BACKEND_CACHE.displaySettings.auth.microsoft
         },
-        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', hide: !BACKEND_CACHE.displaySettings.auth.oidc },
+        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', meta: !BACKEND_CACHE.displaySettings.auth.oidc },
         ldapauth: {
           type: String,
           index: true,
           unique: true,
           sparse: true,
           label: 'LDAP UID',
-          hide: !BACKEND_CACHE.displaySettings.auth.ldapauth
+          meta: !BACKEND_CACHE.displaySettings.auth.ldapauth
         },
         magiclogin: {
           type: String,
@@ -51,7 +51,7 @@ export const userSchema = async () => {
           validate: emailRegex,
           trim: true,
           label: 'Magic Login Email',
-          hide: !BACKEND_CACHE.displaySettings.auth.magiclogin
+          meta: !BACKEND_CACHE.displaySettings.auth.magiclogin
         },
         httpBearer: { type: String, index: true, unique: true, sparse: true, label: 'API Key Hash' }
       },
@@ -99,12 +99,12 @@ export const userSchema = async () => {
           required: true,
           translationPrefix: 'languages.'
         },
-        hasUserSetLanguage: { type: Boolean, required: true, default: false, hide: true },
-        lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, hide: true },
-        lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, hide: true },
-        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', hide: BACKEND_CACHE.settings.disableReportType.healthCareCost },
+        hasUserSetLanguage: { type: Boolean, required: true, default: false, meta: true },
+        lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, meta: true },
+        lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, meta: true },
+        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', meta: BACKEND_CACHE.settings.disableReportType.healthCareCost },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
-        showInstallBanner: { type: Boolean, required: true, default: true, hide: true }
+        showInstallBanner: { type: Boolean, required: true, default: true, meta: true }
       },
       required: true,
       default: () => ({})

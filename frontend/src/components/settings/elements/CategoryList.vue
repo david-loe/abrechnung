@@ -108,8 +108,7 @@ const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchem
       submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
       reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
     }
-  },
-  _id: { type: 'hidden', meta: true }
+  }
 })
 </script>
 

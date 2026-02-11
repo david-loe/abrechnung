@@ -14,6 +14,9 @@ export function mongooseSchemaToVueformSchema(
     const prop = mongooseSchema[path] as SchemaTypeOptions<any>
     vueformSchema[path] = mapSchemaTypeToVueformElement(prop, language, path, assignment)
   }
+  if (!Object.hasOwn(vueformSchema, '_id')) {
+    Object.assign(vueformSchema, { _id: { type: 'hidden', meta: true } })
+  }
 
   return vueformSchema
 }
@@ -26,6 +29,9 @@ function mapSchemaTypeToVueformElement(
 ) {
   if (schemaType.hide) {
     return
+  }
+  if (schemaType.meta) {
+    return { type: 'hidden', meta: true, ...assignment }
   }
   const rules: any[] = ['nullable']
   if (schemaType.rules && Array.isArray(schemaType.rules)) {

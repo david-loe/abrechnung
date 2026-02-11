@@ -188,8 +188,7 @@ const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchem
       submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
       reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
     }
-  },
-  _id: { type: 'hidden', meta: true }
+  }
 })
 if (schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
