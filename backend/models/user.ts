@@ -110,7 +110,7 @@ export const userSchema = async () => {
       default: () => ({})
     },
     vehicleRegistration: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile' }], hide: true },
-    token: { type: Schema.Types.ObjectId, ref: 'Token' }
+    token: { type: Schema.Types.ObjectId, ref: 'Token', hide: true }
   })
 }
 
