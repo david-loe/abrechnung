@@ -177,12 +177,14 @@
     }
   },
   "labels": {
-    "a1Certificate": "Certification A1",
-    "a1CertificateEmail": "Adresse e-mail pour les notifications de Certification A1",
+    "a1Certificate": "Certificat A1",
+    "a1CertificateEmail": "Adresse e-mail pour les notifications de Certificat A1",
     "access": "Droits d'accès",
     "accessIcons": "Icônes pour les droits d'accès",
     "add": "Ajouter",
     "addAssignees": "Ajouter assigné",
+    "additionalDetails": "Détails supplémentaires",
+    "additionalOwnerDetails": "Détails supplémentaires sur le propriétaire",
     "addSupervisors": "Ajouter responsable",
     "addX": "Ajouter {X}",
     "adminTools": "Outils d'administration",

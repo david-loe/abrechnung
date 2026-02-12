@@ -180,6 +180,7 @@ export interface PrintOptions {
   comments: boolean
   notes: boolean
   bookingRemark: boolean
+  additionalOwnerDetails: boolean
 }
 
 export interface BadgeStyle {
@@ -325,7 +326,6 @@ export interface User<idType extends _id = _id, dataType extends binary = binary
     [key in Access]: boolean
   }
   projects: UserProjects<idType>
-  loseAccessAt?: null | Date | string
   settings: {
     language: Locale
     hasUserSetLanguage: boolean
@@ -335,6 +335,8 @@ export interface User<idType extends _id = _id, dataType extends binary = binary
     organisation?: OrganisationSimple<idType> | null
     showInstallBanner: boolean
   }
+  loseAccessAt?: null | Date | string
+  additionalDetails?: string | null
   vehicleRegistration?: DocumentFile<idType, dataType>[] | null
   token?: Token<idType, dataType> | null
 }
@@ -448,11 +450,14 @@ export interface TravelDay<idType extends _id = _id> {
 export type Log<idType extends _id = _id, S extends AnyState = AnyState> = {
   [key in S]?: { on: Date | string; by: UserSimple<idType> }
 }
+interface ReportOwner<idType extends _id = _id> extends UserSimple<idType> {
+  additionalDetails?: string | null
+}
 
 export interface ReportSimple<idType extends _id = _id, S extends AnyState = AnyState> {
   name: string
   reference: number
-  owner: UserSimple<idType>
+  owner: ReportOwner<idType>
   editor: UserSimple<idType>
   project: Project<idType>
   comment?: string | null
