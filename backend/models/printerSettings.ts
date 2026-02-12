@@ -13,6 +13,7 @@ export const printerSettingsSchema = () => {
         comments: { type: BooleanConstructor; required: true }
         notes: { type: BooleanConstructor; required: true }
         bookingRemark: { type: BooleanConstructor; required: true }
+        additionalOwnerDetails: { type: BooleanConstructor; required: true; conditions: (string | number | boolean)[][] }
       }
       required: true
     }
@@ -21,8 +22,9 @@ export const printerSettingsSchema = () => {
     options[reportType] = {
       type: {
         reviewDates: { type: Boolean, required: true },
-        metaInformation: { type: Boolean, required: true },
         project: { type: Boolean, required: true },
+        metaInformation: { type: Boolean, required: true },
+        additionalOwnerDetails: { type: Boolean, required: true, conditions: [[`options.${reportType}.metaInformation`, true]] },
         comments: { type: Boolean, required: true },
         notes: { type: Boolean, required: true },
         bookingRemark: { type: Boolean, required: true }

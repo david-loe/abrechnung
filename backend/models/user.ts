@@ -62,6 +62,7 @@ export const userSchema = async () => {
       type: { givenName: { type: String, trim: true, required: true }, familyName: { type: String, trim: true, required: true } },
       required: true
     },
+    additionalDetails: { type: String, multiline: true, trim: true },
     access: { type: accessObject, default: () => ({}) },
     loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
     projects: {

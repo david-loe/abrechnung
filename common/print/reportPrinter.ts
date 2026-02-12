@@ -20,7 +20,6 @@ import {
   PurposeSimple,
   ReportModelNameWithoutAdvance,
   reportIsAdvance,
-  reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel,
   State,
@@ -160,18 +159,15 @@ class ReportPrint<idType extends _id> {
         opts.project
       ) - 10
     if (opts.metaInformation) {
-      y = await this.drawTravelInformation({
-        xStart: this.drawer.settings.pagePadding,
-        yStart: y,
-        fontSize: this.drawer.settings.fontSizes.M
-      })
-      y = this.drawExpenseInformation({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
-      y = this.drawHealthCareCostInformation({
-        xStart: this.drawer.settings.pagePadding,
-        yStart: y,
-        fontSize: this.drawer.settings.fontSizes.M
-      })
-      y = this.drawAdvanceInformation({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
+      y = await this.drawMetaInformation(
+        {
+          xStart: this.drawer.settings.pagePadding,
+          yStart: y,
+          fontSize: this.drawer.settings.fontSizes.M,
+          width: this.drawer.currentPage.getSize().width - 2 * this.drawer.settings.pagePadding
+        },
+        opts.additionalOwnerDetails
+      )
     }
 
     const receiptMap = {}
@@ -236,81 +232,78 @@ class ReportPrint<idType extends _id> {
     return y
   }
 
-  async drawTravelInformation(options: Options) {
-    let y = options.yStart
+  async drawMetaInformation(options: Options & { width: number }, drawAdditionalOwnerDetails = true) {
+    let x = options.xStart
+    let width = options.width * (3 / 8) // width left
+    let ownerLine: string
+    let metaInformation: string[] = []
+    const placeLines: { text: string; place: { country: CountrySimple; place?: string } }[] = []
     if (reportIsTravel(this.report)) {
-      // Traveler
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.traveler')}: ${this.drawer.formatter.name(this.report.owner.name)}${this.report.claimSpouseRefund ? ` & ${this.report.fellowTravelersNames}` : ''}`,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
-
-      // Reason + Place
-      y = await this.drawer.drawMultilineTextWithPlace(
-        `${this.t('labels.reason')}: ${this.report.reason}    ${this.t('labels.destinationPlace')}: `,
-        this.report.destinationPlace,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
-      let text = ''
-      // Dates + professionalShare + lastPlaceOfWork
       const sc = this.report.stages.length
-      text = `${this.t('labels.from')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[0].departure) : this.drawer.formatter.date(this.report.startDate)}    ${this.t('labels.to')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[sc - 1].arrival) : this.drawer.formatter.date(this.report.endDate)}`
-
-      if (this.report.professionalShare !== null && this.report.professionalShare !== 1) {
-        text = `${text}    ${this.t('labels.professionalShare')}: ${Math.round(this.report.professionalShare * 100)}%`
-      }
+      ownerLine = `${this.t('labels.traveler')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      metaInformation = [
+        this.report.claimSpouseRefund ? `${this.t('labels.fellowTravelersNames')}: ${this.report.fellowTravelersNames}` : '',
+        `${this.t('labels.reason')}: ${this.report.reason}`,
+        `${this.t('labels.from')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[0].departure) : this.drawer.formatter.date(this.report.startDate)}    ${this.t('labels.to')}: ${sc > 0 ? this.drawer.formatter.dateTime(this.report.stages[sc - 1].arrival) : this.drawer.formatter.date(this.report.endDate)}`,
+        this.report.professionalShare !== null && this.report.professionalShare !== 1
+          ? `${this.t('labels.professionalShare')}: ${Math.round(this.report.professionalShare * 100)}%`
+          : ''
+      ].filter((line) => line !== '')
+      placeLines.push({ text: `${this.t('labels.destinationPlace')}: `, place: this.report.destinationPlace })
       if (this.report.lastPlaceOfWork) {
         const lastPlace = { country: this.report.lastPlaceOfWork.country, place: this.report.lastPlaceOfWork.special }
-        y = await this.drawer.drawMultilineTextWithPlace(`${text}    ${this.t('labels.lastPlaceOfWork')}: `, lastPlace, {
-          xStart: options.xStart,
-          yStart: y,
-          fontSize: options.fontSize
-        })
-      } else {
-        y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
+        placeLines.push({ text: `${this.t('labels.lastPlaceOfWork')}: `, place: lastPlace })
       }
+    } else if (reportIsAdvance(this.report)) {
+      ownerLine = `${this.t('labels.advanceRecipient')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      metaInformation = [`${this.t('labels.reason')}: ${this.report.reason}`]
+    } else if (reportIsHealthCareCost(this.report)) {
+      ownerLine = `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      const ec = this.report.expenses.length
+      metaInformation = [
+        `${this.t('labels.patientName')}: ${this.report.patientName}`,
+        `${this.t('labels.insurance')}: ${this.report.insurance.name}`,
+        ec > 0
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          : ''
+      ].filter((line) => line !== '')
+    } else {
+      ownerLine = `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      const ec = this.report.expenses.length
+      metaInformation = [
+        `${this.t('labels.category')}: ${this.report.category.name}`,
+        ec > 0
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          : ''
+      ].filter((line) => line !== '')
     }
-    return y
-  }
-
-  drawExpenseInformation(options: Options) {
-    let y = options.yStart
-    if (reportIsExpenseReport(this.report)) {
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}    ${this.t('labels.category')}: ${this.report.category.name}`,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
-
-      if (this.report.expenses.length > 0) {
-        // Dates
-        const text = `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
-        y = this.drawer.drawMultilineText(text, { xStart: options.xStart, yStart: y, fontSize: options.fontSize })
-      }
+    let yLeft = this.drawer.drawMultilineText(ownerLine, { xStart: x, yStart: options.yStart, fontSize: options.fontSize, width })
+    if (drawAdditionalOwnerDetails && this.report.owner.additionalDetails) {
+      yLeft = this.drawer.drawMultilineText(this.report.owner.additionalDetails, {
+        xStart: x,
+        yStart: yLeft,
+        fontSize: options.fontSize,
+        width
+      })
     }
-    return y
-  }
-
-  drawHealthCareCostInformation(options: Options) {
-    let y = options.yStart
-    if (reportIsHealthCareCost(this.report)) {
-      // Insurance + patientName
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.insurance')}: ${this.report.insurance.name}      ${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.patientName')}: ${this.report.patientName}`,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
+    if (placeLines.length > 0) {
+      yLeft -= options.fontSize
     }
-    return y
-  }
-
-  drawAdvanceInformation(options: Options) {
-    let y = options.yStart
-    if (reportIsAdvance(this.report)) {
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.advanceRecipient')}: ${this.drawer.formatter.name(this.report.owner.name)}      ${this.t('labels.reason')}: ${this.report.reason}`,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
+    for (const place of placeLines) {
+      yLeft = await this.drawer.drawMultilineTextWithPlace(place.text, place.place, {
+        xStart: x,
+        yStart: yLeft,
+        fontSize: options.fontSize,
+        width
+      })
     }
-    return y
+    x += width
+    width = options.width - width // width right
+    let yRight = options.yStart
+    for (const line of metaInformation) {
+      yRight = this.drawer.drawMultilineText(line, { xStart: x, yStart: yRight, fontSize: options.fontSize, width })
+    }
+    return Math.min(yLeft, yRight)
   }
 
   async drawSummary(options: Options) {

@@ -183,6 +183,8 @@
     "accessIcons": "Иконки прав доступа",
     "add": "Добавить",
     "addAssignees": "Добавить ответственных",
+    "additionalDetails": "Дополнительные данные",
+    "additionalOwnerDetails": "Дополнительные данные владельца",
     "addSupervisors": "Добавить руководящего",
     "addX": "Добавить {X}",
     "adminTools": "Административные инструменты",

@@ -196,7 +196,7 @@ if (schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
 }
 const tabs = {
-  tab0: { label: t('labels.general'), elements: ['name', 'email', 'projects', 'settings', 'buttons0'] },
+  tab0: { label: t('labels.general'), elements: ['name', 'email', 'additionalDetails', 'projects', 'settings', 'buttons0'] },
   tab1: { label: `Login & ${t('labels.access')}`, elements: ['fk', 'access', 'loseAccessAt', 'buttons1'] }
 }
 </script>

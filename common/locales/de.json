@@ -183,6 +183,8 @@
     "accessIcons": "Icons für Zugriffsrechte",
     "add": "Hinzufügen",
     "addAssignees": "Zugewiesenen hinzufügen",
+    "additionalDetails": "Zusätzliche Details",
+    "additionalOwnerDetails": "Zusätzliche Besitzer Details",
     "addSupervisors": "Betreuenden hinzufügen",
     "addX": "{X} hinzufügen",
     "adminTools": "Admin Tools",

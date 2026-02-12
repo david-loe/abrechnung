@@ -183,6 +183,8 @@
     "accessIcons": "Icons for access rights",
     "add": "Add",
     "addAssignees": "Add Assignees",
+    "additionalDetails": "Additional Details",
+    "additionalOwnerDetails": "Additional Owner Details",
     "addSupervisors": "Add Supervisors",
     "addX": "Add {X}",
     "adminTools": "Admin Tools",

@@ -83,6 +83,22 @@ export async function checkForMigrations() {
           }
         )
     }
+    if (semver.lte(migrateFrom, '2.5.0')) {
+      logger.info('Apply migration from v2.5.0: add additionalOwnerDetails option to printer settings')
+      await mongoose.connection
+        .collection('printersettings')
+        .updateMany(
+          {},
+          {
+            $set: {
+              'options.travel.additionalOwnerDetails': true,
+              'options.expenseReport.additionalOwnerDetails': true,
+              'options.healthCareCost.additionalOwnerDetails': true,
+              'options.advance.additionalOwnerDetails': true
+            }
+          }
+        )
+    }
     settings.migrateFrom = undefined
     await settings.save()
   }
