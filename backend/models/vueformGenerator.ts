@@ -7,12 +7,16 @@ import i18n from '../i18n.js'
 export function mongooseSchemaToVueformSchema(
   mongooseSchema: SchemaDefinition | any,
   language: Locale | readonly Locale[],
-  assignment = {}
+  assignment = {},
+  addId = true
 ) {
   const vueformSchema: any = {}
   for (const path in mongooseSchema) {
     const prop = mongooseSchema[path] as SchemaTypeOptions<any>
     vueformSchema[path] = mapSchemaTypeToVueformElement(prop, language, path, assignment)
+  }
+  if (addId && !Object.hasOwn(vueformSchema, '_id')) {
+    Object.assign(vueformSchema, { _id: { type: 'hidden', meta: true } })
   }
 
   return vueformSchema
@@ -26,6 +30,9 @@ function mapSchemaTypeToVueformElement(
 ) {
   if (schemaType.hide) {
     return
+  }
+  if (schemaType.meta) {
+    return { type: 'hidden', meta: true, ...assignment }
   }
   const rules: any[] = ['nullable']
   if (schemaType.rules && Array.isArray(schemaType.rules)) {
@@ -140,7 +147,7 @@ function mapSchemaTypeToVueformElement(
     } else if (!isFlatType(schemaType.type[0].type)) {
       // Array of Objects
       vueformElement.type = 'list'
-      vueformElement.object = { schema: mongooseSchemaToVueformSchema(schemaType.type[0].type, language) }
+      vueformElement.object = { schema: mongooseSchemaToVueformSchema(schemaType.type[0].type, language, {}, false) }
     } else {
       vueformElement.type = 'list'
       vueformElement.element = mapSchemaTypeToVueformElement(schemaType.type[0], language, labelStr, { columns: 12 })
@@ -152,15 +159,18 @@ function mapSchemaTypeToVueformElement(
       vueformElement.rules.push('min:0')
     }
   } else if (typeof schemaType.type === 'object') {
-    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
+    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide && !schemaType.type[key].meta)
     vueformElement.type = 'object'
     vueformElement.addClasses = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
     if (keys.length > 1 && isNotNestedObject(schemaType.type)) {
-      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language, {
-        columns: { xl: 12 / (keys.length > 3 ? 4 : keys.length), lg: 12 / (keys.length > 2 ? 3 : keys.length), sm: 6 }
-      })
+      vueformElement.schema = mongooseSchemaToVueformSchema(
+        schemaType.type,
+        language,
+        { columns: { xl: 12 / (keys.length > 3 ? 4 : keys.length), lg: 12 / (keys.length > 2 ? 3 : keys.length), sm: 6 } },
+        false
+      )
     } else {
-      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language)
+      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language, {}, false)
     }
   } else {
     throw new Error(`No Type for conversion found for: ${labelStr} (${schemaType.type})`)

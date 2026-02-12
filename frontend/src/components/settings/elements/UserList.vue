@@ -41,7 +41,6 @@
           </div>
         </div>
       </template>
-
       <template #header-email="header">
         <div class="filter-column">
           {{ t(header.text) }}
@@ -74,6 +73,7 @@
     <div v-if="_showForm" class="container">
       <Vueform
         :schema="schema"
+        :tabs="tabs"
         v-model="userToEdit"
         :sync="true"
         :endpoint="false"
@@ -181,18 +181,23 @@ async function deleteUser(user: User<string>) {
   }
 }
 
+const buttons = {
+  type: 'group',
+  schema: {
+    submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
+    reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
+  }
+}
 const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/user/form')).ok?.data, {
-  buttons: {
-    type: 'group',
-    schema: {
-      submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } },
-      reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
-    }
-  },
-  _id: { type: 'hidden', meta: true }
+  buttons0: buttons,
+  buttons1: buttons
 })
 if (schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
+}
+const tabs = {
+  tab0: { label: t('labels.general'), elements: ['name', 'email', 'projects', 'settings', 'buttons0'] },
+  tab1: { label: `Login & ${t('labels.access')}`, elements: ['fk', 'access', 'loseAccessAt', 'buttons1'] }
 }
 </script>
 

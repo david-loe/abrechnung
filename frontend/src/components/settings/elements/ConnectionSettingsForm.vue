@@ -61,8 +61,7 @@ onMounted(async () => {
     buttons: {
       type: 'group',
       schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }
-    },
-    _id: { type: 'hidden', meta: true }
+    }
   })
   const result = await API.getter<ConnectionSettings>('admin/connectionSettings')
   if (result.ok) {
