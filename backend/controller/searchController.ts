@@ -12,7 +12,7 @@ import {
   User,
   UserSimple
 } from 'abrechnung-common/types.js'
-import mongoose, { QueryFilter } from 'mongoose'
+import mongoose, { model, QueryFilter, Types } from 'mongoose'
 import { Get, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { PaginationQuery } from './controller.js'
 import { NotFoundError } from './error.js'
@@ -30,7 +30,7 @@ export class SearchController {
   @Get()
   public async get(@Queries() query: SearchQuery, @Request() request: AuthenticatedExpressRequest) {
     const meta: Meta = { limit: query.limit || 10, page: query.page || 1, count: 1, countPages: 1 }
-    const result = await simpleSearch(query.term, getPermissionFilter(request.user), meta.limit, meta.page)
+    const result = await simpleSearch(query.term, request.user, meta.limit, meta.page)
     meta.count = result.total
     if (meta.limit > 0) {
       meta.countPages = Math.ceil(meta.count / meta.limit)
@@ -41,8 +41,7 @@ export class SearchController {
   @Get('ref')
   public async getByRef(@Query() ref: number, @Query() type: ReportModelName, @Request() request: AuthenticatedExpressRequest) {
     const filter = getPermissionFilter(request.user)[type]
-    const report = await mongoose
-      .model<{ state: AnyState; name: string; owner: UserSimple }>(type)
+    const report = await model<{ state: AnyState; name: string; owner: UserSimple }>(type)
       .findOne({ ...filter, reference: ref })
       .select({ _id: 1, state: 1, name: 1, owner: 1 })
       .lean()
@@ -55,7 +54,7 @@ export class SearchController {
 
 function getPermissionFilter(user: User) {
   const permissionFilter = (states?: Set<number>, projects?: IdDocument[]) => {
-    const ors: QueryFilter<unknown>[] = []
+    const ors: QueryFilter<{ state: number; project: Types.ObjectId }>[] = []
     if (states && states.size > 0) {
       ors.push({ state: { $in: Array.from(states) } })
     }
@@ -63,7 +62,7 @@ function getPermissionFilter(user: User) {
       const projectIds = projects.map((p) => idDocumentToId(p))
       ors.push({ project: { $in: projectIds } })
     }
-    return { historic: false, $or: [{ owner: user._id }, ...ors] } as QueryFilter<unknown>
+    return { historic: false, $or: [{ owner: user._id }, ...ors] }
   }
 
   const travelStates = new Set<number>()
@@ -121,11 +120,12 @@ function getPermissionFilter(user: User) {
   }
 }
 
-async function simpleSearch(termRaw: string, filter: Record<ReportModelName, QueryFilter<unknown>>, limit: number, page: number) {
+async function simpleSearch(termRaw: string, user: User, limit: number, page: number) {
   const term = termRaw.trim()
   if (!term) {
     return { rows: [], total: 0 }
   }
+  const filter = getPermissionFilter(user)
   const match = (reportModelName: ReportModelName) => ({ $match: { $text: { $search: term }, ...filter[reportModelName] } })
   const pipeline = [
     match('Travel'),
@@ -141,14 +141,7 @@ async function simpleSearch(termRaw: string, filter: Record<ReportModelName, Que
     { $project: { rows: 1, total: { $ifNull: [{ $arrayElemAt: ['$count.total', 0] }, 0] } } }
   ]
   const result = (await mongoose.connection.collection('travels').aggregate(pipeline).toArray())[0] as {
-    rows: {
-      name: string
-      _id: mongoose.Types.ObjectId
-      owner: mongoose.Types.ObjectId
-      state: AnyState
-      score: number
-      _reportModelName: ReportModelName
-    }[]
+    rows: { name: string; _id: Types.ObjectId; owner: Types.ObjectId; state: AnyState; score: number; _reportModelName: ReportModelName }[]
     total: number
   }
   return result
