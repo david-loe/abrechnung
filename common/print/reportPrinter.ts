@@ -266,7 +266,7 @@ class ReportPrint<idType extends _id> {
         ec > 0
           ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
           : ''
-      ]
+      ].filter((line) => line !== '')
     } else {
       ownerLine = `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}`
       const ec = this.report.expenses.length
@@ -275,7 +275,7 @@ class ReportPrint<idType extends _id> {
         ec > 0
           ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
           : ''
-      ]
+      ].filter((line) => line !== '')
     }
     let yLeft = this.drawer.drawMultilineText(ownerLine, { xStart: x, yStart: options.yStart, fontSize: options.fontSize, width })
     if (drawAdditionalOwnerDetails && this.report.owner.additionalDetails) {
