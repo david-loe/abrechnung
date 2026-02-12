@@ -159,7 +159,7 @@ function mapSchemaTypeToVueformElement(
       vueformElement.rules.push('min:0')
     }
   } else if (typeof schemaType.type === 'object') {
-    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide)
+    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide && !schemaType.type[key].meta)
     vueformElement.type = 'object'
     vueformElement.addClasses = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
     if (keys.length > 1 && isNotNestedObject(schemaType.type)) {
