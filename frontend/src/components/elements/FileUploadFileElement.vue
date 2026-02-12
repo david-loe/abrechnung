@@ -26,7 +26,7 @@
             </li>
           </ul>
         </div>
-        <div class="col-auto p-0 file-action">
+        <div class="col-auto p-0 file-action ms-auto">
           <button
             type="button"
             class="btn btn-sm btn-light"
