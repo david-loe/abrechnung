@@ -876,18 +876,6 @@
 					"projects": {
 						"$ref": "#/components/schemas/UserProjects__id_"
 					},
-					"loseAccessAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
 					"settings": {
 						"properties": {
 							"showInstallBanner": {
@@ -936,6 +924,22 @@
 							"language"
 						],
 						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"additionalDetails": {
+						"type": "string",
+						"nullable": true
 					},
 					"vehicleRegistration": {
 						"items": {
@@ -1404,18 +1408,6 @@
 					"projects": {
 						"$ref": "#/components/schemas/UserProjects__id_"
 					},
-					"loseAccessAt": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"nullable": true
-					},
 					"settings": {
 						"properties": {
 							"showInstallBanner": {
@@ -1464,6 +1456,22 @@
 							"language"
 						],
 						"type": "object"
+					},
+					"loseAccessAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"additionalDetails": {
+						"type": "string",
+						"nullable": true
 					},
 					"vehicleRegistration": {
 						"items": {
@@ -1520,8 +1528,9 @@
 								"fk",
 								"access",
 								"projects",
-								"loseAccessAt",
 								"settings",
+								"loseAccessAt",
+								"additionalDetails",
 								"vehicleRegistration",
 								"token"
 							],
@@ -1704,6 +1713,9 @@
 								"type": "array"
 							}
 						]
+					},
+					"additionalDetails": {
+						"type": "string"
 					},
 					"loseAccessAt": {
 						"anyOf": [
@@ -2148,6 +2160,9 @@
 								"type": "array"
 							}
 						]
+					},
+					"additionalDetails": {
+						"type": "string"
 					},
 					"loseAccessAt": {
 						"type": "string",
@@ -3650,6 +3665,30 @@
 				"$ref": "#/components/schemas/Pick_Place.Exclude_keyofPlace.special__",
 				"description": "Construct a type with the properties of T except for those in type K."
 			},
+			"ReportOwner__id_": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"$ref": "#/components/schemas/Name"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"additionalDetails": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UserSimple__id_": {
 				"properties": {
 					"email": {
@@ -3744,7 +3783,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -3975,7 +4014,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -4672,6 +4711,30 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ReportOwner_mongoose.Types.ObjectId_": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
+						"$ref": "#/components/schemas/Name"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"additionalDetails": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"email",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UserSimple_mongoose.Types.ObjectId_": {
 				"properties": {
 					"email": {
@@ -4766,7 +4829,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -5636,7 +5699,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -7475,6 +7538,9 @@
 					},
 					"bookingRemark": {
 						"type": "boolean"
+					},
+					"additionalOwnerDetails": {
+						"type": "boolean"
 					}
 				},
 				"required": [
@@ -7483,7 +7549,8 @@
 					"project",
 					"comments",
 					"notes",
-					"bookingRemark"
+					"bookingRemark",
+					"additionalOwnerDetails"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -7792,6 +7859,9 @@
 						"properties": {
 							"advance": {
 								"properties": {
+									"additionalOwnerDetails": {
+										"type": "boolean"
+									},
 									"notes": {
 										"type": "boolean"
 									},
@@ -7815,6 +7885,9 @@
 							},
 							"healthCareCost": {
 								"properties": {
+									"additionalOwnerDetails": {
+										"type": "boolean"
+									},
 									"notes": {
 										"type": "boolean"
 									},
@@ -7838,6 +7911,9 @@
 							},
 							"expenseReport": {
 								"properties": {
+									"additionalOwnerDetails": {
+										"type": "boolean"
+									},
 									"notes": {
 										"type": "boolean"
 									},
@@ -7861,6 +7937,9 @@
 							},
 							"travel": {
 								"properties": {
+									"additionalOwnerDetails": {
+										"type": "boolean"
+									},
 									"notes": {
 										"type": "boolean"
 									},
@@ -8465,7 +8544,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -8611,7 +8690,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -8865,7 +8944,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -9134,7 +9213,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -9413,7 +9492,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -9529,7 +9608,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -9704,7 +9783,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -9846,7 +9925,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -10032,7 +10111,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
+						"$ref": "#/components/schemas/ReportOwner_mongoose.Types.ObjectId_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple_mongoose.Types.ObjectId_"
@@ -12700,7 +12779,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -12895,7 +12974,7 @@
 						"format": "double"
 					},
 					"owner": {
-						"$ref": "#/components/schemas/UserSimple__id_"
+						"$ref": "#/components/schemas/ReportOwner__id_"
 					},
 					"editor": {
 						"$ref": "#/components/schemas/UserSimple__id_"
@@ -14016,8 +14095,9 @@
 									"fk",
 									"access",
 									"projects",
-									"loseAccessAt",
 									"settings",
+									"loseAccessAt",
+									"additionalDetails",
 									"vehicleRegistration",
 									"token"
 								],
@@ -14120,8 +14200,9 @@
 									"fk",
 									"access",
 									"projects",
-									"loseAccessAt",
 									"settings",
+									"loseAccessAt",
+									"additionalDetails",
 									"vehicleRegistration",
 									"token"
 								],
