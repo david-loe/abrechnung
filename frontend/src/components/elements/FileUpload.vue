@@ -63,7 +63,7 @@
 
 <script lang="ts" setup>
 import { DocumentFile, Token } from 'abrechnung-common/types.js'
-import { fileEventToDocumentFiles, rotateImageClockwise } from '../../../../common/utils/file.js'
+import { fileEventToDocumentFiles, rotateImageClockwise } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

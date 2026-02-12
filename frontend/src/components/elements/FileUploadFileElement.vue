@@ -1,6 +1,6 @@
 <template>
   <div class="col-auto" style="max-width: 110px" :title="props.file.name">
-    <div class="border rounded p-2 clickable" role="button" tabindex="0" @click="onCardClick">
+    <div class="border rounded p-2 clickable" role="button" tabindex="0" @click="onCardClick" @keydown.enter="onCardClick">
       <div class="row justify-content-between m-0">
         <div class="col-auto p-0 dropup-center dropup file-action" v-if="isImage">
           <button
@@ -16,7 +16,7 @@
           <ul class="dropdown-menu p-1">
             <li class="d-flex gap-1">
               <button
-                v-for="angle in ([90, 180,270] as const)"
+                v-for="angle in ([90, 180, 270] as const)"
                 type="button"
                 class="btn btn-sm btn-light dropdown-item p-0"
                 :title="t('labels.rotate') + ' '+ angle + '°'"
@@ -30,9 +30,9 @@
           <button
             type="button"
             class="btn btn-sm btn-light"
-            @click="props.disabled ? null : emit('deleted')"
+            @click="props.disabled || props.rotating ? null : emit('deleted')"
             :title="t('labels.delete')"
-            :disabled="props.disabled">
+            :disabled="props.disabled || props.rotating">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -49,6 +49,7 @@ import { DocumentFile } from 'abrechnung-common/types.js'
 import { computed, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RotationDegreePreview from './RotationDegreePreview.vue'
+import { Dropdown } from 'bootstrap'
 
 const { t } = useI18n()
 
@@ -61,7 +62,7 @@ const emit = defineEmits<{ show: []; rotate: [90 | 180 | 270]; deleted: [] }>()
 const isImage = computed(() => props.file.type.startsWith('image/'))
 const rotateToggleRef = ref<HTMLButtonElement | null>(null)
 
-function onCardClick(event: MouseEvent) {
+function onCardClick(event: Event) {
   if ((event.target as Element).closest('.file-action')) {
     return
   }
@@ -69,8 +70,8 @@ function onCardClick(event: MouseEvent) {
 }
 
 function rotateAndClose(angle: 90 | 180 | 270) {
-  if (rotateToggleRef.value?.getAttribute('aria-expanded') === 'true') {
-    rotateToggleRef.value.click()
+  if (rotateToggleRef.value) {
+    Dropdown.getInstance(rotateToggleRef.value)?.hide()
   }
   emit('rotate', angle)
 }

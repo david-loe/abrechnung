@@ -52,12 +52,13 @@ function blobToImage(blob: Blob): Promise<HTMLImageElement> {
   })
 }
 
-export async function rotateImage90Clockwise(file: Blob, mimeType: ImageType = 'image/jpeg'): Promise<Blob> {
-  return rotateImageClockwise(file, mimeType, 90)
-}
-
 export async function rotateImageClockwise(file: Blob, mimeType: ImageType = 'image/jpeg', degrees: 90 | 180 | 270 = 90): Promise<Blob> {
-  const image = await blobToImage(file)
+  let image: HTMLImageElement
+  try {
+    image = await blobToImage(file)
+  } catch {
+    return file
+  }
   const canvas = document.createElement('canvas')
   if (degrees === 180) {
     canvas.width = image.naturalWidth
