@@ -7,15 +7,19 @@
             v-for="(file, index) of modelValue"
             :file="(file as DocumentFile<string, Blob>)"
             :disabled="disabled"
+            :rotating="isRotating(file, index)"
             :key="(file as DocumentFile<string, Blob>).name"
             @show="_showFile(file)"
+            @rotate="(degrees) => rotateFile(file, index, degrees)"
             @deleted="deleteFile(file, index)" />
         </template>
         <FileUploadFileElement
           v-else
           :file="(modelValue as DocumentFile<string, Blob>)"
           :disabled="disabled"
+          :rotating="isRotating(modelValue as Partial<DocumentFile<string, Blob>>)"
           @show="_showFile(modelValue as Partial<DocumentFile<string, Blob>>)"
+          @rotate="(degrees) => rotateFile(modelValue as Partial<DocumentFile<string, Blob>>, undefined, degrees)"
           @deleted="deleteFile(modelValue as Partial<DocumentFile<string, Blob>>)" />
       </template>
 
@@ -34,14 +38,16 @@
               </div>
             </div>
             <div class="col-auto">
-              <button type="button" class="btn p-0" @click="clear()">
-                <i class="bi bi-x-lg"></i>
-              </button>
+              <button type="button" class="btn p-0" @click="clear()"><i class="bi bi-x-lg"></i></button>
             </div>
           </div>
           <img class="border border-5 rounded border-white" :src="qrSrc" >
         </div>
       </div>
+    </div>
+    <div v-if="showRotateSaveHint" class="form-text text-warning">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ t('alerts.saveAfterRotate') }}
     </div>
     <input
       class="form-control"
@@ -57,9 +63,9 @@
 
 <script lang="ts" setup>
 import { DocumentFile, Token } from 'abrechnung-common/types.js'
-import { fileEventToDocumentFiles } from 'abrechnung-common/utils/file.js'
+import { fileEventToDocumentFiles, rotateImageClockwise } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
-import { onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import API from '../../api.js'
@@ -115,15 +121,84 @@ await APP_LOADER.loadData()
 
 const token = ref(undefined as Token<string, Blob> | undefined)
 const qrSrc = ref('')
+const rotatingKey = ref('')
+const rotatedUnsavedFiles = ref<FileT[]>([])
 let fetchTokenInterval = undefined as NodeJS.Timeout | undefined
 const expireAfterSeconds = APP_DATA.value?.settings.uploadTokenExpireAfterSeconds ?? 1
 const secondsLeft = ref(expireAfterSeconds)
+
+function keyForFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
+  return `${index ?? ''}:${file._id || file.name || 'file'}`
+}
+function isRotating(file: Partial<DocumentFile<string, Blob>>, index?: number) {
+  return rotatingKey.value === keyForFile(file, index)
+}
+function currentFiles(): FileT[] {
+  if (!props.modelValue) {
+    return []
+  }
+  return Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]
+}
+const showRotateSaveHint = computed(() => {
+  const files = currentFiles()
+  return files.some((file) => !file._id && rotatedUnsavedFiles.value.includes(file))
+})
+function trackRotatedUnsavedFile(file: FileT) {
+  rotatedUnsavedFiles.value = rotatedUnsavedFiles.value.concat(file)
+}
+watch(
+  () => props.modelValue,
+  () => {
+    const files = currentFiles()
+    rotatedUnsavedFiles.value = rotatedUnsavedFiles.value.filter((file) => !file._id && files.includes(file))
+  },
+  { deep: true }
+)
 
 async function _showFile(file: Partial<DocumentFile<string, Blob>>): Promise<void> {
   if (file.data) {
     await showFile(file.data as File)
   } else if (file._id) {
     await showFile({ params: { _id: file._id }, endpoint: `${props.endpointPrefix}documentFile`, filename: file.name as string })
+  }
+}
+async function getImageBlob(file: Partial<DocumentFile<string, Blob>>): Promise<Blob | null> {
+  if (file.data) {
+    return file.data as Blob
+  }
+  if (!file._id) {
+    return null
+  }
+  const result = (await API.getter<Blob>(`${props.endpointPrefix}documentFile`, { _id: file._id }, { responseType: 'blob' })).ok
+  return result?.data || null
+}
+async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: number, degrees: 90 | 180 | 270 = 90) {
+  if (props.disabled || !file.type?.startsWith('image/')) {
+    return
+  }
+  rotatingKey.value = keyForFile(file, index)
+  try {
+    const originalBlob = await getImageBlob(file)
+    if (!originalBlob) {
+      return
+    }
+    const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+    const rotatedBlob = await rotateImageClockwise(originalBlob, outputType, degrees)
+    const rotatedFile: FileT = {
+      name: file.name,
+      type: (rotatedBlob.type || file.type) as DocumentFile<string, Blob>['type'],
+      data: rotatedBlob
+    }
+    trackRotatedUnsavedFile(rotatedFile)
+    if (Array.isArray(props.modelValue) && typeof index === 'number') {
+      props.modelValue.splice(index, 1, rotatedFile)
+      emit('update:modelValue', props.modelValue)
+    } else {
+      emit('update:modelValue', rotatedFile)
+    }
+    await showFile(new File([rotatedBlob], file.name || 'image', { type: rotatedBlob.type || file.type }))
+  } finally {
+    rotatingKey.value = ''
   }
 }
 async function deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
