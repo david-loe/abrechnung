@@ -259,15 +259,22 @@ class ReportPrint<idType extends _id> {
       metaInformation = [`${this.t('labels.reason')}: ${this.report.reason}`]
     } else if (reportIsHealthCareCost(this.report)) {
       ownerLine = `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      const ec = this.report.expenses.length
       metaInformation = [
         `${this.t('labels.patientName')}: ${this.report.patientName}`,
-        `${this.t('labels.insurance')}: ${this.report.insurance.name}`
+        `${this.t('labels.insurance')}: ${this.report.insurance.name}`,
+        ec > 0
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          : ''
       ]
     } else {
       ownerLine = `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}`
+      const ec = this.report.expenses.length
       metaInformation = [
         `${this.t('labels.category')}: ${this.report.category.name}`,
-        `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[this.report.expenses.length - 1].cost.date)}`
+        ec > 0
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          : ''
       ]
     }
     let yLeft = this.drawer.drawMultilineText(ownerLine, { xStart: x, yStart: options.yStart, fontSize: options.fontSize, width })
