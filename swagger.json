@@ -3491,6 +3491,9 @@
 			},
 			"AddUpBase__id_": {
 				"properties": {
+					"negativeTotal": {
+						"type": "boolean"
+					},
 					"advanceOverflow": {
 						"type": "boolean"
 					},
@@ -3511,6 +3514,7 @@
 					}
 				},
 				"required": [
+					"negativeTotal",
 					"advanceOverflow",
 					"expenses",
 					"advance",
@@ -4574,6 +4578,9 @@
 			},
 			"AddUpBase_mongoose.Types.ObjectId_": {
 				"properties": {
+					"negativeTotal": {
+						"type": "boolean"
+					},
 					"advanceOverflow": {
 						"type": "boolean"
 					},
@@ -4594,6 +4601,7 @@
 					}
 				},
 				"required": [
+					"negativeTotal",
 					"advanceOverflow",
 					"expenses",
 					"advance",
