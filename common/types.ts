@@ -807,6 +807,7 @@ type AddUpBase<idType extends _id = _id> = {
   advance: BaseCurrencyMoneyNotNull
   expenses: BaseCurrencyMoneyNotNull
   advanceOverflow: boolean
+  negativeTotal: boolean
 }
 
 export interface AddUpTravel {

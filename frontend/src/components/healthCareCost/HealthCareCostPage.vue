@@ -160,10 +160,11 @@
           </div>
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ t('labels.summary') }}</h5>
+              <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
               <div>
                 <table class="table align-bottom">
                   <AddUpTable
+                    class="mb-4"
                     :add-up="healthCareCost.addUp"
                     :project="healthCareCost.project"
                     :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />

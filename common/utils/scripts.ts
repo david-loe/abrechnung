@@ -240,7 +240,8 @@ function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums = fals
     advance: { amount: 0 },
     expenses: { amount: 0 },
     ...(withLumpSums && { lumpSums: { amount: 0 } }),
-    advanceOverflow: false
+    advanceOverflow: false,
+    negativeTotal: false
   }
 }
 
@@ -308,8 +309,12 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
     addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project, isTravel)
   }
   for (const addUp of addUps) {
-    const totalAmount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
-    addUp.total.amount = totalAmount < 0 ? 0 : totalAmount
+    let totalAmount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
+    if (totalAmount < 0) {
+      addUp.negativeTotal = true
+      totalAmount = 0
+    }
+    addUp.total.amount = totalAmount
 
     let balanceAmount = addUp.total.amount - addUp.advance.amount
     if (balanceAmount < 0) {
