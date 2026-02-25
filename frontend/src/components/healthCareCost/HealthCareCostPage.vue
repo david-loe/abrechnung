@@ -162,13 +162,11 @@
             <div class="card-body">
               <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
               <div>
-                <table class="table align-bottom">
-                  <AddUpTable
-                    class="mb-4"
-                    :add-up="healthCareCost.addUp"
-                    :project="healthCareCost.project"
-                    :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />
-                </table>
+                <AddUpTable
+                  class="mb-4"
+                  :add-up="healthCareCost.addUp"
+                  :project="healthCareCost.project"
+                  :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />
                 <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
                   <p v-for="comment of healthCareCost.comments" :key="comment._id">
                     <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
