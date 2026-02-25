@@ -39,6 +39,7 @@
     "isReadOnly": "¡El sistema está en modo de solo lectura!",
     "loginFailed": "¡Inicio de sesión falló!",
     "mailSend": "Correo electrónico enviado.",
+    "negativeTotal": "Esta liquidación no compensa todas las entradas negativas.",
     "noData": {
       "advanceForUserX": "No hay anticipo aprobado para \"{X}\". ¡Solicita uno!",
       "expense": "Todavía no se han registrado gastos. Añade uno.",

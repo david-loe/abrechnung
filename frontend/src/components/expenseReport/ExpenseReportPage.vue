@@ -191,9 +191,10 @@
           </div>
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ t('labels.summary') }}</h5>
+              <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
               <div>
                 <AddUpTable
+                  class="mb-4"
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
                   :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />

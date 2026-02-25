@@ -39,6 +39,7 @@
     "isReadOnly": "Le système est en lecture seule !",
     "loginFailed": "Echec de connexion!",
     "mailSend": "E-mail envoyé.",
+    "negativeTotal": "Cette déclaration ne compense pas toutes les entrées négatives.",
     "noData": {
       "advanceForUserX": "Aucune avance approuvée pour '{X}'. Demandez-en une !",
       "expense": "Aucune dépense n'a encore été enregistrée. Ajoutez-en une.",

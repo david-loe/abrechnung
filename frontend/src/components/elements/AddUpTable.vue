@@ -8,7 +8,7 @@
         </td>
       </tr>
       <tr v-for="row of addUpTableData">
-        <th>
+        <th class="align-top">
           {{ t(row[0]) }}
           <small class="fw-normal" v-if="row[0] === 'labels.lumpSums' && claimSpouseRefund">
             <br >
@@ -22,6 +22,12 @@
               <br >
               {{ `(${formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
             </small>
+            <template v-if="row[0] === 'labels.balance' && addUp[index - 1].negativeTotal">
+              <TooltipElement :text="t('alerts.negativeTotal')"><small class="fw-light">
+                <br >
+                {{ `(⚠️ ${formatter.baseCurrency(addUp[index - 1].expenses.amount + ((addUp[index - 1] as FlatAddUp<string, Travel<string>>).lumpSums?.amount || 0))})` }}
+              </small></TooltipElement>
+            </template>
           </td>
         </template>
       </tr>
@@ -30,9 +36,7 @@
         <td :colspan="addUp.length" class="text-end tnum">{{ formatter.baseCurrency(getTotalBalance(addUp)) }}</td>
       </tr>
       <tr v-if="project.budget && project.budget.amount">
-        <td>
-          <small>{{ t('labels.project') }}</small>
-        </td>
+        <td><small>{{ t('labels.project') }}</small></td>
         <td class="text-end">
           <small>{{ formatter.money(project.balance) + ' ' + t('labels.from') + ' ' + formatter.money(project.budget) }}</small>
         </td>
@@ -42,12 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { AddUp, Project } from 'abrechnung-common/types.js'
+import { AddUp, FlatAddUp, Project, Travel } from 'abrechnung-common/types.js'
 import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../formatter.js'
 import ProgressCircle from './ProgressCircle.vue'
+import TooltipElement from './TooltipElement.vue'
 
 const { t } = useI18n()
 
