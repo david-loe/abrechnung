@@ -422,6 +422,16 @@ class ReportPrint<idType extends _id> {
     return await this.drawer.drawTable<{ author: Comment['author'] | string; text: string }>(rows, columns, tableOptions)
   }
 
+  getReceiptNumberLinkSegments(cost: Cost, receiptMap: ReceiptMap<idType>) {
+    return cost.receipts
+      .filter((r) => receiptMap[(r._id as _id).toString()]) // if vehicle registration is 'none', receipts for ownCar stages are not included
+      .map((r) => {
+        // receipts always have an _id in backend
+        const id = (r._id as _id).toString()
+        return { text: receiptMap[id].number.toString(), targetId: id }
+      })
+  }
+
   async drawStages(receiptMap: ReceiptMap<idType>, options: Options, drawNotes = true) {
     if (!reportIsTravel(this.report) || this.report.stages.length === 0) {
       return options.yStart
@@ -499,10 +509,10 @@ class ReportPrint<idType extends _id> {
       alignment: TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
       fn: (m: Cost) =>
-        m.receipts
-          .filter((r) => receiptMap[(r._id as _id).toString()]) // if vehicle registration is 'none', receipts for ownCar stages are not included
-          .map((r) => receiptMap[(r._id as _id).toString()].number) // receipts always have an _id in backend
-          .join(', ')
+        this.getReceiptNumberLinkSegments(m, receiptMap)
+          .map((segment) => segment.text)
+          .join(', '),
+      internalPdfLinkSegments: (m: Cost) => this.getReceiptNumberLinkSegments(m, receiptMap)
     })
 
     const fontSize = options.fontSize + 2
@@ -551,7 +561,11 @@ class ReportPrint<idType extends _id> {
       width: 45,
       alignment: TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', ') // receipts always have an _id in backend
+      fn: (m: Cost) =>
+        this.getReceiptNumberLinkSegments(m, receiptMap)
+          .map((segment) => segment.text)
+          .join(', '),
+      internalPdfLinkSegments: (m: Cost) => this.getReceiptNumberLinkSegments(m, receiptMap)
     })
 
     const fontSize = options.fontSize + 2

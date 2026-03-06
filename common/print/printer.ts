@@ -7,7 +7,6 @@ import {
   PDFDocument,
   PDFFont,
   PDFImage,
-  PDFName,
   PDFPage,
   PDFPageDrawLineOptions,
   PDFString,
@@ -64,6 +63,8 @@ export interface Column<Type extends {} = any> {
   fn?: (p: any) => string
   // biome-ignore lint/suspicious/noExplicitAny: typing to complex
   countryCodeForFlag?: (p: any) => CountryCode
+  // biome-ignore lint/suspicious/noExplicitAny: typing to complex
+  internalPdfLinkSegments?: (p: any) => { text: string; targetId: string }[]
 }
 
 interface ReceiptMapEntry<idType extends _id, dataType extends binary = binary> {
@@ -196,6 +197,7 @@ export class PDFDrawer<idType extends _id> {
   formatter: Formatter
   settings: PrintSettingsWithColorObjects
   currentPage!: PDFPage
+  pendingInternalLinks: { page: PDFPage; targetId: string; xStart: number; yStart: number; width: number; height: number }[] = []
   getDocumentFileBufferById: (id: idType) => Promise<{ buffer: ArrayBuffer; type: DocumentFileType } | null>
   getOrganisationLogoIdById: (id: idType) => Promise<{ logoId: idType; website?: string | null } | null>
 
@@ -347,6 +349,7 @@ export class PDFDrawer<idType extends _id> {
   }
 
   async attachReceipts(receiptMap: ReceiptMap<idType>) {
+    const receiptFirstPageMap: Record<string, PDFPage> = {}
     for (const receiptId in receiptMap) {
       const receipt = receiptMap[receiptId]
       let doc: { buffer: ArrayBuffer; type: DocumentFileType } | null = null
@@ -361,11 +364,15 @@ export class PDFDrawer<idType extends _id> {
         continue
       }
       try {
+        let firstPageOfReceipt: PDFPage | null = null
         if (receipt.type === 'application/pdf') {
           const insertPDF = await PDFDocument.load(doc.buffer)
           const pages = await this.doc.copyPages(insertPDF, insertPDF.getPageIndices())
           for (const p of pages) {
             this.currentPage = this.doc.addPage(p)
+            if (!firstPageOfReceipt) {
+              firstPageOfReceipt = this.currentPage
+            }
             this.drawReceiptNumber(receipt)
           }
         } else {
@@ -382,6 +389,7 @@ export class PDFDrawer<idType extends _id> {
           } else {
             this.newPage('portrait')
           }
+          firstPageOfReceipt = this.currentPage
           let size = image.scaleToFit(
             this.currentPage.getSize().width - this.settings.pagePadding, // only half padding
             this.currentPage.getSize().height - this.settings.pagePadding
@@ -397,10 +405,30 @@ export class PDFDrawer<idType extends _id> {
           })
           this.drawReceiptNumber(receipt)
         }
+        if (firstPageOfReceipt) {
+          receiptFirstPageMap[receipt._id.toString()] = firstPageOfReceipt
+        }
       } catch (error) {
         console.error(`Error while trying to add Document (${receipt._id})[${doc.type}] to PDF: ${error}`)
       }
     }
+    for (const link of this.pendingInternalLinks) {
+      const targetPage = receiptFirstPageMap[link.targetId]
+      if (!targetPage) {
+        continue
+      }
+      const linkAnnotation = this.doc.context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: [link.xStart, link.yStart, link.xStart + link.width, link.yStart + link.height],
+        Border: [0, 0, 0],
+        C: [0, 0, 1],
+        A: { Type: 'Action', S: 'GoTo', D: [targetPage.ref, 'Fit'] }
+      })
+      const linkAnnotationRef = this.doc.context.register(linkAnnotation)
+      link.page.node.addAnnot(linkAnnotationRef)
+    }
+    this.pendingInternalLinks = []
   }
 
   async drawFlag(countryCode: CountryCode, options: Options) {
@@ -489,7 +517,7 @@ export class PDFDrawer<idType extends _id> {
       A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) }
     })
     const linkAnnotationRef = this.doc.context.register(linkAnnotation)
-    this.currentPage.node.set(PDFName.of('Annots'), this.doc.context.obj([linkAnnotationRef]))
+    this.currentPage.node.addAnnot(linkAnnotationRef)
   }
 
   async drawTable<Type extends {}>(data: Type[], columns: Column<Type>[], options: TableOptions) {
@@ -522,18 +550,24 @@ export class PDFDrawer<idType extends _id> {
         options: { xStart: number; yStart: number; width: number; fontSize: number }
         countryCodeForFlag?: CountryCode
       }[] = []
+      const cellLinks: { targetId: string; options: { xStart: number; yStart: number; width: number; height: number } }[] = []
       for (const column of columns) {
         const datum = data[i][column.key]
         let cell: string
+        let internalPdfLinkSegments: { text: string; targetId: string }[] = []
         if (opts.firstRow) {
           cell = column.title
         } else {
-          cell = String(datum)
-          if (column.fn) {
-            cell = column.fn(datum)
-          }
           if (datum === undefined) {
             cell = EMPTY_CELL
+          } else {
+            cell = String(datum)
+            if (column.fn) {
+              cell = column.fn(datum)
+            }
+            if (column.internalPdfLinkSegments) {
+              internalPdfLinkSegments = column.internalPdfLinkSegments(datum)
+            }
           }
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
@@ -555,8 +589,28 @@ export class PDFDrawer<idType extends _id> {
             }
           })
         }
+        if (!opts.firstRow && internalPdfLinkSegments.length > 0) {
+          let segmentIndex = 0
+          for (const line of multiText.lines) {
+            let lineSearchIndex = 0
+            while (segmentIndex < internalPdfLinkSegments.length) {
+              const segment = internalPdfLinkSegments[segmentIndex]
+              const segmentTextIndex = line.text.indexOf(segment.text, lineSearchIndex)
+              if (segmentTextIndex === -1) {
+                break
+              }
+              const prefix = line.text.slice(0, segmentTextIndex)
+              const width = this.font.widthOfTextAtSize(segment.text, fontSize)
+              const xStart = line.x + this.settings.cellPadding.x + this.font.widthOfTextAtSize(prefix, fontSize)
+              const yStart = line.y + this.settings.cellPadding.bottom
+              cellLinks.push({ targetId: segment.targetId, options: { xStart, yStart, width, height: fontSize } })
+              lineSearchIndex = segmentTextIndex + segment.text.length
+              segmentIndex++
+            }
+          }
+        }
         if (multiText.lines.length > 0 && !opts.firstRow) {
-          if (column.countryCodeForFlag) {
+          if (column.countryCodeForFlag && datum !== undefined) {
             cellTexts[cellTexts.length - 1].text = cellTexts[cellTexts.length - 1].text.slice(
               0,
               cellTexts[cellTexts.length - 1].text.length - FLAG_PSEUDO_SUFFIX.length
@@ -612,6 +666,16 @@ export class PDFDrawer<idType extends _id> {
             fontSize: text.options.fontSize
           })
         }
+      }
+      for (const link of cellLinks) {
+        this.pendingInternalLinks.push({
+          page: this.currentPage,
+          targetId: link.targetId,
+          xStart: link.options.xStart,
+          yStart: link.options.yStart,
+          width: link.options.width,
+          height: link.options.height
+        })
       }
       alreadyOnCompletelyNewPage = false
       for (const border of columnBorders) {
