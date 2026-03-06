@@ -3,6 +3,7 @@ services:
     build:
       context: ./
       dockerfile: ./backend/Dockerfile.${NODE_ENV}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     restart: always
     depends_on:
       - db
@@ -21,6 +22,7 @@ services:
     build:
       context: ./
       dockerfile: ./frontend/Dockerfile.${NODE_ENV}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     volumes:
       - ./frontend:/app
       - ./common:/common:ro
@@ -52,6 +54,7 @@ services:
     build:
       context: ./common
       dockerfile: Dockerfile.${NODE_ENV}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     volumes:
       - ./common:/app
 
