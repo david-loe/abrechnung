@@ -12,8 +12,7 @@ RUN mkdir -p /reports && chown node:node /reports
 
 WORKDIR /npm_cache
 COPY backend/package*.json ./
-RUN npm install
-RUN chown -R node:node /npm_cache
+RUN npm install && chown -R node:node /npm_cache && mkdir -p /app && chown node:node /app
 
 WORKDIR /app
 
