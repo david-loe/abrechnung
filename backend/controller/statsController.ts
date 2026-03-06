@@ -23,7 +23,15 @@ interface ReportUsageQuery {
 export class StatsController extends Controller {
   @Get('health')
   public async get() {
-    return { status: 'ok', db: mongoose.ConnectionStates[mongoose.connection.readyState] }
+    return { status: 'ok' }
+  }
+
+  @Get('ready')
+  public async getReady() {
+    const db = getDbState()
+    const isReady = db === 'connected'
+    this.setStatus(isReady ? 200 : 503)
+    return { status: isReady ? 'ok' : 'not_ready', db }
   }
 
   @Get('stats/dbUsage')
@@ -65,6 +73,10 @@ async function getDBUsage(scale?: number) {
     fsUsedSize: dbUsage.fsUsedSize as number,
     fsTotalSize: dbUsage.fsTotalSize as number
   }
+}
+
+function getDbState() {
+  return mongoose.ConnectionStates[mongoose.connection.readyState] as keyof typeof mongoose.ConnectionStates
 }
 
 async function getReportUsage(from: Date, to: Date) {

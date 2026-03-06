@@ -37,6 +37,8 @@ services:
     restart: always
     volumes:
       - db_data:/data/db
+    tmpfs:
+      - /data/configdb
 
   redis:
     image: redis:8-alpine
