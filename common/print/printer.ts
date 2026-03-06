@@ -558,15 +558,16 @@ export class PDFDrawer<idType extends _id> {
         if (opts.firstRow) {
           cell = column.title
         } else {
-          cell = String(datum)
-          if (column.fn) {
-            cell = column.fn(datum)
-          }
-          if (column.internalPdfLinkSegments) {
-            internalPdfLinkSegments = column.internalPdfLinkSegments(datum)
-          }
           if (datum === undefined) {
             cell = EMPTY_CELL
+          } else {
+            cell = String(datum)
+            if (column.fn) {
+              cell = column.fn(datum)
+            }
+            if (column.internalPdfLinkSegments) {
+              internalPdfLinkSegments = column.internalPdfLinkSegments(datum)
+            }
           }
         }
         const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
@@ -609,7 +610,7 @@ export class PDFDrawer<idType extends _id> {
           }
         }
         if (multiText.lines.length > 0 && !opts.firstRow) {
-          if (column.countryCodeForFlag) {
+          if (column.countryCodeForFlag && datum !== undefined) {
             cellTexts[cellTexts.length - 1].text = cellTexts[cellTexts.length - 1].text.slice(
               0,
               cellTexts[cellTexts.length - 1].text.length - FLAG_PSEUDO_SUFFIX.length
