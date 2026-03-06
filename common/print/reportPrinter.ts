@@ -502,7 +502,14 @@ class ReportPrint<idType extends _id> {
         m.receipts
           .filter((r) => receiptMap[(r._id as _id).toString()]) // if vehicle registration is 'none', receipts for ownCar stages are not included
           .map((r) => receiptMap[(r._id as _id).toString()].number) // receipts always have an _id in backend
-          .join(', ')
+          .join(', '),
+      internalPdfLinkSegments: (m: Cost) =>
+        m.receipts
+          .filter((r) => receiptMap[(r._id as _id).toString()])
+          .map((r) => {
+            const id = (r._id as _id).toString()
+            return { text: receiptMap[id].number.toString(), targetId: id }
+          })
     })
 
     const fontSize = options.fontSize + 2
@@ -551,7 +558,12 @@ class ReportPrint<idType extends _id> {
       width: 45,
       alignment: TextAlignment.Left,
       title: this.t('labels.receiptNumber'),
-      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', ') // receipts always have an _id in backend
+      fn: (m: Cost) => m.receipts.map((r) => receiptMap[(r._id as _id).toString()].number).join(', '), // receipts always have an _id in backend
+      internalPdfLinkSegments: (m: Cost) =>
+        m.receipts.map((r) => {
+          const id = (r._id as _id).toString()
+          return { text: receiptMap[id].number.toString(), targetId: id }
+        })
     })
 
     const fontSize = options.fontSize + 2
