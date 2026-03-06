@@ -8,9 +8,11 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 WORKDIR /npm_cache
 COPY package*.json ./
 RUN npm install
+RUN chown -R node:node /npm_cache
 
 WORKDIR /app
 
+USER node
 ENTRYPOINT [ "/bin/sh", "-c", "cp -r /npm_cache/node_modules/. /app/node_modules && exec \"$0\" \"$@\"" ]
 
 CMD ["npm", "run", "dev"]

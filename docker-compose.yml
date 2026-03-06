@@ -28,7 +28,7 @@ services:
     depends_on:
       - backend
     ports:
-      - ${FRONTEND_PORT:-5000}:80
+      - ${FRONTEND_PORT:-5000}:8080
     env_file:
       - .env
   db:

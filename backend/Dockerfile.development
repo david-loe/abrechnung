@@ -8,14 +8,16 @@ RUN apk add --no-cache tini
 COPY backend/docker-entrypoint.development.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-RUN mkdir /reports
+RUN mkdir -p /reports && chown node:node /reports
 
 WORKDIR /npm_cache
 COPY backend/package*.json ./
 RUN npm install
+RUN chown -R node:node /npm_cache
 
 WORKDIR /app
 
+USER node
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
 
 CMD ["npm", "run", "dev"]
