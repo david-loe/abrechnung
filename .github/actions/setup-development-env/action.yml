@@ -1,0 +1,35 @@
+name: Setup Development Environment
+description: Copy .env.example file and set HOST_UID/HOST_GID for docker compose development runs
+
+runs:
+  using: 'composite'
+  steps:
+    - name: copy .env file
+      uses: canastro/copy-file-action@ae66602ce7d214dbd2e298c1db67a81388755a0a
+      with:
+        source: '.env.example'
+        target: '.env'
+    - name: Set host user mapping in .env
+      shell: bash
+      run: |
+        uid="$(id -u)"
+        gid="$(id -g)"
+        if [ -n "$(tail -c 1 .env)" ]; then
+          echo >> .env
+        fi
+
+        if grep -q '^HOST_UID=' .env; then
+          sed -i "s/^HOST_UID=.*/HOST_UID=${uid}/" .env
+        elif grep -q '^# HOST_UID=' .env; then
+          sed -i "s/^# HOST_UID=.*/HOST_UID=${uid}/" .env
+        else
+          echo "HOST_UID=${uid}" >> .env
+        fi
+
+        if grep -q '^HOST_GID=' .env; then
+          sed -i "s/^HOST_GID=.*/HOST_GID=${gid}/" .env
+        elif grep -q '^# HOST_GID=' .env; then
+          sed -i "s/^# HOST_GID=.*/HOST_GID=${gid}/" .env
+        else
+          echo "HOST_GID=${gid}" >> .env
+        fi

@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 backend"
 LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
-RUN mkdir /reports
+RUN mkdir -p /reports && chown node:node /reports && chmod 775 /reports
 
 WORKDIR /build
 
@@ -20,4 +20,7 @@ COPY backend/ .
 
 RUN npm run build
 
+RUN chown -R node:node /build
+
+USER node
 CMD ["npm", "run", "start"]

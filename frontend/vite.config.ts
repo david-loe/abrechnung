@@ -23,13 +23,13 @@ export default {
     })
   ],
   server: {
-    port: 80,
+    port: 8080,
     strictPort: true,
     host: '0.0.0.0',
     allowedHosts: [process.env.VITE_FRONTEND_URL?.replace(/^https?:\/\//, '')],
     fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
   },
-  preview: { port: 80, host: '0.0.0.0' },
+  preview: { port: 8080, host: '0.0.0.0' },
   resolve: { alias: { '@': resolve(__dirname, './src') } },
   build: { rollupOptions: { output: { entryFileNames: 'app-[hash].js' } } }
 }
