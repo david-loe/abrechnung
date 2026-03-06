@@ -16841,8 +16841,45 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"db": {
+										"status": {
 											"type": "string"
+										}
+									},
+									"required": [
+										"status"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Stats"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/ready": {
+			"get": {
+				"operationId": "GetReady",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"db": {
+											"type": "string",
+											"enum": [
+												"disconnected",
+												"connected",
+												"connecting",
+												"disconnecting",
+												"uninitialized"
+											]
 										},
 										"status": {
 											"type": "string"
