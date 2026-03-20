@@ -1,10 +1,10 @@
 import { CronJob } from 'cron'
 import APP from './app.js'
-import { fetchAndUpdateLumpSums } from './db.js'
 import ENV from './env.js'
+import { fetchAndUpdateLumpSums } from './integrations/lumpSums/trigger.js'
+import { retentionPolicy } from './integrations/policies/trigger.js'
 import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
-import { retentionPolicy } from './retentionpolicy.js'
 
 declare global {
   namespace Express {

@@ -19,7 +19,6 @@ import ENV from './env.js'
 import { formatter } from './factory.js'
 import i18n from './i18n.js'
 import { enqueueMail } from './integrations/notifications/mail.js'
-import { runPolicyAction } from './integrations/runtime.js'
 import { logger } from './logger.js'
 import User from './models/user.js'
 
@@ -161,8 +160,4 @@ export async function applyRetentionPolicy() {
 
   await notificationMailForDeletions(settings.retentionPolicy)
   await triggerDeletion(settings.retentionPolicy)
-}
-
-export async function retentionPolicy() {
-  await runPolicyAction('retention.apply')
 }

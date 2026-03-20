@@ -2,12 +2,10 @@ import countries from 'abrechnung-common/data/countries.json' with { type: 'json
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
 import displaySettings from 'abrechnung-common/data/displaySettings.js'
 import printerSettings from 'abrechnung-common/print/printerSettings.js'
-import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.js'
 import {
   accesses,
   ConnectionSettings as IConnectionSettings,
-  Country as ICountry,
   DisplaySettings as IDisplaySettings,
   PrinterSettings as IPrinterSettings,
   Settings as ISettings,
@@ -16,9 +14,8 @@ import {
   tokenAdminUser
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
-import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, HydratedDocument, Model } from 'mongoose'
+import mongoose, { Connection, Model } from 'mongoose'
 import { CACHE } from './data/cache.js'
 import connectionSettingsDev from './data/connectionSettings.development.js'
 import connectionSettingsProd from './data/connectionSettings.production.js'
@@ -26,7 +23,7 @@ import healthInsurances from './data/healthInsurances.json' with { type: 'json' 
 import settings from './data/settings.js'
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
-import { runInboundSync } from './integrations/runtime.js'
+import { syncLumpSums } from './integrations/lumpSums/sync.js'
 import { logger } from './logger.js'
 import Category from './models/category.js'
 import Country from './models/country.js'
@@ -164,30 +161,6 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
     const newDocs = await model.insertMany(data, { lean })
     logger.info(`Added ${newDocs.length} ${name}`)
   }
-}
-
-export async function syncLumpSums() {
-  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api@1/ALL.json'
-  try {
-    const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
-    if (res.status === 200) {
-      await addLumpSumsToCountries(
-        res.data,
-        (id) => Country.findOne({ _id: id }),
-        async (c) => {
-          ;(c as HydratedDocument<ICountry>).markModified('lumpSums')
-          return (c as HydratedDocument<ICountry>).save()
-        }
-      )
-    }
-  } catch (error) {
-    logger.error(`Unable to fetch lump sums from: ${pauschbetrag_api}`, 'error')
-    logger.error(error, 'error')
-  }
-}
-
-export async function fetchAndUpdateLumpSums() {
-  await runInboundSync('lump_sums.sync_in')
 }
 
 export async function getSettings(init = true): Promise<ISettings> {
