@@ -4,27 +4,39 @@ import {
   getModelNameFromReport,
   getReportTypeFromModelName,
   HealthCareCost,
+  Webhook as IWebhook,
   State,
   Travel
 } from 'abrechnung-common/types.js'
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import { Types } from 'mongoose'
-import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../db.js'
-import ENV from '../env.js'
-import { reportPrinter } from '../factory.js'
-import { updateI18n } from '../i18n.js'
-import Webhook from '../models/webhook.js'
-import { WebhookJobData, webhookQueue } from '../workers/webhook.js'
+import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
+import ENV from '../../env.js'
+import { reportPrinter } from '../../factory.js'
+import { updateI18n } from '../../i18n.js'
+import Webhook from '../../models/webhook.js'
+import { runOutboundAction } from '../runtime.js'
 import { runUserScript } from './runScript.js'
 
+interface WebhookJobData {
+  input: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+  webhook: IWebhook<Types.ObjectId>
+}
+
 export async function runWebhooks(
+  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+) {
+  await runOutboundAction('webhooks.deliver', { report })
+}
+
+export async function executeWebhooks(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
 ) {
   const reportType = getReportTypeFromModelName(getModelNameFromReport(report))
   const hooks = await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
   for (const hook of hooks) {
-    await webhookQueue.add(`webhook:${hook.name}`, { input: report, webhook: hook }, { priority: hook.executionOrder })
+    await processWebhookJob({ input: report, webhook: hook })
   }
 }
 
@@ -70,7 +82,7 @@ export async function processWebhookJob({ webhook, input }: WebhookJobData) {
   }
 }
 
-function buildFormData(data: object): FormData {
+function buildFormData(data: object) {
   const form = new FormData()
 
   for (const [key, value] of Object.entries(data)) {

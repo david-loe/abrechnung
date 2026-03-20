@@ -10,11 +10,12 @@ import {
 } from 'abrechnung-common/types.js'
 import { getTotalBalance, sanitizeFilename } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
-import { BACKEND_CACHE } from '../db.js'
+import { getConnectionSettings } from '../db.js'
 import { formatter, reportPrinter } from '../factory.js'
 import i18n from '../i18n.js'
+import { getClient } from '../integrations/notifications/mail.js'
+import { runOutboundAction } from '../integrations/runtime.js'
 import Organisation from '../models/organisation.js'
-import { getClient } from '../notifications/mail.js'
 
 export async function writeToDiskFilePath(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
@@ -47,11 +48,18 @@ export async function writeToDiskFilePath(
 export async function sendViaMail(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
 ) {
-  if (BACKEND_CACHE.connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
+  await runOutboundAction('reports.email.send', { report })
+}
+
+export async function sendReportViaMail(
+  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+) {
+  const connectionSettings = await getConnectionSettings(false)
+  if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
     const org = await Organisation.findOne({ _id: report.project.organisation._id })
     if (org?.reportEmail) {
       const mailClient = await getClient()
-      const lng = BACKEND_CACHE.connectionSettings.PDFReportsViaEmail.locale
+      const lng = connectionSettings.PDFReportsViaEmail.locale
       formatter.setLocale(lng)
       let subject = '🧾 '
       const pdf = await reportPrinter.print(report, lng)

@@ -13,17 +13,13 @@ import {
 import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
+import { emitIntegrationEvent } from '../integrations/events.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
-import { sendNotification } from '../notifications/notification.js'
-import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { runWebhooks } from '../webhooks/execute.js'
-import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -130,7 +126,7 @@ export class HealthCareCostController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: runWebhooks,
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.draft_saved', report: h }),
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === HealthCareCostState.IN_WORK && request.user.access['inWork:healthCareCost']) {
@@ -156,10 +152,7 @@ export class HealthCareCostController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
-        await runWebhooks(h)
-        await sendNotification(h)
-      },
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: h }),
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
@@ -335,10 +328,8 @@ export class HealthCareCostExamineController extends Controller {
     }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
-        await runWebhooks(h)
-        await sendNotification(h, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined)
-      },
+      cb: async (h: IHealthCareCost<Types.ObjectId>) =>
+        emitIntegrationEvent({ type: extendedBody._id ? 'report.back_to_in_work' : 'report.review_requested', report: h }),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
@@ -357,14 +348,7 @@ export class HealthCareCostExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (h: IHealthCareCost<Types.ObjectId>) => {
-      await runWebhooks(h)
-      await sendNotification(h)
-      await sendViaMail(h)
-      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeReportToDisk(await writeToDiskFilePath(h), h)
-      }
-    }
+    const cb = async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_completed', report: h })
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
@@ -389,10 +373,7 @@ export class HealthCareCostExamineController extends Controller {
 
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
-      cb: async (h: IHealthCareCost<Types.ObjectId>) => {
-        await runWebhooks(h)
-        await sendNotification(h)
-      },
+      cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: h }),
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

@@ -18,15 +18,15 @@ import {
 import { getDiffInDays, mdLinksToHtml, PlaceToString } from 'abrechnung-common/utils/scripts.js'
 import escapeHtml from 'escape-html'
 import { mongo, QueryFilter, Types } from 'mongoose'
-import { BACKEND_CACHE } from '../db.js'
-import ENV from '../env.js'
-import { formatter } from '../factory.js'
-import { genAuthenticatedLink } from '../helper.js'
-import i18n from '../i18n.js'
-import Organisation from '../models/organisation.js'
-import User from '../models/user.js'
+import { BACKEND_CACHE } from '../../db.js'
+import ENV from '../../env.js'
+import { formatter } from '../../factory.js'
+import { genAuthenticatedLink } from '../../helper.js'
+import i18n from '../../i18n.js'
+import Organisation from '../../models/organisation.js'
+import User from '../../models/user.js'
 import { enqueueMail } from './mail.js'
-import { sendPushNotification } from './push.js'
+import { enqueuePushNotification } from './push.js'
 
 export async function sendNotification(report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, textState?: string) {
   let recipients = []
@@ -58,7 +58,6 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${ENV.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
-    // 'REJECTED', 'APPROVED', 'REVIEW_COMPLETED'
     userFilter._id = report.owner._id
     button.link =
       report.state === State.REJECTED ? `${ENV.VITE_FRONTEND_URL}/${reportType}` : `${ENV.VITE_FRONTEND_URL}/${reportType}/${report._id}`
@@ -99,7 +98,7 @@ export async function sendNotification(report: TravelSimple | ExpenseReportSimpl
     lastParagraph = interpolation.comment ? [lastParagraph as string, confirmLine] : confirmLine
   }
   button.text = i18n.t('labels.viewX', { lng: language, X: i18n.t(`labels.${reportType}`, { lng: language }) })
-  await sendPushNotification(subject, paragraph, recipients, button.link)
+  await enqueuePushNotification(subject, paragraph, recipients, button.link)
   await enqueueMail(recipients, subject, paragraph, button, lastParagraph)
 }
 

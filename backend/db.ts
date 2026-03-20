@@ -26,6 +26,7 @@ import healthInsurances from './data/healthInsurances.json' with { type: 'json' 
 import settings from './data/settings.js'
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
+import { runInboundSync } from './integrations/runtime.js'
 import { logger } from './logger.js'
 import Category from './models/category.js'
 import Country from './models/country.js'
@@ -120,7 +121,7 @@ export async function initDB() {
 
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
-  await fetchAndUpdateLumpSums()
+  await syncLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
 
   const organisations = [{ name: 'My Organisation' }]
@@ -165,7 +166,7 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
   }
 }
 
-export async function fetchAndUpdateLumpSums() {
+export async function syncLumpSums() {
   const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api@1/ALL.json'
   try {
     const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
@@ -183,6 +184,10 @@ export async function fetchAndUpdateLumpSums() {
     logger.error(`Unable to fetch lump sums from: ${pauschbetrag_api}`, 'error')
     logger.error(error, 'error')
   }
+}
+
+export async function fetchAndUpdateLumpSums() {
+  await runInboundSync('lump_sums.sync_in')
 }
 
 export async function getSettings(init = true): Promise<ISettings> {

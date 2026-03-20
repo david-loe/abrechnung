@@ -11,11 +11,9 @@ import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
 import i18n from './i18n.js'
+import { closeIntegrationQueue } from './integrations/runtime.js'
 import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
-import { closeMailQueue } from './workers/mail.js'
-import { closeSaveReportOnDiskQueue } from './workers/saveReportOnDisk.js'
-import { closeWebhookQueue } from './workers/webhook.js'
 
 export default async function () {
   await connectDB()
@@ -103,8 +101,6 @@ export default async function () {
 }
 
 export async function shutdown() {
-  await closeMailQueue()
-  await closeSaveReportOnDiskQueue()
-  await closeWebhookQueue()
+  await closeIntegrationQueue()
   await disconnectDB()
 }

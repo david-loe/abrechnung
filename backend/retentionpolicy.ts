@@ -18,9 +18,10 @@ import { getSettings } from './db.js'
 import ENV from './env.js'
 import { formatter } from './factory.js'
 import i18n from './i18n.js'
+import { enqueueMail } from './integrations/notifications/mail.js'
+import { runPolicyAction } from './integrations/runtime.js'
 import { logger } from './logger.js'
 import User from './models/user.js'
-import { enqueueMail } from './notifications/mail.js'
 
 async function getForRetentionPolicy(
   schema: ReportModelNameWithoutAdvance,
@@ -154,10 +155,14 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
   }
 }
 
-export async function retentionPolicy() {
+export async function applyRetentionPolicy() {
   // NO BACKEND_CACHE bc only queried once a day
   const settings = await getSettings()
 
   await notificationMailForDeletions(settings.retentionPolicy)
   await triggerDeletion(settings.retentionPolicy)
+}
+
+export async function retentionPolicy() {
+  await runPolicyAction('retention.apply')
 }

@@ -12,16 +12,12 @@ import {
 import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
+import { emitIntegrationEvent } from '../integrations/events.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
-import { sendNotification } from '../notifications/notification.js'
-import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { runWebhooks } from '../webhooks/execute.js'
-import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -126,7 +122,7 @@ export class ExpenseReportController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: runWebhooks,
+      cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.draft_saved', report: e }),
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === ExpenseReportState.IN_WORK && request.user.access['inWork:expenseReport']) {
@@ -152,10 +148,7 @@ export class ExpenseReportController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: async (e: IExpenseReport<Types.ObjectId>) => {
-        await runWebhooks(e)
-        await sendNotification(e)
-      },
+      cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: e }),
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
@@ -330,10 +323,8 @@ export class ExpenseReportExamineController extends Controller {
     }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: async (e: IExpenseReport<Types.ObjectId>) => {
-        await runWebhooks(e)
-        await sendNotification(e, extendedBody._id ? 'BACK_TO_IN_WORK' : undefined)
-      },
+      cb: async (e: IExpenseReport<Types.ObjectId>) =>
+        emitIntegrationEvent({ type: extendedBody._id ? 'report.back_to_in_work' : 'report.review_requested', report: e }),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
@@ -352,14 +343,7 @@ export class ExpenseReportExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (e: IExpenseReport<Types.ObjectId>) => {
-      await runWebhooks(e)
-      await sendNotification(e)
-      await sendViaMail(e)
-      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeReportToDisk(await writeToDiskFilePath(e), e)
-      }
-    }
+    const cb = async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_completed', report: e })
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
@@ -384,10 +368,7 @@ export class ExpenseReportExamineController extends Controller {
 
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
-      cb: async (e: IExpenseReport<Types.ObjectId>) => {
-        await runWebhooks(e)
-        await sendNotification(e)
-      },
+      cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: e }),
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

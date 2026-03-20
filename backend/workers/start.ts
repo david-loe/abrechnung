@@ -1,7 +1,3 @@
-import { startMailWorker } from './mail.js'
-import { startSaveReportOnDiskWorker } from './saveReportOnDisk.js'
-import { startWebhookWorker } from './webhook.js'
+import { startIntegrationWorker } from '../integrations/runtime.js'
 
-startSaveReportOnDiskWorker()
-startMailWorker()
-startWebhookWorker()
+startIntegrationWorker()
