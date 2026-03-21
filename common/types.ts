@@ -140,6 +140,22 @@ export interface ConnectionSettings<idType extends _id = _id> {
   _id: idType
 }
 
+export type Schedule =
+  | { type: 'everyXHour'; value: number }
+  | { type: 'daily'; hour: number; minute: number }
+  | { type: 'weekly'; weekdays: number[]; hour: number; minute: number }
+
+export interface IntegrationScheduleSettings {
+  enabled: boolean
+  schedule: Schedule
+}
+
+export interface IntegrationSettings<idType extends _id = _id> {
+  integrationKey: string
+  schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
+  _id: idType
+}
+
 export interface DisplaySettings<idType extends _id = _id> {
   auth: { magiclogin: boolean; microsoft: boolean; ldapauth: boolean; oidc: boolean }
   oidc: { label: string; icon: string }

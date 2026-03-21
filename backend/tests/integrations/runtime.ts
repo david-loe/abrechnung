@@ -34,7 +34,7 @@ function createPushUser() {
 }
 
 function stubQueueAdd(t: ExecutionContext, implementation: (name: string, data: IntegrationJobData, opts?: unknown) => Promise<unknown>) {
-  setIntegrationQueueForTests({ add: implementation as never, close: async () => {} })
+  setIntegrationQueueForTests({ add: implementation as never, close: async () => {}, getJob: async () => undefined })
   t.teardown(() => {
     setIntegrationQueueForTests(undefined)
   })
@@ -90,6 +90,23 @@ test.serial('runInboundSync enqueues the expected inbound job payload', async (t
     name: 'lump_sums.sync_in',
     data: { contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} },
     opts: {}
+  })
+})
+
+test.serial('runInboundSync merges integration-specific options with explicit job overrides', async (t) => {
+  let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
+
+  stubQueueAdd(t, async (name, data, opts) => {
+    captured = { name, data, opts }
+    return {} as never
+  })
+
+  await runInboundSync('lump_sums.sync_in', {}, { jobId: 'schedule:lumpSums:sync', removeOnComplete: true, removeOnFail: true })
+
+  t.deepEqual(captured, {
+    name: 'lump_sums.sync_in',
+    data: { contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} },
+    opts: { jobId: 'schedule:lumpSums:sync', removeOnComplete: true, removeOnFail: true }
   })
 })
 

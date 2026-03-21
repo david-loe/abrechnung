@@ -15,7 +15,9 @@ import {
 
 const INTEGRATION_QUEUE_NAME = 'integration'
 
-type IntegrationQueue = Pick<Queue<IntegrationJobData>, 'add' | 'close'>
+export type IntegrationQueueJob = { getState: () => Promise<string>; remove: () => Promise<void> }
+
+type IntegrationQueue = Pick<Queue<IntegrationJobData>, 'add' | 'close' | 'getJob'>
 
 let integrationQueue: IntegrationQueue | undefined
 
@@ -63,16 +65,28 @@ export function getJobOptions(action: IntegrationJobData['action']): JobsOptions
   return {}
 }
 
-export async function runOutboundAction<T extends OutboundActionType>(action: T, payload: OutboundActionPayloadMap[T]) {
-  await getIntegrationQueue().add(action, { contract: 'outboundAction', action, payload }, getJobOptions(action))
+export async function runOutboundAction<T extends OutboundActionType>(
+  action: T,
+  payload: OutboundActionPayloadMap[T],
+  jobOptions: JobsOptions = {}
+) {
+  await getIntegrationQueue().add(action, { contract: 'outboundAction', action, payload }, { ...getJobOptions(action), ...jobOptions })
 }
 
-export async function runInboundSync<T extends InboundSyncType>(action: T, payload = {} as InboundSyncPayloadMap[T]) {
-  await getIntegrationQueue().add(action, { contract: 'inboundSync', action, payload }, getJobOptions(action))
+export async function runInboundSync<T extends InboundSyncType>(
+  action: T,
+  payload = {} as InboundSyncPayloadMap[T],
+  jobOptions: JobsOptions = {}
+) {
+  await getIntegrationQueue().add(action, { contract: 'inboundSync', action, payload }, { ...getJobOptions(action), ...jobOptions })
 }
 
-export async function runPolicyAction<T extends PolicyActionType>(action: T, payload = {} as PolicyActionPayloadMap[T]) {
-  await getIntegrationQueue().add(action, { contract: 'policy', action, payload }, getJobOptions(action))
+export async function runPolicyAction<T extends PolicyActionType>(
+  action: T,
+  payload = {} as PolicyActionPayloadMap[T],
+  jobOptions: JobsOptions = {}
+) {
+  await getIntegrationQueue().add(action, { contract: 'policy', action, payload }, { ...getJobOptions(action), ...jobOptions })
 }
 
 export interface IntegrationRuntimeDependencies {

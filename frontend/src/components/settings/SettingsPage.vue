@@ -20,6 +20,12 @@
               {{ t('labels.' + _entry) }}
             </span>
           </li>
+          <li class="border-top my-3"></li>
+          <li v-for="_entry in integrationSettings" class="nav-item">
+            <span :class="'nav-link clickable ' + (_entry === entry ? 'active' : 'link-body-emphasis')" @click="entry = _entry">
+              {{ t('labels.' + _entry) }}
+            </span>
+          </li>
         </ul>
       </div>
     </div>
@@ -29,8 +35,10 @@
         <SettingsForm v-if="entry === 'settings'" />
         <ConnectionSettingsForm v-else-if="entry === 'connectionSettings'" />
         <DisplaySettingsForm v-else-if="entry === 'displaySettings'" />
+        <IntegrationScheduleForm v-else-if="entry === 'lumpSums'" integrationKey="lumpSums" scheduleKey="sync" />
         <TravelSettingsForm v-else-if="entry === 'travelSettings'" />
         <PrinterSettingsForm v-else-if="entry === 'printerSettings'" />
+        <IntegrationScheduleForm v-else-if="entry === 'retentionPolicy'" integrationKey="retentionPolicy" scheduleKey="apply" />
         <StatsPage v-else-if="entry === 'stats'" />
         <AdminTools v-else-if="entry === 'adminTools'" />
         <template v-else-if="entry === 'users'">
@@ -131,6 +139,7 @@ import CountryList from '@/components/settings/elements/CountryList.vue'
 import CurrencyList from '@/components/settings/elements/CurrencyList.vue'
 import DisplaySettingsForm from '@/components/settings/elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from '@/components/settings/elements/HealthInsuranceList.vue'
+import IntegrationScheduleForm from '@/components/settings/elements/IntegrationScheduleForm.vue'
 import OrganisationList from '@/components/settings/elements/OrganisationList.vue'
 import PrinterSettingsForm from '@/components/settings/elements/PrinterSettingsForm.vue'
 import ProjectList from '@/components/settings/elements/ProjectList.vue'
@@ -154,7 +163,9 @@ const settings = ['travelSettings', 'connectionSettings', 'displaySettings', 'pr
 
 const utils = ['stats', 'adminTools'] as const
 
-type Entry = (typeof items)[number] | (typeof settings)[number] | (typeof utils)[number]
+const integrationSettings = ['lumpSums', 'retentionPolicy'] as const
+
+type Entry = (typeof items)[number] | (typeof settings)[number] | (typeof utils)[number] | (typeof integrationSettings)[number]
 
 const APP_DATA = APP_LOADER.data
 const entry = ref('users' as Entry)
