@@ -1,31 +1,13 @@
-import ENV from '@/env.js'
+import { registerSW } from 'virtual:pwa-register'
 
-if ('serviceWorker' in navigator) {
-  const isProductionMode = ENV.MODE === 'production'
-  const swUrl = isProductionMode ? '/sw.js' : '/dev-sw.js?dev-sw'
-  const swType = isProductionMode ? 'classic' : 'module'
-
-  navigator.serviceWorker
-    .register(swUrl, { type: swType, updateViaCache: 'imports' })
-    .then(async (registration) => {
-      // Gleich nach der Registration eine Update-Prüfung anstoßen
-      await registration.update()
-
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing
-        if (!newWorker) return
-
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            newWorker.postMessage({ type: 'SKIP_WAITING' })
-          }
-        })
-      })
-
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('🆕 Neuer Service Worker aktiv!')
-        window.location.reload()
-      })
-    })
-    .catch((err) => console.error('SW-Registration fehlgeschlagen:', err))
+if (import.meta.env.PROD) {
+  registerSW({
+    immediate: true,
+    onRegisteredSW: async (_swUrl: string, registration: ServiceWorkerRegistration | undefined) => {
+      await registration?.update()
+    },
+    onRegisterError: (error: unknown) => {
+      console.error('SW registration failed:', error)
+    }
+  })
 }
