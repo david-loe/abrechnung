@@ -1,13 +1,19 @@
 import { IntegrationSettings } from 'abrechnung-common/types.js'
 import { NotFoundError } from '../controller/error.js'
-import IntegrationSettingsModel, { normalizeIntegrationSchedulesForPersistence } from '../models/integrationSettings.js'
+import IntegrationSettingsModel from '../models/integrationSettings.js'
 import { getIntegrationDefinition } from './registry.js'
 
-export function buildDefaultIntegrationSettings(integrationKey: string): IntegrationSettings {
+function requireIntegrationDefinition(integrationKey: string) {
   const definition = getIntegrationDefinition(integrationKey)
   if (!definition) {
     throw new NotFoundError(`No integration found for key '${integrationKey}'.`)
   }
+
+  return definition
+}
+
+export function buildDefaultIntegrationSettings(integrationKey: string): IntegrationSettings {
+  const definition = requireIntegrationDefinition(integrationKey)
 
   return {
     integrationKey,
@@ -22,10 +28,7 @@ export function buildDefaultIntegrationSettings(integrationKey: string): Integra
 }
 
 export async function getResolvedIntegrationSettings(integrationKey: string): Promise<IntegrationSettings> {
-  const definition = getIntegrationDefinition(integrationKey)
-  if (!definition) {
-    throw new NotFoundError(`No integration found for key '${integrationKey}'.`)
-  }
+  const definition = requireIntegrationDefinition(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)
   const stored = (await IntegrationSettingsModel.findOne({ integrationKey }, { __v: 0 }).lean()) as IntegrationSettings | null
@@ -46,10 +49,7 @@ export async function getResolvedIntegrationSettings(integrationKey: string): Pr
 }
 
 export async function saveIntegrationSettings(integrationKey: string, settings: IntegrationSettings) {
-  const definition = getIntegrationDefinition(integrationKey)
-  if (!definition) {
-    throw new NotFoundError(`No integration found for key '${integrationKey}'.`)
-  }
+  const definition = requireIntegrationDefinition(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)
   const normalized = {
@@ -64,9 +64,9 @@ export async function saveIntegrationSettings(integrationKey: string, settings: 
 
   await IntegrationSettingsModel.findOneAndUpdate(
     { integrationKey },
-    { integrationKey, schedules: normalizeIntegrationSchedulesForPersistence(normalized.schedules) },
+    { integrationKey, schedules: normalized.schedules },
     { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
   )
 
-  return await getResolvedIntegrationSettings(integrationKey)
+  return getResolvedIntegrationSettings(integrationKey)
 }

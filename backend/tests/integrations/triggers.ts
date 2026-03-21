@@ -12,15 +12,19 @@ function stubQueue(
   setIntegrationQueueForTests({
     add: (options.onAdd ?? (async () => ({}) as never)) as never,
     close: async () => {},
-    getJob: async () =>
-      options.existingJobState
-        ? ({
-            getState: async () => options.existingJobState!,
-            remove: async () => {
-              removedStates.push(options.existingJobState!)
-            }
-          } as never)
-        : undefined
+    getJob: async () => {
+      const existingJobState = options.existingJobState
+      if (!existingJobState) {
+        return undefined
+      }
+
+      return {
+        getState: async () => existingJobState,
+        remove: async () => {
+          removedStates.push(existingJobState)
+        }
+      } as never
+    }
   })
   t.teardown(() => {
     setIntegrationQueueForTests(undefined)

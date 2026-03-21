@@ -69,7 +69,7 @@ export async function sendMail(
   const plainText = `${salutation}\n\n${paragraph}\n\n${button ? `${button.text}: ${button.link}\n\n` : ''}${lastParagraph ? `${Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph}\n\n` : ''}${regards}\n\n${app.name}: ${app.url}`
 
   logger.debug(`Send mail to ${recipient.email}`)
-  return await mailClient.sendMail({
+  return mailClient.sendMail({
     from: `"${app.name}" <${mailClient.options.from}>`,
     to: recipient.email,
     subject: subject,

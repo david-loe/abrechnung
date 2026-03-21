@@ -1,4 +1,4 @@
-import { IntegrationSettings, Schedule } from 'abrechnung-common/types.js'
+import { IntegrationSettings } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
 import { isValidSchedule } from '../integrations/schedules.js'
 
@@ -20,9 +20,3 @@ const schema = new Schema<IntegrationSettings<Types.ObjectId>>({
 })
 
 export default model<IntegrationSettings<Types.ObjectId>>('IntegrationSettings', schema)
-
-export function normalizeIntegrationSchedulesForPersistence(
-  schedules: IntegrationSettings['schedules']
-): Record<string, { enabled: boolean; schedule: Schedule }> {
-  return Object.fromEntries(Object.entries(schedules).map(([scheduleKey, value]) => [scheduleKey, { ...value }]))
-}
