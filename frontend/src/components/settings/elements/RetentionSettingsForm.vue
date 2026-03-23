@@ -3,8 +3,8 @@
     :schema="schema"
     ref="form"
     :endpoint="false"
-    @submit="(form$: any) => postRetentionSettings(form$.data)"
-    @keydown.ctrl.s.prevent="(event: KeyboardEvent) => { event.repeat ? null : postRetentionSettings(formRef?.data as any) }" />
+    @submit="(form$: any) => postRetentionSettings(form$.requestData)"
+    @keydown.ctrl.s.prevent="(event: KeyboardEvent) => { event.repeat ? null : postRetentionSettings((formRef?.requestData ?? {}) as any) }" />
 </template>
 
 <script lang="ts" setup>
@@ -19,6 +19,18 @@ const schema = ref({})
 
 const formRef = useTemplateRef('form')
 
+function buildSchedulerSchema(scheduleSchema: VueformSchema | undefined): VueformSchema {
+  return {
+    ...(scheduleSchema ?? {}),
+    type: 'schedule',
+    addClasses: {
+      ...((scheduleSchema?.addClasses as object | undefined) ?? {}),
+      ElementLabel: { wrapper: 'h5' },
+      ElementLayout: { container: 'mb-2' }
+    }
+  }
+}
+
 async function postRetentionSettings(settings: RetentionSettings) {
   const result = await API.setter<RetentionSettings<string>>('admin/retentionSettings', settings)
   if (result.ok) {
@@ -27,12 +39,17 @@ async function postRetentionSettings(settings: RetentionSettings) {
 }
 
 function loadRetentionSettings(settings: RetentionSettings) {
-  //@ts-expect-error is wrongly typed as Vueform and not VueformElement
-  queueMicrotask(() => (formRef.value as VueformElement).load(settings, false))
+  queueMicrotask(() => {
+    const form = formRef.value as VueformElement | null
+    form?.load({ retentionPolicy: settings.retentionPolicy, scheduler: { enabled: settings.enabled, schedule: settings.schedule } }, true)
+  })
 }
 
 onMounted(async () => {
-  schema.value = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/retentionSettings/form')).ok?.data, {
+  const baseSchema = (await API.getter<{ [key: string]: VueformSchema }>('admin/retentionSettings/form')).ok?.data ?? {}
+  const { enabled: _enabled, schedule, ...restSchema } = baseSchema
+
+  schema.value = Object.assign({}, { scheduler: buildSchedulerSchema(schedule) }, restSchema, {
     buttons: {
       type: 'group',
       schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }

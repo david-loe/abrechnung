@@ -6,7 +6,6 @@ export const adminSectionGroups = [
 ] as const
 
 export type AdminSectionGroupId = (typeof adminSectionGroups)[number]['id']
-export type AdminSearchKeywordKey = `settingsSearch.${string}`
 
 export type AdminSubsection = { id: string; labelKey: `labels.${string}`; keywords: string[] }
 
@@ -28,6 +27,8 @@ export type AdminSectionId =
   | 'retentionPolicy'
   | 'stats'
   | 'adminTools'
+
+export type AdminSearchKeywordKey = `settingsSearch.${AdminSectionId}`
 
 export type AdminSection = {
   id: AdminSectionId

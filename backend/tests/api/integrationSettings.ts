@@ -8,6 +8,8 @@ import createAgent, { loginUser } from '../_agent.js'
 const agent = await createAgent()
 await loginUser(agent, 'admin')
 
+type NewIntegrationSettings = Omit<IntegrationSettings, '_id'>
+
 test.serial('GET /admin/integrationSettings/lumpSums returns the default schedule configuration', async (t) => {
   await IntegrationSettingsModel.deleteOne({ integrationKey: 'lumpSums' })
   const res = await agent.get('/admin/integrationSettings/lumpSums')
@@ -18,8 +20,7 @@ test.serial('GET /admin/integrationSettings/lumpSums returns the default schedul
 
 test.serial('POST /admin/integrationSettings/lumpSums persists updated schedule settings', async (t) => {
   await IntegrationSettingsModel.deleteOne({ integrationKey: 'lumpSums' })
-  const settings: IntegrationSettings = {
-    _id: '' as never,
+  const settings: NewIntegrationSettings = {
     integrationKey: 'lumpSums',
     schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } }
   }
@@ -37,8 +38,7 @@ test.serial('POST /admin/integrationSettings/lumpSums persists updated schedule 
 
 test.serial('POST /admin/integrationSettings/retentionPolicy persists weekly schedules via the retention settings adapter', async (t) => {
   await RetentionSettingsModel.deleteMany({})
-  const settings: IntegrationSettings = {
-    _id: '' as never,
+  const settings: NewIntegrationSettings = {
     integrationKey: 'retentionPolicy',
     schedules: { apply: { enabled: true, schedule: { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 } } }
   }

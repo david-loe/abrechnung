@@ -85,7 +85,7 @@ export async function getResolvedIntegrationSettings(integrationKey: string): Pr
   }
 }
 
-export async function saveIntegrationSettings(integrationKey: string, settings: IntegrationSettings) {
+export async function saveIntegrationSettings(integrationKey: string, settings: Omit<IntegrationSettings, '_id'>) {
   if (integrationKey === 'retentionPolicy') {
     const currentSettings = await getResolvedRetentionSettings()
     const scheduleSettings = settings.schedules?.apply ?? buildDefaultIntegrationSettings(integrationKey).schedules.apply

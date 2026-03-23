@@ -3,8 +3,8 @@
     :schema="schema"
     ref="form"
     :endpoint="false"
-    @submit="(form$: any) => save(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null : save(formRef?.data as any)}" />
+    @submit="(form$: any) => save(form$.requestData)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => { e.repeat ? null : save((formRef?.requestData ?? {}) as any) }" />
 </template>
 
 <script lang="ts" setup>
@@ -22,9 +22,23 @@ const integrationSettings = ref<IntegrationSettings<string> | null>(null)
 
 const formRef = useTemplateRef('form')
 
+function buildSchedulerSchema(scheduleSchema: VueformSchema | undefined): VueformSchema {
+  return {
+    ...(scheduleSchema ?? {}),
+    type: 'schedule',
+    addClasses: {
+      ...((scheduleSchema?.addClasses as object | undefined) ?? {}),
+      ElementLabel: { wrapper: 'h5' },
+      ElementLayout: { container: 'mb-2' }
+    }
+  }
+}
+
 function loadScheduleSettings(scheduleSettings: IntegrationScheduleSettings) {
-  //@ts-expect-error is wrongly typed as Vueform and not VueformElement
-  queueMicrotask(() => (formRef.value as VueformElement).load(scheduleSettings, false))
+  queueMicrotask(() => {
+    const form = formRef.value as VueformElement | null
+    form?.load({ scheduler: scheduleSettings }, true)
+  })
 }
 
 async function loadSettings() {
@@ -33,7 +47,9 @@ async function loadSettings() {
     API.getter<IntegrationSettings<string>>(`admin/integrationSettings/${props.integrationKey}`)
   ])
 
-  schema.value = Object.assign({}, schemaResult.ok?.data, {
+  const { enabled: _enabled, schedule, ...restSchema } = schemaResult.ok?.data ?? {}
+
+  schema.value = Object.assign({}, { scheduler: buildSchedulerSchema(schedule) }, restSchema, {
     buttons: {
       type: 'group',
       schema: { submit: { type: 'button', submits: true, buttonLabel: t('labels.save'), full: true, columns: { container: 6 } } }

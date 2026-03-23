@@ -5,13 +5,20 @@
     <aside
       class="settings-sidebar"
       :class="{ 'settings-sidebar--open': mobileNavigationOpen }"
-      :aria-hidden="!mobileNavigationOpen && isCompactViewport">
+      :aria-hidden="sidebarHidden"
+      :inert="sidebarHidden">
       <div
         class="settings-sidebar__inner offcanvas-body pt-lg-3"
         :class="{ 'settings-sidebar__inner--desktop-scroll': desktopSidebarShouldScroll }">
         <div class="d-flex align-items-center justify-content-between d-lg-none mb-3">
           <h2 class="h5 mb-0">{{ t('labels.contents') }}</h2>
-          <button class="btn btn-light btn-sm" type="button" @click="mobileNavigationOpen = false"><i class="bi bi-x-lg"></i></button>
+          <button
+            class="btn btn-light btn-sm"
+            type="button"
+            :tabindex="sidebarHidden ? -1 : undefined"
+            @click="mobileNavigationOpen = false">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
 
         <div class="settings-sidebar__search">
@@ -21,7 +28,8 @@
             v-model="searchQuery"
             class="form-control"
             type="search"
-            :placeholder="`${t('labels.search')}...`" >
+            :placeholder="`${t('labels.search')}...`"
+            :tabindex="sidebarHidden ? -1 : undefined" >
         </div>
 
         <div class="settings-sidebar__content">
@@ -33,6 +41,7 @@
                   class="nav-link w-100 text-start"
                   :class="item.section.id === activeSection.id ? 'active' : 'link-body-emphasis'"
                   type="button"
+                  :tabindex="sidebarHidden ? -1 : undefined"
                   @click="navigateToSection(item.section)">
                   {{ t(item.section.labelKey) }}
                 </button>
@@ -43,6 +52,7 @@
                     class="btn btn-sm w-100 text-start settings-subsection-button"
                     :class="item.section.id === activeSection.id && activeHash === subsection.id ? 'settings-subsection-button--active' : ''"
                     type="button"
+                    :tabindex="sidebarHidden ? -1 : undefined"
                     @click="navigateToSection(item.section, subsection.id)">
                     {{ t(subsection.labelKey) }}
                   </button>
@@ -114,22 +124,18 @@ const searchQuery = ref('')
 const mobileNavigationOpen = ref(false)
 const viewportWidth = ref(window.innerWidth)
 const desktopSidebarShouldScroll = ref(false)
+const navBarOffset = ref(0)
 const settingsContainerRef = ref<HTMLElement | null>(null)
-let resizeObserver: ResizeObserver | null = null
+let settingsResizeObserver: ResizeObserver | null = null
+let navBarResizeObserver: ResizeObserver | null = null
 
 const isCompactViewport = computed(() => viewportWidth.value < bp.lg)
+const sidebarHidden = computed(() => !mobileNavigationOpen.value && isCompactViewport.value)
 const activeHash = computed(() => route.hash.replace(/^#/, ''))
 const activeSection = computed(() => getAdminSectionById(route.meta.adminSectionId as AdminSectionId | undefined) ?? defaultAdminSection)
 const activeGroup = computed(() => adminSectionGroups.find((group) => group.id === activeSection.value.group) ?? adminSectionGroups[0])
 const normalizedSearchQuery = computed(() => normalize(searchQuery.value.trim()))
-const rightMargin = computed(() => {
-  const container = document.getElementById('navBarContent')
-  let width = 0
-  if (container) {
-    width = container.getBoundingClientRect().right - container.getBoundingClientRect().width
-  }
-  return `${width}px`
-})
+const rightMargin = computed(() => `${navBarOffset.value}px`)
 
 function normalize(value: string) {
   return value
@@ -219,12 +225,24 @@ function updateDesktopSidebarLayout() {
   desktopSidebarShouldScroll.value = contentRect.height <= window.innerHeight - contentRect.top
 }
 
+function updateRightMargin() {
+  const navBarContent = document.getElementById('navBarContent')
+  if (!navBarContent) {
+    navBarOffset.value = 0
+    return
+  }
+
+  const { right, width } = navBarContent.getBoundingClientRect()
+  navBarOffset.value = Math.max(right - width, 0)
+}
+
 function handleResize() {
   viewportWidth.value = window.innerWidth
   if (viewportWidth.value >= bp.lg) {
     mobileNavigationOpen.value = false
   }
   updateDesktopSidebarLayout()
+  updateRightMargin()
 }
 
 watch(
@@ -238,16 +256,24 @@ watch(
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
-  resizeObserver = new ResizeObserver(() => updateDesktopSidebarLayout())
+  settingsResizeObserver = new ResizeObserver(() => updateDesktopSidebarLayout())
   if (settingsContainerRef.value) {
-    resizeObserver.observe(settingsContainerRef.value)
+    settingsResizeObserver.observe(settingsContainerRef.value)
+  }
+
+  navBarResizeObserver = new ResizeObserver(() => updateRightMargin())
+  const navBarContent = document.getElementById('navBarContent')
+  if (navBarContent) {
+    navBarResizeObserver.observe(navBarContent)
   }
   updateDesktopSidebarLayout()
+  updateRightMargin()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
-  resizeObserver?.disconnect()
+  settingsResizeObserver?.disconnect()
+  navBarResizeObserver?.disconnect()
 })
 
 await APP_LOADER.loadData()
