@@ -18,12 +18,6 @@ export default {
     user: true
   },
   disableReportType: { advance: false, expenseReport: false, healthCareCost: true, travel: false },
-  retentionPolicy: {
-    deleteApprovedTravelAfterXDaysUnused: 0,
-    deleteInWorkReportsAfterXDaysUnused: 0,
-    deleteBookedAfterXDays: 0,
-    mailXDaysBeforeDeletion: 7
-  },
   uploadTokenExpireAfterSeconds: 600,
   userCanSeeAllProjects: true,
   onlyShowProjectNamesOnAssigned: false,

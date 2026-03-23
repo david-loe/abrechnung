@@ -1,6 +1,8 @@
-import { IntegrationSettings } from 'abrechnung-common/types.js'
+import { IntegrationSettings, Locale } from 'abrechnung-common/types.js'
 import { NotFoundError } from '../controller/error.js'
 import IntegrationSettingsModel from '../models/integrationSettings.js'
+import { getResolvedRetentionSettings, saveRetentionSettings } from '../models/retentionSettings.js'
+import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { getIntegrationDefinition } from './registry.js'
 
 function requireIntegrationDefinition(integrationKey: string) {
@@ -10,6 +12,32 @@ function requireIntegrationDefinition(integrationKey: string) {
   }
 
   return definition
+}
+
+function requireScheduledActionDefinition(integrationKey: string, scheduleKey: string) {
+  const definition = requireIntegrationDefinition(integrationKey)
+  const action = definition.scheduledActions.find((scheduledAction) => scheduledAction.scheduleKey === scheduleKey)
+  if (!action) {
+    throw new NotFoundError(`No schedule '${scheduleKey}' found for integration '${integrationKey}'.`)
+  }
+
+  return action
+}
+
+export function getIntegrationScheduleSettingsFormSchema(
+  integrationKey: string,
+  scheduleKey: string,
+  language: Locale | readonly Locale[]
+) {
+  requireIntegrationDefinition(integrationKey)
+  requireScheduledActionDefinition(integrationKey, scheduleKey)
+
+  return mongooseSchemaToVueformSchema(
+    { enabled: { type: Boolean, required: true }, schedule: { specialType: 'schedule', required: true, noColumn: true } },
+    language,
+    {},
+    false
+  )
 }
 
 export function buildDefaultIntegrationSettings(integrationKey: string): IntegrationSettings {
@@ -28,6 +56,15 @@ export function buildDefaultIntegrationSettings(integrationKey: string): Integra
 }
 
 export async function getResolvedIntegrationSettings(integrationKey: string): Promise<IntegrationSettings> {
+  if (integrationKey === 'retentionPolicy') {
+    const retentionSettings = await getResolvedRetentionSettings()
+    return {
+      integrationKey,
+      schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } },
+      _id: retentionSettings._id as never
+    }
+  }
+
   const definition = requireIntegrationDefinition(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)
@@ -49,6 +86,22 @@ export async function getResolvedIntegrationSettings(integrationKey: string): Pr
 }
 
 export async function saveIntegrationSettings(integrationKey: string, settings: IntegrationSettings) {
+  if (integrationKey === 'retentionPolicy') {
+    const currentSettings = await getResolvedRetentionSettings()
+    const scheduleSettings = settings.schedules?.apply ?? buildDefaultIntegrationSettings(integrationKey).schedules.apply
+    const retentionSettings = await saveRetentionSettings({
+      enabled: scheduleSettings.enabled,
+      schedule: scheduleSettings.schedule,
+      retentionPolicy: currentSettings.retentionPolicy
+    })
+
+    return {
+      integrationKey,
+      schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } },
+      _id: retentionSettings._id as never
+    }
+  }
+
   const definition = requireIntegrationDefinition(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)

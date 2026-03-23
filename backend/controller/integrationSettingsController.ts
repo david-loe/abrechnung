@@ -1,7 +1,11 @@
-import { IntegrationSettings as IIntegrationSettings } from 'abrechnung-common/types.js'
+import { IntegrationSettings as IIntegrationSettings, locales } from 'abrechnung-common/types.js'
 import { Body, Get, Path, Post, Route, Security, Tags } from 'tsoa'
 import { reloadIntegrationSchedules } from '../integrations/schedulerManager.js'
-import { getResolvedIntegrationSettings, saveIntegrationSettings } from '../integrations/settings.js'
+import {
+  getIntegrationScheduleSettingsFormSchema,
+  getResolvedIntegrationSettings,
+  saveIntegrationSettings
+} from '../integrations/settings.js'
 import { Controller } from './controller.js'
 
 @Tags('Integration Settings')
@@ -12,6 +16,11 @@ export class IntegrationSettingsController extends Controller {
   @Get('{integrationKey}')
   public async get(@Path() integrationKey: string) {
     return { data: await getResolvedIntegrationSettings(integrationKey) }
+  }
+
+  @Get('{integrationKey}/form/{scheduleKey}')
+  public async getForm(@Path() integrationKey: string, @Path() scheduleKey: string) {
+    return { data: getIntegrationScheduleSettingsFormSchema(integrationKey, scheduleKey, locales) }
   }
 
   @Post('{integrationKey}')

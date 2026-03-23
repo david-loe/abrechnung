@@ -14,7 +14,7 @@ import {
   TravelState
 } from 'abrechnung-common/types.js'
 import { model } from 'mongoose'
-import { getSettings } from './db.js'
+import { getRetentionSettings } from './db.js'
 import ENV from './env.js'
 import { formatter } from './factory.js'
 import i18n from './i18n.js'
@@ -156,7 +156,7 @@ async function sendNotificationMails(report: ITravel | IExpenseReport | IHealthC
 
 export async function applyRetentionPolicy() {
   // NO BACKEND_CACHE bc only queried once a day
-  const settings = await getSettings()
+  const settings = await getRetentionSettings()
 
   await notificationMailForDeletions(settings.retentionPolicy)
   await triggerDeletion(settings.retentionPolicy)

@@ -48,9 +48,6 @@ export interface Settings<idType extends _id = _id> {
   preventOwnersFromDeletingReportsAfterReviewCompleted: boolean
   defaultAccess: { [key in Access]: boolean }
   disableReportType: { [key in ReportType]: boolean }
-  retentionPolicy: {
-    [key in RetentionType]: number
-  }
   uploadTokenExpireAfterSeconds: number
   isReadOnly: boolean
   version: string
@@ -153,6 +150,15 @@ export interface IntegrationScheduleSettings {
 export interface IntegrationSettings<idType extends _id = _id> {
   integrationKey: string
   schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
+  _id: idType
+}
+
+export interface RetentionSettings<idType extends _id = _id> {
+  enabled: boolean
+  schedule: Schedule
+  retentionPolicy: {
+    [key in RetentionType]: number
+  }
   _id: idType
 }
 

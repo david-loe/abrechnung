@@ -159,18 +159,19 @@ function mapSchemaTypeToVueformElement(
       vueformElement.rules.push('min:0')
     }
   } else if (typeof schemaType.type === 'object') {
-    const keys = Object.keys(schemaType.type).filter((key) => !schemaType.type[key].hide && !schemaType.type[key].meta)
+    const nestedSchema = schemaType.type instanceof Schema ? schemaType.type.obj : schemaType.type
+    const keys = Object.keys(nestedSchema).filter((key) => !nestedSchema[key].hide && !nestedSchema[key].meta)
     vueformElement.type = 'object'
     vueformElement.addClasses = { ElementLabel: { wrapper: 'h5' }, ElementLayout: { container: 'mb-2' } }
-    if (keys.length > 1 && isNotNestedObject(schemaType.type)) {
+    if (keys.length > 1 && isNotNestedObject(nestedSchema)) {
       vueformElement.schema = mongooseSchemaToVueformSchema(
-        schemaType.type,
+        nestedSchema,
         language,
         { columns: { xl: 12 / (keys.length > 3 ? 4 : keys.length), lg: 12 / (keys.length > 2 ? 3 : keys.length), sm: 6 } },
         false
       )
     } else {
-      vueformElement.schema = mongooseSchemaToVueformSchema(schemaType.type, language, {}, false)
+      vueformElement.schema = mongooseSchemaToVueformSchema(nestedSchema, language, {}, false)
     }
   } else {
     throw new Error(`No Type for conversion found for: ${labelStr} (${schemaType.type})`)

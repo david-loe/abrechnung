@@ -2,6 +2,7 @@ import { IntegrationSettings } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
+import RetentionSettingsModel from '../../models/retentionSettings.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -34,8 +35,8 @@ test.serial('POST /admin/integrationSettings/lumpSums persists updated schedule 
   t.deepEqual(storedSchedule, { enabled: true, schedule: { type: 'everyXHour', value: 6 } })
 })
 
-test.serial('POST /admin/integrationSettings/retentionPolicy persists weekly schedules', async (t) => {
-  await IntegrationSettingsModel.deleteOne({ integrationKey: 'retentionPolicy' })
+test.serial('POST /admin/integrationSettings/retentionPolicy persists weekly schedules via the retention settings adapter', async (t) => {
+  await RetentionSettingsModel.deleteMany({})
   const settings: IntegrationSettings = {
     _id: '' as never,
     integrationKey: 'retentionPolicy',
@@ -46,6 +47,11 @@ test.serial('POST /admin/integrationSettings/retentionPolicy persists weekly sch
 
   t.is(postRes.status, 200)
   t.deepEqual(postRes.body.result.schedules.apply, { enabled: true, schedule: { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 } })
+
+  const stored = await RetentionSettingsModel.findOne({}, { __v: 0 }).lean()
+  t.true(Boolean(stored))
+  t.is(stored?.enabled, true)
+  t.deepEqual(stored?.schedule, { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 })
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
