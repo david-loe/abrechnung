@@ -49,7 +49,11 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<ApprovedTravel, A
 
 schema.statics.addOrUpdate = async function (travel: Travel<Types.ObjectId, mongo.Binary>): Promise<ApprovedTravel<Types.ObjectId>> {
   const converted = convert(travel)
-  return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
+  return await this.findOneAndUpdate(
+    { reportId: converted.reportId },
+    { $set: converted },
+    { upsert: true, returnDocument: 'after' }
+  ).lean()
 }
 
 export default model<ApprovedTravel, ApprovedTravelModelType>('ApprovedTravel', schema)

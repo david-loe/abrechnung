@@ -31,7 +31,7 @@ export class AdminToolController extends Controller {
     }
   ) {
     const model = mongoose.model<{ name: string; owner: UserSimple; project: ProjectSimple; reference: number }>(requestBody.type)
-    const report = await model.findOneAndUpdate({ reference: requestBody.ref }, requestBody.data, { new: true }).lean()
+    const report = await model.findOneAndUpdate({ reference: requestBody.ref }, requestBody.data, { returnDocument: 'after' }).lean()
     if (!report) {
       throw new NotFoundError(`No ${requestBody.type} with ref: '${requestBody.ref}' found`)
     }

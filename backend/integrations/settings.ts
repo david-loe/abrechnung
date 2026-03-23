@@ -118,7 +118,7 @@ export async function saveIntegrationSettings(integrationKey: string, settings: 
   await IntegrationSettingsModel.findOneAndUpdate(
     { integrationKey },
     { integrationKey, schedules: normalized.schedules },
-    { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+    { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true }
   )
 
   return getResolvedIntegrationSettings(integrationKey)

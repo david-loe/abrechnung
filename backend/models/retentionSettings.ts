@@ -85,7 +85,12 @@ export async function saveRetentionSettings(settings: Pick<RetentionSettings, 'e
     retentionPolicy: normalizeRetentionPolicy(settings.retentionPolicy)
   }
 
-  await RetentionSettingsModel.findOneAndUpdate({}, normalized, { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true })
+  await RetentionSettingsModel.findOneAndUpdate({}, normalized, {
+    upsert: true,
+    returnDocument: 'after',
+    runValidators: true,
+    setDefaultsOnInsert: true
+  })
 
   return getResolvedRetentionSettings()
 }
