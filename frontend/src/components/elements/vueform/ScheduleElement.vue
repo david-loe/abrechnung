@@ -1,5 +1,5 @@
 <template>
-  <component :is="elementLayout" :multiple="true" ref="container">
+  <component :is="elementLayout" :multiple="true" class="schedule-element" ref="container">
     <template #element>
       <div class="row g-3">
         <div class="col-12">
@@ -262,13 +262,13 @@ export default defineElement({
 </script>
 
 <style>
-.vf-checkboxgroup-wrapper[aria-labelledby$=".weekdays__label"] {
+.schedule-element .vf-checkboxgroup-wrapper[aria-labelledby$=".weekdays__label"] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
 }
 
-.vf-checkboxgroup-wrapper[aria-labelledby$=".weekdays__label"] .vf-checkbox-container {
+.schedule-element .vf-checkboxgroup-wrapper[aria-labelledby$=".weekdays__label"] .vf-checkbox-container {
   display: inline-flex;
   width: auto;
   align-items: center;

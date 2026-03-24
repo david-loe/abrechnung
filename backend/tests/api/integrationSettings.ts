@@ -1,6 +1,6 @@
-import { IntegrationSettings } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
+import { IntegrationSettingsPayload } from '../../integrations/settings.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
 import RetentionSettingsModel from '../../models/retentionSettings.js'
 import createAgent, { loginUser } from '../_agent.js'
@@ -8,7 +8,7 @@ import createAgent, { loginUser } from '../_agent.js'
 const agent = await createAgent()
 await loginUser(agent, 'admin')
 
-type NewIntegrationSettings = Omit<IntegrationSettings, '_id'>
+type NewIntegrationSettings = IntegrationSettingsPayload
 
 test.serial('GET /admin/integrationSettings/lumpSums returns the default schedule configuration', async (t) => {
   await IntegrationSettingsModel.deleteOne({ integrationKey: 'lumpSums' })

@@ -15,10 +15,11 @@ import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
 
 const props = defineProps<{ integrationKey: string; scheduleKey: string }>()
+type IntegrationSettingsPayload = Omit<IntegrationSettings<string>, '_id'>
 
 const { t } = useI18n()
 const schema = ref({})
-const integrationSettings = ref<IntegrationSettings<string> | null>(null)
+const integrationSettings = ref<IntegrationSettingsPayload | null>(null)
 
 const formRef = useTemplateRef('form')
 
@@ -44,7 +45,7 @@ function loadScheduleSettings(scheduleSettings: IntegrationScheduleSettings) {
 async function loadSettings() {
   const [schemaResult, settingsResult] = await Promise.all([
     API.getter<{ [key: string]: VueformSchema }>(`admin/integrationSettings/${props.integrationKey}/form/${props.scheduleKey}`),
-    API.getter<IntegrationSettings<string>>(`admin/integrationSettings/${props.integrationKey}`)
+    API.getter<IntegrationSettingsPayload>(`admin/integrationSettings/${props.integrationKey}`)
   ])
 
   const { enabled: _enabled, schedule, ...restSchema } = schemaResult.ok?.data ?? {}
@@ -67,7 +68,7 @@ async function save(scheduleSettings: IntegrationScheduleSettings) {
     return
   }
 
-  const result = await API.setter<IntegrationSettings<string>>(`admin/integrationSettings/${props.integrationKey}`, {
+  const result = await API.setter<IntegrationSettingsPayload>(`admin/integrationSettings/${props.integrationKey}`, {
     ...integrationSettings.value,
     schedules: { ...integrationSettings.value.schedules, [props.scheduleKey]: scheduleSettings }
   })

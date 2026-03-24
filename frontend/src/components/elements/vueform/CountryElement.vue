@@ -54,10 +54,12 @@
         </span></template>
 
         <template v-slot:multiplelabel="{ values }">
-          <span class="ms-2 mt-1 me-auto"> <span v-for="value of values" class="me-3 text-nowrap" :title="value.name[$i18n.locale]">
-            <span v-if="value.flag" class="me-1">{{ value.flag }}</span>
-            <span>{{ value._id }}</span>
-          </span> </span>
+          <span class="ms-2 mt-1 me-auto">
+            <span v-for="value of values" :key="value._id" class="me-3 text-nowrap" :title="value.name[$i18n.locale]">
+              <span v-if="value.flag" class="me-1">{{ value.flag }}</span>
+              <span>{{ value._id }}</span>
+            </span>
+          </span>
         </template>
 
         <template v-slot:option="{ option }">

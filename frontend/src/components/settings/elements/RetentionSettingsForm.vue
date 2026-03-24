@@ -46,7 +46,12 @@ function loadRetentionSettings(settings: RetentionSettings) {
 }
 
 onMounted(async () => {
-  const baseSchema = (await API.getter<{ [key: string]: VueformSchema }>('admin/retentionSettings/form')).ok?.data ?? {}
+  const [schemaResult, retentionSettingsResult] = await Promise.all([
+    API.getter<{ [key: string]: VueformSchema }>('admin/retentionSettings/form'),
+    API.getter<RetentionSettings<string>>('admin/retentionSettings')
+  ])
+
+  const baseSchema = schemaResult.ok?.data ?? {}
   const { enabled: _enabled, schedule, ...restSchema } = baseSchema
 
   schema.value = Object.assign({}, { scheduler: buildSchedulerSchema(schedule) }, restSchema, {
@@ -56,9 +61,8 @@ onMounted(async () => {
     }
   })
 
-  const result = await API.getter<RetentionSettings<string>>('admin/retentionSettings')
-  if (result.ok) {
-    loadRetentionSettings(result.ok.data)
+  if (retentionSettingsResult.ok) {
+    loadRetentionSettings(retentionSettingsResult.ok.data)
   }
 })
 </script>

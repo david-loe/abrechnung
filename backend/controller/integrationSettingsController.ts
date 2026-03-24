@@ -1,9 +1,10 @@
-import { IntegrationSettings as IIntegrationSettings, locales } from 'abrechnung-common/types.js'
+import { locales } from 'abrechnung-common/types.js'
 import { Body, Get, Path, Post, Route, Security, Tags } from 'tsoa'
 import { reloadIntegrationSchedules } from '../integrations/schedulerManager.js'
 import {
   getIntegrationScheduleSettingsFormSchema,
   getResolvedIntegrationSettings,
+  type IntegrationSettingsPayload,
   saveIntegrationSettings
 } from '../integrations/settings.js'
 import { Controller } from './controller.js'
@@ -24,7 +25,7 @@ export class IntegrationSettingsController extends Controller {
   }
 
   @Post('{integrationKey}')
-  public async post(@Path() integrationKey: string, @Body() requestBody: Omit<IIntegrationSettings, '_id'>) {
+  public async post(@Path() integrationKey: string, @Body() requestBody: IntegrationSettingsPayload) {
     const result = await saveIntegrationSettings(integrationKey, { ...requestBody, integrationKey })
     await reloadIntegrationSchedules()
     return { message: 'alerts.successSaving', result }
