@@ -1,5 +1,8 @@
 import { defineConfig, VueformElement } from '@vueform/vueform'
-import vueform from '@vueform/vueform/dist/vueform'
+import bootstrap from '@vueform/vueform/dist/bootstrap'
+import '@vueform/vueform/dist/vueform.css'
+import '@vueform/vueform/dist/bootstrap.css'
+
 import de from '@vueform/vueform/locales/de'
 import en from '@vueform/vueform/locales/en'
 import CodeElement from '@/components/elements/vueform/CodeElement.vue'
@@ -10,6 +13,7 @@ import HealthinsuranceElement from '@/components/elements/vueform/Healthinsuranc
 import MixedElement from '@/components/elements/vueform/MixedElement.vue'
 import OrganisationElement from '@/components/elements/vueform/OrganisationElement.vue'
 import ProjectElement from '@/components/elements/vueform/ProjectElement.vue'
+import ScheduleElement from '@/components/elements/vueform/ScheduleElement.vue'
 import UserElement from '@/components/elements/vueform/UserElement.vue'
 import ENV from '@/env.js'
 import { getLanguageFromNavigator } from '@/i18n'
@@ -31,7 +35,7 @@ function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set
 }
 
 export default defineConfig({
-  theme: vueform,
+  theme: bootstrap,
   elements: [
     CountryElement,
     DocumentfileElement,
@@ -41,7 +45,8 @@ export default defineConfig({
     HealthinsuranceElement,
     UserElement,
     MixedElement,
-    CodeElement
+    CodeElement,
+    ScheduleElement
   ],
   locales: { de, en },
   locale: getLanguageFromNavigator(),

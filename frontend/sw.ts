@@ -17,6 +17,7 @@ declare let self: ServiceWorkerGlobalScope
 
 const BACKEND_URL = ENV.VITE_BACKEND_URL
 const FRONTEND_URL = ENV.VITE_FRONTEND_URL
+const IS_DEV_SERVICE_WORKER = self.location.pathname.endsWith('/dev-sw.js') || self.location.search.includes('dev-sw')
 
 // Routes denylist for SPA navigation
 const denylist = []
@@ -34,11 +35,17 @@ if (BACKEND_URL.startsWith(FRONTEND_URL)) {
 // -----------------------------------------------------------------------------
 // Install & Activate
 // -----------------------------------------------------------------------------
-precacheAndRoute(self.__WB_MANIFEST)
-cleanupOutdatedCaches()
-
 self.skipWaiting()
 clientsClaim()
+
+if (IS_DEV_SERVICE_WORKER) {
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(caches.keys().then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))))
+  })
+} else {
+  precacheAndRoute(self.__WB_MANIFEST)
+  cleanupOutdatedCaches()
+}
 
 // -----------------------------------------------------------------------------
 // Default handler
@@ -49,7 +56,9 @@ setDefaultHandler(new NetworkOnly())
 // Route registrations
 // -----------------------------------------------------------------------------
 // 1️⃣ HTML Navigation (Vue SPA)
-registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
+if (!IS_DEV_SERVICE_WORKER) {
+  registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { denylist }))
+}
 
 // 2️⃣ Static Assets
 registerRoute(({ request }) => request.destination === 'font', new StaleWhileRevalidate({ cacheName: 'font-cache' }))

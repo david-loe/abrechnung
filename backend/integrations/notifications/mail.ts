@@ -1,14 +1,15 @@
 import { Contact, User as IUser, Locale } from 'abrechnung-common/types.js'
 import ejs from 'ejs'
 import nodemailer from 'nodemailer'
-import { mapSmtpConfig } from '../data/settingsValidator.js'
-import { getConnectionSettings, getDisplaySettings } from '../db.js'
-import ENV from '../env.js'
-import { genAuthenticatedLink } from '../helper.js'
-import i18n, { updateI18n } from '../i18n.js'
-import { logger } from '../logger.js'
-import { getMailTemplate } from '../templates/cache.js'
-import { mailQueue } from '../workers/mail.js'
+import { mapSmtpConfig } from '../../data/settingsValidator.js'
+import { getConnectionSettings, getDisplaySettings } from '../../db.js'
+import ENV from '../../env.js'
+import { genAuthenticatedLink } from '../../helper.js'
+import i18n, { updateI18n } from '../../i18n.js'
+import { logger } from '../../logger.js'
+import { getMailTemplate } from '../../templates/cache.js'
+import { runOutboundAction } from '../runtime.js'
+import { NotificationEmailPayload } from '../types.js'
 
 export async function getClient() {
   // NO BACKEND_CACHE bc used in worker
@@ -42,7 +43,8 @@ export async function enqueueMail(
         })
       }
     }
-    await mailQueue.add('sendMail', { recipient, subject, paragraph, language, button: recipientButton, lastParagraph })
+    const payload: NotificationEmailPayload = { recipient, subject, paragraph, language, button: recipientButton, lastParagraph }
+    await runOutboundAction('notifications.email.send', payload)
   }
 }
 
@@ -67,11 +69,11 @@ export async function sendMail(
   const plainText = `${salutation}\n\n${paragraph}\n\n${button ? `${button.text}: ${button.link}\n\n` : ''}${lastParagraph ? `${Array.isArray(lastParagraph) ? lastParagraph.join('\n') : lastParagraph}\n\n` : ''}${regards}\n\n${app.name}: ${app.url}`
 
   logger.debug(`Send mail to ${recipient.email}`)
-  return await mailClient.sendMail({
-    from: `"${app.name}" <${mailClient.options.from}>`, // sender address
-    to: recipient.email, // list of receivers
-    subject: subject, // Subject line
-    text: plainText, // plain text body
-    html: renderedHTML // html body
+  return mailClient.sendMail({
+    from: `"${app.name}" <${mailClient.options.from}>`,
+    to: recipient.email,
+    subject: subject,
+    text: plainText,
+    html: renderedHTML
   })
 }

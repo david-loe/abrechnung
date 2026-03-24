@@ -6,7 +6,7 @@ import fr from './fr.json' with { type: 'json' }
 import kk from './kk.json' with { type: 'json' }
 import ru from './ru.json' with { type: 'json' }
 
-type Local = string | { [key: string]: Local }
+type Local = string | string[] | { [key: string]: Local }
 
 export function loadLocales(overwrite: { [key in Locale]?: { [key: string]: string } } = {}) {
   const messages = { de, en, fr, ru, es, kk }

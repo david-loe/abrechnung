@@ -103,7 +103,7 @@ const { t } = useI18n()
 
 const headers: Header[] = [
   { text: 'labels.name', value: 'name' },
-  { text: 'E-Mail', value: 'email' },
+  { text: 'labels.email', value: 'email' },
   { text: 'labels.projects', value: 'projects.assigned', sortable: true },
   { text: 'labels.access', value: 'access' },
   { text: '', value: 'buttons', width: 80 }

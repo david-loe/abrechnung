@@ -3,15 +3,11 @@ import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } 
 import { QueryFilter, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
+import { emitIntegrationEvent } from '../integrations/eventManager.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
-import { sendNotification } from '../notifications/notification.js'
-import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { runWebhooks } from '../webhooks/execute.js'
-import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -69,10 +65,7 @@ export class AdvanceController extends Controller {
     new Advance(extendedBody)
     return await this.setter(Advance, {
       requestBody: extendedBody,
-      cb: async (a: IAdvance<Types.ObjectId>) => {
-        await runWebhooks(a)
-        await sendNotification(a)
-      },
+      cb: async (a: IAdvance<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.submitted', report: a }),
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
         oldObject.state <= AdvanceState.APPLIED_FOR &&
@@ -93,7 +86,7 @@ export class AdvanceController extends Controller {
       allowNew: false,
       cb: async (a: IAdvance<Types.ObjectId>) => {
         a.state += 5
-        await runWebhooks(a)
+        await emitIntegrationEvent({ type: 'advance.received', report: a })
       },
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
@@ -177,14 +170,7 @@ export class AdvanceApproveController extends Controller {
           `${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
-    const cb = async (a: IAdvance<Types.ObjectId>) => {
-      await runWebhooks(a)
-      await sendNotification(a)
-      await sendViaMail(a)
-      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeReportToDisk(await writeToDiskFilePath(a), a)
-      }
-    }
+    const cb = async (a: IAdvance<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_completed', report: a })
 
     return await this.setter(Advance, {
       requestBody: extendedBody,
@@ -206,10 +192,7 @@ export class AdvanceApproveController extends Controller {
 
     return await this.setter(Advance, {
       requestBody: extendedBody,
-      cb: async (a: IAdvance<Types.ObjectId>) => {
-        await runWebhooks(a)
-        await sendNotification(a)
-      },
+      cb: async (a: IAdvance<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.rejected', report: a }),
       allowNew: false,
       checkOldObject: async (oldObject: AdvanceDoc) =>
         oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)

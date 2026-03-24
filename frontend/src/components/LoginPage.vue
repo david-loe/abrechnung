@@ -46,7 +46,7 @@
             placeholder=""
             v-model="magicLoginMail"
             required >
-          <label for="magicLoginMail">E-Mail</label>
+          <label for="magicLoginMail">{{ t('labels.email') }}</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
           <i class="bi bi-envelope-fill me-1"></i>
@@ -75,7 +75,7 @@
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.magiclogin" class="mt-4">
       <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
-        {{ t('labels.signInX', { X: 'E-Mail' }) }}
+        {{ t('labels.signInX', { X: t('labels.email') }) }}
       </button>
     </div>
   </div>

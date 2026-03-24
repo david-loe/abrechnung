@@ -2,30 +2,30 @@ import countries from 'abrechnung-common/data/countries.json' with { type: 'json
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
 import displaySettings from 'abrechnung-common/data/displaySettings.js'
 import printerSettings from 'abrechnung-common/print/printerSettings.js'
-import { addLumpSumsToCountries, LumpSumsJSON } from 'abrechnung-common/travel/lumpSums.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.js'
 import {
   accesses,
   ConnectionSettings as IConnectionSettings,
-  Country as ICountry,
   DisplaySettings as IDisplaySettings,
   PrinterSettings as IPrinterSettings,
+  RetentionSettings as IRetentionSettings,
   Settings as ISettings,
   TravelSettings as ITravelSettings,
   User as IUser,
   tokenAdminUser
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
-import axios from 'axios'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, HydratedDocument, Model } from 'mongoose'
+import mongoose, { Connection, Model } from 'mongoose'
 import { CACHE } from './data/cache.js'
 import connectionSettingsDev from './data/connectionSettings.development.js'
 import connectionSettingsProd from './data/connectionSettings.production.js'
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
+import retentionSettings from './data/retentionSettings.js'
 import settings from './data/settings.js'
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
+import { syncLumpSums } from './integrations/lumpSums/sync.js'
 import { logger } from './logger.js'
 import Category from './models/category.js'
 import Country from './models/country.js'
@@ -86,6 +86,10 @@ export async function initDB() {
     logger.info('Created Settings from Default')
   }
 
+  if ((await mongoose.connection.collection('retentionsettings').countDocuments()) === 0) {
+    await mongoose.connection.collection('retentionsettings').insertOne(retentionSettings satisfies Omit<IRetentionSettings, '_id'>)
+  }
+
   if ((await mongoose.connection.collection('travelsettings').countDocuments()) === 0) {
     await mongoose.connection.collection('travelsettings').insertOne(travelSettings satisfies Omit<ITravelSettings, '_id'>)
   }
@@ -120,7 +124,7 @@ export async function initDB() {
 
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
-  await fetchAndUpdateLumpSums()
+  await syncLumpSums()
   initer(HealthInsurance, 'health insurances', healthInsurances)
 
   const organisations = [{ name: 'My Organisation' }]
@@ -165,26 +169,6 @@ async function initer<T>(model: Model<T>, name: string, data: Partial<T>[], lean
   }
 }
 
-export async function fetchAndUpdateLumpSums() {
-  const pauschbetrag_api = 'https://cdn.jsdelivr.net/npm/pauschbetrag-api@1/ALL.json'
-  try {
-    const res = await axios.get<LumpSumsJSON>(pauschbetrag_api)
-    if (res.status === 200) {
-      await addLumpSumsToCountries(
-        res.data,
-        (id) => Country.findOne({ _id: id }),
-        async (c) => {
-          ;(c as HydratedDocument<ICountry>).markModified('lumpSums')
-          return (c as HydratedDocument<ICountry>).save()
-        }
-      )
-    }
-  } catch (error) {
-    logger.error(`Unable to fetch lump sums from: ${pauschbetrag_api}`, 'error')
-    logger.error(error, 'error')
-  }
-}
-
 export async function getSettings(init = true): Promise<ISettings> {
   await connectDB(init)
   const settings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
@@ -201,6 +185,15 @@ export async function getTravelSettings(init = true): Promise<ITravelSettings> {
     return travelSettings
   }
   throw Error('Travel Settings not found')
+}
+
+export async function getRetentionSettings(init = true): Promise<IRetentionSettings> {
+  await connectDB(init)
+  const retentionSettings = (await mongoose.connection.collection('retentionsettings').findOne()) as IRetentionSettings | null
+  if (retentionSettings) {
+    return retentionSettings
+  }
+  throw Error('Retention Settings not found')
 }
 
 export async function getPrinterSettings(init = true): Promise<IPrinterSettings> {

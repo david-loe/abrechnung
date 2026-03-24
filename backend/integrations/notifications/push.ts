@@ -2,12 +2,17 @@ import { User } from 'abrechnung-common/types.js'
 import { SessionData } from 'express-session'
 import { Types } from 'mongoose'
 import webpush, { WebPushError } from 'web-push'
-import { sessionStore } from '../db.js'
-import ENV from '../env.js'
-import { logger } from '../logger.js'
+import { sessionStore } from '../../db.js'
+import ENV from '../../env.js'
+import { logger } from '../../logger.js'
+import { runOutboundAction } from '../runtime.js'
 
 interface SessionWithSubscription extends SessionData {
   subscription: NonNullable<SessionData['subscription']>
+}
+
+export async function enqueuePushNotification(title: string, body: string, users: User<Types.ObjectId>[], url: string) {
+  await runOutboundAction('notifications.push.send', { title, body, users, url })
 }
 
 export async function sendPushNotification(title: string, body: string, users: User<Types.ObjectId>[], url: string) {

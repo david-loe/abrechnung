@@ -48,7 +48,11 @@ schema.index({ createdAt: 1 })
 
 schema.statics.addOrUpdate = async function (report: Report): Promise<ReportUsage<Types.ObjectId>> {
   const converted = convert(report)
-  return await this.findOneAndUpdate({ reportId: converted.reportId }, { $set: converted }, { upsert: true, new: true }).lean()
+  return await this.findOneAndUpdate(
+    { reportId: converted.reportId },
+    { $set: converted },
+    { upsert: true, returnDocument: 'after' }
+  ).lean()
 }
 
 export default model<ReportUsage, ReportUsageModelType>('ReportUsage', schema)

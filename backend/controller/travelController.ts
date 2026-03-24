@@ -13,16 +13,12 @@ import {
 import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import ENV from '../env.js'
 import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
+import { emitIntegrationEvent } from '../integrations/eventManager.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
-import { sendA1Notification, sendNotification } from '../notifications/notification.js'
-import { sendViaMail, writeToDiskFilePath } from '../pdf/helper.js'
-import { runWebhooks } from '../webhooks/execute.js'
-import { writeReportToDisk } from '../workers/saveReportOnDisk.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -180,10 +176,7 @@ export class TravelController extends Controller {
     }
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: async (t: ITravel<Types.ObjectId>) => {
-        await runWebhooks(t)
-        await sendNotification(t)
-      },
+      cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.submitted', report: t }),
       checkOldObject: async (oldObject: TravelDoc) =>
         !oldObject.historic &&
         oldObject.state <= TravelState.APPROVED &&
@@ -210,10 +203,7 @@ export class TravelController extends Controller {
       }
       cb = async (t: ITravel<Types.ObjectId>) => {
         if (!extendedBody._id) {
-          await runWebhooks(t)
-        }
-        if (t.isCrossBorder && t.destinationPlace.country.needsA1Certificate) {
-          await sendA1Notification(t)
+          await emitIntegrationEvent({ type: 'travel.directly_approved', report: t })
         }
       }
       Object.assign(extendedBody, { state: TravelState.APPROVED, editor: request.user._id, owner: request.user._id })
@@ -245,10 +235,7 @@ export class TravelController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: async (t: ITravel<Types.ObjectId>) => {
-        await runWebhooks(t)
-        await sendNotification(t)
-      },
+      cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: t }),
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
@@ -323,19 +310,10 @@ export class TravelApproveController extends Controller {
         travelApplication.name = `${travelApplication.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
-    const cb = async (t: ITravel<Types.ObjectId>) => {
-      if (!extendedBody._id) {
-        await runWebhooks(t)
-        await sendNotification(t)
-      }
-      if (t.isCrossBorder && t.destinationPlace.country.needsA1Certificate) {
-        await sendA1Notification(t)
-      }
-    }
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb,
+      cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'travel.approved', report: t }),
       allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
@@ -353,10 +331,7 @@ export class TravelApproveController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: async (t: ITravel<Types.ObjectId>) => {
-        await runWebhooks(t)
-        await sendNotification(t)
-      },
+      cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.rejected', report: t }),
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) =>
         oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
@@ -528,14 +503,7 @@ export class TravelExamineController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.REVIEW_COMPLETED, editor: request.user._id })
 
-    const cb = async (t: ITravel<Types.ObjectId>) => {
-      await runWebhooks(t)
-      await sendNotification(t)
-      await sendViaMail(t)
-      if (ENV.BACKEND_SAVE_REPORTS_ON_DISK) {
-        await writeReportToDisk(await writeToDiskFilePath(t), t)
-      }
-    }
+    const cb = async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_completed', report: t })
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
@@ -562,7 +530,7 @@ export class TravelExamineController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
-      cb: (e: ITravel) => sendNotification(e, 'BACK_TO_APPROVED'),
+      cb: (e: ITravel) => emitIntegrationEvent({ type: 'travel.back_to_approved', report: e }),
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
           await oldObject.saveToHistory()
@@ -582,10 +550,7 @@ export class TravelExamineController extends Controller {
 
     return await this.setter(Travel, {
       requestBody: extendedBody,
-      cb: async (t: ITravel<Types.ObjectId>) => {
-        await runWebhooks(t)
-        await sendNotification(t)
-      },
+      cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: t }),
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPROVED && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {

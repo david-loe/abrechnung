@@ -1,6 +1,6 @@
 import { Webhook, WebhookMethod, webhookMethods } from 'abrechnung-common/types.js'
 import ivm from 'isolated-vm'
-import ENV from '../env.js'
+import ENV from '../../env.js'
 
 export async function runUserScript(userScriptCode: string, input: unknown) {
   const isolate = new ivm.Isolate({ memoryLimit: ENV.WEBHOOK_SCRIPT_MEMORY_LIMIT_MB })
@@ -17,11 +17,9 @@ export async function runUserScript(userScriptCode: string, input: unknown) {
     if (typeof run !== 'function') { throw new Error('Script must define a function called \\'run\\''); }
     global.__run = run;
   `
-  // compile
   const script = await isolate.compileScript(wrapped)
   await script.run(context, { timeout: ENV.WEBHOOK_SCRIPT_COMPILE_TIMEOUT_MS })
 
-  // run
   const result = await context.global
     .get('__run', { reference: true })
     .then((ref) =>

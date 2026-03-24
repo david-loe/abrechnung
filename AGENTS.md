@@ -54,6 +54,7 @@ docker run abrechnung-frontend "npm run build"
 - Follow repository formatter/linter settings (Biome + existing frontend ESLint usage where applicable).
 - Respect TypeScript strict mode in all packages; do not weaken compiler settings.
 - Do not add explicit function return type annotations (`func(): Type`) unless the task explicitly requires them.
+- Prefer normal static `import` statements. Do not introduce dynamic `import()` for application code unless the task explicitly requires lazy loading and the reason is documented in the change.
 - Favor descriptive naming and small, cohesive functions.
 - Avoid hidden side effects and implicit behavior.
 - Keep diffs minimal and task-focused.

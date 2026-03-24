@@ -11,6 +11,7 @@ import BookHealthCareCostPage from '@/components/healthCareCost/BookPage.vue'
 import ExamineHealthCareCostPage from '@/components/healthCareCost/ExaminePage.vue'
 import HealthCareCostPage from '@/components/healthCareCost/HealthCareCostPage.vue'
 import LoginPage from '@/components/LoginPage.vue'
+import { adminSections, defaultAdminSection } from '@/components/settings/adminSections'
 import TravelApprovePage from '@/components/travel/ApprovePage.vue'
 import BookTravelPage from '@/components/travel/BookPage.vue'
 import ExamineTravelPage from '@/components/travel/ExaminePage.vue'
@@ -33,7 +34,17 @@ const routes = [
   {
     path: '/admin',
     component: () => import('@/components/settings/SettingsPage.vue'),
-    meta: { requiresAuth: true, requiresVueform: true }
+    meta: { requiresAuth: true, requiresVueform: true },
+    children: [
+      { path: '', redirect: { name: defaultAdminSection.routeName } },
+      { path: 'integrations/retention-policy', redirect: { name: 'admin-retention-policy' } },
+      ...adminSections.map((section) => ({
+        path: section.path,
+        name: section.routeName,
+        component: () => import('@/components/settings/AdminSettingsSection.vue'),
+        meta: { adminSectionId: section.id }
+      }))
+    ]
   },
   {
     path: '/approve/advance/:_id([0-9a-fA-F]{24})?',
