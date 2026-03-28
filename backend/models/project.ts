@@ -12,7 +12,15 @@ export const projectSchema = () =>
     organisation: { type: Schema.Types.ObjectId, ref: 'Organisation', required: true, index: true },
     name: { type: String, trim: true },
     budget: Object.assign({ description: 'in EUR' }, costObject(false, false, false, 0)),
-    balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, 0))
+    balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, 0)),
+    billableDefaults: {
+      type: {
+        transport: { type: Boolean, default: true, label: 'labels.transport' },
+        overnight: { type: Boolean, default: false, label: 'labels.overnight' },
+        expenses: { type: Boolean, default: false, label: 'labels.expenses' }
+      },
+      label: 'labels.billableDefaults'
+    }
   })
 
 const schema = projectSchema()

@@ -320,9 +320,16 @@ export interface ProjectSimpleWithName<idType extends _id = _id> extends Project
   name?: string
 }
 
+export interface BillableDefaults {
+  transport: boolean
+  overnight: boolean
+  expenses: boolean
+}
+
 export interface Project<idType extends _id = _id> extends ProjectSimpleWithName<idType> {
   balance: BaseCurrencyMoneyNotNull
   budget?: BaseCurrencyMoney
+  billableDefaults?: BillableDefaults
 }
 
 export interface ProjectUsers<idType extends _id = _id> {
@@ -420,6 +427,7 @@ export interface Stage<idType extends _id = _id, dataType extends binary = binar
   cost: Cost<idType, dataType>
   purpose: Purpose
   project?: ProjectSimple<idType> | null
+  billable?: boolean
   note?: string | null
   _id: idType
 }
@@ -428,6 +436,7 @@ export interface Expense<idType extends _id = _id, dataType extends binary = bin
   description: string
   cost: Cost<idType, dataType>
   project?: ProjectSimple<idType> | null
+  billable?: boolean
   note?: string | null
   _id: idType
 }

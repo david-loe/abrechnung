@@ -60,6 +60,7 @@ const travelSchema = () =>
           cost: costObject(true, true, false, 0),
           purpose: { type: String, enum: ['professional', 'mixed', 'private'], required: true, default: 'professional' },
           project: { type: Schema.Types.ObjectId, ref: 'Project' },
+          billable: { type: Boolean },
           note: { type: String }
         }
       ],
@@ -69,6 +70,7 @@ const travelSchema = () =>
           cost: costObject(true, true, true, undefined),
           purpose: { type: String, enum: ['professional', 'mixed'], required: true, default: 'professional' },
           project: { type: Schema.Types.ObjectId, ref: 'Project' },
+          billable: { type: Boolean },
           note: { type: String }
         }
       ],
