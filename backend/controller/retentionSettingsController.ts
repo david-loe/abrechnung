@@ -1,6 +1,6 @@
 import { RetentionSettings as IRetentionSettings, locales } from 'abrechnung-common/types.js'
 import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
-import { reloadIntegrationSchedules } from '../integrations/schedulerManager.js'
+import { reloadIntegrationSchedules } from '../integrations/scheduler.js'
 import { getResolvedRetentionSettings, getRetentionSettingsFormSchema, saveRetentionSettings } from '../models/retentionSettings.js'
 import { Controller } from './controller.js'
 

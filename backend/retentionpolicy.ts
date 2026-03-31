@@ -18,7 +18,7 @@ import { getRetentionSettings } from './db.js'
 import ENV from './env.js'
 import { formatter } from './factory.js'
 import i18n from './i18n.js'
-import { enqueueMail } from './integrations/notifications/mail.js'
+import { enqueueMail } from './integrations/notifications/email.js'
 import { logger } from './logger.js'
 import User from './models/user.js'
 

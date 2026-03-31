@@ -3,22 +3,22 @@ import { NotFoundError } from '../controller/error.js'
 import IntegrationSettingsModel from '../models/integrationSettings.js'
 import { getResolvedRetentionSettings, saveRetentionSettings } from '../models/retentionSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
-import { getIntegrationDefinition } from './registry.js'
+import { getScheduledIntegration } from './registry.js'
 
 export type IntegrationSettingsPayload = Omit<IntegrationSettings, '_id'>
 
-function requireIntegrationDefinition(integrationKey: string) {
-  const definition = getIntegrationDefinition(integrationKey)
-  if (!definition) {
+function requireScheduledIntegration(integrationKey: string) {
+  const integration = getScheduledIntegration(integrationKey)
+  if (!integration) {
     throw new NotFoundError(`No integration found for key '${integrationKey}'.`)
   }
 
-  return definition
+  return integration
 }
 
-function requireScheduledActionDefinition(integrationKey: string, scheduleKey: string) {
-  const definition = requireIntegrationDefinition(integrationKey)
-  const action = definition.scheduledActions.find((scheduledAction) => scheduledAction.scheduleKey === scheduleKey)
+function requireScheduledAction(integrationKey: string, scheduleKey: string) {
+  const integration = requireScheduledIntegration(integrationKey)
+  const action = integration.scheduledActions.find((scheduledAction) => scheduledAction.scheduleKey === scheduleKey)
   if (!action) {
     throw new NotFoundError(`No schedule '${scheduleKey}' found for integration '${integrationKey}'.`)
   }
@@ -31,8 +31,8 @@ export function getIntegrationScheduleSettingsFormSchema(
   scheduleKey: string,
   language: Locale | readonly Locale[]
 ) {
-  requireIntegrationDefinition(integrationKey)
-  requireScheduledActionDefinition(integrationKey, scheduleKey)
+  requireScheduledIntegration(integrationKey)
+  requireScheduledAction(integrationKey, scheduleKey)
 
   return mongooseSchemaToVueformSchema(
     { enabled: { type: Boolean, required: true }, schedule: { specialType: 'schedule', required: true, noColumn: true } },
@@ -43,12 +43,12 @@ export function getIntegrationScheduleSettingsFormSchema(
 }
 
 export function buildDefaultIntegrationSettings(integrationKey: string): IntegrationSettingsPayload {
-  const definition = requireIntegrationDefinition(integrationKey)
+  const integration = requireScheduledIntegration(integrationKey)
 
   return {
     integrationKey,
     schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
+      integration.scheduledActions.map((action) => [
         action.scheduleKey,
         { enabled: action.enabledByDefault, schedule: action.defaultSchedule }
       ])
@@ -62,7 +62,7 @@ export async function getResolvedIntegrationSettings(integrationKey: string): Pr
     return { integrationKey, schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } } }
   }
 
-  const definition = requireIntegrationDefinition(integrationKey)
+  const integration = requireScheduledIntegration(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)
   const stored = (await IntegrationSettingsModel.findOne({ integrationKey }, { __v: 0 }).lean()) as IntegrationSettings | null
@@ -76,7 +76,7 @@ export async function getResolvedIntegrationSettings(integrationKey: string): Pr
     ...defaults,
     ...storedWithoutId,
     schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
+      integration.scheduledActions.map((action) => [
         action.scheduleKey,
         stored.schedules?.[action.scheduleKey] ?? defaults.schedules[action.scheduleKey]
       ])
@@ -97,13 +97,13 @@ export async function saveIntegrationSettings(integrationKey: string, settings: 
     return { integrationKey, schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } } }
   }
 
-  const definition = requireIntegrationDefinition(integrationKey)
+  const integration = requireScheduledIntegration(integrationKey)
 
   const defaults = buildDefaultIntegrationSettings(integrationKey)
   const normalized = {
     integrationKey,
     schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
+      integration.scheduledActions.map((action) => [
         action.scheduleKey,
         settings.schedules?.[action.scheduleKey] ?? defaults.schedules[action.scheduleKey]
       ])

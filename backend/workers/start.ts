@@ -1,3 +1,3 @@
-import { startIntegrationWorker } from '../integrations/runtimeWorker.js'
+import { startIntegrationWorker } from '../integrations/worker.js'
 
 startIntegrationWorker()

@@ -3,7 +3,7 @@ import MagicLoginStrategy from 'passport-magic-login'
 import { NotAllowedError } from '../controller/error.js'
 import ENV from '../env.js'
 import i18n from '../i18n.js'
-import { enqueueMail } from '../integrations/notifications/mail.js'
+import { enqueueMail } from '../integrations/notifications/email.js'
 import User from '../models/user.js'
 
 const secret = ENV.MAGIC_LOGIN_SECRET

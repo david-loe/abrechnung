@@ -1,5 +1,5 @@
 import test from 'ava'
-import { emitIntegrationEvent, type RegisteredIntegration } from '../../integrations/events.js'
+import { type EventIntegration, emitIntegrationEvent } from '../../integrations/events.js'
 import { type IntegrationReport } from '../../integrations/types.js'
 
 function createReport(overrides: Record<string, unknown> = {}) {
@@ -26,7 +26,7 @@ function createIntegrations() {
     a1: [] as IntegrationReport[]
   }
 
-  const integrations: RegisteredIntegration[] = [
+  const integrations: EventIntegration[] = [
     {
       handles: (event) =>
         [
@@ -40,7 +40,7 @@ function createIntegrations() {
           'travel.approved',
           'advance.received'
         ].includes(event.type),
-      run: async (event) => {
+      runEvent: async (event) => {
         calls.webhooks.push(event.report as IntegrationReport)
       }
     },
@@ -55,7 +55,7 @@ function createIntegrations() {
           'travel.approved',
           'travel.back_to_approved'
         ].includes(event.type),
-      run: async (event) => {
+      runEvent: async (event) => {
         if (event.type === 'report.back_to_in_work') {
           calls.notifications.push({ report: event.report, textState: 'BACK_TO_IN_WORK' })
         } else if (event.type === 'travel.back_to_approved') {
@@ -67,19 +67,19 @@ function createIntegrations() {
     },
     {
       handles: (event) => event.type === 'report.review_completed',
-      run: async (event) => {
+      runEvent: async (event) => {
         calls.reportMails.push(event.report as IntegrationReport)
       }
     },
     {
       handles: (event) => event.type === 'report.review_completed',
-      run: async (event) => {
+      runEvent: async (event) => {
         calls.disk.push({ filePath: '/reports/test.pdf', report: event.report as IntegrationReport })
       }
     },
     {
       handles: (event) => ['travel.directly_approved', 'travel.approved'].includes(event.type),
-      run: async (event) => {
+      runEvent: async (event) => {
         const report = event.report as { isCrossBorder: boolean; destinationPlace: { country: { needsA1Certificate: boolean } } }
         if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
           calls.a1.push(event.report as IntegrationReport)

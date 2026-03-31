@@ -5,14 +5,31 @@ import webpush, { WebPushError } from 'web-push'
 import { sessionStore } from '../../db.js'
 import ENV from '../../env.js'
 import { logger } from '../../logger.js'
-import { runOutboundAction } from '../runtime.js'
+import { Integration } from '../integration.js'
 
 interface SessionWithSubscription extends SessionData {
   subscription: NonNullable<SessionData['subscription']>
 }
 
+class PushNotificationIntegration extends Integration {
+  public constructor() {
+    super('notifications.push')
+  }
+
+  public override async execute(operation: string, payload: unknown) {
+    if (operation !== 'send') {
+      return super.execute(operation, payload)
+    }
+
+    const notification = payload as { title: string; body: string; users: User<Types.ObjectId>[]; url: string }
+    await sendPushNotification(notification.title, notification.body, notification.users, notification.url)
+  }
+}
+
+export const pushNotificationIntegration = new PushNotificationIntegration()
+
 export async function enqueuePushNotification(title: string, body: string, users: User<Types.ObjectId>[], url: string) {
-  await runOutboundAction('notifications.push.send', { title, body, users, url })
+  await pushNotificationIntegration.enqueue('send', { title, body, users, url })
 }
 
 export async function sendPushNotification(title: string, body: string, users: User<Types.ObjectId>[], url: string) {

@@ -1,5 +1,5 @@
 import { CronJob } from 'cron'
-import { integrationDefinitions } from './registry.js'
+import { scheduledIntegrations } from './registry.js'
 import { scheduleToCronTime } from './schedules.js'
 import { getResolvedIntegrationSettings } from './settings.js'
 
@@ -24,16 +24,20 @@ export async function reloadIntegrationSchedules() {
 
   stopAllScheduledJobs()
 
-  for (const definition of integrationDefinitions) {
-    const settings = await getResolvedIntegrationSettings(definition.integrationKey)
-    for (const scheduledAction of definition.scheduledActions) {
+  for (const integration of scheduledIntegrations) {
+    const settings = await getResolvedIntegrationSettings(integration.key)
+    for (const scheduledAction of integration.scheduledActions) {
       const scheduleSettings = settings.schedules[scheduledAction.scheduleKey]
       if (!scheduleSettings?.enabled) {
         continue
       }
 
-      const jobKey = buildJobKey(definition.integrationKey, scheduledAction.scheduleKey)
-      const job = CronJob.from({ cronTime: scheduleToCronTime(scheduleSettings.schedule), onTick: scheduledAction.onTick, start: true })
+      const jobKey = buildJobKey(integration.key, scheduledAction.scheduleKey)
+      const job = CronJob.from({
+        cronTime: scheduleToCronTime(scheduleSettings.schedule),
+        onTick: () => integration.runScheduledAction(scheduledAction.scheduleKey),
+        start: true
+      })
       scheduledJobs.set(jobKey, job)
     }
   }

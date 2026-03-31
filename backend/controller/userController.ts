@@ -15,7 +15,7 @@ import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
-import { enqueueMail } from '../integrations/notifications/mail.js'
+import { enqueueMail } from '../integrations/notifications/email.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'

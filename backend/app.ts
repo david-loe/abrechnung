@@ -11,8 +11,8 @@ import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
 import i18n from './i18n.js'
-import { closeIntegrationQueue } from './integrations/runtime.js'
-import { stopIntegrationScheduler } from './integrations/schedulerManager.js'
+import { closeIntegrationQueue } from './integrations/queue.js'
+import { stopIntegrationScheduler } from './integrations/scheduler.js'
 import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
 

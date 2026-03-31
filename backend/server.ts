@@ -1,6 +1,6 @@
 import APP from './app.js'
 import ENV from './env.js'
-import { startIntegrationScheduler } from './integrations/schedulerManager.js'
+import { startIntegrationScheduler } from './integrations/scheduler.js'
 import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
 

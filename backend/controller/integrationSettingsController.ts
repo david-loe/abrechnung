@@ -1,6 +1,6 @@
 import { locales } from 'abrechnung-common/types.js'
 import { Body, Get, Path, Post, Route, Security, Tags } from 'tsoa'
-import { reloadIntegrationSchedules } from '../integrations/schedulerManager.js'
+import { reloadIntegrationSchedules } from '../integrations/scheduler.js'
 import {
   getIntegrationScheduleSettingsFormSchema,
   getResolvedIntegrationSettings,

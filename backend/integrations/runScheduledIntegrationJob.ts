@@ -1,5 +1,5 @@
 import { logger } from '../logger.js'
-import { getIntegrationQueue } from './runtime.js'
+import { getIntegrationQueue } from './queue.js'
 
 const NON_TERMINAL_STATES = ['active', 'waiting', 'delayed', 'prioritized', 'waiting-children']
 

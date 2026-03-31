@@ -1,7 +1,7 @@
 import test, { ExecutionContext } from 'ava'
-import { fetchAndUpdateLumpSums } from '../../integrations/lumpSums/trigger.js'
-import { retentionPolicy } from '../../integrations/policies/trigger.js'
-import { closeIntegrationQueue, setIntegrationQueueForTests } from '../../integrations/runtime.js'
+import { runLumpSumsSchedule } from '../../integrations/lumpSums/integration.js'
+import { closeIntegrationQueue, setIntegrationQueueForTests } from '../../integrations/queue.js'
+import { runRetentionPolicySchedule } from '../../integrations/retentionPolicy/integration.js'
 import { type IntegrationJobData } from '../../integrations/types.js'
 
 function stubQueue(
@@ -36,7 +36,7 @@ test.after.always(async () => {
   await closeIntegrationQueue()
 })
 
-test.serial('fetchAndUpdateLumpSums skips enqueueing when the scheduled job is still active', async (t) => {
+test.serial('runLumpSumsSchedule skips enqueueing when the scheduled job is still active', async (t) => {
   let addCalls = 0
   stubQueue(t, {
     existingJobState: 'active',
@@ -46,12 +46,12 @@ test.serial('fetchAndUpdateLumpSums skips enqueueing when the scheduled job is s
     }
   })
 
-  await fetchAndUpdateLumpSums()
+  await runLumpSumsSchedule()
 
   t.is(addCalls, 0)
 })
 
-test.serial('fetchAndUpdateLumpSums removes terminal jobs before enqueueing a fresh run', async (t) => {
+test.serial('runLumpSumsSchedule removes terminal jobs before enqueueing a fresh run', async (t) => {
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
   const { removedStates } = stubQueue(t, {
     existingJobState: 'completed',
@@ -61,17 +61,17 @@ test.serial('fetchAndUpdateLumpSums removes terminal jobs before enqueueing a fr
     }
   })
 
-  await fetchAndUpdateLumpSums()
+  await runLumpSumsSchedule()
 
   t.deepEqual(removedStates, ['completed'])
   t.deepEqual(captured, {
-    name: 'lump_sums.sync_in',
-    data: { contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} },
+    name: 'lumpSums.sync',
+    data: { integrationKey: 'lumpSums', operation: 'sync', payload: {} },
     opts: { jobId: 'schedule:lumpSums:sync', removeOnComplete: true, removeOnFail: true }
   })
 })
 
-test.serial('retentionPolicy skips enqueueing when the scheduled job is still waiting', async (t) => {
+test.serial('runRetentionPolicySchedule skips enqueueing when the scheduled job is still waiting', async (t) => {
   let addCalls = 0
   stubQueue(t, {
     existingJobState: 'waiting',
@@ -81,12 +81,12 @@ test.serial('retentionPolicy skips enqueueing when the scheduled job is still wa
     }
   })
 
-  await retentionPolicy()
+  await runRetentionPolicySchedule()
 
   t.is(addCalls, 0)
 })
 
-test.serial('retentionPolicy removes terminal jobs before enqueueing a fresh run', async (t) => {
+test.serial('runRetentionPolicySchedule removes terminal jobs before enqueueing a fresh run', async (t) => {
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
   const { removedStates } = stubQueue(t, {
     existingJobState: 'failed',
@@ -96,12 +96,12 @@ test.serial('retentionPolicy removes terminal jobs before enqueueing a fresh run
     }
   })
 
-  await retentionPolicy()
+  await runRetentionPolicySchedule()
 
   t.deepEqual(removedStates, ['failed'])
   t.deepEqual(captured, {
-    name: 'retention.apply',
-    data: { contract: 'policy', action: 'retention.apply', payload: {} },
+    name: 'retentionPolicy.apply',
+    data: { integrationKey: 'retentionPolicy', operation: 'apply', payload: {} },
     opts: { jobId: 'schedule:retentionPolicy:apply', removeOnComplete: true, removeOnFail: true }
   })
 })

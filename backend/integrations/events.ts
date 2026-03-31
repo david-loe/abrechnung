@@ -16,15 +16,15 @@ export type IntegrationEvent =
   | { type: 'travel.back_to_approved'; report: TravelEventTarget }
   | { type: 'advance.received'; report: Advance }
 
-export interface RegisteredIntegration {
+export interface EventIntegration {
   handles(event: IntegrationEvent): boolean
-  run(event: IntegrationEvent): Promise<void>
+  runEvent(event: IntegrationEvent): Promise<void>
 }
 
-export async function emitIntegrationEvent(event: IntegrationEvent, integrations: RegisteredIntegration[]) {
+export async function emitIntegrationEvent(event: IntegrationEvent, integrations: EventIntegration[]) {
   for (const integration of integrations) {
     if (integration.handles(event)) {
-      await integration.run(event)
+      await integration.runEvent(event)
     }
   }
 }
