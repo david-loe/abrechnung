@@ -8193,6 +8193,9 @@
 			},
 			"SetterPartial_PostOrganisation.NoPost_": {
 				"properties": {
+					"website": {
+						"type": "string"
+					},
 					"logo": {
 						"properties": {
 							"data": {
@@ -8230,9 +8233,6 @@
 					"subfolderPath": {
 						"type": "string"
 					},
-					"website": {
-						"type": "string"
-					},
 					"name": {
 						"type": "string"
 					},
@@ -8254,6 +8254,9 @@
 			},
 			"SetterPartial_Omit_IOrganisation_mongoose.Types.ObjectId_.logo_.NoPost_": {
 				"properties": {
+					"website": {
+						"type": "string"
+					},
 					"companyNumber": {
 						"type": "string"
 					},
@@ -8267,9 +8270,6 @@
 						"type": "string"
 					},
 					"subfolderPath": {
-						"type": "string"
-					},
-					"website": {
 						"type": "string"
 					},
 					"name": {
