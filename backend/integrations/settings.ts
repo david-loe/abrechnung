@@ -100,6 +100,7 @@ export async function getAllIntegrationSettings() {
   return await mongoose.connection
     .collection<IntegrationSettingsPayload>('integrationsettings')
     .find({}, { projection: { _id: 0, __v: 0 } })
+    .sort({ integrationKey: 1 })
     .toArray()
 }
 
