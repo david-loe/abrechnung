@@ -12,9 +12,8 @@ import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
 import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
 import ENV from '../../env.js'
-import { reportPrinter } from '../../factory.js'
-import { updateI18n } from '../../i18n.js'
 import Webhook from '../../models/webhook.js'
+import { renderReportPdf } from '../../pdf/report.js'
 import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { runUserScript } from './runScript.js'
@@ -82,15 +81,11 @@ export async function processWebhookJob({ webhookId, input }: WebhookJobData) {
       const lng = connectionSettings.PDFReportsViaEmail.locale
 
       const displaySettings = await getDisplaySettings(false)
-      updateI18n(displaySettings.locale)
-
       const printerSettings = await getPrinterSettings(false)
       const travelSettings = await getTravelSettings(false)
-      reportPrinter.setSettings(printerSettings)
-      reportPrinter.setTravelSettings(travelSettings)
       form.append(
         request.pdfFormFieldName,
-        new Blob([await reportPrinter.print(input, lng)], { type: 'application/pdf' }),
+        new Blob([await renderReportPdf(input, lng, { displaySettings, printerSettings, travelSettings })], { type: 'application/pdf' }),
         `${refNumberToString(input.reference, getModelNameFromReport(input))}.pdf`
       )
     }
